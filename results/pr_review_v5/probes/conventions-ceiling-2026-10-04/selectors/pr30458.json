@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P010",
+  "where": "div_eq_inv_self, div_left_injective, div_left_inj, div_eq_self, div_right_injective, div_right_inj, Finset.card_le_card_div_*, Set.finite_div, Set.infinite_div",
+  "why": "The whole PR weakens Group assumptions to DivInvMonoid/DivisionMonoid plus cancellation mixins, so results hold more generally."
+ },
+ {
+  "id": "P338",
+  "where": "PR description; all generalized declarations",
+  "why": "Generalizations proposed for their own sake with no intended use; extra typeclass mixins complicate the statements."
+ },
+ {
+  "id": "P041",
+  "where": "PR description",
+  "why": "Design change (generalizing assumptions) offered with no motivation: author states no intended use for it."
+ },
+ {
+  "id": "P038",
+  "where": "PR description",
+  "why": "Changes found by asking Codex; PR is AI-assisted and its disclosure of how is in the description."
+ },
+ {
+  "id": "P374",
+  "where": "div_left_injective, div_left_inj proofs; Finset and Set proofs",
+  "why": "AI-generated code with convoluted proofs (have + simpa + named-argument mul_right_cancel) submitted for review."
+ },
+ {
+  "id": "P333",
+  "where": "PR description",
+  "why": "Submitter says they lack the maturity to judge whether the Codex-generated generalizations are valuable or well done."
+ },
+ {
+  "id": "P332",
+  "where": "Basic.lean sections RightCancelDivInvMonoid/LeftCancelDivisionMonoid; Finset LeftCancel/RightCancel/DivisionMonoid; Set DivisionMonoid",
+  "why": "Declarations needing different typeclass assumptions are reorganised into new sections declaring each assumption set."
+ },
+ {
+  "id": "P369",
+  "where": "Finset/Basic.lean sections LeftCancel and RightCancel; trailing variable for card_le_card_div_self",
+  "why": "New sections and variable commands each serve a single lemma, rather than binding arguments in signatures."
+ },
+ {
+  "id": "P006",
+  "where": "Finset/Basic.lean, variable after end RightCancel",
+  "why": "Variable line [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t} duplicated from LeftCancel section."
+ },
+ {
+  "id": "P329",
+  "where": "div_eq_inv_self, div_eq_self, div_left_inj proofs; card_le_card_div_left/right proofs",
+  "why": "Moved declarations get rewritten proofs and reformatting beyond what the generalization requires."
+ },
+ {
+  "id": "P011",
+  "where": "div_left_inj, div_left_injective",
+  "why": "div_left_inj reproved by constructor instead of div_left_injective.eq_iff; injectivity reproved instead of library mul_right_injective-style lemmas."
+ },
+ {
+  "id": "P054",
+  "where": "div_left_injective, div_left_inj",
+  "why": "simpa using (mul_right_cancel ... h') wraps a term whose type already matches the goal."
+ },
+ {
+  "id": "P089",
+  "where": "div_left_injective, div_left_inj, div_right_inj, card_le_card_div_*, Set.finite_div, Set.infinite_div",
+  "why": "Named arguments (a := ...), (G := G), (b := b) passed where elaboration could infer them."
+ },
+ {
+  "id": "P084",
+  "where": "div_eq_inv_self, div_eq_self; Finset trailing variable line",
+  "why": "One-line proofs and a short variable command split across lines though they fit within 100 characters."
+ },
+ {
+  "id": "P040",
+  "where": "Finset.card_le_card_div_left, Finset.card_le_card_div_right",
+  "why": "Term-mode proofs replaced by short `by obtain ...; exact ...` tactic blocks a single term proves."
+ },
+ {
+  "id": "P139",
+  "where": "removed div_left_injective/div_right_injective FIXME comments",
+  "why": "FIXME comments dropped; div_right_injective still uses simp only + exact, so its FIXME may still apply."
+ },
+ {
+  "id": "P036",
+  "where": "div_left_injective, div_right_injective (implicit b)",
+  "why": "Implicit b in injectivity lemmas now must be pinned by (b := ...) at every use site."
+ },
+ {
+  "id": "P100",
+  "where": "div_left_* vs div_right_* lemmas; Finset LeftCancel/RightCancel",
+  "why": "Left/right sibling families generalized asymmetrically: DivInvMonoid+IsRightCancelMul versus DivisionMonoid+IsLeftCancelMul."
+ },
+ {
+  "id": "P098",
+  "where": "div_eq_inv_self, div_left_injective, div_left_inj, div_eq_self, div_right_injective, div_right_inj",
+  "why": "Declarations moved and generalised; their to_additive and simp attributes must carry over unchanged."
+ },
+ {
+  "id": "P322",
+  "where": "div_left_inj",
+  "why": "Iff proved with constructor followed by intro h in a bullet, rather than introducing hypotheses in the term."
+ },
+ {
+  "id": "P097",
+  "where": "div_left_inj",
+  "why": "`· rintro rfl; rfl` puts two tactics on one line with a semicolon."
+ },
+ {
+  "id": "P007",
+  "where": "Set/Finite.lean section variable",
+  "why": "Assumes [IsLeftCancelMul α] [IsRightCancelMul α] together, a conjunction the library names IsCancelMul."
+ },
+ {
+  "id": "P012",
+  "where": "Finset/Basic.lean sections LeftCancel, RightCancel",
+  "why": "New section commands immediately followed by variable commands with no separating blank line."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title 'misc. generalizations' does not say which lemmas are generalized or moved within Basic.lean."
+ },
+ {
+  "id": "P138",
+  "where": "whole PR",
+  "why": "Generalizations proposed for their own sake; benefit unclear relative to review cost of reorganised sections and proofs."
+ }
+]

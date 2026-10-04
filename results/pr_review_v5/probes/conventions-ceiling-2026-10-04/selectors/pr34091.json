@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P010",
+  "where": "Cardinal.infinite_pigeonhole_card_lt, Cardinal.exists_infinite_fiber (Pigeonhole.lean)",
+  "why": "The PR weakens hypotheses on the codomain (ℵ₀ ≤ #α, Infinite α) to hypotheses on the domain."
+ },
+ {
+  "id": "P392",
+  "where": "exists_infinite_fiber (hβ : Infinite β), exists_infinite_fiber' (hα : Infinite α), exists_uncountable_fiber (hβ : Uncountable β); callers pass (by infer_instance)",
+  "why": "Class-typed hypotheses Infinite/Uncountable are taken as named explicit arguments."
+ },
+ {
+  "id": "P113",
+  "where": "Cardinal.exists_infinite_fiber' (Pigeonhole.lean)",
+  "why": "New variant of exists_infinite_fiber distinguished only by an appended prime."
+ },
+ {
+  "id": "P029",
+  "where": "docstring of Cardinal.exists_infinite_fiber'",
+  "why": "Docstring says 'A weaker version of exists_infinite_fiber' instead of stating the result itself."
+ },
+ {
+  "id": "P139",
+  "where": "docstrings of infinite_pigeonhole_card_lt, exists_infinite_fiber, exists_uncountable_fiber; removed TODO above le_range_of_union_finset_eq_univ",
+  "why": "Docstrings rewritten for the new statements (domain vs codomain wording); a TODO removed as done."
+ },
+ {
+  "id": "P072",
+  "where": "le_range_of_union_finset_eq_top -> _eq_univ; old exists_infinite_fiber statement now under exists_infinite_fiber'",
+  "why": "A declaration is renamed and an existing lemma's statement moves to a new name."
+ },
+ {
+  "id": "P288",
+  "where": "Cardinal.le_range_of_union_finset_eq_univ and its deprecated alias",
+  "why": "Declaration renamed from _eq_top to _eq_univ with a deprecation for the old name."
+ },
+ {
+  "id": "P019",
+  "where": "Cardinal.le_range_of_union_finset_eq_univ",
+  "why": "Name changed from `top` to `univ` to match `Set.univ` in its statement."
+ },
+ {
+  "id": "P001",
+  "where": "Set.univ in le_range_of_union_finset_eq_univ; Cardinal.infinite_iff, Cardinal.aleph0_lt_mk_iff, Order.succ_le_iff in proofs inside namespace Cardinal",
+  "why": "New code writes namespace prefixes (Cardinal., Order., Set.) inside namespace Cardinal where unqualified names are already used."
+ },
+ {
+  "id": "P097",
+  "where": "Cardinal.exists_uncountable_fiber proof",
+  "why": "`(by rw [isRegular_aleph_one.cof_eq]; exact ...)` puts two tactics on one line with `;`."
+ },
+ {
+  "id": "P354",
+  "where": "Cardinal.exists_infinite_fiber' proof",
+  "why": "Two-line tactic block `(by rw ... exact ...)` embedded inside a term application."
+ },
+ {
+  "id": "P434",
+  "where": "@[deprecated (since := \"2026-01-17\")] alias le_range_of_union_finset_eq_top",
+  "why": "New deprecation attribute records its date."
+ },
+ {
+  "id": "P211",
+  "where": "Cardinal.exists_infinite_fiber'",
+  "why": "New primed name, sibling of unprimed exists_infinite_fiber."
+ },
+ {
+  "id": "P220",
+  "where": "Cardinal.exists_infinite_fiber vs exists_infinite_fiber'",
+  "why": "General version keeps plain name; weaker special case marked by an ad hoc prime suffix."
+ },
+ {
+  "id": "P154",
+  "where": "Cardinal.exists_infinite_fiber'",
+  "why": "New lemma only combines exists_infinite_fiber with a cardinal inequality; no real simplification."
+ },
+ {
+  "id": "P027",
+  "where": "Cardinal.exists_infinite_fiber', used in linearIndependent_le_infinite_basis",
+  "why": "Special case of the generalized lemma, with codomain-infinite hypothesis, stated as its own lemma for callers."
+ },
+ {
+  "id": "P357",
+  "where": "Cardinal.exists_uncountable_fiber",
+  "why": "New lemma added but not used anywhere in the PR."
+ },
+ {
+  "id": "P048",
+  "where": "infinite_pigeonhole_card_lt, exists_infinite_fiber, exists_infinite_fiber', exists_uncountable_fiber",
+  "why": "Consecutive declarations repeat `{β α : Type u} (f : β → α) (h : #α < #β)`."
+ },
+ {
+  "id": "P202",
+  "where": "deprecated alias le_range_of_union_finset_eq_top; changed exists_infinite_fiber statement",
+  "why": "Deprecated alias points to a replacement whose hypothesis is spelled differently (⊤ vs Set.univ)."
+ },
+ {
+  "id": "P073",
+  "where": "deprecated alias le_range_of_union_finset_eq_top",
+  "why": "A deprecation is added; it must name its replacement."
+ },
+ {
+  "id": "P082",
+  "where": "deprecated alias le_range_of_union_finset_eq_top",
+  "why": "Deprecated declaration kept as an alias to its replacement; old proof removed."
+ },
+ {
+  "id": "P371",
+  "where": "hypotheses hα, hβ, h in the four Pigeonhole.lean theorems",
+  "why": "Hypotheses renamed from w, w' to hβ/hα/h, named after the constrained variable."
+ },
+ {
+  "id": "P363",
+  "where": "le_range_of_union_finset_eq_univ hypothesis w; hβ : ℵ₀ ≤ #β vs Infinite β",
+  "why": "Hypothesis respelled from `= ⊤` to `= Set.univ`; sibling lemmas spell infiniteness differently."
+ },
+ {
+  "id": "P222",
+  "where": "docstrings of infinite_pigeonhole_card_lt, exists_infinite_fiber, exists_uncountable_fiber",
+  "why": "Docstrings revised to describe the generalized statements; wording must match the new generality."
+ },
+ {
+  "id": "P329",
+  "where": "rename of le_range_of_union_finset_eq_top; renaming w, w' to h, hβ",
+  "why": "PR titled as a generalization also renames a lemma and its hypotheses."
+ }
+]

@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P165",
+  "where": "Int.isFundamentalDiscr_iff_squarefree (two anonymous haves)",
+  "why": "Two general facts (squarefree via odd primes and 4; odd p^2 dividing 4m) are proved inline inside one proof."
+ },
+ {
+  "id": "P341",
+  "where": "isFundamentalDiscr_def, IsFundamentalDiscr.ne_zero, emod_four_eq_zero_or_one, four_mul(_add_one), IsCoprime.dvd_mul_*_iff, Odd.isCoprime_two",
+  "why": "Many added declarations use `theorem` without any docstring."
+ },
+ {
+  "id": "P024",
+  "where": "IsFundamentalDiscr.ne_zero, Int.isFundamentalDiscr_iff_squarefree",
+  "why": "Proofs are closed by `grind [isFundamentalDiscr_def]` in place of explicit arguments."
+ },
+ {
+  "id": "P315",
+  "where": "Int.isFundamentalDiscr_def",
+  "why": "Characterisation iff of the new definition is passed to `grind` by hand at three call sites."
+ },
+ {
+  "id": "P353",
+  "where": "Int.IsFundamentalDiscr vs Int.isFundamentalDiscr_iff_squarefree",
+  "why": "New notion has equivalent formulations; the PR chooses the primitive one as definition, squarefree one as lemma."
+ },
+ {
+  "id": "P152",
+  "where": "Int.IsFundamentalDiscr (and the file FundamentalDiscriminant.lean)",
+  "why": "New notion named with the shortened `Discr` rather than the full standard name `Discriminant`."
+ },
+ {
+  "id": "P228",
+  "where": "Int.IsFundamentalDiscr and its lemma family",
+  "why": "The word discriminant is abbreviated `Discr` in the new names; library abbreviation must be matched."
+ },
+ {
+  "id": "P047",
+  "where": "Int.squarefree_iff_prime_sq_not_dvd (Mathlib/Data/Nat/Squarefree.lean)",
+  "why": "Lambdas written with `=>` while other added code uses `↦`."
+ },
+ {
+  "id": "P357",
+  "where": "IsCoprime.dvd_mul_right_iff, IsFundamentalDiscr.ne_zero, IsFundamentalDiscr.emod_four_eq_zero_or_one",
+  "why": "Several added lemmas are not used in the PR; whether they are intended API must be decided."
+ },
+ {
+  "id": "P280",
+  "where": "Int.isFundamentalDiscr_four_mul, Int.isFundamentalDiscr_four_mul_add_one",
+  "why": "Iff lemmas named like the bare proposition of their left-hand side, without `_iff`."
+ },
+ {
+  "id": "P074",
+  "where": "Int.squarefree_iff_prime_sq_not_dvd in Mathlib/Data/Nat/Squarefree.lean",
+  "why": "An `Int` lemma is added, in a new `namespace Int`, to a file about `Nat` squarefreeness."
+ },
+ {
+  "id": "P086",
+  "where": "Odd.isCoprime_two, Int.squarefree_iff_prime_sq_not_dvd, Nat.forall_prime_iff_two_and_odd, IsCoprime.dvd_mul_*_iff",
+  "why": "New general lemmas in basic files that the library may already state in another form."
+ },
+ {
+  "id": "P014",
+  "where": "Int.isFundamentalDiscr_iff_squarefree",
+  "why": "`simp +contextual only [...]` is squeezed although its output feeds only the flexible `grind` finisher."
+ },
+ {
+  "id": "P057",
+  "where": "Int.isFundamentalDiscr_iff_squarefree",
+  "why": "`IsCoprime.pow hp.isCoprime_two` applies a namespaced lemma by full name to a term of that type."
+ },
+ {
+  "id": "P070",
+  "where": "Int.squarefree_iff_prime_sq_not_dvd, Nat.forall_prime_iff_two_and_odd",
+  "why": "Names must spell statement head-first; `prime_sq_not_dvd` places `not` after the divisibility terms."
+ },
+ {
+  "id": "P254",
+  "where": "IsCoprime.dvd_mul_left_iff, IsCoprime.dvd_mul_right_iff",
+  "why": "New iff lemmas must follow analogues' naming (e.g. Nat.Coprime.dvd_mul_left) and sibling patterns."
+ },
+ {
+  "id": "P431",
+  "where": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+  "why": "`@[expose] public section` covers the whole file containing one definition."
+ },
+ {
+  "id": "P048",
+  "where": "Int.isFundamentalDiscr_def, ne_zero, emod_four_eq_zero_or_one, isFundamentalDiscr_iff_squarefree",
+  "why": "`{D : ℤ}` is repeated in each consecutive declaration's signature rather than declared once."
+ },
+ {
+  "id": "P182",
+  "where": "Int.IsFundamentalDiscr, Int.squarefree_iff_prime_sq_not_dvd, Nat.forall_prime_iff_two_and_odd",
+  "why": "Statements quantify `∀ p : ℕ, p.Prime → ...` with an explicit binder determined by the hypothesis."
+ },
+ {
+  "id": "P154",
+  "where": "IsFundamentalDiscr.emod_four_eq_zero_or_one, isFundamentalDiscr_four_mul(_add_one), IsCoprime.dvd_mul_*_iff",
+  "why": "Lemmas that are projections or `simp` instantiations of other lemmas, adding little new statement."
+ },
+ {
+  "id": "P216",
+  "where": "Nat.forall_prime_iff_two_and_odd",
+  "why": "Case split `obtain rfl | hne := eq_or_ne p 2` on whether the prime is two."
+ },
+ {
+  "id": "P151",
+  "where": "Nat.forall_prime_iff_two_and_odd",
+  "why": "Hypothesis `h` of a conjunction is introduced whole and used only as `h.1` and `h.2`."
+ },
+ {
+  "id": "P267",
+  "where": "IsCoprime.dvd_mul_right_iff/left_iff; isFundamentalDiscr_four_mul_add_one/four_mul",
+  "why": "Pairs of parallel short declarations are separated by blank lines."
+ },
+ {
+  "id": "P043",
+  "where": "the PR as a whole",
+  "why": "General lemmas in three basic files are bundled with a new NumberTheory file defining a notion."
+ },
+ {
+  "id": "P421",
+  "where": "Int.IsFundamentalDiscr docstring and module docstring",
+  "why": "Definition formalises the named notion fundamental discriminant; no reference or background link given."
+ }
+]

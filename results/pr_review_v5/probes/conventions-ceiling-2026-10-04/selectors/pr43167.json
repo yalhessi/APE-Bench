@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P072",
+  "where": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup (Pointwise.lean) and the deprecated aliases in Basic.lean",
+  "why": "A lemma is moved between files and renamed; the old name is handled by deprecation."
+ },
+ {
+  "id": "P263",
+  "where": "Subgroup.commutator_sup_left, Subgroup.commutator_sup_right, commutator_sup_left'",
+  "why": "New multiplicative results without to_additive, while sibling commutator lemmas carry it."
+ },
+ {
+  "id": "P081",
+  "where": "commutator_mono_left/right, commutator_le_of_le vs commutator_sup_left/right/left'",
+  "why": "to_additive applied to some new sibling commutator lemmas but not others."
+ },
+ {
+  "id": "P206",
+  "where": "Subgroup.commutator_sup_left, Subgroup.commutator_sup_right",
+  "why": "Plain names commutator_sup_left/right used for statements needing a [N.Normal] hypothesis."
+ },
+ {
+  "id": "P120",
+  "where": "Subgroup.commutator_sup_left, Subgroup.commutator_sup_right",
+  "why": "Distributivity over binary sup stated; an indexed iSup version may hold."
+ },
+ {
+  "id": "P143",
+  "where": "Subgroup.commutator_mono_left, Subgroup.commutator_mono_right",
+  "why": "New monotonicity lemmas for the commutator in one argument, tagged gcongr."
+ },
+ {
+  "id": "P186",
+  "where": "Subgroup.commutator_mono_left, Subgroup.commutator_mono_right",
+  "why": "gcongr attribute passed on to_additive declarations via (attr := gcongr)."
+ },
+ {
+  "id": "P154",
+  "where": "commutator_mono_left, commutator_mono_right, commutator_le_of_le",
+  "why": "New lemmas merely instantiate commutator_mono or combine commutator_le_sup with sup_le."
+ },
+ {
+  "id": "P358",
+  "where": "commutator_sup_left' (private)",
+  "why": "Private lemma states a general distributivity result under a normality instance, possibly of independent use."
+ },
+ {
+  "id": "P394",
+  "where": "commutator_sup_left' (private)",
+  "why": "Private auxiliary lemma added without a docstring saying what it is for."
+ },
+ {
+  "id": "P211",
+  "where": "commutator_sup_left'",
+  "why": "Primed name for an auxiliary variant of commutator_sup_left with a different hypothesis."
+ },
+ {
+  "id": "P254",
+  "where": "Subgroup.inf_normalizer_le_normalizer_sup",
+  "why": "Lemma renamed to follow sibling inf_normalizer_le_normalizer_inf's naming pattern."
+ },
+ {
+  "id": "P001",
+  "where": "commutator_sup_left', commutator_sup_left, AddSubgroup deprecated alias",
+  "why": "Names written with Subgroup./_root_.AddSubgroup. prefixes inside the Subgroup namespace."
+ },
+ {
+  "id": "P013",
+  "where": "Subgroup.commutator_sup_left (hHM, hKM, hNM, hHNM, hKNM, hHKN); commutator_sup_left' (hH, hK)",
+  "why": "Many named haves whose proofs are short terms like le_sup_left."
+ },
+ {
+  "id": "P437",
+  "where": "Subgroup.commutator_sup_left",
+  "why": "haves hHNM, hKNM introduced at the top but used only in a later simp."
+ },
+ {
+  "id": "P181",
+  "where": "Subgroup.commutator_sup_left, commutator_sup_left'",
+  "why": "Non-trivial quotient/normalizer proof strategy with no explanatory comments."
+ },
+ {
+  "id": "P370",
+  "where": "Subgroup.commutator_sup_left, the first two bullets after refine sup_le",
+  "why": "Two branches repeat grw [le_normalizer_iff_commutator_le_right, hHKN, ...] differing only at the end."
+ },
+ {
+  "id": "P240",
+  "where": "Subgroup.commutator_mono_left, Subgroup.commutator_mono_right",
+  "why": "Short proof terms placed on a new line after :=; statement and proof may fit one line."
+ },
+ {
+  "id": "P030",
+  "where": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean imports",
+  "why": "New public import of Mathlib.GroupTheory.Commutator.Basic added to Pointwise.lean."
+ },
+ {
+  "id": "P190",
+  "where": "Subgroup.inf_normalizer_le_normalizer_sup moved to Subgroup/Basic.lean; commutator_sup_left",
+  "why": "Lemma moved to an earlier file; new proof uses quotient-group machinery."
+ },
+ {
+  "id": "P329",
+  "where": "inf_normalizer_le_normalizer_sup rename and call sites in Pointwise.lean",
+  "why": "PR renames an existing lemma and edits its uses beyond what the new theorem needs."
+ },
+ {
+  "id": "P099",
+  "where": "deprecated alias normalizer_inf_normalizer_le_normalizer_sup in Basic.lean",
+  "why": "deprecated attribute inline before alias spanning two lines; other alias has it on its own line."
+ },
+ {
+  "id": "P201",
+  "where": "deprecated alias _root_.AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup",
+  "why": "Additive twin of the deprecated alias is written by hand."
+ },
+ {
+  "id": "P094",
+  "where": "commutator_sup_left' (sup_le (commutator_mono_left le_sup_left) ...)",
+  "why": "Monotonicity steps discharged by applying named commutator_mono_left rather than gcongr."
+ },
+ {
+  "id": "P341",
+  "where": "commutator_mono_left/right, commutator_le_of_le, commutator_sup_left', commutator_sup_left/right",
+  "why": "Undocumented auxiliary results declared with theorem rather than lemma."
+ }
+]

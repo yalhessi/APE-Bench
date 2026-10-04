@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Description says minor premises are renamed by content, but the diff renames only the motive; title says one name."
+ },
+ {
+  "id": "P418",
+  "where": "Monoid.Coprod.induction_on', Monoid.Coprod.induction_on",
+  "why": "Both are custom elab_as_elim induction principles whose cases (minor premises) are restated."
+ },
+ {
+  "id": "P264",
+  "where": "Monoid.Coprod.induction_on' (proof) and its use as an eliminator",
+  "why": "Eliminators meant for `induction … using … with`; minor premise names become case names; proof uses structured induction."
+ },
+ {
+  "id": "P371",
+  "where": "minor premises one, inl_mul, inr_mul, inl, inr, mul",
+  "why": "PR concerns naming the hypotheses (minor premises) of the recursors after what they state."
+ },
+ {
+  "id": "P105",
+  "where": "motive argument of both theorems",
+  "why": "Renames the motive variable from `C` to `motive`, a choice of variable name by convention."
+ },
+ {
+  "id": "P084",
+  "where": "Monoid.Coprod.induction_on signature",
+  "why": "Longer `motive` name forces the signature to be re-broken across lines at the length limit."
+ },
+ {
+  "id": "P032",
+  "where": "Monoid.Coprod.induction_on, induction_on' signatures",
+  "why": "Multi-line signatures; the conclusion `: motive m` sits at the end of a binder line."
+ },
+ {
+  "id": "P069",
+  "where": "continuation lines of both signatures",
+  "why": "Changed statement continuation lines carry indentation (four spaces)."
+ },
+ {
+  "id": "P100",
+  "where": "other recursors in Mathlib/GroupTheory/Coprod and analogues",
+  "why": "Motive rename applied to two recursors; sibling eliminators elsewhere may still use `C`."
+ },
+ {
+  "id": "P126",
+  "where": "Mathlib/GroupTheory/Coprod/Basic.lean",
+  "why": "Motive naming should be spelled consistently across the file's eliminators after the rename."
+ },
+ {
+  "id": "P113",
+  "where": "Monoid.Coprod.induction_on'",
+  "why": "A primed variant of induction_on, distinguished only by a prime."
+ },
+ {
+  "id": "P211",
+  "where": "Monoid.Coprod.induction_on'",
+  "why": "Primed name beside the unprimed sibling induction_on; which is primary form is at issue."
+ },
+ {
+  "id": "P036",
+  "where": "{motive : M ∗ N → Prop} (m : M ∗ N) binders",
+  "why": "Binder kinds of motive (implicit) and major premise (explicit) in a changed signature."
+ },
+ {
+  "id": "P182",
+  "where": "inl_mul, inr_mul, mul minor premises",
+  "why": "Minor premises `∀ m x, motive x → …` quantify variables followed by hypotheses on them."
+ },
+ {
+  "id": "P339",
+  "where": "∀ m x / ∀ n / ∀ x y binders in minor premises",
+  "why": "Bound variables in the changed statements carry no explicit types."
+ },
+ {
+  "id": "P186",
+  "where": "@[to_additive (attr := elab_as_elim)] on both theorems",
+  "why": "elab_as_elim passed through to_additive's attr so the additive eliminator gets it."
+ },
+ {
+  "id": "P408",
+  "where": "Monoid.Coprod.induction_on', induction_on and additive twins",
+  "why": "to_additive generates additive eliminators; neither original nor generated declaration has a docstring."
+ },
+ {
+  "id": "P341",
+  "where": "theorem induction_on', theorem induction_on",
+  "why": "Both declared with `theorem` and carry no docstring."
+ },
+ {
+  "id": "P185",
+  "where": "whole PR",
+  "why": "Renaming the motive variable is a stylistic change to existing code."
+ },
+ {
+  "id": "P138",
+  "where": "whole PR",
+  "why": "Cosmetic argument rename and line re-break; marginal-benefit change weighed against review cost."
+ },
+ {
+  "id": "P329",
+  "where": "Monoid.Coprod.induction_on signature re-break",
+  "why": "PR touches existing code; changes should stay to what the rename requires."
+ },
+ {
+  "id": "P266",
+  "where": "Monoid.Coprod.induction_on', induction_on",
+  "why": "Coprod is a quotient type; these are its own induction API."
+ },
+ {
+  "id": "P312",
+  "where": "proof of Monoid.Coprod.induction_on'",
+  "why": "Quotient element case-analysed via `rcases mk_surjective m with ⟨x, rfl⟩`."
+ },
+ {
+  "id": "P048",
+  "where": "{motive : M ∗ N → Prop} (m : M ∗ N) in both theorems",
+  "why": "Same arguments repeated in two consecutive declarations' signatures."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title `fix(GroupTheory/Coprod): …` follows type(Area) form; type choice for a rename."
+ }
+]

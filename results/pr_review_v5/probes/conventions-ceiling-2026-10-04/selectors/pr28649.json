@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P053",
+  "where": "Convergence.lean module doc and limitProcess-convergence docstring; Upcrossing.lean; Variance.lean Popoviciu docstring",
+  "why": "Cleanup PR with rewording hunks (Implementationwise, liminfs to limit inferiors, variance to variances) of debatable readability gain."
+ },
+ {
+  "id": "P185",
+  "where": "all seven files, especially Convergence.lean, Upcrossing.lean, Variance.lean, Gaussian/Real.lean",
+  "why": "Third-party stylistic edits to existing prose: capitalisation, hyphenation, rephrasing not mandated by the style guide."
+ },
+ {
+  "id": "P138",
+  "where": "the whole PR (docstring-only changes across seven Probability files)",
+  "why": "Pure docstring polish PR; marginal benefit weighed against review cost."
+ },
+ {
+  "id": "P329",
+  "where": "Convergence.lean (Implementationwise, liminfs), Variance.lean (variances), Upcrossing.lean (left-hand)",
+  "why": "Typo-fix PR also rewrites wording that is not a typo; changes beyond its stated purpose."
+ },
+ {
+  "id": "P156",
+  "where": "PR title 'doc(Probability): miscellaneous typo fixes' and missing description",
+  "why": "Title calls everything typo fixes while several hunks are rewordings or capitalisation; description absent."
+ },
+ {
+  "id": "P219",
+  "where": "Gaussian/Real.lean: gaussianPDFReal and its six lemma docstrings",
+  "why": "gaussian recapitalised to Gaussian, a term derived from Gauss's name; consistency throughout file matters."
+ },
+ {
+  "id": "P126",
+  "where": "Gaussian/Real.lean docstrings; Moments/Basic.lean module doc (MGFs/CGFs vs mgf/cgf)",
+  "why": "Same term spelled differently within a file: MGFs/CGFs beside unchanged 'the cgf exists'; Gaussian vs gaussian elsewhere."
+ },
+ {
+  "id": "P278",
+  "where": "Moments/Basic.lean main results (MGFs, CGFs); Gaussian/Real.lean (pdf); Convergence.lean (limit inferiors)",
+  "why": "Docstrings use identifier-style abbreviations (pdf, mgf, cgf, liminf) being respelled; full words preferred."
+ },
+ {
+  "id": "P235",
+  "where": "Moments/Basic.lean (MGFs, CGFs); Convergence.lean (limit inferiors); Upcrossing.lean (left-hand side)",
+  "why": "PR changes spelling of standard notions' names; should follow the literature's usual spelling."
+ },
+ {
+  "id": "P396",
+  "where": "gaussianPDFReal docstring; Popoviciu docstring title in Variance.lean",
+  "why": "Noun-phrase docstring 'Probability density function of the Gaussian distribution ...' ends with a full stop."
+ },
+ {
+  "id": "P125",
+  "where": "lemma docstrings in Gaussian/Real.lean, Convergence.lean, Variance.lean",
+  "why": "Modified docstrings; whether each is a full sentence ending in a period, e.g. bold Popoviciu title line."
+ },
+ {
+  "id": "P192",
+  "where": "Variance.lean docstring '**Popoviciu's inequality on variances**'",
+  "why": "Docstring names a theorem; whether it states what the theorem says and links notions."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title in form doc(Probability): description; commit convention applies."
+ },
+ {
+  "id": "P025",
+  "where": "CompNotation.lean module docstring title",
+  "why": "Module docstring title 'Notation for the composition of a measure and a kernel' is edited."
+ },
+ {
+  "id": "P194",
+  "where": "Moments/Basic.lean module doc Main results list",
+  "why": "Changed lines are continuation lines of docstring list items, indented under the item text."
+ },
+ {
+  "id": "P255",
+  "where": "Moments/Basic.lean main results (mgf, cgf in prose); Convergence.lean module doc (tendsto_of_no_upcrossings)",
+  "why": "Docstrings mention declarations (mgf, cgf, tendsto_of_no_upcrossings) in prose; backticks and full names apply."
+ },
+ {
+  "id": "P382",
+  "where": "IntegralCompProd.lean module doc, Implementation details paragraph",
+  "why": "Edited paragraph says the file is largely a copy of MeasureTheory/Integral/Prod.lean."
+ },
+ {
+  "id": "P135",
+  "where": "IntegralCompProd.lean (Main statements, Implementation details); CompNotation.lean (Notations)",
+  "why": "Modified module docstrings carry section headings that differ from the standard ones."
+ },
+ {
+  "id": "P230",
+  "where": "IntegralCompProd.lean module doc",
+  "why": "Edited paragraph cross-references another module, Mathlib/MeasureTheory/Integral/Prod.lean, in documentation."
+ },
+ {
+  "id": "P297",
+  "where": "Convergence.lean and Upcrossing.lean section docstrings",
+  "why": "Edited docstrings use LaTeX ($a$, $b$, $U_N(a, b)$) mixed with unicode for mathematics."
+ },
+ {
+  "id": "P212",
+  "where": "Gaussian/Real.lean lemma docstrings (gaussianPDFReal_pos, _nonneg, measurable_, integral_ ... _eq_one)",
+  "why": "Modified lemma docstrings largely restate the lemma statement in words."
+ },
+ {
+  "id": "P044",
+  "where": "Convergence.lean and Upcrossing.lean section docstrings",
+  "why": "Modified /-! -/ blocks end with a blank line before the closing -/ on its own line."
+ },
+ {
+  "id": "P285",
+  "where": "Convergence.lean and Upcrossing.lean mid-file /-! -/ blocks; CompNotation.lean /- -/ after module doc",
+  "why": "Explanation of main results sits in separate /-! -/ blocks further down and a /- -/ after docstring."
+ },
+ {
+  "id": "P045",
+  "where": "Moments/Basic.lean module docstring Main results",
+  "why": "Main results list of the module docstring is edited; must match the file's results as stated."
+ },
+ {
+  "id": "P059",
+  "where": "Moments/Basic.lean module doc; Upcrossing.lean (left-hand)",
+  "why": "Docstring text spacing within modified objects, e.g. '`centralMoment X p μ`:`p`th' lacks a space."
+ }
+]

@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P010",
+  "where": "tprod_nonneg signature",
+  "why": "Six typeclass assumptions plus `[L.NeBot]`; whether each is needed or could be weakened is the question."
+ },
+ {
+  "id": "P086",
+  "where": "tprod_nonneg; PR description",
+  "why": "New lemma; description says 'Hopefully I didn't miss anything', so an existing library statement may exist."
+ },
+ {
+  "id": "P263",
+  "where": "tprod_nonneg",
+  "why": "Declaration about the multiplicative tprod; its additive counterpart tsum_nonneg exists, and the lemma has no `to_additive`."
+ },
+ {
+  "id": "P341",
+  "where": "tprod_nonneg",
+  "why": "Declared with `theorem` and carries no docstring."
+ },
+ {
+  "id": "P386",
+  "where": "section WithZero ... end WithZero",
+  "why": "New section named `WithZero`, which is not the notion (CommMonoidWithZero) its declaration is about."
+ },
+ {
+  "id": "P332",
+  "where": "section WithZero in Order.lean",
+  "why": "A new section is opened for a declaration with typeclass assumptions different from neighbouring sections."
+ },
+ {
+  "id": "P254",
+  "where": "tprod_nonneg",
+  "why": "Name should follow the pattern of sibling tsum_nonneg and other tprod lemmas in the file."
+ },
+ {
+  "id": "P019",
+  "where": "tprod_nonneg",
+  "why": "Lemma name built from statement's declarations: tprod and nonneg (`0 ≤`)."
+ },
+ {
+  "id": "P409",
+  "where": "tprod_nonneg signature",
+  "why": "Arguments: typeclass assumptions, then `[L.NeBot]`, then implicit f, then hypothesis hf; their order matters."
+ },
+ {
+  "id": "P259",
+  "where": "Order.lean, new section before CanonicallyOrderedMul",
+  "why": "New tprod lemma placed between existing sections; should sit beside existing nonneg/tprod order lemmas."
+ },
+ {
+  "id": "P016",
+  "where": "tprod_nonneg proof, second branch",
+  "why": "`simp [tprod_eq_one_of_not_multipliable h]` lists a lemma; is it already a simp lemma."
+ },
+ {
+  "id": "P014",
+  "where": "tprod_nonneg proof, second branch",
+  "why": "Terminal `simp [...]` call closing the goal."
+ },
+ {
+  "id": "P007",
+  "where": "tprod_nonneg hypothesis hf",
+  "why": "Hypothesis `∀ i, 0 ≤ f i` unfolds the library predicate `0 ≤ f`."
+ },
+ {
+  "id": "P363",
+  "where": "tprod_nonneg hypothesis hf",
+  "why": "Hypothesis spelling `∀ i, 0 ≤ f i` versus forms used by existing nonneg lemmas."
+ },
+ {
+  "id": "P036",
+  "where": "tprod_nonneg binders",
+  "why": "`{f : ι → α}` implicit, determined by explicit hypothesis hf; binder kinds follow inferability."
+ },
+ {
+  "id": "P032",
+  "where": "tprod_nonneg signature",
+  "why": "Multi-line signature broken after the colon before `0 ≤ ∏'[L] x, f x`."
+ },
+ {
+  "id": "P069",
+  "where": "tprod_nonneg signature",
+  "why": "Statement continuation lines indented four spaces."
+ },
+ {
+  "id": "P084",
+  "where": "tprod_nonneg signature",
+  "why": "First signature line is near the 100-character limit; line breaking choices."
+ },
+ {
+  "id": "P012",
+  "where": "section WithZero / end WithZero",
+  "why": "New `section` and `end` commands separated from surrounding declarations by blank lines."
+ },
+ {
+  "id": "P188",
+  "where": "section WithZero / end WithZero",
+  "why": "New section opened and closed with matching `end WithZero`."
+ },
+ {
+  "id": "P369",
+  "where": "section WithZero, tprod_nonneg signature",
+  "why": "Typeclass arguments used by one declaration are bound in its signature, not a `variable`."
+ },
+ {
+  "id": "P100",
+  "where": "tprod_nonneg",
+  "why": "New member of the nonneg family (tsum_nonneg, HasSum.nonneg); sibling variants for tprod may be expected."
+ },
+ {
+  "id": "P081",
+  "where": "tprod_nonneg among Order.lean tprod lemmas",
+  "why": "Sibling tprod lemmas in file carry `@[to_additive]`; this one carries none."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title `feat(Topology/InfiniteSum): non-negativity of tprod` follows the commit convention form."
+ },
+ {
+  "id": "P130",
+  "where": "tprod_nonneg",
+  "why": "Name states the conclusion `0 ≤ tprod` without naming hypotheses."
+ }
+]

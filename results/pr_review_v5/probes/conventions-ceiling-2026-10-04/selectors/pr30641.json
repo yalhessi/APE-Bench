@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P044",
+  "where": "docstrings of posLog_sum, posLog_norm_sum_le, posLog_add",
+  "why": "The PR moves the closing `-/` of these docstrings onto a line of its own."
+ },
+ {
+  "id": "P321",
+  "where": "docstrings of posLog_sum, posLog_norm_sum_le, posLog_add",
+  "why": "The reformatted docstrings start their text on the line after `/--`."
+ },
+ {
+  "id": "P003",
+  "where": "Real.posLog_zero, Real.posLog_one",
+  "why": "New @[simp] lemmas evaluating log⁺ at the canonical arguments 0 and 1."
+ },
+ {
+  "id": "P099",
+  "where": "Real.posLog_pow",
+  "why": "`@[simp]` sits inline before `lemma` although the header spans two lines."
+ },
+ {
+  "id": "P084",
+  "where": "Real.posLog_pow signature; last calc step of posLog_norm_sum_le; reformatted docstrings",
+  "why": "Lines are broken where the signature or the calc step's term would fit on one line."
+ },
+ {
+  "id": "P267",
+  "where": "Real.posLog_zero, Real.posLog_one",
+  "why": "Two parallel one-line simp lemmas are separated by a blank line."
+ },
+ {
+  "id": "P230",
+  "where": "module docstring",
+  "why": "The added cross-reference names a module by its dotted name `Mathlib.Analysis...PosLogEqCircleAverage`."
+ },
+ {
+  "id": "P254",
+  "where": "Real.posLog_norm_sum_le",
+  "why": "New name carries `_le` while siblings posLog_sum, posLog_add, posLog_prod, posLog_mul do not."
+ },
+ {
+  "id": "P029",
+  "where": "docstring of Real.posLog_norm_sum_le (and posLog_sum, posLog_add)",
+  "why": "Docstring describes the lemma as a 'Variant of `posLog_sum`' rather than on its own terms."
+ },
+ {
+  "id": "P216",
+  "where": "proof of Real.posLog_pow",
+  "why": "`by_cases` splits followed by `rw [not_le] at h₂a` and `simp_all` on the n = 0 case."
+ },
+ {
+  "id": "P094",
+  "where": "proof of Real.posLog_norm_sum_le, first calc step",
+  "why": "Monotonicity step done by `apply monotoneOn_posLog` instead of `gcongr`."
+ },
+ {
+  "id": "P010",
+  "where": "Real.posLog_norm_sum_le",
+  "why": "Assumes `NormedAddCommGroup E` though the proof uses only the triangle inequality for norms."
+ },
+ {
+  "id": "P255",
+  "where": "docstring of Real.posLog_norm_sum_le",
+  "why": "Mentions `posLog_sum` without the full name `Real.posLog_sum` used by the neighbouring docstrings."
+ },
+ {
+  "id": "P126",
+  "where": "PosLog.lean: new `lemma`s beside existing `theorem`s; new docstring layout",
+  "why": "New declarations use `lemma` and a docstring layout differing from the rest of the file."
+ },
+ {
+  "id": "P329",
+  "where": "docstrings of posLog_sum, posLog_add; blank lines after section headers",
+  "why": "Existing docstrings and spacing rewritten though the lemmas added do not require it."
+ },
+ {
+  "id": "P138",
+  "where": "docstrings of posLog_sum, posLog_add; blank lines after section headers",
+  "why": "PR includes cosmetic docstring polish and blank-line changes of marginal benefit."
+ },
+ {
+  "id": "P154",
+  "where": "Real.posLog_norm_sum_le",
+  "why": "Lemma combines monotoneOn_posLog, norm_sum_le and posLog_sum with no new content."
+ },
+ {
+  "id": "P100",
+  "where": "Real.posLog_norm_sum_le vs posLog_add, posLog_prod, posLog_mul",
+  "why": "Norm variant added for posLog_sum only, not for its sibling estimates."
+ },
+ {
+  "id": "P191",
+  "where": "Real.posLog_pow, Real.posLog_zero, Real.posLog_one",
+  "why": "Right-hand sides of new @[simp] lemmas, including the cast `↑n * log⁺ a`."
+ },
+ {
+  "id": "P109",
+  "where": "proof of Real.posLog_norm_sum_le, first calc step",
+  "why": "`apply ... _ ...` leaves a side goal closed afterwards by a separate `simp`."
+ },
+ {
+  "id": "P144",
+  "where": "proof of Real.posLog_norm_sum_le, first calc step",
+  "why": "`apply` with an `_` hole that becomes a goal, instead of `refine` with `?_`."
+ },
+ {
+  "id": "P045",
+  "where": "module docstring",
+  "why": "Module docstring edited while new results posLog_pow and posLog_norm_sum_le are added to the file."
+ },
+ {
+  "id": "P016",
+  "where": "proofs of posLog_pow, posLog_zero, posLog_one, posLog_norm_sum_le",
+  "why": "Several `simp`/`simp_all` calls carry explicit lemma lists."
+ },
+ {
+  "id": "P036",
+  "where": "Real.posLog_pow, Real.posLog_norm_sum_le",
+  "why": "posLog_pow takes n, a implicit; posLog_norm_sum_le takes s, f explicit."
+ },
+ {
+  "id": "P212",
+  "where": "docstring of Real.posLog_pow",
+  "why": "New docstring 'commutes with taking powers' describes the equation log⁺ (a^n) = n * log⁺ a."
+ }
+]

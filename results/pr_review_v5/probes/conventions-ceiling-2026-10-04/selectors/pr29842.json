@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P010",
+  "where": "tangentConeAt.lim_zero, tangentConeAt_mono_nhds..tangentConeAt_inter_nhds, UniqueDiffWithinAt.mono_nhds..IsOpen.uniqueDiffOn",
+  "why": "Normed-space hypotheses weakened to ContinuousSMul/ContinuousAdd on a TVS; whether these are exactly what each proof needs."
+ },
+ {
+  "id": "P332",
+  "where": "TVS sections: added `variable [ContinuousSMul 𝕜 E]`, `variable [ContinuousAdd E]`, `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`",
+  "why": "Declarations with different typeclass needs organised by incremental variable lines within TVS sections."
+ },
+ {
+  "id": "P369",
+  "where": "added `variable [ContinuousSMul 𝕜 E]` before tangentConeAt.lim_zero; `variable [ContinuousAdd E]` after it",
+  "why": "New variable commands introduce instance arguments for a run of declarations; whether each serves many."
+ },
+ {
+  "id": "P098",
+  "where": "tangentConeAt_closure, uniqueDiffWithinAt_closure (@[simp]), protected alias UniqueDiffWithinAt.of_closure/closure, mono_closure",
+  "why": "Declarations moved into new Normed sections must keep their @[simp] and protected attributes exactly."
+ },
+ {
+  "id": "P012",
+  "where": "moved `end TVS` / `section Normed` / `variable ...` blocks in TangentCone.lean",
+  "why": "Section, end and variable commands added and moved; `section Normed` directly followed by `variable` lines."
+ },
+ {
+  "id": "P329",
+  "where": "tangentConeAt.lim_zero proof; moves of tangentConeAt_closure, uniqueDiffWithinAt_closure, mono_closure",
+  "why": "Proof rewritten and declarations relocated; whether each change is required by the generalisation."
+ },
+ {
+  "id": "P259",
+  "where": "tangentConeAt_closure moved away from tangentConeAt_mono; uniqueDiffWithinAt_closure and mono_closure moved after IsOpen.uniqueDiffOn",
+  "why": "Moving closure lemmas into later Normed sections changes grouping of declarations about one notion."
+ },
+ {
+  "id": "P063",
+  "where": "lemmas moved from Normed into TVS sections",
+  "why": "Results previously stated for normed spaces using only topological-vector-space properties are restated for every such space."
+ },
+ {
+  "id": "P363",
+  "where": "tangentConeAt.lim_zero hypothesis hc",
+  "why": "hc spelled `Tendsto (‖c n‖) l atTop`; proof immediately rewrites it to the cobounded form."
+ },
+ {
+  "id": "P401",
+  "where": "tangentConeAt.lim_zero, last step",
+  "why": "Goal closed by `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`, a lemma conclusion up to simp."
+ },
+ {
+  "id": "P013",
+  "where": "tangentConeAt.lim_zero, `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n`",
+  "why": "Auxiliary `have` with a short term proof used once, in `apply Tendsto.congr' this`."
+ },
+ {
+  "id": "P166",
+  "where": "tangentConeAt.lim_zero, eventual equality via `.mono`",
+  "why": "A `∀ᶠ` statement is produced through the filter API from eventually_ne_of_tendsto_norm_atTop."
+ },
+ {
+  "id": "P018",
+  "where": "tangentConeAt.lim_zero, `rw [tendsto_norm_atTop_iff_cobounded] at hc` then `simpa using ...`",
+  "why": "Consecutive tactic calls (rewrite at hc, then simpa) that one call might perform."
+ },
+ {
+  "id": "P024",
+  "where": "tangentConeAt.lim_zero proof",
+  "why": "Explicit step-by-step proof (A, B, C, D) replaced by a shorter proof ending in flexible `simpa`."
+ },
+ {
+  "id": "P047",
+  "where": "tangentConeAt.lim_zero statement",
+  "why": "Statement keeps `fun n => ...` lambdas while the rewritten proof uses `↦`."
+ },
+ {
+  "id": "P188",
+  "where": "TVS and Normed section boundaries in TangentCone.lean",
+  "why": "`end TVS` and `section Normed` moved; sections must remain properly matched and closed."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title says 'generalize some lemmas to TVS' without naming which; description not recoverable."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title `feat(TangentCone): ...` uses a commit-convention area tag; whether the area spelling follows convention."
+ },
+ {
+  "id": "P338",
+  "where": "lemmas generalised to TVS",
+  "why": "Declarations stated in greater generality; whether any use needs the TVS generality."
+ },
+ {
+  "id": "P190",
+  "where": "tangentConeAt.lim_zero",
+  "why": "Proof rewritten to avoid norms on E, so the lemma's machinery matches its weakened statement."
+ },
+ {
+  "id": "P168",
+  "where": "tangentConeAt.lim_zero proof",
+  "why": "Multi-step norm argument compressed into dense one-line terms with `.mono fun ... ↦` and `simpa using`."
+ },
+ {
+  "id": "P048",
+  "where": "added variable lines for ContinuousAdd/ContinuousSMul in TVS sections",
+  "why": "Instance arguments shared by consecutive declarations declared once with `variable`."
+ },
+ {
+  "id": "P006",
+  "where": "re-declared variable blocks in the new Normed sections; `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`",
+  "why": "New variable declarations; whether they duplicate variables already declared in the file."
+ },
+ {
+  "id": "P045",
+  "where": "TangentCone.lean module docstring",
+  "why": "Lemmas generalised from normed spaces to TVS; module docstring may describe the old setting."
+ },
+ {
+  "id": "P222",
+  "where": "tangentConeAt.lim_zero docstring",
+  "why": "Docstring of a declaration whose generality changed; terminology must match the new TVS setting."
+ }
+]

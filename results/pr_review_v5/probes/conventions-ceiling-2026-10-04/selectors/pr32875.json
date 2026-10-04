@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P024",
+  "where": "Finset.mem_map_equiv; Rat.inv_intCast_den_of_pos",
+  "why": "grind replaces short explicit proofs, and the PR's own profiling shows both got slower (<10 ms to 25/17 ms)."
+ },
+ {
+  "id": "P208",
+  "where": "Finset.mem_map_equiv; Rat.inv_intCast_den_of_pos",
+  "why": "Heavy general automation grind closes goals a lighter tactic or direct lemma might close."
+ },
+ {
+  "id": "P146",
+  "where": "PR description; all seven changed proofs",
+  "why": "PR replaces explicit proofs by grind/simp across many proofs and reports a trace-profiling benchmark."
+ },
+ {
+  "id": "P005",
+  "where": "Finset.mem_map_equiv; Rat.inv_intCast_den_of_pos",
+  "why": "Hand-written rewrite chains and terms replaced by a finishing tactic (grind) closing the goal."
+ },
+ {
+  "id": "P014",
+  "where": "Finset.mem_map_equiv; Rat.inv_intCast_den_of_pos",
+  "why": "simp only [...] output feeds only the flexible finisher grind; question whether squeezing is warranted."
+ },
+ {
+  "id": "P133",
+  "where": "mem_map_equiv; inv_intCast_den_of_pos; tendsto_of_forall_isClosed_limsup_real_le'; limsup_finset_sup'",
+  "why": "simp calls whose result is consumed by grind or exact; squeezed to simp only."
+ },
+ {
+  "id": "P401",
+  "where": "tendsto_of_forall_isClosed_limsup_real_le'; limsup_finset_sup'; both setLIntegral_condKernel_eq_measure_prod",
+  "why": "simp only ... at h then exact lemma: goal is lemma's conclusion up to simp, candidate simpa using."
+ },
+ {
+  "id": "P018",
+  "where": "all new two-line proofs (simp only then grind/exact)",
+  "why": "Consecutive simp only + grind/exact calls that one call (grind [...], simpa using) could perform."
+ },
+ {
+  "id": "P053",
+  "where": "whole PR, each golfed hunk",
+  "why": "Cleanup/golf PR; each hunk must gain more than it costs in readability."
+ },
+ {
+  "id": "P011",
+  "where": "exists_lt_mem_ball_of_mem_ball; setLIntegral_condKernel_eq_measure_prod; tendsto_of_forall_isClosed_limsup_real_le'; pi_map_piCongrLeft",
+  "why": "Proofs rederived from existing library lemmas (exists_between', compProd_apply_prod, Fintype.prod_equiv) instead of first principles."
+ },
+ {
+  "id": "P040",
+  "where": "Metric.exists_lt_mem_ball_of_mem_ball; both setLIntegral_condKernel_eq_measure_prod",
+  "why": "Short tactic blocks turned into, or still provable by, a single term."
+ },
+ {
+  "id": "P168",
+  "where": "limsup_finset_sup'; pi_map_piCongrLeft; tendsto_of_forall_isClosed_limsup_real_le'",
+  "why": "Multi-step arguments compressed into dense one-line terms by golfing."
+ },
+ {
+  "id": "P119",
+  "where": "simp only lemma lists in mem_map_equiv, limsup_finset_sup' (gt_iff_lt), inv_intCast_den_of_pos",
+  "why": "New simp only lists and steps may include lemmas or steps the proof does not need."
+ },
+ {
+  "id": "P089",
+  "where": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "why": "Fintype.prod_equiv _ _ _ passes explicit placeholder arguments that elaboration infers."
+ },
+ {
+  "id": "P329",
+  "where": "whole PR, seven files",
+  "why": "PR rewrites existing proofs across unrelated files; incidental proof changes are the whole content."
+ },
+ {
+  "id": "P138",
+  "where": "whole PR",
+  "why": "Golfing working proofs is a change of marginal benefit weighed against review cost."
+ },
+ {
+  "id": "P166",
+  "where": "limsup_finset_sup'",
+  "why": "Eventually goal now handled via eventually_all_finset instead of unpacking into an explicit set."
+ },
+ {
+  "id": "P060",
+  "where": "pi_map_piCongrLeft; both setLIntegral_condKernel_eq_measure_prod",
+  "why": "congrFun rfl and (compProd_apply_prod hs ht).symm obtain the needed fact by converting another."
+ },
+ {
+  "id": "P065",
+  "where": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "why": "congrFun rfl closes the pointwise goal by rfl across the let-bound s' definitional unfolding."
+ },
+ {
+  "id": "P249",
+  "where": "Rat.inv_intCast_den_of_pos",
+  "why": "Cast goal handled by listing cast lemmas (num_intCast) in simp only rather than cast tactics."
+ },
+ {
+  "id": "P240",
+  "where": "Metric.exists_lt_mem_ball_of_mem_ball",
+  "why": "Proof becomes a term after :=; placement depends on fitting on the statement line."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title says golf using grind and simp; several hunks instead use direct library lemmas."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title 'chore: golf using grind and simp' is subject to the type(Area): description convention."
+ },
+ {
+  "id": "P043",
+  "where": "whole PR, seven unrelated files",
+  "why": "Batch of separable golfs across seven areas, above the description's own ~5-file guideline."
+ },
+ {
+  "id": "P209",
+  "where": "PR description",
+  "why": "Description carries boilerplate batching guidelines alongside the profiling results."
+ }
+]
