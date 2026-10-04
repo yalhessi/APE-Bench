@@ -1,0 +1,1 @@
+{"path":"Mathlib/Probability/Distributions/Gaussian/Real.lean","declaration_name":"ProbabilityTheory.gaussianPDFReal_pos","new_declaration":"/-- The Gaussian probability density function is positive when the variance is not zero. -/\nlemma gaussianPDFReal_pos (μ : ℝ) (v : ℝ≥0) (x : ℝ) (hv : v ≠ 0) : 0 < gaussianPDFReal μ v x := by\n  rw [gaussianPDFReal]\n  positivity"}

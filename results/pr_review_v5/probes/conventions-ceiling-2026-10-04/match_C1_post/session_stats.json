@@ -1,0 +1,58 @@
+{
+ "41930": {
+  "E1": {
+   "findings": 0,
+   "compiles": 1
+  },
+  "X2": {
+   "findings": 0,
+   "compiles": 1
+  },
+  "X1": {
+   "findings": 0,
+   "compiles": 1
+  }
+ },
+ "42814": {
+  "E1": {
+   "findings": 7,
+   "compiles": 9
+  },
+  "X1": {
+   "findings": 7,
+   "compiles": 18
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 11
+  }
+ },
+ "43167": {
+  "X2": {
+   "findings": 6,
+   "compiles": 10
+  },
+  "E1": {
+   "findings": 8,
+   "compiles": 11
+  },
+  "X1": {
+   "findings": 6,
+   "compiles": 15
+  }
+ },
+ "42184": {
+  "E1": {
+   "findings": 5,
+   "compiles": 6
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 3
+  },
+  "X2": {
+   "findings": 2,
+   "compiles": 3
+  }
+ }
+}

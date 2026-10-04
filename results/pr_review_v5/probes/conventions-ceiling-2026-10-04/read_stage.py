@@ -99,3 +99,15 @@ for m in matchers:
         print(f"{m} {c}: {hits} reached / {found} findings = {hits / found:.3f}" if found else f"{m} {c}: no findings")
 for tag, (u, _) in sets.items():
     print(f"\n{tag} agreement:", u.get("agreement"))
+
+print(f"\n== asks where {treated} and {control} differ (sessions reaching / sessions, per matcher) ==")
+for tag, (u, _) in sets.items():
+    for cid in u[matchers[0]]["table"]:
+        got = {m: {c: [sum(v == "reached" for s, v in u[m]["table"][cid].items() if condition(s) == c),
+                       sum(condition(s) == c for s in u[m]["table"][cid])] for c in (treated, control)}
+               for m in matchers}
+        if any(got[m][treated][0] * got[m][control][1] != got[m][control][0] * got[m][treated][1] for m in matchers):
+            a = asks[cid]
+            print(f"{a['pr']} {cid} {a['family']:4} {'in ' if a['in_census'] else 'OUT'} " + " ".join(
+                f"| m{m}: {treated} {got[m][treated][0]}/{got[m][treated][1]} {control} {got[m][control][0]}/{got[m][control][1]}"
+                for m in matchers))

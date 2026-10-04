@@ -1,0 +1,49 @@
+import json, sys
+D = sys.argv[1]
+findings = [
+  {
+    "target": "Mathlib/Probability/Martingale/Convergence.lean (module doc of section AeConvergence, 'Almost everywhere martingale convergence theorem')",
+    "claim": "The PR rewrites the correct, author-chosen word \"Implementationwise\" as \"In terms of implementation\". That is not a typo fix. It is a rewording of existing prose that the style guide does not require, made by someone other than the author, inside a PR titled as typo fixes.",
+    "requested_change": "Drop this hunk and restore the original sentence \"Implementationwise, we have `tendsto_of_no_upcrossings` which shows that ...\". Keep the PR to genuine typos.",
+    "severity": "advisory",
+    "evidence": "diff.patch hunk @@ -87 in Convergence.lean changes only the opening word of the paragraph. file_read of Convergence.lean (lines 1-60, 125-175) shows that the paragraph is otherwise unchanged and that the file's author is Kexing Ying. The other changes in the PR are real misspellings (compostition, measurablity, gaussian), so this one is out of character for the PR. The convention applied: a purely stylistic change to existing prose that the style guide does not mandate is left to the original author's taste."
+  },
+  {
+    "target": "Mathlib/Probability/Moments/Basic.lean (module doc, '## Main results')",
+    "claim": "The PR changes \"mgfs\"/\"cgfs\" to \"MGFs\"/\"CGFs\". This keeps the identifier abbreviations of `mgf`/`cgf` in prose instead of the mathematical words. It also leaves the bullet list inconsistent: line 30 of the same docstring still says \"the cgf exists\", and every other prose use in Probability/Moments is the lowercase \"mgf\".",
+    "requested_change": "In the `IndepFun.mgf_add` and `IndepFun.cgf_add` bullets, write \"and their moment generating functions are defined at `t`\" and \"and their cumulant generating functions are defined at `t`\". Move the displayed equation to the next line so each line stays under 100 characters. Do not introduce the capitalized abbreviations.",
+    "severity": "advisory",
+    "evidence": "content_search for MGF/CGF/mgf/cgf in prose under target/Mathlib/Probability found the capitalized form only in these two PR-edited lines (Moments/Basic.lean:25,27). Lowercase \"mgf\" appears in ComplexMGF.lean:15-32, MGFAnalytic.lean:20 and SubGaussian.lean:30-110, and \"the cgf exists\" at Moments/Basic.lean:30. The definitions bullets of the same docstring (lines 17-20) already spell out \"moment generating function\" and \"cumulant generating function\". lean_verify_edit (line mode, lines 15-27 of Moments/Basic.lean, with the spelled-out wording) returned outcome=compiled; every line is at most 99 characters. The convention applied: a docstring uses full mathematical words, not the abbreviations used in identifiers."
+  },
+  {
+    "target": "Mathlib/Probability/Distributions/Gaussian/Real.lean (docstrings of gaussianPDFReal_pos, gaussianPDFReal_nonneg, measurable_gaussianPDFReal, stronglyMeasurable_gaussianPDFReal, lintegral_gaussianPDFReal_eq_one, integral_gaussianPDFReal_eq_one)",
+    "claim": "The PR rewrites these docstrings, but they still say \"The Gaussian pdf ...\" and \"The Gaussian distribution pdf ...\", using the abbreviation from the identifier `gaussianPDFReal` instead of the mathematical words. The definition's own docstring, two lines above, already says \"Probability density function of the Gaussian distribution\".",
+    "requested_change": "Since these lines are being edited anyway, replace \"pdf\" with \"probability density function\". For example: `/-- The Gaussian probability density function is positive when the variance is not zero. -/`, \"The Gaussian probability density function is nonnegative/measurable/strongly measurable.\" and \"The Gaussian probability density function integrates to 1 when the variance is not zero.\"",
+    "severity": "advisory",
+    "evidence": "content_search of Real.lean lists the docstrings at lines 57, 62, 67, 72, 100 and 118, all of which use \"pdf\", while line 43 (`gaussianPDFReal`) uses \"Probability density function\". lean_verify_edit in line mode, replacing line 57 with `/-- The Gaussian probability density function is positive when the variance is not zero. -/`, returned outcome=compiled with no warnings. (A declaration-mode attempt that included the docstring failed with a duplicate '/--', which was an artifact of how the tool splices, not a problem with the code.) The convention applied: a docstring uses full mathematical words, not identifier abbreviations."
+  },
+  {
+    "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module doc, '## Main statements')",
+    "claim": "The module docstring, which this PR edits, gives the composition result the wrong name and the wrong integral. It lists `ProbabilityTheory.integral_comp` and states it as `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`. The lemma is actually `ProbabilityTheory.Kernel.integral_comp`, and it is about the Bochner integral `∫`, not the lower Lebesgue integral `∫⁻` (that is `Kernel.lintegral_comp`).",
+    "requested_change": "Replace the bullet with \"* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.\"",
+    "severity": "advisory",
+    "evidence": "content_search and file_read of IntegralCompProd.lean: `namespace Kernel` opens at line 359 and `theorem integral_comp : ∀ {f : γ → E} (_ : Integrable f ((η ∘ₖ κ) a)), ∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a` is at line 417. The module doc (lines 30-31) says `ProbabilityTheory.integral_comp` with `∫⁻`. lean_verify_edit replacing lines 30-31 with the corrected bullet returned outcome=compiled."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Upcrossing.lean (module doc 'Variant of the upcrossing estimate')",
+    "claim": "The docstring this PR edits states the measurability argument wrongly. It writes $U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}$ and says $\\{U_N(a, b) < N\\}$ is measurable \"since $U_N(a, b)$ is a stopping time\". The identity that `upcrossingsBefore_eq_sum` proves, and that `Adapted.measurable_upcrossingsBefore` uses, sums indicators of $\\{\\tau_i < N\\}$, where $\\tau_i$ is the upper crossing time (`upperCrossingTime`). The stopping time in the argument is $\\tau_i$, not $U_N(a, b)$.",
+    "requested_change": "Replace the display and the following sentence with \"$$ U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}} $$ $U_N(a, b)$ is measurable as $\\{\\tau_i < N\\}$ is a measurable set since the upper crossing time $\\tau_i$ is a stopping time.\"",
+    "severity": "advisory",
+    "evidence": "file_read of Upcrossing.lean: lines 702-706 contain the formula as quoted. Line 711 has `upcrossingsBefore_eq_sum : upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`. Line 744 proves measurability through `hf.isStoppingTime_upperCrossingTime.measurableSet_lt_of_pred N`. The proof outline at lines 73-79 already names the upper crossing times $\\tau_n$. lean_verify_edit replacing lines 702-706 with the corrected text returned outcome=compiled."
+  },
+  {
+    "target": "Mathlib/Probability/Moments/Basic.lean (module doc, '## Main definitions')",
+    "claim": "The module docstring this typo PR edits still has a typo: the `centralMoment` bullet has no space after the colon (\"`ProbabilityTheory.centralMoment X p μ`:`p`th central moment\"). Every other bullet in the list has one.",
+    "requested_change": "Add the missing space: \"* `ProbabilityTheory.centralMoment X p μ`: `p`th central moment of `X` with respect to measure `μ`,\". The line is 99 characters.",
+    "severity": "advisory",
+    "evidence": "file_read of Moments/Basic.lean line 15 shows the colon with no space; lines 13, 17 and 19 have \"`: \". lean_verify_edit replacing lines 15-27 (including this fix) returned outcome=compiled, and the edited line is 99 characters."
+  }
+]
+with open(f"{D}/findings.json", "w") as fh:
+    json.dump(findings, fh, ensure_ascii=False, indent=2)
+print(len(json.load(open(f"{D}/findings.json"))))
