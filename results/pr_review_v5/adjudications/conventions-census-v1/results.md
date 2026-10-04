@@ -1,8 +1,8 @@
 # The convention census: how many principles generate what maintainers ask for (results)
 
 *Pre-registered 2026-09-29 (`reader_rubric_census_v1.md`, commit `30a0a22`); val1000 read
-2026-09-29 to 2026-10-03; held-out sets in progress. `results.json` holds every count;
-`analyse.py --write` regenerates it.*
+2026-09-29 to 2026-10-03; the held-out reading **paused 2026-10-04** at the point in §6.
+`results.json` holds every count; `analyse.py --write` regenerates it.*
 
 **The question** (`docs/todo/conventions-nature.md`, study 1). We kept assuming Mathlib's
 conventions can be written down, and nothing measured how many there are. Two blind readers each
@@ -169,7 +169,7 @@ explicitly in the comment), another that it be left unsqueezed before a flexible
 P014, 19 asks). Both readers kept them as separate entries; the census records that two
 maintainers hold opposite rules on one situation.
 
-## 6. The held-out test (in progress)
+## 6. The held-out test (paused 2026-10-04)
 
 Rule, fixed before any label: entries created over the 1,070 outside asks, as a share of the
 val1000 codebook; **saturated at or under 10% (41 entries for A), not saturated at or over 25%
@@ -180,15 +180,26 @@ budget-forced stop cleaner. The total is the same if everything is read.
 
 | held-out batch | A new | A cumulative | B new | B cumulative |
 |---|---|---|---|---|
-| y00 (125) | 14 | 14 | | |
-| y01 (125) | 11 | 25 | | |
+| y00 (125) | 14 | 14 | not read | |
+| y01 (125) | 11 | 25 | not read | |
+| y02 (19) | 4 | 29 | not read | |
 
-After 250 other-years asks A has 25 new entries, 6.1% of its codebook: a pace that would reach
-about 107 over the full set, on the not-saturated side. This section is completed as the batches
-land; the verdict is read only on the full set, or on exactly what was read if the budget stops
-the reading, with the thresholds unchanged.
+**Where it stopped.** Reader A read the whole other-years sample (269 asks) and added **29 entries,
+7.1% of its val1000 codebook**; reader B read none of it. Neither read the same-window sample
+(801 asks). Two runs were killed by the session limit on 2026-10-03 (A on w00, B on y00) after
+rewriting their codebooks and before any labels; those unlabelled entries were discarded and both
+codebooks stand at their last committed state (A 438, B 407).
 
-## 7. Reading, provisional until the held-out test completes
+**No held-out verdict is read.** The rule is cumulative over the 1,070 outside asks, and a third of
+them have been read by one reader. A's pace on the other-years sample (29 per 269 asks) would reach
+about 115 over the full set, on the not-saturated side, but that is a projection from one reader
+and one sample, not the pre-registered reading.
+
+**What is left, if resumed:** B on y00..y02 (3 runs), both readers on w00..w06 (14 runs), about
+17 reader runs at about 200k subagent tokens each (3.4M tokens, two to three 5-hour windows). Each
+run follows `reader_instructions.md` and is validated with `provenance/check_batch.py`.
+
+## 7. Reading, provisional (the held-out test is paused)
 
 - **At this grain, review draws on about 400 principles and the census is not saturated.** Both
   pre-registered val1000 readings say so, by two readers who agree on the count to within two.
