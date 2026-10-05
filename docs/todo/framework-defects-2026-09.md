@@ -496,3 +496,28 @@ episode; or take `proof_profile` out of the solo grant. That second option is th
 gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands at a run boundary.
 The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
 task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.
+
+## The no-submission prompts name `submit_result` and tell a finished reviewer to keep working (found 2026-10-05)
+
+A batch session's result is what its submission tool records, so a turn with no tool call cannot be
+left alone: the model has yielded with nothing filed. Both scaffolds answer it with a user message.
+APE-Agent's is `_create_no_tool_call_prompt` ("No tool call detected! You must use tools to make
+progress ... When the task is fully completed, use `submit_result`"), with `_create_empty_response_prompt`
+for an empty reply; Claude Code's is `_create_retry_prompt` ("Continue. You must submit your final result
+using the `...submit_result` tool ..."). The text the model wrote stays in the history.
+
+Two things are wrong with the wording, in all three. It hard-codes `submit_result`, and a review task's
+tool is `submit_findings`. And it reads a stop as being stuck ("Leverage all available tools to
+thoroughly complete the task"), where a reviewer that stops has usually finished: the prompt should
+say to call the task's own submission tool if done, and to continue otherwise. `batch_preamble: plain`
+does not reach these prompts.
+
+**It has not touched a result.** In the 262 APE-Agent gpt review sessions logged 29 September to
+5 October (5,072 calls), the no-tool-call prompt was sent 0 times and the empty-response prompt twice,
+both to gpt-5.5 after an empty `final_answer` (0 characters; PRs 43167 and 26185). After the first it
+submitted at once; after the second it went back to searching. Each also lost that turn's reasoning
+item, since the API refuses a reasoning item with nothing after it. Not measured: how often the
+open-weight `elm_*` models hit it, and how often Claude Code's fires.
+
+**What would close it:** take the submission tool's name from the task in all three prompts, reword
+them as above, and pin both with a test. No run is needed.
