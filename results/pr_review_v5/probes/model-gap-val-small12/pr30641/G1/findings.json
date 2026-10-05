@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Real.posLog_pow",
+    "claim": "The docstring of `Real.posLog_pow`, \"The function `log⁺` commutes with taking powers.\", misstates the lemma. Commuting with powers would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, but the lemma proves `log⁺ (a ^ n) = n * log⁺ a`: a power becomes a multiple.",
+    "requested_change": "Reword the docstring to state what the lemma proves, e.g. `/-- The positive part of the logarithm of a power: `log⁺ (a ^ n) = n * log⁺ a`. -/` (or \"`log⁺` turns powers into multiples\").",
+    "severity": "advisory",
+    "evidence": "Read the PR's file with file_read (lines 101-110): the docstring says 'commutes with taking powers' over the statement `log⁺ (a ^ n) = n * log⁺ a`. The suggested docstring, with the golfed proof below, compiled via lean_verify_edit in line mode (lines 101-110): outcome `compiled`, no errors."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "`Real.posLog_pow` takes `{n : ℕ} {a : ℝ}` as implicit binders. Both occur only in the conclusion, so no explicit argument or hypothesis determines them, and `posLog_pow` cannot be instantiated as a rewrite (`rw [posLog_pow a n]`) without named arguments. Its model `Real.log_pow` is `@[simp] theorem log_pow (x : ℝ) (n : ℕ)`, with both explicit.",
+    "requested_change": "Make the arguments explicit and order them as in `Real.log_pow`: `@[simp] theorem posLog_pow (a : ℝ) (n : ℕ) : log⁺ (a ^ n) = n * log⁺ a`.",
+    "severity": "advisory",
+    "evidence": "content_search on Mathlib/Analysis/SpecialFunctions/Log/Basic.lean: line 267 has `theorem log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x`. lean_verify_edit with the signature `(a : ℝ) (n : ℕ)` compiled (outcome `compiled`). Nothing else in the file uses `posLog_pow`, so no use site breaks."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "`Real.posLog_pow` is proved by a six-line case analysis: `by_cases` on `n = 0` and on `|a| ≤ 1`, a `rw [not_le] at h₂a`, an auxiliary `have : 1 < |a ^ n|`, and hinted `simp`/`simp_all` calls. The statement follows directly from the definition `log⁺ = max 0 ∘ log`, `Real.log_pow` and `mul_max_of_nonneg`, because `n ≥ 0`.",
+    "requested_change": "Replace the proof with `simp [posLog, mul_max_of_nonneg]`, or, if a non-flexible proof is preferred, with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on `Real.posLog_pow` with proof `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`: compiled. With proof `simp [posLog, mul_max_of_nonneg]`: compiled. content_search: `mul_max_of_nonneg (b c : R) (ha : 0 ≤ a) : a * max b c = max (a * b) (a * c)` is in Mathlib/Algebra/Order/Ring/Unbundled/Basic.lean:525."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but the statement and proof use only the norm and the triangle inequality `norm_sum_le`. Both are available in any `SeminormedAddCommGroup`, so the hypothesis is stronger than needed.",
+    "requested_change": "Weaken the typeclass to `[SeminormedAddCommGroup E]` and say \"seminormed additive commutative groups\" in the docstring.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing `[NormedAddCommGroup E]` with `[SeminormedAddCommGroup E]`, proof unchanged: outcome `compiled`, no errors."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "The first calc step of `Real.posLog_norm_sum_le` leaves the second membership side goal as `_` in `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`, then closes it with a separate `simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]`. The whole two-step calc is a single `MonotoneOn` application chained with `posLog_sum`.",
+    "requested_change": "Write the proof as one term: `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`. If the calc is kept, at least discharge the side goal inline as `(by simp [Finset.sum_nonneg])`, as `posLog_sum` already does, instead of leaving `_` and a trailing `simp`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on `Real.posLog_norm_sum_le` with body `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`: compiled. Replacing the first step by `gcongr` fails ('gcongr did not make progress'): `posLog` has no `@[gcongr]` lemma, so `gcongr` is not an option here."
+  }
+]
