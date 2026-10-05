@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+  "claim": "`isMulCommutative_mono` is named as a monotonicity lemma, but the statement is order-reversing in the subobject: from `s ≤ t` it uses commutativity of the larger object `t` to prove commutativity of the smaller object `s`. This should use the `_anti` suffix.",
+  "requested_change": "Rename the declaration to `isMulCommutative_anti` (letting `to_additive` generate `isAddCommutative_anti`).",
+  "severity": "blocking"
+ }
+]

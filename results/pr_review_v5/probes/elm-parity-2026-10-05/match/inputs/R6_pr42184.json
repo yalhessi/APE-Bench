@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "tprod_nonneg",
+  "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `∏'[L]` is a `finprod` (`tprod_bot`), which is nonnegative by `finprod_induction`. Every sibling bound in this file (`one_le_tprod`/`tsum_nonneg`, `tprod_le_one`, `tprod_le_of_prod_le'`) drops `L.NeBot` exactly this way, so the new lemma is strictly weaker than its neighbours, and a `positivity` extension for `tprod` modelled on `evalTsum` (lines 378-399, which calls `tsum_nonneg` with an arbitrary `L`) could not use it, since it would have to synthesize `L.NeBot`.",
+  "requested_change": "Remove `[L.NeBot]` from `tprod_nonneg` and handle the degenerate filter the way `tprod_le_one` does. Use `i` as the bound variable to match the siblings:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · rw [tprod_eq_one_of_not_multipliable h]\n    exact zero_le_one\n```",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "claim": "The new `section WithZero` / `end WithZero` around `tprod_nonneg` is named after the `WithZero` type constructor, which this lemma is not about. The section holds no `variable`s; it only groups a lemma about `CommMonoidWithZero`. The other sections in this file are named after their algebraic-order setting (`OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`), and Mathlib's with-zero sections use the full class name (`MonoidWithZero`, `CommMonoidWithZero`, `GroupWithZero`).",
+  "requested_change": "Rename the section to name the setting, e.g. `section CommMonoidWithZero` ... `end CommMonoidWithZero` (or `MonoidWithZero`), or drop the section wrapper, since it declares no variables.",
+  "severity": "advisory"
+ }
+]

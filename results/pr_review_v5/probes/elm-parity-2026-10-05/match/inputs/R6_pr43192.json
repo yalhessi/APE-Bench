@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+  "claim": "The module documentation heading is ungrammatical: it says `Modules over presheaves commutative rings`, missing the preposition before `commutative rings`.",
+  "requested_change": "Change the heading to `# Modules over presheaves of commutative rings`.",
+  "severity": "advisory"
+ }
+]

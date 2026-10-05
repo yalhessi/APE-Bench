@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+  "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`. The neighboring `one_le_tprod` and `tprod_le_one` handle arbitrary summation filters by treating the bottom filter via `tprod_bot`, and the same argument works here, so the current lemma is less usable than it needs to be for `L = ⊥`.",
+  "requested_change": "Remove the `[L.NeBot]` hypothesis and add a bottom-filter branch, e.g. after splitting on `L.NeBot`, use the existing limit proof in the nonbottom case and prove the bottom case from `tprod_bot hL` with `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+  "severity": "blocking"
+ }
+]

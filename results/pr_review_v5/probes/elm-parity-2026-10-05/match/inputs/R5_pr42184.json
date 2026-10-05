@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "tprod_nonneg",
+  "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `tprod_bot` rewrites the product to a `finprod`, which is nonnegative by `finprod_induction`. The sibling lemmas in the same file (`one_le_tprod`, `tprod_le_one`, and hence `tsum_nonneg`) carry no `NeBot` assumption and handle the bot case this way. As written, the extra instance argument makes the lemma weaker than its additive-side counterpart and unusable for a generic `L`, e.g. from a positivity extension.",
+  "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and split on `L.NeBot` the way `one_le_tprod` does, using the file's own `le_hasProd_of_le_prod` rather than `ge_of_tendsto'`:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_eq_one_of_not_multipliable h]\n      exact zero_le_one\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n```",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "claim": "The file has a `positivity` extension for `tsum` (`Mathlib.Meta.Positivity.evalTsum`, built on `tsum_nonneg`), but none for `tprod`. So even with the new `tprod_nonneg`, `positivity` still fails on goals like `0 ≤ ∏' i, f i ^ 2`.",
+  "requested_change": "Once `[L.NeBot]` is dropped from `tprod_nonneg`, add an `evalTprod` extension next to `evalTsum` in the `Mathlib.Meta.Positivity` namespace, together with a test in `MathlibTest/positivity.lean`:\n```lean\nattribute [local instance] monadLiftOptionMetaM in\n/-- Positivity extension for infinite products.\n\nThis extension only proves non-negativity, strict positivity is more delicate for infinite products\nand requires more assumptions. -/\n@[positivity tprod _]\nmeta def evalTprod : PositivityExt where eval {u α} zα pα? e :=\n  match pα? with | none => pure .none | some pα => do\n  match e with\n  | ~q(@tprod _ $ι $instCommMonoid $instTopSpace $f $L) =>\n    lambdaBoundedTelescope f 1 fun args (body : Q($α)) => do\n      let #[(i : Q($ι))] := args | failure\n      let rbody ← core zα pα body\n      let pbody ← rbody.toNonneg\n      let pr : Q(∀ i, 0 ≤ $f i) ← mkLambdaFVars #[i] pbody\n      let mα' ← synthInstanceQ q(CommMonoidWithZero $α)\n      let oα' ← synthInstanceQ q(Preorder $α)\n      let zα' ← synthInstanceQ q(ZeroLEOneClass $α)\n      let pmα' ← synthInstanceQ q(PosMulMono $α)\n      let instClosed ← synthInstanceQ q(ClosedIciTopology $α)\n      assertInstancesCommute\n      return .nonnegative\n        q(@tprod_nonneg $ι $α $L $mα' $instTopSpace $oα' $zα' $pmα' $instClosed $f $pr)\n  | _ => throwError \"not tprod\"\n```",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "section in Order.lean",
+  "claim": "The new section is named `WithZero`. In Mathlib that name suggests lemmas about the `WithZero` type constructor, as in `GroupTheory/SpecificGroups/Cyclic.lean`, where `section WithZero` holds an instance on `(WithZero G)ˣ`. This section is about a `CommMonoidWithZero`, and the sibling files in the same directory call such sections `section CommMonoidWithZero` (`InfiniteSum/Basic.lean:774`) and `section CommGroupWithZero` (`InfiniteSum/Group.lean:418`).",
+  "requested_change": "Rename the section to `CommMonoidWithZero` (change both `section WithZero` and `end WithZero`). Optionally, as in the file's other sections, hoist the shared binders into a `variable [CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [TopologicalSpace α] [ClosedIciTopology α]` line.",
+  "severity": "advisory"
+ }
+]

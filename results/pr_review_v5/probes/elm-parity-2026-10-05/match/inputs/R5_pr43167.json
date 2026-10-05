@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+  "claim": "`Pointwise.lean` imports `Mathlib.GroupTheory.Commutator.Basic`, but the file contains no commutator references and still compiles after removing this line. This unnecessarily makes basic subgroup pointwise API depend on the heavier commutator theory module.",
+  "requested_change": "Remove the `public import Mathlib.GroupTheory.Commutator.Basic` line from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+  "claim": "`Subgroup.commutator_sup_left` introduces new public commutator API without an additive counterpart; its sibling `commutator_sup_right` is also multiplicative-only, unlike the surrounding subgroup commutator lemmas in this file.",
+  "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, to `commutator_sup_left`, and to `commutator_sup_right`, or otherwise provide the corresponding `AddSubgroup.addCommutator_sup_left` and `AddSubgroup.addCommutator_sup_right` declarations.",
+  "severity": "blocking"
+ }
+]

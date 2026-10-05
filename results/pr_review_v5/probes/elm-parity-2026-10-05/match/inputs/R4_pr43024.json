@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "isMulCommutative_mono",
+  "claim": "`isMulCommutative_mono` is misnamed. It proves `s ≤ t → IsMulCommutative t → IsMulCommutative s`, so commutativity passes from the larger subobject down to the smaller one. As a function of the subobject, `IsMulCommutative` is antitone, not monotone. Mathlib's `_mono`/`_anti` convention, and the sibling lemmas for predicates inherited by smaller objects (`Set.Subsingleton.anti`, `SimpleGraph.IsAcyclic.anti`, `SimpleGraph.CliqueFree.anti`, `Graph.Loopless.anti`, `Graph.Simple.anti`, `ConvexCone.Salient.anti`, `ConvexCone.Blunt.anti`, `Filter.Subsingleton.anti`, versus `ConvexCone.Pointed.mono` for the upward direction), call this `_anti`. The PR's own title already announces `isMulCommutative_anti`, so the code and the title disagree. The generated additive name `isAddCommutative_mono` has the same problem.",
+  "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti`, which through `to_additive` also renames `isAddCommutative_mono` to `isAddCommutative_anti`. Keep the statement, docstrings and proof unchanged.",
+  "severity": "blocking"
+ }
+]

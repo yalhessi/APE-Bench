@@ -1,0 +1,9 @@
+[
+ {
+  "ask_id": "p0008",
+  "path": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean",
+  "code_at_comment": "@@ -346,3 +346,11 @@ lemma setLike_mul_comm {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]\n     {s : S} [IsMulCommutative s] ⦃a b : M⦄ (ha : a ∈ s) (hb : b ∈ s) :\n     a * b = b * a :=\n   isMulCommutative_iff_of_setLike.mp ‹_› a ha b hb\n+\n+/-- Commutativity of multiplication passes to smaller subobjects. -/\n+@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/ ]\n+lemma isMulCommutative_mono {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]",
+  "comment": "```suggestion\r\nlemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]\r\n```",
+  "replies_to": null
+ }
+]

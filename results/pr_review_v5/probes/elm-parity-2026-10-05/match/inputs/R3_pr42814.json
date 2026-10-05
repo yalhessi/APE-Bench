@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+  "claim": "The module documentation for `Int.IsFundamentalDiscr` says fundamental discriminants are exactly the discriminants of quadratic fields, but the definition and `Int.isFundamentalDiscr_iff_squarefree` make `1` a fundamental discriminant, so the statement as written is false without mentioning the convention that includes `1`.",
+  "requested_change": "Change the sentence to explicitly mention the convention, for example: `This convention includes 1; the other fundamental discriminants are exactly the discriminants of quadratic fields.`",
+  "severity": "blocking"
+ }
+]

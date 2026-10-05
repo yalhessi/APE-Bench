@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+  "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`; unlike the nearby `one_le_tprod`, the statement is still true for the bottom summation filter because `tprod_bot` reduces it to nonnegativity of a finite product (or `1`).",
+  "requested_change": "Remove the `[L.NeBot]` argument from `tprod_nonneg` and add a `by_cases hL : L.NeBot` branch, proving the non-`NeBot` case via `simp only [tprod_bot hL]` followed by `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+  "severity": "blocking"
+ }
+]
