@@ -36,6 +36,12 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   the code departs from at the reviewing point, not in supplying the conventions. Untried: a
   pinpointing pass with tools that outputs candidate departures at named places for the reviewer to
   vet; the selector's `where` delivered; exemplars; a second session a PR.
+- **Stage G, pre-registered 2026-10-05 at the user's direction: conventions as guarded rules,
+  pinpointed.** Each of 52 entries (the 26 behind the ten PRs' asks, pooled, and 26 decoys from stage
+  F's blind selections) is written as a rule with a trigger and a check, from census asks only; a
+  blind pass a PR lists where each trigger holds; the reviewer gets the place, the convention and the
+  check. Its leak is the pooled rule set, so it is a best case for the delivery, not a floor. Rule:
+  G − X within 0.05 of E − X recovers the ceiling; `≤ +0.05` does not carry it. Same README.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

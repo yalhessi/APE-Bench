@@ -540,12 +540,108 @@ delivery the floor is the unbriefed reviewer. The ceiling replicates under new m
   `tmp/` and ran it with the project's Python by its absolute path; nothing outside the packet was
   read). `run_stage_f.sh` held back that batch's commit and the matching's until the flag was read.
 
+## Stage G: conventions as guarded rules, pinpointed (pre-registered 2026-10-05, before any rule, pinpointing or session)
+
+The user (2026-10-05), looking for a design less ad hoc than a list of sentences: think of a
+convention as an inference rule, with preconditions, postconditions, a scope, and what is undefined
+or nondeterministic. Asked which test would say whether that framing is worth building, the answer
+given was this stage, and the user's reply was *"Okay it's worth testing the probe."* Nothing below
+has run.
+
+**What the stage tests.** Stage F delivered each convention as a sentence, 25 a PR, and the
+reviewer weighed each one and passed the code. The exact brief carried two things beside the text:
+that the convention is in play on this PR, and, by being one of five, roughly where. A guarded rule
+states both openly: a trigger that says where the convention is in play, and a check that says how
+to tell a departure. If reach under that delivery comes near the exact brief's, the trigger and the
+place carry the gain, and both are computed from the diff, not from the asks.
+
+**The rule set, and its leak, stated first** (`stage_g_entries.json`, `build_stage_g_entries.py`):
+52 census entries.
+- **The pool: the 26 entries behind the 33 in-census asks on the ten stage C PRs.** The set is
+  chosen knowing the asks, pooled over the PRs. So the stage skips retrieval over the 438: the right
+  rule is always among the 52. On any one PR, two to five of the 52 are behind its asks; which of
+  them fire there, and where, is decided blind.
+- **26 decoys, none behind an ask on any of the 14 PRs:** the entries stage F's blind selectors
+  picked on the most of the ten PRs (three on 5 PRs, four on 4, eight on 3, eleven on 2). Their
+  situations occur in these PRs and the maintainers asked nothing under them, so a false fire has
+  somewhere to come from.
+
+The stage is therefore a best case for the guarded-rule delivery, given a rule set that holds the
+right rule. It is not a floor, and stage F's remains the only ask-free number.
+
+**The rules** (`rule_writer_rubric.md`, `build_rule_writer_folders.py`, `rules.json`). Two blind
+writers, 26 entries each, shuffled and unmarked. A writer's folder holds each entry's sentence and
+up to four of the census asks reader A filed under it, comment and code, all on census PRs
+(disjoint from the probe's). Per entry it writes `applies_to`, `trigger` (a yes-or-no test on
+changed code that does not judge its quality), `required`, `check_kind` (`read`, `compile`,
+`lookup` or `judge`), `check` and `not_when`.
+
+**The pinpointing pass** (`pinpoint_rubric.md`, `build_pinpoint_folders.py`, `pinpoints/`). One
+blind subagent a PR. Its folder holds the reviewer packet's own `pr.md`, `model.md` and
+`diff.patch` and the 52 rules in one seeded order. No tools, no asks. It goes through every rule.
+For a `read` rule it lists a place only where the code departs. For the other kinds it lists every
+place the trigger holds, at most three a rule, without judging the code: that takes the check, and
+the check takes tools. Each item is a file, a declaration, a fact about this code and a status.
+
+**The brief** is brief X plus a section (`probes.CANDIDATES_LEAD` and `candidate_line`, tested). An
+item reads: the place, the fact, the convention's census sentence, then either "Decided by
+reading: the code departs" or the rule's check, then the rule's exception if it has one. The lead
+tells the reviewer to verify every item, run the check an item names, file where the code departs,
+drop the rest without comment, and review the rest of the PR as the brief says.
+
+**The reviewer** is session G1: the ten stage C PRs, one session each, in stage C's order, on
+stage C's route, model, effort and CLI.
+
+**Matching.** One seal a set holding X1, X2, E1 and G1, two blind matchers a set. A1 is left out to
+save matcher cost; X and E are re-judged beside G and tie this table to stage F's.
+
+**Read before any reviewer session** (`build_candidate_briefs.py`): for each of the 33 asks,
+whether a candidate carries an entry behind it and whether it sits at the ask's place; and the
+candidates a PR, from the pool and from the decoys. If an entry is delivered for fewer than 11 of
+the 33, the sessions are not spent and that is the result.
+
+**Reading rule, fixed now.** Stage C's measure: per-session reach on the 39 in-census asks, pooled,
+each of two matchers, with 26755, 36822 and 43192 imputed as before.
+
+| G − X, on both matchers | reading |
+|---|---|
+| within 0.05 of E − X | **guarded rules, pinpointed, recover the ceiling**: the trigger and the place carry what the asks' own pinpointing carried |
+| `≥ +0.15`, more than 0.05 under E − X | **the delivery carries most of the direction**; the decomposition says where the rest went |
+| between +0.05 and +0.15 | partial |
+| `≤ +0.05` | **this delivery does not carry it either** |
+
+Asks reached per finding must be no lower than X's.
+
+**Also read, fixed now** (`decompose_stage_g.py`).
+- **Application at the place.** Asks with a candidate at their place, with the entry delivered
+  elsewhere, and with no candidate: how many G, E and X reach. Stage F's sentence among 25 gave 12
+  of 22 and the exact brief 18 of 22; the rate at the place is this framing's own number.
+- **By kind of check:** reach on asks whose rule is `read`, `compile`, `lookup` or `judge`.
+- **The decoys:** candidates delivered from them a PR, and findings a PR against X's and E's.
+- Out-of-census asks, which should not move.
+
+**Limits, stated before.** The pooled rule set, above. One writer a rule, one pinpointer and one
+session a PR. The pinpointer has no tools, so no check arrives already run. The rules are written
+by Claude from a census Claude wrote.
+
+**Untried after this, whatever it reads:** rules for all 438 with retrieval in front; the checks
+run before delivery; decoys at the census's real ratio; a second session a PR.
+
+**Cost and tokens.** Token B is disabled: read at 06:12, its login answers "your organization has
+disabled Claude subscription access". Everything runs on token C, at 41% of its five-hour window
+(resets 09:50) and 39% of its week when read. Expected, from stage F's meters: two writers about 8
+points of a window, ten pinpointers about 40, ten sessions about 100, four matcher runs about 25,
+so about 1.7 windows. Writers and pinpointers go in the current window; `run_stage_g.sh` runs the
+sessions and the matching, meters each batch, and sleeps to the reset when a batch does not fit.
+Sessions run in stage C's order, so a spent window or week leaves the most informative prefix, and
+a stage cut short is reported as partial on the PRs it ran.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
 picked from the diff do not move the reviewer, and the ceiling's gain was in the pinpointing. The
 design the two results point to is a pinpointing pass (above), which is code and a prompt, not a
-brief. Nothing of it is built; it waits for the user.
+brief. Stage G, above, is its first test: the user asked for it on 2026-10-05.
 
 ## What closes it
 
