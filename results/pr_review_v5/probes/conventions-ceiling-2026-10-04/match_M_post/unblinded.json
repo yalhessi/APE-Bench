@@ -1,0 +1,378 @@
+{
+ "asks": 16,
+ "1": {
+  "reach": {
+   "GB1": 0.25,
+   "GB2": 0.3125,
+   "GE1": 0.5,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "GB": 0.28125,
+   "GE": 0.5,
+   "X": 0.46875
+  },
+  "stable": {
+   "GB": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "GE": [
+    "p0002",
+    "p0007",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "GB": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "GE": [
+    "p0002",
+    "p0007",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "GB1": "no",
+    "GB2": "reached",
+    "GE1": "no",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0013": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "2": {
+  "reach": {
+   "GB1": 0.25,
+   "GB2": 0.3125,
+   "GE1": 0.5,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "GB": 0.28125,
+   "GE": 0.5,
+   "X": 0.46875
+  },
+  "stable": {
+   "GB": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "GE": [
+    "p0002",
+    "p0007",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "GB": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "GE": [
+    "p0002",
+    "p0007",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "GB1": "no",
+    "GB2": "reached",
+    "GE1": "no",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0013": {
+    "GB1": "reached",
+    "GB2": "reached",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "GB1": "no",
+    "GB2": "no",
+    "GE1": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "agreement": {
+  "cells": 80,
+  "three_valued": 80,
+  "reached_or_not": 80
+ }
+}
