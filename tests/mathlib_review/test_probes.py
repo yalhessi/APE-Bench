@@ -484,6 +484,33 @@ def test_a_packet_brief_ends_with_its_conventions_and_an_empty_brief_is_brief_x(
                              conventions={43192: ["A is written as B."]})
 
 
+def test_a_packet_brief_can_end_with_pinpointed_candidates_instead(tmp_path):
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe"})
+    read = {"file": "Mathlib/A.lean", "declaration": "foo_of_bar", "fact": "It takes `h : Bar x` first.",
+            "convention": "A is named in B's namespace.", "status": "departs", "check": "", "not_when": ""}
+    run = {"file": "Mathlib/A.lean", "declaration": "baz", "fact": "The step is a monotonicity step.",
+           "convention": "Such a step is closed by `gcongr`.", "status": "check",
+           "check": "Replace the step by `gcongr`; it departs if that compiles.", "not_when": "the function is not tagged."}
+    briefed, bare = probes.write_packets(spec, ["G1"], tmp_path / "scratch", prs=[43192, 43024],
+                                         candidates={43192: [read, run], 43024: []})
+    brief_x = probes.BRIEF_X.read_text()
+    assert (briefed / "brief.md").read_text() == (
+        brief_x + f"\n## {probes.CANDIDATES_TITLE}\n\n{probes.CANDIDATES_LEAD}\n\n"
+        "- `Mathlib/A.lean`, `foo_of_bar`: It takes `h : Bar x` first. Convention: A is named in B's namespace. "
+        "Decided by reading: the code departs.\n"
+        "- `Mathlib/A.lean`, `baz`: The step is a monotonicity step. Convention: Such a step is closed by `gcongr`. "
+        "Check: Replace the step by `gcongr`; it departs if that compiles. Not when: the function is not tagged.\n")
+    assert (bare / "brief.md").read_text() == brief_x
+    with pytest.raises(KeyError, match="43024"):
+        probes.write_packets(spec, ["G2"], tmp_path / "scratch", prs=[43192, 43024], candidates={43192: [read]})
+    with pytest.raises(ValueError, match="not both"):
+        probes.write_packets(spec, ["G3"], tmp_path / "scratch", prs=[43192], candidates={43192: [read]},
+                             conventions={43192: ["A is written as B."]})
+    briefs = tmp_path / "candidates.json"
+    briefs.write_text(json.dumps({"prs": {"43192": [read], "43024": []}}))
+    assert probes.load_candidates(briefs) == {43192: [read], 43024: []}
+
+
 def test_a_brief_is_its_entries_sentences_in_codebook_order(tmp_path):
     codebook, briefs = tmp_path / "codebook.json", tmp_path / "briefs.json"
     codebook.write_text(json.dumps([{"id": "P001", "principle": "first"}, {"id": "P002", "principle": "second"}]))

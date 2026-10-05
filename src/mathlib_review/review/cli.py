@@ -162,6 +162,9 @@ def build_parser() -> argparse.ArgumentParser:
                                     help='end each brief with its PR\'s conventions section: a JSON '
                                          '{"prs": {pr: [entry ids]}}, with --codebook (needs --prs)')
     parsers["packets"].add_argument("--codebook", type=Path, help="the census codebook --conventions names entries of")
+    parsers["packets"].add_argument("--candidates", type=Path, metavar="BRIEFS",
+                                    help='end each brief with its PR\'s pinpointed candidates instead: a JSON '
+                                         '{"prs": {pr: [items]}} (probes.load_candidates; needs --prs)')
     parsers["feedback"].add_argument("--write", action="store_true")
     for name in ("readers", "match-inputs"):
         parsers[name].add_argument("--out", required=True, type=Path)
@@ -592,7 +595,8 @@ def _probe(args, logger) -> int:
             raise SystemExit("--conventions and --codebook go together")
         written = probes.write_packets(
             spec, args.sessions, args.scratch.resolve(), prs=args.prs,
-            conventions=probes.load_conventions(args.conventions, args.codebook) if args.conventions else None)
+            conventions=probes.load_conventions(args.conventions, args.codebook) if args.conventions else None,
+            candidates=probes.load_candidates(args.candidates) if args.candidates else None)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "prompts":
         for pr in args.prs or spec.pr_numbers:

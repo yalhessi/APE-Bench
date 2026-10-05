@@ -429,6 +429,42 @@ def load_conventions(briefs: Path, codebook: Path) -> Dict[int, List[str]]:
             for pr, ids in json.loads(Path(briefs).read_text())["prs"].items()}
 
 
+#: Stage G of the same probe: conventions as guarded rules. A blind pinpointing pass evaluates each
+#: rule's trigger on the PR's changed code, and the section names the places where one fires, with
+#: how to tell a departure. Stage F delivered the sentences alone, 25 a PR, and moved nothing.
+CANDIDATES_TITLE = "Places where a maintainers' convention may apply"
+CANDIDATES_LEAD = (
+    "A separate pass compared this PR's changed code with conventions Mathlib's maintainers hold "
+    "when they review. Each item below names a place where one convention's situation occurs, the "
+    "convention, and how to tell whether the code departs from it. The pass read the diff only and "
+    "ran nothing. Treat every item as a claim to verify: where an item names a check, run it with "
+    "your tools; where the code departs, request the change the convention calls for, as a finding "
+    "at that place; where it does not, drop the item and say nothing of it. The items are not the "
+    "whole review: review the rest of the PR as the brief above says.")
+
+
+def candidate_line(item: Dict[str, str]) -> str:
+    """One pinpointed candidate as a brief line: the place, what occurs there, the convention, then
+    either that reading already shows a departure or the check that decides it."""
+
+    decided = ("Decided by reading: the code departs." if item["status"] == "departs"
+               else f"Check: {item['check']}")
+    exception = f" Not when: {item['not_when']}" if item.get("not_when") else ""
+    return (f"- `{item['file']}`, `{item['declaration']}`: {item['fact']} "
+            f"Convention: {item['convention']} {decided}{exception}")
+
+
+def candidates_section(items: List[Dict[str, str]]) -> str:
+    return CANDIDATES_LEAD + "\n\n" + "\n".join(candidate_line(i) for i in items) + "\n"
+
+
+def load_candidates(briefs: Path) -> Dict[int, List[Dict[str, str]]]:
+    """A stage's pinpointed briefs: `{"prs": {pr: [item, ...]}}`, each item holding `file`,
+    `declaration`, `fact`, `convention`, `status` (`departs` or `check`), `check` and `not_when`."""
+
+    return {int(pr): items for pr, items in json.loads(Path(briefs).read_text())["prs"].items()}
+
+
 def pr_markdown(episode: Dict[str, Any]) -> str:
     title = episode["title"]["text"] if isinstance(episode["title"], dict) else episode["title"]
     desc = (episode.get("description") or {}).get("text") or "(not recoverable at review start)"
@@ -438,12 +474,15 @@ def pr_markdown(episode: Dict[str, Any]) -> str:
 
 def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optional[List[int]] = None,
                   brief: Path = BRIEF_X, root: Optional[Path] = None,
-                  conventions: Optional[Dict[int, List[str]]] = None) -> List[Path]:
+                  conventions: Optional[Dict[int, List[str]]] = None,
+                  candidates: Optional[Dict[int, List[Dict[str, str]]]] = None) -> List[Path]:
     """One packet per (PR, session): brief, PR text, diff, pass-0 model and the logging `ptool`.
 
     A packet that already holds findings is refused: it is a finished session, and rewriting its
     inputs would detach them from what it read. With `conventions`, each PR's brief ends with its
     conventions section; every PR must be named, and an empty list leaves the brief as it is.
+    With `candidates` it ends with the pinpointed section instead, under the same two rules; a
+    packet takes one or the other.
 
     A packet goes where `session_dir` will look for it, so a PR whose earlier sessions live under
     `sessions_from` gets its new ones beside them (until 2026-10-04 they were written under
@@ -452,8 +491,12 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
 
     root = Path(root or Path.cwd())
     prs = list(prs or spec.pr_numbers)
+    if conventions is not None and candidates is not None:
+        raise ValueError("a packet's brief ends with conventions or with candidates, not both")
     if conventions is not None and set(prs) - set(conventions):
         raise KeyError(f"no conventions listed for PRs {sorted(set(prs) - set(conventions))}")
+    if candidates is not None and set(prs) - set(candidates):
+        raise KeyError(f"no candidates listed for PRs {sorted(set(prs) - set(candidates))}")
     models = render_models(spec.release, prs, spec.inventory)
     episodes = {json.loads(l)["pr_number"]: json.loads(l)
                 for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()}
@@ -465,8 +508,10 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
                 raise FileExistsError(f"{d} is a finished session")
             (d / "tmp").mkdir(parents=True, exist_ok=True)
             held = conventions[pr] if conventions else []
-            (d / "brief.md").write_bytes(brief.read_bytes() + (
-                f"\n## {CONVENTIONS_TITLE}\n\n{conventions_section(held)}".encode() if held else b""))
+            found = candidates[pr] if candidates else []
+            section = (f"\n## {CONVENTIONS_TITLE}\n\n{conventions_section(held)}" if held else
+                       f"\n## {CANDIDATES_TITLE}\n\n{candidates_section(found)}" if found else "")
+            (d / "brief.md").write_bytes(brief.read_bytes() + section.encode())
             (d / "model.md").write_text(models[pr])
             (d / "pr.md").write_text(pr_markdown(episodes[pr]))
             (d / "diff.patch").write_text(episodes[pr]["diff"])
