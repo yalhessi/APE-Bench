@@ -528,3 +528,21 @@ so nothing has been submitted yet. If you have finished, call `<tool>` now. If y
 with the tools." APE-Agent sends it for a reply with no tool call and, opening "Your last reply was
 empty", for an empty one; Claude Code and Codex send it from one method on the base manager, and
 their two copies are deleted.
+
+## An exhausted ELM key will look like a slow run: its 429 is retried for hours (found 2026-10-05)
+
+ELM's OpenAPI spec (`/api-docs/elm-proxy-api.yaml`): "Each API key has a spend limit. Once exceeded,
+requests return `429` until the quota resets or is increased by an administrator." The client retries
+a 429 like any transient error, 100 attempts with waits up to 60 s, so when the key's £500 runs out
+every job of a run sits retrying for 1.5-2 h a call, billing nothing, logged only as "API call failed,
+retrying". A rate-limit 429 is transient and a quota 429 is not, and the status alone does not say
+which. Not yet seen: no ELM call has met either (the gateway reported OpenAI's limits, 30,000 requests
+and 180M tokens a minute, on 2026-10-05).
+
+**What would close it:** on a 429 from an ELM model, read `GET /api/v1/costs`
+(`ape.llm_clients.elm_budget.key_costs`) once; if `usage >= limit`, raise `RequestRejectedError`
+naming the spend and the limit, so the run fails at once; otherwise retry as now. Pin it with a
+transport answering 429 and a `/costs` at its limit. A preflight in `cli plan` that compares a run's
+worst-case cost with what `/costs` reports left would catch the same thing before any spend, with the
+caveat that the caps are dollar list-price estimates and the limit is pounds.
+

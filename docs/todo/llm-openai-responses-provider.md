@@ -391,7 +391,13 @@ gpt_5_mini) would retry for hours and bill nothing.
 | `summary: auto` | 1 part | 3 parts | 0, then 1 |
 | message `phase`, and a replay carrying it | none set | `commentary`, 200 | `commentary`, 200 |
 
-These are the snapshots the direct rows name. A stream ends in `response.completed`. The prompt cache
+These are the snapshots the direct rows name. A stream ends in `response.completed`.
+**Stateless only.** ELM's OpenAI organisation is under Zero Data Retention: `store: true` is answered
+as `store: false`, and `previous_response_id` and a Conversations-API `conversation` are each a 400,
+"cannot be used for this organization due to Zero Data Retention" (2026-10-05; ELM's OpenAPI spec
+lists both, and its `include` enum omits `reasoning.encrypted_content`, which works). So the manual
+replay with carried encrypted reasoning that this provider does is the only multi-turn mode on ELM;
+a server-state provider there would be refused on its second call. The prompt cache
 works through the gateway: a 3,336-token request repeated twice reported 2,688 cached tokens each time
 (gpt-5.2). On Chat Completions the gateway behaves as OpenAI does: gpt-5.2 takes tools with high effort,
 gpt-5.5 answers the same 400 naming `/v1/responses`. `gpt-5-mini` on Chat Completions resolves to

@@ -255,6 +255,13 @@ class ElmResponsesProvider(OpenAIResponsesProvider):
     measured is written down. It exists because gpt-5.4 and gpt-5.5 refuse tools with a
     reasoning effort on Chat Completions through the gateway as they do directly, and because
     the project's OpenAI key stopped working on 2026-10-05 (HTTP 401, project archived).
+
+    Stateless is the only mode ELM serves. Its OpenAI organisation runs under Zero Data Retention,
+    so `store: true` comes back `store: false`, and both `previous_response_id` and a
+    Conversations-API `conversation` are refused with HTTP 400 ("cannot be used for this
+    organization due to Zero Data Retention"; measured 2026-10-05, though ELM's OpenAPI spec lists
+    them). Replaying the history with the encrypted reasoning items, as this class does, is the
+    path OpenAI provides for such organisations.
     """
 
     DEFAULT_BASE_URL = "https://elm.edina.ac.uk/api/v1/responses"
