@@ -317,7 +317,9 @@ to 5 October, 6,278 of them:
 | gpt-5.5, Codex (`probe_postcutoff_gpt55_Grc_codex_rep1`) | 6 | 80 | 70 `commentary` | all, 0 with a phase |
 
 Under APE-Agent the models go from reasoning straight to tool calls and write no preamble, so there
-was no phase to lose. Those sessions are every gpt-5.4 and gpt-5.5 figure in `reviewer-model-gap.md`'s
+was no phase to lose. The preamble's "Every response MUST include TOOL CALLS" is not why: under
+`batch_preamble: plain`, which drops it, 81 sessions (66 gpt-5.2, 15 gpt-5.5; 1,981 calls) emitted no
+assistant message either, and only Codex's own prompt drew commentary. Those sessions are every gpt-5.4 and gpt-5.5 figure in `reviewer-model-gap.md`'s
 post-cutoff, validation and dev comparisons. gpt-5.2 emits no phase at all and shows the same gap.
 
 **Where it was dropped, the documented symptom did not appear.** All 12 Codex sessions, 10 of which
