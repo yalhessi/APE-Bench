@@ -1,0 +1,16 @@
+{
+ "X1": {
+  "kind": "claude"
+ },
+ "X2": {
+  "kind": "claude"
+ },
+ "GB1": {
+  "kind": "solo",
+  "run": "probe_val_small12_gpt55_Grc_rep1"
+ },
+ "GE1": {
+  "kind": "solo",
+  "run": "probe_conv_val_elmgpt55_exact_rep1"
+ }
+}

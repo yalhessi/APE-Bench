@@ -72,3 +72,7 @@ on disk, all at the same snapshot, effort high, reasoning carried, brief G, `use
 - **Stopped and not used:** the driver's first two runs, `probe_conv_{val,post}_elmgpt55_base_rep1`,
   were stopped about five minutes in, three sessions each completed. Their run directories stay out of
   the commit; their spend is in the ELM total.
+- **Matchers moved to this session's own login.** Token B now refuses every call ("Your organization
+  has disabled Claude subscription access for Claude Code"), and token C was spent until 14:50. The
+  four matchers run as subagents of the orchestrating session, the route of stage L and of stage C's
+  post-cutoff round. Decided before any cell was judged.
