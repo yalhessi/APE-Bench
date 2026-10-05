@@ -333,3 +333,20 @@ provider and in the relay, with a round-trip test on `responses_gpt55_stream_tex
 (its message is `commentary`). It matters before any run that makes these models write between tool
 calls: the Codex harness, or an APE-Agent contract asking for visible notes. It changes the request, so
 it goes in at a run boundary.
+
+## Open: no gpt transcript holds readable reasoning, because no summary is requested (found 2026-10-05)
+
+The provider sends `reasoning: {"effort": ...}` and nothing else, so every reasoning item comes back
+with `summary: []`: 1,998 of 1,998 in the gpt-5.4 and gpt-5.5 APE-Agent review sessions. The models do
+reason (median 342 and 201 reasoning tokens a call) and each item is carried, but the transcript shows
+only tool calls. Codex and Claude Code show a user their reasoning because they ask for it; under
+APE-Agent these models also write no text between calls (0 messages a session, against 6.8 and 11.7
+under Codex's prompt). So every reading of *why* a gpt reviewer passed over an ask has been made from
+its calls and its final findings alone. The loop itself is the same: one user message, then about 16-18
+rounds of reasoning, 2-3 tool calls and their results, ending on `submit_findings`.
+
+**What would close it:** a `reasoning.summary` knob on the provider, off by default so existing runs
+keep their request, with one live call first to confirm it is accepted under `store: false` and what
+it bills. Then the stage-by-stage relabelling in `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md`
+(was the specific concern raised?) has something written to read. Whether a summary changes what the
+model does is unmeasured; treat a summarised run as its own condition until one pair says otherwise.
