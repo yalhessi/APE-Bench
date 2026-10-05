@@ -79,6 +79,38 @@ def test_carried_reasoning_round_trips_with_its_id_restored(relay):
     assert [b.name for b in assistant.message.content] == ["mcp__core__submit_findings"]
 
 
+def test_a_message_phase_goes_out_and_comes_back(relay):
+    """gpt-5.4 and gpt-5.5 mark a preamble `commentary`. Codex returns the phase it was given
+    (captured 2026-10-05); the relay used to give it none, so 111 preambles went back to the model
+    unphased in the two Codex runs of 2026-10-01."""
+
+    from ape.llm_clients.adapters import MessageFormatter
+    from ape.llm_clients.models import ContentBlock, ConversationSession, TokenUsage
+    from ape.llm_clients.providers.openai_provider import responses_input
+
+    relay._backend_tools(CODEX_TOOLS)
+    out = ConversationSession()
+    node = out.add_assistant_message([
+        ContentBlock.text_block("I'll read the diff first."),
+        ContentBlock.tool_use_block("call_1", "mcp__core__submit_findings", {})], "/w")
+    node.message.signature = json.dumps({"responses_output": [
+        {"type": "message", "phase": "commentary"}, {"type": "function_call", "call_id": "call_1"}]})
+    sent = relay._nodes_to_response(out.nodes, TokenUsage(), "gpt-5.5")["output"]
+    assert [(i["type"], i.get("phase")) for i in sent] == [("message", "commentary"), ("function_call", None)]
+
+    returned = {"input": [
+        {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Review PR 1."}]},
+        {"type": "message", "role": "assistant", "phase": "commentary",
+         "content": [{"type": "output_text", "text": "I'll read the diff first."}]},
+        {k: v for k, v in sent[1].items() if k not in ("id", "status")},
+        {"type": "function_call_output", "call_id": "call_1", "output": "ok"}]}
+    session = relay._responses_to_session(returned, relay._backend_tools(CODEX_TOOLS))
+    _, items = responses_input(MessageFormatter().format_for_api(session), carryover=False)
+    assert items[1] == {"role": "assistant", "content": "I'll read the diff first.", "phase": "commentary"}
+    assert [i.get("type", i.get("role")) for i in items] == [
+        "user", "assistant", "function_call", "function_call_output"]
+
+
 def test_a_late_developer_message_keeps_its_place(relay):
     session = relay._responses_to_session({"instructions": "I", "input": [
         {"type": "message", "role": "user", "content": "Review."},

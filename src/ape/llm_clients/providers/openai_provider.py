@@ -132,6 +132,12 @@ class OpenAIResponsesProvider(OpenAIProvider):
     go back as `reasoning` input items, in their original order: the API rejects a reasoning
     item passed without the item that followed it.
 
+    A message's `phase` (`commentary` before tool calls, `final_answer`) rides in the same slot and
+    goes back on the replayed text, with carry-over on or off. gpt-5.4 and gpt-5.5 set it, and
+    OpenAI's reasoning guide says to keep it in a manual replay: "Missing or dropped `phase` can
+    cause preambles to be treated as final answers". No response logged here held two messages
+    (6,278 calls, 2026-10-05), so a turn's joined text takes its first message's phase.
+
     No `reasoning.context` is sent. The default, `current_turn`, keeps carried reasoning since the
     last user message or text-only answer, and a review session has neither after its task prompt
     (0 in 33 high-effort sessions, measured 2026-09-30), so it keeps all of it. `all_turns` would
@@ -198,8 +204,8 @@ def responses_input(messages: List[Dict[str, Any]], *,
 
     Leading system messages become `instructions`; a later one stays in place as a system
     item. A tool result becomes a `function_call_output`, and an assistant turn becomes its
-    text and its `function_call` items -- preceded, with carry-over on, by the reasoning items
-    it recorded, in their original order.
+    text, under the `phase` it was given, and its `function_call` items -- preceded, with
+    carry-over on, by the reasoning items it recorded, in their original order.
     """
 
     instructions: List[str] = []
@@ -233,11 +239,12 @@ def _assistant_items(message: Dict[str, Any], *, carryover: bool) -> List[Dict[s
             "name": function.get("name") or "", "arguments": function.get("arguments") or "{}"}
 
     items: List[Dict[str, Any]] = []
-    for entry in (_carried_output(message.get("signature")) if carryover else []):
+    for entry in _carried_output(message.get("signature")):
         if entry.get("type") == "reasoning":
-            items.append(entry)
+            if carryover:
+                items.append(entry)
         elif entry.get("type") == "message" and text is not None:
-            items.append(text)
+            items.append({**text, "phase": entry["phase"]} if entry.get("phase") else text)
             text = None
         elif entry.get("type") == "function_call" and entry.get("call_id") in calls:
             items.append(calls.pop(entry["call_id"]))
@@ -248,7 +255,7 @@ def _assistant_items(message: Dict[str, Any], *, carryover: bool) -> List[Dict[s
 
 
 def _carried_output(signature: Optional[str]) -> List[Dict[str, Any]]:
-    """The output order a carry-over turn recorded, or nothing if the signature is not one."""
+    """The output order a turn recorded, or nothing if the signature is not one."""
 
     if not signature:
         return []
@@ -273,13 +280,14 @@ def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -
             parts = item.get("content") or []
             texts.append("".join(p.get("text") or "" for p in parts if p.get("type") == "output_text"))
             refusals.extend(p.get("refusal") or "" for p in parts if p.get("type") == "refusal")
-            order.append({"type": "message"})
+            order.append({"type": "message", "phase": item["phase"]} if item.get("phase")
+                         else {"type": "message"})
         elif kind == "function_call":
             tool_calls.append({"id": item.get("call_id") or "", "type": "function",
                                "function": {"name": item.get("name") or "",
                                             "arguments": item.get("arguments") or "{}"}})
             order.append({"type": "function_call", "call_id": item.get("call_id") or ""})
-        elif kind == "reasoning":
+        elif kind == "reasoning" and carryover:
             order.append({key: item[key] for key in ("type", "id", "encrypted_content", "summary")
                           if key in item})
 
@@ -289,7 +297,7 @@ def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -
         message["tool_calls"] = tool_calls
     if refusals:
         message["refusal"] = "\n\n".join(refusals)
-    if carryover and any(entry["type"] == "reasoning" for entry in order):
+    if any(entry["type"] == "reasoning" or entry.get("phase") for entry in order):
         message["signature"] = json.dumps({"responses_output": order})
 
     if response.get("status") == "incomplete":

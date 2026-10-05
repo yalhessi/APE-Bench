@@ -330,3 +330,71 @@ def test_carryover_sends_no_reasoning_context():
     payload = payload_for(config(reasoning_effort="high", openai_responses_reasoning_carryover=True),
                           session_with(user("x")))
     assert payload["reasoning"] == {"effort": "high"}
+
+
+# --- message phase -----------------------------------------------------------------------
+
+@pytest.mark.parametrize("carryover", [False, True])
+def test_a_commentary_phase_goes_back_on_the_replayed_text(carryover):
+    """gpt-5.5's recorded preamble before a tool call. Replayed without its phase, it reads to the
+    model as a final answer (OpenAI's reasoning guide); 111 were sent back that way through the
+    Codex relay on 2026-10-01."""
+
+    cfg = config("gpt_5.5", reasoning_effort="low", openai_responses_reasoning_carryover=carryover)
+    (nodes, _, _), _ = call_api(
+        cfg, sse_answer((FIXTURES / "responses_gpt55_stream_text_and_tool_call.sse").read_text()),
+        stream=True)
+
+    session = session_with(user("Weather in Paris?"))
+    session.nodes.extend(nodes)
+    session.add_tool_result(nodes[0].message.content[1].id, "sunny", cwd="/")
+    items = payload_for(cfg, session)["input"]
+
+    assert [item.get("type", item.get("role")) for item in items] == [
+        "user", "assistant", "function_call", "function_call_output"]
+    assert items[1] == {"role": "assistant", "content": "I'll check Paris weather now.",
+                        "phase": "commentary"}
+
+
+def test_a_final_answer_keeps_its_phase():
+    message = responses_to_chat_completion(
+        fixture("responses_gpt54_high_turn2_text.json"), carryover=False)["choices"][0]["message"]
+    _, (item,) = responses_input([message], carryover=False)
+    assert (item["role"], item["phase"]) == ("assistant", "final_answer")
+
+
+def test_a_turn_with_no_phase_and_no_carryover_records_nothing():
+    """So a request from a run that never saw a phase is what it was before: gpt-5.2 sets none,
+    and the gpt-5.4 and gpt-5.5 APE-Agent review sessions wrote no message to carry one."""
+
+    calls = responses_to_chat_completion(
+        fixture("responses_gpt54_high_two_tool_calls.json"), carryover=False)["choices"][0]["message"]
+    assert "signature" not in calls
+
+    plain = {"output": [{"type": "message", "role": "assistant",
+                         "content": [{"type": "output_text", "text": "hello"}]}],
+             "status": "completed"}
+    message = responses_to_chat_completion(plain, carryover=False)["choices"][0]["message"]
+    assert "signature" not in message
+    assert responses_input([message], carryover=False)[1] == [{"role": "assistant", "content": "hello"}]
+
+
+def test_carryover_off_keeps_the_phase_and_no_reasoning():
+    output = [{"type": "reasoning", "id": "rs_1", "encrypted_content": "e1", "summary": []},
+              {"type": "message", "role": "assistant", "phase": "commentary",
+               "content": [{"type": "output_text", "text": "Checking."}]},
+              {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
+    response = {"output": output, "status": "completed"}
+
+    recorded_off = responses_to_chat_completion(response, carryover=False)["choices"][0]["message"]
+    assert json.loads(recorded_off["signature"])["responses_output"] == [
+        {"type": "message", "phase": "commentary"}, {"type": "function_call", "call_id": "c1"}]
+
+    recorded_on = responses_to_chat_completion(response, carryover=True)["choices"][0]["message"]
+    for message in (recorded_off, recorded_on):
+        _, items = responses_input([message], carryover=False)
+        assert items == [{"role": "assistant", "content": "Checking.", "phase": "commentary"},
+                         {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
+    _, items = responses_input([recorded_on], carryover=True)
+    assert [item.get("type", item.get("phase")) for item in items] == [
+        "reasoning", "commentary", "function_call"]

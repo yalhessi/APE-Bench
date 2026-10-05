@@ -297,7 +297,7 @@ Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the
 retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
 (`framework-defects-2026-09.md`).
 
-## Open: the replay drops `phase` (measured 2026-10-05, no spend)
+## The replay dropped `phase` (measured and fixed 2026-10-05, no spend)
 
 OpenAI's reasoning guide says that for gpt-5.4 and gpt-5.5 on Responses a manually replayed
 assistant message should keep its `phase` (`commentary` or `final_answer`): "Missing or dropped
@@ -328,11 +328,14 @@ response. Their reach was 0.31 (gpt-5.4) and 0.25 (gpt-5.5) against APE-Agent's 
 each. That rules out early stopping, the named failure. It does not rule out the guide's unnamed
 "other misbehavior", which one run a model cannot see.
 
-**What would close it:** keep `phase` in the carried `responses_output` entry and send it back, in the
-provider and in the relay, with a round-trip test on `responses_gpt55_stream_text_and_tool_call.sse`
-(its message is `commentary`). It matters before any run that makes these models write between tool
-calls: the Codex harness, or an APE-Agent contract asking for visible notes. It changes the request, so
-it goes in at a run boundary.
+**Fixed on `gpt-harness-parity`.** A message's phase is recorded in its `responses_output` entry and
+sent back on the replayed text, with carry-over on or off; a turn with no phase and no carry-over
+records nothing, so those requests are unchanged. The Codex relay puts it on the message it sends and
+reads it from the one Codex returns: `codex-cli` 0.144.5 does return it, captured against a local
+server with no model. Under Claude Code it rides the relay's turn-signature cache, as reasoning does.
+Pinned on `responses_gpt55_stream_text_and_tool_call.sse` and in both relay test files. It matters for
+a run that makes these models write between tool calls: the Codex harness, or the unrun gpt cells
+under Claude Code. It changes those requests, so a rerun of a Codex condition is a new condition.
 
 ## Open: no gpt transcript holds readable reasoning, because no summary is requested (found 2026-10-05)
 

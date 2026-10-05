@@ -565,6 +565,40 @@ def test_a_turn_without_carried_reasoning_gains_none():
     assert all(n.message.signature is None for n in session.nodes if n.type == "assistant")
 
 
+def test_a_preambles_phase_returns_with_it():
+    """The same slot carries a message's `phase`, with or without reasoning beside it, so gpt-5.4
+    and gpt-5.5 under Claude Code get their `commentary` preamble back as one."""
+
+    import json
+
+    from ape.llm_clients.adapters.message_formatter import MessageFormatter
+    from ape.llm_clients.config import LLMConfig
+    from ape.llm_clients.models import ContentBlock, ConversationSession
+    from ape.llm_clients.providers.openai_provider import responses_input
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    relay = ClaudeCodeRelaySession(port=41007, llm_config=LLMConfig(model_name="gpt_5.5"))
+    response = ConversationSession()
+    node = response.add_assistant_message([
+        ContentBlock.text_block("I'll look the name up first."),
+        ContentBlock.tool_use_block("call_1", "mcp__core__declaration_search", {"identifier": "Foo"})], "/w")
+    node.message.signature = json.dumps({"responses_output": [
+        {"type": "message", "phase": "commentary"}, {"type": "function_call", "call_id": "call_1"}]})
+    relay._cache_turn_signatures([node])
+
+    request = {"messages": [
+        {"role": "user", "content": "Review PR 1."},
+        {"role": "assistant", "content": [
+            {"type": "text", "text": "I'll look the name up first."},
+            {"type": "tool_use", "id": "call_1", "name": "mcp__core__declaration_search",
+             "input": {"identifier": "Foo"}}]},
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "call_1", "content": "found"}]}]}
+    session = relay._convert_anthropic_to_session(request, None)
+    _instructions, items = responses_input(MessageFormatter().format_for_api(session), carryover=False)
+    assert items[1] == {"role": "assistant", "content": "I'll look the name up first.",
+                        "phase": "commentary"}
+
+
 def test_a_call_to_a_tool_that_does_not_exist_ran_nothing(tmp_path):
     """H-claude rep 2 called `zulip_search` for `mcp__core__zulip_search`, and the CLI answered
     "No such tool available". Nothing ran, so it is not a leak; an unclassifiable call without
