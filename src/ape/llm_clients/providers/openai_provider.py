@@ -10,33 +10,40 @@ from .base import BaseProvider
 from ..config import MODEL_MAPPINGS, LLMProvider, ProviderError, RequestRejectedError
 
 
-def chat_completions_refusal(config, *, sends_tools: bool) -> Optional[str]:
-    """Why Chat Completions would reject this request, or None if it would not.
+def is_openai_model(model_name: Optional[str]) -> bool:
+    """An OpenAI model, called directly or through ELM (a row marked `openai_responses`)."""
 
-    One check with two callers: `OpenAIProvider` refuses the request before sending it, and
-    `cli plan` refuses the run before any spend. Without it, gpt-5.4 and gpt-5.5 at
-    `reasoning_effort: high` failed every call of `probe_postcutoff_gpt5{4,5}_Gr_rep1` with
-    HTTP 400, and the first sign was the retry log. The measured fact lives in
-    `MODEL_MAPPINGS` (`chat_completions_tools_with_reasoning`); a model without the key is
-    assumed to accept the combination, as gpt-5.2 does.
+    entry = MODEL_MAPPINGS.get(model_name) or {}
+    return entry.get("provider") is LLMProvider.OPENAI or bool(entry.get("openai_responses"))
+
+
+def reasoning_drop_refusal(config) -> Optional[str]:
+    """Why this config would drop an OpenAI model's reasoning between turns, or None.
+
+    The GPT-5 models reason, and only the Responses API returns that reasoning, as encrypted
+    items the next request can carry back. Chat Completions returns none, so every turn of a
+    session would reason from nothing, and Responses with carry-over off drops the items too.
+    So an OpenAI model runs on Responses with carry-over, or not at all (the user, 2026-10-05).
+    Carry-over was already the standard condition: it concluded 44 of 44 sessions and cut
+    repeats tenfold at a fifth of the cost (`docs/todo/reviewer-model-gap.md`, Phase 0). Chat
+    Completions also refuses tools with reasoning for gpt-5.4 and gpt-5.5 (HTTP 400, 2026-09-30).
+
+    One check with two callers: the OpenAI providers refuse a request before sending it, and
+    `cli plan` refuses the run before any spend. A refusal and not a new default, so a config
+    written for the old endpoint fails at once instead of quietly meaning something else.
     """
 
-    if not sends_tools or getattr(config, "openai_api", "chat_completions") != "chat_completions":
+    if not is_openai_model(getattr(config, "model_name", None)):
         return None
-    if config.reasoning_effort in (None, "none"):
-        return None
-    entry = MODEL_MAPPINGS.get(config.model_name) or next(
-        (row for row in MODEL_MAPPINGS.values()
-         if row["model_name"] == config.formal_model_name), {})
-    if entry.get("chat_completions_tools_with_reasoning", True):
-        return None
-    remedy = ("set llm_config.openai_api: responses"
-              if entry.get("provider") is LLMProvider.OPENAI or entry.get("openai_responses") else
-              "use an OpenAI model with llm_config.openai_api: responses")
-    return (
-        f"{config.model_name} rejects tools with reasoning_effort={config.reasoning_effort!r} "
-        f"on Chat Completions (HTTP 400, measured 2026-09-30), and this request sends tools. "
-        f"To reason with tools, {remedy}; or set reasoning_effort: none.")
+    if getattr(config, "openai_api", "chat_completions") != "responses":
+        return (f"{config.model_name} is an OpenAI model, and those run on the Responses API with "
+                "their reasoning carried: Chat Completions returns no reasoning, so every turn "
+                "would reason from nothing. Set llm_config.openai_api: responses and "
+                "llm_config.openai_responses_reasoning_carryover: true.")
+    if not config.openai_responses_reasoning_carryover:
+        return (f"{config.model_name} on Responses with carry-over off drops each turn's reasoning "
+                "items. Set llm_config.openai_responses_reasoning_carryover: true.")
+    return None
 
 
 class OpenAIProvider(BaseProvider):
@@ -70,7 +77,7 @@ class OpenAIProvider(BaseProvider):
         stream: bool = False,
     ) -> Dict[str, Any]:
         """Build OpenAI Chat Completions payload."""
-        refusal = chat_completions_refusal(self.config, sends_tools=bool(tools))
+        refusal = reasoning_drop_refusal(self.config)
         if refusal:
             raise RequestRejectedError(refusal)
         payload: Dict[str, Any] = {
@@ -125,9 +132,9 @@ class OpenAIResponsesProvider(OpenAIProvider):
     * `store: false` throughout, so nothing refers to server-side state.
     * a stream's final `response.completed` event carries the whole response.
 
-    Reasoning between turns is `openai_responses_reasoning_carryover`. Off, the default, drops
-    each turn's reasoning items, as Chat Completions does, so a run is comparable with
-    gpt-5.2's Chat Completions runs. On, the encrypted items ride in the assistant message's
+    Reasoning between turns is `openai_responses_reasoning_carryover`, which an OpenAI model must
+    have on (`reasoning_drop_refusal`); off survives only for a model that is not one. On, the
+    encrypted items ride in the assistant message's
     `signature` (the slot `ConversationMessage` keeps for opaque provider reasoning state) and
     go back as `reasoning` input items, in their original order: the API rejects a reasoning
     item passed without the item that followed it.
@@ -163,6 +170,9 @@ class OpenAIResponsesProvider(OpenAIProvider):
     ) -> Dict[str, Any]:
         """The Responses payload for these Chat Completions messages and tools."""
 
+        refusal = reasoning_drop_refusal(self.config)
+        if refusal:
+            raise RequestRejectedError(refusal)
         instructions, items = responses_input(messages, carryover=self._carryover)
         payload: Dict[str, Any] = {
             "model": self.config.formal_model_name,

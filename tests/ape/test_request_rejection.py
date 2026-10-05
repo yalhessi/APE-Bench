@@ -75,6 +75,12 @@ def call(config, status, body, *, stream=False, tools=(TOOL,)):
 
 
 def config(model="gpt_5.4", **overrides):
+    """An OpenAI model on the one path it may take: Responses, reasoning carried."""
+
+    if model.startswith(("gpt_", "elm_gpt_")):
+        overrides.setdefault("openai_api", "responses")
+        if overrides["openai_api"] == "responses":
+            overrides.setdefault("openai_responses_reasoning_carryover", True)
     return LLMConfig(model_name=model, retry_max_attempts=3, **overrides)
 
 
@@ -132,40 +138,67 @@ def test_a_provider_refusal_before_sending_is_not_retried(model, overrides):
     assert requests == []
 
 
-# --- the known rejection is refused before it is sent -------------------------------------
+# --- an OpenAI model's reasoning is never dropped between turns ---------------------------
 #
-# `MODEL_MAPPINGS[...]["chat_completions_tools_with_reasoning"]` records the measured 400;
-# `chat_completions_refusal` is the one check, used by the provider and by `cli plan`.
+# `reasoning_drop_refusal` is the one check, used by both OpenAI providers before sending and by
+# `cli plan` before any spend. Chat Completions returns no reasoning to carry; Responses with
+# carry-over off drops it. Either is refused for an OpenAI model, direct or through ELM.
 
-@pytest.mark.parametrize("model", ["gpt_5.4", "gpt_5.5", "elm_gpt_5.4"])
-def test_tools_with_reasoning_on_chat_completions_are_refused_unsent(model):
-    error, requests = call(config(model, reasoning_effort="high"), 200, {})
+OPENAI_MODELS = ["gpt_5.2", "gpt_5.4", "gpt_5.5", "gpt_5_mini",
+                 "elm_gpt_5.2", "elm_gpt_5.4", "elm_gpt_5.5", "elm_gpt_5_mini"]
 
+
+@pytest.mark.parametrize("model", OPENAI_MODELS)
+@pytest.mark.parametrize("effort,tools", [("high", (TOOL,)), ("none", (TOOL,)), (None, ())])
+def test_an_openai_model_on_chat_completions_is_refused_unsent(model, effort, tools):
+    """Whatever the effort and whether or not tools are sent: gpt-5.2 accepted tools with
+    reasoning there, and its reasoning was still dropped every turn."""
+
+    error, requests = call(config(model, openai_api="chat_completions", reasoning_effort=effort),
+                           200, {}, tools=tools)
     assert isinstance(error, RequestRejectedError)
     assert requests == []
     assert "openai_api: responses" in str(error)
 
 
-@pytest.mark.parametrize("model,effort,tools", [
-    ("gpt_5.4", "none", (TOOL,)),     # reasoning off: what test (e)'s first half ran
-    ("gpt_5.4", None, (TOOL,)),       # nothing sent; accepted (gpt-5.5 too, measured)
-    ("gpt_5.4", "high", ()),          # no tools: the 400 is about the combination
-    ("gpt_5.2", "high", (TOOL,)),     # gpt-5.2 accepts it; its high-effort runs worked
-])
-def test_what_chat_completions_accepts_is_sent(model, effort, tools):
+@pytest.mark.parametrize("model", OPENAI_MODELS)
+def test_an_openai_model_on_responses_without_carryover_is_refused_unsent(model):
+    error, requests = call(config(model, openai_responses_reasoning_carryover=False), 200, {})
+    assert isinstance(error, RequestRejectedError)
+    assert requests == []
+    assert "openai_responses_reasoning_carryover: true" in str(error)
+
+
+def test_an_openai_model_with_its_reasoning_carried_is_sent():
+    from ape.llm_clients.providers.openai_provider import reasoning_drop_refusal
+
+    ok = {"output": [{"type": "message", "role": "assistant",
+                      "content": [{"type": "output_text", "text": "hi"}]}],
+          "status": "completed", "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2}}
+    for model in OPENAI_MODELS:
+        assert reasoning_drop_refusal(config(model, reasoning_effort="high")) is None, model
+        error, requests = call(config(model, reasoning_effort="high"), 200, ok)
+        assert error is None and len(requests) == 1, model
+
+
+def test_a_model_that_is_not_openai_keeps_chat_completions():
     ok = {"choices": [{"message": {"role": "assistant", "content": "hi"}}],
           "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}}
-    error, requests = call(config(model, reasoning_effort=effort), 200, ok, tools=tools)
+    error, requests = call(config("elm_mistral_small_4", reasoning_effort="high"), 200, ok)
+    assert error is None and len(requests) == 1
+    assert "messages" in json.loads(requests[0].content)
 
-    assert error is None
-    assert len(requests) == 1
 
+def test_every_elm_row_serving_a_gpt_model_is_marked():
+    """The mark is how the check knows a row is an OpenAI model; an unmarked ELM `gpt-` row
+    would slip back onto Chat Completions."""
 
-def test_the_responses_api_is_not_refused():
-    from ape.llm_clients.providers.openai_provider import chat_completions_refusal
+    from ape.llm_clients.config import MODEL_MAPPINGS, LLMProvider
 
-    cfg = config("gpt_5.4", reasoning_effort="high", openai_api="responses")
-    assert chat_completions_refusal(cfg, sends_tools=True) is None
+    unmarked = [name for name, row in MODEL_MAPPINGS.items()
+                if row["provider"] is LLMProvider.ELM and row["model_name"].startswith("gpt-")
+                and not row.get("openai_responses")]
+    assert unmarked == []
 
 
 def test_cli_plan_refuses_the_run_before_building_anything():
@@ -176,7 +209,8 @@ def test_cli_plan_refuses_the_run_before_building_anything():
 
     dataset, scaffold, overrides = load_run(
         Path("configs/pr_review_v5_specialist4.yaml"),
-        {"llm_config": {"model_name": "gpt_5.4", "reasoning_effort": "high"}})
+        {"llm_config": {"model_name": "gpt_5.4", "reasoning_effort": "high",
+                        "openai_api": "chat_completions"}})
     dataset.dry_run = True
     quiet = mock.Mock()
     with mock.patch("src.mathlib_review.review.runner.load_release",

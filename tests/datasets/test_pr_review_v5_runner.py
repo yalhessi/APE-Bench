@@ -79,7 +79,8 @@ def scaffold():
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    return ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"))
+    return ApeAgentConfig(llm_config=LLMConfig(
+        model_name="gpt_5.2", openai_api="responses", openai_responses_reasoning_carryover=True))
 
 
 def _dataset(run_name: str, mode: str = "lead") -> V5DatasetConfig:

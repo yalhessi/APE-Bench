@@ -48,7 +48,10 @@ def keys():
 
 
 def config(model="gpt_5.4", **overrides):
+    """An OpenAI model as it must be configured: Responses, reasoning carried."""
+
     overrides.setdefault("openai_api", "responses")
+    overrides.setdefault("openai_responses_reasoning_carryover", True)
     return LLMConfig(model_name=model, retry_max_attempts=1, **overrides)
 
 
@@ -118,8 +121,8 @@ def test_responses_reaches_the_openai_models_through_elm_and_nothing_else_there(
 
     with mock.patch.dict(os.environ, {"ELM_API_KEY": "elm-test"}):
         for model, alias in (("elm_gpt_5.2", "gpt-5.2"), ("elm_gpt_5.4", "gpt-5.4"),
-                             ("elm_gpt_5.5", "gpt-5.5")):
-            cfg = config(model, reasoning_effort="high", openai_responses_reasoning_carryover=True)
+                             ("elm_gpt_5.5", "gpt-5.5"), ("elm_gpt_5_mini", "gpt-5-mini")):
+            cfg = config(model, reasoning_effort="high")
             client = LLMClient(cfg, enable_raw_logging=False)
             assert type(client.provider) is ElmResponsesProvider
             assert type(client.message_formatter) is MessageFormatter
@@ -128,9 +131,8 @@ def test_responses_reaches_the_openai_models_through_elm_and_nothing_else_there(
             assert headers["Authorization"] == "Bearer elm-test", "never the OpenAI key"
             assert payload_for(cfg, session_with(user("x")))["model"] == alias
 
-    for unmeasured in ("elm_gpt_5_mini", "elm_qwen_3.5"):
-        with pytest.raises(ConfigurationError, match="unmeasured"):
-            LLMConfig(model_name=unmeasured, openai_api="responses")
+    with pytest.raises(ConfigurationError, match="unmeasured"):
+        LLMConfig(model_name="elm_qwen_3.5", openai_api="responses")
 
 
 def test_carryover_is_refused_without_responses():
@@ -167,7 +169,7 @@ def test_the_payload_is_what_the_probes_sent():
     assert payload["max_output_tokens"] == 4000
     assert payload["store"] is False
     assert payload["temperature"] == 1.0
-    assert "include" not in payload, "encrypted reasoning is requested only to carry it"
+    assert payload["include"] == ["reasoning.encrypted_content"]
     assert "messages" not in payload and "max_completion_tokens" not in payload
 
 
@@ -234,7 +236,9 @@ def test_two_parallel_tool_calls_become_tool_use_blocks():
     assert [(c.id, c.name, c.input) for c in calls] == [
         ("call_Ek1Doh5KKLDdXRhpTKxrGAGy", "get_weather", {"city": "Paris"}),
         ("call_gbeTsKnFM1upcOVOjzcKt2pZ", "get_weather", {"city": "Rome"})]
-    assert node.message.signature is None, "carry-over is off: nothing rides to the next turn"
+    carried = json.loads(node.message.signature)["responses_output"]
+    assert [entry["type"] for entry in carried] == ["reasoning", "function_call", "function_call"], (
+        "the reasoning item rides to the next turn, before the calls it preceded")
 
 
 def test_usage_and_cost_read_as_chat_completions_would():
@@ -352,13 +356,12 @@ def test_carryover_sends_no_reasoning_context():
 
 # --- message phase -----------------------------------------------------------------------
 
-@pytest.mark.parametrize("carryover", [False, True])
-def test_a_commentary_phase_goes_back_on_the_replayed_text(carryover):
+def test_a_commentary_phase_goes_back_on_the_replayed_text():
     """gpt-5.5's recorded preamble before a tool call. Replayed without its phase, it reads to the
     model as a final answer (OpenAI's reasoning guide); 111 were sent back that way through the
     Codex relay on 2026-10-01."""
 
-    cfg = config("gpt_5.5", reasoning_effort="low", openai_responses_reasoning_carryover=carryover)
+    cfg = config("gpt_5.5", reasoning_effort="low")
     (nodes, _, _), _ = call_api(
         cfg, sse_answer((FIXTURES / "responses_gpt55_stream_text_and_tool_call.sse").read_text()),
         stream=True)
@@ -446,13 +449,11 @@ def test_a_summary_is_asked_for_only_when_the_knob_is_set():
         LLMConfig(model_name="gpt_5.4", openai_responses_reasoning_summary="auto")
 
 
-@pytest.mark.parametrize("carryover", [False, True])
-def test_a_summary_is_kept_as_the_turns_thinking_block_and_only_the_item_goes_back(carryover):
+def test_a_summary_is_kept_as_the_turns_thinking_block_and_only_the_item_goes_back():
     """Where a transcript can be read. Until this knob, all 1,998 reasoning items in the gpt-5.4
     and gpt-5.5 review sessions came back with `summary: []`."""
 
-    cfg = config(reasoning_effort="high", openai_responses_reasoning_carryover=carryover,
-                 openai_responses_reasoning_summary="auto")
+    cfg = config(reasoning_effort="high", openai_responses_reasoning_summary="auto")
     (nodes, _, _), _ = call_api(cfg, json_answer(summarised("responses_gpt54_high_two_tool_calls.json")))
     blocks = nodes[0].message.content
     assert [b.type for b in blocks] == ["thinking", "tool_use", "tool_use"]
@@ -464,12 +465,10 @@ def test_a_summary_is_kept_as_the_turns_thinking_block_and_only_the_item_goes_ba
         session.add_tool_result(block.id, "sunny", cwd="/")
     items = payload_for(cfg, session)["input"]
     kinds = [item.get("type", item.get("role")) for item in items]
-    carried = ["reasoning"] if carryover else []
-    assert kinds == ["user", *carried, "function_call", "function_call",
+    assert kinds == ["user", "reasoning", "function_call", "function_call",
                      "function_call_output", "function_call_output"]
-    if carryover:
-        assert items[1]["summary"] == [{"type": "summary_text",
-                                        "text": "Paris first, then Rome; one call each."}]
+    assert items[1]["summary"] == [{"type": "summary_text",
+                                    "text": "Paris first, then Rome; one call each."}]
     assert all("reasoning_content" not in item for item in items)
 
 

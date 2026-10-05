@@ -95,10 +95,8 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.25,
         # OpenAI reports no cache-write tokens, so this rate is never applied.
         "cache_creation_per_1M_usd": None,
-        #: HTTP 400 on /v1/chat/completions for tools with any reasoning_effort but "none",
-        #: measured 2026-09-30; gpt-5.2 accepts the combination. Absent means accepted.
-        #: `chat_completions_refusal` reads it; `openai_api: responses` is the way round.
-        "chat_completions_tools_with_reasoning": False,
+        # Chat Completions answers HTTP 400 for tools with any reasoning_effort but "none"
+        # (2026-09-30). No OpenAI model is sent there now (`reasoning_drop_refusal`).
     },
     "gpt_5.5": {
         # Standard tier, short context (<= 272K), same source and date as gpt_5.4.
@@ -111,8 +109,7 @@ MODEL_MAPPINGS = {
         "output_per_1M": 30.00,
         "cached_input_per_1M_usd": 0.50,
         "cache_creation_per_1M_usd": None,
-        # Same 400 as gpt_5.4, measured the same day.
-        "chat_completions_tools_with_reasoning": False,
+        # Same 400 as gpt_5.4 on Chat Completions, measured the same day.
     },
     "gpt_5.2": {
         "model_name": "gpt-5.2-2025-12-11",
@@ -179,7 +176,8 @@ MODEL_MAPPINGS = {
     # ending in `response.completed`, and prompt caching (2,688 of 3,336 input tokens cached on
     # a repeat). The aliases resolved to the snapshots the direct rows name: gpt-5.2-2025-12-11,
     # gpt-5.4-2026-03-05, gpt-5.5-2026-04-23. `LLMConfig` refuses `openai_api: responses` for an
-    # ELM row without the mark.
+    # ELM row without the mark, and every ELM row serving a `gpt-` model must carry it: the mark
+    # is how `reasoning_drop_refusal` knows the row is an OpenAI model.
     "elm_gpt_5.2": {
         "model_name": "gpt-5.2",
         "provider": LLMProvider.ELM,
@@ -200,8 +198,7 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.25,
         "cache_creation_per_1M_usd": None,
         "supports_tools": True,
-        # The gateway forwards OpenAI's 400 for this combination (2026-09-30).
-        "chat_completions_tools_with_reasoning": False,
+        # The gateway forwards OpenAI's Chat Completions 400 for tools with reasoning (2026-09-30).
         "openai_responses": True,
     },
     "elm_gpt_5.5": {
@@ -213,11 +210,13 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.50,
         "cache_creation_per_1M_usd": None,
         "supports_tools": True,
-        # Forwarded 400, measured through the gateway on 2026-10-05.
-        "chat_completions_tools_with_reasoning": False,
+        # The same forwarded 400, measured through the gateway on 2026-10-05.
         "openai_responses": True,
     },
     "elm_gpt_5_mini": {
+        # The judge's snapshot (gpt-5-mini-2025-08-07). On /v1/responses, 2026-10-05: tools at high
+        # effort, the reasoning item carried and accepted back (1,792 of 1,935 tokens cached on
+        # turn 2). It returned no summary text on that call.
         "model_name": "gpt-5-mini",
         "provider": LLMProvider.ELM,
         "input_per_1M": 0.25,
@@ -225,6 +224,7 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.0625,
         "cache_creation_per_1M_usd": None,
         "supports_tools": True,
+        "openai_responses": True,
     },
 
     # Locally hosted open-weight models. These cost the project nothing per token, and the
@@ -418,16 +418,18 @@ class LLMConfig(BaseModel):
     reasoning_effort: Optional[str] = None
 
     #: Which OpenAI API an OpenAI model is called through, direct or by way of ELM (the rows
-    #: marked `openai_responses`). `chat_completions` is what
+    #: marked `openai_responses`). An OpenAI model must say `responses`, with carry-over on, or
+    #: its requests are refused (`reasoning_drop_refusal`, 2026-10-05); the default is kept so a
+    #: config written before that fails instead of changing meaning. `chat_completions` is what
     #: every run before this field used. `responses` exists because gpt-5.4 and gpt-5.5
     #: reject tools with a reasoning effort on Chat Completions (HTTP 400, 2026-09-30), and
     #: every review task sends tools; see `OpenAIResponsesProvider`. A field rather than an
     #: inference from the model, so the run's config says which endpoint produced it.
     openai_api: Literal["chat_completions", "responses"] = "chat_completions"
 
-    #: Responses only: carry each turn's encrypted reasoning items into the next request.
-    #: Off drops them, as Chat Completions does, which keeps a run comparable with the Chat
-    #: Completions runs; on is what OpenAI recommends for tool use, and a separate condition.
+    #: Responses only: carry each turn's encrypted reasoning items into the next request, as
+    #: OpenAI recommends for tool use. Required for an OpenAI model (`reasoning_drop_refusal`);
+    #: off drops the items, as Chat Completions does.
     openai_responses_reasoning_carryover: bool = False
 
     #: Responses only: ask for a summary of each reasoning item. Unset sends no `summary`, and

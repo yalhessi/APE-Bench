@@ -427,3 +427,21 @@ gpt-5.5. A run moves with
 - Codex is told `llm_config.model_name` with `_` as `-`, so `elm_gpt_5.5` reaches it as `elm-gpt-5.5`,
   which has no catalog entry. A Codex config on ELM sets `codex_model: gpt-5.5`.
 
+## An OpenAI model runs only on Responses with its reasoning carried (decided 2026-10-05)
+
+The user's call: no Chat Completions backend for GPT models, so reasoning cannot be dropped between
+turns by accident. `reasoning_drop_refusal` (`openai_provider.py`) refuses an OpenAI model, direct or
+through ELM (`openai_responses` rows), on Chat Completions or on Responses with carry-over off. Both
+OpenAI providers check it before sending, and `cli plan` before any spend. It replaces
+`chat_completions_refusal`, which refused only tools with reasoning on gpt-5.4 and gpt-5.5, and its
+`chat_completions_tools_with_reasoning` flag. gpt-5.2 had passed that check and still lost its
+reasoning every turn on Chat.
+
+A refusal and not a new default, deliberately. Of the 129 GPT configs on disk, 103 were written for
+the old paths: 98 on Chat Completions (11 of them the judge's `gpt_5_mini`) and 5 on Responses with
+carry-over off. Flipping the defaults would have made each of them, and a `--resume` of any of their
+runs, quietly mean a different condition; refused, they fail at plan time with the two lines to set.
+They all name the direct models, whose key is dead anyway. `elm_gpt_5_mini` was measured on Responses
+the same day (tools at high effort, reasoning carried, 1,792 of 1,935 tokens cached on turn 2) and
+marked, so the judge has a path: moving it from `gpt_5_mini` is still the open cache decision above.
+

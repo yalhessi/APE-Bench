@@ -178,7 +178,11 @@ three were plain redundancy, and the fixes took a line each.
 go through the University of Edinburgh gateway. The OpenAI key stopped working on 2026-10-05
 (HTTP 401, project archived), so a `gpt_*` run now only retries. `elm_gpt_5.2`, `elm_gpt_5.4` and
 `elm_gpt_5.5` are the same snapshots through ELM and take `openai_api: responses` with carry-over
-(measured that day; `docs/todo/llm-openai-responses-provider.md`). The judge base still pins
+(measured that day; `docs/todo/llm-openai-responses-provider.md`). **An OpenAI model runs only on
+Responses with `openai_responses_reasoning_carryover: true`**: Chat Completions, or carry-over off,
+drops its reasoning every turn, so both are refused before the first request and at `cli plan`
+(`reasoning_drop_refusal`, user, 2026-10-05). 103 of the 129 GPT configs then on disk were written for
+the old paths and are refused rather than reinterpreted; a new GPT config states both lines. The judge base still pins
 `gpt_5_mini`, and moving it to `elm_gpt_5_mini` forks its cache. The ELM key has a fixed **£500**
 limit (GBP, not dollars): `ape/bin/python -m ape.llm_clients.elm_budget` prints what is left, from
 ELM's `GET /api/v1/costs` (spec at `/swagger-ui/`). ELM syncs that figure periodically (`asOf`), so
