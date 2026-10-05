@@ -296,3 +296,38 @@ Also seen: with no effort sent, gpt-5.5 on Responses runs at `medium` (the respo
 Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
 retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
 (`framework-defects-2026-09.md`).
+
+## Open: the replay drops `phase` (measured 2026-10-05, no spend)
+
+OpenAI's reasoning guide says that for gpt-5.4 and gpt-5.5 on Responses a manually replayed
+assistant message should keep its `phase` (`commentary` or `final_answer`): "Missing or dropped
+`phase` can cause preambles to be treated as final answers". The provider drops it:
+`responses_to_chat_completion` records a message as `{"type": "message"}` and `_assistant_items`
+replays `{"role": "assistant", "content": ...}`. The Codex relay (`scaffolds/codex/relay.py`,
+`_assistant_turn` and `_nodes_to_response`) drops it as well, so Codex never receives one to send back.
+
+**It did not touch the APE-Agent numbers.** Every Responses call in `data/llm_logs` from 29 September
+to 5 October, 6,278 of them:
+
+| | sessions | calls | assistant messages emitted | assistant text replayed |
+|---|---|---|---|---|
+| gpt-5.4, APE-Agent, effort high | 51 | 847 | 0 | 0 |
+| gpt-5.5, APE-Agent, effort high | 65 | 1,215 | 2, both `final_answer` | 0 |
+| gpt-5.4, Codex (`probe_postcutoff_gpt54_Grc_codex_rep1`) | 6 | 110 | 41 `commentary` | all, 0 with a phase |
+| gpt-5.5, Codex (`probe_postcutoff_gpt55_Grc_codex_rep1`) | 6 | 80 | 70 `commentary` | all, 0 with a phase |
+
+Under APE-Agent the models go from reasoning straight to tool calls and write no preamble, so there
+was no phase to lose. Those sessions are every gpt-5.4 and gpt-5.5 figure in `reviewer-model-gap.md`'s
+post-cutoff, validation and dev comparisons. gpt-5.2 emits no phase at all and shows the same gap.
+
+**Where it was dropped, the documented symptom did not appear.** All 12 Codex sessions, 10 of which
+replayed unphased commentary, ended on `submit_findings`, with no text-only turn and no incomplete
+response. Their reach was 0.31 (gpt-5.4) and 0.25 (gpt-5.5) against APE-Agent's 0.19 and 0.31, one run
+each. That rules out early stopping, the named failure. It does not rule out the guide's unnamed
+"other misbehavior", which one run a model cannot see.
+
+**What would close it:** keep `phase` in the carried `responses_output` entry and send it back, in the
+provider and in the relay, with a round-trip test on `responses_gpt55_stream_text_and_tool_call.sse`
+(its message is `commentary`). It matters before any run that makes these models write between tool
+calls: the Codex harness, or an APE-Agent contract asking for visible notes. It changes the request, so
+it goes in at a run boundary.
