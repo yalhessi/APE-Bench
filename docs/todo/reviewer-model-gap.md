@@ -636,4 +636,15 @@ the same session shape (75 calls against 80, 68 commentary preambles against 70,
 drops, which gpt-5.5 had compiled and left unfiled before; Kb1 filed only the title typo there. Kb1's
 43167 generality finding (`[N.Normal]` to normalizer hypotheses) is not in it. Neither run is matched yet:
 by the pre-stated rule a single-run gain needs >= 0.25 (4 asks) before it is worth two more reps.
+**Matched (same day, `results/pr_review_v5/probes/elm-parity-2026-10-05/`):** Eb1 0.25 against Hb1 0.3125
+(parity), EKb1 0.375 against Kb1 0.25 (+0.125, under the 0.25 bar); the README classifies every miss from
+the summaries. **Next, proposed, not run:** (a) `filing_bar: request` with summaries on, gpt-5.5 through
+ELM, on validation small12, where the bar did not transfer (~$11; `..._val_small12_gpt55_Grc_bar.yaml`
+with `elm_gpt_5.5` and the summary knob). It asks whether the bar removes the stated withholding there,
+and, if reach still does not move, what the remaining misses are. Read it by counting withholding
+passages and raised-but-untested candidates per missed ask, against this probe's table. (b) Only if (a)
+shows raised-and-dropped candidates are common, a "test what you raise" contract: each change the
+reviewer considers is either compiled or declined with a reason in the submission. Caution from D1: a
+verdict demanded per pre-enumerated cell came back 98% `no_issue`; this would be per self-raised
+candidate instead.
 
