@@ -1,0 +1,331 @@
+[
+ {
+  "id": "P036",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "`{n : ℕ} {a : ℝ}` are implicit though they occur only in the conclusion `log⁺ (a ^ n) = n * log⁺ a`; nothing explicit determines them.",
+  "status": "departs"
+ },
+ {
+  "id": "P094",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "First calc step proves `log⁺ ‖∑ f t‖ ≤ log⁺ (∑ ‖f t‖)` by `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`, a named monotonicity lemma.",
+  "status": "check"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Proof uses case analysis (`by_cases hn : n = 0`, `by_cases h₂a : |a| ≤ 1`) and simp calls, for a statement about `log⁺` and powers (cf. `log_pow`).",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "New binder `{E : Type*} [NormedAddCommGroup E]` names a normed group with `E`, plus index type `α`; letters for normed spaces are customary in the area.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "`by_cases h₂a : |a| ≤ 1` is followed by `rw [not_le] at h₂a`; `have : 1 < |a ^ n|` feeds only the closing `simp`.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Adds a norm variant of `posLog_sum` only; its siblings `posLog_add`, `posLog_prod` and `posLog_mul` get no corresponding norm variant.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Conclusion spelled `n * log⁺ a` with a cast natural factor, one of equivalent spellings (`n • log⁺ a`) for the power rule.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Assumes `[NormedAddCommGroup E]` while statement and proof use only the norm and `norm_sum_le`, which a seminormed group may provide.",
+  "status": "check"
+ },
+ {
+  "id": "P267",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_zero",
+  "fact": "Parallel one-liners `@[simp] lemma posLog_zero : log⁺ 0 = 0` and `@[simp] lemma posLog_one : log⁺ 1 = 0` are separated by a blank line.",
+  "status": "departs"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Declared with `lemma` and inline `@[simp]`, while the file's other declarations use the `theorem` keyword.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Uses `lemma` and a docstring with `/--` and `-/` on their own lines, unlike the file's `theorem` declarations and inline `/-- ... -/` docstrings.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_sum",
+  "fact": "Docstring rewritten to `/--` and `-/` on separate lines, while neighbouring docstrings (e.g. `posLog_mul`, `posLog_nonneg`) open text on the `/--` line.",
+  "status": "check"
+ },
+ {
+  "id": "P154",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Proof only chains `norm_sum_le`, `monotoneOn_posLog` and `posLog_sum` in a two-step calc.",
+  "status": "check"
+ },
+ {
+  "id": "P154",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_zero",
+  "fact": "New lemma proved by the one-line `simp [posLog]`, unfolding the definition at 0.",
+  "status": "check"
+ },
+ {
+  "id": "P154",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_one",
+  "fact": "New lemma proved by the one-line `simp [posLog]`, unfolding the definition at 1.",
+  "status": "check"
+ },
+ {
+  "id": "P338",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Stated for an arbitrary normed additive commutative group `E` with extra type parameter, beyond the real-valued `posLog_sum`.",
+  "status": "check"
+ },
+ {
+  "id": "P168",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "The `|a| ≤ 1` branch is closed by one `simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]`, and the last branch by a hinted `simp`, hiding intermediate claims.",
+  "status": "check"
+ },
+ {
+  "id": "P232",
+  "file": "PR",
+  "declaration": "title",
+  "fact": "Title `feat: elementary lemmas aiding computations with log⁺` has no parenthesised area such as `(Analysis/SpecialFunctions/Log/PosLog)`.",
+  "status": "departs"
+ },
+ {
+  "id": "P043",
+  "file": "PR",
+  "declaration": "description",
+  "fact": "Bundles new lemmas (`posLog_zero`, `posLog_one`, `posLog_pow`, `posLog_norm_sum_le`) with docstring reflows of `posLog_sum`/`posLog_add`, section-header spacing and a module-doc cross-reference.",
+  "status": "check"
+ },
+ {
+  "id": "P048",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Repeats `{α : Type*} (s : Finset α)`, the binders of the preceding `posLog_sum` (whose docstring the PR changes), rather than a shared `variable`.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_sum",
+  "fact": "Hunk only reflows the existing docstring text into `/--`, one line, `-/`; wording and meaning unchanged.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_add",
+  "fact": "Hunk only reflows the existing docstring text into `/--`, one line, `-/`; wording and meaning unchanged.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "section headers `## Elementary Properties`, `## Estimates for Products`, `## Estimates for Sums`",
+  "fact": "Hunks only insert a blank line after each section-header module docstring; pure spacing.",
+  "status": "departs"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Goal closed by a case split (`by_cases` on `n = 0` and `|a| ≤ 1`), `rw [not_le] at h₂a`, a `have` and hinted `simp` rather than one finishing tactic.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Goal closed by a two-step calc with explicit `apply monotoneOn_posLog`, `norm_sum_le` and `posLog_sum` applications rather than a single finishing tactic.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_sum",
+  "fact": "Existing docstring re-laid out with `/--` and `-/` on own lines; meaning unchanged.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_add",
+  "fact": "Existing docstring re-laid out with `/--` and `-/` on own lines; meaning unchanged.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "section headers `## Elementary Properties`, `## Estimates for Products`, `## Estimates for Sums`",
+  "fact": "Blank lines inserted after existing section-header docstrings, a stylistic change to existing layout.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_zero",
+  "fact": "New lemma `log⁺ 0 = 0`, a basic fact about the existing `posLog`.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_one",
+  "fact": "New lemma `log⁺ 1 = 0`, a basic fact about the existing `posLog`.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "New lemma `log⁺ (a ^ n) = n * log⁺ a`, a basic fact about `posLog` and powers.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "The `by calc` block's first step is `by apply monotoneOn_posLog ...` then `simp [Finset.sum_nonneg ...]`, assembling lemma applications.",
+  "status": "check"
+ },
+ {
+  "id": "P089",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Passes a `_` placeholder in `monotoneOn_posLog (by simp) _ (norm_sum_le s f)` and explicit `s f` to `norm_sum_le`.",
+  "status": "check"
+ },
+ {
+  "id": "P089",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Passes a `_` placeholder in the simp hint `(posLog_eq_zero_iff _).2`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Rewrites `h₂a` by `not_le`, then weakens `this : 1 < |a ^ n|` and `h₂a` via `.le` to fit `posLog_eq_log`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Uses `monotoneOn_posLog` on `Set.Ici 0`, opening membership side goals (`by simp`, `Finset.sum_nonneg`) only to adapt it to the step.",
+  "status": "check"
+ },
+ {
+  "id": "P024",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Branches `n = 0` and `|a| ≤ 1` are closed by general automation `simp_all` (with hints) instead of explicit steps.",
+  "status": "check"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Statement broken after `{a : ℝ} :` though the whole line with `:= by` fits in 74 characters.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Signature broken before `{α : Type*}` though the first line could take it (and all binders, 100 chars); final calc step breaks before a fitting `posLog_sum s (‖f ·‖)`.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "docstring of Real.posLog_norm_sum_le",
+  "fact": "Docstring line ends after `commutative` at 76 characters though the next word `groups,` fits within 100.",
+  "status": "departs"
+ },
+ {
+  "id": "P045",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "module docstring",
+  "fact": "Module docstring lists `posLog_prod` and `posLog_sum`; the PR adds `posLog_norm_sum_le` and `posLog_pow` without listing them.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_zero",
+  "fact": "Equation `log⁺ 0 = 0` computing `posLog`, tagged only `@[simp]`, no `grind` attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_one",
+  "fact": "Equation `log⁺ 1 = 0` computing `posLog`, tagged only `@[simp]`, no `grind` attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Equation `log⁺ (a ^ n) = n * log⁺ a` computing `posLog` of a power, tagged only `@[simp]`, no `grind` attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P263",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_norm_sum_le",
+  "fact": "Statement about a sum in `[NormedAddCommGroup E]`; no `to_additive` and no product counterpart for normed rings in the PR.",
+  "status": "check"
+ },
+ {
+  "id": "P263",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_pow",
+  "fact": "Statement involves `a ^ n` and `n * log⁺ a`, multiplicative operations; no `to_additive` attribute or additive counterpart.",
+  "status": "check"
+ },
+ {
+  "id": "P263",
+  "file": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "declaration": "Real.posLog_zero",
+  "fact": "Statement about `0`, the additive identity; its multiplicative counterpart would be `posLog_one`.",
+  "status": "check"
+ }
+]

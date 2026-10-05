@@ -1,0 +1,93 @@
+[
+  {
+    "id": "P043",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "'miscellaneous typo fixes' bundles independent doc edits in seven files, including rewordings ('Implementationwise', 'liminfs', 'variance') that need none of the other edits.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Probability/Moments/Basic.lean",
+    "declaration": "module docstring",
+    "fact": "Changed lines capitalise 'MGFs'/'CGFs', while the same docstring keeps lowercase 'the cgf exists' and `mgf`/`cgf` in prose.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Probability/Martingale/Upcrossing.lean",
+    "declaration": "module docstring (Variant of the upcrossing estimate)",
+    "fact": "Changed line hyphenates 'left-hand side'; the file's other prose occurrences of 'left hand side' or 'right hand side' may be spelled unhyphenated.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Probability/Distributions/Gaussian/Real.lean",
+    "declaration": "gaussianPDFReal",
+    "fact": "Changed docstrings capitalise 'Gaussian'; other docstrings and comments in the file may still spell it 'gaussian'.",
+    "status": "check"
+  },
+  {
+    "id": "P138",
+    "file": "Mathlib/Probability/Martingale/Convergence.lean",
+    "declaration": "module docstring (Almost everywhere martingale convergence theorem)",
+    "fact": "'Implementationwise' reworded to 'In terms of implementation': wording only, the original was correct English, no factual or egregious error corrected.",
+    "status": "departs"
+  },
+  {
+    "id": "P138",
+    "file": "Mathlib/Probability/Martingale/Upcrossing.lean",
+    "declaration": "module docstring (Variant of the upcrossing estimate)",
+    "fact": "'left hand side' changed to 'left-hand side': hyphenation only, meaning unchanged, no factual or egregious error corrected.",
+    "status": "departs"
+  },
+  {
+    "id": "P138",
+    "file": "Mathlib/Probability/Moments/Variance.lean",
+    "declaration": "docstring 'Popoviciu's inequality' (lemma after variance_le_sub_mul_sub)",
+    "fact": "Heading 'on variance' changed to 'on variances': a one-letter wording change, meaning unchanged, no egregious error corrected.",
+    "status": "departs"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/Probability/Martingale/Convergence.lean",
+    "declaration": "module docstring (Almost everywhere martingale convergence theorem)",
+    "fact": "Third-party rewording of the original author's 'Implementationwise' to 'In terms of implementation', meaning unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/Probability/Martingale/Upcrossing.lean",
+    "declaration": "module docstring (Variant of the upcrossing estimate)",
+    "fact": "Punctuation-only change 'left hand side' to 'left-hand side' in existing prose, meaning unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/Probability/Martingale/Convergence.lean",
+    "declaration": "docstring of the theorem after upcrossings_eq_top_of_frequently_lt",
+    "fact": "Existing docstring reworded 'bounded liminfs' to 'bounded limit inferiors', meaning unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/Probability/Moments/Basic.lean",
+    "declaration": "module docstring",
+    "fact": "Changed lines write 'their MGFs'/'their CGFs', the identifier abbreviations `mgf`/`cgf` used as words, not 'moment generating functions'/'cumulant generating functions'.",
+    "status": "departs"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/Probability/Distributions/Gaussian/Real.lean",
+    "declaration": "gaussianPDFReal_pos",
+    "fact": "Changed docstring 'The Gaussian pdf is positive ...' uses the identifier abbreviation 'pdf' (of `gaussianPDFReal`) as a word, not 'probability density function'.",
+    "status": "departs"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/Probability/Distributions/Gaussian/Real.lean",
+    "declaration": "lintegral_gaussianPDFReal_eq_one",
+    "fact": "Changed docstring 'The Gaussian distribution pdf integrates to 1' uses shorthand 'pdf' as a word instead of 'probability density function'.",
+    "status": "departs"
+  }
+]

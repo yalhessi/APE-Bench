@@ -1,0 +1,450 @@
+[
+ {
+  "id": "P392",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Takes the class hypothesis as a named explicit binder `(hβ : Infinite β)`; both call sites in the PR pass it `(by infer_instance)`.",
+  "status": "departs"
+ },
+ {
+  "id": "P392",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New lemma takes the class `Infinite α` as named explicit hypothesis `(hα : Infinite α)`, not `[Infinite α]`; StrongRankCondition passes `(by infer_instance)`.",
+  "status": "departs"
+ },
+ {
+  "id": "P392",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New lemma takes the class `Uncountable β` as named explicit hypothesis `(hβ : Uncountable β)` rather than instance-implicit `[Uncountable β]`.",
+  "status": "departs"
+ },
+ {
+  "id": "P048",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Repeats `{β α : Type u} (f : β → α) (h : #α < #β)` verbatim from the adjacent `infinite_pigeonhole_card_lt` and `exists_infinite_fiber` instead of one `variable`.",
+  "status": "departs"
+ },
+ {
+  "id": "P048",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Fourth consecutive signature repeating `{β α : Type u} (f : β → α) (h : #α < #β)`; no `variable` declares them once.",
+  "status": "departs"
+ },
+ {
+  "id": "P048",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Changed signature `{β α : Type u} (f : β → α) (h : #α < #β)` duplicates the binders of adjacent `infinite_pigeonhole_card_lt` and the two new lemmas.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Term proof `exists_infinite_fiber f h (by rw [Cardinal.infinite_iff] at hα ⊢; exact hα.trans h.le)` is broken over three lines though it fits on one (about 88 characters).",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "docstring of Cardinal.exists_uncountable_fiber",
+  "fact": "First docstring line is 95 characters; the next line's leading word `has` fits within 100 (99), so the break does not fill the line.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "docstring of Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Rewritten first docstring line is 92 characters; the next line's leading word `has` would fit (96), so the break does not fill the line.",
+  "status": "departs"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Rewritten proof case-splits `rcases lt_or_ge #α ℵ₀`; the finite-codomain branch reapplies `infinite_pigeonhole_card` at ℵ₀ where existing finite pigeonhole API might serve.",
+  "status": "check"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New proof case-splits on `#α < ℵ₀`, rewrites to ℵ₁ form and calls `infinite_pigeonhole_card` or `infinite_pigeonhole_card_lt` per branch.",
+  "status": "check"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Rewritten proof case-splits `rcases lt_or_ge #α ℵ₀`, applying `infinite_pigeonhole_card` at ℵ₀ or at `succ #α` in each branch.",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New binders `{β α : Type u}` with `f : β → α`: the domain is lettered β and the codomain α, reversing the usual α → β order.",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New binders `{β α : Type u}` with `f : β → α`: domain lettered β, codomain α.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Inner `by` does `rw [Cardinal.infinite_iff] at hα ⊢` then `exact hα.trans h.le`: a rewrite followed by `exact`.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "`rw [isRegular_aleph_one.cof_eq]; exact hα.trans …`, and `rw [← Order.succ_le_succ_iff, succ_aleph0] at hα` then `exact ⟨a, …⟩`: rewrites followed by `exact`.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "An old-form primed variant (codomain infinite) is added for `exists_infinite_fiber` only; `infinite_pigeonhole_card_lt` changed hypothesis `ℵ₀ ≤ #α` with no such variant.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New uncountable sibling of `exists_infinite_fiber`; check for missing counterparts, e.g. a codomain-uncountable variant like `exists_infinite_fiber'` or a set-domain version.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Hypothesis generalised from `ℵ₀ ≤ #α` to `ℵ₀ ≤ #β`; check whether pigeonhole siblings such as the set-domain versions need the same weakening.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.le_range_of_union_finset_eq_univ",
+  "fact": "Hypothesis respelled `⋃ a, (f a : Set β) = Set.univ` (was `= ⊤`); check which spelling library covering lemmas use.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Hypothesis and conclusion spelled `Uncountable β` and `Uncountable (f ⁻¹' {a})`, while sibling `infinite_pigeonhole_card_lt` uses cardinal inequalities like `ℵ₀ ≤ #β`.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "New hypothesis `hβ : ℵ₀ ≤ #β` is the cardinal spelling, while sibling `exists_infinite_fiber` now spells the same condition `Infinite β`.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Takes cardinality side conditions `h : #α < #β` and the new `hβ : ℵ₀ ≤ #β`; check each is needed in this generalised form.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Takes `h : #α < #β` and `hβ : Infinite β`; check both are needed and in their weakest form.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Takes `h : #α < #β` and `hβ : Uncountable β`; check whether either is stronger than the proof needs.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Uses `rw [Cardinal.infinite_iff] at hα ⊢` where the adjacent `exists_infinite_fiber` performs the same rewrite with `simp_rw`.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Writes `Order.succ_le_iff`, `Order.succ_le_succ_iff`, `Cardinal.aleph0_lt_mk_iff` qualified, while the file writes `succ_le_iff`, `succ_le_of_lt` unqualified inside `namespace Cardinal`.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.le_range_of_union_finset_eq_univ",
+  "fact": "Statement writes `Set.univ` qualified while the proof uses `range f`, `inclusion` unqualified; hypothesis keeps name `w` while siblings now use `h`.",
+  "status": "check"
+ },
+ {
+  "id": "P154",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New lemma's proof only applies `exists_infinite_fiber` with `Cardinal.infinite_iff` and `h.le`; its single use site could combine these directly.",
+  "status": "check"
+ },
+ {
+  "id": "P168",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Proof packs steps: a three-lemma `simp_rw … at hβ ⊢`, a nested `(by rw …; exact …)` inside `exact`, and `obtain ⟨a, ha⟩` without type ascription.",
+  "status": "check"
+ },
+ {
+  "id": "P168",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Branch `obtain ⟨a, ha⟩ := infinite_pigeonhole_card … (by rwa …)` has no type ascription and a nested `by`; `ha.trans' (succ_le_of_lt hα)` then closes it.",
+  "status": "check"
+ },
+ {
+  "id": "P168",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Branches `exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa …)` and `obtain ⟨a, ha⟩` without type ascription carry the argument on single lines.",
+  "status": "check"
+ },
+ {
+  "id": "P043",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.le_range_of_union_finset_eq_univ",
+  "fact": "Rename from `_eq_top` with `⊤` respelled `Set.univ` (resolving a TODO), plus its Basis/Cardinality.lean call-site update, is separable from generalising the pigeonhole lemmas.",
+  "status": "check"
+ },
+ {
+  "id": "P043",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New uncountable-fiber lemma, unused in the PR, is an extension bundled beside the generalisation of `infinite_pigeonhole_card_lt` and `exists_infinite_fiber`.",
+  "status": "check"
+ },
+ {
+  "id": "P190",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Statement needs only `#`, `Uncountable` and preimages; the proof uses regular cardinals and cofinality (`isRegular_aleph_one.cof_eq`, `infinite_pigeonhole_card`).",
+  "status": "check"
+ },
+ {
+  "id": "P190",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Statement is about `Infinite` fibres and `#α < #β`; the rewritten proof now uses `isRegular_aleph0.cof_eq` and `infinite_pigeonhole_card` directly.",
+  "status": "check"
+ },
+ {
+  "id": "P254",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New primed variant of `exists_infinite_fiber` for an infinite codomain; compare its name with siblings' and analogues' naming of that hypothesis.",
+  "status": "check"
+ },
+ {
+  "id": "P254",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New uncountable counterpart of `exists_infinite_fiber`; compare its name with library analogues for uncountable or countable fibres.",
+  "status": "check"
+ },
+ {
+  "id": "P254",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.le_range_of_union_finset_eq_univ",
+  "fact": "Renamed using `union` for the indexed union `⋃ a` (library names say `iUnion`) and the `eq_univ` affix; compare with sibling names.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Existing binder `w : #α < #β` renamed to `h` with its type unchanged: a purely stylistic edit inside the changed signature.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Existing binder `w : #α < #β` renamed to `h` with unchanged type; only the other hypothesis's change is substantive.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Side goal `Infinite β` from `Infinite α` and `#α < #β` is closed by `rw [Cardinal.infinite_iff] at hα ⊢` then `exact hα.trans h.le`.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Cofinality side goal closed by `rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one`; second branch by `rw … at hα` and a hand-built term.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "First branch, after a case split, closes `succ #α ≤ #(f ⁻¹' {a})` with the hand-built `⟨a, ha.trans' (succ_le_of_lt hα)⟩`.",
+  "status": "check"
+ },
+ {
+  "id": "P401",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "`simp_rw [← Cardinal.aleph0_lt_mk_iff, ← Order.succ_le_iff, succ_aleph0] at hβ ⊢` rewrites the goal backwards into `ℵ₁ ≤ #…` form, then applies `infinite_pigeonhole_card`.",
+  "status": "check"
+ },
+ {
+  "id": "P401",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "`simp_rw [← succ_le_iff]` rewrites the goal backwards into `succ #α ≤ #…` form, then each branch uses `infinite_pigeonhole_card`.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/LinearAlgebra/Basis/Cardinality.lean",
+  "declaration": "infinite_basis_le_maximal_linearIndependent'",
+  "fact": "`have w₁` is a `by` block of `apply Cardinal.le_range_of_union_finset_eq_univ` then `exact union_support_maximal_linearIndependent_eq_range_basis b v i m`.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Inner `(by rw [Cardinal.infinite_iff] at hα ⊢; exact hα.trans h.le)` is a short block a term from `Cardinal.infinite_iff` might replace.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Inner `(by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)` is a short block a term might replace.",
+  "status": "check"
+ },
+ {
+  "id": "P089",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Changed lines pass `_` placeholders: `le_succ _` in `hα.trans (le_succ _)` and `lt_succ _` in `(lt_succ _).trans_le`.",
+  "status": "check"
+ },
+ {
+  "id": "P211",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Declares a primed name; the unprimed `exists_infinite_fiber` exists in the same file, now with the weaker hypothesis.",
+  "status": "check"
+ },
+ {
+  "id": "P211",
+  "file": "Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean",
+  "declaration": "linearIndependent_le_infinite_basis",
+  "fact": "Proof now refers to the primed `Cardinal.exists_infinite_fiber'` instead of `Cardinal.exists_infinite_fiber`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Uses `aleph0_lt_aleph_one.le` for `ℵ₀ ≤ ℵ₁`, weakens via `hβ.trans' aleph0_lt_aleph_one.le`, and rewrites `hα` by `succ_le_succ_iff` into composable form.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.infinite_pigeonhole_card_lt",
+  "fact": "Branch weakens then composes, `ha.trans' (succ_le_of_lt hα)`; the cofinality side goal is reached by `rwa [isRegular_aleph0.cof_eq]`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "Reaches `Infinite β` by rewriting `hα` and the goal with `Cardinal.infinite_iff`, then `hα.trans h.le`; a direct lemma may exist.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New general lemma: a map with `#α < #β` and uncountable domain has an uncountable fibre; check the library for an existing statement.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New lemma restating the pre-PR `exists_infinite_fiber` (infinite codomain); check whether existing API already states it.",
+  "status": "check"
+ },
+ {
+  "id": "P329",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.le_range_of_union_finset_eq_univ",
+  "fact": "Existing theorem renamed from `le_range_of_union_finset_eq_top` and `⊤` respelled `Set.univ`; the title's generalisation does not require the rename.",
+  "status": "check"
+ },
+ {
+  "id": "P329",
+  "file": "Mathlib/LinearAlgebra/Basis/Cardinality.lean",
+  "declaration": "infinite_basis_le_maximal_linearIndependent'",
+  "fact": "Existing proof changed only to call the renamed `le_range_of_union_finset_eq_univ`; the deprecated alias would keep the old name resolving.",
+  "status": "check"
+ },
+ {
+  "id": "P045",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "module docstring",
+  "fact": "File restates `infinite_pigeonhole_card_lt`, `exists_infinite_fiber`, renames `le_range_of_union_finset_eq_top`, adds `exists_uncountable_fiber`, `exists_infinite_fiber'`; the module docstring is not in the diff.",
+  "status": "check"
+ },
+ {
+  "id": "P063",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber",
+  "fact": "Statement fixes both `β α` in one universe `Type u`; the `Infinite` fibre conclusion might hold across universes with `Cardinal.lift`.",
+  "status": "check"
+ },
+ {
+  "id": "P063",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "New statement fixes `{β α : Type u}` in one shared universe, where the cardinal hypothesis could be lifted across universes.",
+  "status": "check"
+ },
+ {
+  "id": "P063",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_infinite_fiber'",
+  "fact": "New statement fixes `{β α : Type u}` in one shared universe.",
+  "status": "check"
+ },
+ {
+  "id": "P094",
+  "file": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "declaration": "Cardinal.exists_uncountable_fiber",
+  "fact": "Derives `ℵ₁ ≤ succ #α` from `hα : ℵ₀ ≤ #α` via the named order lemma `Order.succ_le_succ_iff` (`rw … at hα`), a monotonicity step.",
+  "status": "check"
+ }
+]

@@ -636,6 +636,27 @@ sessions and the matching, meters each batch, and sleeps to the reset when a bat
 Sessions run in stage C's order, so a spent window or week leaves the most informative prefix, and
 a stage cut short is reported as partial on the PRs it ran.
 
+**Running notes (2026-10-05, written after the rules and nine pinpointings, before any reviewer session).**
+- **The rules:** 52, both writers audited clean, committed as written (`rules.json`, `60209444`).
+  Check kinds: of the 26 pool rules, compile 11, lookup 8, read 6, judge 1; of the 26 decoys,
+  read 14, lookup 6, judge 4, compile 2.
+- **The window cost about three times stage F's rate.** The writers ran at 17k weighted units a
+  point of the five-hour window, the first four pinpointers at 12k, against stage F's 23-31k. Part
+  of it is another session on token C (its window rose from 41% to 53% in six minutes before
+  this stage spent anything); the rest is unexplained. The second batch of four ran into the
+  limit: pr28649 and pr42184 finished; pr34091 wrote `candidates.json` at 10:10:55 and was cut off
+  before its own check, and the file passes every check the rubric names, so it stands, as the
+  census's b05 did; pr43167 wrote nothing and is rerun from a rebuilt folder after the 14:50 reset.
+- **A weekly guard, added now.** At that rate the ten sessions could take most of the remaining
+  week (52% at 10:15, resetting Friday 04:00), which the user's other sessions share. So
+  `run_stage_g.sh` now runs one session at a time, meters each against the dearest cost seen so
+  far, and starts none once the week reaches 72%. Matching runs on the PRs that finished while the
+  week is under 85%. A stage cut short reads as partial on the PRs it ran, in stage C's order, as
+  fixed above; both caps are environment variables.
+- **Brief length, read before any session:** 13 to 74 candidates a PR on the nine done (328 in
+  all, 183 from pool rules, 145 from decoys; 67 decided by reading, 261 checks). Stage F's 25
+  sentences diluted; this brief is longer, but each item carries a place and a check.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences

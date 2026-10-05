@@ -25,34 +25,43 @@ packet_dir() {
   esac
 }
 . $P/token_window.sh
-run_sessions() {  # one pass: batches of up to three while they fit under the ceiling
-  local ceiling=$1 status used reset
+# Sessions run one at a time. Each is started only if the five-hour window has room for it at the
+# dearest cost metered so far (stage F's per-session points times cost_scale/10, 2.5x until a
+# session here is metered: on 2026-10-05 subagents used token C's window about three times faster
+# than stage F's did), and only while the week is under SESSION_WEEK_CAP. A session the limit kills
+# leaves no findings.json; the runner then stops uncommitted, to be read by hand.
+SESSION_WEEK_CAP=${SESSION_WEEK_CAP:-72}; MATCH_WEEK_CAP=${MATCH_WEEK_CAP:-85}; cost_scale=25
+run_sessions() {
+  local status used0 used1 reset week rc
   while [ ${#queue[@]} -gt 0 ]; do
-    read -r status used reset < <(window)
-    [[ "$status" == allowed* ]] || break
-    local batch=() items=() dirs=() need=0
-    for job in "${queue[@]:0:3}"; do
-      IFS=: read -r tag pr est <<< "$job"
-      [ $(( used + need + est )) -le "$ceiling" ] || break
-      batch+=("$job"); items+=("${SET[$tag]}:$pr"); dirs+=("$(packet_dir $tag $pr)"); need=$(( need + est ))
-    done
-    [ ${#batch[@]} -gt 0 ] || break
+    IFS=: read -r tag pr est <<< "${queue[0]}"
+    local need=$(( est * cost_scale / 10 )) dir; dir=$(packet_dir $tag $pr)
+    rc=0; wait_for_room "$need" 97 "$SESSION_WEEK_CAP" || rc=$?
+    if [ $rc = 2 ]; then echo "$(date '+%H:%M:%S') the week is at ${SESSION_WEEK_CAP}%: sessions stop; unrun: ${queue[*]}"; break; fi
+    if [ $rc != 0 ]; then echo "$(date '+%H:%M:%S') no room after twelve tries; unrun: ${queue[*]}"; break; fi
+    read -r status used0 reset week < <(window)
     n=$(( n + 1 ))
-    echo "$(date '+%H:%M:%S') batch g$n ($used% used, up to $need expected): ${items[*]}"
-    $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C g$n $S/claude_logs G1 "${items[@]}"
+    echo "$(date '+%H:%M:%S') batch g$n (five-hour $used0%, week $week%, about $need expected): ${SET[$tag]}:$pr"
+    $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C g$n $S/claude_logs G1 "${SET[$tag]}:$pr"
+    read -r status used1 reset week < <(window)
+    if [ "$used1" -gt "$used0" ]; then
+      local scale=$(( (used1 - used0) * 10 / est ))
+      [ "$scale" -le "$cost_scale" ] || cost_scale=$scale
+    fi
     python3 $P/batch_report.py $S/claude_logs/g$n.jsonl $S/claude_logs/g$n.prompt > $S/report_g$n.txt
     grep -E '^Reviewer|^five-hour|^result' $S/report_g$n.txt
+    echo "metered: five-hour $used0% -> $used1%, week now $week%; cost_scale now $cost_scale"
+    [ -f $dir/findings.json ] || { echo "pr$pr: no findings.json (killed?); stopping uncommitted"; exit 8; }
     local clean=1
     python3 $P/audit_batch.py $S/claude_logs/g$n.jsonl > $S/audit_g$n.txt || { clean=0; flagged=1; }
     cat $S/audit_g$n.txt
-    for d in "${dirs[@]}"; do [ -f $d/findings.json ]; done
     if [ $clean = 1 ]; then
-      { echo "results: stage G batch g$n on token C -- sessions briefed with pinpointed candidates, audited clean; committed by run_stage_g.sh unattended"
-        echo; grep -E '^Reviewer|^five-hour' $S/report_g$n.txt; echo; cat $S/audit_g$n.txt; } > $S/msg_g$n.txt
-      git add "${dirs[@]}"
+      { echo "results: stage G batch g$n on token C -- the session on $pr briefed with pinpointed candidates, audited clean; committed by run_stage_g.sh unattended"
+        echo; grep -E '^Reviewer|^five-hour' $S/report_g$n.txt; echo "metered: five-hour $used0% -> $used1%, week $week%"; echo; cat $S/audit_g$n.txt; } > $S/msg_g$n.txt
+      git add "$dir"
       git commit -q -F $S/msg_g$n.txt
     fi
-    queue=("${queue[@]:${#batch[@]}}")
+    queue=("${queue[@]:1}")
   done
 }
 
@@ -74,20 +83,24 @@ fi
 echo "items in 30641's brief: $(grep -c '^- `' "$(packet_dir val 30641)/brief.md" || true)"
 DRY_RUN=1 $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C dry_g $S/claude_logs G1 ${SET[val]}:30641 > /dev/null
 echo "$(date '+%H:%M:%S') packets built; sessions on token C while they fit"
-while [ ${#queue[@]} -gt 0 ]; do
-  IFS=: read -r tag pr est <<< "${queue[0]}"
-  wait_for_room "$est" 88 || { echo "sessions left unrun: ${queue[*]}"; exit 6; }
-  run_sessions 88
-done
+run_sessions
 
 printf '{"X1": {"kind": "claude"}, "X2": {"kind": "claude"}, "E1": {"kind": "claude"}, "G1": {"kind": "claude"}}\n' > $P/sources_G.json
-declare -A PRS=([val]="30641 29842 32875 30458 28649 34091" [post]="41930 42814 43167 42184")
+# Match the PRs whose G1 session finished: all ten, or the prefix the week allowed (reported as partial).
+declare -A PRS=([val]="" [post]="")
+for job in val:30641 val:29842 val:32875 val:30458 val:28649 val:34091 post:41930 post:42814 post:43167 post:42184; do
+  IFS=: read -r tag pr <<< "$job"
+  [ -f "$(packet_dir $tag $pr)/findings.json" ] && PRS[$tag]="${PRS[$tag]} $pr"
+done
+echo "matching: val [${PRS[val]} ] post [${PRS[post]} ]"
+[ -n "${PRS[val]}" ] && [ -n "${PRS[post]}" ] || { echo "a set has no finished G1 session; matching waits"; exit 9; }
 for tag in val post; do
   [ -f $P/blinding_G_${tag}_SEALED.json ] || probe seal --set ${SET[$tag]} --sessions X1 X2 E1 G1 --prs ${PRS[$tag]} --out $P/blinding_G_${tag}_SEALED.json
   probe match-inputs --set ${SET[$tag]} --seal $P/blinding_G_${tag}_SEALED.json --sources $P/sources_G.json --out $S/match_G_$tag > $S/match_G_$tag.prompts
 done
 for tag in val post; do
-  wait_for_room 16 96 || { echo "no room for the matchers on $tag"; exit 7; }
+  rc=0; wait_for_room 40 97 "$MATCH_WEEK_CAP" || rc=$?
+  [ $rc = 0 ] || { echo "no room for the matchers on $tag (week cap ${MATCH_WEEK_CAP}% or no window); sessions are committed, matching waits"; exit 7; }
   echo "$(date '+%H:%M:%S') matchers, $tag"
   $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C m_G_$tag $S/claude_logs - @$S/match_G_$tag.prompts
   python3 $P/batch_report.py $S/claude_logs/m_G_$tag.jsonl $S/claude_logs/m_G_$tag.prompt | grep -E '^Matcher|^five-hour'
