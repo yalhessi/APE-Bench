@@ -547,7 +547,7 @@ def test_a_turns_carried_reasoning_returns_with_it():
     assistant = [n for n in session.nodes if n.type == "assistant"]
     assert [n.message.signature for n in assistant] == [carried]
 
-    _instructions, items = responses_input(MessageFormatter().format_for_api(session), carryover=True)
+    _instructions, items = responses_input(MessageFormatter().format_for_api(session))
     kinds = [i.get("type") for i in items]
     assert kinds.index("reasoning") == kinds.index("function_call") - 1
     assert next(i for i in items if i.get("type") == "reasoning")["encrypted_content"] == "gAAAA-opaque"
@@ -594,7 +594,7 @@ def test_a_preambles_phase_returns_with_it():
              "input": {"identifier": "Foo"}}]},
         {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "call_1", "content": "found"}]}]}
     session = relay._convert_anthropic_to_session(request, None)
-    _instructions, items = responses_input(MessageFormatter().format_for_api(session), carryover=False)
+    _instructions, items = responses_input(MessageFormatter().format_for_api(session))
     assert items[1] == {"role": "assistant", "content": "I'll look the name up first.",
                         "phase": "commentary"}
 

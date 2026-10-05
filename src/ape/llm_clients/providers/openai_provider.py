@@ -132,15 +132,15 @@ class OpenAIResponsesProvider(OpenAIProvider):
     * `store: false` throughout, so nothing refers to server-side state.
     * a stream's final `response.completed` event carries the whole response.
 
-    Reasoning between turns is `openai_responses_reasoning_carryover`, which an OpenAI model must
-    have on (`reasoning_drop_refusal`); off survives only for a model that is not one. On, the
-    encrypted items ride in the assistant message's
-    `signature` (the slot `ConversationMessage` keeps for opaque provider reasoning state) and
-    go back as `reasoning` input items, in their original order: the API rejects a reasoning
-    item passed without the item that followed it.
+    Reasoning is always carried between turns: every config that reaches this class is an OpenAI
+    model with `openai_responses_reasoning_carryover` on (`reasoning_drop_refusal`, 2026-10-05).
+    The encrypted items ride in the assistant message's `signature` (the slot
+    `ConversationMessage` keeps for opaque provider reasoning state) and go back as `reasoning`
+    input items, in their original order: the API rejects a reasoning item passed without the
+    item that followed it.
 
     A message's `phase` (`commentary` before tool calls, `final_answer`) rides in the same slot and
-    goes back on the replayed text, with carry-over on or off. gpt-5.4 and gpt-5.5 set it, and
+    goes back on the replayed text. gpt-5.4 and gpt-5.5 set it, and
     OpenAI's reasoning guide says to keep it in a manual replay: "Missing or dropped `phase` can
     cause preambles to be treated as final answers". No response logged here held two messages
     (6,278 calls, 2026-10-05), so a turn's joined text takes its first message's phase.
@@ -158,10 +158,6 @@ class OpenAIResponsesProvider(OpenAIProvider):
 
     DEFAULT_BASE_URL = "https://api.openai.com/v1/responses"
 
-    @property
-    def _carryover(self) -> bool:
-        return self.config.openai_responses_reasoning_carryover
-
     def build_request_payload(
         self,
         messages: List[Dict[str, Any]],
@@ -173,7 +169,7 @@ class OpenAIResponsesProvider(OpenAIProvider):
         refusal = reasoning_drop_refusal(self.config)
         if refusal:
             raise RequestRejectedError(refusal)
-        instructions, items = responses_input(messages, carryover=self._carryover)
+        instructions, items = responses_input(messages)
         payload: Dict[str, Any] = {
             "model": self.config.formal_model_name,
             "input": items,
@@ -181,6 +177,7 @@ class OpenAIResponsesProvider(OpenAIProvider):
             "temperature": self.config.temperature,
             "stream": stream,
             "store": False,
+            "include": ["reasoning.encrypted_content"],
         }
         if instructions:
             payload["instructions"] = instructions
@@ -189,19 +186,17 @@ class OpenAIResponsesProvider(OpenAIProvider):
         if self.config.openai_responses_reasoning_summary is not None:
             payload.setdefault("reasoning", {})["summary"] = (
                 self.config.openai_responses_reasoning_summary)
-        if self._carryover:
-            payload["include"] = ["reasoning.encrypted_content"]
         if tools:
             payload["tools"] = [responses_tool(tool) for tool in tools]
         return payload
 
     async def make_request(self, payload: Dict[str, Any], session_id: Optional[str] = None) -> Dict[str, Any]:
         response = await super().make_request(payload, session_id)
-        return responses_to_chat_completion(response, carryover=self._carryover)
+        return responses_to_chat_completion(response)
 
     async def make_streaming_request(self, payload: Dict[str, Any], session_id: Optional[str] = None):
         response = await super().make_streaming_request(payload, session_id)
-        return _CompletedResponseStream(response, carryover=self._carryover)
+        return _CompletedResponseStream(response)
 
 
 def responses_tool(tool: Dict[str, Any]) -> Dict[str, Any]:
@@ -216,14 +211,13 @@ def responses_tool(tool: Dict[str, Any]) -> Dict[str, Any]:
     return flat
 
 
-def responses_input(messages: List[Dict[str, Any]], *,
-                    carryover: bool) -> Tuple[Optional[str], List[Dict[str, Any]]]:
+def responses_input(messages: List[Dict[str, Any]]) -> Tuple[Optional[str], List[Dict[str, Any]]]:
     """Chat Completions messages as Responses `(instructions, input)`.
 
     Leading system messages become `instructions`; a later one stays in place as a system
     item. A tool result becomes a `function_call_output`, and an assistant turn becomes its
-    text, under the `phase` it was given, and its `function_call` items -- preceded, with
-    carry-over on, by the reasoning items it recorded, in their original order.
+    text, under the `phase` it was given, and its `function_call` items, with the reasoning
+    items it recorded, all in their original order.
     """
 
     instructions: List[str] = []
@@ -238,13 +232,13 @@ def responses_input(messages: List[Dict[str, Any]], *,
                           "call_id": message.get("tool_call_id") or "",
                           "output": message.get("content") or ""})
         elif role == "assistant":
-            items.extend(_assistant_items(message, carryover=carryover))
+            items.extend(_assistant_items(message))
         else:
             items.append({"role": role, "content": message.get("content") or ""})
     return "\n\n".join(instructions) or None, items
 
 
-def _assistant_items(message: Dict[str, Any], *, carryover: bool) -> List[Dict[str, Any]]:
+def _assistant_items(message: Dict[str, Any]) -> List[Dict[str, Any]]:
     """One assistant turn as input items, in the order the model produced them."""
 
     text = ({"role": "assistant", "content": message["content"]}
@@ -259,8 +253,7 @@ def _assistant_items(message: Dict[str, Any], *, carryover: bool) -> List[Dict[s
     items: List[Dict[str, Any]] = []
     for entry in _carried_output(message.get("signature")):
         if entry.get("type") == "reasoning":
-            if carryover:
-                items.append(entry)
+            items.append(entry)
         elif entry.get("type") == "message" and text is not None:
             items.append({**text, "phase": entry["phase"]} if entry.get("phase") else text)
             text = None
@@ -285,7 +278,7 @@ def _carried_output(signature: Optional[str]) -> List[Dict[str, Any]]:
     return [entry for entry in order if isinstance(entry, dict)] if isinstance(order, list) else []
 
 
-def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -> Dict[str, Any]:
+def responses_to_chat_completion(response: Dict[str, Any]) -> Dict[str, Any]:
     """A Responses response as the Chat Completions response the processors read."""
 
     texts: List[str] = []
@@ -308,9 +301,8 @@ def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -
             order.append({"type": "function_call", "call_id": item.get("call_id") or ""})
         elif kind == "reasoning":
             summaries.extend(part.get("text") or "" for part in item.get("summary") or [])
-            if carryover:
-                order.append({key: item[key]
-                              for key in ("type", "id", "encrypted_content", "summary") if key in item})
+            order.append({key: item[key]
+                          for key in ("type", "id", "encrypted_content", "summary") if key in item})
 
     message: Dict[str, Any] = {"role": "assistant",
                                "content": "\n\n".join(t for t in texts if t) or None}
@@ -359,9 +351,8 @@ class _CompletedResponseStream:
     is re-emitted as an `error` chunk, which the processor already raises on.
     """
 
-    def __init__(self, response, *, carryover: bool):
+    def __init__(self, response):
         self._response = response
-        self._carryover = carryover
 
     async def aiter_lines(self):
         final = None
@@ -383,7 +374,7 @@ class _CompletedResponseStream:
                 return
         if final is None:
             raise ProviderError("the Responses stream ended without a response.completed event")
-        completion = responses_to_chat_completion(final, carryover=self._carryover)
+        completion = responses_to_chat_completion(final)
         choice = completion["choices"][0]
         delta = dict(choice["message"])
         if delta.get("tool_calls"):

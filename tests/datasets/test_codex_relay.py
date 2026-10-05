@@ -105,7 +105,7 @@ def test_a_message_phase_goes_out_and_comes_back(relay):
         {k: v for k, v in sent[1].items() if k not in ("id", "status")},
         {"type": "function_call_output", "call_id": "call_1", "output": "ok"}]}
     session = relay._responses_to_session(returned, relay._backend_tools(CODEX_TOOLS))
-    _, items = responses_input(MessageFormatter().format_for_api(session), carryover=False)
+    _, items = responses_input(MessageFormatter().format_for_api(session))
     assert items[1] == {"role": "assistant", "content": "I'll read the diff first.", "phase": "commentary"}
     assert [i.get("type", i.get("role")) for i in items] == [
         "user", "assistant", "function_call", "function_call_output"]

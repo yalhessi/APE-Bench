@@ -219,7 +219,7 @@ def test_a_tool_conversation_becomes_function_call_items():
 def test_a_system_message_after_the_start_stays_in_place():
     instructions, items = responses_input(
         [{"role": "system", "content": "a"}, {"role": "user", "content": "u"},
-         {"role": "system", "content": "b"}], carryover=False)
+         {"role": "system", "content": "b"}])
     assert instructions == "a"
     assert items == [{"role": "user", "content": "u"}, {"role": "system", "content": "b"}]
 
@@ -266,7 +266,7 @@ def test_a_reply_cut_off_before_any_output_is_malformed_as_on_chat_completions()
     finish_reason length, which the processor already treats as malformed."""
 
     completion = responses_to_chat_completion(
-        fixture("responses_gpt54_high_incomplete.json"), carryover=False)
+        fixture("responses_gpt54_high_incomplete.json"))
     assert completion["choices"][0]["finish_reason"] == "length"
     with pytest.raises(MalformedResponseError):
         call_api(config(reasoning_effort="high"),
@@ -331,17 +331,9 @@ def test_carryover_keeps_interleaved_reasoning_in_order():
               {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"},
               {"type": "reasoning", "id": "rs_2", "encrypted_content": "e2", "summary": []},
               {"type": "function_call", "call_id": "c2", "name": "f", "arguments": "{}"}]
-    message = responses_to_chat_completion({"output": output, "status": "completed"},
-                                           carryover=True)["choices"][0]["message"]
-    _, items = responses_input([message], carryover=True)
+    message = responses_to_chat_completion({"output": output, "status": "completed"})["choices"][0]["message"]
+    _, items = responses_input([message])
     assert [item.get("id") or item.get("call_id") for item in items] == ["rs_1", "c1", "rs_2", "c2"]
-
-
-def test_carryover_off_sends_no_reasoning_even_if_a_signature_exists():
-    message = responses_to_chat_completion(
-        fixture("responses_gpt54_high_two_tool_calls.json"), carryover=True)["choices"][0]["message"]
-    _, items = responses_input([message], carryover=False)
-    assert [item["type"] for item in items] == ["function_call", "function_call"]
 
 
 def test_carryover_sends_no_reasoning_context():
@@ -379,46 +371,34 @@ def test_a_commentary_phase_goes_back_on_the_replayed_text():
 
 def test_a_final_answer_keeps_its_phase():
     message = responses_to_chat_completion(
-        fixture("responses_gpt54_high_turn2_text.json"), carryover=False)["choices"][0]["message"]
-    _, (item,) = responses_input([message], carryover=False)
+        fixture("responses_gpt54_high_turn2_text.json"))["choices"][0]["message"]
+    _, (item,) = responses_input([message])
     assert (item["role"], item["phase"]) == ("assistant", "final_answer")
 
 
-def test_a_turn_with_no_phase_and_no_carryover_records_nothing():
-    """So a request from a run that never saw a phase is what it was before: gpt-5.2 sets none,
-    and the gpt-5.4 and gpt-5.5 APE-Agent review sessions wrote no message to carry one."""
+def test_a_turn_with_no_phase_and_no_reasoning_records_nothing():
+    """So a reply that carries neither replays as it did before the slot held phases: gpt-5.2 sets
+    no phase, and a reply at effort none returns no reasoning item."""
 
-    calls = responses_to_chat_completion(
-        fixture("responses_gpt54_high_two_tool_calls.json"), carryover=False)["choices"][0]["message"]
-    assert "signature" not in calls
-
-    plain = {"output": [{"type": "message", "role": "assistant",
-                         "content": [{"type": "output_text", "text": "hello"}]}],
-             "status": "completed"}
-    message = responses_to_chat_completion(plain, carryover=False)["choices"][0]["message"]
+    output = [{"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "hello"}]},
+              {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
+    message = responses_to_chat_completion({"output": output, "status": "completed"})["choices"][0]["message"]
     assert "signature" not in message
-    assert responses_input([message], carryover=False)[1] == [{"role": "assistant", "content": "hello"}]
+    assert responses_input([message])[1] == [
+        {"role": "assistant", "content": "hello"},
+        {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
 
 
-def test_carryover_off_keeps_the_phase_and_no_reasoning():
+def test_a_phase_and_a_reasoning_item_go_back_in_the_order_produced():
     output = [{"type": "reasoning", "id": "rs_1", "encrypted_content": "e1", "summary": []},
               {"type": "message", "role": "assistant", "phase": "commentary",
                "content": [{"type": "output_text", "text": "Checking."}]},
               {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
-    response = {"output": output, "status": "completed"}
-
-    recorded_off = responses_to_chat_completion(response, carryover=False)["choices"][0]["message"]
-    assert json.loads(recorded_off["signature"])["responses_output"] == [
-        {"type": "message", "phase": "commentary"}, {"type": "function_call", "call_id": "c1"}]
-
-    recorded_on = responses_to_chat_completion(response, carryover=True)["choices"][0]["message"]
-    for message in (recorded_off, recorded_on):
-        _, items = responses_input([message], carryover=False)
-        assert items == [{"role": "assistant", "content": "Checking.", "phase": "commentary"},
-                         {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
-    _, items = responses_input([recorded_on], carryover=True)
-    assert [item.get("type", item.get("phase")) for item in items] == [
-        "reasoning", "commentary", "function_call"]
+    message = responses_to_chat_completion({"output": output, "status": "completed"})["choices"][0]["message"]
+    _, items = responses_input([message])
+    assert items == [{"type": "reasoning", "id": "rs_1", "encrypted_content": "e1", "summary": []},
+                     {"role": "assistant", "content": "Checking.", "phase": "commentary"},
+                     {"type": "function_call", "call_id": "c1", "name": "f", "arguments": "{}"}]
 
 
 # --- reasoning summaries -----------------------------------------------------------------
@@ -486,7 +466,7 @@ def test_a_reply_that_is_only_summarised_reasoning_is_still_an_empty_reply():
     reasoning item with nothing after it, which the API refuses."""
 
     cut_off = summarised("responses_gpt54_high_incomplete.json")
-    message = responses_to_chat_completion(cut_off, carryover=True)["choices"][0]["message"]
+    message = responses_to_chat_completion(cut_off)["choices"][0]["message"]
     assert "reasoning_content" not in message
     with pytest.raises(MalformedResponseError):
         call_api(config(reasoning_effort="high", openai_responses_reasoning_summary="auto"),
