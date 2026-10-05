@@ -76,3 +76,37 @@ on disk, all at the same snapshot, effort high, reasoning carried, brief G, `use
   has disabled Claude subscription access for Claude Code"), and token C was spent until 14:50. The
   four matchers run as subagents of the orchestrating session, the route of stage L and of stage C's
   post-cutoff round. Decided before any cell was judged.
+
+## Result (2026-10-05): the ceiling holds for gpt-5.5 -- +0.222 on both matchers, in-census reach 0.19 to 0.41
+
+Two briefed runs (GE1), matched blind beside the unbriefed gpt-5.5 runs on disk (GB) and Claude's
+X1, X2 under one seal a set. Agreement 116 of 120 cells (validation) and 80 of 80 (post-cutoff); all
+four matcher transcripts audit clean. `read_stage.py M GE GB` prints the tables.
+
+| per-session reach (issue recall), matcher 1 / 2 | GB, unbriefed | GE, exact | GE − GB | Claude X, same seal |
+|---|---|---|---|---|
+| **in-census asks, pooled (39), the rule's measure** | 0.19 / 0.19 | **0.41 / 0.41** | **+0.222 / +0.222** | 0.46 |
+| validation (25) | 0.16 | 0.36 | +0.20 | 0.48 |
+| post-cutoff (14) | 0.21 | 0.50 | +0.29 | 0.43 |
+| all asks (46) | 0.26 / 0.24 | 0.43 / 0.41 | +0.18 / +0.17 | 0.49 / 0.47 |
+| out-of-census (7) | 0.67 / 0.56 | 0.57 / 0.43 | −0.10 / −0.13 | |
+
+**By the rule (`≥ +0.15` on both matchers): the ceiling holds for gpt-5.5.** Provisional: one briefed
+run a set, and on validation one unbriefed run, through OpenAI directly at an earlier date.
+
+- **Nine in-census asks gained, none lost**, all on both matchers: three instance-implicit binders
+  (34091), two auto-params and a name (43192), two `simpa` closes (32875) and a shared `variable`
+  (42814). Every one is an ask no unbriefed gpt-5.5 session reached.
+- **The out-of-census drop is one ask:** 43024's `_anti` naming ask, reached by one of the two
+  unbriefed sessions and not by GE. 43024's brief is empty, so GE read there what GB read: this is
+  session noise, not the brief.
+- **It is not volume:** 31 findings against 30, asks reached per finding 0.53 / 0.50 to 0.65 / 0.61.
+- **Beside the other models** (in-census, unbriefed to exact): Claude 0.46-0.49 to 0.74 (+0.26 / +0.28,
+  stage C), gpt-5.5 0.19 to 0.41 (+0.22), the local Qwen3.5-397B 0.03 to 0.09 (+0.05, stage L).
+  Briefed gpt-5.5 reaches about what unbriefed Claude does. The local model is the exception: it is
+  at the floor and does not turn a stated convention into the ask.
+
+**Cost.** The two briefed runs record $47.18 before cache discounts ($18.90 validation, 10.6 min;
+$28.28 post-cutoff, 8.2 min); this morning's parity run billed a quarter of its recorded figure. The
+two stopped unbriefed runs add six sessions. The ELM key's own figure syncs daily. Matchers: about
+400k subagent tokens on the orchestrating session's login.

@@ -25,6 +25,10 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   read exactly as X (0.29 against 0.29 on two PRs). Ten in-census asks stay missed: six are design or judgement calls
   the convention does not carry (three of them PR-level asks for motivation), two the right
   convention at a neighbouring place.
+- **The ceiling holds for gpt-5.5 (2026-10-05, stage M, `cross_model.md` there).** One briefed run a set at
+  high effort through ELM, against the unbriefed gpt-5.5 runs on disk: in-census reach 0.19 to 0.41,
+  +0.222 on both matchers; nine asks gained and none lost. With Claude (+0.26 / +0.28) and the local
+  397B (+0.05), the gain holds for both strong reviewers and not for the floor model.
 - **The floor (the ladder's "applicable" level) read +0.026: the gain needed the asks' pinpointing.**
   A blind selector picked 25 census entries a PR from the diff alone (stage F, same README); they
   hold the entry behind 22 of the 33 in-census asks. The same reviewer briefed with them reaches
