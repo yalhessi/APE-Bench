@@ -1,0 +1,12 @@
+# The one condition where this branch changes what the model is sent: Codex with gpt-5.5 carried
+# (pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml, Kb1, `probe_postcutoff_gpt55_Grc_codex_rep1`:
+# 0.25 of 16 asks, $5.36). Kb1's sessions wrote 70 `commentary` preambles and each went back to the
+# model without its phase; with e9cdedfb they go back as commentary. Reached through ELM (the direct
+# key is dead), same snapshot. Codex is told `gpt-5.5` by name: `elm_gpt_5.5` would reach it as
+# `elm-gpt-5.5`, which its catalog does not have.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml
+
+llm_config:
+  model_name: elm_gpt_5.5
+
+codex_model: gpt-5.5

@@ -1,0 +1,10 @@
+# Parity check after `gpt-harness-parity` (2026-10-05): pr_review_v5_probe_2026_07_08_v1_gpt55_Grc.yaml
+# (Hb1, `probe_postcutoff_gpt55_Grc_rep1`: 0.3125 of 16 asks, $5.15) with the model reached through
+# ELM, the same snapshot (gpt-5.5-2026-04-23), because the direct key is dead. Under APE-Agent these
+# sessions write no text between calls, so `phase` never arises; the request differs from Hb1's in
+# the model alias and the endpoint only. It answers whether the endpoint and this branch's harness
+# changes broke the condition, not whether anything fixed it.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Grc.yaml
+
+llm_config:
+  model_name: elm_gpt_5.5
