@@ -2,9 +2,15 @@
 # (Hb1, `probe_postcutoff_gpt55_Grc_rep1`: 0.3125 of 16 asks, $5.15) with the model reached through
 # ELM, the same snapshot (gpt-5.5-2026-04-23), because the direct key is dead. Under APE-Agent these
 # sessions write no text between calls, so `phase` never arises; the request differs from Hb1's in
-# the model alias and the endpoint only. It answers whether the endpoint and this branch's harness
-# changes broke the condition, not whether anything fixed it.
+# the model alias, the endpoint and the reasoning summary only. It answers whether those and this
+# branch's harness changes broke the condition, not whether anything fixed it.
 extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Grc.yaml
 
 llm_config:
   model_name: elm_gpt_5.5
+  # Readable reasoning (the user, 2026-10-05): every account of why gpt passed over an ask has been
+  # read off its calls and findings. The summary is recorded as each turn's thinking block and never
+  # sent back. It should not change the reviewer: gpt-5.4's 561 output tokens on ELM were its 516
+  # reasoning tokens plus 45 of text and call, so the summary is not part of the model's own turn.
+  # Unverified on review sessions, so this run tests the endpoint and the summary together.
+  openai_responses_reasoning_summary: auto

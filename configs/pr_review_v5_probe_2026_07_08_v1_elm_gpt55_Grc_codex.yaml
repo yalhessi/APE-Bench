@@ -8,5 +8,11 @@ extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml
 
 llm_config:
   model_name: elm_gpt_5.5
+  # Readable reasoning (the user, 2026-10-05): every account of why gpt passed over an ask has been
+  # read off its calls and findings. The summary is recorded as each turn's thinking block and never
+  # sent back. It should not change the reviewer: gpt-5.4's 561 output tokens on ELM were its 516
+  # reasoning tokens plus 45 of text and call, so the summary is not part of the model's own turn.
+  # Unverified on review sessions, so a change here is the phase fix and the summary together.
+  openai_responses_reasoning_summary: auto
 
 codex_model: gpt-5.5
