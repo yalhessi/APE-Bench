@@ -629,4 +629,11 @@ So the ask was considered and declined on false-positive risk, not missed. Until
 inferred from compiled edits left unfiled. One session, one rep; whether the same reason recurs across
 the residual misses is what the summaries can now settle (the stage-by-stage relabelling in
 `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md`).
+The Codex twin the same day (`probe_postcutoff_elm_gpt55_Grc_codex_rep1`, $4.72), the condition the
+`phase` fix changes: 445 of 445 replayed assistant messages carried their phase (Kb1: 0 of 494), with
+the same session shape (75 calls against 80, 68 commentary preambles against 70, 0 text-only turns).
+7 findings against Kb1's 7. On 43192 it filed the `by cat_disch` defaults that `PresheafOfModulesOfCommRing.mk`
+drops, which gpt-5.5 had compiled and left unfiled before; Kb1 filed only the title typo there. Kb1's
+43167 generality finding (`[N.Normal]` to normalizer hypotheses) is not in it. Neither run is matched yet:
+by the pre-stated rule a single-run gain needs >= 0.25 (4 asks) before it is worth two more reps.
 
