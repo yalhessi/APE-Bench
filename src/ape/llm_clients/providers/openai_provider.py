@@ -138,6 +138,11 @@ class OpenAIResponsesProvider(OpenAIProvider):
     cause preambles to be treated as final answers". No response logged here held two messages
     (6,278 calls, 2026-10-05), so a turn's joined text takes its first message's phase.
 
+    `openai_responses_reasoning_summary` asks for a summary of each reasoning item. It comes back
+    inside the item, and is also recorded as the turn's `reasoning_content`, which the processors
+    keep as a thinking block and nothing sends back. Only beside text or a call: a reply that is
+    reasoning alone stays the empty reply it is without the knob.
+
     No `reasoning.context` is sent. The default, `current_turn`, keeps carried reasoning since the
     last user message or text-only answer, and a review session has neither after its task prompt
     (0 in 33 high-effort sessions, measured 2026-09-30), so it keeps all of it. `all_turns` would
@@ -171,6 +176,9 @@ class OpenAIResponsesProvider(OpenAIProvider):
             payload["instructions"] = instructions
         if self.config.reasoning_effort is not None:
             payload["reasoning"] = {"effort": self.config.reasoning_effort}
+        if self.config.openai_responses_reasoning_summary is not None:
+            payload.setdefault("reasoning", {})["summary"] = (
+                self.config.openai_responses_reasoning_summary)
         if self._carryover:
             payload["include"] = ["reasoning.encrypted_content"]
         if tools:
@@ -272,6 +280,7 @@ def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -
 
     texts: List[str] = []
     refusals: List[str] = []
+    summaries: List[str] = []
     tool_calls: List[Dict[str, Any]] = []
     order: List[Dict[str, Any]] = []
     for item in response.get("output") or []:
@@ -287,14 +296,19 @@ def responses_to_chat_completion(response: Dict[str, Any], *, carryover: bool) -
                                "function": {"name": item.get("name") or "",
                                             "arguments": item.get("arguments") or "{}"}})
             order.append({"type": "function_call", "call_id": item.get("call_id") or ""})
-        elif kind == "reasoning" and carryover:
-            order.append({key: item[key] for key in ("type", "id", "encrypted_content", "summary")
-                          if key in item})
+        elif kind == "reasoning":
+            summaries.extend(part.get("text") or "" for part in item.get("summary") or [])
+            if carryover:
+                order.append({key: item[key]
+                              for key in ("type", "id", "encrypted_content", "summary") if key in item})
 
     message: Dict[str, Any] = {"role": "assistant",
                                "content": "\n\n".join(t for t in texts if t) or None}
     if tool_calls:
         message["tool_calls"] = tool_calls
+    summary = "\n\n".join(s for s in summaries if s)
+    if summary and (message["content"] or tool_calls):
+        message["reasoning_content"] = summary
     if refusals:
         message["refusal"] = "\n\n".join(refusals)
     if any(entry["type"] == "reasoning" or entry.get("phase") for entry in order):

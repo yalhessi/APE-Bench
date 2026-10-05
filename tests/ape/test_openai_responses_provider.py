@@ -398,3 +398,79 @@ def test_carryover_off_keeps_the_phase_and_no_reasoning():
     _, items = responses_input([recorded_on], carryover=True)
     assert [item.get("type", item.get("phase")) for item in items] == [
         "reasoning", "commentary", "function_call"]
+
+
+# --- reasoning summaries -----------------------------------------------------------------
+
+def summarised(name, text="Paris first, then Rome; one call each."):
+    """A recorded response with its reasoning item summarised, in the shape OpenAI's reasoning
+    guide documents (`summary: [{"type": "summary_text", "text": ...}]`). Not recorded live: the
+    key was refused on 2026-10-05, so the knob's first real call is still owed."""
+
+    response = fixture(name)
+    for item in response["output"]:
+        if item["type"] == "reasoning":
+            item["summary"] = [{"type": "summary_text", "text": text}]
+    return response
+
+
+def test_a_summary_is_asked_for_only_when_the_knob_is_set():
+    session = session_with(user("x"))
+    asked = config(reasoning_effort="high", openai_responses_reasoning_summary="auto")
+    assert payload_for(asked, session)["reasoning"] == {"effort": "high", "summary": "auto"}
+    assert payload_for(config(openai_responses_reasoning_summary="concise"),
+                       session)["reasoning"] == {"summary": "concise"}
+    assert payload_for(config(reasoning_effort="high"), session)["reasoning"] == {"effort": "high"}
+    assert asked.model_dump(mode="json")["openai_responses_reasoning_summary"] == "auto", (
+        "inside the provenance hash, as the endpoint and the carry-over are")
+
+    with pytest.raises(ConfigurationError, match="needs openai_api: responses"):
+        LLMConfig(model_name="gpt_5.4", openai_responses_reasoning_summary="auto")
+
+
+@pytest.mark.parametrize("carryover", [False, True])
+def test_a_summary_is_kept_as_the_turns_thinking_block_and_only_the_item_goes_back(carryover):
+    """Where a transcript can be read. Until this knob, all 1,998 reasoning items in the gpt-5.4
+    and gpt-5.5 review sessions came back with `summary: []`."""
+
+    cfg = config(reasoning_effort="high", openai_responses_reasoning_carryover=carryover,
+                 openai_responses_reasoning_summary="auto")
+    (nodes, _, _), _ = call_api(cfg, json_answer(summarised("responses_gpt54_high_two_tool_calls.json")))
+    blocks = nodes[0].message.content
+    assert [b.type for b in blocks] == ["thinking", "tool_use", "tool_use"]
+    assert blocks[0].reasoning_content == "Paris first, then Rome; one call each."
+
+    session = session_with(user("Weather in Paris and Rome?"))
+    session.nodes.extend(nodes)
+    for block in blocks[1:]:
+        session.add_tool_result(block.id, "sunny", cwd="/")
+    items = payload_for(cfg, session)["input"]
+    kinds = [item.get("type", item.get("role")) for item in items]
+    carried = ["reasoning"] if carryover else []
+    assert kinds == ["user", *carried, "function_call", "function_call",
+                     "function_call_output", "function_call_output"]
+    if carryover:
+        assert items[1]["summary"] == [{"type": "summary_text",
+                                        "text": "Paris first, then Rome; one call each."}]
+    assert all("reasoning_content" not in item for item in items)
+
+
+def test_a_summarised_stream_keeps_its_thinking_block_too():
+    stream = "event: response.completed\ndata: " + json.dumps({
+        "type": "response.completed",
+        "response": summarised("responses_gpt54_high_two_tool_calls.json")}) + "\n\n"
+    (nodes, _, _), _ = call_api(config(openai_responses_reasoning_summary="auto"),
+                                sse_answer(stream), stream=True)
+    assert [b.type for b in nodes[0].message.content] == ["thinking", "tool_use", "tool_use"]
+
+
+def test_a_reply_that_is_only_summarised_reasoning_is_still_an_empty_reply():
+    """A summary alone must not turn a cut-off reply into a turn: the session would then replay a
+    reasoning item with nothing after it, which the API refuses."""
+
+    cut_off = summarised("responses_gpt54_high_incomplete.json")
+    message = responses_to_chat_completion(cut_off, carryover=True)["choices"][0]["message"]
+    assert "reasoning_content" not in message
+    with pytest.raises(MalformedResponseError):
+        call_api(config(reasoning_effort="high", openai_responses_reasoning_summary="auto"),
+                 json_answer(cut_off))

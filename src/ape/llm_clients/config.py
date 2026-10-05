@@ -404,6 +404,13 @@ class LLMConfig(BaseModel):
     #: Completions runs; on is what OpenAI recommends for tool use, and a separate condition.
     openai_responses_reasoning_carryover: bool = False
 
+    #: Responses only: ask for a summary of each reasoning item. Unset sends no `summary`, and
+    #: every item then comes back with an empty one: 1,998 of 1,998 in the gpt-5.4 and gpt-5.5
+    #: review sessions logged to 2026-10-05, so no gpt transcript held a word of why a reviewer
+    #: passed over anything. Set, the summary is recorded as the turn's thinking block. Whether
+    #: asking changes what the model does is unmeasured, so a summarised run is its own condition.
+    openai_responses_reasoning_summary: Optional[Literal["auto", "concise", "detailed"]] = None
+
     def model_post_init(self, __context: Any) -> None:
         """Auto-configure immediately after initialization."""
         # If model_name is None, skip auto-configuration (use official models)
@@ -428,6 +435,10 @@ class LLMConfig(BaseModel):
             raise ConfigurationError(
                 "openai_responses_reasoning_carryover needs openai_api: responses; Chat "
                 "Completions returns no reasoning items to carry.")
+        if self.openai_responses_reasoning_summary and self.openai_api != "responses":
+            raise ConfigurationError(
+                "openai_responses_reasoning_summary needs openai_api: responses; Chat "
+                "Completions returns no reasoning items to summarise.")
     
     @staticmethod
     def detect_provider_type(model_name: str) -> LLMProvider:

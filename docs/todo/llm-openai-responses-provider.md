@@ -337,19 +337,37 @@ Pinned on `responses_gpt55_stream_text_and_tool_call.sse` and in both relay test
 a run that makes these models write between tool calls: the Codex harness, or the unrun gpt cells
 under Claude Code. It changes those requests, so a rerun of a Codex condition is a new condition.
 
-## Open: no gpt transcript holds readable reasoning, because no summary is requested (found 2026-10-05)
+## No gpt transcript holds readable reasoning, because no summary was requested (found 2026-10-05; knob built, its first live call still owed)
 
 The provider sends `reasoning: {"effort": ...}` and nothing else, so every reasoning item comes back
 with `summary: []`: 1,998 of 1,998 in the gpt-5.4 and gpt-5.5 APE-Agent review sessions. The models do
 reason (median 342 and 201 reasoning tokens a call) and each item is carried, but the transcript shows
-only tool calls. Codex and Claude Code show a user their reasoning because they ask for it; under
+only tool calls. Codex as this project runs it asks for none either: its own request, captured
+against a local server, carries `reasoning: {"effort": "medium"}` and no summary. Under
 APE-Agent these models also write no text between calls (0 messages a session, against 6.8 and 11.7
 under Codex's prompt). So every reading of *why* a gpt reviewer passed over an ask has been made from
 its calls and its final findings alone. The loop itself is the same: one user message, then about 16-18
 rounds of reasoning, 2-3 tool calls and their results, ending on `submit_findings`.
 
-**What would close it:** a `reasoning.summary` knob on the provider, off by default so existing runs
-keep their request, with one live call first to confirm it is accepted under `store: false` and what
-it bills. Then the stage-by-stage relabelling in `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md`
-(was the specific concern raised?) has something written to read. Whether a summary changes what the
-model does is unmeasured; treat a summarised run as its own condition until one pair says otherwise.
+**Built on `gpt-harness-parity`:** `llm_config.openai_responses_reasoning_summary` (`auto`, `concise`
+or `detailed`; unset by default, so existing requests are unchanged). Set, the request carries
+`reasoning.summary`, the summary stays inside the carried reasoning item, and its text is recorded as
+the turn's thinking block, which a session file and `cli trajectory` show and no request sends back.
+A reply that is reasoning alone stays an empty reply. Refused without `openai_api: responses`. The
+relays need nothing: both build their request from `llm_config`.
+
+**Still owed: one live call.** On 2026-10-05 the key in `env.zsh` was refused (HTTP 401,
+`not_authorized_invalid_project`: "The project you are requesting has been archived"), on
+`/v1/models` as well, so nothing here has met the endpoint. The tests use the response shape OpenAI's
+reasoning guide documents (`summary: [{"type": "summary_text", "text": ...}]`). With a working key,
+before any run uses the knob: one gpt-5.5 call with it set, `store: false` and carry-over on, to
+confirm HTTP 200 and a non-empty summary (the guide says an organisation "may need to complete
+organization verification"); a second turn returning the item, to confirm it is accepted back; and
+the usage of both, since the guide does not say whether a summary is billed. Record the first as a
+fixture. A refusal that names the parameter fails at once (`RequestRejectedError`), not after hours.
+
+Then the stage-by-stage relabelling in `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md` (was
+the specific concern raised?) has something written to read. Whether a summary changes what the model
+does is unmeasured; treat a summarised run as its own condition until one pair says otherwise. Like
+`reasoning_effort` and `openai_api`, the knob changes what a run measures and a resume may change it
+(`framework-defects-2026-09.md`).
