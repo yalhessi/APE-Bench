@@ -81,7 +81,11 @@ class BaseScaffoldConfig(BaseModel):
     #: On the base, with `workspace_environment`, since 2026-10-01: every scaffold builds
     #: its first message from the same preamble (APE-Agent as its system message, Claude
     #: Code and Codex in their first user message), so a contract condition that sets
-    #: them means the same text under each harness.
+    #: them means the same text under each harness. The default stays "standard" although the
+    #: best Claude results ran without it and gpt's recall did not move when it was dropped
+    #: (dev, 2-3 of 23 either way): 127 of the 135 review configs inherit the default
+    #: (2026-10-05) and have runs under their names, so flipping it would change what each
+    #: of them means. A new review config sets "plain", or extends one that does.
     batch_preamble: Literal["standard", "plain"] = "standard"
 
     #: False drops the system prompt's `<environment>` section (scratch as a place for "rapid
