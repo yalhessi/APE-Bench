@@ -408,7 +408,11 @@ gpt-5.5. A run moves with
 **Not known, and to settle on the first real run:**
 - ELM's rate limits and quota. A dev run is 20-24M processed tokens; nothing here sent more than a few
   thousand. Watch the first minutes for 429s, which the client retries quietly.
-- What the institution is billed. The rates are OpenAI's list prices, so the dollar caps bind as before.
+- How ELM's charge relates to the caps. The key's limit is £500 and ELM reports its spend in pounds
+  (`GET /api/v1/costs`, read by `python -m ape.llm_clients.elm_budget`; on 2026-10-05 £0.10 used, as
+  of that day's 00:00 sync). The caps price at OpenAI's list rates in dollars. After the first paid run,
+  compare its billed total with the change in ELM's `usage` once `asOf` has passed the run, and record
+  the ratio here.
 - Whether a run through ELM reproduces a direct one. Same snapshots and the same API, but no pair has
   been run; treat the first ELM repetition of a direct condition as a replication, not as a given.
 - The judge. `configs/bases/v5_judge.yaml` pins `gpt_5_mini`, direct. `elm_gpt_5_mini` is the same

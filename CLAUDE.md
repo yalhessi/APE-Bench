@@ -179,7 +179,10 @@ go through the University of Edinburgh gateway. The OpenAI key stopped working o
 (HTTP 401, project archived), so a `gpt_*` run now only retries. `elm_gpt_5.2`, `elm_gpt_5.4` and
 `elm_gpt_5.5` are the same snapshots through ELM and take `openai_api: responses` with carry-over
 (measured that day; `docs/todo/llm-openai-responses-provider.md`). The judge base still pins
-`gpt_5_mini`, and moving it to `elm_gpt_5_mini` forks its cache. Separate variables on purpose — both are usually
+`gpt_5_mini`, and moving it to `elm_gpt_5_mini` forks its cache. The ELM key has a fixed **£500**
+limit (GBP, not dollars): `ape/bin/python -m ape.llm_clients.elm_budget` prints what is left, from
+ELM's `GET /api/v1/costs` (spec at `/swagger-ui/`). ELM syncs that figure periodically (`asOf`), so
+spend since the last sync is not in it, and the run caps are USD list-price estimates, not ELM's bill. Separate variables on purpose — both are usually
 exported in the same shell and neither may stand in for the other. `elm_*` names are their own
 canonical models, not a `base_url` override, so the run plan records which endpoint produced a run;
 switching one forks the judge cache, so switch at a run boundary. The four open-weight `elm_*`
