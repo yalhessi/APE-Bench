@@ -1,0 +1,13 @@
+{
+ "folder": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/gpt-harness-parity/results/pr_review_v5/probes/elm-parity-2026-10-05/match/m1",
+ "calls": 9,
+ "flagged": [
+  {
+   "tool": "Bash",
+   "why": [
+    "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+   ],
+   "input": "cd <dir> && cat > tmp/build.py <<'EOF'\nimport json\nN = \"no\"\ndef row(pr, aid, vals, note):\n    d = {\"pr\": pr, \"ask_id\": aid}\n    for k, (v, i) in zip([\"R1\",\"R2\","
+  }
+ ]
+}
