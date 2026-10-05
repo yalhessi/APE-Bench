@@ -340,6 +340,7 @@ def build_candidate_verification_artifact(
 
 class LeanPRReviewV4CandidateTask(BasePRReviewTask):
     task_type = "lean_pr_review_v4_candidates"
+    submit_tool = "submit_candidates"
     data_class = LeanPRReviewV4CandidateData
     task_config_class = LeanPRReviewV4CandidateConfig
     task_result_class = LeanPRReviewV4CandidateResult

@@ -1,0 +1,16 @@
+[
+ {
+  "ask_id": "p0002",
+  "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+  "comment": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)",
+  "replies_to": null
+ },
+ {
+  "ask_id": "p0003",
+  "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+  "comment": "and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)",
+  "replies_to": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)"
+ }
+]

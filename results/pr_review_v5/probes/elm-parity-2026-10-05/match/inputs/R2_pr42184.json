@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+  "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`; the statement is still true for the bottom summation filter, where `tprod_bot` reduces the goal to nonnegativity of the finite product. This makes the new API weaker than the neighboring unconditional `one_le_tprod`/`tprod_le_one` lemmas.",
+  "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg` and split on `hL : L.NeBot`; keep the current proof in the nonbottom branch, and in the bottom branch rewrite with `tprod_bot hL` and close using `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+  "severity": "blocking"
+ }
+]

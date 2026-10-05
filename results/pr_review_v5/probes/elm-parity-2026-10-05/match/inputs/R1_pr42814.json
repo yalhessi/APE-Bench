@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:14",
+  "claim": "The module doc for `Int.IsFundamentalDiscr` says fundamental discriminants are exactly the discriminants of quadratic fields, but the definition used in this file also makes `1` a fundamental discriminant, so the statement is false as written.",
+  "requested_change": "Replace the sentence with one that records the convention, for example: “With the convention used here, `1` is included as the trivial fundamental discriminant; the nontrivial fundamental discriminants are the discriminants of quadratic fields.”",
+  "severity": "blocking"
+ }
+]

@@ -95,6 +95,7 @@ class LeanPRReviewSelectorTask(BasePRReviewTask):
     """Per-PR agentic selector — scores candidate findings with workspace grounding."""
 
     task_type = "lean_pr_review_selector"
+    submit_tool = "submit_scores"
     data_class = PRReviewSelectorData
     task_config_class = BasePRReviewConfig
     task_result_class = PRReviewSelectorResult

@@ -89,6 +89,7 @@ def build_verification_artifact(
 
 class LeanPRReviewV4OpportunityTask(BasePRReviewTask):
     task_type = "lean_pr_review_v4_opportunity_adjudication"
+    submit_tool = "submit_opportunity_adjudications"
     data_class = LeanPRReviewV4OpportunityData
     task_config_class = LeanPRReviewV4OpportunityConfig
     task_result_class = LeanPRReviewV4OpportunityResult

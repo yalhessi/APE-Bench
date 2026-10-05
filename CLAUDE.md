@@ -175,7 +175,18 @@ outlier before marking it slow, splitting the suite or reaching for any other ma
 three were plain redundancy, and the fixes took a line each.
 
 **Providers.** `OPENAI_API_KEY` for the `gpt_*` models; `ELM_API_KEY` for the `elm_*` ones, which
-go through the University of Edinburgh gateway. Separate variables on purpose — both are usually
+go through the University of Edinburgh gateway. The OpenAI key stopped working on 2026-10-05
+(HTTP 401, project archived), so a `gpt_*` run now only retries. `elm_gpt_5.2`, `elm_gpt_5.4` and
+`elm_gpt_5.5` are the same snapshots through ELM and take `openai_api: responses` with carry-over
+(measured that day; `docs/todo/llm-openai-responses-provider.md`). **An OpenAI model runs only on
+Responses with `openai_responses_reasoning_carryover: true`**: Chat Completions, or carry-over off,
+drops its reasoning every turn, so both are refused before the first request and at `cli plan`
+(`reasoning_drop_refusal`, user, 2026-10-05). 103 of the 129 GPT configs then on disk were written for
+the old paths and are refused rather than reinterpreted; a new GPT config states both lines. The judge base still pins
+`gpt_5_mini`, and moving it to `elm_gpt_5_mini` forks its cache. The ELM key has a fixed **£500**
+limit (GBP, not dollars): `ape/bin/python -m ape.llm_clients.elm_budget` prints what is left, from
+ELM's `GET /api/v1/costs` (spec at `/swagger-ui/`). ELM syncs that figure periodically (`asOf`), so
+spend since the last sync is not in it, and the run caps are USD list-price estimates, not ELM's bill. Separate variables on purpose — both are usually
 exported in the same shell and neither may stand in for the other. `elm_*` names are their own
 canonical models, not a `base_url` override, so the run plan records which endpoint produced a run;
 switching one forks the judge cache, so switch at a run boundary. The four open-weight `elm_*`

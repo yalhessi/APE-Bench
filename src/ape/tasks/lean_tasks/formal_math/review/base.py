@@ -175,6 +175,8 @@ class BasePRReviewTask(BaseLeanTask):
     """Shared, read-only, externally-scored review task. Not registered; subclass
     it, set `task_type`, and implement `_get_prompts`."""
 
+    submit_tool = "submit_findings"
+
     #: A review task has no scratch file. The thing worth compiling is the reviewed file in
     #: `target/`, which is read-only for the agent but not blocked from the compiler — review
     #: sets `read_only_path_patterns` and leaves `blocked_path_patterns` empty. Opting in here

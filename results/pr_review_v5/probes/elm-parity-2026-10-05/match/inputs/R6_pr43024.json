@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+  "claim": "`isMulCommutative_mono` is misnamed: with `h : s ≤ t` it derives `IsMulCommutative s` from `[IsMulCommutative t]`, so this is a property descending to a smaller subobject rather than a monotone result. Existing typeclass-property lemmas of this shape use `_of_le` (for example `isFiniteMeasure_of_le`, `isArtinian_of_le`, `isNilpotent_of_le`).",
+  "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le`, letting `to_additive` generate `isAddCommutative_of_le`.",
+  "severity": "blocking"
+ }
+]

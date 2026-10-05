@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+  "claim": "The new public import of `Mathlib.GroupTheory.Commutator.Basic` in `Subgroup.Pointwise` is unused and unnecessarily makes this low-level algebra file depend on the commutator theory file.",
+  "requested_change": "Remove the `public import Mathlib.GroupTheory.Commutator.Basic` line from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+  "claim": "`Subgroup.commutator_sup_left` exposes only the `[N.Normal]` case, but its proof only needs `H ≤ normalizer N` and `K ≤ normalizer N`; the global normality hypothesis is stronger than necessary for the reusable statement.",
+  "requested_change": "Add a generalized theorem, for example `commutator_sup_left_of_le_normalizer (H K N) (hHN : H ≤ normalizer N) (hKN : K ≤ normalizer N)`, using the current proof with `hHKN` derived from `le_normalizer_iff_commutator_le_right.mp hHN` and `... hKN`; then make the existing `[N.Normal]` `commutator_sup_left` a one-line corollary using `le_normalizer_of_normal`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+  "claim": "`Subgroup.commutator_sup_left` and its sibling `commutator_sup_right` are new public subgroup commutator API, but they lack `@[to_additive]`, so the corresponding `AddSubgroup` distributivity lemmas are not generated despite the surrounding commutator API being mirrored additively.",
+  "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'` and to both public theorems `commutator_sup_left` and `commutator_sup_right`.",
+  "severity": "blocking"
+ }
+]

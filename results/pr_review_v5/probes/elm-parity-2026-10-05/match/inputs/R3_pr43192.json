@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+  "claim": "`PresheafOfModulesOfCommRing.mk` drops the `by cat_disch` defaults that the underlying `PresheafOfModules.mk` constructor provides for `map_id` and `map_comp`, so the convenience constructor forces users to supply routine category-law proofs explicitly.",
+  "requested_change": "Give `map_id` and `map_comp` the same `:= by cat_disch` defaults as `PresheafOfModules.mk` (the body may remain the structure literal or be `PresheafOfModules.mk obj map map_id map_comp`).",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+  "claim": "The module doc title is ungrammatical: `# Modules over presheaves commutative rings` is missing `of`.",
+  "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+  "severity": "advisory"
+ }
+]

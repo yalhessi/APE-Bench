@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "isMulCommutative_mono",
+  "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` is antitone in the subobject (commutativity passes DOWN to smaller subobjects), so the `_mono` suffix describes the wrong direction. It also disagrees with the PR's own title (`isMulCommutative_anti`) and with the library's name for exactly this shape of lemma, `Subgroup.isCyclic_of_le (h : H ≤ H') [IsCyclic H'] : IsCyclic H` and `LieSubmodule.isNilpotent_of_le (h₁ : M₁ ≤ M₂) [IsNilpotent L M₂] : IsNilpotent L M₁`.",
+  "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le` (its `to_additive` twin becomes `isAddCommutative_of_le`), keeping the statement and proof unchanged, and make the PR title match the final name.",
+  "severity": "advisory"
+ }
+]

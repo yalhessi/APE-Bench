@@ -16,6 +16,9 @@ recording server (no model, 2026-10-01):
 - **Reasoning comes back as input items.** Codex returns each turn's reasoning items, encrypted
   content and all but without their `id`. They become the turn's message `signature`, the slot
   `openai_provider` reads for carry-over, with the `id` restored from what this relay sent.
+
+A message's `phase` takes the same road in both directions: out on the message item, and back in
+from the one Codex returns (it does return it; captured the same way, 2026-10-05).
 """
 
 import asyncio
@@ -150,11 +153,12 @@ class CodexRelaySession(BaseRelaySession):
                 text = _text(item)
                 if text:
                     blocks.append(ContentBlock.text_block(text))
-                    order.append({"type": "message"})
+                    order.append({"type": "message", "phase": item["phase"]} if item.get("phase")
+                                 else {"type": "message"})
         if not blocks:
             return  # reasoning with nothing after it: the API rejects such an item
         node = session.add_assistant_message(blocks, cwd)
-        if any(e["type"] == "reasoning" for e in order):
+        if any(e["type"] == "reasoning" or e.get("phase") for e in order):
             node.message.signature = json.dumps({"responses_output": order})
 
     def _responses_to_session(self, body: Dict[str, Any],
@@ -202,10 +206,13 @@ class CodexRelaySession(BaseRelaySession):
                            model: str) -> Dict[str, Any]:
         output: List[Dict[str, Any]] = []
 
-        def message(text: str) -> Dict[str, Any]:
-            return {"type": "message", "id": f"msg_{uuid.uuid4().hex[:24]}", "role": "assistant",
+        def message(text: str, phase: Optional[str] = None) -> Dict[str, Any]:
+            item = {"type": "message", "id": f"msg_{uuid.uuid4().hex[:24]}", "role": "assistant",
                     "status": "completed",
                     "content": [{"type": "output_text", "text": text, "annotations": []}]}
+            if phase:
+                item["phase"] = phase
+            return item
 
         def call(block: ContentBlock) -> Dict[str, Any]:
             namespace, name = self._namespaced.get(block.name, (None, block.name))
@@ -232,7 +239,7 @@ class CodexRelaySession(BaseRelaySession):
                     output.append({"type": "reasoning", "id": rid, "summary": entry.get("summary") or [],
                                    "encrypted_content": entry["encrypted_content"]})
                 elif entry.get("type") == "message" and texts:
-                    output.append(message("\n\n".join(texts)))
+                    output.append(message("\n\n".join(texts), entry.get("phase")))
                     texts = []
                 elif entry.get("type") == "function_call" and entry.get("call_id") in calls:
                     output.append(call(calls.pop(entry["call_id"])))

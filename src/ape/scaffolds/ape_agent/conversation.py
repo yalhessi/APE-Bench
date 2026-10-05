@@ -1117,7 +1117,7 @@ class ApeAgentConversationManager:
                 ) from e
             
             # Add fallback prompt for empty response
-            prompt = self._create_empty_response_prompt()
+            prompt = self._no_submission_prompt(empty=True)
             await self._add_prompt_to_session(session, prompt, is_retry_prompt=True)
             self.logger.info(f'Added empty response prompt: {str(e)}')
             
@@ -1200,8 +1200,8 @@ class ApeAgentConversationManager:
             self.logger.warning(f"Intelligent stop (no tool calls): {stop_reason}")
             raise ConversationStoppedError(stop_reason)
 
-        # Add supplemental prompt to enforce tool usage
-        prompt = self._create_no_tool_call_prompt()
+        # The turn ended with nothing submitted: ask for the submission, or for more work
+        prompt = self._no_submission_prompt()
         await self._add_prompt_to_session(session, prompt, is_retry_prompt=True)
         self.logger.info('Added no tool call prompt')
     
@@ -1404,29 +1404,14 @@ class ApeAgentConversationManager:
     # Helper methods
     # ========================================================================
     
-    def _create_no_tool_call_prompt(self) -> str:
-        """Create a prompt reminding the model to call tools."""
+    def _no_submission_prompt(self, *, empty: bool = False) -> str:
+        """The shared no-submission prompt, followed by the tool names this session was given."""
+        from ape.scaffolds.prompts import no_submission_prompt
+
+        submit = self.task.submit_tool_name if self.task else "submit_result"
         tool_names = [tool['function']['name'] for tool in self.tools]
-        
-        message = ("No tool call detected! You must use tools to make progress on this task. "
-                  "Leverage all available tools to thoroughly complete the task. "
-                  "Analyze, create, modify, verify, and iterate as needed. "
-                    "When the task is fully completed, use `submit_result`.")
-        
-        message += f"\n\nAvailable tools: {', '.join(tool_names)}"
-        return message
-    
-    def _create_empty_response_prompt(self) -> str:
-        """Create a prompt for empty responses."""
-        tool_names = [tool['function']['name'] for tool in self.tools]
-        
-        message = ("No response detected! Leverage all available tools to thoroughly complete the task. "
-                    "Analyze, create, modify, verify, and iterate as needed. "
-                    "When the task is fully completed, use `submit_result`.")
-        
-        message += f"\n\nAvailable tools: {', '.join(tool_names)}"
-        return message
-    
+        return f"{no_submission_prompt(submit, empty=empty)}\n\nAvailable tools: {', '.join(tool_names)}"
+
     async def _get_available_tools(self, mcp_instance: Client) -> List[Dict[str, Any]]:
         """Fetch the list of available tools."""
         available_tools = await mcp_instance.list_tools()

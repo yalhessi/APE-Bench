@@ -1,0 +1,51 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean (module docstring)",
+  "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but `Int.IsFundamentalDiscr 1` holds (1 % 4 = 1, 1 is not 4 * x, and no odd prime square divides 1). 1 is not the discriminant of any quadratic field, so the sentence is false for the definition as written.",
+  "requested_change": "Fix the sentence to match the definition, e.g. \"These are exactly `1` and the discriminants of quadratic fields.\" Also say in the `IsFundamentalDiscr` docstring that `D = 1` is included. If the intended convention excludes 1, add `D ≠ 1` to the definition and adjust `isFundamentalDiscr_iff_squarefree` and `isFundamentalDiscr_four_mul_add_one` to match.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Odd.isCoprime_two",
+  "claim": "`Odd.isCoprime_two : Odd x → IsCoprime x 2` breaks the left/right naming used by its exact siblings. In Mathlib/Data/Nat/Prime/Basic.lean, `Odd.coprime_two_right : n.Coprime 2` and `Odd.coprime_two_left : Coprime 2 n` are aliases. In Mathlib/RingTheory/Int/Basic.lean, `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` and `Int.isCoprime_two_left` are the pair. The PR's name leaves out the side, and it adds no `IsCoprime 2 x` counterpart.",
+  "requested_change": "Rename to `Odd.isCoprime_two_right`, add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`, and update the use in `Int.isFundamentalDiscr_iff_squarefree` to `hp.isCoprime_two_right`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "IsCoprime.dvd_mul_left_iff",
+  "claim": "`IsCoprime.dvd_mul_left_iff` and `IsCoprime.dvd_mul_right_iff` carry an `_iff` suffix that the established lemmas of the same shape do not. `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m` and `Nat.Coprime.dvd_mul_left`, `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` are all iff statements named without `_iff`. `IsCoprime.dvd_mul_left/right` do not exist yet, so the suffix does not avoid a clash either.",
+  "requested_change": "Rename the pair to `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right`, matching `Nat.Coprime.dvd_mul_left/right`, and update the call in `Int.isFundamentalDiscr_iff_squarefree`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Int.squarefree_iff_prime_sq_not_dvd",
+  "claim": "The proof builds a local `bridge` lemma with a `show … by push_cast; ring` cast rewrite and then transports both directions of the iff by hand. The cast bookkeeping is a direct simp rewrite through `Int.natCast_dvd` and `Nat.cast_pow`.",
+  "requested_change": "Replace the proof with `rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree]` followed by `simp_rw [← sq, ← Int.natCast_dvd, Nat.cast_pow]`. The one-liner `simp [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, ← sq, ← Int.natCast_dvd]` also works.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Nat.forall_prime_iff_two_and_odd",
+  "claim": "The reverse direction does a manual `obtain rfl | hne := eq_or_ne p 2` split and then rebuilds oddness with `hp.odd_of_ne_two hne`. The existing `Nat.Prime.eq_two_or_odd' : p = 2 ∨ Odd p` gives that disjunction directly.",
+  "requested_change": "Golf to a term proof: `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "The proof introduces two anonymous `have {m} : …` facts. The second shadows the first `this`, and `grind` only finds them because they happen to sit in the local context, which the proof has to explain in a comment. Named hypotheses would make the dependency explicit and the comment unnecessary.",
+  "requested_change": "Name the two facts, e.g. `have hsq {m} : Squarefree m ↔ ¬ 4 ∣ m ∧ …` and `have hdvd {m p : ℤ} (hp : Odd p) : p ^ 2 ∣ 4 * m ↔ p ^ 2 ∣ m`, and delete the comment that explains the anonymous `have`s.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "`simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` performs a single closed rewrite of `4 * d / 4`. Neither `+contextual` nor `simp` is needed for that.",
+  "requested_change": "Replace `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` with `rw [Int.mul_ediv_cancel_left d four_ne_zero]`.",
+  "severity": "advisory"
+ }
+]

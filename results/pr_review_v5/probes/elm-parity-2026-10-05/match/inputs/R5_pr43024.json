@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+  "claim": "`isMulCommutative_mono` is named as a monotonicity lemma, but its direction is order-reversing: from `s ≤ t` it derives `IsMulCommutative s` from `IsMulCommutative t`. This is the antitone direction for the predicate on subobjects.",
+  "requested_change": "Rename the declaration to `isMulCommutative_anti` and have the `to_additive` declaration named `isAddCommutative_anti`.",
+  "severity": "blocking"
+ }
+]

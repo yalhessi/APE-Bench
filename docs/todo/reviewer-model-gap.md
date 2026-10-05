@@ -613,3 +613,38 @@ a turn and 1.9-13.5K a session. `text.verbosity` is also never sent (grep of `sr
 close it:** gpt-5.5 contract v2 on dev at `xhigh`, three reps, read against its 3 of 23 with the bar
 stated before the run (6 of 23 a lever, 4 or fewer not). Expected $10-20 a rep under the existing
 $20 / 24M cap.
+
+**First run with readable gpt reasoning (2026-10-05, $5.74; `probe_postcutoff_elm_gpt55_Grc_rep1`, branch
+`gpt-harness-parity`).** gpt-5.5 carried, through ELM, with `openai_responses_reasoning_summary: auto`,
+otherwise Hb1. Process parity with Hb1: 6 of 6 sessions submitted, 6 findings against 6, 78 turns against
+69, 211 tool calls against 199. The findings are the same on four PRs; Hb1's `isMulCommutative_mono` ->
+`_anti` finding on 43024 is gone and a `pushforward₀` duplication finding on 43192 is new (not yet
+matched to the asks). Summaries came back on 37 of the 76 turns that reasoned.
+
+The 43024 session shows the withholding mechanism in the model's own words for the first time. It
+searched for `_anti` and `_mono` naming precedents on turns 2-3, and on turn 17 its summary reads that
+`isMulCommutative_mono` "might be misleading", then: "If I suggest a name change and the maintainers
+disagree, I could be creating a false positive." It submitted no findings, `merge_ready_as_is: true`.
+So the ask was considered and declined on false-positive risk, not missed. Until now withholding was
+inferred from compiled edits left unfiled. One session, one rep; whether the same reason recurs across
+the residual misses is what the summaries can now settle (the stage-by-stage relabelling in
+`docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md`).
+The Codex twin the same day (`probe_postcutoff_elm_gpt55_Grc_codex_rep1`, $4.72), the condition the
+`phase` fix changes: 445 of 445 replayed assistant messages carried their phase (Kb1: 0 of 494), with
+the same session shape (75 calls against 80, 68 commentary preambles against 70, 0 text-only turns).
+7 findings against Kb1's 7. On 43192 it filed the `by cat_disch` defaults that `PresheafOfModulesOfCommRing.mk`
+drops, which gpt-5.5 had compiled and left unfiled before; Kb1 filed only the title typo there. Kb1's
+43167 generality finding (`[N.Normal]` to normalizer hypotheses) is not in it. Neither run is matched yet:
+by the pre-stated rule a single-run gain needs >= 0.25 (4 asks) before it is worth two more reps.
+**Matched (same day, `results/pr_review_v5/probes/elm-parity-2026-10-05/`):** Eb1 0.25 against Hb1 0.3125
+(parity), EKb1 0.375 against Kb1 0.25 (+0.125, under the 0.25 bar); the README classifies every miss from
+the summaries. **Next, proposed, not run:** (a) `filing_bar: request` with summaries on, gpt-5.5 through
+ELM, on validation small12, where the bar did not transfer (~$11; `..._val_small12_gpt55_Grc_bar.yaml`
+with `elm_gpt_5.5` and the summary knob). It asks whether the bar removes the stated withholding there,
+and, if reach still does not move, what the remaining misses are. Read it by counting withholding
+passages and raised-but-untested candidates per missed ask, against this probe's table. (b) Only if (a)
+shows raised-and-dropped candidates are common, a "test what you raise" contract: each change the
+reviewer considers is either compiled or declined with a reason in the submission. Caution from D1: a
+verdict demanded per pre-enumerated cell came back 98% `no_issue`; this would be per self-raised
+candidate instead.
+

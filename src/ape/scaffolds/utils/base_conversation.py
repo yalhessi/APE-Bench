@@ -245,15 +245,11 @@ class BaseConversationManager(ABC):
         """
         pass
 
-    @abstractmethod
     def _create_retry_prompt(self) -> str:
-        """
-        Create retry/supplement prompt - must be implemented by subclass
+        """What the CLI is told when its turn ended with nothing submitted."""
+        from ape.scaffolds.prompts import no_submission_prompt
 
-        Returns:
-            str: Retry prompt
-        """
-        pass
+        return no_submission_prompt(self.task.submit_tool_name)
 
     async def run_conversation(self, *args, **kwargs) -> bool:
         """

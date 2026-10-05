@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+  "claim": "`Subgroup/Pointwise.lean` now imports `Mathlib.GroupTheory.Commutator.Basic`, but none of this file's declarations depend on the commutator file after `inf_normalizer_le_normalizer_sup` was moved to `Subgroup/Basic.lean`; this adds an unnecessary high-level import edge to a low-level subgroup file.",
+  "requested_change": "Remove the `public import Mathlib.GroupTheory.Commutator.Basic` line from `Subgroup/Pointwise.lean`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+  "claim": "`Subgroup.commutator_sup_left` (and its sibling `commutator_sup_right`) add public commutator API without additive translations, unlike the surrounding commutator lemmas in this file; this leaves the corresponding `AddSubgroup` distributivity lemmas unavailable.",
+  "requested_change": "Add `@[to_additive]` to the private helper and add `@[to_additive (attr := simp)]` (or at least `@[to_additive]`) to both `commutator_sup_left` and `commutator_sup_right`, so the additive versions are generated together with the multiplicative lemmas.",
+  "severity": "blocking"
+ }
+]

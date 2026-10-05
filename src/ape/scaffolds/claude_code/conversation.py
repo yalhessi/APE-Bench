@@ -198,19 +198,6 @@ class ClaudeCodeConversationManager(BaseConversationManager):
         """Send retry prompt to SDK"""
         await self._claude_client.query(prompt)
 
-    def _create_retry_prompt(self) -> str:
-        """Create retry prompt for Claude SDK"""
-        # Get submit tool name from config (mcp_server_name already includes trailing __)
-        submit_tool_name = f"{self.config.mcp_server_name}submit_result"
-
-        return (
-            f"Continue. You must submit your final result using the `{submit_tool_name}` tool "
-            "when you have completed the task. "
-            "Leverage all available tools to thoroughly complete the task. "
-            "Analyze, create, modify, verify, and iterate as needed. "
-            f"When the task is fully completed, use `{submit_tool_name}`."
-        )
-
     async def _interrupt_internal(self) -> None:
         """Interrupt SDK message stream"""
         if self._claude_client:

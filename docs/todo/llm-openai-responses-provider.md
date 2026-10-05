@@ -5,7 +5,8 @@ checks passed (section "Built", at the end). **The blocked runs ran 2026-09-30**
 `pipeline-overfit-review`, with reasoning carried (the user's choice, after the carry-over coherence
 test). gpt_5.2 high with carry-over reached 0.93 of Claude, against 0.67 on Chat
 (`reviewer-model-gap.md`). Open: whether carry-over should become the default for OpenAI reasoning
-models in the pipeline, and the ELM gateway's `/v1/responses`.
+models in the pipeline. The ELM gateway's `/v1/responses` was measured and wired in on 2026-10-05
+(last section), the day the project's own OpenAI key stopped working.
 **Cost** — the build spends only its live checks, a few dollars. The blocked runs afterwards are
 about $70 billed at the estimated rates, plus about $10 of calibration.
 **Motivating example** — test (e) of `reviewer-model-gap.md` could not run its high-effort half.
@@ -270,7 +271,7 @@ plus check 2), median 45 turns and max 80, there is no mid-session user message 
 answer. So under the default, carry-over keeps every reasoning item of a session. The provider
 therefore sends no `context`: sending `all_turns` would change nothing in these sessions, and it would
 refuse gpt_5.2, which d23fbde's clean persistence test needs. If a scaffold retry prompt ever appears
-(`_create_empty_response_prompt`, after a malformed response), reasoning before it is dropped. Count
+(`_no_submission_prompt`, after a malformed response), reasoning before it is dropped. Count
 such prompts before reading a carry-over run; there were 0 in 33.
 
 **What carry-over costs over tens of turns** (projected from those 32 gpt-5.2 sessions, each call's
@@ -293,6 +294,181 @@ So the growth there should be smaller. The projection is gpt-5.2's.
 
 Also seen: with no effort sent, gpt-5.5 on Responses runs at `medium` (the response echoes it).
 
-Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
+Still open, and not part of closing this: the 401/403 half of the
 retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
 (`framework-defects-2026-09.md`).
+
+## The replay dropped `phase` (measured and fixed 2026-10-05, no spend)
+
+OpenAI's reasoning guide says that for gpt-5.4 and gpt-5.5 on Responses a manually replayed
+assistant message should keep its `phase` (`commentary` or `final_answer`): "Missing or dropped
+`phase` can cause preambles to be treated as final answers". The provider drops it:
+`responses_to_chat_completion` records a message as `{"type": "message"}` and `_assistant_items`
+replays `{"role": "assistant", "content": ...}`. The Codex relay (`scaffolds/codex/relay.py`,
+`_assistant_turn` and `_nodes_to_response`) drops it as well, so Codex never receives one to send back.
+
+**It did not touch the APE-Agent numbers.** Every Responses call in `data/llm_logs` from 29 September
+to 5 October, 6,278 of them:
+
+| | sessions | calls | assistant messages emitted | assistant text replayed |
+|---|---|---|---|---|
+| gpt-5.4, APE-Agent, effort high | 51 | 847 | 0 | 0 |
+| gpt-5.5, APE-Agent, effort high | 65 | 1,215 | 2, both `final_answer` | 0 |
+| gpt-5.4, Codex (`probe_postcutoff_gpt54_Grc_codex_rep1`) | 6 | 110 | 41 `commentary` | all, 0 with a phase |
+| gpt-5.5, Codex (`probe_postcutoff_gpt55_Grc_codex_rep1`) | 6 | 80 | 70 `commentary` | all, 0 with a phase |
+
+Under APE-Agent the models go from reasoning straight to tool calls and write no preamble, so there
+was no phase to lose. The preamble's "Every response MUST include TOOL CALLS" is not why: under
+`batch_preamble: plain`, which drops it, 81 sessions (66 gpt-5.2, 15 gpt-5.5; 1,981 calls) emitted no
+assistant message either, and only Codex's own prompt drew commentary. Those sessions are every gpt-5.4 and gpt-5.5 figure in `reviewer-model-gap.md`'s
+post-cutoff, validation and dev comparisons. gpt-5.2 emits no phase at all and shows the same gap.
+
+**Where it was dropped, the documented symptom did not appear.** All 12 Codex sessions, 10 of which
+replayed unphased commentary, ended on `submit_findings`, with no text-only turn and no incomplete
+response. Their reach was 0.31 (gpt-5.4) and 0.25 (gpt-5.5) against APE-Agent's 0.19 and 0.31, one run
+each. That rules out early stopping, the named failure. It does not rule out the guide's unnamed
+"other misbehavior", which one run a model cannot see.
+
+**Fixed on `gpt-harness-parity`.** A message's phase is recorded in its `responses_output` entry and
+sent back on the replayed text, with carry-over on or off; a turn with no phase and no carry-over
+records nothing, so those requests are unchanged. The Codex relay puts it on the message it sends and
+reads it from the one Codex returns: `codex-cli` 0.144.5 does return it, captured against a local
+server with no model. Under Claude Code it rides the relay's turn-signature cache, as reasoning does.
+Pinned on `responses_gpt55_stream_text_and_tool_call.sse` and in both relay test files. It matters for
+a run that makes these models write between tool calls: the Codex harness, or the unrun gpt cells
+under Claude Code. It changes those requests, so a rerun of a Codex condition is a new condition.
+Live, through ELM the same day: gpt-5.4 and gpt-5.5 each opened with a `commentary` message, and the
+next turn, with that message replayed under its phase, answered HTTP 200.
+
+## No gpt transcript holds readable reasoning, because no summary was requested (found 2026-10-05; knob built and checked through ELM)
+
+The provider sends `reasoning: {"effort": ...}` and nothing else, so every reasoning item comes back
+with `summary: []`: 1,998 of 1,998 in the gpt-5.4 and gpt-5.5 APE-Agent review sessions. The models do
+reason (median 342 and 201 reasoning tokens a call) and each item is carried, but the transcript shows
+only tool calls. Codex as this project runs it asks for none either: its own request, captured
+against a local server, carries `reasoning: {"effort": "medium"}` and no summary. Under
+APE-Agent these models also write no text between calls (0 messages a session, against 6.8 and 11.7
+under Codex's prompt). So every reading of *why* a gpt reviewer passed over an ask has been made from
+its calls and its final findings alone. The loop itself is the same: one user message, then about 16-18
+rounds of reasoning, 2-3 tool calls and their results, ending on `submit_findings`.
+
+**Built on `gpt-harness-parity`:** `llm_config.openai_responses_reasoning_summary` (`auto`, `concise`
+or `detailed`; unset by default, so existing requests are unchanged). Set, the request carries
+`reasoning.summary`, the summary stays inside the carried reasoning item, and its text is recorded as
+the turn's thinking block, which a session file and `cli trajectory` show and no request sends back.
+A reply that is reasoning alone stays an empty reply. Refused without `openai_api: responses`. The
+relays need nothing: both build their request from `llm_config`.
+
+**Checked live through ELM** (2026-10-05; the direct key was refused that day, HTTP 401,
+`not_authorized_invalid_project`). `reasoning.summary: auto` is accepted with `store: false` and
+carry-over on, and echoed back as `detailed`. gpt-5.4 returned three `summary_text` parts (1,495
+characters, on 516 reasoning tokens) and gpt-5.2 one (455, on 293); gpt-5.5 returned none on one call
+(386 reasoning tokens) and one on the next, so an empty summary there is not a failure. The item goes
+back with its summary and the next turn answers HTTP 200. The summary is not in the output tokens:
+gpt-5.4's 561 are its 516 reasoning tokens plus 45 of text and call. The gpt-5.4 response is the
+fixture `responses_elm_gpt54_high_summary_commentary_call.json`.
+
+Then the stage-by-stage relabelling in `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md` (was
+the specific concern raised?) has something written to read. Whether a summary changes what the model
+does is unmeasured; treat a summarised run as its own condition until one pair says otherwise. Like
+`reasoning_effort` and `openai_api`, the knob changes what a run measures and a resume may change it
+(`framework-defects-2026-09.md`).
+
+## The OpenAI models through ELM's `/v1/responses` (measured and built 2026-10-05)
+
+**Motivating fact.** The project's OpenAI key stopped working on 2026-10-05: HTTP 401,
+`not_authorized_invalid_project`, "The project you are requesting has been archived", on `/v1/models`
+too. Every `gpt_*` config (52 of them name gpt_5.2, gpt_5.4 or gpt_5.5, and the judge base names
+gpt_5_mini) would retry for hours and bill nothing.
+
+**Measured, one tiny call each, `httpx` to `https://elm.edina.ac.uk/api/v1/responses`:**
+
+| | gpt-5.2 | gpt-5.4 | gpt-5.5 |
+|---|---|---|---|
+| snapshot the alias resolved to | gpt-5.2-2025-12-11 | gpt-5.4-2026-03-05 | gpt-5.5-2026-04-23 |
+| function tool with `reasoning: {effort: high}`, `store: false` | 200 | 200 | 200 |
+| encrypted reasoning item returned, and accepted back on turn 2 | yes | yes | yes |
+| `summary: auto` | 1 part | 3 parts | 0, then 1 |
+| message `phase`, and a replay carrying it | none set | `commentary`, 200 | `commentary`, 200 |
+
+These are the snapshots the direct rows name. A stream ends in `response.completed`.
+**Stateless only.** ELM's OpenAI organisation is under Zero Data Retention: `store: true` is answered
+as `store: false`, and `previous_response_id` and a Conversations-API `conversation` are each a 400,
+"cannot be used for this organization due to Zero Data Retention" (2026-10-05; ELM's OpenAPI spec
+lists both, and its `include` enum omits `reasoning.encrypted_content`, which works). So the manual
+replay with carried encrypted reasoning that this provider does is the only multi-turn mode on ELM;
+a server-state provider there would be refused on its second call. The prompt cache
+works through the gateway: a 3,336-token request repeated twice reported 2,688 cached tokens each time
+(gpt-5.2). On Chat Completions the gateway behaves as OpenAI does: gpt-5.2 takes tools with high effort,
+gpt-5.5 answers the same 400 naming `/v1/responses`. `gpt-5-mini` on Chat Completions resolves to
+gpt-5-mini-2025-08-07, the judge's snapshot.
+
+**Built on `gpt-harness-parity`.** `elm_gpt_5.5` is a row; `elm_gpt_5.4` takes `gpt_5.4`'s rates in
+place of a placeholder it had kept. The three rows carry `openai_responses: True`, `LLMConfig` accepts
+`openai_api: responses` for a row with that mark and refuses any other ELM row, and
+`ElmResponsesProvider` is `OpenAIResponsesProvider` at the gateway's address with `ELM_API_KEY`. A
+tool conversation through `LLMClient.call_api` ran to its final answer on each model, and streamed on
+gpt-5.5. A run moves with
+`--set llm_config.model_name=elm_gpt_5.5`; the name is in the plan, so the plan says which endpoint.
+
+**Not known, and to settle on the first real run:**
+- ELM's rate limits and quota. A dev run is 20-24M processed tokens; nothing here sent more than a few
+  thousand. Watch the first minutes for 429s, which the client retries quietly.
+- How ELM's charge relates to the caps. The key's limit is £500 and ELM reports its spend in pounds
+  (`GET /api/v1/costs`, read by `python -m ape.llm_clients.elm_budget`; on 2026-10-05 £0.10 used, as
+  of that day's 00:00 sync). The caps price at OpenAI's list rates in dollars. After the first paid run,
+  compare its billed total with the change in ELM's `usage` once `asOf` has passed the run, and record
+  the ratio here.
+- Whether a run through ELM reproduces a direct one. Same snapshots and the same API, but no pair has
+  been run; treat the first ELM repetition of a direct condition as a replication, not as a given.
+- The judge. `configs/bases/v5_judge.yaml` pins `gpt_5_mini`, direct. `elm_gpt_5_mini` is the same
+  snapshot, but the name is in the judge's cache key, so moving it forfeits every cached verdict. That
+  is a decision, and it is not taken here.
+- Codex is told `llm_config.model_name` with `_` as `-`, so `elm_gpt_5.5` reaches it as `elm-gpt-5.5`,
+  which has no catalog entry. A Codex config on ELM sets `codex_model: gpt-5.5`.
+
+## An OpenAI model runs only on Responses with its reasoning carried (decided 2026-10-05)
+
+The user's call: no Chat Completions backend for GPT models, so reasoning cannot be dropped between
+turns by accident. `reasoning_drop_refusal` (`openai_provider.py`) refuses an OpenAI model, direct or
+through ELM (`openai_responses` rows), on Chat Completions or on Responses with carry-over off. Both
+OpenAI providers check it before sending, and `cli plan` before any spend. It replaces
+`chat_completions_refusal`, which refused only tools with reasoning on gpt-5.4 and gpt-5.5, and its
+`chat_completions_tools_with_reasoning` flag. gpt-5.2 had passed that check and still lost its
+reasoning every turn on Chat.
+
+A refusal and not a new default, deliberately. Of the 129 GPT configs on disk, 103 were written for
+the old paths: 98 on Chat Completions (11 of them the judge's `gpt_5_mini`) and 5 on Responses with
+carry-over off. Flipping the defaults would have made each of them, and a `--resume` of any of their
+runs, quietly mean a different condition; refused, they fail at plan time with the two lines to set.
+They all name the direct models, whose key is dead anyway. `elm_gpt_5_mini` was measured on Responses
+the same day (tools at high effort, reasoning carried, 1,792 of 1,935 tokens cached on turn 2) and
+marked, so the judge has a path: moving it from `gpt_5_mini` is still the open cache decision above.
+
+## The replay renders as the API's own items, and carried reasoning stays rendered (checked 2026-10-05)
+
+Checked against OpenAI's reasoning guide ("Preserve reasoning across calls") before the first ELM probe
+run. Its requirements for a stateless tool loop: keep every output item, and pass back the reasoning,
+function-call and function-call-output items since the last user message unchanged. `reasoning.context`
+decides whether reasoning from before that user message is rendered; models before GPT-5.6 default to
+`current_turn`, which renders only the active turn's.
+
+The provider rebuilds items from its Chat-shaped record rather than resending the output verbatim, so
+this was measured, not argued. A three-city lookup prompt at high effort through ELM, one tool round,
+then a second, each replayed three ways:
+
+| | turn 2: ours / verbatim / reasoning stripped | turn 3: ours / verbatim / stripped | turn-1 reasoning tokens |
+|---|---|---|---|
+| gpt-5.5 | 688 / 688 / 170 | 752 / 752 / 234 | 516 |
+| gpt-5.4 | 434 / 434 / 170 | 498 / 498 / 234 | 262 |
+
+So the rebuilt history renders token for token as the API's own items, and the carried reasoning is
+rendered (stripping it removes 518 and 264 tokens, the turn-1 reasoning plus a couple of tokens) and is
+still rendered two rounds later. Both models spent 0 reasoning tokens on turn 2, so the turn-3 reading
+is turn 1's reasoning surviving a round, not two rounds of it accumulating.
+
+Under `current_turn`, a user message mid-session starts a new turn, and the reasoning before it stops
+being rendered. In a review session that is only the no-submission prompt (2 in 262 APE-Agent sessions)
+or a CLI harness's retry prompt. `all_turns` would keep it, but gpt-5.2 answers it with a 400 and the
+guide lists it for GPT-5.6 and later, so no `reasoning.context` is sent, as before.
+

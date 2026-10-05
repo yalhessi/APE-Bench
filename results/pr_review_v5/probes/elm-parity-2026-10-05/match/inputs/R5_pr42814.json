@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+  "claim": "The module documentation says fundamental discriminants are exactly the discriminants of quadratic fields, but `Int.IsFundamentalDiscr` includes `1` via `Int.isFundamentalDiscr_four_mul_add_one` with `m = 0`; `1` is the discriminant of `ℚ`, not of a quadratic field in the usual degree-two sense.",
+  "requested_change": "Qualify the sentence to include the exceptional `1`, for example: \"These are exactly the discriminants of quadratic fields, together with `1`, the discriminant of `ℚ`.\"",
+  "severity": "advisory"
+ }
+]

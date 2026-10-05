@@ -85,6 +85,7 @@ class LeanPRReviewDistillTask(BasePRReviewTask):
     """Workspace-grounded distillation — reads full proofs, emits the PRDistillation artifact."""
 
     task_type = "lean_pr_review_distill"
+    submit_tool = "submit_distillation"
     data_class = BasePRReviewData
     task_config_class = BasePRReviewConfig
     task_result_class = PRDistillResult

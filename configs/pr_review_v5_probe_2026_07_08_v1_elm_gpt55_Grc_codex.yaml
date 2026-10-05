@@ -1,0 +1,18 @@
+# The one condition where this branch changes what the model is sent: Codex with gpt-5.5 carried
+# (pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml, Kb1, `probe_postcutoff_gpt55_Grc_codex_rep1`:
+# 0.25 of 16 asks, $5.36). Kb1's sessions wrote 70 `commentary` preambles and each went back to the
+# model without its phase; with e9cdedfb they go back as commentary. Reached through ELM (the direct
+# key is dead), same snapshot. Codex is told `gpt-5.5` by name: `elm_gpt_5.5` would reach it as
+# `elm-gpt-5.5`, which its catalog does not have.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml
+
+llm_config:
+  model_name: elm_gpt_5.5
+  # Readable reasoning (the user, 2026-10-05): every account of why gpt passed over an ask has been
+  # read off its calls and findings. The summary is recorded as each turn's thinking block and never
+  # sent back. It should not change the reviewer: gpt-5.4's 561 output tokens on ELM were its 516
+  # reasoning tokens plus 45 of text and call, so the summary is not part of the model's own turn.
+  # Unverified on review sessions, so a change here is the phase fix and the summary together.
+  openai_responses_reasoning_summary: auto
+
+codex_model: gpt-5.5

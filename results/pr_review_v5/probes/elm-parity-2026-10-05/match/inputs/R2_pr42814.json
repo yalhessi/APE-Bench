@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean (module docstring)",
+  "claim": "The module docstring asserts that fundamental discriminants \"are exactly the discriminants of quadratic fields\", but under `Int.IsFundamentalDiscr` as defined, `D = 1` is a fundamental discriminant (1 ≡ 1 mod 4, no `x` with `1 = 4 * x`, no odd prime square divides 1), and 1 is not the discriminant of any quadratic field. The documented characterization is therefore false for the definition in the file.",
+  "requested_change": "Correct the sentence to match the definition, e.g. \"These are exactly `1` and the discriminants of quadratic fields\" (and state the `D = 1` convention in the `IsFundamentalDiscr` docstring as well); alternatively, if `1` is meant to be excluded, add `D ≠ 1` to `IsFundamentalDiscr` and update `isFundamentalDiscr_iff_squarefree` / `isFundamentalDiscr_four_mul_add_one` accordingly.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Odd.isCoprime_two",
+  "claim": "`Odd.isCoprime_two : Odd x → IsCoprime x 2` breaks the established left/right naming for coprimality with 2: the library already has `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` / `Int.isCoprime_two_left` (Mathlib/RingTheory/Int/Basic.lean) and the ℕ aliases `Odd.coprime_two_right : Odd n → n.Coprime 2` / `Odd.coprime_two_left` (Mathlib/Data/Nat/Prime/Basic.lean). The new name omits the side, and there is no `IsCoprime 2 x` counterpart.",
+  "requested_change": "Rename to `Odd.isCoprime_two_right` (updating the use `hp.isCoprime_two` in `Int.isFundamentalDiscr_iff_squarefree`) and add the companion `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "IsCoprime.dvd_mul_right_iff",
+  "claim": "The new iff lemmas `IsCoprime.dvd_mul_right_iff (H : IsCoprime x z) : x ∣ y * z ↔ x ∣ y` and `IsCoprime.dvd_mul_left_iff (H : IsCoprime x y) : x ∣ y * z ↔ x ∣ z` carry an `_iff` suffix that the library's exact analogues do not: `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m`, `Nat.Coprime.dvd_mul_left`, `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` are all iff statements without `_iff`, and the names `IsCoprime.dvd_mul_right/left` are free.",
+  "requested_change": "Rename the pair to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left` (same statements and proofs), and update the use `(IsCoprime.pow hp.isCoprime_two).dvd_mul_left_iff` in `Int.isFundamentalDiscr_iff_squarefree`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Int.squarefree_iff_prime_sq_not_dvd",
+  "claim": "The proof builds a named `bridge` lemma with a `show ... by push_cast; ring` cast rewrite and then a hand-written two-way `exact ⟨fun ... => ..., fun ... => ...⟩` (with `=>` rather than `↦`), where a single rewrite chain through existing cast lemmas closes the goal.",
+  "requested_change": "Replace the proof by `simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_mul, Int.natCast_dvd]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Nat.forall_prime_iff_two_and_odd",
+  "claim": "The reverse direction re-derives the case split `p = 2 ∨ Odd p` by hand (`obtain rfl | hne := eq_or_ne p 2` followed by `hp.odd_of_ne_two hne`), although `Nat.Prime.eq_two_or_odd'` in the same file states exactly that split.",
+  "requested_change": "Write the proof as the term `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "The proof introduces two anonymous `have`s, so the second shadows the first as `this` (the first becomes inaccessible) and a comment is needed to explain that `grind` picks them up; in addition `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` uses `+contextual` although it is not needed.",
+  "requested_change": "Name the two auxiliary facts (e.g. `have hsq {m} : Squarefree m ↔ ...` and `have hdvd {m p : ℤ} (hp : Odd p) : ...`), drop the explanatory comment, and replace `simp +contextual only [...]` by `simp only [Int.mul_ediv_cancel_left d four_ne_zero]`.",
+  "severity": "advisory"
+ }
+]

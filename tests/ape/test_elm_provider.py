@@ -93,9 +93,10 @@ def test_direct_openai_models_are_untouched():
 # --------------------------------------------------------------------------------------
 
 def test_the_payload_uses_max_completion_tokens():
-    """ELM's OpenAI models reject `max_tokens` outright ("not supported with this model")."""
+    """ELM's OpenAI models reject `max_tokens` outright ("not supported with this model"), and
+    every model accepts `max_completion_tokens`; the OpenAI ones no longer reach Chat at all."""
 
-    payload = client_for("elm_gpt_5.2").provider.build_request_payload([], stream=False)
+    payload = client_for("elm_mistral_small_4").provider.build_request_payload([], stream=False)
     assert payload["max_completion_tokens"]
     assert "max_tokens" not in payload
 
@@ -103,11 +104,11 @@ def test_the_payload_uses_max_completion_tokens():
 def test_streaming_asks_for_usage():
     """Without this the streamed response carries no usage and billed cost reads zero."""
 
-    payload = client_for("elm_gpt_5.2").provider.build_request_payload([], stream=True)
+    payload = client_for("elm_mistral_small_4").provider.build_request_payload([], stream=True)
     assert payload["stream_options"] == {"include_usage": True}
 
 
-@pytest.mark.parametrize("model", ["elm_gpt_5.2", "elm_qwen_3.5", "elm_mistral_small_4"])
+@pytest.mark.parametrize("model", ["elm_qwen_3.5", "elm_mistral_small_4"])
 def test_tool_capable_models_pass_tools_through(model):
     payload = client_for(model).provider.build_request_payload([], tools=[TOOL])
     assert payload["tools"] == [TOOL]
@@ -235,10 +236,11 @@ def test_a_model_with_no_reasoning_mode_refuses_the_knob(model, effort):
 
 def test_an_unmeasured_model_passes_the_knob_through():
     """An untested model cannot be asserted to lack a reasoning mode. The OpenAI models
-    proxied by ELM carry no measured row, so nothing here may refuse them."""
+    proxied by ELM carry no measured `reasoning_efforts` row, so this check may not refuse them
+    (they go through Responses, where `reasoning_drop_refusal` governs them instead)."""
 
     config = LLMConfig(model_name="elm_gpt_5.2", reasoning_effort="high")
-    assert ElmProvider(config).build_request_payload([])["reasoning_effort"] == "high"
+    ElmProvider(config)._assert_reasoning_effort_is_real()
 
 
 def test_the_reasoning_table_covers_every_open_weight_model():

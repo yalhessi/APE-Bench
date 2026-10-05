@@ -496,3 +496,53 @@ episode; or take `proof_profile` out of the solo grant. That second option is th
 gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands at a run boundary.
 The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
 task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.
+
+## The no-submission prompts named `submit_result` and told a finished reviewer to keep working (found and fixed 2026-10-05)
+
+A batch session's result is what its submission tool records, so a turn with no tool call cannot be
+left alone: the model has yielded with nothing filed. Both scaffolds answer it with a user message.
+APE-Agent's is `_create_no_tool_call_prompt` ("No tool call detected! You must use tools to make
+progress ... When the task is fully completed, use `submit_result`"), with `_create_empty_response_prompt`
+for an empty reply; Claude Code's is `_create_retry_prompt` ("Continue. You must submit your final result
+using the `...submit_result` tool ..."). The text the model wrote stays in the history.
+
+Two things are wrong with the wording, in all three. It hard-codes `submit_result`, and a review task's
+tool is `submit_findings`. And it reads a stop as being stuck ("Leverage all available tools to
+thoroughly complete the task"), where a reviewer that stops has usually finished: the prompt should
+say to call the task's own submission tool if done, and to continue otherwise. `batch_preamble: plain`
+does not reach these prompts.
+
+**It has not touched a result.** In the 262 APE-Agent gpt review sessions logged 29 September to
+5 October (5,072 calls), the no-tool-call prompt was sent 0 times and the empty-response prompt twice,
+both to gpt-5.5 after an empty `final_answer` (0 characters; PRs 43167 and 26185). After the first it
+submitted at once; after the second it went back to searching. Each also lost that turn's reasoning
+item, since the API refuses a reasoning item with nothing after it. Not measured: how often the
+open-weight `elm_*` models hit it, and how often Claude Code's fires.
+
+**Fixed on `gpt-harness-parity`.** `BaseTask.submit_tool` names the tool a task ends on
+(`submit_result` by default; `submit_findings`, `submit_candidates`, `submit_routing`,
+`submit_scores`, `submit_distillation` and `submit_opportunity_adjudications` where a class registers
+one), and a test checks it against the tools registered by the nearest class that registers any, for
+all 27 task types. `prompts.no_submission_prompt` is the one wording: "Your last reply called no tool,
+so nothing has been submitted yet. If you have finished, call `<tool>` now. If you have not, continue
+with the tools." APE-Agent sends it for a reply with no tool call and, opening "Your last reply was
+empty", for an empty one; Claude Code and Codex send it from one method on the base manager, and
+their two copies are deleted.
+
+## An exhausted ELM key will look like a slow run: its 429 is retried for hours (found 2026-10-05)
+
+ELM's OpenAPI spec (`/api-docs/elm-proxy-api.yaml`): "Each API key has a spend limit. Once exceeded,
+requests return `429` until the quota resets or is increased by an administrator." The client retries
+a 429 like any transient error, 100 attempts with waits up to 60 s, so when the key's £500 runs out
+every job of a run sits retrying for 1.5-2 h a call, billing nothing, logged only as "API call failed,
+retrying". A rate-limit 429 is transient and a quota 429 is not, and the status alone does not say
+which. Not yet seen: no ELM call has met either (the gateway reported OpenAI's limits, 30,000 requests
+and 180M tokens a minute, on 2026-10-05).
+
+**What would close it:** on a 429 from an ELM model, read `GET /api/v1/costs`
+(`ape.llm_clients.elm_budget.key_costs`) once; if `usage >= limit`, raise `RequestRejectedError`
+naming the spend and the limit, so the run fails at once; otherwise retry as now. Pin it with a
+transport answering 429 and a `/costs` at its limit. A preflight in `cli plan` that compares a run's
+worst-case cost with what `/costs` reports left would catch the same thing before any spend, with the
+caveat that the caps are dollar list-price estimates and the limit is pounds.
+

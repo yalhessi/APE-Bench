@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+  "claim": "The module doc title says “Modules over presheaves commutative rings”, which is missing “of” and reads ungrammatically.",
+  "requested_change": "Change the title to `# Modules over presheaves of commutative rings` (or `# Presheaves of modules over presheaves of commutative rings`).",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+  "claim": "`PresheafOfModulesOfCommRing.pushforward₀` expands the commutative-ring pushforward directly even though the existing API already has the same wrapper as `PresheafOfModules.pushforward₀OfCommRingCat`.",
+  "requested_change": "Change the body of `PresheafOfModulesOfCommRing.pushforward₀` to `PresheafOfModules.pushforward₀OfCommRingCat F R`.",
+  "severity": "advisory"
+ }
+]

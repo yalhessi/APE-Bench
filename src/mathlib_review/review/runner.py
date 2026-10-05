@@ -1021,20 +1021,19 @@ def assert_the_judge_model_is_pinned(dataset, logger) -> None:
             "from this run are not strictness results.")
 
 
-def assert_the_endpoint_accepts_tools(scaffold) -> None:
-    """Refuse a model and API that reject tools with this reasoning effort, before any spend.
+def assert_the_model_keeps_its_reasoning(scaffold) -> None:
+    """Refuse an OpenAI model configured to drop its reasoning between turns, before any spend.
 
-    Every review task sends tools, so such a run cannot make a single call. Refused in a dry
+    The providers would refuse its first request; this says so at plan time. Refused in a dry
     run too, unlike an environment gap: it is a property of the config, and no machine can run
-    it. Without it, `probe_postcutoff_gpt5{4,5}_Gr_rep1` sealed a plan, started, and was
-    found only in the retry log.
+    it. Without a plan-time check, `probe_postcutoff_gpt5{4,5}_Gr_rep1` sealed a plan, started,
+    and was found only in the retry log.
     """
 
-    from ape.llm_clients.providers.openai_provider import chat_completions_refusal
+    from ape.llm_clients.providers.openai_provider import reasoning_drop_refusal
 
     llm = getattr(scaffold, "llm_config", None)
-    refusal = (chat_completions_refusal(llm, sends_tools=True)
-               if llm is not None and llm.model_name else None)
+    refusal = reasoning_drop_refusal(llm) if llm is not None and llm.model_name else None
     if refusal:
         raise ValueError(refusal)
 
@@ -1758,7 +1757,7 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
 
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
     assert_ready(scaffold, logger, enforce=not dataset.dry_run)
-    assert_the_endpoint_accepts_tools(scaffold)
+    assert_the_model_keeps_its_reasoning(scaffold)
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")

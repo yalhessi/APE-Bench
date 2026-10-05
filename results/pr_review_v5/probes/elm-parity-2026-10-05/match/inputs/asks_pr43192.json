@@ -1,0 +1,30 @@
+[
+ {
+  "ask_id": "p0013",
+  "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+  "code_at_comment": "@@ -0,0 +1,120 @@\n+/-\n+Copyright (c) 2026 Brian Nugent. All rights reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Brian Nugent\n+-/\n+module\n+\n+public import Mathlib.Algebra.Category.ModuleCat.Presheaf.Pullback\n+\n+/-!\n+# Modules over presheaves commutative rings",
+  "comment": "```suggestion\n# Modules over presheaves of commutative rings\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "p0014",
+  "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+  "code_at_comment": "rev mk (obj : ∀ (X : Cᵒᵖ), ModuleCat.{v} (R.obj X)) (map : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n+      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n+    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom\n+      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _)\n+    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z),\n+      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫\n+        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom\n+          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :",
+  "comment": "Could you add `by cat_disch` as default tactics?",
+  "replies_to": null
+ },
+ {
+  "ask_id": "p0015",
+  "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+  "code_at_comment": "rev mk (obj : ∀ (X : Cᵒᵖ), ModuleCat.{v} (R.obj X)) (map : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n+      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n+    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom\n+      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _)\n+    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z),\n+      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫\n+        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom\n+          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :",
+  "comment": "(This may apply to other definitions below.)",
+  "replies_to": "Could you add `by cat_disch` as default tactics?"
+ },
+ {
+  "ask_id": "p0016",
+  "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+  "code_at_comment": " over a presheaf of commutative rings at an object. -/\n+abbrev obj (F : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : ModuleCat.{v} (R.obj X) :=\n+  PresheafOfModules.obj F X\n+\n+/-- The restriction map of a presheaf of modules over a presheaf of commutative rings. -/\n+abbrev map (F : PresheafOfModulesOfCommRing.{v} R) {X Y : Cᵒᵖ} (f : X ⟶ Y) :\n+    F.obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (F.obj Y) :=\n+  PresheafOfModules.map _ _\n+\n+/-- Construct a morphism of presheaves of modules over a presheaf of commutative rings. -/\n+abbrev mkHom {M₁ M₂ : PresheafOfModulesOfCommRing.{v} R}",
+  "comment": "I would prefer the name `homMk` (overall, there is an hesitation in mathlib about `mkHom` or `homMk`). In the `PresheafOfModules` namespace, there is a `homMk` (with different parameters though).",
+  "replies_to": null
+ }
+]
