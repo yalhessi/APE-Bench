@@ -1,0 +1,1 @@
+{"code": "  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  apply Tendsto.congr' this\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd", "limit": 5}

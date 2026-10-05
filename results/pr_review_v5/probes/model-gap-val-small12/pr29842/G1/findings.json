@@ -1,0 +1,16 @@
+[
+ {
+  "target": "UniqueDiffWithinAt.mono",
+  "claim": "`UniqueDiffWithinAt.mono` (s ⊆ t) now sits after `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`, so it picks up both classes because it goes through `mono_nhds`. Neither class is needed: `tangentConeAt_mono` and `closure_mono` already hold with no topological-algebra assumptions. The PR's TVS generalization therefore stops short for this lemma.",
+  "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (next to `UniqueDiffWithinAt.congr_pt`) and prove it directly: `⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`, so that it holds for any `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (line mode, lines 433-443 of Mathlib/Analysis/Calculus/TangentCone.lean) put `UniqueDiffWithinAt.mono` with that direct proof before the variable line, followed by an `example` with only `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]` that applies `h.mono st`, and left `mono_nhds` and the rest of the file unchanged. Outcome: `compiled`, no errors or warnings. So the whole file, including every later use of `.mono` in the Normed and Real sections, builds with the weaker statement."
+ },
+ {
+  "target": "tangentConeAt.lim_zero",
+  "claim": "The new proof of `tangentConeAt.lim_zero` spends a separate `apply Tendsto.congr' this` step before the closing `simpa`. The congruence can be applied inside the `simpa` term, and after `rw [...] at hc` the `≠ 0` fact can come from `hc.eventually_ne_cobounded 0`, so the separate `have`/`apply` steps are unnecessary.",
+  "requested_change": "Shorten the proof to\n```\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  simpa using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' <|\n    (hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n```\nor, keeping the `have`, replace `apply Tendsto.congr' this` and the final `simpa` with a single `simpa using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' this`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (declaration_name `tangentConeAt.lim_zero`): (a) the two-line version above has outcome `compiled` with no errors or warnings; (b) the version that keeps the `have` and uses `simpa using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' this` also has outcome `compiled`. declaration_search confirms `Filter.Tendsto.eventually_ne_cobounded` exists at the base (Mathlib/Topology/Bornology/Basic.lean:256). precedent_search turned up a maintainer (ADedecker, PR #21065) suggesting this same shape for this lemma: `rw ... at hc`, `filter_upwards [hc.eventually_ne_cobounded 0] ...`, then a single `simpa ... using tendsto_inv₀_cobounded.comp hc |>.smul hd`."
+ }
+]
