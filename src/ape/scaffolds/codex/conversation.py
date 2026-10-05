@@ -139,16 +139,6 @@ class CodexConversationManager(BaseConversationManager):
     async def _send_retry_prompt(self, prompt: str) -> None:
         self._pending_prompt = prompt
 
-    def _create_retry_prompt(self) -> str:
-        submit_tool_name = f"{self.config.mcp_server_name}submit_result"
-        return (
-            f"Continue. You must submit your final result using the `{submit_tool_name}` tool "
-            "when you have completed the task. "
-            "Leverage all available tools to thoroughly complete the task. "
-            "Analyze, create, modify, verify, and iterate as needed. "
-            f"When the task is fully completed, use `{submit_tool_name}`."
-        )
-
     async def _interrupt_internal(self) -> None:
         await self._terminate()
 

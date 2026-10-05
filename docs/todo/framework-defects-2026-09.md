@@ -497,7 +497,7 @@ gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands a
 The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
 task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.
 
-## The no-submission prompts name `submit_result` and tell a finished reviewer to keep working (found 2026-10-05)
+## The no-submission prompts named `submit_result` and told a finished reviewer to keep working (found and fixed 2026-10-05)
 
 A batch session's result is what its submission tool records, so a turn with no tool call cannot be
 left alone: the model has yielded with nothing filed. Both scaffolds answer it with a user message.
@@ -519,5 +519,12 @@ submitted at once; after the second it went back to searching. Each also lost th
 item, since the API refuses a reasoning item with nothing after it. Not measured: how often the
 open-weight `elm_*` models hit it, and how often Claude Code's fires.
 
-**What would close it:** take the submission tool's name from the task in all three prompts, reword
-them as above, and pin both with a test. No run is needed.
+**Fixed on `gpt-harness-parity`.** `BaseTask.submit_tool` names the tool a task ends on
+(`submit_result` by default; `submit_findings`, `submit_candidates`, `submit_routing`,
+`submit_scores`, `submit_distillation` and `submit_opportunity_adjudications` where a class registers
+one), and a test checks it against the tools registered by the nearest class that registers any, for
+all 27 task types. `prompts.no_submission_prompt` is the one wording: "Your last reply called no tool,
+so nothing has been submitted yet. If you have finished, call `<tool>` now. If you have not, continue
+with the tools." APE-Agent sends it for a reply with no tool call and, opening "Your last reply was
+empty", for an empty one; Claude Code and Codex send it from one method on the base manager, and
+their two copies are deleted.

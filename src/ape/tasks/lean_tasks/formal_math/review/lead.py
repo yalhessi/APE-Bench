@@ -285,6 +285,7 @@ class ReviewLeadResult(BasePRReviewResult):
 
 class ReviewLeadTask(BasePRReviewTask):
     task_type = LEAD_TASK_TYPE
+    submit_tool = "submit_routing"
     data_class = ReviewLeadData
     task_config_class = ReviewLeadConfig
     task_result_class = ReviewLeadResult

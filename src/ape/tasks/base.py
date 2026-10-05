@@ -189,6 +189,10 @@ class BaseTask:
     data_class: type[BaseTaskData] = None
     task_config_class: type['BaseTaskConfig'] = None
     task_result_class: type['BaseTaskResult'] = BaseTaskResult
+    #: The tool whose call records this task's result and ends the session, under the name the
+    #: task registers it by. A scaffold names it when a turn ends with nothing submitted
+    #: (`scaffolds.prompts.no_submission_prompt`), so a class that registers another one says so.
+    submit_tool: str = "submit_result"
 
     def __init__(self, data: BaseTaskData, config: 'BaseScaffoldConfig'):
         """Initialize task instance.
@@ -504,6 +508,11 @@ class BaseTask:
             index_path=getattr(self.data, "execution_index_path", None),
             parent_id=getattr(self.data, "episode_id", None) or self.data.task_id,
         )
+
+    @property
+    def submit_tool_name(self) -> str:
+        """`submit_tool` as the model is shown it, behind the scaffold's MCP server prefix."""
+        return f"{self.config.mcp_server_name}{self.submit_tool}"
 
     async def register_task_tools(self, mcp) -> None:
         """Register task-specific tools. Override in subclasses."""

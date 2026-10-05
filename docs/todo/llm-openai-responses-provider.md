@@ -270,7 +270,7 @@ plus check 2), median 45 turns and max 80, there is no mid-session user message 
 answer. So under the default, carry-over keeps every reasoning item of a session. The provider
 therefore sends no `context`: sending `all_turns` would change nothing in these sessions, and it would
 refuse gpt_5.2, which d23fbde's clean persistence test needs. If a scaffold retry prompt ever appears
-(`_create_empty_response_prompt`, after a malformed response), reasoning before it is dropped. Count
+(`_no_submission_prompt`, after a malformed response), reasoning before it is dropped. Count
 such prompts before reading a carry-over run; there were 0 in 33.
 
 **What carry-over costs over tens of turns** (projected from those 32 gpt-5.2 sessions, each call's

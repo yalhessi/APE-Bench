@@ -55,6 +55,22 @@ PLAIN_BATCH_SYSTEM_PROMPT = """You work through tools: they are how you read, se
 #: `ApeAgentConfig.batch_preamble` -> the preamble a batch-mode session opens with.
 BATCH_PREAMBLES = {"standard": BATCH_MODE_SYSTEM_PROMPT, "plain": PLAIN_BATCH_SYSTEM_PROMPT}
 
+
+def no_submission_prompt(submit_tool_name: str, *, empty: bool = False) -> str:
+    """What a batch session is told when a turn ends with nothing submitted.
+
+    A batch session's result is what its submission tool records, so a reply that calls no tool
+    cannot be left alone: the model has yielded with nothing filed. Every scaffold answers it
+    with this, naming the task's own tool (`BaseTask.submit_tool_name`). A model that stops has
+    usually finished, so it is asked to submit, not told it is stuck. The three prompts this
+    replaces all named `submit_result`, whatever the task registered, and told the model to
+    "leverage all available tools to thoroughly complete the task".
+    """
+    what = "Your last reply was empty" if empty else "Your last reply called no tool"
+    return (f"{what}, so nothing has been submitted yet. If you have finished, call "
+            f"`{submit_tool_name}` now. If you have not, continue with the tools.")
+
+
 CLI_MODE_SYSTEM_PROMPT = """You are a helpful assistant. You must **strictly** follow the user's instructions, and you mustn't do anything the user didn't ask you to do.
 
 <TOOL_USAGE>

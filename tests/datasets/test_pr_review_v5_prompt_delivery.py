@@ -324,3 +324,80 @@ def test_every_scaffold_config_accepts_the_contract_preamble_knobs():
         config = config_class(llm_config=LLMConfig(model_name="gpt_5.2"),
                               batch_preamble="plain", workspace_environment=False)
         assert (config.batch_preamble, config.workspace_environment) == ("plain", False)
+
+
+# --- a turn that ends with nothing submitted ----------------------------------------------------
+
+
+def test_every_task_names_a_submission_tool_its_nearest_class_registers():
+    """A scaffold asks for `BaseTask.submit_tool` when a turn ends with nothing filed. The three
+    prompts it replaces all said `submit_result`, to review tasks whose tool is `submit_findings`,
+    `submit_candidates` or `submit_routing`. So the name is checked against the tools registered
+    by the first class up the hierarchy that registers any."""
+
+    import inspect
+    import re
+    import sys
+
+    import ape.tasks  # noqa: F401 -- registers every task type
+    from ape.tasks.base import BaseTask, get_task_class, list_task_types
+
+    registered = {}
+
+    def tools_of(module_name):
+        if module_name not in registered:
+            registered[module_name] = set(re.findall(
+                r"async def (submit_\w+)\(", inspect.getsource(sys.modules[module_name])))
+        return registered[module_name]
+
+    wrong = {}
+    for task_type in list_task_types():
+        cls = get_task_class(task_type)
+        for klass in cls.__mro__:
+            if klass is BaseTask or klass is object:
+                continue
+            if tools_of(klass.__module__):
+                if cls.submit_tool not in tools_of(klass.__module__):
+                    wrong[task_type] = (cls.submit_tool, sorted(tools_of(klass.__module__)))
+                break
+    assert not wrong, wrong
+    assert get_task_class("lean_pr_review_v5_solo").submit_tool == "submit_findings"
+    assert get_task_class("lean_pr_review_v5_lead").submit_tool == "submit_routing"
+    assert get_task_class("lean_pr_review_v5_arm").submit_tool == "submit_candidates"
+
+    prefixed = SimpleNamespace(config=SimpleNamespace(mcp_server_name="mcp__core__"),
+                               submit_tool="submit_findings")
+    assert BaseTask.submit_tool_name.fget(prefixed) == "mcp__core__submit_findings"
+
+
+def test_the_no_submission_prompt_asks_for_the_tasks_tool_and_does_not_scold():
+    """A reviewer that stops has usually finished. The old text read a stop as being stuck: "No
+    tool call detected! You must use tools to make progress ... thoroughly complete the task"."""
+
+    from ape.scaffolds.prompts import no_submission_prompt
+
+    prompt = no_submission_prompt("mcp__core__submit_findings")
+    assert prompt == ("Your last reply called no tool, so nothing has been submitted yet. If you "
+                      "have finished, call `mcp__core__submit_findings` now. If you have not, "
+                      "continue with the tools.")
+    assert no_submission_prompt("submit_findings", empty=True).startswith("Your last reply was empty,")
+
+
+def test_every_scaffold_sends_that_prompt_with_the_tasks_tool():
+    from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
+    from ape.scaffolds.claude_code.conversation import ClaudeCodeConversationManager
+    from ape.scaffolds.codex.conversation import CodexConversationManager
+    from ape.scaffolds.prompts import no_submission_prompt
+
+    task = SimpleNamespace(submit_tool_name="mcp__core__submit_findings")
+    for manager in (ClaudeCodeConversationManager, CodexConversationManager):
+        cli = object.__new__(manager)
+        cli.task = task
+        assert cli._create_retry_prompt() == no_submission_prompt("mcp__core__submit_findings")
+
+    agent = object.__new__(ApeAgentConversationManager)
+    agent.task = SimpleNamespace(submit_tool_name="submit_findings")
+    agent.tools = [{"function": {"name": "file_read"}}, {"function": {"name": "submit_findings"}}]
+    assert agent._no_submission_prompt() == (
+        no_submission_prompt("submit_findings") + "\n\nAvailable tools: file_read, submit_findings")
+    assert agent._no_submission_prompt(empty=True).startswith("Your last reply was empty,")
