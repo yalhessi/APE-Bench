@@ -49,3 +49,26 @@ validation run (8 of the 11 PRs of `probe_val_small12_gpt55_Grc_rep1`, 19 min fo
 are about $80 billed, $300-330 before cache discounts. ELM's own figure is in pounds against the key's
 £500 (`ape/bin/python -m ape.llm_clients.elm_budget`; £491.80 left at 2026-10-05 00:00, synced daily),
 and which of the two it tracks is not known. Matchers: Claude subagents on token B, four runs.
+
+## As run: one briefed run a set, against the unbriefed runs on disk (revised 2026-10-05, before any briefed session)
+
+The user, as the first runs started: *"We already have no conventions … We just need one run with
+exact conventions."* So the stage is one GE run a set, and GB is the unbriefed gpt-5.5 runs already
+on disk, all at the same snapshot, effort high, reasoning carried, brief G, `user_prompt: v1`:
+
+| label | run | route | PRs |
+|---|---|---|---|
+| GB1, validation | `probe_val_small12_gpt55_Grc_rep1` | OpenAI directly | 11, of which the 8 with asks are matched |
+| GB1, post-cutoff | `probe_postcutoff_elm_gpt55_Grc_rep1` (Eb1) | ELM, summaries on: GE's own config | 6 |
+| GB2, post-cutoff | `probe_postcutoff_gpt55_Grc_rep1` (Hb1) | OpenAI directly | 6 |
+| GE1, each set | `probe_conv_<set>_elmgpt55_exact_rep1` | ELM, summaries on | 8 and 6 |
+
+- The seal per set holds X1, X2, GB and GE1: five reviewers a PR on post-cutoff, four on validation.
+- The rule above is unchanged: GE − GB on the 39 in-census asks, pooled, both matchers. With one
+  briefed run it is provisional, as stage C's was.
+- **What differs between GB and GE besides the brief, stated:** on validation the endpoint (OpenAI
+  directly against ELM), the reasoning summary, and the harness's code date; on post-cutoff, for GB1,
+  only the date. `../elm-parity-2026-10-05/` read Eb1 − Hb1 = −0.0625 (parity) on these PRs.
+- **Stopped and not used:** the driver's first two runs, `probe_conv_{val,post}_elmgpt55_base_rep1`,
+  were stopped about five minutes in, three sessions each completed. Their run directories stay out of
+  the commit; their spend is in the ELM total.

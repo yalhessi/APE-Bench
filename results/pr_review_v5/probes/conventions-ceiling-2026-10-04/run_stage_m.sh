@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Stage M unattended (cross_model.md): twelve gpt-5.5 runs through ELM in two queues, one a set, in
-# rep order (base, exact; rep 1 to 3), each run committed as it finishes; then one seal a set over
-# X1, X2, GB1-3, GE1-3, two blind matchers a set headless on token B, the unblinding and the reading.
+# Stage M unattended (cross_model.md, "As run"): one briefed gpt-5.5 run a set through ELM, the two
+# in parallel, each committed as it finishes; then one seal a set over X1, X2, the unbriefed gpt-5.5
+# runs on disk (GB) and GE1, two blind matchers a set headless on token B, the unblinding and the reading.
 # A failed run stops its queue; an audit flag holds back the matching's commit.
 # usage: bash run_stage_m.sh <scratch dir>
 set -euo pipefail
@@ -16,8 +16,8 @@ commit() { flock $S/git_M.lock bash -c "$1"; }
 
 queue() {
   local tag=$1
-  for rep in 1 2 3; do
-    for level in base exact; do
+  for rep in 1; do
+    for level in exact; do
       local name=probe_conv_${tag}_elmgpt55_${level}_rep${rep} t
       t=$(date +%s)
       $P/run_elm.sh $tag $level $rep > $L/$name.log 2>&1
@@ -63,17 +63,21 @@ print("unknown", 100)
 EOF
 }
 for tag in val post; do
+  # GB: the unbriefed gpt-5.5 runs already on disk (cross_model.md, "As run"); GE1: this stage's run.
   python3 - $tag > $S/sources_M_$tag.json <<'EOF'
 import json, sys
 tag = sys.argv[1]
 src = {"X1": {"kind": "claude"}, "X2": {"kind": "claude"}}
-for label, level in (("GB", "base"), ("GE", "exact")):
-    for n in (1, 2, 3):
-        src[f"{label}{n}"] = {"kind": "solo", "run": f"probe_conv_{tag}_elmgpt55_{level}_rep{n}"}
+base = {"val": ["probe_val_small12_gpt55_Grc_rep1"],
+        "post": ["probe_postcutoff_elm_gpt55_Grc_rep1", "probe_postcutoff_gpt55_Grc_rep1"]}[tag]
+for n, run in enumerate(base, 1):
+    src[f"GB{n}"] = {"kind": "solo", "run": run}
+src["GE1"] = {"kind": "solo", "run": f"probe_conv_{tag}_elmgpt55_exact_rep1"}
 print(json.dumps(src, indent=1))
 EOF
   cp $S/sources_M_$tag.json $P/sources_M_$tag.json
-  [ -f $P/blinding_M_${tag}_SEALED.json ] || probe seal --set ${SET[$tag]} --sessions X1 X2 GB1 GB2 GB3 GE1 GE2 GE3 --out $P/blinding_M_${tag}_SEALED.json
+  sessions=$(python3 -c 'import json, sys; print(" ".join(json.load(open(sys.argv[1]))))' $S/sources_M_$tag.json)
+  [ -f $P/blinding_M_${tag}_SEALED.json ] || probe seal --set ${SET[$tag]} --sessions $sessions --out $P/blinding_M_${tag}_SEALED.json
   probe match-inputs --set ${SET[$tag]} --seal $P/blinding_M_${tag}_SEALED.json --sources $P/sources_M_$tag.json --out $S/match_M_$tag > $S/match_M_$tag.prompts
   for try in $(seq 1 30); do
     read -r st used < <(window)
