@@ -1,0 +1,470 @@
+[
+ {
+  "id": "P005",
+  "applies_to": "a proof step closing a goal",
+  "trigger": "A changed proof closes a goal or branch by several manual steps (a `rw` chain, explicit lemma applications, a hand-built term, `convert_to`, a case split) rather than by a single finishing tactic.",
+  "required": "Close the goal with a standard finishing tactic, with hint lemmas if needed.",
+  "check_kind": "compile",
+  "check": "Replace the manual steps for that goal by a standard finishing tactic, with hints if needed (`simp`, `grind [...]`, `fun_prop`, `positivity`, `omega`, `grw [...]`, `rfl`); if it closes the goal, the original departs.",
+  "not_when": ""
+ },
+ {
+  "id": "P006",
+  "applies_to": "the binders of a new declaration in a file with `variable` commands",
+  "trigger": "A new declaration binds arguments in its own signature (types, instance arguments, terms) while `variable` commands in scope in that file declare arguments of the same kind.",
+  "required": "Use the existing `variable`s, adding missing companions to the `variable` line, rather than rebinding them.",
+  "check_kind": "lookup",
+  "check": "Read the `variable` commands in scope above the declaration; a departure is a signature binder duplicating one of them (same name, type or class), or a companion of one that belongs on that line.",
+  "not_when": ""
+ },
+ {
+  "id": "P010",
+  "applies_to": "hypotheses and typeclass assumptions of a declaration",
+  "trigger": "A new or changed declaration takes a side-condition hypothesis (nonzero, finiteness, cardinality, triviality, positivity, divisibility or membership) or a typeclass assumption that bundles more structure than the operations its statement and body mention.",
+  "required": "Every hypothesis is one the proof needs, in the weakest form it needs, so the result holds in greater generality.",
+  "check_kind": "compile",
+  "check": "Delete the hypothesis, or replace the typeclass with the weakest class providing the operations used, and rebuild the declaration. Departure: it still compiles (perhaps after a small proof fix), or the hypothesis follows from the others by an existing lemma.",
+  "not_when": ""
+ },
+ {
+  "id": "P011",
+  "applies_to": "a proof, construction or meta-code routine",
+  "trigger": "A new or rewritten proof, construction or meta-code routine takes several steps of definition unfolding, element chasing, case analysis, hand-written fields or explicit loops, for a statement about notions that already have library API.",
+  "required": "The result derived from existing lemmas or API (a composition, an existing equivalence or combinator) in a short proof.",
+  "check_kind": "lookup",
+  "check": "Search the library, including recent master, for lemmas or API whose combination yields the statement (composition lemmas, existing equivalences, a general form). Departure: such a derivation exists and is shorter or needs fewer assumptions.",
+  "not_when": ""
+ },
+ {
+  "id": "P012",
+  "applies_to": "`namespace`, `section`, `end` and `variable` commands",
+  "trigger": "The diff adds or moves a `namespace`, `section`, `end` or `variable` command.",
+  "required": "A blank line before and after the command, separating it from neighbouring declarations and commands.",
+  "check_kind": "read",
+  "check": "Look at the lines directly above and below each such command. Departure: either is non-blank (another command, a declaration or a docstring) rather than the start or end of the file.",
+  "not_when": ""
+ },
+ {
+  "id": "P014",
+  "applies_to": "a `simp` call in a proof",
+  "trigger": "The changed proof has a `simp only [...]` or `simpa only [...]` call that closes its goal, or whose result is used only by a flexible finishing tactic tolerant of changes in goal shape (`linarith`, `nlinarith`, `omega`, `positivity`, `grind` and the like).",
+  "required": "A plain `simp` or `simpa` (with only the lemmas it needs beyond the simp set), not a squeezed lemma list.",
+  "check_kind": "read",
+  "check": "Look at what follows each `simp only` or `simpa only` on the same goal. Departure: nothing follows (it closes the goal), or only a flexible finishing tactic does.",
+  "not_when": ""
+ },
+ {
+  "id": "P018",
+  "applies_to": "consecutive tactic calls or `calc` steps",
+  "trigger": "The changed proof has consecutive tactic calls or `calc` steps of a kind one call can combine: successive rewrites at one location, a rewrite then `exact` or `assumption`, a goal-negating rewrite then `intro`, or chained `calc` steps closed alike.",
+  "required": "One call doing the work: a merged rewrite list, `rwa`, `simpa ... using`, `by_contra!`, or a single `calc` step.",
+  "check_kind": "compile",
+  "check": "Replace the consecutive calls with one combined call (a concatenated `rw` list, `rwa` for rewrite-then-exact, `by_contra!` for negate-then-intro, one merged `calc` step) and rebuild. Departure: the combined call compiles.",
+  "not_when": ""
+ },
+ {
+  "id": "P024",
+  "applies_to": "a proof step handed to `grind` or an unsqueezed `simp`",
+  "trigger": "The changed code introduces `grind` or similar general automation into a proof in place of explicit steps or a term, replaces a `simp only [...]` with a bare `simp` or `simpa`, or adds tooling that suggests such replacements.",
+  "required": "Keep a short explicit proof or squeezed `simp only`; use automation only where it is not markedly slower.",
+  "check_kind": "compile",
+  "check": "Write the explicit term or squeezed `simp only` for that step and compare elaboration time or heartbeats; a departure is that a short readable explicit form compiles, or that the automation is markedly slower (half a second counts).",
+  "not_when": "The explicit proof is long or hard to read and the automation is not markedly slower."
+ },
+ {
+  "id": "P030",
+  "applies_to": "a file's import lines",
+  "trigger": "The diff adds or changes an `import` (or `public import`) line.",
+  "required": "Only imports the file needs and that none of its other imports already provides.",
+  "check_kind": "compile",
+  "check": "Delete the added import and rebuild the file (or run `lake exe shake`). Departure: the file still compiles, so the import is unused or arrives transitively through another import.",
+  "not_when": ""
+ },
+ {
+  "id": "P036",
+  "applies_to": "the binder kind of a declaration's argument",
+  "trigger": "A new declaration has an argument occurring in no later explicit argument's or hypothesis's type (only in the conclusion or instance arguments), or an argument that a later explicit argument's or hypothesis's type determines.",
+  "required": "Make arguments that cannot be inferred explicit, and inferable ones implicit.",
+  "check_kind": "read",
+  "check": "Read the binder kind of each such argument, including those from `variable`; a departure is an implicit binder on one that cannot be inferred, or an explicit binder on one that can.",
+  "not_when": ""
+ },
+ {
+  "id": "P040",
+  "applies_to": "a short tactic proof",
+  "trigger": "A changed proof is a short `by` block, a handful of tactics, made mostly of `have`, `refine`, `apply`, `exact`, `use`, `constructor` or `intro` assembling lemma applications.",
+  "required": "Write the proof as a single term: a lemma application chain, anonymous constructor or `fun`.",
+  "check_kind": "compile",
+  "check": "Replace the `by` block with one term built from the same lemmas (dot-notation chain, `⟨…⟩`, `fun … ↦ …`); if it compiles and reads no worse, the original departs.",
+  "not_when": ""
+ },
+ {
+  "id": "P041",
+  "applies_to": "the PR description or module docstring",
+  "trigger": "The PR adds a new definition, structure, class or file, a lemma whose statement does not show its use, or reformulates or redesigns existing declarations.",
+  "required": "Say in the module docstring or PR description why it is useful and how it will be used.",
+  "check_kind": "read",
+  "check": "Read the PR description and module docstring; a departure is that neither says why the addition or change is wanted or what it is for (a downstream use, application, reference or example).",
+  "not_when": ""
+ },
+ {
+  "id": "P043",
+  "applies_to": "the scope of a PR",
+  "trigger": "The PR's diff contains more than one separable part: edits to a file its main change does not need, fixes unrelated to its stated purpose, or a core plus extensions or a design-heavy part that compile without each other.",
+  "required": "Split separable parts into their own PRs; keep together parts that only make sense together.",
+  "check_kind": "judge",
+  "check": "Does the diff contain a part (a file, a section, a batch of fixes) that the rest does not depend on and that could be reviewed alone, still bundled into this PR?",
+  "not_when": "The parts only make sense together, so splitting them would be arbitrary."
+ },
+ {
+  "id": "P045",
+  "applies_to": "a file's module docstring",
+  "trigger": "The PR adds, removes, moves, renames or restates a main definition or theorem in a file with a module docstring (`/-! ... -/`), creates a file with one, or moves a declaration out of a file whose docstring may list it.",
+  "required": "The module docstring covers every main definition and result the file contains, as currently stated, and claims nothing it no longer contains.",
+  "check_kind": "lookup",
+  "check": "Compare the file's main declarations with its docstring's lists, and search other files' module docstrings for declarations the PR moved or removed. Departure: a main declaration is missing or misstated, or a docstring claims one its file no longer has.",
+  "not_when": ""
+ },
+ {
+  "id": "P048",
+  "applies_to": "arguments shared by consecutive declarations",
+  "trigger": "Two or more consecutive new or changed declarations take the same argument (same name and type, including instance arguments), whether in their signatures or through a `variable` line the PR edits or removes.",
+  "required": "Declare the shared arguments once with `variable` (in a section) and drop them from each signature.",
+  "check_kind": "read",
+  "check": "Compare the neighbouring signatures; a departure is a binder repeated in several of them, or a removed `variable` binder reappearing in each declaration, rather than declared once by `variable`.",
+  "not_when": ""
+ },
+ {
+  "id": "P060",
+  "applies_to": "a proof step citing a lemma",
+  "trigger": "A proof step reaches its goal indirectly: rewriting the goal or a hypothesis into another lemma's form, converting a library lemma to fit (as `rfl.le`), weakening then composing, routing through a generic instance, or opening side goals only for that adaptation.",
+  "required": "The lemma whose statement is the goal, cited directly (`le_rfl`, not `rfl.le`), without the conversion.",
+  "check_kind": "lookup",
+  "check": "Search the library (`exact?`, names the naming convention predicts for the composite or specialised statement) for a lemma whose conclusion is the step's goal as stated. Departure: one exists and closes the goal without the conversion or extra side goals.",
+  "not_when": ""
+ },
+ {
+  "id": "P063",
+  "applies_to": "a declaration's statement: the types, objects and universe levels it is stated for",
+  "trigger": "A new or changed declaration fixes, in its statement, a concrete type, a specific object or value, or specific universe levels (as domain, codomain, index type or parameter) where a variable carrying typeclass assumptions or hypotheses could stand.",
+  "required": "State it for every type, object or value with the properties the proof actually uses.",
+  "check_kind": "compile",
+  "check": "Replace the concrete type, object or fixed universes by a variable assuming only the classes or hypotheses the proof uses (for universes, a typeclass hypothesis instead); if the statement and proof still compile, it departs.",
+  "not_when": ""
+ },
+ {
+  "id": "P072",
+  "applies_to": "a declaration deleted, renamed or moved by the PR",
+  "trigger": "The diff deletes a declaration that existed before the PR (a removed `theorem`, `lemma`, `def`, `instance` or `abbrev`), or changes its name or namespace, so that its old name would no longer resolve.",
+  "required": "Keep the old name as a `@[deprecated (since := \"…\")]` alias or declaration pointing to its replacement.",
+  "check_kind": "read",
+  "check": "For each old name that disappears, look among the PR's added lines for a `deprecated` alias or declaration carrying that name and naming its replacement; its absence shows a departure.",
+  "not_when": ""
+ },
+ {
+  "id": "P084",
+  "applies_to": "line breaks in code, docstrings and comments",
+  "trigger": "The diff adds a line over 100 characters, or breaks across lines a call, signature, short proof, attribute with its declaration, docstring or comment.",
+  "required": "Lines of at most 100 characters; anything fitting in 100 characters stays on one line, and breaks fill lines.",
+  "check_kind": "read",
+  "check": "Measure line lengths. Departure: a line exceeds 100 characters, or a broken expression, signature, docstring or comment could take its next line's leading binder, argument or word, or all of it, within 100 characters.",
+  "not_when": ""
+ },
+ {
+  "id": "P086",
+  "applies_to": "a new predicate, structure, class, definition or lemma",
+  "trigger": "The PR introduces a predicate, class, structure, definition or general lemma whose content is expressed entirely through notions the library already has: a standard mathematical object, a property built from existing predicates, or a basic fact about an existing operation, order or coercion.",
+  "required": "No new declaration; the existing library declaration that already states or expresses it is used instead.",
+  "check_kind": "lookup",
+  "check": "Search the library (documentation, `exact?`, names the naming convention predicts, more general forms) for a declaration stating or expressing the same thing, possibly under another name or namespace. Departure: one exists.",
+  "not_when": ""
+ },
+ {
+  "id": "P089",
+  "applies_to": "arguments passed in a term or statement",
+  "trigger": "The changed code passes arguments explicitly: an `@`-prefixed application with written-out arguments, a named argument `(x := e)`, or `_` or `..` placeholders in argument positions.",
+  "required": "Arguments elaboration can infer are omitted: no `@`, placeholders or redundant named arguments for them.",
+  "check_kind": "compile",
+  "check": "Remove the `@` together with the inferable arguments and placeholders, or the named argument, and rebuild. Departure: the code still elaborates, with the same statement or proof.",
+  "not_when": ""
+ },
+ {
+  "id": "P094",
+  "applies_to": "a monotonicity step in an inequality proof",
+  "trigger": "A proof step proves an inequality (`≤` or `<`) from inequalities between its parts by `apply`, `refine` or `exact` of a named monotonicity or order-compatibility lemma.",
+  "required": "Use `gcongr` for that step, discharging any side goals afterwards.",
+  "check_kind": "compile",
+  "check": "Replace the application of the named monotonicity lemma by `gcongr`, then discharge the remaining side goals; if it compiles, the original departs.",
+  "not_when": ""
+ },
+ {
+  "id": "P097",
+  "applies_to": "the layout of a tactic proof",
+  "trigger": "A changed tactic proof has a line holding more than one tactic, or more than one alternative of a `cases`, `induction`, `rcases` or `match`.",
+  "required": "Write one tactic per line, and each alternative on its own line.",
+  "check_kind": "read",
+  "check": "Look at such lines; a departure is tactics joined by `;` (not the `<;>` combinator, not inside brackets) or several `| … =>` alternatives on one line.",
+  "not_when": ""
+ },
+ {
+  "id": "P100",
+  "applies_to": "a change to one member of a family of parallel declarations",
+  "trigger": "The PR adds a variant of, or changes (rename, new field name, new instance, new form), one member of a family of parallel siblings: left/right or primed versions, analogous structures, simprocs, tactics, attributes, or parallel meta-code paths.",
+  "required": "The same variant or change for every sibling in the family, in the same PR.",
+  "check_kind": "lookup",
+  "check": "Identify the member's siblings (the mirrored left/right name, the analogous structure, tactic, simproc or code path) in the file and library. Departure: a sibling exists for which the PR provides no corresponding variant or change.",
+  "not_when": ""
+ },
+ {
+  "id": "P105",
+  "applies_to": "the letter naming a variable or type parameter",
+  "trigger": "A new binder or `variable` command introduces a letter for a type or object of a kind the file or area customarily names with particular letters (spaces, rings, algebras, ideals, submodules), or a letter resembling a digit or symbol.",
+  "required": "Use the area's customary letter for that kind of object; avoid loaded or confusable letters.",
+  "check_kind": "lookup",
+  "check": "Look up which letters the file and its area use for that kind of object; a departure is a different letter, one conventionally denoting something else there (a small real, an ideal), or one confusable with a digit.",
+  "not_when": ""
+ },
+ {
+  "id": "P113",
+  "applies_to": "the name of a new lemma or definition variant",
+  "trigger": "The PR adds or renames a declaration whose name is a sibling's name with a prime (`'`, `''`) appended, distinguishing it from that sibling or from a declaration it replaces.",
+  "required": "A name that names the term in which the statement differs from its sibling, instead of a prime.",
+  "check_kind": "read",
+  "check": "Read the new names and their siblings' statements. Departure: a name differs from its sibling only by a prime, while the statements differ in a nameable term (a structure, a hypothesis, or the form of the conclusion).",
+  "not_when": "The primed declaration's docstring explains how it differs from its unprimed sibling."
+ },
+ {
+  "id": "P126",
+  "applies_to": "the spelling of a construct or notation within one file",
+  "trigger": "The changed lines spell a construct that has interchangeable spellings (`have`/`haveI`, `=>`/`↦`, an attribute inline or on its own line, a binder named or `_`, a hyphenated or bracketed word in prose) and the construct also occurs elsewhere in the file.",
+  "required": "Spell it the way the rest of the file does, in code and in docstrings.",
+  "check_kind": "lookup",
+  "check": "Search the file for the other occurrences of the same construct; a departure is a changed line whose spelling differs from the one used by the file's other occurrences or by the neighbouring declarations.",
+  "not_when": ""
+ },
+ {
+  "id": "P138",
+  "applies_to": "a cosmetic or polishing change in a PR",
+  "trigger": "The PR, or a hunk of it, changes only the presentation of existing material (spacing, line breaks, wording of docstrings or comments, formatting of references) without changing meaning.",
+  "required": "Leave such changes out; revert those hunks.",
+  "check_kind": "read",
+  "check": "Read each such hunk; a departure is one whose only effect is spacing, wording or reference formatting and which corrects no factual or egregious error.",
+  "not_when": "The change corrects an egregious error."
+ },
+ {
+  "id": "P153",
+  "applies_to": "a new iff lemma",
+  "trigger": "The PR adds a lemma whose conclusion is an `↔` between statements about a named predicate or structure, so that each direction could be applied with dot notation, or whose directions the file uses separately.",
+  "required": "Add an `alias ⟨_, _⟩ :=` of the iff, or standalone lemmas, naming each direction.",
+  "check_kind": "lookup",
+  "check": "Search the PR and file for a named declaration proving each direction (an `alias ⟨_, _⟩` of the iff, or a standalone lemma); a departure is a useful direction with none.",
+  "not_when": ""
+ },
+ {
+  "id": "P154",
+  "applies_to": "a new lemma",
+  "trigger": "The PR adds a lemma whose proof only applies, specialises or chains one to three existing lemmas (a term one-liner or a short `rw`/`simp`/`ext` script), or whose statement restates a sibling or existing lemma's conclusion in an equivalent form.",
+  "required": "The lemma is not added; use sites combine the existing lemmas directly, and of equivalent siblings only one is kept.",
+  "check_kind": "judge",
+  "check": "Does the statement give users a real simplification over combining the existing lemmas it is proved from, or is it an instantiation or reshaping that a use site gets in one line? Departure: the latter.",
+  "not_when": "The statement is a real simplification over the combination of existing lemmas it replaces."
+ },
+ {
+  "id": "P156",
+  "applies_to": "the PR title and description",
+  "trigger": "The PR's title or description names declarations, arguments, results or a kind of change (move, split, rename), or the diff moves, splits or renames code.",
+  "required": "Title and description state exactly what the diff does, kept accurate as the PR changes.",
+  "check_kind": "read",
+  "check": "Compare title and description with the diff; a departure is a named item absent from the diff, a claimed result the diff does not contain, a move, split or rename left undescribed, or a main subject of the diff unmentioned.",
+  "not_when": ""
+ },
+ {
+  "id": "P168",
+  "applies_to": "a tactic proof",
+  "trigger": "A new or golfed tactic proof packs several reasoning steps into single lines: a non-terminal `<;>`, an anonymous-constructor `refine` with nested `by` blocks, merged `obtain`s without type ascriptions, or one long automation call (with many hints) carrying an intricate argument.",
+  "required": "Intermediate steps that read on their own: `have`s with stated types, `calc` blocks, separate bullets, type ascriptions kept.",
+  "check_kind": "judge",
+  "check": "Can a reader without the infoview follow each step, seeing the intermediate claims (stated `have` types, `calc` lines, ascriptions), or is the substance hidden in merged steps, a non-terminal `<;>` or opaque automation? Departure: the latter.",
+  "not_when": "A shortening that removes redundant steps rather than merging them, leaving each remaining step readable."
+ },
+ {
+  "id": "P182",
+  "applies_to": "a universally quantified statement, hypothesis or structure field",
+  "trigger": "A statement, hypothesis or structure field quantifies a variable (`∀ x, P x → …` or `∀ x ∈ s, …`) and the hypothesis immediately following the binder mentions that variable, so determines it.",
+  "required": "Bind it strict-implicitly: `∀ ⦃x⦄, x ∈ s → …`.",
+  "check_kind": "read",
+  "check": "Read the binder; a departure is an explicit `∀ x,` or the binder notation `∀ x ∈ s,` rather than `∀ ⦃x⦄,`.",
+  "not_when": ""
+ },
+ {
+  "id": "P185",
+  "applies_to": "a third party's edit to existing code or prose",
+  "trigger": "The PR alters existing code, docstrings or comments only stylistically (rewording, punctuation, dash style, heading levels, notation formatting), leaving the meaning unchanged.",
+  "required": "Leave it as the original author wrote it; revert the stylistic change.",
+  "check_kind": "judge",
+  "check": "Is each such change required by the style guide, or does it fix a spelling, grammar or factual error? If neither, it departs.",
+  "not_when": "The style guide mandates it, the original had a real error, or the original author agrees."
+ },
+ {
+  "id": "P190",
+  "applies_to": "a proof's dependencies and the file the lemma sits in",
+  "trigger": "A new proof uses a construction or lemma not available in the earliest file where the statement's notions are defined, or the PR adds imports that the proof needs but the statement does not.",
+  "required": "Prove it from what is available where the statement makes sense, and place it in that earliest file.",
+  "check_kind": "judge",
+  "check": "Could the statement be proved by elementary means available where its notions are defined, avoiding the heavier lemma, construction or import, so that it could sit in an earlier file?",
+  "not_when": ""
+ },
+ {
+  "id": "P201",
+  "applies_to": "a hand-written dual, additive, projection or characterisation lemma",
+  "trigger": "The PR hand-writes a declaration of a kind a generator produces: the order-dual or additive version of a neighbouring lemma, a projection or component lemma of a definition built with structure syntax, or an iff unfolding a structure or class into its fields.",
+  "required": "Generate it with `to_dual`, `to_additive`, `simps` or `mk_iff`, placing the source after the lemmas the generator needs.",
+  "check_kind": "compile",
+  "check": "Delete the hand-written lemma and put the generator attribute (`to_dual`, `to_additive`, `simps`, `mk_iff`) on its source, moving the source after the lemmas it needs if necessary; if the generated statement serves and everything compiles, it departs.",
+  "not_when": ""
+ },
+ {
+  "id": "P211",
+  "applies_to": "a name ending in a prime",
+  "trigger": "The changed code declares, renames or refers to a declaration, structure field or `to_additive` target name ending in a prime (`'`).",
+  "required": "An unprimed name, unless an unprimed sibling exists that is the primary form.",
+  "check_kind": "lookup",
+  "check": "Search the library and the PR for the same name without the prime. Departure: no declaration or field with the unprimed name exists, so the prime distinguishes nothing.",
+  "not_when": ""
+ },
+ {
+  "id": "P232",
+  "applies_to": "the PR title",
+  "trigger": "The pull request has a title (always true: the convention concerns the title of every PR).",
+  "required": "A title `type(Area): description`, type a keyword such as feat, fix, chore, refactor, doc or perf, Area the edited path.",
+  "check_kind": "read",
+  "check": "Read the title. Departure: it lacks a lowercase type keyword, a parenthesised area naming the edited directory or file (without `Mathlib/` and `.lean`), or a colon followed by a description.",
+  "not_when": ""
+ },
+ {
+  "id": "P240",
+  "applies_to": "placement of a declaration's term-mode proof",
+  "trigger": "A new or changed declaration has a term-mode proof (not a `by` block) written after `:=` on the same line as the last line of its statement.",
+  "required": "The proof on its own indented line, unless the whole declaration, statement and proof together, fits on one line.",
+  "check_kind": "read",
+  "check": "Look at the declaration's lines. Departure: the statement occupies more than one line, or the single line exceeds 100 characters, yet the proof term follows `:=` on the statement's line.",
+  "not_when": ""
+ },
+ {
+  "id": "P254",
+  "applies_to": "a new declaration's name and namespace",
+  "trigger": "A new declaration is a variant, special case or counterpart of an existing one (the same statement on another type, the symmetric or reversed case, an analogous construction), or its name uses a standard part such as a hypothesis abbreviation or a positional affix.",
+  "required": "Name and place it as its siblings and analogues are: same abbreviations, part order, affix position and namespace.",
+  "check_kind": "lookup",
+  "check": "Find the siblings or analogues (neighbouring declarations, the general lemma in the library, the counterpart construction) and compare names; a departure is a part spelled more fully or differently, parts in another order, or another namespace for the same kind of construction.",
+  "not_when": ""
+ },
+ {
+  "id": "P263",
+  "applies_to": "a new declaration about a multiplicative or additive algebraic structure",
+  "trigger": "The PR adds a definition, lemma or instance whose statement involves a multiplicative structure or operation (`*`, `⁻¹`, `1`, monoid- or group-style classes and bundled maps), or an additive one (`+`, `-`, `0`, additive classes).",
+  "required": "Its counterpart exists: `@[to_additive]` on the multiplicative declaration where that works, otherwise a hand-written counterpart beside it.",
+  "check_kind": "lookup",
+  "check": "Read whether the declaration carries `@[to_additive]`. If not, search the PR and the library for the counterpart (name and statement with mul/add, one/zero, inv/neg swapped). Departure: neither the attribute nor a counterpart exists.",
+  "not_when": "The declaration is additive and its statement has no multiplicative analogue."
+ },
+ {
+  "id": "P267",
+  "applies_to": "the layout of parallel one-line declarations",
+  "trigger": "The changed code contains two or more one-line declarations of parallel form near each other: counterpart lemmas, aliases of corresponding directions, or dual statements.",
+  "required": "Put them on consecutive lines with no blank line between, so the parallel lines up.",
+  "check_kind": "read",
+  "check": "Read the layout; a departure is a blank line or an interposed declaration between parallel one-line declarations of the same shape.",
+  "not_when": ""
+ },
+ {
+  "id": "P278",
+  "applies_to": "a docstring's prose",
+  "trigger": "A new or changed docstring uses an identifier abbreviation (`hom`, `add`, `mul`) or an undefined shorthand as an English word, or names a mathematical object by a pasted Lean expression (an application or dot-notation term) instead of words.",
+  "required": "Write full mathematical words (homomorphism, additive monoid) and describe objects in prose.",
+  "check_kind": "read",
+  "check": "Read the docstring's prose; a departure is an identifier abbreviation or shorthand used as a word, or a Lean term in backticks standing where a phrase describing the object would do.",
+  "not_when": ""
+ },
+ {
+  "id": "P315",
+  "applies_to": "attributes of a new characterisation lemma",
+  "trigger": "The PR adds a lemma whose conclusion is an `↔` or an `=` characterising a predicate or operation in terms of other notions (a `..._iff` lemma, or an equation unfolding or computing a definition).",
+  "required": "The lemma tagged `@[grind =]`, alongside any other attributes it carries.",
+  "check_kind": "compile",
+  "check": "Check whether it carries a `grind` attribute; if not, add `@[grind =]` and build. Departure: no `grind` attribute is present and `@[grind =]` is accepted (grind finds a usable pattern on the left-hand side).",
+  "not_when": ""
+ },
+ {
+  "id": "P329",
+  "applies_to": "changes to existing declarations in a PR",
+  "trigger": "The diff changes the proof, body or name of a declaration that existed before the PR (removed lines replaced by new ones), rather than only adding code.",
+  "required": "Existing code changed only where the PR's purpose requires; other proofs and names left as they were.",
+  "check_kind": "compile",
+  "check": "Restore the pre-PR proof or name (with its uses) and rebuild against the rest of the PR. Departure: it still compiles and the PR's description does not make that change part of its purpose.",
+  "not_when": "The change is what the PR is for, or the old code stops compiling after the PR's other changes."
+ },
+ {
+  "id": "P332",
+  "applies_to": "section and `variable` organisation of typeclass assumptions",
+  "trigger": "The PR adds an `omit` command, or adds or strengthens typeclass assumptions on a `variable` line shared by several declarations of a section.",
+  "required": "Separate sections, each declaring exactly the assumptions its declarations need; no `omit`.",
+  "check_kind": "read",
+  "check": "Look for `omit` in the changed sections, and for a section assumption that some declarations in its scope do not use. Departure: either is present.",
+  "not_when": ""
+ },
+ {
+  "id": "P338",
+  "applies_to": "the generality of a new or changed declaration",
+  "trigger": "A new or changed declaration is stated beyond the standard case: semilinear maps or an extra ring hom `σ`, additional type or ring parameters, coefficients beyond the usual fields, or a weakened structure in a core definition.",
+  "required": "The statement in the generality existing uses need; it is generalised when a use arrives.",
+  "check_kind": "lookup",
+  "check": "Search the PR and the library for uses that need the extra generality (a non-identity `σ`, the other parameters or coefficients, the weaker structure). Departure: none exist, and the generality adds arguments, hypotheses or friction (lost notation, harder statements).",
+  "not_when": "The general form is no more complicated to state or use than the special one."
+ },
+ {
+  "id": "P341",
+  "applies_to": "a declaration introduced with the `theorem` keyword",
+  "trigger": "The PR adds a declaration using the `theorem` keyword.",
+  "required": "Give it a docstring, or use `lemma` if it is an auxiliary result.",
+  "check_kind": "read",
+  "check": "Look immediately above the `theorem` and its attributes for a `/-- … -/` docstring; its absence shows a departure.",
+  "not_when": "The `theorem` is pre-existing code that the PR merely edits."
+ },
+ {
+  "id": "P363",
+  "applies_to": "the spelling of a hypothesis, conclusion or assumption",
+  "trigger": "A new statement phrases a hypothesis, conclusion or typeclass assumption in one of several equivalent spellings the library has: set-level versus elementwise, membership versus (in)equality, one of several equivalent classes, or one construction versus another.",
+  "required": "The spelling most existing library lemmas use; if another is kept, lemmas relating the two spellings.",
+  "check_kind": "lookup",
+  "check": "Search the library for lemmas about the same notions and see which spelling most use. Departure: the new statement uses a less common spelling and the PR adds no lemma converting it to the common one.",
+  "not_when": ""
+ },
+ {
+  "id": "P369",
+  "applies_to": "a `variable` command and its section",
+  "trigger": "The PR adds a `variable` command (including `variable ... in`), opens a section to hold one, or adds binders to an existing one.",
+  "required": "`variable` only for arguments shared by many declarations; arguments of one or a few declarations bound in their signatures.",
+  "check_kind": "read",
+  "check": "For each binder of the `variable` command, count the declarations in its scope that use it. Departure: some binder is used by only one or a few declarations, or by none.",
+  "not_when": ""
+ },
+ {
+  "id": "P392",
+  "applies_to": "a hypothesis binder whose type is a class",
+  "trigger": "A declaration takes a hypothesis whose type is a typeclass applied to arguments, such as `IsEmpty α`, `Nonempty α`, `Fact p` or any other declared `class`.",
+  "required": "Take it as an instance-implicit argument `[C x]`.",
+  "check_kind": "read",
+  "check": "Read the binder; a departure is a named explicit or implicit binder `(h : C x)` or `{h : C x}` instead of `[C x]`.",
+  "not_when": ""
+ },
+ {
+  "id": "P401",
+  "applies_to": "a proof step closing a goal with a lemma",
+  "trigger": "A proof rewrites the goal backwards (`rw [← ...]`, `nth_rw ... [← ...]`, `simp only [← ...]`) to put it into the form of a lemma that it then `apply`s or `exact`s.",
+  "required": "`simpa using` the lemma, with its arguments (implicit ones too) supplied explicitly, letting `simp` normalise into the goal.",
+  "check_kind": "compile",
+  "check": "Replace the backward rewrites and the closing `apply` or `exact` with `simpa using L ...`, giving L's arguments explicitly (named arguments for implicit ones), and rebuild. Departure: it compiles.",
+  "not_when": ""
+ }
+]
