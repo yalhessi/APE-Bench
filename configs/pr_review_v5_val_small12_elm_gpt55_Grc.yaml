@@ -1,0 +1,11 @@
+# gpt-5.5 at high effort with reasoning carried, through ELM, on validation small12: the set's gpt_5.5
+# carried config (probe_val_small12_gpt55_Grc_rep1) with the model reached through ELM, as
+# pr_review_v5_probe_2026_07_08_v1_elm_gpt55_Grc.yaml does for the post-cutoff set (parity there:
+# Eb1 - Hb1 = -0.0625, results/pr_review_v5/probes/elm-parity-2026-10-05/). For the conventions
+# ceiling probe's cross-model step (conventions-ceiling-2026-10-04/cross_model.md), whose runs set
+# their own context file and PRs.
+extends: pr_review_v5_val_small12_gpt55_Grc.yaml
+
+llm_config:
+  model_name: elm_gpt_5.5
+  openai_responses_reasoning_summary: auto
