@@ -171,6 +171,15 @@ MODEL_MAPPINGS = {
     # OpenAI models proxied by ELM. Rates are OpenAI list price, which is the best available
     # estimate of what the institution is billed -- ELM publishes no tariff. They exist to
     # keep the cost caps binding and the preflight estimate honest, not as an invoice.
+    #
+    # `openai_responses` marks a row whose model was called through ELM's `/v1/responses` and
+    # did what a review run needs (2026-10-05, each of gpt-5.2, gpt-5.4, gpt-5.5): a function
+    # tool with `reasoning: {effort: high}`, `store: false`, the encrypted reasoning item
+    # returned and accepted back on the next turn, a `summary`, a replayed `phase`, a stream
+    # ending in `response.completed`, and prompt caching (2,688 of 3,336 input tokens cached on
+    # a repeat). The aliases resolved to the snapshots the direct rows name: gpt-5.2-2025-12-11,
+    # gpt-5.4-2026-03-05, gpt-5.5-2026-04-23. `LLMConfig` refuses `openai_api: responses` for an
+    # ELM row without the mark.
     "elm_gpt_5.2": {
         "model_name": "gpt-5.2",
         "provider": LLMProvider.ELM,
@@ -179,18 +188,34 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.125,
         "cache_creation_per_1M_usd": 1.25,
         "supports_tools": True,
+        "openai_responses": True,
     },
     "elm_gpt_5.4": {
         "model_name": "gpt-5.4",
         "provider": LLMProvider.ELM,
-        # Same PLACEHOLDER rates as `gpt_5.4`; see the note there.
-        "input_per_1M": 1.75,
-        "output_per_1M": 14.00,
-        "cached_input_per_1M_usd": 0.125,
-        "cache_creation_per_1M_usd": 1.25,
+        # `gpt_5.4`'s rates. Until 2026-10-05 this row still held the placeholder that row
+        # dropped on 2026-09-30 (1.75 / 14.00 / 0.125, copied from gpt-5.2).
+        "input_per_1M": 2.50,
+        "output_per_1M": 15.00,
+        "cached_input_per_1M_usd": 0.25,
+        "cache_creation_per_1M_usd": None,
         "supports_tools": True,
         # The gateway forwards OpenAI's 400 for this combination (2026-09-30).
         "chat_completions_tools_with_reasoning": False,
+        "openai_responses": True,
+    },
+    "elm_gpt_5.5": {
+        # `gpt_5.5`'s rates and its reasoning default (it reasons unless told `none`).
+        "model_name": "gpt-5.5",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 5.00,
+        "output_per_1M": 30.00,
+        "cached_input_per_1M_usd": 0.50,
+        "cache_creation_per_1M_usd": None,
+        "supports_tools": True,
+        # Forwarded 400, measured through the gateway on 2026-10-05.
+        "chat_completions_tools_with_reasoning": False,
+        "openai_responses": True,
     },
     "elm_gpt_5_mini": {
         "model_name": "gpt-5-mini",
@@ -392,7 +417,8 @@ class LLMConfig(BaseModel):
     #: against the measured row rather than letting either outcome happen at runtime.
     reasoning_effort: Optional[str] = None
 
-    #: Which OpenAI API a direct OpenAI model is called through. `chat_completions` is what
+    #: Which OpenAI API an OpenAI model is called through, direct or by way of ELM (the rows
+    #: marked `openai_responses`). `chat_completions` is what
     #: every run before this field used. `responses` exists because gpt-5.4 and gpt-5.5
     #: reject tools with a reasoning effort on Chat Completions (HTTP 400, 2026-09-30), and
     #: every review task sends tools; see `OpenAIResponsesProvider`. A field rather than an
@@ -426,11 +452,13 @@ class LLMConfig(BaseModel):
         if not self.api_key:
             self.api_key = self._resolve_api_key_from_environment(self.provider_type)
         # Refused rather than ignored: a knob the run records and nothing honours.
-        if self.openai_api == "responses" and self.provider_type is not LLMProvider.OPENAI:
+        if self.openai_api == "responses" and not (
+                self.provider_type is LLMProvider.OPENAI
+                or MODEL_MAPPINGS.get(self.model_name, {}).get("openai_responses")):
             raise ConfigurationError(
-                f"openai_api: responses is for direct OpenAI models, and {self.model_name} is "
-                f"{self.provider_type.value}. The ELM gateway answers on /v1/responses too, "
-                "but it is untested here.")
+                f"openai_api: responses is for OpenAI's models, direct or through ELM "
+                f"(the rows marked openai_responses), and {self.model_name} is neither: "
+                f"ELM's /v1/responses is unmeasured for it.")
         if self.openai_responses_reasoning_carryover and self.openai_api != "responses":
             raise ConfigurationError(
                 "openai_responses_reasoning_carryover needs openai_api: responses; Chat "

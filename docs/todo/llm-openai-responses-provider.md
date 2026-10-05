@@ -5,7 +5,8 @@ checks passed (section "Built", at the end). **The blocked runs ran 2026-09-30**
 `pipeline-overfit-review`, with reasoning carried (the user's choice, after the carry-over coherence
 test). gpt_5.2 high with carry-over reached 0.93 of Claude, against 0.67 on Chat
 (`reviewer-model-gap.md`). Open: whether carry-over should become the default for OpenAI reasoning
-models in the pipeline, and the ELM gateway's `/v1/responses`.
+models in the pipeline. The ELM gateway's `/v1/responses` was measured and wired in on 2026-10-05
+(last section), the day the project's own OpenAI key stopped working.
 **Cost** — the build spends only its live checks, a few dollars. The blocked runs afterwards are
 about $70 billed at the estimated rates, plus about $10 of calibration.
 **Motivating example** — test (e) of `reviewer-model-gap.md` could not run its high-effort half.
@@ -293,7 +294,7 @@ So the growth there should be smaller. The projection is gpt-5.2's.
 
 Also seen: with no effort sent, gpt-5.5 on Responses runs at `medium` (the response echoes it).
 
-Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
+Still open, and not part of closing this: the 401/403 half of the
 retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
 (`framework-defects-2026-09.md`).
 
@@ -336,8 +337,10 @@ server with no model. Under Claude Code it rides the relay's turn-signature cach
 Pinned on `responses_gpt55_stream_text_and_tool_call.sse` and in both relay test files. It matters for
 a run that makes these models write between tool calls: the Codex harness, or the unrun gpt cells
 under Claude Code. It changes those requests, so a rerun of a Codex condition is a new condition.
+Live, through ELM the same day: gpt-5.4 and gpt-5.5 each opened with a `commentary` message, and the
+next turn, with that message replayed under its phase, answered HTTP 200.
 
-## No gpt transcript holds readable reasoning, because no summary was requested (found 2026-10-05; knob built, its first live call still owed)
+## No gpt transcript holds readable reasoning, because no summary was requested (found 2026-10-05; knob built and checked through ELM)
 
 The provider sends `reasoning: {"effort": ...}` and nothing else, so every reasoning item comes back
 with `summary: []`: 1,998 of 1,998 in the gpt-5.4 and gpt-5.5 APE-Agent review sessions. The models do
@@ -356,18 +359,61 @@ the turn's thinking block, which a session file and `cli trajectory` show and no
 A reply that is reasoning alone stays an empty reply. Refused without `openai_api: responses`. The
 relays need nothing: both build their request from `llm_config`.
 
-**Still owed: one live call.** On 2026-10-05 the key in `env.zsh` was refused (HTTP 401,
-`not_authorized_invalid_project`: "The project you are requesting has been archived"), on
-`/v1/models` as well, so nothing here has met the endpoint. The tests use the response shape OpenAI's
-reasoning guide documents (`summary: [{"type": "summary_text", "text": ...}]`). With a working key,
-before any run uses the knob: one gpt-5.5 call with it set, `store: false` and carry-over on, to
-confirm HTTP 200 and a non-empty summary (the guide says an organisation "may need to complete
-organization verification"); a second turn returning the item, to confirm it is accepted back; and
-the usage of both, since the guide does not say whether a summary is billed. Record the first as a
-fixture. A refusal that names the parameter fails at once (`RequestRejectedError`), not after hours.
+**Checked live through ELM** (2026-10-05; the direct key was refused that day, HTTP 401,
+`not_authorized_invalid_project`). `reasoning.summary: auto` is accepted with `store: false` and
+carry-over on, and echoed back as `detailed`. gpt-5.4 returned three `summary_text` parts (1,495
+characters, on 516 reasoning tokens) and gpt-5.2 one (455, on 293); gpt-5.5 returned none on one call
+(386 reasoning tokens) and one on the next, so an empty summary there is not a failure. The item goes
+back with its summary and the next turn answers HTTP 200. The summary is not in the output tokens:
+gpt-5.4's 561 are its 516 reasoning tokens plus 45 of text and call. The gpt-5.4 response is the
+fixture `responses_elm_gpt54_high_summary_commentary_call.json`.
 
 Then the stage-by-stage relabelling in `docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md` (was
 the specific concern raised?) has something written to read. Whether a summary changes what the model
 does is unmeasured; treat a summarised run as its own condition until one pair says otherwise. Like
 `reasoning_effort` and `openai_api`, the knob changes what a run measures and a resume may change it
 (`framework-defects-2026-09.md`).
+
+## The OpenAI models through ELM's `/v1/responses` (measured and built 2026-10-05)
+
+**Motivating fact.** The project's OpenAI key stopped working on 2026-10-05: HTTP 401,
+`not_authorized_invalid_project`, "The project you are requesting has been archived", on `/v1/models`
+too. Every `gpt_*` config (52 of them name gpt_5.2, gpt_5.4 or gpt_5.5, and the judge base names
+gpt_5_mini) would retry for hours and bill nothing.
+
+**Measured, one tiny call each, `httpx` to `https://elm.edina.ac.uk/api/v1/responses`:**
+
+| | gpt-5.2 | gpt-5.4 | gpt-5.5 |
+|---|---|---|---|
+| snapshot the alias resolved to | gpt-5.2-2025-12-11 | gpt-5.4-2026-03-05 | gpt-5.5-2026-04-23 |
+| function tool with `reasoning: {effort: high}`, `store: false` | 200 | 200 | 200 |
+| encrypted reasoning item returned, and accepted back on turn 2 | yes | yes | yes |
+| `summary: auto` | 1 part | 3 parts | 0, then 1 |
+| message `phase`, and a replay carrying it | none set | `commentary`, 200 | `commentary`, 200 |
+
+These are the snapshots the direct rows name. A stream ends in `response.completed`. The prompt cache
+works through the gateway: a 3,336-token request repeated twice reported 2,688 cached tokens each time
+(gpt-5.2). On Chat Completions the gateway behaves as OpenAI does: gpt-5.2 takes tools with high effort,
+gpt-5.5 answers the same 400 naming `/v1/responses`. `gpt-5-mini` on Chat Completions resolves to
+gpt-5-mini-2025-08-07, the judge's snapshot.
+
+**Built on `gpt-harness-parity`.** `elm_gpt_5.5` is a row; `elm_gpt_5.4` takes `gpt_5.4`'s rates in
+place of a placeholder it had kept. The three rows carry `openai_responses: True`, `LLMConfig` accepts
+`openai_api: responses` for a row with that mark and refuses any other ELM row, and
+`ElmResponsesProvider` is `OpenAIResponsesProvider` at the gateway's address with `ELM_API_KEY`. A
+tool conversation through `LLMClient.call_api` ran to its final answer on each model, and streamed on
+gpt-5.5. A run moves with
+`--set llm_config.model_name=elm_gpt_5.5`; the name is in the plan, so the plan says which endpoint.
+
+**Not known, and to settle on the first real run:**
+- ELM's rate limits and quota. A dev run is 20-24M processed tokens; nothing here sent more than a few
+  thousand. Watch the first minutes for 429s, which the client retries quietly.
+- What the institution is billed. The rates are OpenAI's list prices, so the dollar caps bind as before.
+- Whether a run through ELM reproduces a direct one. Same snapshots and the same API, but no pair has
+  been run; treat the first ELM repetition of a direct condition as a replication, not as a given.
+- The judge. `configs/bases/v5_judge.yaml` pins `gpt_5_mini`, direct. `elm_gpt_5_mini` is the same
+  snapshot, but the name is in the judge's cache key, so moving it forfeits every cached verdict. That
+  is a decision, and it is not taken here.
+- Codex is told `llm_config.model_name` with `_` as `-`, so `elm_gpt_5.5` reaches it as `elm-gpt-5.5`,
+  which has no catalog entry. A Codex config on ELM sets `codex_model: gpt-5.5`.
+

@@ -25,7 +25,8 @@ from ape.llm_clients.client import LLMClient
 from ape.llm_clients.config import (
     ConfigurationError, LLMConfig, MalformedResponseError, ProviderError)
 from ape.llm_clients.models import ContentBlock, ConversationSession
-from ape.llm_clients.providers import OpenAIProvider, OpenAIResponsesProvider
+from ape.llm_clients.providers import (
+    ElmResponsesProvider, OpenAIProvider, OpenAIResponsesProvider)
 from ape.llm_clients.providers.openai_provider import (
     responses_input, responses_to_chat_completion)
 
@@ -110,9 +111,26 @@ def test_responses_is_opt_in_and_chat_completions_is_untouched():
     assert headers["Authorization"] == "Bearer sk-test"
 
 
-def test_responses_is_refused_for_a_gateway_model():
-    with pytest.raises(ConfigurationError, match="direct OpenAI models"):
-        LLMConfig(model_name="elm_gpt_5.4", openai_api="responses")
+def test_responses_reaches_the_openai_models_through_elm_and_nothing_else_there():
+    """The project's OpenAI key stopped working on 2026-10-05, and ELM proxies the same
+    snapshots. Its `/v1/responses` was measured that day for these three rows: a tool with high
+    effort, the reasoning item carried, a summary, a replayed phase, a stream, the prompt cache."""
+
+    with mock.patch.dict(os.environ, {"ELM_API_KEY": "elm-test"}):
+        for model, alias in (("elm_gpt_5.2", "gpt-5.2"), ("elm_gpt_5.4", "gpt-5.4"),
+                             ("elm_gpt_5.5", "gpt-5.5")):
+            cfg = config(model, reasoning_effort="high", openai_responses_reasoning_carryover=True)
+            client = LLMClient(cfg, enable_raw_logging=False)
+            assert type(client.provider) is ElmResponsesProvider
+            assert type(client.message_formatter) is MessageFormatter
+            url, headers = client.provider.get_request_info("s")
+            assert url == "https://elm.edina.ac.uk/api/v1/responses"
+            assert headers["Authorization"] == "Bearer elm-test", "never the OpenAI key"
+            assert payload_for(cfg, session_with(user("x")))["model"] == alias
+
+    for unmeasured in ("elm_gpt_5_mini", "elm_qwen_3.5"):
+        with pytest.raises(ConfigurationError, match="unmeasured"):
+            LLMConfig(model_name=unmeasured, openai_api="responses")
 
 
 def test_carryover_is_refused_without_responses():
@@ -404,8 +422,8 @@ def test_carryover_off_keeps_the_phase_and_no_reasoning():
 
 def summarised(name, text="Paris first, then Rome; one call each."):
     """A recorded response with its reasoning item summarised, in the shape OpenAI's reasoning
-    guide documents (`summary: [{"type": "summary_text", "text": ...}]`). Not recorded live: the
-    key was refused on 2026-10-05, so the knob's first real call is still owed."""
+    guide documents (`summary: [{"type": "summary_text", "text": ...}]`), for the two shapes
+    with no recorded summary. The recorded one is `responses_elm_gpt54_high_summary_...`."""
 
     response = fixture(name)
     for item in response["output"]:
@@ -474,3 +492,39 @@ def test_a_reply_that_is_only_summarised_reasoning_is_still_an_empty_reply():
     with pytest.raises(MalformedResponseError):
         call_api(config(reasoning_effort="high", openai_responses_reasoning_summary="auto"),
                  json_answer(cut_off))
+
+
+
+def test_a_turn_recorded_through_elm_goes_back_as_the_gateway_accepted_it():
+    """gpt-5.4 through ELM at high effort with a summary asked for (2026-10-05): a reasoning item
+    with three summary parts, a `commentary` preamble and one call. The second-turn input built
+    here -- the item with its summary, the text under its phase, the call -- is the shape the
+    gateway answered with HTTP 200. gpt-5.2 summarised too; gpt-5.5 reasoned for 386 tokens and
+    returned an empty summary, once."""
+
+    recorded = fixture("responses_elm_gpt54_high_summary_commentary_call.json")
+    with mock.patch.dict(os.environ, {"ELM_API_KEY": "elm-test"}):
+        cfg = config("elm_gpt_5.4", reasoning_effort="high",
+                     openai_responses_reasoning_carryover=True,
+                     openai_responses_reasoning_summary="auto")
+        (nodes, usage, _), requests = call_api(cfg, json_answer(recorded))
+        blocks = nodes[0].message.content
+        session = session_with(user("Which two cities?"))
+        session.nodes.extend(nodes)
+        session.add_tool_result(blocks[2].id, "18C and sunny", cwd="/")
+        items = payload_for(cfg, session)["input"]
+
+    assert requests[0]["reasoning"] == {"effort": "high", "summary": "auto"}
+    assert [b.type for b in blocks] == ["thinking", "text", "tool_use"]
+    assert blocks[0].reasoning_content.startswith("**Clarifying city capitals**")
+    assert len(blocks[0].reasoning_content) > 1400
+    assert usage.reasoning_tokens == 516
+
+    reasoning = recorded["output"][0]
+    assert [(i.get("type", i.get("role")), i.get("phase")) for i in items] == [
+        ("user", None), ("reasoning", None), ("assistant", "commentary"),
+        ("function_call", None), ("function_call_output", None)]
+    assert items[1] == {"type": "reasoning", "id": reasoning["id"],
+                        "encrypted_content": reasoning["encrypted_content"],
+                        "summary": reasoning["summary"]}
+

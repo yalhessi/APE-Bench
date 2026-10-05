@@ -32,7 +32,7 @@ import json
 from typing import Any, Dict, List, Optional
 
 from ..config import MODEL_MAPPINGS, RequestRejectedError
-from .openai_provider import OpenAIProvider
+from .openai_provider import OpenAIProvider, OpenAIResponsesProvider
 
 
 #: Sentinel: distinguishes "leave this argument alone" from a repair that yields None.
@@ -245,3 +245,16 @@ class ElmProvider(OpenAIProvider):
             if not (actual == "integer" and "number" in allowed):
                 return _UNREPAIRED
         return parsed
+
+
+class ElmResponsesProvider(OpenAIResponsesProvider):
+    """OpenAI's `/v1/responses` for the OpenAI models ELM proxies, at the gateway's address.
+
+    Nothing but the address differs: the gateway forwards the request and returns OpenAI's
+    response. Reached only for a `MODEL_MAPPINGS` row marked `openai_responses`, where what was
+    measured is written down. It exists because gpt-5.4 and gpt-5.5 refuse tools with a
+    reasoning effort on Chat Completions through the gateway as they do directly, and because
+    the project's OpenAI key stopped working on 2026-10-05 (HTTP 401, project archived).
+    """
+
+    DEFAULT_BASE_URL = "https://elm.edina.ac.uk/api/v1/responses"

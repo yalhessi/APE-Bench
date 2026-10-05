@@ -1,0 +1,142 @@
+{
+ "id": "resp_0d9ff5e876f17581016ac37cba2c6487d2a6df660388f66aec",
+ "object": "response",
+ "created_at": 1791196346,
+ "status": "completed",
+ "access_programs": null,
+ "background": false,
+ "billing": {
+  "payer": "developer"
+ },
+ "completed_at": 1791196353,
+ "error": null,
+ "frequency_penalty": 0.0,
+ "incomplete_details": null,
+ "instructions": null,
+ "max_output_tokens": 3000,
+ "max_tool_calls": null,
+ "model": "gpt-5.4-2026-03-05",
+ "moderation": null,
+ "output": [
+  {
+   "id": "rs_0d9ff5e876f17581016ac37cbab5f087d28745cdb4377f7d41",
+   "type": "reasoning",
+   "content": [],
+   "encrypted_content": "gAAAAABqw3zB9S9qI4nV6IdhT0-OkHOhH6pgBpQ1W8sQZRhh3B0vzEBbrPJSpoeAIsFfz4F2YhIgrXbfrrwfkKg_5LpI3frU6m75fNv_BUsKQbKyY7C626Ngr1Yh8BAHwzTVAHx3a_yg2BiPv_RVf1U19dNBJSGJFsjkS_P9MNkh_2JoBNEBYAg58gKam4SQIKkz1ZGLl7ThIIfj_0GETHk2R5bbgISWEUH0yxaG3O_FX-dfhSHpvDUnZx4afYMf0ORVWwTwJc9ZPH23O0Z1-Xwgxug4dleLJZGJcD1x7WOjzN5kZ-WYw-kFQASvYtkDIgGqbTe3032l6iaZZbPhRUKFJJiEB3wlevvGSsXeofpSspleBvaWA4wTPgXOa1HNguSITfDj92x0PrN80lxkgWDTrQN8rvRltzPWs2DBXTpBZFH2qbBW-92A-Fwxl8OG7Oj_01Dhx6xFapP1Mqhe1QEAjgCPdKPsOU4KA0bcSlFxU2EP1gXWUMHnyeOXOXNs-P6708nf8l3xahCP9IS8jkv2CzztV_Pmkt179i963ZwdqMSFUXxp6MRbKzU2TtquIXDeutDsepqzSQDoW-1iCJ4PcN5j6juWqMziDcnxqDqMBlpH5WQ4wSAxWFoYSheR3mjnrBUOFCg1VB8SsWh8Zv5D0XxuYZ4CLr8ld4MmJFgRh_YNZVfSiO3IiaLydPfEwNijC1WpQc-Z3OJNFfzHxRNVOL7lAM6M-9S_sISvWCgoza5WAi4WQAHScaTaaPmLlE6bNwDO9hReK_rADjnbwx0_xJ61eOrdBJdh9FY6f7C3MH7YJwqYOXHOyvU-v9-ifwCCtPxY3G3Gj3sFPj0YzH1sxzGZyp-XRcJ02EcF61nz0EqGUQuMVcx_f_DWRRQ02-8iISnNM4yroNTYNDpNPhbYhHxsGw2oeq3xcpjISZmlBktVqZ0WsZA3umsU4BoUR_wCoplt7AAaqnY2DICHnfQpsnuO73vEBjkzCbec8OidqHCKC7QiHjTIwE_zAH7fJJq_dQ6Qo73_yvveSr3rYf6RhTSSbeN8FRTC5K8_kR2r8E90EROi_LKBvcmROyjD651VBeoyJD0U_6mkONKVaPOAbsAyUZPQgZCzi-y4MSX-tdJbY4ZWgUDSRA0ezgmi3qUhD6Tt3NmtaFKR4PG-7NTXDkWf30bG_vwOHtSQMmCgZOtGWr7_20QmQR_t5sBI_3m2zh17Q9Nsmlr9ZFexVyu6fU9OqQhv2N0sV3NpPhtV5bpXeVllwE18QdcuKFGHoYtRYy016ZDx6sxJjv9CZpXHTEqzKt5EiCbPjbQDTzSfmbInVaahaMdoOCUpwPyT5v-jPOKzCDTNzLYkOB8ifdrTpGPPZiAeus8mYHWtoJaqD--f0NXC3OtGJiqC2HeZD6Vyg47scQDPZxBVD-zbJRBq8plzZOUDkmrq7Y_Hw5W1jiLrwbeLlQyDANimZzfx_EHM2Xt-kCC3Ds1KOVm1wWb1pc37bsD_KujhdJjbH-Fq4VhVNby8a9at3gK5Rz4Uf_2TMKv6ahWu688WrZwMRH0qPvztlne5Kq6i0GOs9XHi3Vs1cnaWhEleL-N-OefTRgt4hb3caMjtM72eUmjrd2yr-3fAEE2XVsLU8rGXZYmHXlGQSfSQvIeyz53KG2vOYtM9uQA-8IZJkVv0ViOHkz4IZfUz-TUhdJu_6LdS0-w1H92Q9_L9OMH7FOlaIV6GEgySpSldozciwRhJZHbofIQyssJlAPjphAk7lt-sl2SRkXcqmwRBxxeJ5oGunD_iabRQWc3wmbbl1oAeGzGlNga5fFhgb5A_wgcj4ZWXI6NFUQSs1IV-Hp3RsH6jPLRv_wtAiagt3vpPcuzOrM9G2ur2JM35i_ORP2ImpC6OoeLHjv6EQiD8kmsSiCrROnlrT60IsMUquP0wahsnICfApJlHN4TDDVOGPXDJlq4bkg-MIgXh1cbwtX9lw_vSlhjveyR7AvUHphz3jTh5qVhm7MorLYzJ5Q1huQbkUokNBpKTSBfc_fmGQvsLcUnzSYiTf8C89PvtLCFXKqCVp61FEK11RYyA7OE30Qv4KDAHWmvYH6VBweBuOsGjnc8GxkNg0ABfGHDZxu19FP1T3s-8p0WTy41sHLtdlJFs0qgAexfa-L1T2Lu016nDkShthpz2ofPCnbVuvmNt3Rj-mNwD0GGbu5LN9m6Dnjw7MdxdxMYSbzhV14RM631WgJZEo-3FdiT8PF7pTEY6qh2ySCB13NR8_NO4QDUdwVOgYU5WvJmvKqdWD1h9QoVUhBE177wB4OUq8Y4YvrJ97VjtYKY54crS6qPvftMZQ7Mk6Vaaa-M44jXu2liLyvBylv560py5-pckvdE2l1gDmS3f2fCc32sZbwjrUCW0YGmGH-2bJXL_FMTjDL5jX_bVgh9Gqyg5jcTB4lRbq_jwM3CdbXWCOXnte840qDJt7d4AE3RWnL4GXIgZZ1uN7A3GVYahJc7rfcM1pxt5cPSVNl8BIwPhsM7t5J3Ye9UUyY3FJL3AM90iREtk3BBXRYw3L5Ad1ZWkNei25LTQrJzNlybXBZcpj3Df7KYrdRF2yw9cOlrXzmXc94oPjPP2-jb3dQPLPHLlZn6ZFlIhjcKNsnGM3W3O2eFiV8VA9Jg-p2zqO7vuykdPg6-NJe56BehVt56MLFNAbDdsBfcFs0v-H92Ipa2rcACcE6D4HZ5pJ8eZ_oHTFV79qbehSApFTxkle69xDXDh3U-MtOM7hYPRXqCKZNWyRIQeZGYflOy-ueGWFl3FXas80cVLACjLOKdxrC9D0VaVVnJkWo334bGIr8gRR3jcAa_LY8ZyPVOj5zz3Xq8qgpnHTVHtt7u4QuJMl6kRS7aHmpF6pD16Q3oKRNw9FPiUMt6UGqOWt-J6grhawi3ZEPljWw7Xwwhmt2p5fgBZ0Y3niX7idGH4YC2yzqUda8EPnSEoNQKuNQ085wPIPW_oA8FRkqvIYvISbfqMbOis9zQHHsyMRNPmQN8kNuGSAKYpiKJfPl5DA142lvS7mdeSuFcu6lpESU4fvegoPPUbCGlFJNsn1x8K8UYs_Y88ZvjJTWegbf0klNkwLBHnBD-sWcUBp5OsbgsJF2O79CwwRYeHMbmtHTQ5UT0NAZCu4NBusIRmI052D2I3WmmEPs3YiGinMa1zbAM4YXzIDwq7-ufIIBQmVnqatZjo9lF0CnkbxmoBEsc8eszHObN1rtKK4fVjlG7VEu0Ytw6Hg5-UBquejZNcoMh9kV_AZn7oXh-5W6OdkH28vMvVIQBhXlxqBmTIGB2uE64j4vr8T7hEj7ssEEXnrCRCXMFNa7pFth40FUQtVD_3i9aTPo12eGdQJ0eWhyzua_qXP3fDREmFPbd--odf6Mpkfsv_ddQrtRqPgw_CX9z6Lt4-YM57R327mRwVkuqzq6OE_7sp6AFFDOe_25Xwoy8gYUAztRdxGqTRufhOY_XyNEGrKnBzWleSDE3ZuAnUbQsG-AYVvtESOA7pi3L-yo2wZ9Xk_0NSaszYvv4aQq1mPLMtM4wMTX7XgF48bTn4GWhasr9RhELTAix7krbSFn91pC8QkpYzuhHtyDsvy7VXY79uI2VDUE79NBQTMH0dss5g-AdtZpXVVUb8iuT3tillGd2pHUPlq9j24J6lT0tmJLQZjQ6MZaIyqYBp9xq1ONUHcLEjMLDrar0dpsgTGO5XnbJcmgVkxkhLMxWqj4ngQ_w9A50sag0XAdC6-07VW0E1qN31rdqkakNGJYM_PzZV61NUW2oRAj8CT9TbSRe4C-zli9fyEpx73T5ROKIbgFQ-yvK3QucucO3O8FVQu66NNMvgfb9UMwMpSVFBnszsP6pm7vygDYXYIeRfEbsMsBmFC_9lCWohbfHqibkbsVtAE6V2ZoGetOl4P5c5UhCb1sH6cy0uYrtH2hJammtSXHdRtmabZTKBlUGb8_GKdlnKlDdu7Cp6KBcVpKreYFoDEY5DZQXZGUpU1oe3BLq2JPPAsCgRbt_HFNysdHDdfXnvxmRCrJnNNlwHfLhr8DzEn4TpKNTlDjwOc9gDPkwN0gGrkpP5E5_Xl1S5Ab8XihyBRKyO7NXjHtmHmTQR2ufRDFRgRWo-DmjnQOFcrIJ16SY8zsNIZEZk73EKSgBm8pn__sbz_Rhn2mCauRnXwlqlwn1fBgr8kCBWOtnMgRaKELNLSAY7C3pmSj2ecle9JxG_9Rde0RVX0u78xmm5WVJyD5rRc_N4v5oiAS3QSsRe4jxP_oygQprmlp4W8vblgLiQmAHSmJIe0i8sAwD94LUfzTUcZEww2I_Ybmt7qZBHUOfUlP9e9M3YMS6CNDOEdkNricDdN_XnQC1GgXnRWEqMZ25L0tGstaUFHJiP_cz4EsC2kWc2v9lmmZ_k6459xxCYFobmT3bjDkabRAjFyemKgHPunJkPfuSdrgfYrSmufYAvYdFusj4hWttPtqbnImmS5nZNYXWI2fZx7nCHLxlh3VVedUrOQ9qzKU6UTarJx_5w-2v8qrivAaYWkAZcnHzRPZvpWGCLn4MA9BH0kiSSufIL5S39M-ifUiCMaSYVFOqwbOOAKTkR5QkDF0dgNHu9uCYQ9sXq206s_HKqS36As83SuGziEyOXP_HLUxmIlEXs_7fD4FaJMmmRVKbAG8dD91ZF5Nz9z2hn23vppvpHFQ1twgTqrQ2iPk1114lVYOwnHyU=",
+   "summary": [
+    {
+     "type": "summary_text",
+     "text": "**Clarifying city capitals**\n\nI need to answer a question about two cities. City A is likely Rome, the capital of Italy, known for its flag of vertical green, white, and red bands. City B is probably Paris, the capital of France, which hosted the 2024 Summer Olympics. I'll use the weather tool to get current weather data for both cities. Since the weather for these cities is independent, I'll call the tool for each city simultaneously."
+    },
+    {
+     "type": "summary_text",
+     "text": "**Determining weather calls**\n\nI need to call the weather tool once for each city. I'll start by saying in plain text what I'm about to do, and then proceed with the tool calls. It seems like I can use the multi_tool_use.parallel function to handle both weather requests simultaneously. However, I must ensure the weather tool is defined correctly in the namespace since it mentions using only tools defined in developer messages. So, I\u2019ll double-check the tool definitions first before implementing the calls."
+    },
+    {
+     "type": "summary_text",
+     "text": "**Clarifying weather tool use**\n\nI see that the developer message specifies valid tool definitions, including get_weather in the functions namespace. However, since get_weather isn't mentioned in the developer messages, it might not work with the parallel tool. So, it seems like the best option is to call get_weather for each city sequentially. The user wants me to identify the cities, check their weather, and then determine which is farther north. I\u2019ll start with a sentence explaining this before making the tool calls for Rome and Paris."
+    }
+   ]
+  },
+  {
+   "id": "msg_0d9ff5e876f17581016ac37cc1696487d293ffca9105210bb0",
+   "type": "message",
+   "status": "completed",
+   "content": [
+    {
+     "type": "output_text",
+     "annotations": [],
+     "logprobs": [],
+     "text": "I\u2019ll identify the two capitals, get their weather, and say which is farther north."
+    }
+   ],
+   "phase": "commentary",
+   "role": "assistant"
+  },
+  {
+   "id": "fc_0d9ff5e876f17581016ac37cc171dc87d2950293214405c6d0",
+   "type": "function_call",
+   "status": "completed",
+   "arguments": "{\"city\":\"Rome\"}",
+   "call_id": "call_kclTe6vyKq0cPgqDrEmEwv6W",
+   "name": "get_weather"
+  }
+ ],
+ "parallel_tool_calls": true,
+ "presence_penalty": 0.0,
+ "previous_response_id": null,
+ "prompt_cache_key": null,
+ "prompt_cache_retention": "in_memory",
+ "reasoning": {
+  "context": "current_turn",
+  "effort": "high",
+  "mode": "standard",
+  "summary": "detailed"
+ },
+ "safety_identifier": null,
+ "service_tier": "default",
+ "store": false,
+ "temperature": 1.0,
+ "text": {
+  "format": {
+   "type": "text"
+  },
+  "verbosity": "medium"
+ },
+ "tool_choice": "auto",
+ "tool_usage": {
+  "image_gen": {
+   "input_tokens": 0,
+   "input_tokens_details": {
+    "image_tokens": 0,
+    "text_tokens": 0
+   },
+   "output_tokens": 0,
+   "output_tokens_details": {
+    "image_tokens": 0,
+    "text_tokens": 0
+   },
+   "total_tokens": 0
+  },
+  "web_search": {
+   "num_requests": 0
+  }
+ },
+ "tools": [
+  {
+   "type": "function",
+   "description": "Weather for a city",
+   "name": "get_weather",
+   "output_schema": null,
+   "parameters": {
+    "type": "object",
+    "properties": {
+     "city": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "city"
+    ]
+   },
+   "strict": false
+  }
+ ],
+ "top_logprobs": 0,
+ "top_p": 0.98,
+ "truncation": "disabled",
+ "usage": {
+  "input_tokens": 130,
+  "input_tokens_details": {
+   "cache_write_tokens": 0,
+   "cached_tokens": 0
+  },
+  "output_tokens": 561,
+  "output_tokens_details": {
+   "reasoning_tokens": 516
+  },
+  "total_tokens": 691
+ },
+ "user": null,
+ "metadata": {}
+}

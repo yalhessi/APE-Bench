@@ -31,8 +31,8 @@ def chat_completions_refusal(config, *, sends_tools: bool) -> Optional[str]:
     if entry.get("chat_completions_tools_with_reasoning", True):
         return None
     remedy = ("set llm_config.openai_api: responses"
-              if entry.get("provider") is LLMProvider.OPENAI else
-              "use the direct OpenAI model with llm_config.openai_api: responses")
+              if entry.get("provider") is LLMProvider.OPENAI or entry.get("openai_responses") else
+              "use an OpenAI model with llm_config.openai_api: responses")
     return (
         f"{config.model_name} rejects tools with reasoning_effort={config.reasoning_effort!r} "
         f"on Chat Completions (HTTP 400, measured 2026-09-30), and this request sends tools. "
