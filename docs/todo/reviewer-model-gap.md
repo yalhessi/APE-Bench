@@ -613,3 +613,20 @@ a turn and 1.9-13.5K a session. `text.verbosity` is also never sent (grep of `sr
 close it:** gpt-5.5 contract v2 on dev at `xhigh`, three reps, read against its 3 of 23 with the bar
 stated before the run (6 of 23 a lever, 4 or fewer not). Expected $10-20 a rep under the existing
 $20 / 24M cap.
+
+**First run with readable gpt reasoning (2026-10-05, $5.74; `probe_postcutoff_elm_gpt55_Grc_rep1`, branch
+`gpt-harness-parity`).** gpt-5.5 carried, through ELM, with `openai_responses_reasoning_summary: auto`,
+otherwise Hb1. Process parity with Hb1: 6 of 6 sessions submitted, 6 findings against 6, 78 turns against
+69, 211 tool calls against 199. The findings are the same on four PRs; Hb1's `isMulCommutative_mono` ->
+`_anti` finding on 43024 is gone and a `pushforward₀` duplication finding on 43192 is new (not yet
+matched to the asks). Summaries came back on 37 of the 76 turns that reasoned.
+
+The 43024 session shows the withholding mechanism in the model's own words for the first time. It
+searched for `_anti` and `_mono` naming precedents on turns 2-3, and on turn 17 its summary reads that
+`isMulCommutative_mono` "might be misleading", then: "If I suggest a name change and the maintainers
+disagree, I could be creating a false positive." It submitted no findings, `merge_ready_as_is: true`.
+So the ask was considered and declined on false-positive risk, not missed. Until now withholding was
+inferred from compiled edits left unfiled. One session, one rep; whether the same reason recurs across
+the residual misses is what the summaries can now settle (the stage-by-stage relabelling in
+`docs/research/gpt-reviewer-gap-diagnosis-2026-10-05.md`).
+
