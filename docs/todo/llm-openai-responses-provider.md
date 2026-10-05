@@ -445,3 +445,30 @@ They all name the direct models, whose key is dead anyway. `elm_gpt_5_mini` was 
 the same day (tools at high effort, reasoning carried, 1,792 of 1,935 tokens cached on turn 2) and
 marked, so the judge has a path: moving it from `gpt_5_mini` is still the open cache decision above.
 
+## The replay renders as the API's own items, and carried reasoning stays rendered (checked 2026-10-05)
+
+Checked against OpenAI's reasoning guide ("Preserve reasoning across calls") before the first ELM probe
+run. Its requirements for a stateless tool loop: keep every output item, and pass back the reasoning,
+function-call and function-call-output items since the last user message unchanged. `reasoning.context`
+decides whether reasoning from before that user message is rendered; models before GPT-5.6 default to
+`current_turn`, which renders only the active turn's.
+
+The provider rebuilds items from its Chat-shaped record rather than resending the output verbatim, so
+this was measured, not argued. A three-city lookup prompt at high effort through ELM, one tool round,
+then a second, each replayed three ways:
+
+| | turn 2: ours / verbatim / reasoning stripped | turn 3: ours / verbatim / stripped | turn-1 reasoning tokens |
+|---|---|---|---|
+| gpt-5.5 | 688 / 688 / 170 | 752 / 752 / 234 | 516 |
+| gpt-5.4 | 434 / 434 / 170 | 498 / 498 / 234 | 262 |
+
+So the rebuilt history renders token for token as the API's own items, and the carried reasoning is
+rendered (stripping it removes 518 and 264 tokens, the turn-1 reasoning plus a couple of tokens) and is
+still rendered two rounds later. Both models spent 0 reasoning tokens on turn 2, so the turn-3 reading
+is turn 1's reasoning surviving a round, not two rounds of it accumulating.
+
+Under `current_turn`, a user message mid-session starts a new turn, and the reasoning before it stops
+being rendered. In a review session that is only the no-submission prompt (2 in 262 APE-Agent sessions)
+or a CLI harness's retry prompt. `all_turns` would keep it, but gpt-5.2 answers it with a 400 and the
+guide lists it for GPT-5.6 and later, so no `reasoning.context` is sent, as before.
+
