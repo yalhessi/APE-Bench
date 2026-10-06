@@ -19,7 +19,8 @@ from .config import (
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
 from .providers import (
-    BaseProvider, ElmProvider, ElmResponsesProvider, OpenAIProvider, OpenAIResponsesProvider)
+    BaseProvider, ElmProvider, ElmResponsesProvider, LocalProvider, OpenAIProvider,
+    OpenAIResponsesProvider)
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -49,6 +50,7 @@ class LLMClient:
     _PROVIDER_IMPLEMENTATIONS = {
         LLMProvider.OPENAI: (OpenAIProvider, OpenAIMessageFormatter),
         LLMProvider.ELM: (ElmProvider, OpenAIMessageFormatter),
+        LLMProvider.LOCAL: (LocalProvider, OpenAIMessageFormatter),
     }
 
     def _implementation(self):
