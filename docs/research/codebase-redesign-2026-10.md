@@ -305,7 +305,7 @@ real work, and a step that misses it is reported as missed, not widened.
 
 | step | what | threshold, stated first | est. commits | tests touched |
 |---|---|---|---:|---|
-| 0 | this document; the pin inventory; the identity map into the rules file; cut the two inside→outside edges (`solo.py:408`, `arm.py:34`) | -- | 2-3 | 1-2 |
+| 0 | this document; the pin inventory; the identity map into the rules file; cut the task layer's import of a reading (`solo.py:408` → `analysis.probes`). The second edge the review named, `arm.py:34` → `agenda.registry`, is kept: `registry.py` imports only `dataclasses` and `typing` and `agenda/__init__.py` is empty, so it is a downward edge to a data declaration; cutting it mattered only for the rejected move of designs out of the task package | -- | 2-3 | 1-2 |
 | 1 | the three guards (§4.1); the spine and the tool-outcomes reading (§4.2) | the next thread's fixes to shared machinery are their own commits, found through the reading rather than a new script | 4-6 | +3 new |
 | 2 | identity (§4.3): omitted-when-unset hashing, once, at the declared boundary; the knob rule | the next knob forks no run that does not set it, and resumes refuse a changed one | 2-3 | `test_pr_review_v5_designs.py` (the payload pin moves once), `task_adapter_fields` |
 | 3 | producers (§4.4): one registry and vocabulary, explicit sorted grants, `section` delivery, the bench shape | after-structure §2's first detector lands in ≤ 3 `src/` files, 1 fixture, 0 hub edits | 8-12 | ~8 (`context_tools`, `prompt_delivery`, the consistency table's comment, grants) |

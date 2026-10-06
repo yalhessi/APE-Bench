@@ -266,6 +266,28 @@ def test_the_context_tool_grant_has_one_owner():
 
 
 
+def test_the_task_layer_imports_no_reading():
+    """A task is what a model runs inside; a reading is what is done to a finished run.
+
+    The solo task imported `analysis.probes` -- 1,262 lines of packet writing, sealing and
+    unblinding -- to learn the two words it stamps on an unlabelled finding (2026-10-06,
+    `docs/research/codebase-redesign-2026-10.md`). The words moved to `schema/findings.py`. A task
+    that needs something a reading also uses takes it from the schema, or from the producer that
+    computes it, never from `analysis/`. Function-local imports count: they are the same edge,
+    only paid later.
+    """
+
+    crossing = [
+        (str(path), module)
+        for path in _modules(["src/ape"])
+        for module, _ in _imports(path)
+        if module.startswith("src.mathlib_review.analysis")
+    ]
+    assert crossing == [], (
+        "the task layer imports a reading:\n" +
+        "\n".join(f"  {p}: {m}" for p, m in crossing))
+
+
 def test_no_private_name_crosses_a_generation():
     """The half that blocks the collapse, and it is closed.
 

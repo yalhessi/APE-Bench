@@ -405,7 +405,7 @@ class SoloReviewTask(BasePRReviewTask):
         normalized = super()._normalize_findings(findings)
         if self.config.task_config.user_prompt == "v2":
             # Not asked for, so not the model's: the pair an imported Claude finding carries.
-            from src.mathlib_review.analysis.probes import IMPORT_ISSUE_KIND, UNLABELLED_FAMILY
+            from src.mathlib_review.schema.findings import IMPORT_ISSUE_KIND, UNLABELLED_FAMILY
 
             for finding in normalized:
                 finding["concern_family"], finding["issue_kind"] = UNLABELLED_FAMILY, IMPORT_ISSUE_KIND

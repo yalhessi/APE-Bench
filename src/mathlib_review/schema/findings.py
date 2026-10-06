@@ -46,6 +46,16 @@ IssueKind = Literal[
     "style_norm_violation",
 ]
 
+#: The pair a finding carries when nobody asked the reviewer for labels: an imported probe
+#: session (`analysis/probes.py::import_probe_session`) and the solo task under `user_prompt: v2`.
+#: The candidate validator refuses a finding without an `issue_kind` on any release rendered at
+#: candidate-prompt/12 or later, and the judge's prompt shows the concern family, not the kind. With
+#: no evidence chain the gate is closed, so the pair routes nothing; it is a placeholder, not a
+#: label. It lives here, beside the vocabularies, because a task and the probe harness both stamp
+#: it, and a task must not import the probe harness to learn two words.
+UNLABELLED_FAMILY: ConcernFamily = "other"
+IMPORT_ISSUE_KIND: IssueKind = "style_norm_violation"
+
 
 class SynthesisAnchor(StrictModel):
     change_id: str

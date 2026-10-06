@@ -442,7 +442,7 @@ def test_user_prompt_v2_stamps_the_imported_claude_pair_on_every_finding(tmp_pat
     import inspect
 
     from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
-    from src.mathlib_review.analysis.probes import IMPORT_ISSUE_KIND, UNLABELLED_FAMILY
+    from src.mathlib_review.schema.findings import IMPORT_ISSUE_KIND, UNLABELLED_FAMILY
 
     task = _v2_task(tmp_path, finding_budget=2)
     task._register_lean_verify_edit = lambda mcp: None
