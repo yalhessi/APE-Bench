@@ -1,0 +1,107 @@
+[
+ {
+  "target": "PR description (Mathlib/Algebra/Group/Basic.lean generalizations of div_left_injective, div_right_injective, div_left_inj, div_right_inj, div_eq_self, div_eq_inv_self)",
+  "claim": "The PR generalizes six lemmas from `Group` to `DivInvMonoid` + `IsRightCancelMul` / `DivisionMonoid` + `IsLeftCancelMul`, and with them the Finset and Set lemmas. The description says there is no intended use. The PR names no type that is not a group and carries these classes, so the extra generality has no consumer and buys nothing.",
+  "requested_change": "Either add to the description a concrete motivating instance or use, meaning a type in Mathlib (or one about to land) that is a cancellative `DivInvMonoid`/`DivisionMonoid` but not a `Group` and that needs these lemmas, or drop the generalization and keep the `Group` statements.",
+  "severity": "blocking",
+  "evidence": "Searched the base tree for `instance/def ... : DivisionMonoid|DivisionCommMonoid|DivInvMonoid` (24 files). The hits are transfer instances (Opposite, ULift, Prod, Pi, Multiplicative, OrderDual/Lex, Germ, ConjAct). The rest are structures with a zero (GroupWithZero, WithZero, ENNReal, EReal, ℝ, ℂ, Matrix, HahnSeries, Cauchy) or pointwise Set/Finset/Filter, none of them cancellative, and NonemptyInterval/Interval, which have no cancellation instance (a content_search for `Cancel` under Algebra/Order/Interval found none). The `IsRightCancelMul`/`IsCancelMul` instances in the tree are likewise transfer instances (Prod, Opposite, Shrink, Subsemigroup, Additive, hom types, Germ, OrderDual/Lex). So I found no non-group type on which the new statements apply. Zulip (maintainers_only): Kevin Buzzard, 2025-06-19: \"generalisation for generalisation's sake with no actual examples can be actively bad for the library because it causes disruption and can slow down typeclass inference\"; Yaël Dillies, 2025-08-08: \"generality without applicability is merely ruining the soul\"."
+ },
+ {
+  "target": "div_left_injective",
+  "claim": "`div_left_injective` is reproved with a three-step manual proof: `intro`, a `have` through `simpa [div_eq_mul_inv]`, then `simpa using mul_right_cancel (a := a₁) (b := b⁻¹) (c := a₂) h'`. A one-line proof works. The PR also deletes the FIXME saying 'this could be by `simpa`' without doing what it says, and adds a needless `: G` ascription to the binder.",
+  "requested_change": "Write it as `theorem div_left_injective : Function.Injective fun a ↦ a / b := by simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹`. This is the `simpa` form the deleted FIXME asked for, and it keeps the original `fun a ↦ a / b` statement.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Basic.lean, replacing `div_left_injective` with `by simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹` under the PR's `[DivInvMonoid G] [IsRightCancelMul G]`: outcome compiled, no errors. The pre-PR proof (`simp only [div_eq_mul_inv]; exact fun a a' h ↦ mul_left_injective b⁻¹ h`) also compiles unchanged. The simpa bug behind the FIXME is now a regression test in Batteries (`BatteriesTest/simpa.lean`, namespace `div_left_inj_issue`, which proves `div_left_injective` by `simpa only [div_eq_mul_inv] using ...`)."
+ },
+ {
+  "target": "div_left_inj",
+  "claim": "`div_left_inj` is proved by a hand-written iff split: `constructor`, `intro`, a `have` through `simpa`, `simpa using mul_right_cancel ...`, and `rintro rfl; rfl`, the last joining two tactics with `;` on one line. Its mirror `div_right_inj` is the one-term `div_right_injective.eq_iff`, and the same term works here.",
+  "requested_change": "Replace the proof with `div_left_injective.eq_iff`, i.e. `theorem div_left_inj : b / a = c / a ↔ b = c := div_left_injective.eq_iff`, matching `div_right_inj`. Alternatively keep the pre-PR proof `rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _`, which still compiles.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Basic.lean with `div_left_inj := div_left_injective.eq_iff`: compiled. The pre-PR proof `rw [div_eq_mul_inv, div_eq_mul_inv]` / `exact mul_left_inj _` also compiled under `[DivInvMonoid G] [IsRightCancelMul G]`. The combined block (all six Basic.lean lemmas with the proofs proposed in these findings) compiled as well."
+ },
+ {
+  "target": "div_right_injective",
+  "claim": "The PR deletes the `FIXME see above` comment on `div_right_injective` but keeps the `simp only [div_eq_mul_inv]` / `exact ...` workaround that the FIXME was about. It also renames the binder to `fun x : G ↦ b / x`, a change the statement does not need.",
+  "requested_change": "Since `simpa` now works, resolve the FIXME instead of only deleting it: `theorem div_right_injective : Function.Injective fun a ↦ b / a := by simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective`. This also keeps the original binder.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Basic.lean replacing `div_right_injective` with the `simpa only ... using (mul_right_injective b).comp inv_injective` proof and the original `fun a ↦ b / a` statement, under `[DivisionMonoid G] [IsLeftCancelMul G]`: compiled, no errors."
+ },
+ {
+  "target": "div_right_inj",
+  "claim": "`div_right_inj` passes the redundant named arguments `(G := G) (b := a)` to `div_right_injective`. Both are determined by the expected type, and the pre-PR term `div_right_injective.eq_iff` elaborates unchanged.",
+  "requested_change": "Restore the proof term `div_right_injective.eq_iff`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Basic.lean with `div_right_inj : a / b = a / c ↔ b = c := div_right_injective.eq_iff`: compiled, no errors."
+ },
+ {
+  "target": "div_eq_inv_self",
+  "claim": "The PR moves the proof of `div_eq_inv_self` onto a second line, but the pre-PR one-line form, `theorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]` (85 characters), is within the 100-character limit. The diff therefore contains a pure reformatting of a lemma the PR only had to re-section.",
+  "requested_change": "Keep the declaration on one line as before the PR: `theorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]`.",
+  "severity": "advisory",
+  "evidence": "Read from the diff: the old line is 85 characters. The combined Basic.lean edit with the one-line form compiled (lean_verify_edit, outcome compiled)."
+ },
+ {
+  "target": "div_eq_self",
+  "claim": "The PR breaks the proof of `div_eq_self` onto a second line, but the pre-PR one-line declaration (about 90 characters) fits the 100-character limit. This is diff noise in a moved lemma.",
+  "requested_change": "Keep `theorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]` on one line.",
+  "severity": "advisory",
+  "evidence": "Read from the diff: the old line is about 90 characters. The combined Basic.lean edit with the one-line form compiled (lean_verify_edit)."
+ },
+ {
+  "target": "Finset.card_le_card_div_left",
+  "claim": "`Finset.card_le_card_div_left` has its term proof rewritten into an `obtain`/`exact` tactic block with the explicit argument `(div_right_injective (b := a))`. The generalization does not require this: the original term proof compiles unchanged under the new hypotheses, so the rewrite is unrelated churn.",
+  "requested_change": "Restore the pre-PR proof `have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean replacing `Finset.card_le_card_div_left` with the pre-PR term proof, under the PR's `[DivisionMonoid α] [IsLeftCancelMul α]`: compiled, no errors."
+ },
+ {
+  "target": "Finset.card_le_card_div_right",
+  "claim": "`Finset.card_le_card_div_right` has its term proof rewritten into an `obtain`/`exact` block with `(div_left_injective (b := b))`, though the pre-PR term proof still compiles under the new hypotheses.",
+  "requested_change": "Restore the pre-PR proof `have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Finset/Basic.lean replacing `Finset.card_le_card_div_right` with the pre-PR term proof, under `[DivisionMonoid α] [IsRightCancelMul α]`: compiled, no errors."
+ },
+ {
+  "target": "variable command in section RightCancel (Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean)",
+  "claim": "Section `RightCancel` assumes `[DivisionMonoid α]`, but its only lemma, `card_le_card_div_right`, uses only `div_left_injective`, which this PR states for `[DivInvMonoid G] [IsRightCancelMul G]`. If the generalization is kept, this lemma is stated in less generality than its ingredient, which is inconsistent with what the PR does in Basic.lean.",
+  "requested_change": "If the generalization stays, state `card_le_card_div_right` under `[DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α]`, mirroring `div_left_injective`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (line mode, Finset/Basic.lean lines 1244-1270) with `card_le_card_div_right` in a section `variable [DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}`: compiled, no errors."
+ },
+ {
+  "target": "variable command after `end RightCancel` (Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean)",
+  "claim": "After `end RightCancel` the PR re-declares `variable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α]` / `{s t : Finset α}`, verbatim the binders of section `LeftCancel`. It splits the declaration across two lines although it is 80 characters, and it serves only `card_le_card_div_self`, which needs exactly the `LeftCancel` context.",
+  "requested_change": "Move `card_le_card_div_self` into section `LeftCancel`, after `card_le_card_div_left`, and delete the trailing `variable` command.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (line mode, lines 1244-1270) with `card_le_card_div_self` moved into section LeftCancel and the trailing variable removed, all else as the PR has it: compiled, no errors."
+ },
+ {
+  "target": "Set.finite_div",
+  "claim": "`Set.finite_div` swaps the pre-PR `fun _ _ ↦ div_left_injective.injOn` / `fun _ _ ↦ div_right_injective.injOn` for named binders and redundant named arguments, `(div_left_injective (b := b)).injOn` and `(div_right_injective (b := a)).injOn`, and so needs an extra line. The old one-line term still elaborates under the new hypotheses.",
+  "requested_change": "Restore `finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Set/Finite.lean replacing `Set.finite_div` with the pre-PR proof under the PR's variables: compiled, no errors."
+ },
+ {
+  "target": "Set.infinite_div",
+  "claim": "`Set.infinite_div` has the same needless rewrite as `finite_div`: named binders plus `(b := b)` / `(b := a)` arguments, split over two lines, where the pre-PR one-liner still compiles.",
+  "requested_change": "Restore `infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Set/Finite.lean replacing `Set.infinite_div` with the pre-PR proof: compiled, no errors."
+ },
+ {
+  "target": "variable command in section DivisionMonoid (Mathlib/Algebra/Group/Pointwise/Set/Finite.lean)",
+  "claim": "The section assumes `[DivisionMonoid α] [IsLeftCancelMul α] [IsRightCancelMul α]`, but the single class `[IsCancelMul α]` says the same. The library spells this assumption as `IsCancelMul` almost everywhere, and the author explicitly asks whether the assumptions could be stated more concisely.",
+  "requested_change": "Replace the two mixins with `[IsCancelMul α]`: `variable [DivisionMonoid α] [IsCancelMul α] {s t : Set α}`.",
+  "severity": "advisory",
+  "evidence": "content_search over target/Mathlib: `[IsCancelMul X]` appears as a binder in 11 files (e.g. Algebra/Group/Pointwise/Set/Card.lean, GroupTheory/Exponent.lean, MonoidLocalization). The paired spelling `[IsLeftCancelMul α] [IsRightCancelMul α]` appears in only one file, this one (line 101, `section Cancel`, plus the PR's line 139). lean_verify_edit (line mode, lines 139-149) with `[DivisionMonoid α] [IsCancelMul α]` and the pre-PR proofs: compiled, no errors."
+ },
+ {
+  "target": "PR title",
+  "claim": "The title `chore(Algebra): misc. generalizations` and the description do not say what changes. Neither names a declaration, nor the new assumptions, nor that six Basic.lean lemmas move into new sections and that the dependent Finset/Set lemmas are generalized.",
+  "requested_change": "Retitle to say what is generalized, e.g. `chore(Algebra/Group): generalize div_left_injective and friends to cancellative DivInvMonoid/DivisionMonoid`. List the affected lemmas and their new typeclass assumptions in the description.",
+  "severity": "advisory",
+  "evidence": "Read from pr.md and the diff: six declarations in Basic.lean are moved into two new sections with new typeclass assumptions, and four Finset/Set lemmas are re-sectioned. The title and description name none of them."
+ }
+]
