@@ -309,3 +309,37 @@ was the one credited as `v0005`'s exact match. Read at its own line it was wrong
 fact named `hϕ`. Its text matched `v0005`'s ask (at line 387, where there was no fact) by
 coincidence of the misparse. `v0006`, the ask at line 430, asks for `hϕ.2.clm_apply_of_inCoordinates`,
 which a binder-typed shape cannot state. Under `/3` neither is stated, and 8 of 49 are exact.
+
+## Stage 5: does a section that states the exact ask make a reviewer file it? (pre-registered 2026-10-06, before the set is built)
+
+Stages 1-4 measured the facts. This stage measures a reviewer reading them, at the one place the
+answer is cheapest to read: PRs where a packet-ready detector states, word for word, what a
+maintainer asked. **The record predicts a null.** The ceiling probe's stage G handed a reviewer the
+right convention at the right place with a check, and the reviewer verified it and overrode it
+(+0.000). This stage tests whether a deterministic fact about the code fares differently.
+
+**Set** (census PRs, val1000, disjoint from every evaluation set):
+- *Stratum A, asked*: every PR where a packet-ready detector's fact is exactly a reader-A ask, by
+  the stage 2-4 hand reads -- `dot_notation/3`: 28484 (v0644), 31961 (v1252, v1254), 32674 (v1397),
+  32715 (v1412-v1414), 34241 (v1661); `primed_names`: 30645 (v1057), 31007 (v1096), 32992 (v1490),
+  35807 (v1935), 36355 (v2081). **10 PRs, 13 asks.**
+- *Stratum B, unasked*: 6 PRs in the seeded order (seed `census-detectors-stage5`) of census PRs
+  where a packet-ready fact fires and no labelled ask shares a change target with any fact.
+- A PR whose reviewed workspace does not build is replaced from its stratum's seeded order (B) or
+  dropped and reported (A).
+
+The release is cut from the sealed val1000 draw restricted to these PRs, by the same writer the
+evaluation releases use (`frame.write_evaluation_release`), into `inputs/probes/census-detectors-v1/`.
+
+**Conditions** -- the frozen solo baseline harness (Opus 5.5 under Claude Code, contract v2, the
+hygiene tools), one rep each, differing only in `context_file`:
+- *S0*: each PR's pass-0 PR model, as every probe set has it;
+- *S1*: the same, followed by the `primed_names` and `dot_notation/3` sections.
+
+**Reading, by hand (no judge).** For each of the 13 stratum-A asks: is there a finding at its place
+asking for its change, in S0 and in S1? For every section fact without an ask (stratum B, and
+stratum A's other facts): is there a finding that repeats it, in S0 and in S1?
+- The section **moves the reviewer** if S1 files at least **4 more** of the 13 asks than S0;
+  **no effect** at a difference of 1 or less; between, a second rep decides.
+- **Emission:** S1's findings that repeat an unasked fact, against S0's, per stratum-B PR. More than
+  1.0 more per PR than S0 makes the section a volume lever, whatever it does to the asks.
