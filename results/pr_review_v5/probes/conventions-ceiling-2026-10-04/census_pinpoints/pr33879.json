@@ -1,0 +1,108 @@
+[
+  {"id": "P036", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (preorder section)", "fact": "`(i₀ i₁ i₂ : ι)` are explicit although the later explicit hypotheses `hi₀₁ : i₀ ≤ i₁` and `hi₁₂ : i₁ ≤ i₂` determine them.", "status": "departs"},
+  {"id": "P036", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "Takes `i₀ i₁ i₂` explicitly from the variable line, though `hi₀₁` and `hi₁₂` determine them; callers must write `twoδ₁Toδ₀' _ _ _ hi₀₁ hi₁₂`.", "status": "departs"},
+  {"id": "P036", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁'", "fact": "Takes `i₀ i₁ i₂` explicitly from the variable line, though the explicit hypotheses `hi₀₁` and `hi₁₂` determine them.", "status": "departs"},
+
+  {"id": "P011", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Proof rewrites with `NatTrans.isIso_iff_isIso_app`, then case-splits with `fin_cases i <;> tauto` inside a hand-built anonymous constructor.", "status": "check"},
+  {"id": "P011", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "Proof rewrites with `NatTrans.isIso_iff_isIso_app`, then case-splits over `Fin 3` with `fin_cases i <;> tauto` in a hand-built constructor.", "status": "check"},
+  {"id": "P011", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₂Toδ₁ f g fg h)", "fact": "Built by `rw [isIso_iff₁]`, `constructor`, `dsimp`, `infer_instance` on components, rather than from existing isomorphism API such as `isoMk₁`.", "status": "check"},
+
+  {"id": "P105", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "Names `ComposableArrows C 2` objects `F G` and the morphism `f`, while neighbouring `isoMk₂`, `ext₂` name such objects `f g`.", "status": "check"},
+  {"id": "P105", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (preorder section)", "fact": "New binders introduce `ι` for the preorder type and `i₀ i₁ i₂` for its elements.", "status": "check"},
+
+  {"id": "P018", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "`rw [NatTrans.isIso_iff_isIso_app]` is followed directly by `exact ⟨…⟩`: a rewrite then `exact`.", "status": "check"},
+  {"id": "P018", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "`rw [NatTrans.isIso_iff_isIso_app]` is followed directly by `exact ⟨…⟩`: a rewrite then `exact`.", "status": "check"},
+  {"id": "P018", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "`rw [NatTrans.isIso_iff_isIso_app]` is followed directly by `exact ⟨…⟩`: a rewrite then `exact`.", "status": "check"},
+
+  {"id": "P100", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "Adds a literal-`2` restatement plus primed `⟨2, by valid⟩` variant for `homMk₂` only; `homMk₃`–`homMk₅` component lemmas presumably keep `⟨n, by valid⟩` alone.", "status": "check"},
+  {"id": "P100", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "`isIso_iff₀`, `isIso_iff₁`, `isIso_iff₂` are added, but the `isoMk₃`–`isoMk₅` / `homMk₃`–`homMk₅` family has no `isIso_iff₃`–`isIso_iff₅`.", "status": "check"},
+  {"id": "P100", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "mk₂", "fact": "`@[simp]` is replaced by `@[reducible]` on `mk₂`–`mk₅`; sibling constructors `mk₀`, `mk₁` are not touched.", "status": "check"},
+
+  {"id": "P369", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (preorder section)", "fact": "A new section opens to hold `ι`, `i₀ i₁ i₂`, `hi₀₁`, `hi₁₂`, used by only two declarations, `twoδ₁Toδ₀'` and `twoδ₂Toδ₁'`.", "status": "departs"},
+
+  {"id": "P153", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "New iff `IsIso f ↔ IsIso (f.app 0)` about the predicate `IsIso`, with no named direction lemmas.", "status": "check"},
+  {"id": "P153", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "New iff `IsIso f ↔ IsIso (f.app 0) ∧ IsIso (f.app 1)`; its reverse direction is used separately (via `rw`) by the instances in Two.lean.", "status": "check"},
+  {"id": "P153", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "New iff `IsIso f ↔ IsIso (f.app 0) ∧ IsIso (f.app 1) ∧ IsIso (f.app 2)`, with no named direction lemmas.", "status": "check"},
+
+  {"id": "P363", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two", "fact": "Conclusion respelled from `.app ⟨2, by valid⟩` to `.app 2` (an `OfNat` literal), one of two equivalent spellings of the index.", "status": "check"},
+  {"id": "P363", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "Keeps the other spelling `.app ⟨2, by valid⟩` as a second simp lemma beside the `.app 2` form.", "status": "check"},
+  {"id": "P363", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "Statement spells the composite as `homOfLE (hi₀₁.trans hi₁₂)` rather than `homOfLE hi₀₁ ≫ homOfLE hi₁₂`.", "status": "check"},
+
+  {"id": "P154", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "Restates sibling `homMk₂_app_two`'s conclusion with the index spelled `⟨2, by valid⟩` instead of `2`; proof is `rfl`.", "status": "check"},
+  {"id": "P154", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "Proof only specialises `NatTrans.isIso_iff_isIso_app` to `Fin 1` via `rw` and a short `fin_cases` term.", "status": "check"},
+  {"id": "P154", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Proof only specialises `NatTrans.isIso_iff_isIso_app` to `Fin 2` via `rw` and a short `fin_cases … <;> tauto` term.", "status": "check"},
+
+  {"id": "P168", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₂Toδ₁ f g fg h)", "fact": "`constructor <;> dsimp <;> infer_instance` uses non-terminal `<;>`, hiding both component goals.", "status": "check"},
+  {"id": "P168", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₁Toδ₀ f g fg h)", "fact": "`constructor <;> dsimp <;> infer_instance` uses non-terminal `<;>`, hiding both component goals.", "status": "check"},
+  {"id": "P168", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "`exact ⟨fun h ↦ ⟨h 0, h 1, h 2⟩, fun _ i ↦ by fin_cases i <;> tauto⟩` packs both directions and a case split into one anonymous constructor.", "status": "check"},
+
+  {"id": "P043", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "mk₂", "fact": "`@[simp]` → `@[reducible]` on `mk₂`–`mk₅` is a simp-set change the `isIso_iff` lemmas do not obviously need.", "status": "check"},
+  {"id": "P043", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "variable command (section for ComposableArrows C 2)", "fact": "Adds `:= by cat_disch` autoparams to `w₀ w₁` (and to `homMkSucc`, `homMk₃`–`homMk₅` variables): an API change separable from `isIso_iff`.", "status": "check"},
+  {"id": "P043", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "New preorder variants `twoδ₁Toδ₀'`, `twoδ₂Toδ₁'` in their own section, independent of the `isIso_iff` lemmas.", "status": "check"},
+
+  {"id": "P048", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁", "fact": "`h : f ≫ g = fg`, removed from the variable line, reappears as `(h : … := by cat_disch)` in this signature and in `twoδ₁Toδ₀`'s.", "status": "departs"},
+  {"id": "P048", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀", "fact": "Consecutive with `twoδ₂Toδ₁`, it repeats the same binder `(h : f ≫ g = fg := by cat_disch)` instead of one shared `variable`.", "status": "departs"},
+
+  {"id": "P156", "file": "PR", "declaration": "title", "fact": "Title names only `isIso_iff`; the diff also moves `twoδ₁Toδ₀`, swaps `@[simp]` for `@[reducible]` on `mk₂`–`mk₅`, adds autoparams, preorder variants and instances.", "status": "departs"},
+
+  {"id": "P254", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "Specialisation of `NatTrans.isIso_iff_isIso_app` named with positional affix `₂`, like siblings `isoMk₂`, `ext₂`, `homMk₂`.", "status": "check"},
+  {"id": "P254", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "Preorder counterpart of `twoδ₁Toδ₀`, distinguished by a prime rather than a naming part.", "status": "check"},
+  {"id": "P254", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "Variant of `homMk₂_app_two` for the `⟨2, by valid⟩` index, distinguished by a prime.", "status": "check"},
+
+  {"id": "P138", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "blank line before `suppress_compilation in` (after Functor.mapComposableArrowsObjMk₂Iso)", "fact": "Hunk whose only effect is deleting one blank line; it corrects no error.", "status": "departs"},
+
+  {"id": "P005", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Goal closed by `rw` plus a hand-built anonymous-constructor term with a `fin_cases` case split, not a single finishing tactic.", "status": "check"},
+  {"id": "P005", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "Goal closed by `rw` plus a hand-built anonymous-constructor term with a `fin_cases` case split over `Fin 3`.", "status": "check"},
+  {"id": "P005", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₂Toδ₁ f g fg h)", "fact": "Closed by `rw [isIso_iff₁]`, `constructor`, `dsimp`, `infer_instance`: several manual steps.", "status": "check"},
+
+  {"id": "P185", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (C, f, g, fg)", "fact": "Existing `universe v u`, `{C : Type u} [Category.{v} C]` respelled as `{C : Type*} [Category* C]`, meaning unchanged.", "status": "check"},
+  {"id": "P185", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "blank line before `suppress_compilation in` (after Functor.mapComposableArrowsObjMk₂Iso)", "fact": "Purely stylistic deletion of a blank line in existing code.", "status": "check"},
+
+  {"id": "P006", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁", "fact": "Binds `(h : f ≫ g = fg := by cat_disch)` in its signature, a companion of the `f g fg` variables in scope.", "status": "check"},
+  {"id": "P006", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀", "fact": "Binds `(h : f ≫ g = fg := by cat_disch)` in its signature, while `variable (h : f ≫ g = fg)` follows in the same section.", "status": "check"},
+
+  {"id": "P041", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "mk₂", "fact": "Redesign: `mk₂`–`mk₅` lose `@[simp]` for `@[reducible]`; no visible description or docstring says why.", "status": "departs"},
+  {"id": "P041", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two", "fact": "Simp lemma restated to `.app 2` with the old form kept as `homMk₂_app_two'`; no visible motivation.", "status": "departs"},
+  {"id": "P041", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "New preorder definitions `twoδ₁Toδ₀'`, `twoδ₂Toδ₁'`; docstring says only 'Variant … for preorders', no use or reason stated.", "status": "departs"},
+
+  {"id": "P113", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "Differs from `homMk₂_app_two` only by a prime, though the statements differ in a nameable term (index `⟨2, by valid⟩` vs `2`); no docstring.", "status": "departs"},
+
+  {"id": "P086", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Componentwise iso criterion for `ComposableArrows C 1` (essentially arrows); the library may already state it, e.g. for `Arrow`.", "status": "check"},
+  {"id": "P086", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "Basic fact about `IsIso` of a natural transformation, expressed entirely through existing notions.", "status": "check"},
+  {"id": "P086", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "New definition expressed entirely through `twoδ₁Toδ₀` and `homOfLE`.", "status": "check"},
+
+  {"id": "P040", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "Short `by` block, `rw` then `exact ⟨…⟩`, could be one term via `NatTrans.isIso_iff_isIso_app.trans`.", "status": "check"},
+  {"id": "P040", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Short `by` block, `rw` then `exact ⟨…⟩`, assembling one lemma and an anonymous constructor.", "status": "check"},
+  {"id": "P040", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₂Toδ₁ f g fg h)", "fact": "Short `by` block of `rw`, `constructor`, `dsimp`, `infer_instance`; could be `(isIso_iff₁ _).2 ⟨…, …⟩`.", "status": "check"},
+
+  {"id": "P089", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "Body `twoδ₁Toδ₀ (homOfLE hi₀₁) _ _ rfl` passes `_` placeholders for `g`, `fg` and explicit `rfl` for the autoparam `h`.", "status": "check"},
+  {"id": "P089", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁'", "fact": "Body `twoδ₂Toδ₁ _ (homOfLE hi₁₂) _ rfl` passes `_` placeholders for `f`, `fg` and explicit `rfl` for the autoparam `h`.", "status": "check"},
+
+  {"id": "P211", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two'", "fact": "New primed name; unprimed `homMk₂_app_two` exists in the PR.", "status": "check"},
+  {"id": "P211", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₁Toδ₀'", "fact": "New primed name; unprimed `twoδ₁Toδ₀` exists.", "status": "check"},
+  {"id": "P211", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁'", "fact": "New primed name; unprimed `twoδ₂Toδ₁` exists.", "status": "check"},
+
+  {"id": "P060", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "Reaches the goal by rewriting with `NatTrans.isIso_iff_isIso_app` into its `∀ i` form, then adapting by `fin_cases`.", "status": "check"},
+  {"id": "P060", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₂Toδ₁ f g fg h)", "fact": "Rewrites the goal into `isIso_iff₁`'s form and opens two component goals for `infer_instance`.", "status": "check"},
+  {"id": "P060", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "instance IsIso (twoδ₁Toδ₀ f g fg h)", "fact": "Rewrites the goal into `isIso_iff₁`'s form and opens two component goals for `infer_instance`.", "status": "check"},
+
+  {"id": "P024", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "`fin_cases i <;> tauto` uses general automation where `isIso_iff₀` closes the same kind of goal with `assumption`.", "status": "check"},
+  {"id": "P024", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "`fin_cases i <;> tauto` uses general automation to extract components from the conjunction hypothesis.", "status": "check"},
+
+  {"id": "P084", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "Signature is broken after `:` but the whole line, `… : IsIso f ↔ IsIso (f.app 0) := by`, is 91 characters.", "status": "departs"},
+  {"id": "P084", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "twoδ₂Toδ₁'", "fact": "Signature split over two lines (second indented five spaces) though `abbrev twoδ₂Toδ₁' : … :=` fits in 75 characters.", "status": "departs"},
+  {"id": "P084", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (C, f, g, fg)", "fact": "After dropping `h`, the two-line `variable {C : Type*} [Category* C] {i j k : C} (f …) (g …) (fg …)` fits in 83 characters.", "status": "departs"},
+
+  {"id": "P045", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "module docstring", "fact": "File with a module docstring gains definitions `twoδ₁Toδ₀'`, `twoδ₂Toδ₁'` and `IsIso` instances; docstring is unchanged.", "status": "check"},
+
+  {"id": "P315", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "New `_iff` characterisation of `IsIso f` with no `grind` attribute.", "status": "check"},
+  {"id": "P315", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₁", "fact": "New `_iff` characterisation of `IsIso f` with no `grind` attribute.", "status": "check"},
+  {"id": "P315", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₂", "fact": "New `_iff` characterisation of `IsIso f` with no `grind` attribute.", "status": "check"},
+
+  {"id": "P329", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "homMk₂_app_two", "fact": "Existing lemma's statement changed to `.app 2`; its old statement moves to the new name `homMk₂_app_two'`.", "status": "check"},
+  {"id": "P329", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "mk₂", "fact": "Existing `mk₂`–`mk₅` lines changed: `@[simp]` replaced by `@[reducible]`.", "status": "check"},
+  {"id": "P329", "file": "Mathlib/CategoryTheory/ComposableArrows/Two.lean", "declaration": "variable command (C, f, g, fg)", "fact": "Existing variable line rewritten (`Type u`→`Type*`, `Category.{v}`→`Category*`, `h` removed) and `universe v u` deleted.", "status": "check"},
+
+  {"id": "P126", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "isIso_iff₀", "fact": "Uses `fun h ↦`, while the adjacent `ext₀` writes `fun i =>`.", "status": "check"},
+  {"id": "P126", "file": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean", "declaration": "mk₂", "fact": "Spells reducible definitions as `@[reducible] def` (on `mk₂`–`mk₅`), an interchangeable spelling of `abbrev`.", "status": "check"}
+]

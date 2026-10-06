@@ -1,0 +1,198 @@
+[
+ {
+  "id": "P011",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Proves the empty-rows case by unfolding the definition (`intro k f _ _ _`), case analysis on `k` and a rewrite chain, not from existing submatrix or determinant API.",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "New signature binder `A` names the matrix; proof introduces `k` and `f` for the submatrix size and row selector.",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "New signature binder `A` names the matrix `Matrix m n R`.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Consecutive `intro k f _ _ _` then `cases k with` (combinable as `rintro (_ | k) ...`), and `use 1; rw [...]` in the zero branch.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Adds the empty case for rows, one member of the file's rows/columns sibling pattern (cf. fromRows/fromCols); emptyCols covers columns, other row/column siblings to be checked.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "No rows is spelled as the class `[IsEmpty m]`, one of several equivalent spellings (IsEmpty, card zero, not Nonempty).",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "No columns is spelled as the class `[IsEmpty n]`, one of several equivalent spellings of emptiness.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Takes the cardinality side condition `[IsEmpty m]`, plus the file's ring assumptions on `R` through `variable`.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Takes the cardinality side condition `[IsEmpty n]`, plus the file's ring assumptions on `R` through `variable`.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "`@[simp]` placed on its own line above `lemma`; hypotheses introduced as `_` binders in `intro k f _ _ _`.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Spells the transpose as `A.transpose` rather than `Aᵀ`; `@[simp]` on its own line.",
+  "status": "check"
+ },
+ {
+  "id": "P097",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "The `zero` alternative joins two tactics with `;`: `use 1; rw [submatrix_empty, det_fin_zero, SignType.coe_one]` on one line.",
+  "status": "departs"
+ },
+ {
+  "id": "P154",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Proof is a term one-liner chaining `emptyRows_isTotallyUnimodular` on `A.transpose` with `IsTotallyUnimodular.transpose`; statement mirrors its sibling.",
+  "status": "check"
+ },
+ {
+  "id": "P168",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "The `zero` branch packs the witness `use 1` and a three-lemma rewrite on one line; hypotheses introduced anonymously as `_`.",
+  "status": "check"
+ },
+ {
+  "id": "P232",
+  "file": "PR",
+  "declaration": "title",
+  "fact": "Title `feat(LinearAlgebra/Matrix/Determinant/TotallyUnimodular):` ends at the colon with no description after it.",
+  "status": "departs"
+ },
+ {
+  "id": "P048",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Repeats the binder `(A : Matrix m n R)` already in the consecutive new lemma `emptyRows_isTotallyUnimodular`, instead of one `variable` declaration.",
+  "status": "departs"
+ },
+ {
+  "id": "P254",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Name `emptyRows_isTotallyUnimodular` spells the `IsEmpty m` hypothesis as `emptyRows`, prefix-style like `reindex_isTotallyUnimodular`, rather than e.g. an `_of_isEmpty` affix.",
+  "status": "check"
+ },
+ {
+  "id": "P254",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Counterpart name `emptyCols_isTotallyUnimodular` abbreviates columns as `Cols` and the `IsEmpty n` hypothesis as `empty`.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Goal closed by a manual case split on `k`, `use 1` with a three-lemma `rw` chain, and a hand-built `(IsEmpty.false (f 0)).elim` term.",
+  "status": "check"
+ },
+ {
+  "id": "P006",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Binds `[IsEmpty m]` and `(A : Matrix m n R)` in its signature while `m`, `n`, `R` and their instances come from the file's `variable` commands.",
+  "status": "check"
+ },
+ {
+  "id": "P006",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Binds `[IsEmpty n]` and `(A : Matrix m n R)` in its signature while `m`, `n`, `R` and their instances come from the file's `variable` commands.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "New lemma states a basic fact about the existing predicate `IsTotallyUnimodular`: a matrix with empty row type satisfies it.",
+  "status": "check"
+ },
+ {
+  "id": "P086",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "New lemma states a basic fact about the existing predicate `IsTotallyUnimodular`: a matrix with empty column type satisfies it.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Short `by` block of `intro`, `cases`, `use`, `rw` and `exact` that might be one `fun ... => match ...` term.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "The `succ` branch converts `IsEmpty.false (f 0)` into `False` then `.elim`, rather than citing a direct eliminator such as `isEmptyElim`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Reaches the goal indirectly: applies the rows lemma to `A.transpose`, then converts back with `IsTotallyUnimodular.transpose`.",
+  "status": "check"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyRows_isTotallyUnimodular",
+  "fact": "Signature broken before `A.IsTotallyUnimodular := by`, though the joined line is 96 characters, within the 100 limit.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean",
+  "declaration": "emptyCols_isTotallyUnimodular",
+  "fact": "Signature broken before `A.IsTotallyUnimodular :=`, though the joined line is 93 characters, within the 100 limit.",
+  "status": "departs"
+ }
+]
