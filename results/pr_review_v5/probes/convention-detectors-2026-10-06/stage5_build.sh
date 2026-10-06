@@ -4,7 +4,10 @@
 #   nohup bash results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5_build.sh &
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export PYTHONPATH="$PWD:$PWD/src" PATH="/research/projects/proofedit/ya475/.elan/bin:$PATH"
+# ELAN_HOME as well as PATH: elan otherwise unpacks a missing toolchain into ~/.elan, and home is at
+# quota (the first launch, 2026-10-06, failed there: "Quota exceeded (os error 122)").
+export ELAN_HOME=/research/projects/proofedit/ya475/.elan
+export PYTHONPATH="$PWD:$PWD/src" PATH="$ELAN_HOME/bin:$PATH"
 LOG="$HERE/stage5/build.log"
 log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
 log "bases: $(wc -l < "$HERE/stage5/base_build_rows.jsonl") rows"

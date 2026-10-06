@@ -1,0 +1,227 @@
+{
+  "producer": "primed_names",
+  "version": "primed_names/1",
+  "set": "dev_medium_0_3_0",
+  "prs": 15,
+  "asks": 47,
+  "facts": 5,
+  "facts_per_pr": {
+    "33066": 0,
+    "33098": 0,
+    "33117": 0,
+    "33145": 2,
+    "33149": 0,
+    "33285": 0,
+    "33294": 0,
+    "33304": 0,
+    "33305": 0,
+    "33315": 0,
+    "33321": 2,
+    "33337": 0,
+    "33362": 0,
+    "33421": 1,
+    "33438": 0
+  },
+  "control_prs": [
+    33304,
+    33315,
+    33438
+  ],
+  "control_facts": {
+    "33304": 0,
+    "33315": 0,
+    "33438": 0
+  },
+  "asks_located": [
+    "d0019",
+    "d0020",
+    "d0021",
+    "d0022",
+    "d0023",
+    "d0024",
+    "d0025",
+    "d0026",
+    "d0027",
+    "d0028",
+    "d0044",
+    "d0048"
+  ],
+  "located": [
+    {
+      "pr_number": 33145,
+      "cid": "d0019",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:171",
+      "ask": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0020",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:183",
+      "ask": "```suggestion\ntheorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0021",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:191",
+      "ask": "There's a trick you can use for this kind of thing by using the `OrderDual`.\n```suggestion\n    lowerBounds (f '' S) = lowerBounds (range f) :=\n  hS.continuous_upperBounds (α := αᵒᵈ) hf\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0022",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:195",
+      "ask": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0023",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:208",
+      "ask": "```suggestion\ntheorem Dense.ciInf {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0024",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:217",
+      "ask": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup (α := αᵒᵈ) hf h\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0025",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask": "```suggestion\ntheorem Dense.ciSup' {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0026",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:239",
+      "ask": "It's easier if you case split on whether the range of the function from the subtype is bounded above or not.\n```suggestion\n  by_cases h : BddAbove (range (fun x : S ↦ f x))\n  · refine hS.ciSup hf <| h.closure.mono ?_\n    simpa [← Function.comp_def, range_comp] using hf.range_subset_closure_image_dense hS\n  · suffices ¬ BddAbove (range f) by simp [ciSup_of_not_bddAbove, this, h]\n    contrapose h\n    exact h.mono fun _ ↦ by aesop\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0027",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask": "```suggestion\ntheorem Dense.ciInf' {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0028",
+      "fact": "`continuous_sup'` is new, and `continuous_sup` is declared at `Mathlib/Topology/Order/IsLUB.lean:195`. `continuous_sup'` concludes `⨆ i, f i = ⨆ s : S, f s`; `continuous_sup` concludes `⨆ i, f i = ⨆ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:261",
+      "ask": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup' (α := αᵒᵈ) hf\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0019",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:171",
+      "ask": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0020",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:183",
+      "ask": "```suggestion\ntheorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0021",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:191",
+      "ask": "There's a trick you can use for this kind of thing by using the `OrderDual`.\n```suggestion\n    lowerBounds (f '' S) = lowerBounds (range f) :=\n  hS.continuous_upperBounds (α := αᵒᵈ) hf\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0022",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:195",
+      "ask": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0023",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:208",
+      "ask": "```suggestion\ntheorem Dense.ciInf {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0024",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:217",
+      "ask": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup (α := αᵒᵈ) hf h\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0025",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:221",
+      "ask": "```suggestion\ntheorem Dense.ciSup' {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0026",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:239",
+      "ask": "It's easier if you case split on whether the range of the function from the subtype is bounded above or not.\n```suggestion\n  by_cases h : BddAbove (range (fun x : S ↦ f x))\n  · refine hS.ciSup hf <| h.closure.mono ?_\n    simpa [← Function.comp_def, range_comp] using hf.range_subset_closure_image_dense hS\n  · suffices ¬ BddAbove (range f) by simp [ciSup_of_not_bddAbove, this, h]\n    contrapose h\n    exact h.mono fun _ ↦ by aesop\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0027",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask": "```suggestion\ntheorem Dense.ciInf' {α : Type*} [TopologicalSpace α]\n```"
+    },
+    {
+      "pr_number": 33145,
+      "cid": "d0028",
+      "fact": "`continuous_inf'` is new, and `continuous_inf` is declared at `Mathlib/Topology/Order/IsLUB.lean:208`. `continuous_inf'` concludes `⨅ i, f i = ⨅ s : S, f s`; `continuous_inf` concludes `⨅ i, f i = ⨅ s : S, f s`.",
+      "at": "Mathlib/Topology/Order/IsLUB.lean:243",
+      "ask_at": "Mathlib/Topology/Order/IsLUB.lean:261",
+      "ask": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup' (α := αᵒᵈ) hf\n```"
+    },
+    {
+      "pr_number": 33321,
+      "cid": "d0044",
+      "fact": "`linearIndepOn_root_baseOf'` is new, and `linearIndepOn_root_baseOf` is declared at `Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102`. `linearIndepOn_root_baseOf'` concludes `LinearIndepOn S P.root (baseOf P.root (f : M →+ S))`; `linearIndepOn_root_baseOf` concludes `LinearIndepOn R P.root (baseOf P.root (f : M →+ ℚ))`.",
+      "at": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:72",
+      "ask_at": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "ask": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```"
+    },
+    {
+      "pr_number": 33421,
+      "cid": "d0048",
+      "fact": "`round_eq'` is new, and `round_eq` is declared at `Mathlib/Algebra/Order/Round.lean:173`. `round_eq'` concludes `round x = (⌊2 * x⌋ + 1) / 2`; `round_eq` concludes `round x = ⌊x + 1 / 2⌋`.",
+      "at": "Mathlib/Algebra/Order/Round.lean:51",
+      "ask_at": "Mathlib/Algebra/Order/Round.lean:51",
+      "ask": "How about `round_eq_div`?"
+    }
+  ]
+}

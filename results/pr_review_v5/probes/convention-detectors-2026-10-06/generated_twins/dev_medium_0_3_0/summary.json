@@ -1,0 +1,176 @@
+{
+  "producer": "generated_twins",
+  "version": "generated_twins/1",
+  "set": "dev_medium_0_3_0",
+  "prs": 15,
+  "asks": 47,
+  "facts": 18,
+  "facts_per_pr": {
+    "33066": 0,
+    "33098": 0,
+    "33117": 17,
+    "33145": 0,
+    "33149": 0,
+    "33285": 0,
+    "33294": 1,
+    "33304": 0,
+    "33305": 0,
+    "33315": 0,
+    "33321": 0,
+    "33337": 0,
+    "33362": 0,
+    "33421": 0,
+    "33438": 0
+  },
+  "control_prs": [
+    33304,
+    33315,
+    33438
+  ],
+  "control_facts": {
+    "33304": 0,
+    "33315": 0,
+    "33438": 0
+  },
+  "asks_located": [
+    "d0018"
+  ],
+  "located": [
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_deriv` is written by hand; `@[to_fun]` on `Meromorphic.deriv` (`Mathlib/Analysis/Meromorphic/Basic.lean:717`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:720",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_neg` is written by hand; `@[to_fun]` on `Meromorphic.neg` (`Mathlib/Analysis/Meromorphic/Basic.lean:649`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:652",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_zpow` is written by hand; `@[to_fun]` on `Meromorphic.zpow` (`Mathlib/Analysis/Meromorphic/Basic.lean:711`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:714",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_prod` is written by hand; `@[to_fun]` on `Meromorphic.prod` (`Mathlib/Analysis/Meromorphic/Basic.lean:688`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:692",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_pow` is written by hand; `@[to_fun]` on `Meromorphic.pow` (`Mathlib/Analysis/Meromorphic/Basic.lean:705`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:708",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_sum` is written by hand; `@[to_fun]` on `Meromorphic.sum` (`Mathlib/Analysis/Meromorphic/Basic.lean:663`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:667",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_sub` is written by hand; `@[to_fun]` on `Meromorphic.sub` (`Mathlib/Analysis/Meromorphic/Basic.lean:672`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:676",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_iterated_deriv` is written by hand; `@[to_fun]` on `Meromorphic.iterated_deriv` (`Mathlib/Analysis/Meromorphic/Basic.lean:724`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:728",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_add` is written by hand; `@[to_fun]` on `Meromorphic.add` (`Mathlib/Analysis/Meromorphic/Basic.lean:655`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:659",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_mul` is written by hand; `@[to_fun]` on `Meromorphic.mul` (`Mathlib/Analysis/Meromorphic/Basic.lean:680`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:684",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_div` is written by hand; `@[to_fun]` on `Meromorphic.div` (`Mathlib/Analysis/Meromorphic/Basic.lean:697`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:701",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`sum` is written by hand; `@[to_additive]` on `Meromorphic.prod` (`Mathlib/Analysis/Meromorphic/Basic.lean:688`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:663",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`sub` is written by hand; `@[to_additive]` on `Meromorphic.div` (`Mathlib/Analysis/Meromorphic/Basic.lean:697`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:672",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_sum` is written by hand; `@[to_additive]` on `Meromorphic.fun_prod` (`Mathlib/Analysis/Meromorphic/Basic.lean:692`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:667",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_add` is written by hand; `@[to_additive]` on `Meromorphic.fun_mul` (`Mathlib/Analysis/Meromorphic/Basic.lean:684`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:659",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`add` is written by hand; `@[to_additive]` on `Meromorphic.mul` (`Mathlib/Analysis/Meromorphic/Basic.lean:680`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:655",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    },
+    {
+      "pr_number": 33117,
+      "cid": "d0018",
+      "fact": "`fun_sub` is written by hand; `@[to_additive]` on `Meromorphic.fun_div` (`Mathlib/Analysis/Meromorphic/Basic.lean:701`) generates it.",
+      "at": "Mathlib/Analysis/Meromorphic/Basic.lean:676",
+      "ask_at": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+      "ask": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop"
+    }
+  ]
+}
