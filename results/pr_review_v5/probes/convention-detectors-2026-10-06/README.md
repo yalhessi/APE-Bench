@@ -405,3 +405,13 @@ exactly the 8 read valid in stage 6 (`isSMulRegular_iff` in three files, the `ge
 26591 and 26846); 43167's three facts stand. **What it shows:** a precise but nearly silent section
 -- 8 facts on 3 of 973 census PRs, none on a control PR, none at any of the census's 11 P201 asks.
 It is not shown to be a lever, and on this evidence it rarely has anything to say.
+
+**Stage 5, ready and not run (2026-10-06).** The workspaces are built: 14 base snapshots (two
+existed), restored, then 16 of 16 reviewed workspaces (`stage5/build.log`; 11:45-16:29 after a
+first launch died on the home-directory quota, `stage5/build_*_attempt1.*`). `cli plan` preflights
+both conditions clean with the login exported: 16 of 16 workspaces prebuilt, both plans seal (S0
+agenda `6a9532d20371`, S1 `c3f0e42ed4b4`, 702 prompt hashes each). The run is not launched: the two
+Pro subscription accounts now refuse Claude Code, so it would spend the user's primary quota
+(about two five-hour windows; seven_day at 67% that day), which is the user's call. Commands:
+`ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`,
+then the `_hygiene_sections_` config as `probe_census_detectors_s1_rep1`.

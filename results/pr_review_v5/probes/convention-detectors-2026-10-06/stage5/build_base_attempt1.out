@@ -1,0 +1,211 @@
+2026-10-06 11:37:58 | INFO     | main:920 - Lean verification service batch builder
+2026-10-06 11:37:58 | INFO     | run_batch_build:851 - Starting batch build process
+2026-10-06 11:37:58 | INFO     | run_batch_build:861 - Input file: ['/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/codebase-redesign/results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5/base_build_rows.jsonl']
+2026-10-06 11:37:58 | INFO     | run_batch_build:862 - Commit ID key name: commit_hash
+2026-10-06 11:37:58 | INFO     | run_batch_build:866 - Number of processes: 4
+2026-10-06 11:37:58 | INFO     | __init__:153 - Batch builder initialized
+2026-10-06 11:37:58 | INFO     | build_from_file:540 - Starting batch build from 1 files
+2026-10-06 11:37:58 | INFO     | build_from_file:543 - Loading file: /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/codebase-redesign/results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5/base_build_rows.jsonl
+2026-10-06 11:37:58 | INFO     | build_from_file:551 -   Loaded 16 commits and 16 toolchains from /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/codebase-redesign/results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5/base_build_rows.jsonl
+2026-10-06 11:37:58 | INFO     | build_from_file:569 - Total 16 commits and 16 toolchains found
+2026-10-06 11:37:58 | INFO     | build_commits:646 - Checking and cloning required Git repositories...
+2026-10-06 11:37:58 | INFO     | _ensure_repositories_cloned:245 - Checking 1 repositories...
+2026-10-06 11:37:58 | INFO     | ensure_one_repo:253 - Repository exists: mathlib4
+2026-10-06 11:37:58 | INFO     | _ensure_repositories_cloned:300 - Repository check completed: 1/1 ready
+2026-10-06 11:37:58 | INFO     | build_commits:658 - Installing 16 toolchains...
+2026-10-06 11:37:58 | INFO     | _install_toolchains:176 - Installing 9 toolchains...
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.24.0 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.24.0
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc2 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc2
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.24.0-rc1 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.24.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.27.0-rc1 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.27.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.26.0-rc2 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.26.0-rc2
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.26.0-rc1 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.26.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc6 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc6
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.25.0-rc2 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.25.0-rc2
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc4 (attempt 1)
+2026-10-06 11:37:58 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc4
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.24.0' is already installed
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.24.0-rc1' is already installed
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.27.0-rc1' is already installed
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.26.0-rc2' is already installed
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.26.0-rc1' is already installed
+2026-10-06 11:37:58 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.29.0-rc6' is already installed
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.24.0
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.24.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.27.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.26.0-rc2
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.26.0-rc1
+2026-10-06 11:37:58 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.29.0-rc6
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: waiting for previous installation request to finish (/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.lock, held by PID 1738571)
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+2026-10-06 11:37:59 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.25.0-rc2/lean-4.25.0-rc2-linux.tar.zst
+2026-10-06 11:38:02 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.0-rc2
+2026-10-06 11:38:02 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+2026-10-06 11:38:07 | INFO     | read_stream:296 - [command] stderr: error: failed to extract package
+2026-10-06 11:38:07 | INFO     | read_stream:296 - [command] stderr: info: caused by: failed to unpack `lean-4.25.0-rc2-linux/lib/lean/Lean/Compiler/FFI.olean.private` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.tmp/lib/lean/Lean/Compiler/FFI.olean.private`
+2026-10-06 11:38:07 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:07 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.25.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.25.0-rc2/lean-4.25.0-rc2-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.0-rc2
+error: failed to extract package
+info: caused by: failed to unpack `lean-4.25.0-rc2-linux/lib/lean/Lean/Compiler/FFI.olean.private` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.tmp/lib/lean/Lean/Compiler/FFI.olean.private`
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:07 | INFO     | read_stream:296 - [command] stderr: error: failed to extract package
+2026-10-06 11:38:07 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122) when creating dir /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Lean
+2026-10-06 11:38:07 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+error: failed to extract package
+info: caused by: Quota exceeded (os error 122) when creating dir /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Lean
+2026-10-06 11:38:08 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+2026-10-06 11:38:08 | INFO     | read_stream:296 - [command] stderr: error: could not create temp file: /common/home/ya475/.elan/tmp/pkz_4b88nf9o38k8_file
+2026-10-06 11:38:08 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc4: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: waiting for previous installation request to finish (/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.lock, held by PID 1738571)
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+error: could not create temp file: /common/home/ya475/.elan/tmp/pkz_4b88nf9o38k8_file
+2026-10-06 11:38:17 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.25.0-rc2 (attempt 2)
+2026-10-06 11:38:17 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.25.0-rc2
+2026-10-06 11:38:17 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:38:17 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc2 (attempt 2)
+2026-10-06 11:38:17 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc2
+2026-10-06 11:38:17 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.25.0-rc2/lean-4.25.0-rc2-linux.tar.zst
+2026-10-06 11:38:17 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:38:17 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+2026-10-06 11:38:18 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc4 (attempt 2)
+2026-10-06 11:38:18 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc4
+2026-10-06 11:38:18 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:38:18 | INFO     | read_stream:296 - [command] stderr: info: waiting for previous installation request to finish (/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.lock, held by PID 1739371)
+2026-10-06 11:38:20 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.0-rc2
+2026-10-06 11:38:20 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: error: failed to extract package
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: info: caused by: failed to unpack `lean-4.29.0-rc2-linux/lib/lean/Std/Data/TreeSet/Raw/WF.olean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Std/Data/TreeSet/Raw/WF.olean`
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: error: failed to extract package
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: info: caused by: failed to unpack `lean-4.25.0-rc2-linux/lib/lean/Std/Data/Iterators/Lemmas/Producers/Empty.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.tmp/lib/lean/Std/Data/Iterators/Lemmas/Producers/Empty.ilean`
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:23 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.25.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.25.0-rc2/lean-4.25.0-rc2-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.0-rc2
+error: failed to extract package
+info: caused by: failed to unpack `lean-4.25.0-rc2-linux/lib/lean/Std/Data/Iterators/Lemmas/Producers/Empty.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.25.tmp/lib/lean/Std/Data/Iterators/Lemmas/Producers/Empty.ilean`
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:23 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+error: failed to extract package
+info: caused by: failed to unpack `lean-4.29.0-rc2-linux/lib/lean/Std/Data/TreeSet/Raw/WF.olean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Std/Data/TreeSet/Raw/WF.olean`
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:23 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+2026-10-06 11:38:27 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc4
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: error: failed to extract package
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: info: caused by: failed to unpack `lean-4.29.0-rc4-linux/lib/lean/Init/Data/String/Subslice.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Init/Data/String/Subslice.ilean`
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:43 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc4: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: waiting for previous installation request to finish (/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.lock, held by PID 1739371)
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc4
+error: failed to extract package
+info: caused by: failed to unpack `lean-4.29.0-rc4-linux/lib/lean/Init/Data/String/Subslice.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Init/Data/String/Subslice.ilean`
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:38:43 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.25.0-rc2 (attempt 3)
+2026-10-06 11:38:43 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.25.0-rc2
+2026-10-06 11:38:43 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc2 (attempt 3)
+2026-10-06 11:38:43 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc2
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: error: Quota exceeded (os error 122)
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:38:43 | INFO     | read_stream:296 - [command] stderr: error: Quota exceeded (os error 122)
+2026-10-06 11:38:43 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.25.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+error: Quota exceeded (os error 122)
+2026-10-06 11:38:43 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc2: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+error: Quota exceeded (os error 122)
+2026-10-06 11:39:03 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.29.0-rc4 (attempt 3)
+2026-10-06 11:39:03 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.29.0-rc4
+2026-10-06 11:39:03 | INFO     | read_stream:296 - [command] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:39:04 | INFO     | read_stream:296 - [command] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+2026-10-06 11:39:07 | INFO     | read_stream:296 - [command] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc4
+2026-10-06 11:39:11 | INFO     | read_stream:296 - [command] stderr: error: could not create temp toolchain directory directory: '/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp'
+2026-10-06 11:39:11 | INFO     | read_stream:296 - [command] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:39:11 | WARNING  | install_one_toolchain:203 - Failed to install toolchain leanprover/lean4:v4.29.0-rc4: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc4/lean-4.29.0-rc4-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc4
+error: could not create temp toolchain directory directory: '/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp'
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:39:11 | INFO     | _install_toolchains:225 - Toolchain installation completed: 6/9 successful
+2026-10-06 11:39:11 | WARNING  | build_commits:662 - Some toolchains failed to install, continue build process
+2026-10-06 11:39:11 | INFO     | build_commits:667 - Concurrent build 16 commits, using 4 processes
+2026-10-06 11:39:11 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 11:39:11 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 11:39:11 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 11:39:11 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 11:39:11 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 11:39:11 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 11:39:11 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 11:39:11 | INFO     | build_workspace:314 - Start building workspace: 21f7dcba68e7532c8c291f71767cb5032b1526e1
+2026-10-06 11:39:11 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 11:39:11 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 11:39:11 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 11:39:11 | INFO     | build_workspace:314 - Start building workspace: 3e143864e89e46310b5eec17f86951d1b670999b
+2026-10-06 11:39:11 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 11:39:11 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 11:39:11 | INFO     | build_workspace:314 - Start building workspace: 370d9705df1c68b0707ca1a9688a60e299264c5f
+2026-10-06 11:39:11 | INFO     | build_workspace:314 - Start building workspace: 2fc191a2c76719bffe2403726776d0ed3773a94d
+2026-10-06 11:39:11 | INFO     | build_workspace:326 - Workspace already built: 21f7dcba68e7532c8c291f71767cb5032b1526e1
+2026-10-06 11:39:11 | INFO     | build_workspace:335 - Execute build: 3e143864e89e46310b5eec17f86951d1b670999b
+2026-10-06 11:39:11 | INFO     | _print_progress:511 - [1m[96mProgress:[0m [92m1[0m/[94m16[0m ([92m6.2%[0m) | [1m[96mSuccess:[0m [92m1[0m/[94m1[0m ([92m100.0%[0m) | [1m[96mFailed:[0m [91m0[0m | [1m[96mETA:[0m [93m0h0m0s[0m
+2026-10-06 11:39:11 | INFO     | build_workspace:335 - Execute build: 370d9705df1c68b0707ca1a9688a60e299264c5f
+2026-10-06 11:39:11 | INFO     | _ensure_repository_cloned_unlocked:103 - Repository already exists: mathlib4
+2026-10-06 11:39:11 | INFO     | build_workspace:335 - Execute build: 2fc191a2c76719bffe2403726776d0ed3773a94d
+2026-10-06 11:39:11 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 11:39:11 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 11:39:11 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 11:39:11 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 11:39:11 | INFO     | build_workspace:314 - Start building workspace: 4416d9e74ce0c8e32be5035066434c5a790e7145
+2026-10-06 11:39:11 | INFO     | build_workspace:335 - Execute build: 4416d9e74ce0c8e32be5035066434c5a790e7145
+2026-10-06 11:39:18 | INFO     | create_worktree:222 - Created worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/3e143864e89e46310b5eec17f86951d1b670999b_1740944_fed4313b
+2026-10-06 11:39:18 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 3e143864e89e46310b5eec17f86951d1b670999b
+2026-10-06 11:39:19 | INFO     | _ensure_repository_cloned_unlocked:103 - Repository already exists: mathlib4
+2026-10-06 11:39:27 | INFO     | create_worktree:222 - Created worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/4416d9e74ce0c8e32be5035066434c5a790e7145_1740935_8dd5eb21
+2026-10-06 11:39:27 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 4416d9e74ce0c8e32be5035066434c5a790e7145
+2026-10-06 11:39:29 | INFO     | _ensure_repository_cloned_unlocked:103 - Repository already exists: mathlib4
+2026-10-06 11:39:36 | INFO     | create_worktree:222 - Created worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/370d9705df1c68b0707ca1a9688a60e299264c5f_1740941_580690f9
+2026-10-06 11:39:36 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 370d9705df1c68b0707ca1a9688a60e299264c5f
+2026-10-06 11:39:38 | INFO     | _ensure_repository_cloned_unlocked:103 - Repository already exists: mathlib4
+2026-10-06 11:39:46 | INFO     | create_worktree:222 - Created worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/2fc191a2c76719bffe2403726776d0ed3773a94d_1740938_034df9b8
+2026-10-06 11:39:46 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 2fc191a2c76719bffe2403726776d0ed3773a94d
+2026-10-06 11:42:16 | INFO     | run_command:241 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] Starting execution: lake exe cache get
+2026-10-06 11:42:16 | INFO     | run_command:243 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] Working directory: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/3e143864e89e46310b5eec17f86951d1b670999b_1740944_fed4313b
+2026-10-06 11:42:16 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+2026-10-06 11:42:16 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+2026-10-06 11:42:20 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+2026-10-06 11:42:30 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: error: failed to extract package
+2026-10-06 11:42:30 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: info: caused by: failed to unpack `lean-4.29.0-rc2-linux/lib/lean/Lean/Meta/Tactic/Grind/Arith/Util.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Lean/Meta/Tactic/Grind/Arith/Util.ilean`
+2026-10-06 11:42:30 | INFO     | read_stream:296 - [lake cache get 3e143864e89e46310b5eec17f86951d1b670999b] stderr: info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:42:30 | WARNING  | _get_cache_for_workspace:1233 - Cache get failed: info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.29.0-rc2/lean-4.29.0-rc2-linux.tar.zst
+info: installing /common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.0-rc2
+error: failed to extract package
+info: caused by: failed to unpack `lean-4.29.0-rc2-linux/lib/lean/Lean/Meta/Tactic/Grind/Arith/Util.ilean` into `/common/home/ya475/.elan/toolchains/leanprover--lean4---v4.29.tmp/lib/lean/Lean/Meta/Tactic/Grind/Arith/Util.ilean`
+info: caused by: Quota exceeded (os error 122)
+2026-10-06 11:42:40 | DEBUG    | _get_cache_for_workspace:1182 - Retry cache get (2/3)
+2026-10-06 11:42:50 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 3e143864e89e46310b5eec17f86951d1b670999b
