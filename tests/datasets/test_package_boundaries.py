@@ -145,8 +145,10 @@ def test_private_imports_inside_mathlib_review_do_not_increase():
     package, where a sibling import would be legitimate and this is not.
 
     Three, and each is a real one -- `wrapper_composition._changed_roles` and `._target_goal`
-    read by the implementation registry, and `lean_parser._build_top_level_index` read by the
-    change-graph builder.
+    read by the implementation registry, and `review.runner._scratch_dirs` read by
+    `analysis/bench_cli.py`. (This named `lean_parser._build_top_level_index` until 2026-10-06;
+    that one went and `_scratch_dirs` took its place under the same ceiling, unnoticed, because
+    the test counts and the docstring did not.)
     """
 
     root = Path("src/mathlib_review")

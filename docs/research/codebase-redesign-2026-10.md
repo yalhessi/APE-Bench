@@ -262,10 +262,10 @@ and its three `unblind.py` siblings are one. Its width in `results/` does not ch
   its directory and its roster, hashed by nine manifests, and may lose its code with 17 tests --
   a decision for the user, since it closes the v2 selector line by fiat (the tag keeps it).
 - **Configs.** The 26 v2/v4 configs naming a spent run go first; then whatever a cell expresses.
-- **Pins.** An inventory classifies the ~20 structural tests: a pin that records a lesson or is
-  differential stays (the ten-hash table, the grant-survival test, the solo payload's resume
-  identity); a pure pin goes (the 3-of-3 private-import ceiling, exact schema counts, configs by
-  filename, the basename allow-list), each in the commit that would otherwise have had to edit it.
+- **Pins.** The inventory is §10. Three tests are pure pins (the exact class count, the
+  basename allow-list, the design-config filename prefix) and go in the commit that would
+  otherwise have had to edit them; the rest record a lesson, are ratchets, or are differential,
+  and stay with their paths updated.
 
 ## 5. Would it have changed the past threads? (honest)
 
@@ -338,3 +338,56 @@ in the main tree, which is why every step is a worktree.
    launches reader sessions by hand.
 4. Whether steps 3-5 start with the after-structure plan's §2 detector, which is both the first
    planned producer and the threshold for step 3.
+
+## 10. The pin inventory (step 0, 2026-10-06)
+
+The surveys counted about twenty tests that pin the *shape* of the tree, and the reviews asked
+which of them record a lesson. Read one docstring at a time, nearly all do: each names the defect
+it was written after, usually with the measurement. So the inventory's result is narrower than
+§4.7 expected. Almost nothing is deleted; what a step needs is the list of pins it will have to
+*update*, and the few pure pins it may drop instead.
+
+**Pure pins: a number or a name with no lesson behind it.** Each goes in the commit that would
+otherwise have had to edit it, replaced by the property it stands for.
+
+| test | pins | replace with |
+|---|---|---|
+| `test_pr_review_v4_schema_split.py::test_every_class_landed_in_exactly_one_module` | exactly 112 classes | the duplicate-class check alone; the count adds nothing to it |
+| `test_pr_review_v4_no_duplicate_helpers.py::ALLOWED` | allowed files keyed by *basename*; the `phase9_fixed_orchestration.py` entry is already dead because `legacy_pipeline` is excluded | keys by repo path; the dead entry removed |
+| `test_pr_review_v5_designs.py::test_there_is_a_config_per_registered_design_and_each_names_its_design` | a design config's filename starts with the design's name | the config's `dataset.design` field, which the next test already reads |
+
+**Ratchets: counts that may only go down.** Kept. The ceiling inside `mathlib_review` is 3 with 3
+used, so a step that splits a subpackage and turns a sibling import into a crossing one either
+removes the crossing or raises the ceiling in the same commit with the reason. Its docstring had
+gone stale -- it named an import that no longer exists while a different one filled the slot --
+and is corrected in the commit that adds this section.
+
+| test | count |
+|---|---|
+| `test_package_boundaries.py::test_private_imports_inside_mathlib_review_do_not_increase` | ≤ 3 (3 used: `wrapper_composition` ×2, `review.runner._scratch_dirs`) |
+| `test_package_boundaries.py::test_private_cross_boundary_imports_do_not_increase` | ≤ 14 in the v2 packages (9 used) |
+| `test_pr_review_v5_cli.py::test_no_v5_config_is_longer_than_its_own_deltas_plus_its_reasoning` | ≤ 8 leaves per v5 config |
+
+**Differential or identity pins.** Kept, and the reason each is not a pure pin is written in it.
+
+| test | why it stays |
+|---|---|
+| `test_pr_review_v5_arm_registry_consistency.py::test_spec_identities_are_unchanged` | nine of ten unchanged is the check that a commit touched one arm and not the registry's shape; each deliberate move carries its reason inline |
+| `test_pr_review_v5_designs.py` baseline digests and `test_a_solo_payload_is_what_it_was_before_the_registry_existed` | the hygiene reps and every design comparison read these exact bytes and resume on this identity |
+| `test_pr_review_v4_schema_split.py::test_the_facade_still_resolves_every_name` (exactly 133) | exact on purpose, so a record that silently stops being exported fails |
+| `test_pr_review_v4_rerender_release.py` | today's renderer reproduces a frozen release's `prompt_sha256` |
+
+**Lessons pinned by path.** Kept; the step that moves the named file updates the path in the same
+commit, and `test_the_structural_guards_are_pointed_at_a_directory_that_exists` is the backstop
+against a vacuous pass.
+
+| step | tests it will update |
+|---|---|
+| 3 producers | `test_context_tool_grants_survive.py` (vocabulary and registrar checks become one), `test_package_boundaries.py::test_the_context_tool_grant_has_one_owner`, `test_retrieval_gate.py::test_every_context_tool_records_a_gate` (regexes over `context_tools.py`'s text), `test_prompt_contamination.py::MODEL_TEXT_MODULES` (any new prompt or brief location), `test_pr_review_v5_cli.py::test_nothing_asks_for_a_tool_that_cannot_register` |
+| 4 design-owned run data | `test_pr_review_v5_designs.py` (ledger rows, stage rows), `test_pr_review_v5_lead.py` (one `TaskOrchestrator(` in `runner.run`), `test_config_strictness.py::test_load_run_has_one_implementation` (the module trio) |
+| 5 the stage as the probe unit | `test_probes.py` |
+| 6 hygiene | `test_pr_review_v4_no_prior_generation.py` and `test_pr_review_v4_no_duplicate_helpers.py` (the `legacy_pipeline` exclusion), `test_package_boundaries.py` (generation paths, if v2's code goes), `test_subtask_primitive.py::test_every_nested_call_site_uses_the_shared_convention` and `test_subtask_isolation.py::test_the_workspace_hangs_off_the_attempt_path` (named source files) |
+
+The record this leaves: the tests are not what made threads wide. A thread edits them because it
+moves the thing they guard, and the docstrings say why each guard exists. §4.7's "pure pins go"
+is three tests, not twenty.
