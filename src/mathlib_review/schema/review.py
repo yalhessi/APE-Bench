@@ -215,7 +215,7 @@ class ContextCall(StrictModel):
     #: followed its convention (now `conforms`).
     #: Null on a call that returned an answer, and on every row written before the split.
     empty_because: Optional[Literal["subject_unresolved", "no_population", "population_too_small",
-                                     "no_dominant_prefix"]] = None
+                                     "no_dominant_prefix", "scope_conflict"]] = None
 
 
 class CandidateAssessment(StrictModel):

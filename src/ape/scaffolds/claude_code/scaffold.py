@@ -155,6 +155,18 @@ class ClaudeCodeScaffold(BaseScaffold):
         task_user_prompt = await self.task.create_user_prompt()
         return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
 
+    def _session_cwd(self) -> Path:
+        """The attempt's `workspaces/`, by its resolved spelling, for the CLI and the first message.
+
+        Under a linked `.ape/` (every worktree) the unresolved path goes through the worktree's
+        symlink while the `<WORKSPACE_PATHS>` block resolves its paths, so the first message
+        named two roots for one attempt and told the agent to use both (2026-10-01). One
+        spelling here; `provisioned_roots` still admits either, since a tool may report a file
+        by whichever the process sees.
+        """
+
+        return Path(os.path.realpath(self.task.workspaces_dir))
+
     def _relay_environment(self) -> Dict[str, str]:
         """This task's relay address for its own CLI process; empty when no relay runs."""
         relay = self.conversation_manager._relay_session if self.conversation_manager else None
@@ -247,8 +259,7 @@ class ClaudeCodeScaffold(BaseScaffold):
         if not self.task.scratch_workspace or not self.task.attempt_path:
             raise RuntimeError("Task workspace not initialized for Claude scaffold")
 
-        # Use workspaces directory directly
-        cwd = self.task.workspaces_dir
+        cwd = self._session_cwd()
 
         # No need for add_dirs since cwd is the workspaces directory
         add_dirs = []
@@ -305,7 +316,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             from .containment import pre_tool_use_hook, provisioned_roots
 
             self.containment_roots = provisioned_roots(
-                cwd, extra=[Path(d) for d in add_dirs])
+                self.task.workspaces_dir, extra=[Path(d) for d in add_dirs])
             optional_containment["hooks"] = {"PreToolUse": [HookMatcher(
                 matcher=None,
                 hooks=[pre_tool_use_hook(self.containment_roots, os.path.abspath(cwd),

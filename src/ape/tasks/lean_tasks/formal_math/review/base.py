@@ -184,6 +184,13 @@ class BasePRReviewTask(BaseLeanTask):
     #: does require a self-contained snippet.
     lean_verify_allows_target = True
 
+    #: `lean_verify` is the snippet probe here (`LeanVerifyToolsProvider._register_snippet_probe`):
+    #: a review task has no scratch Lean file to compile, the reviewed file is compiled through
+    #: `lean_verify_edit`, and under the general registration the two tools read as one
+    #: ("verify ... correctness" with a `file_path`) while reviewers used this one for `#check`
+    #: and `example` probes 55 times in 84 (2026-10-01).
+    lean_verify_snippet_only = True
+
     data_class = BasePRReviewData
     task_config_class = BasePRReviewConfig
     task_result_class = BasePRReviewResult
@@ -244,16 +251,26 @@ class BasePRReviewTask(BaseLeanTask):
         tools = self.config.task_config.enabled_tools or []
         has = lambda t: t in tools  # noqa: E731
         parts = []
-        if has("file_read"):
+        if getattr(self.config, "scaffold_type", "") == "claude_code":
+            # Claude Code keeps its own file tools and APE's are not registered there, so the
+            # line below named three tools the session did not have (`file_read`,
+            # `content_search`, `file_search`), and a reviewer called `zulip_search` by its bare
+            # name twice where the harness spells it `mcp__core__zulip_search` (2026-10-01).
+            parts.append("read and search files with Read, Grep and Glob")
+            parts.append("every other tool below is spelled `"
+                         f"{self.config.mcp_server_name}<name>`")
+        if has("file_read") and not parts:
             parts.append("read files")
-        if has("content_search"):
+        if has("content_search") and getattr(self.config, "scaffold_type", "") != "claude_code":
             parts.append("grep the repo (content_search)")
-        if has("file_search"):
+        if has("file_search") and getattr(self.config, "scaffold_type", "") != "claude_code":
             parts.append("find files by name (file_search)")
         if has("lean_retrieve"):
             parts.append("semantic library search (lean_retrieve)")
         if has("lean_verify"):
-            parts.append("compile/verify Lean code (lean_verify)")
+            parts.append("compile a snippet against the library (lean_verify)"
+                         if getattr(self, "lean_verify_snippet_only", False)
+                         else "compile/verify Lean code (lean_verify)")
         if has("get_lean_goal"):
             parts.append("inspect goals")
         if any(has(t) for t in ("code_hover", "code_goto")):
@@ -368,12 +385,17 @@ class BasePRReviewTask(BaseLeanTask):
             return splice_declaration(src, declaration_name, new_declaration, label=norm)
 
         lines = src.split("\n")
-        if line_start is None or line_end is None or replacement is None:
+        if line_start is None and line_end is None:
+            if replacement is not None:
+                return None, "`replacement` needs the span it replaces: give `line_start` and `line_end`"
             return src, ""  # compile the file unedited
         if not (isinstance(line_start, int) and isinstance(line_end, int)
                 and 1 <= line_start <= line_end <= len(lines)):
             return None, f"line span {line_start}-{line_end} out of range for {norm} ({len(lines)} lines)"
-        edited = lines[: line_start - 1] + str(replacement).split("\n") + lines[line_end:]
+        # No replacement for a span is a deletion. The model's way of saying "delete these lines"
+        # was `"replacement": }`, malformed JSON that the CLI refused before the tool saw it, on
+        # 7 calls in three dev runs (2026-10-01).
+        edited = lines[: line_start - 1] + (str(replacement).split("\n") if replacement else []) + lines[line_end:]
         return "\n".join(edited), ""
 
     @staticmethod
@@ -387,7 +409,12 @@ class BasePRReviewTask(BaseLeanTask):
         return str((item or {}).get("data") or "").strip()
 
     async def _baseline_errors(self, path: Optional[str]) -> set:
-        """Errors the reviewed file already has, compiled once per attempt and cached.
+        """Errors the reviewed file already has, compiled once per attempt and cached."""
+
+        return (await self._baseline_diagnostics(path))["errors"]
+
+    async def _baseline_diagnostics(self, path: Optional[str]) -> Dict[str, set]:
+        """Errors and warnings the reviewed file already has, compiled once per attempt and cached.
 
         Cached because the unedited file does not change during an attempt, and a full-file
         compile is the expensive operation here — paying it once per file rather than once
@@ -401,33 +428,49 @@ class BasePRReviewTask(BaseLeanTask):
         key = _strip_ws_prefix(path)
         if key in cache:
             return cache[key]
+        empty = {"errors": set(), "warnings": set()}
         code, err = self._edited_file_code(path)
         if code is None:
-            cache[key] = set()
+            cache[key] = empty
             return cache[key]
         from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
 
         lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
         try:
-            baseline = await lean_tool.execute(code=code, max_messages=50)
+            baseline = await lean_tool.execute(code=code, max_messages=50, options=WHOLE_FILE_OPTIONS)
         except Exception:  # noqa: BLE001
-            cache[key] = set()
+            cache[key] = empty
             return cache[key]
         cache[key] = {
-            self._error_key(item) for item in (baseline.get("errors") or [])
+            "errors": {self._error_key(item) for item in (baseline.get("errors") or [])},
+            "warnings": {self._error_key(item) for item in (baseline.get("warnings") or [])},
         }
         return cache[key]
 
     async def _attribute_errors(self, path: Optional[str], result: Dict[str, Any]) -> Dict[str, Any]:
-        """Split a compile result into errors this edit introduced and errors already present."""
+        """Split a compile result into the errors and warnings this edit introduced and those
+        already present."""
 
         errors = list(result.get("errors") or [])
-        if not errors:
+        warnings = list(result.get("warnings") or [])
+        if not errors and not warnings:
             return result
-        baseline = await self._baseline_errors(path)
+        baseline = await self._baseline_diagnostics(path)
+        enriched = dict(result)
+        if warnings:
+            # Mathlib's linters run on the whole file (`WHOLE_FILE_OPTIONS`), so a long file
+            # reports every pre-existing warning on every edit; only the edit's own are the
+            # reviewer's business here, and the file's own are the as-is call's.
+            enriched["warnings_introduced_by_your_edit"] = [
+                item for item in warnings if self._error_key(item) not in baseline["warnings"]]
+            enriched["warnings_already_in_the_file"] = len(warnings) - len(
+                enriched["warnings_introduced_by_your_edit"])
+            enriched.pop("warnings", None)
+        if not errors:
+            return enriched
+        baseline = baseline["errors"]
         introduced = [item for item in errors if self._error_key(item) not in baseline]
         pre_existing = [item for item in errors if self._error_key(item) in baseline]
-        enriched = dict(result)
         enriched["errors_introduced_by_your_edit"] = introduced
         enriched["errors_already_in_the_file"] = pre_existing
         # The note states what was measured and nothing more. It used to end "The file does
@@ -498,7 +541,8 @@ class BasePRReviewTask(BaseLeanTask):
                 "replaces that whole declaration (robust for match/structured proofs; no line "
                 "counting). You may include the declaration's `@[...]` attributes and "
                 "modifiers or omit them; either way they are not duplicated. Or "
-                "`line_start`/`line_end` + `replacement` to splice a line span. Your edit may "
+                "`line_start`/`line_end` + `replacement` to splice a line span, with no "
+                "`replacement` to delete the span. Your edit may "
                 "reference the PR's own new declarations. Omitting all edit args answers a "
                 "DIFFERENT question — whether the file compiles as the PR leaves it — and "
                 "returns `compiles` plus `errors_already_in_the_file`, with no `success` "
@@ -506,7 +550,8 @@ class BasePRReviewTask(BaseLeanTask):
                 "weighing. Errors come back split into "
                 "`errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only "
                 "the former; line numbers refer to the whole spliced file, so use `code_line` "
-                "to locate them. " + OUTCOME_NOTE
+                "to locate them. Warnings are Mathlib's standard linters, as CI runs them, split "
+                "the same way. " + OUTCOME_NOTE
             )
         )
         async def lean_verify_edit(
@@ -520,7 +565,7 @@ class BasePRReviewTask(BaseLeanTask):
             line_end: Annotated[Optional[int], Field(
                 description="Line mode: last line of the span (inclusive)")] = None,
             replacement: Annotated[Optional[str], Field(
-                description="Line mode: exact Lean text to substitute for that span")] = None,
+                description="Line mode: exact Lean text to substitute for that span; omit it to delete the span")] = None,
             max_messages: Annotated[int, Field(description="Max compile messages to return")] = 20,
         ) -> Dict[str, Any]:
             code, err = self._edited_file_code(
@@ -531,7 +576,8 @@ class BasePRReviewTask(BaseLeanTask):
             from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
             lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
             try:
-                result = await lean_tool.execute(code=code, max_messages=max_messages)
+                result = await lean_tool.execute(code=code, max_messages=max_messages,
+                                                 options=WHOLE_FILE_OPTIONS)
             except Exception as exc:  # noqa: BLE001
                 return {"success": False, "outcome": "tool_error", "error": f"verify raised: {exc}"}
             # Which of these errors are actually the caller's fault?
@@ -639,6 +685,18 @@ class BasePRReviewTask(BaseLeanTask):
                     "error": ("Not recorded: `notes` is empty. Give your account of the review, "
                               "object by object, including what you checked and found nothing "
                               "wrong with, then call this tool again."),
+                }
+            budget = self.config.task_config.finding_budget
+            if 0 < budget < len(findings or []):
+                # Refused, not truncated. `_normalize_findings` used to cut the tail and warn in
+                # the log, so a finding past the budget vanished with nothing said to the
+                # reviewer: 2 and 4 findings on 33149 in two dev reps (2026-10-01). The reviewer
+                # chooses what to drop.
+                return {
+                    "success": False, "outcome": "invalid_request",
+                    "error": (f"Not recorded: {len(findings)} findings exceed this review's budget "
+                              f"of {budget}. Call again with at most {budget}, keeping the changes "
+                              "you would most insist on; mention the rest in `message`."),
                 }
             extra = {} if notes is None else {"review_notes": notes}
             try:
@@ -789,6 +847,16 @@ _VERIFY_CONCURRENCY = 3
 # Predicted paths are workspace-relative (target/Mathlib/…); the materialized reviewed
 # tree is rooted at target_workspace.path with repo-relative paths (Mathlib/…).
 _WS_PREFIX_RE = re.compile(r"^(?:target/|reference/[^/]+/|scratch/|a/|b/|\./|/)+")
+
+#: `-D` options for compiling a whole reviewed Mathlib file: the standard linter set, as the
+#: package build and CI apply it (`lakefile.lean`, `mathlibLeanOptions`, each name prefixed
+#: `weak.` so that a file compiled outside the package accepts it). Without it a whole-file
+#: compile reported `warnings: []` on a 101-character line the maintainers asked to wrap
+#: (d0041; `transcript-inspection-2026-09-30`), and the one reviewer that found it compiled a
+#: snippet with the linter switched on by hand. Checked 2026-10-01 in a reviewed workspace:
+#: the long-line linter fires on a standalone compile with this option and not without it.
+#: Snippet probes (`lean_verify`) do not get it: the header linter would flag every snippet.
+WHOLE_FILE_OPTIONS = {"weak.linter.mathlibStandardSet": "true"}
 
 
 def splice_declaration(

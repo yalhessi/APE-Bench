@@ -96,3 +96,44 @@ def test_a_task_that_does_not_opt_in_still_cannot_read_target(tmp_path):
     call = _lean_verify(workspaces, allows_target=False)
     assert call("target/Mathlib/Foo.lean")["success"] is False
     assert call("scratch/Try.lean")["success"] is True
+
+
+def test_a_review_task_gets_the_snippet_probe_and_no_file_path(tmp_path):
+    """A review task has no scratch Lean file, so `lean_verify` there is the snippet probe:
+    of 84 calls in three dev runs, 55 were `#check`, `example` or `exact?` probes and 0 gave a
+    `file_path` (2026-10-01). The registration says so and takes only the snippet."""
+
+    from fastmcp import Client, FastMCP
+
+    from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
+
+    workspaces, _store, _other, _gold = _layout(tmp_path)
+    provider = object.__new__(LeanVerifyToolsProvider)
+    provider.task = SimpleNamespace(workspaces_dir=workspaces, lean_verify_allows_target=True,
+                                    lean_verify_snippet_only=True)
+    provider.target_workspace = workspaces / "target"
+    provider.scratch_workspace = workspaces / "scratch"
+    provider.logger = SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None,
+                                      warning=lambda *a, **k: None, debug=lambda *a, **k: None)
+    seen = {}
+
+    async def compiled(code, max_messages=20, options=None):
+        seen["code"], seen["options"] = code, options
+        return {"success": True, "outcome": "compiled"}
+
+    provider.execute = compiled
+    mcp = FastMCP("probe")
+    provider.register_tools(mcp, {"lean_verify"})
+
+    async def run():
+        async with Client(mcp) as client:
+            tools = {tool.name: tool for tool in await client.list_tools()}
+            schema = tools["lean_verify"].inputSchema
+            assert "file_path" not in schema["properties"] and "code" in schema["required"]
+            assert "SNIPPET" in tools["lean_verify"].description
+            assert "lean_verify_edit" in tools["lean_verify"].description
+            result = await client.call_tool("lean_verify", {"code": "#check Nat"})
+            return result.data if hasattr(result, "data") else result
+
+    assert asyncio.run(run())["success"] is True
+    assert seen["code"] == "#check Nat" and seen["options"] is None

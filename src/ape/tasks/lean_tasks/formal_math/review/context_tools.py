@@ -24,6 +24,7 @@ convention for a task that needs dataset code is a function-local import, as in
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Optional
 
@@ -35,6 +36,12 @@ from pydantic import Field
 MAX_HITS = 8
 MAX_RESULT_CHARS = 6000
 MAX_SNIPPET = 400
+
+#: One token that could be a Lean declaration name, as `declaration_search` accepts it when the
+#: prose filter finds nothing (`Meromorphic`, `Fintype`, `abelianizeAdj`, `foo'`, `ne_zero!`).
+#: Unicode letters and subscripts are part of a Lean name: the ASCII form of this rule refused
+#: `tensorμ`, the one refused call of the hygiene rep (2026-10-01).
+_ONE_IDENTIFIER_RE = re.compile(r"[^\W\d][\w'!?.₀-₉]*")
 
 
 def _append_trace(task, row: Dict[str, Any]) -> None:
@@ -346,6 +353,13 @@ def _register_declaration(task, mcp) -> None:
         )
 
         terms = searchable_identifiers(identifier)
+        if not terms and _ONE_IDENTIFIER_RE.fullmatch((identifier or "").strip()):
+            # `searchable_identifiers` filters a candidate's *prose* (its stoplist and its
+            # dotted-or-snake-cased rule exist because "the" matched 193 of 200 files). A tool
+            # argument is not prose: one token that could name a declaration is the name asked
+            # for, and `Meromorphic`, `Fintype` and `abelianizeAdj` were refused as "not
+            # identifier-shaped" on 15 of 249 calls in three dev runs (2026-10-01).
+            terms = [(identifier or "").strip()]
         if not terms:
             return {"success": False, "error": (
                 f"{identifier!r} is not identifier-shaped. Give a declaration name such as "
@@ -589,6 +603,29 @@ def _register_proof_profile(task, mcp) -> None:
         }
 
 
+#: Per process: (snapshot sha, directory) -> {subject token: SubjectPopulation}. A directory is a
+#: few dozen files; parsing them once per session is cheap, once per call is not.
+_DIRECTORY_POPULATIONS: Dict[tuple, Dict[str, Any]] = {}
+
+
+def _directory_population(root: Path, snapshot_sha: str, found_in: Optional[str], subject: Optional[str]):
+    """The subject's population in the base snapshot's copy of the reviewed file's directory,
+    or None when there is no such directory, no subject, or the scan fails."""
+
+    if not found_in or not subject:
+        return None
+    from src.mathlib_review.evidence.operators.naming_norm import scan_population
+
+    directory = Path(found_in).parent
+    key = (snapshot_sha, str(directory))
+    if key not in _DIRECTORY_POPULATIONS:
+        try:
+            _DIRECTORY_POPULATIONS[key] = scan_population(root, snapshot_sha, within=directory).by_subject
+        except (FileNotFoundError, OSError):
+            _DIRECTORY_POPULATIONS[key] = {}
+    return _DIRECTORY_POPULATIONS[key].get(subject)
+
+
 def _register_naming_norm(task, mcp) -> None:
     # The description quotes the census thresholds, so they are read here, at registration --
     # not only inside the call, where the rest of the operator's names are imported.
@@ -620,7 +657,11 @@ def _register_naming_norm(task, mcp) -> None:
             "judge it on the evidence you have. `population_too_small`: the leading spelling "
             f"has fewer than {MIN_SUPPORT} declarations, too few to call a convention. "
             "`no_dominant_prefix`: the leading spelling is under the "
-            f"{MIN_SUPPORT_RATIO:.0%} bar, so no prefix is the convention."
+            f"{MIN_SUPPORT_RATIO:.0%} bar, so no prefix is the convention. "
+            "`scope_conflict`: the reviewed file's own directory leads with a different "
+            "spelling from the library, so the library-wide count is not a convention to hold "
+            "this PR to; the area's spelling is offered as candidate names. The directory's "
+            "counts are always reported beside the library's."
         )
     )
     async def naming_norm(
@@ -632,7 +673,7 @@ def _register_naming_norm(task, mcp) -> None:
         from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
         from src.mathlib_review.evidence.operators.naming_norm import (
             MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix, norm_for,
-            norm_index, norm_verdict, rename_candidates,
+            norm_index, norm_verdict, rename_candidates, scoped_verdict,
         )
 
         base = task.data.snapshot_base_sha
@@ -648,6 +689,7 @@ def _register_naming_norm(task, mcp) -> None:
         # The declaration's own conclusion, from the reviewed text -- the arm is asking about a
         # name this PR introduces, which by construction is not in the base tree.
         signature = ""
+        found_in: Optional[str] = None
         overlay = _reviewed_overlay_root(task)
         wanted = declaration.rsplit(".", 1)[-1]
         for rel in getattr(task.data, "changed_files", None) or []:
@@ -664,6 +706,7 @@ def _register_naming_norm(task, mcp) -> None:
                 name = item.fullname or item.name or ""
                 if name == declaration or name.rsplit(".", 1)[-1] == wanted:
                     signature = item.signature or ""
+                    found_in = str(rel)
                     break
             if signature:
                 break
@@ -725,9 +768,20 @@ def _register_naming_norm(task, mcp) -> None:
         # too small to count (4 of 4 was reported as a plurality "under the 80% bar"), and 20
         # had no dominant prefix.
         verdict, empty_because = norm_verdict(population, current)
+        # The area's own population, read beside the library's. The library-wide count is one
+        # scope, and on 33337 it was the wrong one: `coe_` led the library and `toLinearMap_`
+        # the file's neighbourhood, and all three Opus reviewers asked for a `coe_` name
+        # (2026-10-01). `scoped_verdict` downgrades a verdict the area contradicts.
+        local = _directory_population(Path(root), base, found_in, subject.token)
+        verdict, empty_because, scope_lines, area_prefix = scoped_verdict(
+            population, local, verdict, empty_because, current,
+            str(Path(found_in).parent) if found_in else None)
         candidates = (rename_candidates(declaration, dominant, subject.expression,
                                         index.get("notation"))
-                      if verdict in ("established", "emerging") else [])
+                      if verdict in ("established", "emerging") else
+                      rename_candidates(declaration, area_prefix, subject.expression,
+                                        index.get("notation"))
+                      if area_prefix else [])
         counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
         lines = [
             f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
@@ -771,8 +825,10 @@ def _register_naming_norm(task, mcp) -> None:
             lines.append("This census counts only each name's LEADING token. It says nothing about "
                          "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
                          "judge those against the siblings you read and against precedent.")
+        lines.extend(scope_lines)
         if candidates:
-            lines.append("Candidate names: " + ", ".join(f"`{name}`" for name in candidates))
+            lines.append(("The area's spelling, as candidate names: " if area_prefix else "Candidate names: ")
+                         + ", ".join(f"`{name}`" for name in candidates))
         rendered, truncated = _truncate("\n".join(lines))
         _append_trace(task, {
             "schema_version": "v5-context-call1",

@@ -74,7 +74,7 @@ The reps do not differ much in *where* they look. Two reps of one configuration 
 
 | obligation | what every Claude cell did at the site |
 |---|---|
-| `64e1164f`, `ce7b5d2e` (33337, rename `coe_…` to `toLinearMap_…`) | all three project cells asked for a *different* rename at the site (`isComplProjection` to `isCompl_projection`); Opus 5 wrote "keep the `coe_` fronting", which is `naming_norm`'s global count (`coe_` 48 to 9) speaking. X1 reached it under brief X. |
+| `64e1164f`, `ce7b5d2e` (33337, rename `coe_…` to `toLinearMap_…`) | all three project cells asked for a *different* rename at the site (`isComplProjection` to `isCompl_projection`); Opus 5 wrote "keep the `coe_` fronting". X1 reached it under brief X; hygiene rep 2 did too (2026-10-02). *Corrected 2026-10-02:* the tool did not mislead here. On 33337 `naming_norm` told every Opus cell `emerging`, `toLinearMap_` 21 to `coe_` 7, with `toLinearMap_` candidate names, before and after the hygiene change; the reviewers chose another name. The `coe_` 48-to-9 miscount is validation PR d0045 (Phase 1). So 33337 is a decision miss with the right evidence in hand. |
 | `57bcc9fd` (33117, `@[to_fun]` in place of hand-written `fun_*` lemmas) | 3-6 findings at the site in every cell (`fun_prop` lemmas, explicit `n`, `protected deriv`); none names the attribute. |
 | `7f098f6a`, `8e276803` (33294, dot notation in a name and in a `rw`) | no finding at either site in any cell. |
 | `8d887ce4`, `7fef913e`, `e8e02821` (33145, `ciSup'`/`ciInf'` by duality, the `by_cases` restructure) | the exact `by_cases h : BddAbove (range f)` restructure and the exact `(α := αᵒᵈ)` dual proof were filed in both reps and scored `loc`; Opus 5's wording of the same restructure scored a hit. |
@@ -103,7 +103,8 @@ Read from the sessions (`.ape/runs/probe_dev_opus55_contract2_claude_sub_rep*`):
    4 in rep 2 on 33149, the AI-generated PR with 4 obligations (`_normalize_findings` warns in the
    log and nowhere else).
 3. **`naming_norm` counts a prefix globally** and told three reviewers the wrong convention on
-   33337 (§2.3; Phase 1's d0045, "fix first").
+   validation PR d0045 (Phase 1, "fix first"). *Corrected 2026-10-02:* this said 33337, where the
+   tool was right (`emerging`, `toLinearMap_` 21 to `coe_` 7) and the reviewers did not follow it.
 4. **`proof_profile` is in the grant and dead on dev** (no declaration tables), and the first
    message names two different absolute roots for the same attempt (the worktree's `.ape/runs`
    and the main checkout's).
@@ -148,18 +149,36 @@ its run.
 
 ### Layer 0 — hygiene, free, first
 
-1. Make the first message true. Either grant `Write` on `scratch/` (the probe harness's condition:
-   a `notes.md` the reviewer rereads and rewrites, brief X's instrument, untried under the project
-   harness: `contract-2026-10-01` "untried" item 2) or drop the workspace paragraph. The grant is
-   the condition to test, the drop is the fallback. Containment already refuses writes outside the
-   attempt.
-2. The solo task's budget refuses or warns the reviewer, never truncates: raise `finding_budget`
-   for the solo task and return the overflow to the model as a refusal it can resubmit, as the
-   arms' invalid submissions are returned.
-3. `naming_norm` reports the prefix population in three scopes (the file's directory, the area, the
-   library) and says when they disagree, instead of one global count.
-4. Drop `proof_profile` from a grant whose release has no declaration tables; one root in the
-   first message.
+**Built on `hygiene-layer`, 2026-10-01** (eight commits, `01b09ce7`..`786f00a1`), after a count of
+what every tool call in the three Opus subscription runs came back with
+(`results/pr_review_v5/probes/claude-models-2026-10-01/tool_outcomes.py`; the table is in that
+README). The user's addition to the layer: a cleaning round of the tools, since runs mixed
+`lean_verify` with `lean_verify_edit`, many tools failed to run or ran to a negative, and the
+interface's interaction with the file storage was not principled. What the count found, and what
+each item became:
+
+| measured | built |
+|---|---|
+| hover, goto and goal refused on 7 of 9 calls: they took `target/Mathlib/...` where every other tool and the diff say `Mathlib/...` | one spelling for every tool: a reviewed file is `Mathlib/.../X.lean`; the refusal names the spellings (`01b09ce7`) |
+| `lean_verify` described as "verify ... correctness" with a `file_path`; used 55 times in 84 as a `#check`/`example` probe, never with a file | in a review task it is the snippet probe, takes only the snippet, and says `lean_verify_edit` is for the reviewed file (`0a3d7d33`) |
+| 7 `lean_verify_edit` calls never ran: `"replacement": }` to delete a span | a span without a replacement is a deletion (`0a3d7d33`) |
+| whole-file compiles reported `warnings: []` on the 101-character line maintainers asked to wrap (d0041) | edit and as-is compiles run Mathlib's standard linter set, as CI does; warnings split like errors (`0a3d7d33`) |
+| `declaration_search` refused `Fintype`, `Meromorphic`, `abelianizeAdj` as "not identifier-shaped" (15 of 249) | one identifier-shaped token is searched as given; prose is still refused (`f8a65df5`) |
+| `naming_norm`'s one global count misled three reviewers on validation PR d0045 (this row said 33337, where the tool was right: corrected 2026-10-02) | the reviewed file's directory is counted beside the library and overrules a verdict it contradicts (`scope_conflict`, `7d39d0d7`) |
+| `finding_budget: 20` dropped 2 and 4 findings on 33149 with a log line as the only trace | the call is refused with the count and the budget; the reviewer chooses (`50742516`) |
+| the first message promised a read-write `scratch/` "for creating and editing files" with `Write` and `Edit` disallowed; two roots named for one attempt | built-in writes may land in `scratch/` and nowhere else, so the hygiene config grants `Write` and `Edit`; one resolved root (`669c217d`) |
+| `proof_profile` granted and dead on every base but one | out of the solo grant (`786f00a1`) |
+| the "Tools available" line named `file_read`, `content_search`, `file_search`, none of which exist under Claude Code; `zulip_search` called by a bare name | under Claude Code the line names Read, Grep, Glob and the `mcp__core__` spelling; `lean_verify` reads as the snippet probe (`332631a4`) |
+
+Not changed, and why: the no-edit mode of `lean_verify_edit` (the correctness arm's sealed prompt
+opens with it, and 33057's gold obligation is a red reviewed state; with the linters on it now
+reports what CI would); `Glob`'s `head_limit` refusals (a CLI-version mismatch in the harness,
+3 calls); the `submit_findings` "rejected" wording in transcripts (the scaffold ends the session
+at submission; `task_result.json` is the record).
+
+The condition: `configs/pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml`, which is
+the H-claude config with `Write` and `Edit` granted (contained to `scratch/`) and the solo budget at
+40, on the tools above. Its re-baseline (§5, Layer 0's rule) is the next run.
 
 ### Layer 1 — deterministic evidence before the model
 
@@ -174,7 +193,12 @@ delivering them as packet sections rather than arms, so any model under any scaf
 - **a mechanism catalogue**: the attributes and generators that replace hand-written families
   (`to_additive`, `to_fun`, `mk_iff`, `simps`, `fun_prop`, `deprecated alias`, `variable … in`),
   each with its one-line applicability test, as a brief section;
-- **scoped naming evidence** (Layer 0 item 3, plus the Zulip hits the `toLinearMap_` push has).
+- **scoped naming evidence** (Layer 0 item 3, plus the Zulip hits the `toLinearMap_` push has);
+- **the static analysis pass** (`docs/todo/static-analysis-pass.md`, the user's direction of
+  2026-10-01, next up after Layer 0's re-baseline): what Mathlib's own linters, the tacticAnalysis
+  set, `#lint` and `shake` say about the reviewed state and about every edit, as a packet section
+  restricted to the diff, a gate on `lean_verify_edit`, and a finder for the mechanical subset.
+  The standard linter set is already on every whole-file compile (`0a3d7d33`).
 
 The census codebook on `conventions-nature` is the source for the catalogue; its PRs must be
 disjoint from every evaluation set (the PR-level leakage rule).

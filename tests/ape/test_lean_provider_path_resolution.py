@@ -75,3 +75,25 @@ def test_every_lsp_entry_point_resolves_before_finding_the_project():
 
     source = inspect.getsource(LeanCodeToolsProvider)
     assert source.count("self._resolve_in_workspace(file_path)") == 4
+
+
+def test_a_bare_repository_path_resolves_to_the_reviewed_file(workspace):
+    """`Mathlib/.../X.lean` is how `lean_verify_edit` takes a reviewed file and how the diff
+    names it. These tools took only `target/Mathlib/...`, and a reviewer using one spelling for
+    both failed with "Cannot find Lean project" on 7 of 9 hover, goto and goal calls across
+    three dev runs (2026-10-01). Same file, second spelling."""
+
+    resolved = _provider(workspace)._resolve_in_workspace(Path("Mathlib/Topology/Thing.lean"))
+    assert resolved == (workspace / "target" / "Mathlib" / "Topology" / "Thing.lean").resolve()
+    assert find_project_path(resolved) == workspace.resolve()
+
+
+def test_a_path_under_neither_root_is_named_as_such(tmp_path_factory):
+    """The refusal says which spellings exist, instead of "Cannot find Lean project"."""
+
+    # No `lean-toolchain` anywhere above: the LSP has no project to attach to.
+    bare = tmp_path_factory.mktemp("bare")
+    provider = _provider(bare)
+    with pytest.raises(FileNotFoundError) as excinfo:
+        provider._ensure_client(bare / "Mathlib" / "Topology" / "Missing.lean")
+    assert "Mathlib/.../X.lean" in str(excinfo.value) and "scratch/" in str(excinfo.value)

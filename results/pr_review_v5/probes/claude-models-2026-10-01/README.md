@@ -197,7 +197,9 @@ sessions' visible text and budget truncations.
   set comprehension, one gold obligation each; at 33149's Parseval axiom, rep 1 found the Mathlib
   lemma by search and rep 2 did not.
 - **The never-reached ten are knowledge at an attended site**: the `toLinearMap_` rename (all
-  three project cells asked a different rename there, Opus 5 citing `coe_`'s global count), the
+  three project cells asked a different rename there, although `naming_norm` had told each of them
+  `emerging`, `toLinearMap_` 21 to `coe_` 7, with the `toLinearMap_` names as candidates; corrected
+  2026-10-02 from "Opus 5 citing `coe_`'s global count", which was validation PR d0045's), the
   `@[to_fun]` mechanism (3-6 findings at the site, none the attribute), dot notation (no finding at
   the site in any cell), and the 33145 `ciSup'` cluster, where the exact `by_cases` restructure and
   the exact `(α := αᵒᵈ)` dual proof were filed in both reps and scored `loc`.
@@ -209,3 +211,156 @@ sessions' visible text and budget truncations.
   the same attempt.
 - **Control emission**: Opus 5.5 under the project harness 1.0 per control PR, Opus 5 and the swap
   4.0, X1/X2 1.0-1.5, gpt 0-0.5.
+
+## What the tool calls came back with (2026-10-01, `tool_outcomes.py`, no spend)
+
+Every tool call in the three Opus subscription runs' transcripts (47 sessions), classified by
+what the result was: an answer, a negative (the tool ran and found nothing), a refusal of the
+call's arguments, an error (the call never ran), or an environment failure. The measurement
+behind the hygiene layer (`docs/plans/2026-10-01-beyond-the-solo-baseline.md` §4).
+
+| tool | calls | answered | negative | refused | error | env |
+|---|---|---|---|---|---|---|
+| `Grep` | 334 | 281 | 52 | 0 | 1 | 0 |
+| `lean_verify_edit` | 313 | 234 | 72 | 0 | 7 | 0 |
+| `declaration_search` | 249 | 178 | 56 | 15 | 0 | 0 |
+| `Read` | 231 | 230 | 0 | 0 | 1 | 0 |
+| `Glob` | 161 | 80 | 75 | 0 | 6 | 0 |
+| `lean_verify` | 84 | 49 | 35 | 0 | 0 | 0 |
+| `naming_norm` | 43 | 16 | 27 | 0 | 0 | 0 |
+| `precedent_search` | 23 | 23 | 0 | 0 | 0 | 0 |
+| `zulip_search` | 21 | 21 | 0 | 0 | 0 | 0 |
+| `code_goto` | 4 | 1 | 0 | 0 | 3 | 0 |
+| `code_hover` | 3 | 0 | 0 | 0 | 3 | 0 |
+| `get_lean_goal` | 2 | 1 | 0 | 0 | 1 | 0 |
+| `proof_profile` | 2 | 1 | 0 | 0 | 0 | 1 |
+| `zulip_search` by a bare or miscased name | 2 | 0 | 0 | 0 | 2 | 0 |
+
+- **The LSP tools were dead**: 7 of 9 hover, goto and goal calls failed with "Cannot find Lean
+  project", every one on the `Mathlib/...` spelling that `lean_verify_edit` and the diff use.
+- **`declaration_search` refused real names**: `Fintype`, `Meromorphic`, `abelianizeAdj`,
+  `conjStarAlgEquiv`, as "not identifier-shaped" (15 of 249).
+- **`lean_verify_edit` never saw 7 calls**: the model wrote `"replacement": }` to delete a span,
+  which the CLI refused as malformed JSON.
+- **`lean_verify` is a probe**: 55 of its 84 calls were `#check`, `example` or `exact?` snippets
+  and none gave a file path, while its description said "verify ... correctness" with a
+  `file_path`. 33 `lean_verify_edit` calls carried no edit (the as-is compile).
+- **`proof_profile`** had no table on dev; **`Glob`** was passed a `head_limit` parameter the
+  installed CLI (2.1.285) lacks three times, and twice pointed at the store root, which
+  containment refused as designed.
+- `submit_findings` reads as "rejected" in every transcript because the scaffold ends the session
+  at submission; every session's `task_result.json` holds the submission.
+
+Each row above that is a defect has a commit on `hygiene-layer` (2026-10-01): `01b09ce7` (one
+path spelling for the LSP tools), `0a3d7d33` (snippet probe, deletion, Mathlib's linters on
+whole-file compiles), `f8a65df5` (single-token names), `786f00a1` (`proof_profile` out of the
+grant), `332631a4` (the tool line names `mcp__core__` and Read, Grep and Glob).
+
+## Hygiene rep 1: Layer 0's reading (2026-10-01, `hygiene_reading.py`)
+
+`probe_dev_opus55_contract2_hygiene_claude_sub_rep1`: H-claude on the hygiene layer's tools
+(`configs/pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml`: `Write` and `Edit`
+granted and contained to `scratch/`, solo budget 40; the tool commits `01b09ce7`..`786f00a1`).
+*Corrected 2026-10-02:* this line said `proof_profile` was out of the grant. It is not, for this
+condition: `786f00a1` removed it from `configs/bases/v5_solo.yaml`, but
+`configs/pr_review_v5_dev_medium_gpt52.yaml` restates the dev set's tool list with it, so every
+hygiene rep holds `[zulip_search, precedent_search, declaration_search, naming_norm,
+proof_profile]`, as H-claude did. Rep 1 never called it. The frozen config is left as it is
+(`review-designs` pins it by digest); the defect register carries the correction (`928ca6b6`).
+15 of 15 sessions, every containment audit clean and usable,
+19.3M processed tokens (max session 4.2M), nothing billed; `completion_status=complete`, 93
+findings. Launched 14:23, closed 14:50.
+
+**The rule** (plan §5, Layer 0: no recall rule; the truncation and the contradiction gone, and
+held-out findings not below 77):
+
+| | H-claude reps 1, 2 | hygiene rep 1 |
+|---|---|---|
+| held-out findings | 77, 77 | **75** |
+| control-PR findings (33304, 33315) | 1, 1 | 1, 1 |
+| first message names one root | no (two) | yes, 15 of 15 |
+| budget truncations | 1, 1 (silent) | 0 (33149 filed 18 of 40) |
+| tool calls refused, errored or unanswerable | 7 LSP, 15 `declaration_search`, 7 malformed deletions, 1 `proof_profile`, 2 misnamed | **1** (`declaration_search` on prose) in 372 calls |
+| hover / goto / goal | 7 of 9 refused | 2 goal calls, both answered |
+| `lean_verify_edit` results carrying the linter split | 0 | 71 of 82 |
+| built-in writes | not granted | granted, **used 0 times** |
+
+**By the rule: not met, by two findings.** 75 against the 77 bar, with one run on each side;
+H-claude's two reps spread 99 to 97 total candidates, so two held-out findings is inside one
+run's noise and is not evidence of a volume cost. The two structural conditions are met: no
+truncation, one root. What the layer was built for is visible in the tools column: the refusals
+and errors that cost 30 turns across the three Opus runs are gone, and the goal tool answered
+for the first time in the record under Claude Code.
+
+**Two things the run says that the rule did not ask.** The reviewer did not write a single file
+although it could; the account still lives only in the final `notes`, so the "running notes"
+condition is unmeasured by this run and needs an instruction, not a grant. And `lean_verify`
+was called 38 times as the snippet probe, 19 answers and 19 negatives, as described.
+
+**Not read:** recall. The judge was not run (about $0.20 on `gpt_5_mini`); reps 2 and 3 after
+the weekly window resets (2026-10-02 10:00) complete the re-baseline, and the three are judged
+together as mean / union / stable against H-claude's 7, 7.
+
+**Judged (2026-10-01, judge v9, $0.22, audit `probe-dev-opus55-contract2-hygiene-claude-sub-rep1`):
+9 of 23, issue recall 0.391**, reachable 0.500, resolution 0.304, control emission 1.0 per PR,
+gold alignment 0.118 (H-claude: 0.091, 0.093). One run, so provisional, and within the judge's
+noise of H-claude's 7, 7; on the right side of it. The spine (`consistency.py`, which now carries
+the cell as `Hyg1`): the six obligations every Opus 5.x cell hits, plus `5ffba48e` (33321's set
+comprehension, H-claude rep 2's), `695ae9fd` (33362's namespace layout, Opus 5's) and
+`585e5e0b` (33285's one-term golf), which no project-harness cell had reached before; `61f68eed`
+(the Parseval lemma, H-claude rep 1's) is the one it loses. Union with the two H-claude reps:
+10 of 23; the Opus 5.x family's union stays 13, its stable set 6. Both new hits are judgement,
+not the linters: the term proof `I.cotangentEquivIdeal.symm_apply_eq.mpr rfl` and "keep the
+original layout". The linters' visible work in that session was the edit gate: a long-line
+warning on the reviewer's own proposed edit.
+
+## Hygiene, three reps: Layer 0's verdict (2026-10-02)
+
+Reps 2 and 3 ran on accounts B and C in parallel (06:40); each account's five-hour window ran out
+after about 20M tokens, and `run --resume` finished the three lost sessions (33066 on rep 2;
+33321 and 33066 on rep 3) on the main account at 10:11 after its reset. Every session completed
+and every containment audit is clean and usable; nothing billed. Judge v9 on the held-out 12.
+
+| cell (dev held-out 12) | obligations | issue recall | reachable | resolution | held-out findings | control findings (33304, 33315) | gold alignment |
+|---|---|---|---|---|---|---|---|
+| H-claude rep 1 | 7 | 0.304 | 0.500 | 0.217 | 77 | 1, 1 | 0.091 |
+| H-claude rep 2 | 7 | 0.304 | 0.417 | 0.217 | 77 | 1, 1 | 0.093 |
+| hygiene rep 1 | 9 | 0.391 | 0.500 | 0.304 | 75 | 1, 1 | 0.118 |
+| hygiene rep 2 | 9 | 0.391 | 0.500 | 0.304 | 82 | 1, 0 | 0.126 |
+| hygiene rep 3 | 7 | 0.304 | 0.500 | 0.217 | 82 | 0, 4 | 0.108 |
+
+| | per rep | mean | union | stable |
+|---|---|---|---|---|
+| H-claude (2 reps) | 7, 7 | 7.0 | 8 | 6 |
+| hygiene (3 reps) | 9, 9, 7 | **8.33** | 11 | 6 |
+| hygiene, any two reps | | | 10, 10, 10 | 8, 6, 6 |
+
+**By the rule** (plan of 2026-10-01 §5, Layer 0: no recall rule; the truncation and the
+contradiction gone, held-out findings per rep not below 77): **met.** No budget truncation and
+one named root in every first message across 48 sessions; held-out findings 75, 82, 82 (mean
+79.7). Control emission 1.0, 0.5 and 2.0 per control PR (mean 1.17, H-claude 1.0); rep 3's four
+on 33315 sit at the 2.0 bar the design rules use.
+
+**Beside it.** The mean is 1.3 obligations above H-claude's, inside the judge's noise at 23, at
+better aim (0.108-0.126 against 0.091-0.093). The stable core is unchanged at 6; what moved is the
+spread: any two hygiene reps reach 10 where H-claude's two reach 8. Four obligations only the
+hygiene reps reach (`585e5e0b`, the 33285 one-term golf, in all three; `695ae9fd`, the 33362 layout;
+`64e1164f`, the `toLinearMap_` rename; `7fef913e`, the order-dual `ciInf'`, never hit by any cell
+before), and one only H-claude's (`61f68eed`, the Parseval lemma). The family's never-hit set drops
+from ten to nine.
+
+**What is not the tools.** On 33337, `naming_norm` gave every Opus cell, before and after the
+hygiene layer, the right evidence (`emerging`, `toLinearMap_` 21 to `coe_` 7, the maintainers' name
+as a candidate); one hygiene rep of three filed it. Rep 3's new `ciInf'` hit and rep 2's rename are
+draws at the decision, with the evidence already in hand. That is the inconsistency the review
+designs (`docs/plans/2026-10-02-review-designs.md`) are built to remove.
+
+**Defects the parallel reps exposed** (`docs/todo/framework-defects-2026-09.md`): Claude Code aborts
+an MCP call after 300 s of silence, the compile tool's own timeout, which cut seven compiles off
+while eight sessions compiled at once; and one more malformed `"replacement": }` deletion. Rep 2's
+and rep 3's tool tables (16 and 17 transcripts, including the attempts the limit cut short) are in
+`hygiene_reading.py`'s output; apart from those, no tool refused a call.
+
+**The baseline, frozen.** Hygiene's 9, 9, 7 (mean 8.33, union 11, stable 6) is what every review
+design is read against from here, with the four-pass union (12 of 23, 7.0 control findings per PR;
+`../ensemble-union-2026-10-02/`) as the consistency yardstick.

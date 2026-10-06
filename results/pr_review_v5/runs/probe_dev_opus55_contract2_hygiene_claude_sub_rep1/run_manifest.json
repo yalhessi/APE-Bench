@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 95,
+  "completion_status": "complete",
+  "context_calls_total": 70,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 93,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 1605,
+  "pruned": 1605,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_dev_opus55_contract2_hygiene_claude_sub_rep1",
+  "run_name": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1",
+  "run_plan_sha256": "f4068a2e8f6005cd52e92049469d15053afef078d6668ba7de162b0ee1332810",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "abd4b6972fd86b4d5e35057eca015d946fc572799278eb0a884443e57332c477",
+  "succeeded": 0,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 19272557.0,
+    "tokens": 19272557.0
+  },
+  "wall_seconds": 1463.735242
+}

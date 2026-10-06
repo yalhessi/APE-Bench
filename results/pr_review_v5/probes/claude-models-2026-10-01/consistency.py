@@ -39,11 +39,14 @@ CELLS = {
     "H55r1": ("probe-dev-opus55-contract2-claude-sub-rep1", "probe_dev_opus55_contract2_claude_sub_rep1"),
     "H55r2": ("probe-dev-opus55-contract2-claude-sub-rep2", "probe_dev_opus55_contract2_claude_sub_rep2"),
     "M5": ("probe-dev-opus5-contract2-claude-sub-rep1", "probe_dev_opus5_contract2_claude_sub_rep1"),
+    "Hyg1": ("probe-dev-opus55-contract2-hygiene-claude-sub-rep1", "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"),
+    "Hyg2": ("probe-dev-opus55-contract2-hygiene-claude-sub-rep2", "probe_dev_opus55_contract2_hygiene_claude_sub_rep2"),
+    "Hyg3": ("probe-dev-opus55-contract2-hygiene-claude-sub-rep3", "probe_dev_opus55_contract2_hygiene_claude_sub_rep3"),
     "M48": ("probe-dev-opus48-contract2-claude-sub-rep1", "probe_dev_opus48_contract2_claude_sub_rep1"),
     "g55v2": ("probe-dev-gpt55-Grc-contract2-rep1", "probe_dev_gpt55_Grc_contract2_rep1"),
     "g52v2": ("probe-dev-gpt52-Grc-contract2-rep1", "probe_dev_gpt52_Grc_contract2_rep1"),
 }
-OPUS5X = ["X1", "X2", "swap", "H55r1", "H55r2", "M5"]
+OPUS5X = ["X1", "X2", "swap", "H55r1", "H55r2", "M5", "Hyg1", "Hyg2", "Hyg3"]
 #: The same harness, model, prompt and effort: the only pair that is a repetition in the strict sense.
 SAME_CONFIG = ["H55r1", "H55r2"]
 HELD_OUT = [33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
