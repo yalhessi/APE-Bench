@@ -37,7 +37,10 @@ paths:
   written only when set and not resumable; a `task_config` key reaches `scaffold_config_sha256`,
   which *is* resumable, so a knob changed there is silently resumed onto the old results; a
   task-data field reaches `global_index`. A knob the model sees or the submission enforces goes on
-  task data, typed and optional, omitted when unset -- never on `task_config`.
+  task data, declared with `knob()` (`ape.tasks.base`, 2026-10-06): None until a run sets it, and
+  left out of `global_index` until then, so the tasks that do not use it keep their identity and
+  the ones that do fork. Never on `task_config`. `test_pr_review_v5_task_data_knobs.py` refuses a
+  new review data field that is not a knob, and an old one that becomes one.
 - **Concern vocabulary:** arms say `documentation`, gold says `docs`; both spellings are hashed into
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.

@@ -75,6 +75,28 @@ class BaseTaskConfig(BaseModel):
         """
         pass  # Base class performs no modifications by default
 
+#: The `json_schema_extra` key that marks a task-data field as entering `global_index` only when it
+#: is set (not None). Use `knob()` to declare one.
+IDENTITY_WHEN_SET = "identity_when_set"
+
+
+def knob(description: str, **kwargs: Any) -> Any:
+    """A task-data field that is None until a run sets it, and absent from `global_index` until then.
+
+    `global_index` hashes the whole data model, defaults included, so declaring one ordinary new
+    field moves the identity of every task of that type -- even where the field is never set --
+    and every orchestrator cache and resume then misses, silently re-running work already paid
+    for. A knob does not: unset, it is left out of the hash, so the tasks that do not use it keep
+    the identity they had; set, it is hashed like any field, so the tasks that do use it fork, as
+    they must. None means "off": read it as a falsy value, and never give it another default --
+    a default that changes would change behaviour without changing the identity.
+    """
+
+    extra = dict(kwargs.pop("json_schema_extra", None) or {})
+    extra[IDENTITY_WHEN_SET] = True
+    return Field(default=None, description=description, json_schema_extra=extra, **kwargs)
+
+
 class BaseTaskData(BaseModel):
     """Base class for task data models.
 
@@ -106,7 +128,13 @@ class BaseTaskData(BaseModel):
         Returns:
             A 64-character hexadecimal hash string.
         """
-        data_for_hash = self.model_dump(mode='json', exclude={'task_id', 'metadata', 'global_index'})
+        exclude = {'task_id', 'metadata', 'global_index'}
+        # A `knob()` field enters the identity only once it is set; see `knob`.
+        for name, info in type(self).model_fields.items():
+            extra = info.json_schema_extra
+            if isinstance(extra, dict) and extra.get(IDENTITY_WHEN_SET) and getattr(self, name) is None:
+                exclude.add(name)
+        data_for_hash = self.model_dump(mode='json', exclude=exclude)
         hash_content = json.dumps(data_for_hash, sort_keys=True, ensure_ascii=False)
         hash_obj = hashlib.sha256(hash_content.encode('utf-8'))
         return hash_obj.hexdigest()
