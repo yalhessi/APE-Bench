@@ -47,6 +47,46 @@ from typing import List, Optional
 SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline"})
 
 
+def _producer(args) -> int:
+    """`producer bench` and `producer context`. Neither calls a model; `context` writes a new file
+    and never touches `--base`."""
+
+    from src.mathlib_review.io import jsonl_rows
+    from src.mathlib_review.paths import assert_repo_root
+
+    assert_repo_root()
+    if args.producer_command == "bench":
+        from src.mathlib_review.analysis.producer_bench import bench
+
+        out = bench(args.producer, args.set)
+        if args.out is not None:
+            args.out.mkdir(parents=True, exist_ok=True)
+            (args.out / "facts.jsonl").write_text(
+                "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in out["fact_rows"]),
+                encoding="utf-8")
+            summary = {k: v for k, v in out.items() if k != "fact_rows"}
+            (args.out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
+                                                   encoding="utf-8")
+        print(json.dumps({k: v for k, v in out.items() if k not in ("fact_rows", "located")}, indent=2))
+        return 0
+    from src.mathlib_review.analysis.probes import load_probe_set
+    from src.mathlib_review.producers import change_graphs, context_jsonl, context_rows
+
+    spec = load_probe_set(args.set)
+    if args.out.exists():
+        raise SystemExit(f"{args.out} exists; a context_file is written once, under a new name")
+    graphs = change_graphs(spec.release, spec.pr_numbers)
+    rows = context_rows([graphs[pr] for pr in spec.pr_numbers if pr in graphs], args.producers,
+                        jsonl_rows(args.base) if args.base else None)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(context_jsonl(rows), encoding="utf-8")
+    print(json.dumps({"out": str(args.out), "prs": len(rows),
+                      "sections_added": sum(len(r["sections"]) for r in rows)
+                      - (sum(len(r["sections"]) for r in jsonl_rows(args.base)) if args.base else 0)},
+                     indent=2))
+    return 0
+
+
 def _say_nothing_ran(command: str, facts: dict) -> None:
     """Report a preflight so it cannot be read as a completed run.
 
@@ -367,6 +407,25 @@ def build_parser() -> argparse.ArgumentParser:
     tool.add_argument("--run-config", type=Path, required=True,
                       help="the run config whose scaffold (Lean timeouts, axioms) the tools use")
     tool.add_argument("--arguments", default="", help="the tool's arguments, as a JSON object")
+
+    producer = sub.add_parser(
+        "producer", help="facts about a PR computed before review (src/mathlib_review/producers); "
+                         "calls no model")
+    producer_sub = producer.add_subparsers(dest="producer_command", required=True)
+    producer_bench = producer_sub.add_parser(
+        "bench", help="measure a producer alone on a probe set: facts per PR, control emission, "
+                      "asks located (analysis/producer_bench.py)")
+    producer_bench.add_argument("--producer", required=True)
+    producer_bench.add_argument("--set", type=Path, required=True, help="a configs/probe_sets/*.yaml")
+    producer_bench.add_argument("--out", type=Path, default=None,
+                                help="a directory for summary.json and facts.jsonl")
+    producer_context = producer_sub.add_parser(
+        "context", help="write a solo `context_file`: each PR's base sections, then each producer's")
+    producer_context.add_argument("--producer", action="append", required=True, dest="producers")
+    producer_context.add_argument("--set", type=Path, required=True, help="a configs/probe_sets/*.yaml")
+    producer_context.add_argument("--base", type=Path, default=None,
+                                  help="an existing context_file whose sections come first (read, never rewritten)")
+    producer_context.add_argument("--out", type=Path, required=True)
 
     return parser
 
@@ -758,6 +817,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         from src.mathlib_review.review.toolbox import main as tool_main
 
         return tool_main(args)
+    if args.command == "producer":
+        return _producer(args)
     if args.command == "trajectory":
         from src.mathlib_review.analysis.trajectory import (
             DEFAULT_APE_ROOT, DEFAULT_TOOL_RESULT_CAP, assert_repo_root, write_trajectory,
