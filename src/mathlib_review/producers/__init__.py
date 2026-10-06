@@ -63,7 +63,9 @@ class Producer(Protocol):
 
 #: name -> "module:attribute". Imported on use, so a producer's dependencies load only when it is
 #: asked for.
-PRODUCERS: Dict[str, str] = {}
+PRODUCERS: Dict[str, str] = {
+    "dot_notation": "src.mathlib_review.producers.dot_notation:DOT_NOTATION",
+}
 
 
 def producer(name: str) -> Producer:

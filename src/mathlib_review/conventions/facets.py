@@ -86,7 +86,7 @@ _EXISTS = re.compile(r"∃")
 _FORALL = re.compile(r"∀")
 
 
-def _split_binders(signature: str) -> List[Tuple[str, str]]:
+def split_binders(signature: str) -> List[Tuple[str, str]]:
     """`(kind, text)` for each top-level binder group before the conclusion colon.
 
     Depth-tracked over `()[]{}⦃⦄`. Kinds: `explicit` `(…)`, `instance` `[…]`, `implicit` `{…}`,
@@ -122,7 +122,7 @@ def statement_shape(signature: Optional[str]) -> Dict[str, object]:
     """
 
     sig = signature or ""
-    binders = _split_binders(sig)
+    binders = split_binders(sig)
     conclusion = declaration_conclusion(sig)
     by_kind: Dict[str, int] = {}
     for kind, _ in binders:
@@ -154,13 +154,13 @@ def typeclass_binders(signature: Optional[str],
     """
 
     heads: List[str] = []
-    for kind, text in _split_binders(signature or ""):
+    for kind, text in split_binders(signature or ""):
         if kind == "instance":
             match = _CLASS_HEAD.match(text)
             if match:
                 heads.append(match.group(1))
     for var in variables or ():
-        for kind, text in _split_binders(str(var)):
+        for kind, text in split_binders(str(var)):
             if kind == "instance":
                 match = _CLASS_HEAD.match(text)
                 if match:

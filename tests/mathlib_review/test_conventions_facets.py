@@ -10,7 +10,7 @@ request "no". These facets are the representation that was missing.
 from __future__ import annotations
 
 from src.mathlib_review.conventions.facets import (
-    _split_binders, proof_structure, statement_shape, typeclass_binders,
+    split_binders, proof_structure, statement_shape, typeclass_binders,
 )
 from src.mathlib_review.conventions.situations import situation_of
 
@@ -29,7 +29,7 @@ def test_a_tactic_named_in_a_comment_is_not_a_step():
 
 
 def test_binders_are_split_by_kind_with_depth_tracking():
-    kinds = [k for k, _ in _split_binders("{R : Type*} [CommRing R] (I : Ideal (Fin 3 → R)) ⦃x⦄ : P")]
+    kinds = [k for k, _ in split_binders("{R : Type*} [CommRing R] (I : Ideal (Fin 3 → R)) ⦃x⦄ : P")]
     assert kinds == ["implicit", "instance", "explicit", "strict"]
 
 
