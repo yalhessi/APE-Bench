@@ -68,3 +68,24 @@ not asked for -- and, for every located ask, is the fact the ask.
 
 The detector lands in at most **three `src/` files, one test fixture, and no hub edit**
 (`runner.py`, `cli.py`, the task bases, `schema`).
+
+## Amendment 1 (2026-10-06, after the in-sample check, before any out-of-sample set was run)
+
+**The in-sample check, as it came out.** On dev, 7 facts on 2 of 15 PRs, 0 on the three control
+PRs. `d0038` (33294) is located with the fact that states its ask exactly
+(`IsFundamentalSequence.of_isNormal`). `d0039` (33294, `rw [Order.IsNormal.map_iSup h …]` ->
+`h.map_iSup`) is **missed**, and the miss is a limit of the shape, not a bug: `h` there is bound
+by a `fun h =>` inside the proof, so its type is known only after elaboration, and shape 2 reads
+the declaration's binders. Five other facts on 33294 state the same move (`Order.IsNormal.map_*
+H` -> `H.map_*`) where `H` *is* a binder, on lines no maintainer commented on -- the asked
+transformation, at its siblings. Typing proof-local names by guesswork would trade the precision
+bar for one ask, so the shape stays as fixed; closing the miss needs the elaborated local context,
+which is the try-it battery's (after-structure §3). Reading continues with this limit stated.
+
+**Validity is checked by Lean where it can be.** Several `H` are typed `Ordinal.IsNormal`, not
+`Order.IsNormal`, and whether `H.map_sSup` then resolves is Lean's to say. So a method-call fact
+(P057) counts as *valid as written* when the one-line edit it names compiles in the PR's reviewed
+workspace (`cli tool lean_verify_edit`, line mode, the line with `N.lemma x` replaced by
+`x.lemma`), and as invalid when it does not. A placement fact (P108) is a rename, which a compile
+cannot judge, so it is read: the predicate's namespace exists and the dotted name is not already
+declared (`cli tool declaration_search`). The pooled half-valid bar is unchanged.
