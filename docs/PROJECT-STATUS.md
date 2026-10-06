@@ -455,9 +455,10 @@ fast-closing PRs.
   keeps what was rejected and why. Built on branch `codebase-redesign` (write-up §11): steps 0-2
   (`report conditions` carries the per-obligation spine, `report tools`, two ratchet lints, a
   post-commit note, `knob()` task-data fields that move no existing identity) and the first half of
-  step 3 (one tool vocabulary; unknown tools refused). Step 4's design move and step 6's deletions
-  were dropped on reading the code and the record; the rest waits for the first convention
-  detector and the next probe.
+  step 3 (one tool vocabulary; unknown tools refused), then the producer seam with three convention
+  detectors measured alone (`docs/todo/convention-detectors.md`). Step 4's design move and step 6's
+  deletions were dropped on reading the code and the record; step 5 waits for the next probe that
+  launches sessions by hand.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not
   until the agent is mature enough to be worth their time.
 
