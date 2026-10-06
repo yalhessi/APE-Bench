@@ -657,12 +657,86 @@ a stage cut short is reported as partial on the PRs it ran.
   all, 183 from pool rules, 145 from decoys; 67 decided by reading, 261 checks). Stage F's 25
   sentences diluted; this brief is longer, but each item carries a place and a check.
 
+## Result 5 (2026-10-06): guarded rules, pinpointed, move nothing -- the reviewer gets the right convention at the right place and decides it is not worth asking
+
+Stage G as pre-registered above. 52 rules, ten blind pinpointings, ten briefed sessions (G1), and
+one seal a set holding X1, X2, E1 and G1. `read_stage.py G G X --impute 26755 36822 43192` and
+`decompose_stage_g.py` print the tables.
+
+| per-session reach (issue recall), matcher 1 / 2 | X, unbriefed | G, pinpointed rules | E, exact |
+|---|---|---|---|
+| **in-census asks, pooled (39), the rule's measure** | 0.46 / 0.46 | **0.46 / 0.46** | 0.74 / 0.74 |
+| difference from X | | **+0.000 / +0.000** | +0.282 / +0.282 |
+| validation, in-census (25) | 0.48 | 0.48 | 0.76 |
+| post-cutoff, in-census (14) | 0.43 | 0.43 | 0.71 |
+| out-of-census (5) | 0.40 / 0.60 | 0.40 / 0.60 | 0.40 / 0.60 |
+
+**By the rule (`≤ +0.05` on both matchers): this delivery does not carry the ceiling either.** G
+differs from X on two asks, one each way. The ceiling replicates a third time under new matchers
+(E − X = +0.282 on both). Asks reached per finding on the ten run PRs: G 0.23 / 0.25 against X 0.27 /
+0.29 and E 0.42 / 0.44, so the side condition fails as stage F's did; G filed 61 findings, X 52.5 a
+session, E 59. Matchers agree on 102 of 108 cells on validation and 44 of 44 post-cutoff.
+Provisional: one session a PR, one writer a rule, one pinpointer a PR, and a pooled rule set.
+
+**Retrieval was not the gap.** A candidate carried an entry behind the ask for 28 of the 33
+in-census asks, at the ask's place for 21 by the mechanical test (stage F's sentences: 22 of 33,
+no place). The briefs ran from 13 to 74 items a PR, 385 in all (217 from pool rules, 168 from
+decoys; 78 decided by reading, 307 checks).
+
+**Application was** (matcher 1; matcher 2 the same within one ask):
+
+| | asks | X, a session | G | E |
+|---|---|---|---|---|
+| a candidate at the ask's place | 21 | 9.0 | 9 | 17 |
+| the entry delivered elsewhere | 7 | 3.0 | 3 | 5 |
+| no candidate | 5 | 0.0 | 0 | 1 |
+
+Of the 10 asks only the exact brief reached, G reaches none, and 8 had a candidate at the place.
+
+**What the notes say there.** The session verified the candidate and overrode it:
+- `gcongr` on 30641's monotone step: run, "did not make progress, because `posLog` has no gcongr
+  lemma. I dropped that item." The maintainer's ask was a question, "Can `gcongr` do this (or do you
+  need to provide the side condition manually)?"
+- `{D : ℤ}` repeated in four consecutive signatures on 42814, delivered as *departs*: "Missing
+  docstrings, line-wrapping and `variable {D}` items: Mathlib does not require these, so I would
+  not request them."
+- The primed private helper on 43167, delivered as *departs*: "The prime on a private helper is
+  acceptable, so I raised no naming ask."
+- The `HasProd` sibling on 42184: "would be natural follow-ups ... I would not" ask.
+- 28649's `MGFs`: the convention judged departed, and a different change filed (revert to
+  lowercase rather than spell it out): `partial`, as X.
+- 30458's `variable` sections: filed, as a different restructure: `partial`, as X.
+
+**What it means, at this altitude.** Stage F delivered the text without the place; stage G
+delivered the text, the place and the check; both read as X. What the exact brief carried and
+neither did is the assertion: a list of one to five conventions is a claim that maintainers ask
+for each of them here. Given a long list to verify, half of it decoys, with an instruction to drop
+what does not depart, the reviewer applies its own bar for what a maintainer would ask, and that
+bar is X's. This is the filing bar the post-carry-over plan names ("verified, withheld"), met on
+Claude.
+
+**Untried, and not concluded against.**
+- **The lead, isolated:** the exact entries delivered as pinpointed candidates under stage G's
+  verify-and-drop lead. At X, the lead is what removes the gain; near E, the decoys and length do.
+- **An asserting lead:** the same candidates, told that maintainers raise these and to file each,
+  as a question where a check fails ("can `gcongr` do this?"), unless the check refutes it.
+- Rules for all 438 with retrieval in front; checks run before delivery; a second session a PR.
+
+**How it ran.** Rules (two writers) and pinpointing (ten) on token C on 2026-10-05; two pinpointers
+were cut by the five-hour limit (pr34091's file, written before the cut, stands; pr43167 reran).
+Sessions one at a time from 15:01 to 01:12, three windows, each 6 to 16 points of the five-hour
+window at 27k to 36k weighted units a point, as stage F; the week went from 53% to 61% for the
+sessions and to 63% with the matchers. Two session audits flagged the project's Python run by
+absolute path, on helper scripts in the packet's own `tmp/` and on `findings.json`; read, benign,
+committed by hand (`146bf67e`).
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
 picked from the diff do not move the reviewer, and the ceiling's gain was in the pinpointing. The
 design the two results point to is a pinpointing pass (above), which is code and a prompt, not a
-brief. Stage G, above, is its first test: the user asked for it on 2026-10-05.
+brief. Stage G, above, was its first test (2026-10-05): the place and the check arrived and the
+reviewer overrode them. What remains untested is the decision to file, listed under Result 5.
 
 ## What closes it
 
