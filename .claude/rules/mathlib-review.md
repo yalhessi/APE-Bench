@@ -406,8 +406,10 @@ paths:
   audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
 
 - **Count what every tool call came back with before reading a run's tool use as the model's
-  (2026-10-01).** Over the three Opus subscription runs on the dev set (47 sessions), read with
-  `results/pr_review_v5/probes/claude-models-2026-10-01/tool_outcomes.py`: hover, goto and goal
+  (2026-10-01).** The command is `cli report tools --run <run>` (2026-10-06; either scaffold,
+  every attempt, a lead's nested arms included). Over the three Opus subscription runs on the dev
+  set (47 sessions), read then with the probe script it replaced
+  (`results/pr_review_v5/probes/claude-models-2026-10-01/tool_outcomes.py`): hover, goto and goal
   were refused on 7 of 9 calls (the `Mathlib/...` spelling, which every other tool takes),
   `declaration_search` refused 15 of 249 real names as "not identifier-shaped", 7
   `lean_verify_edit` calls never ran because the model wrote `"replacement": }` to delete a span,

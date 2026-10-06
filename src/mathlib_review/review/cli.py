@@ -277,6 +277,10 @@ def build_parser() -> argparse.ArgumentParser:
     retrieval = report_sub.add_parser(
         "retrieval", help="which retrieval tool the arms reached for, and what came back")
     retrieval.add_argument("--run", required=True)
+    tools = report_sub.add_parser(
+        "tools", help="what every tool call came back with: answered, negative, refused, "
+                      "error or env, per tool, from the session transcripts in .ape/runs")
+    tools.add_argument("--run", required=True)
     stages = report_sub.add_parser(
         "stages", help="what has happened to this run, and whether its artifacts agree")
     stages.add_argument("--run", required=True)
@@ -557,6 +561,10 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
+    elif args.report_command == "tools":
+        from src.mathlib_review.analysis.tool_outcomes import tool_outcomes
+
+        print(json.dumps(tool_outcomes(args.run), indent=2))
     elif args.report_command == "stages":
         from src.mathlib_review.analysis.report import stages as stages_report
 
