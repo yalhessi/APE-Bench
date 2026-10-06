@@ -341,6 +341,19 @@ def test_conventions_follow_the_model_as_a_second_section_and_no_pr_is_skipped()
         probes.model_context(POST, prs, conventions={41930: ["A is written as B."]})
 
 
+def test_a_conventions_section_can_close_with_a_paragraph_and_an_empty_brief_still_reads_none():
+    from src.mathlib_review.io import jsonl_rows
+
+    ref = jsonl_rows(G52_DIR / "model_context.jsonl")[:2]
+    rows = [json.loads(line) for line in probes.model_context(
+        POST, [41930, 42184], conventions={41930: ["A is written as B."], 42184: []},
+        closing=probes.CONVENTIONS_DISPOSITION).split("\n") if line]
+    assert rows[0]["sections"][1]["text"] == (
+        probes.CONVENTIONS_LEAD + "\n\n- A is written as B.\n\n" + probes.CONVENTIONS_DISPOSITION + "\n")
+    assert rows[1] == ref[1]
+    assert "would insist on it are not grounds" in probes.CONVENTIONS_DISPOSITION
+
+
 def test_a_set_can_name_its_own_modification_inventory():
     dev = probes.load_probe_set(SETS / "dev_medium_0_3_0.yaml")
     assert dev.inventory != dev.release / "derived/modification_inventory.jsonl"
@@ -509,6 +522,28 @@ def test_a_packet_brief_can_end_with_pinpointed_candidates_instead(tmp_path):
     briefs = tmp_path / "candidates.json"
     briefs.write_text(json.dumps({"prs": {"43192": [read], "43024": []}}))
     assert probes.load_candidates(briefs) == {43192: [read], 43024: []}
+
+
+def test_the_candidates_lead_is_chosen_by_name_and_stage_g_stays_the_default(tmp_path):
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe"})
+    item = {"file": "Mathlib/A.lean", "declaration": "foo", "fact": "It is stated with `theorem`.",
+            "convention": "A minor lemma is a `lemma`.", "status": "departs", "check": "", "not_when": ""}
+    line = ("- `Mathlib/A.lean`, `foo`: It is stated with `theorem`. Convention: A minor lemma is a "
+            "`lemma`. Decided by reading: the code departs.\n")
+    brief_x = probes.BRIEF_X.read_text()
+    assert probes.CANDIDATES_LEADS["verify"] is probes.CANDIDATES_LEAD
+    for name in ("disposition", "ledger"):
+        (packet,) = probes.write_packets(spec, [f"{name[0].upper()}1"], tmp_path / "scratch", prs=[43192],
+                                         candidates={43192: [item]}, candidates_lead=name)
+        lead = probes.CANDIDATES_LEADS[name]
+        assert (packet / "brief.md").read_text() == (
+            brief_x + f"\n## {probes.CANDIDATES_TITLE}\n\n{lead}\n\n{line}")
+        # Neither lead may give a guess about maintainers as a reason to leave a change out.
+        assert "would insist" in lead or "decide `file`" in lead
+        assert "say nothing" not in lead
+    with pytest.raises(KeyError):
+        probes.write_packets(spec, ["Z1"], tmp_path / "scratch", prs=[43192],
+                             candidates={43192: [item]}, candidates_lead="assert")
 
 
 def test_a_brief_is_its_entries_sentences_in_codebook_order(tmp_path):
