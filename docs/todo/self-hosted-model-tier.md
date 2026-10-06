@@ -44,6 +44,17 @@ taken, prompt caching must be handled, not assumed.
     subscription window. Given the conventions behind each PR's asks, the model's per-session reach
     on those asks went from 0.034 to 0.085 on both matchers: steadier on what it already reached,
     one new ask of 39. Supplying the knowledge did not lift it either.
+- **Steering screen, 2026-10-03** (`results/pr_review_v5/probes/local-unlock-2026-10-03/`, branch
+  `local-model-unlock`).
+  - 13 settings over 23 judged runs, one variable each: system role, over-file, conventions,
+    temperature, examples, brainstorm, specialists, diff-only, tool-free, evidence mandate, Claude
+    Code harness, comments-first, and over-file with reasoning.
+  - No single pass leaves the floor (best 3 of 23).
+  - Over-file is the best direction: 3, 3, 0, 1, 0, and its five passes reach 4 in union.
+  - Reach across every run is capped at 5 of 23.
+  - The branch also carries `ApeAgentConfig.system_prompt_role` and a preflight refusal of a
+    missing brief or context file.
+
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 

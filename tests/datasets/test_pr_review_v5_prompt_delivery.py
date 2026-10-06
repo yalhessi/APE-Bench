@@ -401,3 +401,23 @@ def test_every_scaffold_sends_that_prompt_with_the_tasks_tool():
     assert agent._no_submission_prompt() == (
         no_submission_prompt("submit_findings") + "\n\nAvailable tools: file_read, submit_findings")
     assert agent._no_submission_prompt(empty=True).startswith("Your last reply was empty,")
+def test_system_prompt_role_user_moves_the_system_text_into_the_first_user_message():
+    """`system_prompt_role: user` (2026-10-03): no system message, the same text opening the first
+    user message with `with_task_system_prompt`'s separator. The default delivers as before."""
+
+    import inspect
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.ape_agent import conversation
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.scaffolds.prompts import first_user_prompt
+
+    assert first_user_prompt("SYSTEM", "PR") == f"SYSTEM\n\n{'=' * 80}\n\nPR"
+    assert first_user_prompt(None, "PR") == "PR" == first_user_prompt("", "PR")
+    assert ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")).system_prompt_role == "system"
+
+    create = inspect.getsource(conversation.ApeAgentConversationManager.create_conversation_session)
+    assert 'self.config.system_prompt_role == "user"' in create
+    assert "self._system_text_for_first_user = system_prompt" in create
+    run = inspect.getsource(conversation.ApeAgentConversationManager.run_conversation)
+    assert 'first_user_prompt(getattr(self, "_system_text_for_first_user", None), prompt)' in run

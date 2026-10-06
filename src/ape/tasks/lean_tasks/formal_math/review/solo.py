@@ -260,6 +260,18 @@ class SoloReviewConfig(BasePRReviewConfig):
     user_prompt: Literal["v1", "v2"] = "v1"
 
     @model_validator(mode="after")
+    def _named_files_exist(self) -> "SoloReviewConfig":
+        """A named brief or context file that is not there is refused when the config is built,
+        not when the first session opens it. `--set task_config.context_file=null` reached every
+        session of iter_local397_unlock_D_rep1 as the path "null" (`parse_cli_args` spells the null
+        value `None`) and the run sealed its plan; all 15 tasks then failed on their first prompt."""
+        for name in ("system_prompt_file", "context_file"):
+            path = getattr(self, name)
+            if path is not None and not Path(path).is_file():
+                raise ValueError(f"{name} {str(path)!r} is not a file (to unset it, --set {name}=None)")
+        return self
+
+    @model_validator(mode="after")
     def _notes_need_the_request_bar(self) -> "SoloReviewConfig":
         if self.review_notes and self.filing_bar != "request":
             raise ValueError("review_notes is implemented for filing_bar: request only")

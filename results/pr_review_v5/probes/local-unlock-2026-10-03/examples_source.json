@@ -1,0 +1,93 @@
+[
+ {
+  "comment_id": 1513608989,
+  "pr_number": 11152,
+  "path": "Mathlib/LinearAlgebra/PiTensorProduct.lean",
+  "created_at": "2024-03-05T23:10:04Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/11152#discussion_r1513608989"
+ },
+ {
+  "comment_id": 1663060898,
+  "pr_number": 14337,
+  "path": "Mathlib/AlgebraicGeometry/AffineScheme.lean",
+  "created_at": "2024-07-02T19:32:49Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/14337#discussion_r1663060898"
+ },
+ {
+  "comment_id": 1622382993,
+  "pr_number": 13401,
+  "path": "Mathlib/RingTheory/TwoSidedIdeal.lean",
+  "created_at": "2024-05-31T12:57:14Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/13401#discussion_r1622382993"
+ },
+ {
+  "comment_id": 1956422232,
+  "pr_number": 21817,
+  "path": "Cache/IO.lean",
+  "created_at": "2025-02-14T16:31:09Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/21817#discussion_r1956422232"
+ },
+ {
+  "comment_id": 1776047898,
+  "pr_number": 17122,
+  "path": "Mathlib/SetTheory/Game/PGame.lean",
+  "created_at": "2024-09-25T22:11:08Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/17122#discussion_r1776047898"
+ },
+ {
+  "comment_id": 1822225519,
+  "pr_number": 18377,
+  "path": "Mathlib/Topology/Algebra/OpenSubgroup.lean",
+  "created_at": "2024-10-30T09:40:01Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/18377#discussion_r1822225519"
+ },
+ {
+  "comment_id": 1936863968,
+  "pr_number": 21259,
+  "path": "Mathlib/Algebra/MvPolynomial/Rename.lean",
+  "created_at": "2025-01-31T08:32:52Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/21259#discussion_r1936863968"
+ },
+ {
+  "comment_id": 2325423374,
+  "pr_number": 29361,
+  "path": "Mathlib/RingTheory/PowerSeries/Catalan.lean",
+  "created_at": "2025-09-05T15:36:06Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/29361#discussion_r2325423374"
+ },
+ {
+  "comment_id": 2308986687,
+  "pr_number": 28488,
+  "path": "Mathlib/SetTheory/Cardinal/Basic.lean",
+  "created_at": "2025-08-29T02:44:40Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/28488#discussion_r2308986687"
+ },
+ {
+  "comment_id": 2512848970,
+  "pr_number": 31492,
+  "path": "Mathlib/Analysis/SpecialFunctions/Pow/NthRootLemmas.lean",
+  "created_at": "2025-11-11T05:03:43Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/31492#discussion_r2512848970"
+ },
+ {
+  "comment_id": 1780064394,
+  "pr_number": 16687,
+  "path": "Mathlib/Topology/Algebra/Nonarchimedean/TotallyDisconnected.lean",
+  "created_at": "2024-09-29T14:56:26Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/16687#discussion_r1780064394"
+ },
+ {
+  "comment_id": 2495925751,
+  "pr_number": 31287,
+  "path": "Mathlib/SetTheory/ZFC/Basic.lean",
+  "created_at": "2025-11-05T19:55:31Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/31287#discussion_r2495925751"
+ },
+ {
+  "comment_id": 1948116620,
+  "pr_number": 21593,
+  "path": "Mathlib/LinearAlgebra/QuadraticForm/Basic.lean",
+  "created_at": "2025-02-09T14:15:49Z",
+  "html_url": "https://github.com/leanprover-community/mathlib4/pull/21593#discussion_r1948116620"
+ }
+]

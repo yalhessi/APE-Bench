@@ -694,10 +694,14 @@ class ApeAgentConversationManager:
             # only the user prompt reached the model. Appending rather than replacing keeps
             # the workspace/tool preamble the harness depends on.
             system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
-            session.add_system_message(
-                content_blocks=[ContentBlock.text_block(system_prompt)],
-                cwd=cwd
-            )
+            if self.config.system_prompt_role == "user":
+                # No system message: `run_conversation` opens the first user message with it.
+                self._system_text_for_first_user = system_prompt
+            else:
+                session.add_system_message(
+                    content_blocks=[ContentBlock.text_block(system_prompt)],
+                    cwd=cwd
+                )
 
             # Record tool definitions separately
             if tools:
@@ -809,10 +813,13 @@ class ApeAgentConversationManager:
         )
 
         if prompt and not has_user_message:
+            from ape.scaffolds.prompts import first_user_prompt
+
             cwd = self._get_session_context()
 
             session.add_user_message(
-                content_blocks=[ContentBlock.text_block(prompt)],
+                content_blocks=[ContentBlock.text_block(
+                    first_user_prompt(getattr(self, "_system_text_for_first_user", None), prompt))],
                 cwd=cwd
             )
             self.logger.debug(f"Added initial user prompt to new session")
