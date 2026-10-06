@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stage H, unattended on token C: the census pinpointers (negatives), the rates, design `rate`, then
+# Stage H, unattended on the login TOKEN_VAR names (default token C): the census pinpointers (negatives), the rates, design `rate`, then
 # the deciders design by design, then the score. Every batch is metered; no work starts once the
 # week reaches WEEK_CAP (80%). An audit flag or an invalid file stops it uncommitted, to be read by hand.
 # usage: bash run_stage_h.sh <scratch dir> <census bodies.json>
@@ -18,7 +18,7 @@ wait_or_stop() {  # wait_or_stop <points needed> <what>
   echo "$(date '+%H:%M:%S') stopping before $2: week at ${WEEK_CAP}% or no window"; exit 6
 }
 batch() {  # batch <name> <prompts file>: run, report, audit (exit 4 on a flag)
-  $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C $1 $S/claude_logs - @$2
+  $P/run_claude_batch.sh ${TOKEN_VAR:-CLAUDE_CODE_OAUTH_TOKEN_C} $1 $S/claude_logs - @$2
   python3 $P/batch_report.py $S/claude_logs/$1.jsonl $S/claude_logs/$1.prompt | grep -E '^(Pinpointer|Decider)|^five-hour|^result'
   python3 $P/audit_batch.py $S/claude_logs/$1.jsonl > $S/audit_$1.txt || { cat $S/audit_$1.txt; echo "audit flag in $1: stopping uncommitted"; exit 4; }
   tail -1 $S/audit_$1.txt

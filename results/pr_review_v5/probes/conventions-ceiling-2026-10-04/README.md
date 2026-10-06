@@ -801,6 +801,10 @@ five-hour window at 51% with another session drawing on it. Expected: 16 pinpoin
 points of a window each, eight deciders at 5 to 15: about two windows, and about 8 to 12 points of
 the week. `run_stage_h.sh` meters every batch and stops starting work once the week reaches 80%.
 
+**Running note (2026-10-06 04:30, before any batch ran).** At the user's direction the stage runs on
+the main account (`CLAUDE_CODE_OAUTH_TOKEN`; five-hour window 6%, week 55% when read, resetting
+Friday 10:00), not token C. Same model, route and caps; the runner reads the login from `TOKEN_VAR`.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
