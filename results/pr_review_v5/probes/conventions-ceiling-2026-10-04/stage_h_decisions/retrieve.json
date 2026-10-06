@@ -1,0 +1,896 @@
+[
+ {
+  "cid": "c02bde3",
+  "raise": false,
+  "p": 0.15,
+  "basis": "simp only then exact; asked v0726 'No simpa using?' is close, but golf PR and rewrite-then-exact not-asked neg:26979:4, neg:31081:9."
+ },
+ {
+  "cid": "c0e9f6d",
+  "raise": false,
+  "p": 0.3,
+  "basis": "Missing mirrored IsCoprime 2 x is a classic left/right ask (v0613, v1137, v0168), yet helper lemmas in census rarely drew sibling requests (neg:26979:7)."
+ },
+ {
+  "cid": "c17afd8",
+  "raise": false,
+  "p": 0.07,
+  "basis": "have plus simp/exact; term form awkward. Closest are not-asked neg:33879:52, neg:26979:31; asked v0108, v0186 were constructor/intro blocks."
+ },
+ {
+  "cid": "c18ed33",
+  "raise": false,
+  "p": 0.15,
+  "basis": "simp only [this] then exact; asked v0726 similar, but golf PR and not-asked rewrite-then-exact neg:33879:9, neg:26979:4 dominate."
+ },
+ {
+  "cid": "c23ba0f",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Only a proof golf of one lemma, no new variant; unlike asked v1275, v0613; like not-asked neg:36577:5."
+ },
+ {
+  "cid": "c251853",
+  "raise": false,
+  "p": 0.03,
+  "basis": "theorem vs lemma keyword is not enforced; not-asked neg:27054:11 flagged same; no asked analogue."
+ },
+ {
+  "cid": "c2e55fe",
+  "raise": false,
+  "p": 0.2,
+  "basis": "by_cases then rw [not_le] at mergeable (by_cases!/le_or_lt), like asked v1058 by_contra!; not-asked neg:26301:3 intro/cases similar."
+ },
+ {
+  "cid": "c2fd7d3",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Both left and right iff versions added; remaining siblings speculative, like not-asked neg:27054:5, neg:31081:12."
+ },
+ {
+  "cid": "c337c9d",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Rename-only fix keeping original breaks; like not-asked neg:36430:3 where a rename freed room on the line."
+ },
+ {
+  "cid": "c33eb4f",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Proof already shortened via inv_smul_smul₀ and Tendsto.congr'; no evident one-lemma derivation; like not-asked neg:30244:0, neg:31081:5."
+ },
+ {
+  "cid": "c3af5d4",
+  "raise": false,
+  "p": 0.2,
+  "basis": "rw then hand-built iff via bridge; simp [bridge] likely closes. Asked v0241, v0189 simp golfs; not-asked neg:33879:37 rw plus term."
+ },
+ {
+  "cid": "c428fec",
+  "raise": false,
+  "p": 0.08,
+  "basis": "rw step blocks a clean term; like not-asked neg:33879:52, neg:26979:30 rw-then-exact blocks."
+ },
+ {
+  "cid": "c42b714",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Asked v2201 requested motive rename on siblings, but here both file eliminators are renamed; other-file siblings speculative, like neg:36577:4."
+ },
+ {
+  "cid": "c44fb2d",
+  "raise": false,
+  "p": 0.15,
+  "basis": "simp only [this] then exact in golf PR; asked v0726 similar; not-asked neg:33879:9, neg:26979:4 rewrite-then-exact."
+ },
+ {
+  "cid": "c46e601",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Docstring delimiter layout; not-asked neg:36577:33, neg:37341:0 docstring spelling items; asked v0829 was content coherence."
+ },
+ {
+  "cid": "c47bfa7",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Golf PR, signature untouched; called lemma likely needs same class. Like not-asked neg:31081:23 'check whether needed'."
+ },
+ {
+  "cid": "c4d83e1",
+  "raise": false,
+  "p": 0.08,
+  "basis": "lemma/theorem and docstring layout mix; not-asked neg:27054:11, neg:36577:9; no asked example on keyword or delimiter style."
+ },
+ {
+  "cid": "c4d9f45",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Iff statement broken at ↔ is common style; like not-asked neg:30244:20, neg:33879:64."
+ },
+ {
+  "cid": "c4de185",
+  "raise": false,
+  "p": 0.2,
+  "basis": "Generalization PR variable line; asked v1063 'can topology be dropped too?' similar, but not-asked neg:30652:3 same PR; speculative."
+ },
+ {
+  "cid": "c5ab6ba",
+  "raise": false,
+  "p": 0.2,
+  "basis": "Could want _right affix matching Nat coprime_two lemmas, like asked v0110; but affix choices not-asked neg:26301:16, neg:26979:18."
+ },
+ {
+  "cid": "c5b27b2",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Rename-only fix keeping original layout; like not-asked neg:36430:3, neg:33879:65."
+ },
+ {
+  "cid": "c5c5191",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Docstring wrapped a word early; same as not-asked neg:32598:37, neg:36577:33, neg:37190:41."
+ },
+ {
+  "cid": "c6271df",
+  "raise": false,
+  "p": 0.12,
+  "basis": "refine/obtain/exact iff proof could be term; asked v0108, v0506 similar small iffs; not-asked neg:31081:62, neg:28678:13."
+ },
+ {
+  "cid": "c629280",
+  "raise": false,
+  "p": 0.15,
+  "basis": "Nat.Coprime.dvd_mul_left lacks _iff; asked v0110, v1926 match-analogue names; not-asked neg:36430:9 extra _iff unflagged."
+ },
+ {
+  "cid": "c65dfdc",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Partial generalization; asked v2096 completed siblings, but closure lemma needs metric; not-asked neg:30244:6 left-behind sibling."
+ },
+ {
+  "cid": "c6d177a",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Statement differs from Nat sibling (p^2, cast); like not-asked neg:26979:18, neg:37190:20 new-part names."
+ },
+ {
+  "cid": "c72953e",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Case split essential, no single finishing tactic evident; like not-asked neg:26301:18, neg:37190:22."
+ },
+ {
+  "cid": "c742ab1",
+  "raise": false,
+  "p": 0.1,
+  "basis": "rw then exact/simp inside haves; like not-asked neg:33879:9, neg:27054:3; asked v0504 merged rw chains."
+ },
+ {
+  "cid": "c79ce2b",
+  "raise": false,
+  "p": 0.02,
+  "basis": "↦ is preferred in new code; same contrast not-asked neg:33879:74, neg:36430:29."
+ },
+ {
+  "cid": "c7e2acc",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Golf of one variant, no new variant introduced; like not-asked neg:36577:5."
+ },
+ {
+  "cid": "c7f9dc4",
+  "raise": true,
+  "p": 0.5,
+  "basis": "Concrete standard weakening Normed→Seminormed on a new lemma, like asked w0181, w0025, v1615; not-asked neg:36430:27 was a privacy-only PR."
+ },
+ {
+  "cid": "c839bcf",
+  "raise": false,
+  "p": 0.1,
+  "basis": "apply/rw at/simpa sequence; asked v2291 merged similar, but not-asked neg:31081:9, neg:37190:5 dominate."
+ },
+ {
+  "cid": "c863742",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Single implicit {m : ℤ} in two lemmas; like not-asked neg:35140:23, neg:26301:15."
+ },
+ {
+  "cid": "c876128",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Positivity hypothesis is needed (statement fails for a ≤ 0); nothing to drop."
+ },
+ {
+  "cid": "c8c918c",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Could derive from log_pow and mul_max_of_nonneg; asked v1578 'show from existing'; not-asked neg:26301:0 case-analysis proofs."
+ },
+ {
+  "cid": "c97d393",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Repeats binders of one earlier lemma only; like not-asked neg:27054:16, neg:26301:15."
+ },
+ {
+  "cid": "c9cb7d2",
+  "raise": false,
+  "p": 0.15,
+  "basis": "Hand bridge via casts; asked v0806, v0351 reuse-library asks; not-asked neg:37190:1 instantiate-then-rewrite proofs."
+ },
+ {
+  "cid": "c9f1c3f",
+  "raise": false,
+  "p": 0.1,
+  "basis": "obtain then exact; term form needs subst; asked v0506 similar, not-asked neg:28678:13, neg:33879:52."
+ },
+ {
+  "cid": "ca29e9a",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Statement needs negation (fails in semirings like ℕ); no weaker class applies."
+ },
+ {
+  "cid": "ca41dfe",
+  "raise": false,
+  "p": 0.12,
+  "basis": "simp only then exact; maybe simp [this, lemma]; asked v0241 similar, not-asked neg:26979:22, neg:31081:47."
+ },
+ {
+  "cid": "cade8f1",
+  "raise": false,
+  "p": 0.07,
+  "basis": "have plus simp/exact; no natural term; like not-asked neg:33879:52, neg:26979:31."
+ },
+ {
+  "cid": "caedeea",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Already golfed to simp plus exact fun; like not-asked neg:31081:47, neg:26979:22."
+ },
+ {
+  "cid": "cb35f8c",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Mixed have/apply/rw at/simpa not a term chain; like not-asked neg:31081:62, neg:37190:30."
+ },
+ {
+  "cid": "cb7091d",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Siblings left in Normed in a partial generalization; asked v2096 vs not-asked neg:30244:6; title says 'some lemmas'."
+ },
+ {
+  "cid": "cb7c84d",
+  "raise": false,
+  "p": 0.25,
+  "basis": "Whole statement fits in ~76 chars; asked w0317, v0780, v1988 joins; not-asked neg:33879:64, neg:35140:28 equally fitting."
+ },
+ {
+  "cid": "cb808b3",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Destructure then lemma; no finishing tactic evident; like not-asked neg:33879:37, neg:28678:10."
+ },
+ {
+  "cid": "cb91eb9",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Variable name d vs m in prose; asked v0829 docstring coherence, but not-asked neg:37341:0 docstring spelling."
+ },
+ {
+  "cid": "cbf9d8e",
+  "raise": false,
+  "p": 0.02,
+  "basis": "↦ matches surrounding lines; no inconsistency; like not-asked neg:33879:74."
+ },
+ {
+  "cid": "cc0b477",
+  "raise": false,
+  "p": 0.04,
+  "basis": "lemma keyword and inline @[simp]; not-asked neg:37052:3, neg:26301:9 attribute placement."
+ },
+ {
+  "cid": "cc15f27",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Local haves reprove characterisations; asked v1445 suggests library; not-asked neg:31081:3, neg:37190:2 long hand proofs."
+ },
+ {
+  "cid": "cc37928",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Short case split on p = 2; no single library lemma evident; like not-asked neg:33879:3, neg:26301:0."
+ },
+ {
+  "cid": "cc4aa99",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Limit argument, no finishing tactic; like not-asked neg:31081:48, neg:37190:22."
+ },
+ {
+  "cid": "ccbe5c1",
+  "raise": false,
+  "p": 0.1,
+  "basis": "apply then simp in calc step could be term; asked v1543 calc-step term; not-asked neg:37190:30."
+ },
+ {
+  "cid": "ccdad97",
+  "raise": false,
+  "p": 0.15,
+  "basis": "ContinuousAdd possibly weakenable; asked v1063 in generalization PR; not-asked neg:30652:3, speculative weaker class."
+ },
+ {
+  "cid": "cce257a",
+  "raise": false,
+  "p": 0.15,
+  "basis": "Signature and calc step could fill lines; asked v2242, v1477; not-asked neg:31081:73, neg:30244:22."
+ },
+ {
+  "cid": "cce7d52",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Asked v2201 motive rename for siblings, but file eliminators both renamed; other-file siblings speculative like neg:36577:4."
+ },
+ {
+  "cid": "ccfdb92",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Maybe grind closes with eq_two_or_odd; asked v0633 grind; not-asked neg:33879:37 short manual proofs."
+ },
+ {
+  "cid": "cd0a35f",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Norm variants for add/mul not obvious need; like not-asked neg:31081:12, neg:37190:7."
+ },
+ {
+  "cid": "cd97805",
+  "raise": false,
+  "p": 0.04,
+  "basis": "=> vs ↦ in old file; not-asked neg:36430:29, neg:33879:74."
+ },
+ {
+  "cid": "ce7af7f",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Two-step calc is appropriate; like not-asked neg:31081:48."
+ },
+ {
+  "cid": "ceaeffb",
+  "raise": false,
+  "p": 0.2,
+  "basis": "{D : ℤ} in four signatures of a new file; asked v1290, v1986; not-asked neg:35140:23, neg:27054:16 only two repeats."
+ },
+ {
+  "cid": "cec77c0",
+  "raise": false,
+  "p": 0.12,
+  "basis": "simp only then explicit term; asked v0241; not-asked neg:26979:22, neg:31081:47; golf PR."
+ },
+ {
+  "cid": "cecb026",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Eliminator motives normally bound per signature; like not-asked neg:35140:23."
+ },
+ {
+  "cid": "ced8392",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Docstring wrap one word short; same as not-asked neg:32598:37, neg:36577:33."
+ },
+ {
+  "cid": "cee72f4",
+  "raise": false,
+  "p": 0.12,
+  "basis": "rw then exact ⟨…⟩ identical to not-asked neg:33879:8, neg:33879:9; push_cast; ring standard."
+ },
+ {
+  "cid": "cf18974",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Docstring wrap one word short; same as not-asked neg:32598:37, neg:35140:30."
+ },
+ {
+  "cid": "cfc72ad",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Golf of one member; dual likely derived by duality; like not-asked neg:36577:5."
+ },
+ {
+  "cid": "c02a0ed",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Naming of new counterpart lemmas rarely questioned; resembles not-asked neg:26979:19, neg:35140:16; no clear clash with siblings."
+ },
+ {
+  "cid": "c0757b2",
+  "raise": false,
+  "p": 0.04,
+  "basis": "tprod_nonneg matches root-namespace tsum_nonneg; like not-asked neg:28678:8, neg:26979:17 namespace comparisons."
+ },
+ {
+  "cid": "c080b6d",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Qualified vs unqualified names inside namespace; like not-asked neg:27054:11, neg:31081:25; minor."
+ },
+ {
+  "cid": "c084c60",
+  "raise": false,
+  "p": 0.18,
+  "basis": "Whole div_left_inj proof likelier replaced by a term than steps merged; asked v0726, v0177 differ; not-asked neg:26979:4."
+ },
+ {
+  "cid": "c0fc3a3",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Already a clean one-line term; asked v0241, v0190 replace multi-step chains, not short terms."
+ },
+ {
+  "cid": "c14ca72",
+  "raise": false,
+  "p": 0.25,
+  "basis": "intro/have/simpa could be one simpa (asked v1959, v0241), but golf likelier framed as reusing mul_left_injective."
+ },
+ {
+  "cid": "c1721fb",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Proof essentially the original Mathlib one, only moved; like not-asked neg:31081:47."
+ },
+ {
+  "cid": "c209cc8",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Nearly-full docstring line not filled; not-asked neg:32598:37, neg:36577:33; asked v1676, v2184 were orphan-word breaks."
+ },
+ {
+  "cid": "c23bc2f",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Short anonymous-constructor branch; like not-asked neg:33879:37, neg:26301:18."
+ },
+ {
+  "cid": "c279c41",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Rewrite list cannot fit one line anyway; partial refill like not-asked neg:31081:72, neg:30244:22."
+ },
+ {
+  "cid": "c2a2afc",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Asymmetric generalization mathematically forced; like not-asked neg:30244:6, neg:37052:0."
+ },
+ {
+  "cid": "c306e3e",
+  "raise": false,
+  "p": 0.04,
+  "basis": "intro vs fun binding style; like not-asked neg:33879:74, neg:30244:39."
+ },
+ {
+  "cid": "c340799",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Short side-goal rw then exact; like not-asked neg:26979:22, neg:30244:24."
+ },
+ {
+  "cid": "c36956d",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Hypothesis name and qualification minor; like not-asked neg:27054:12, neg:27054:11."
+ },
+ {
+  "cid": "c36e4f6",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Any comment would be term vs tactic (P040), not file spelling; like not-asked neg:26301:9."
+ },
+ {
+  "cid": "c3cf0e7",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Named binders forced by explicit (b := ...) arguments; like not-asked neg:35140:6."
+ },
+ {
+  "cid": "c3d7be2",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Repeated explicit binders follow file's existing style; not-asked neg:27054:16, neg:26301:15, neg:35140:24."
+ },
+ {
+  "cid": "c3ff654",
+  "raise": false,
+  "p": 0.07,
+  "basis": "rw then exact of a term, not rwa-mergeable; like not-asked neg:33879:9, neg:26979:4."
+ },
+ {
+  "cid": "c4039f7",
+  "raise": false,
+  "p": 0.04,
+  "basis": "_left/_right affixes standard; like not-asked neg:26301:17, neg:33879:33."
+ },
+ {
+  "cid": "c408911",
+  "raise": false,
+  "p": 0.07,
+  "basis": "convert plus hinted simp acceptable in long proof; like not-asked neg:30244:25, neg:27054:19."
+ },
+ {
+  "cid": "c453521",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Name plausible; naming remarks rare; like not-asked neg:31081:43, neg:26979:19."
+ },
+ {
+  "cid": "c4d6de6",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Normality inherited and needed for statement; like not-asked neg:26301:7."
+ },
+ {
+  "cid": "c4d9c93",
+  "raise": false,
+  "p": 0.15,
+  "basis": "`union` vs `iUnion` might draw remark (asked v1197), but part inherited from old name; like not-asked neg:26979:18."
+ },
+ {
+  "cid": "c4e2775",
+  "raise": false,
+  "p": 0.1,
+  "basis": "simp only; exact kept from original proof; like not-asked neg:31081:47, neg:31081:9."
+ },
+ {
+  "cid": "c544636",
+  "raise": true,
+  "p": 0.45,
+  "basis": "Original proof via mul_left_injective b⁻¹ replaced by hand-rolled chain; like asked v1514, v1578, v0152."
+ },
+ {
+  "cid": "c572443",
+  "raise": false,
+  "p": 0.08,
+  "basis": "by_cases plus ge_of_tendsto' mirrors tsum_nonneg's proof; like not-asked neg:26301:0, neg:30244:0."
+ },
+ {
+  "cid": "c598362",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Primed backward-compatibility variant; family completion asks rare here; like not-asked neg:33879:11, neg:33879:12."
+ },
+ {
+  "cid": "c5e6ab8",
+  "raise": true,
+  "p": 0.45,
+  "basis": "Sibling div_right_inj is `.eq_iff`; long constructor proof reproves it; like asked v1578, v0152, v1514."
+ },
+ {
+  "cid": "c63c5aa",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Small inner by-block; like not-asked neg:26979:30, neg:30244:31 more than asked v0994."
+ },
+ {
+  "cid": "c700817",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Proof applies library pigeonhole lemmas directly; like not-asked neg:37190:2."
+ },
+ {
+  "cid": "c7142b5",
+  "raise": false,
+  "p": 0.25,
+  "basis": "Term proof turned into tactic block; asked v0108, w0293 vs not-asked neg:26979:31; moderate."
+ },
+ {
+  "cid": "c72458f",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Inner rw/exact on cofinality; like not-asked neg:30244:31, neg:26979:30."
+ },
+ {
+  "cid": "c759176",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Short by-block split though it fits; asked v2111 similar, but not-asked neg:26301:26, neg:35140:28 dominate."
+ },
+ {
+  "cid": "c77f9c8",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Binder names x/i trivial; like not-asked neg:35140:6, neg:33879:74."
+ },
+ {
+  "cid": "c7a4a42",
+  "raise": false,
+  "p": 0.04,
+  "basis": "rw vs simp_rw for same rewrite; like not-asked neg:30244:37."
+ },
+ {
+  "cid": "c7a80fb",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Both left and right variants added; further siblings speculative; like not-asked neg:31081:11, neg:37052:0."
+ },
+ {
+  "cid": "c7cf9f3",
+  "raise": false,
+  "p": 0.15,
+  "basis": "Odd break of 80-char variable line; like not-asked neg:33879:66; likely subsumed by variable-layout comment."
+ },
+ {
+  "cid": "c83d2ac",
+  "raise": false,
+  "p": 0.07,
+  "basis": "rw then exact of a term, not rwa; like not-asked neg:33879:8, neg:26979:5."
+ },
+ {
+  "cid": "c848b15",
+  "raise": true,
+  "p": 0.4,
+  "basis": "Third near-verbatim variable block in one section instead of shared variable; like asked v2080, v0567, v0544."
+ },
+ {
+  "cid": "c905386",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Hyphenation in typo-fix prose; like not-asked neg:37341:0, neg:37341:1."
+ },
+ {
+  "cid": "c9172e2",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Primed variant naming; like not-asked neg:33879:34, neg:36577:17, neg:33879:35."
+ },
+ {
+  "cid": "c9216dd",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Multi-step quotient argument, not short assembly; like not-asked neg:31081:61, neg:28678:13."
+ },
+ {
+  "cid": "c92b22f",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Repeated explicit binders across new lemmas; like not-asked neg:35140:24, neg:27054:16."
+ },
+ {
+  "cid": "c954791",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Attribute placement forced by line length; like not-asked neg:37052:3, neg:36577:7."
+ },
+ {
+  "cid": "c988408",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Docstring fill minor; reviewer likelier to fix wording; like not-asked neg:32598:37, neg:36577:33."
+ },
+ {
+  "cid": "c99b9b7",
+  "raise": false,
+  "p": 0.1,
+  "basis": "One-line declaration split; asked w0286 optional, not-asked neg:33879:64, neg:26301:27 closer."
+ },
+ {
+  "cid": "c9ad5b7",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Lowercase 'cgf' left nearby; asked w0268 consistency, but typo-PR not-asked neg:37341:0, neg:37341:2 closer."
+ },
+ {
+  "cid": "c9c95bb",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Quotient rewriting unlikely closable by finishing tactic; like not-asked neg:30244:25, neg:27054:19."
+ },
+ {
+  "cid": "ca3e65f",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Both hypotheses mathematically needed; like not-asked neg:26301:7, neg:31081:21."
+ },
+ {
+  "cid": "ca5f039",
+  "raise": false,
+  "p": 0.18,
+  "basis": "DivisionMonoid unneeded for right-cancel lemma, like asked w0025, w0181; but not-asked neg:30244:8 in similar generalization PR."
+ },
+ {
+  "cid": "ca6708c",
+  "raise": false,
+  "p": 0.2,
+  "basis": "Same term-to-tactic change as left lemma; asked v0108 vs not-asked neg:26979:30; second occurrence."
+ },
+ {
+  "cid": "ca72784",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Typeclass list plausible; checking each speculative; like not-asked neg:30652:3, neg:36430:27."
+ },
+ {
+  "cid": "cac351d",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Short rw/exact and term branches; like not-asked neg:31081:47, neg:26979:23."
+ },
+ {
+  "cid": "cb23b23",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Natural counterpart name; like not-asked neg:26979:18, neg:37190:20."
+ },
+ {
+  "cid": "cbec1b5",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Siblings need group structure; further-generalization ask speculative; like not-asked neg:30244:6, neg:30244:7."
+ },
+ {
+  "cid": "cc4ac1e",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Rewrites at different locations not mergeable; like not-asked neg:31081:9, neg:27054:3."
+ },
+ {
+  "cid": "cc59f86",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Normalizer hypothesis may suffice, but asked v1300, w0025 were obvious; like not-asked neg:31081:23."
+ },
+ {
+  "cid": "cc836a0",
+  "raise": false,
+  "p": 0.25,
+  "basis": "have-by-simpa then simpa mergeable; asked v0726, v0177 similar, but golf likelier framed as lemma reuse."
+ },
+ {
+  "cid": "cc9fde0",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Repeated binders match file style; like not-asked neg:27054:16, neg:35140:24."
+ },
+ {
+  "cid": "ccde78d",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Long new proof without obvious library shortcut; like not-asked neg:31081:3, neg:37190:2."
+ },
+ {
+  "cid": "cd4b87a",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Both mixins and DivisionMonoid needed jointly; like not-asked neg:30244:8."
+ },
+ {
+  "cid": "cd6985c",
+  "raise": false,
+  "p": 0.03,
+  "basis": "lemma vs theorem not enforced; like not-asked neg:27054:11."
+ },
+ {
+  "cid": "cda88ae",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Term proof on next line is standard; like not-asked neg:26301:27, neg:35140:28."
+ },
+ {
+  "cid": "cdb41f1",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Rename aligns with family; other siblings speculative; like not-asked neg:26979:8."
+ },
+ {
+  "cid": "cdeae9c",
+  "raise": false,
+  "p": 0.12,
+  "basis": "HasProd.nonneg or tprod_pos ask possible (asked v0613, w0182), but not-asked neg:26979:7, neg:28678:2 closer."
+ },
+ {
+  "cid": "ce3c52e",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Case split applying core lemma is direct; like not-asked neg:37190:2, neg:33879:3."
+ },
+ {
+  "cid": "ce477e2",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Redundant Subgroup. qualification minor; like not-asked neg:27054:11, neg:31081:25."
+ },
+ {
+  "cid": "ce656ac",
+  "raise": false,
+  "p": 0.1,
+  "basis": "Generalizing set-domain siblings plausible (asked v2201), but like not-asked neg:26979:6."
+ },
+ {
+  "cid": "ceb3977",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Only lemma name changed on this line; like not-asked neg:31081:60, neg:26979:30."
+ },
+ {
+  "cid": "cefa9e1",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Two declarations sharing binders; like not-asked neg:26301:15, neg:35140:24."
+ },
+ {
+  "cid": "cf10b73",
+  "raise": true,
+  "p": 0.4,
+  "basis": "Sibling div_right_inj is a `.eq_iff` term; constructor/intro block like asked v0108, w0293."
+ },
+ {
+  "cid": "cf4ed8d",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Classes essentially minimal for proof; like not-asked neg:30244:8, neg:36430:27."
+ },
+ {
+  "cid": "cf4ee0d",
+  "raise": false,
+  "p": 0.12,
+  "basis": "Finite-codomain branch could use finite pigeonhole API (asked v1445 style), but like not-asked neg:37190:2."
+ },
+ {
+  "cid": "cf57706",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Term proof on next line is standard; like not-asked neg:26301:27, neg:35140:28."
+ },
+ {
+  "cid": "cf6e80a",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Speculative missing counterparts; like not-asked neg:28678:2, neg:37190:7."
+ },
+ {
+  "cid": "cf7ae96",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Both hypotheses needed; like not-asked neg:26301:7."
+ },
+ {
+  "cid": "cf7c9f9",
+  "raise": false,
+  "p": 0.12,
+  "basis": "PR split a former one-liner; asked w0286, v0293 vs not-asked neg:33879:64, neg:26301:27."
+ },
+ {
+  "cid": "cf86889",
+  "raise": false,
+  "p": 0.05,
+  "basis": "No finishing tactic proves tprod nonnegativity; like not-asked neg:26301:18, neg:28678:10."
+ },
+ {
+  "cid": "cf9bfc2",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Hypotheses needed; like not-asked neg:26301:8."
+ },
+ {
+  "cid": "cfda496",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Typo PR likely fixed occurrences; consistency asks rare; like not-asked neg:37341:2."
+ },
+ {
+  "cid": "cff4d13",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Repeated binders match file style; like not-asked neg:27054:16, neg:35140:24."
+ },
+ {
+  "cid": "cffcd29",
+  "raise": false,
+  "p": 0.25,
+  "basis": "simp [div_eq_mul_inv] may close it (asked v0241), but likelier suggestion is the div_left_injective.eq_iff term."
+ }
+]
