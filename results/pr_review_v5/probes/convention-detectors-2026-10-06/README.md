@@ -254,3 +254,27 @@ ask in sample (33117, d0018), and fires on no census or out-of-sample PR. Census
 **Too noisy, by the rule; the failing shape is `@[to_additive]`.** The census's P201 asks are
 mostly a missing attribute on a lemma with no hand-written twin (as 43167's p0011, "Missing
 `@[to_additive]` here"), which neither shape can see.
+
+## Stage 4: refinements named by the misses (pre-registered 2026-10-06, before either is written)
+
+**`dot_notation/2`** adds three conditions to the method-call shape, one per invalid mechanism the
+stage-2 sample showed, and changes nothing else:
+- *R1, qualified binder.* When the binder's type head is written qualified (`Bicategory.Adjunction`,
+  `Ordinal.IsNormal`), the call prefix must be exactly that head; `x.lemma` resolves in the binder's
+  own namespace first. (An unqualified binder head keeps the last-component match: the dev facts on
+  `H : IsNormal …` compile. The `PullbackCone.IsLimit` case, unqualified `IsLimit`, is not reachable
+  without the environment and stays.)
+- *R2, a variable is not a namespace.* The prefix's first component is neither a binder name of the
+  declaration nor a single capital letter (`P.lemma h`, `S.downward_closed hf`).
+- *R3, a relation is not a receiver.* A binder whose type is a relation (`conclusion_head` not
+  `other`: `h : Fintype.card α = …`) is not a receiver.
+
+Since the three were read off the stage-2 sample, they are tested on a **holdout**: a fresh seeded
+sample of 20 census facts of `/2`, none of them in the stage-2 sample (seed
+`dot-notation-census-2026-10-06-holdout`). **Bars:** at least **15 of 20** valid as written (stage 2's
+sample was 13 of 20); of the 9 exact census asks, at most **one** lost; and the dev compile outcomes
+reported for the facts that remain (in sample: R1 is expected to drop all three `Ordinal.IsNormal`
+facts, two invalid and one valid).
+
+**`generated_twins/2`** retires the `@[to_additive]` shape, wrong on 29 of 29 facts. Nothing is
+tuned: the `@[to_fun]` shape is unchanged, and its facts must be identical.
