@@ -233,9 +233,12 @@ machinery reachable only from `bench` is retired once grants are config.
 
 ### 4.5 Designs own their run data
 
-`DESIGNS` stays where it is, with its explicit line. What moves is the design-specific code still
-in `runner.py`: `_ledger_rows`, `stage_rows_for`, `_design_preflight`, and the per-mode converters
-behind them, onto the design class, as `design_payload` and `describe_design_payload` already are.
+`DESIGNS` stays where it is, with its explicit line. *Amended 2026-10-06, on reading the code
+(§11):* the move proposed here -- `_ledger_rows`, `stage_rows_for` and `_design_preflight` onto the
+design class -- is dropped. Each already dispatches through the design's own hooks
+(`reads_stage`, `design_payload`, `describe_design_payload`) and works for any design; the
+`runner.py` edits in D1's and D2's commits built that generic chain once, and moving it would
+relocate code without making the next design cheaper. What remains is below.
 A design declares its stages, and each stage its route and budget, so a critic on another model is
 one design's declaration and not a second run config. The target is checkable: a new per-PR design
 is its module, its registry line and its config, and `runner.py` is not in the diff.
@@ -309,7 +312,7 @@ real work, and a step that misses it is reported as missed, not widened.
 | 1 | the three guards (§4.1); the spine and the tool-outcomes reading (§4.2) | the next thread's fixes to shared machinery are their own commits, found through the reading rather than a new script | 4-6 | +3 new |
 | 2 | identity (§4.3): omitted-when-unset hashing, once, at the declared boundary; the knob rule | the next knob forks no run that does not set it, and resumes refuse a changed one | 2-3 | `test_pr_review_v5_designs.py` (the payload pin moves once), `task_adapter_fields` |
 | 3 | producers (§4.4): one registry and vocabulary, explicit sorted grants, `section` delivery, the bench shape | after-structure §2's first detector lands in ≤ 3 `src/` files, 1 fixture, 0 hub edits | 8-12 | ~8 (`context_tools`, `prompt_delivery`, the consistency table's comment, grants) |
-| 4 | design-owned run data (§4.5); per-stage route | the next design (a critic on another model, or D3) lands with `runner.py` absent from the diff | 4-6 | ~6 |
+| 4 | per-stage route and budget (§4.5), with the critic-on-another-model work. *Amended 2026-10-06:* the move of `_ledger_rows`, `stage_rows_for` and `_design_preflight` is dropped -- they already dispatch through each design's hooks, see §11 | the next design (a critic on another model, or D3) lands with `runner.py` absent from the diff | 2-4 | ~4 |
 | 5 | the stage as the probe unit (§4.6): `packet_on_disk`, one seal, the record gate, prepare/read readings, `cells.py` | the next probe needs no new `cli probe` subcommand and no `probes.py` edit | 8-12 | ~8 (`test_probes.py` shrinks) |
 | 6 | hygiene (§4.7): legacy by importer list, spent configs, pure pins | the boundary counts go down and nothing frozen moves | 4-6 | −43 legacy, −17 v2 if decided |
 
@@ -391,3 +394,28 @@ against a vacuous pass.
 The record this leaves: the tests are not what made threads wide. A thread edits them because it
 moves the thing they guard, and the docstrings say why each guard exists. §4.7's "pure pins go"
 is three tests, not twenty.
+
+## 11. Implementation record
+
+On branch `codebase-redesign` (worktree `.claude/worktrees/codebase-redesign`), each commit with
+the suite green and `verify_frozen verify` ok. Not merged into `develop`: four sessions are
+working in the main checkout, and a fast-forward there rewrites files under them, as the
+2026-10-06 consolidation also found; it waits for that checkout to be idle.
+
+| step | status | commits |
+|---|---|---|
+| 0 the identity map in the rules file | built | `fd2a6dfe` (on `develop`) |
+| 0 the task layer imports no reading | built: the unlabelled label pair moved to `schema/findings.py`; a boundary test pins it, checked to bite on `develop`'s `solo.py` | `a0cf0110` |
+| 0 `arm.py` → `agenda.registry` | not done, on purpose: `registry.py` imports only `dataclasses` and `typing`, a downward edge to a data declaration | -- |
+| 0 the pin inventory | built: §10; three pure pins, the rest record a lesson; one stale ceiling docstring corrected | `622ac775` |
+| 1 the spine | built, as an addition to `report conditions` (which already held mean / union / stable, exclusive sets, control emission and the judge and denominator refusals): `per_obligation` and `never_hit`. Agrees with `consistency.py` on all 23 obligations for the three hygiene reps | `cd341464` |
+| 1 tool outcomes | built: `cli report tools --run <run>`, either scaffold, every attempt, nested arms. Same counts as the probe script on all 12 tools of an Opus run; reads a gpt (ape_agent) run the script could not; 333 attempts on `pr5_A_lead_heldout12_rep1` (12 leads, 321 arm sessions) | `01c101ed` |
+| 1 the run-reader and input lints | built, as exact allow-lists that only shrink: 23 results scripts, 9 configs; tracked files only | `c3a689ab` |
+| 1 the framework-fix note | built: a PostToolUse hook that notes, never refuses, a commit mixing a framework file with an exploration file; registered in `.claude/settings.json`, live once merged | `9005184f` |
+| 2 identity, omitted when unset | not started: needs the user's run boundary (§9.2) | -- |
+| 3 producers | not started: §9.4 | -- |
+| 4 the design move | dropped (§4.5); per-stage route goes with the critic work | -- |
+| 5, 6 | not started | -- |
+
+Step 1's threshold -- the next thread's shared-machinery fixes land as their own commits, found
+through `report tools` rather than a new script -- is read on the next thread, not here.
