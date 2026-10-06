@@ -38,3 +38,15 @@ def test_silent_when_it_carries_it_when_too_few_siblings_do_or_when_it_is_the_ad
     assert MISSING.facts(_graph("G.add_x", "theorem add_x : P := x", TAGGED)) == []
     untagged = [(f"G.other{i}", f"theorem other{i} : P := x") for i in range(6)]
     assert MISSING.facts(_graph("G.mul_x", "theorem mul_x : P := x", TAGGED + untagged)) == []
+
+
+def test_v2_reads_an_attribute_on_the_keywords_own_line():
+    assert attributes("@[to_dual] lemma succ_max (a b : α) : P := x") == {"to_dual"}
+    assert attributes("/-- doc with lemma in it -/\n@[to_additive] theorem foo : P := x") == {"to_additive"}
+
+
+def test_v2_skips_a_declaration_whose_name_is_additive_anywhere():
+    from src.mathlib_review.producers.missing_attribute import name_words
+    assert "add" in name_words("AddSubmonoid.IsSpanning") and "neg" in name_words("NegAntiClass")
+    for name in ("AddSubmonoid.IsSpanning", "NegAntiClass", "AddZero"):
+        assert MISSING.facts(_graph(name, f"theorem {name.rsplit('.', 1)[-1]} : P := x", TAGGED)) == []

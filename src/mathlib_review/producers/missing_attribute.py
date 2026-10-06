@@ -13,26 +13,37 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Set
 
+from ape.toolkits.code.lean.lean_parser import mask_noncode_regions
+
 from src.mathlib_review.producers import Fact, declarations
 
 ATTRIBUTES = ("to_additive", "to_dual")
 _ADDITIVE_WORDS = {"add", "zero", "sum", "neg", "sub", "nsmul", "zsmul", "vadd"}
-_KEYWORD = re.compile(r"^\s*(?:(?:private|protected|noncomputable|nonrec|partial|unsafe)\s+)*"
-                      r"(?:theorem|lemma|def|instance|abbrev|structure|class|inductive)\b", re.M)
+#: The first declaration keyword, wherever it sits: `@[to_dual] lemma succ_max` puts the attribute on
+#: the keyword's own line (missing_attribute/2; /1 read the block only when the keyword began a line).
+_KEYWORD = re.compile(r"\b(?:theorem|lemma|def|instance|abbrev|structure|class|inductive)\b")
+_WORD = re.compile(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])|\d+")
 MIN_SIBLINGS = 3
+
+
+def name_words(full: str) -> Set[str]:
+    """Every word of a full name, lowercased: `.`- and `_`-separated, then camelCase parts, so
+    `AddSubmonoid.IsSpanning` holds `add` (missing_attribute/2; /1 read the leaf's `_` words only)."""
+
+    return {word.lower() for part in re.split(r"[._]", full) for word in _WORD.findall(part)}
 
 
 def attributes(code: str) -> Set[str]:
     """The generator attributes in a declaration's attribute block (before its keyword)."""
 
-    match = _KEYWORD.search(code or "")
+    match = _KEYWORD.search(mask_noncode_regions(code or ""))
     prefix = (code or "")[: match.start()] if match else ""
     return {name for name in ATTRIBUTES if re.search(rf"\b{name}\b", prefix)}
 
 
 class MissingAttribute:
     name = "missing_attribute"
-    version = "missing_attribute/1"
+    version = "missing_attribute/2"
     title = "Generator attributes the file's other declarations carry"
     lead = ("Mathlib states a multiplicative or order lemma once and lets a generator attribute "
             "(`@[to_additive]`, `@[to_dual]`) produce its twin. Each declaration below is new in this "
@@ -52,7 +63,7 @@ class MissingAttribute:
             full = entity["fullname"]
             siblings = {n: a for n, a in by_path.get(entity.get("path"), {}).items() if n != full}
             own = attributes(entity.get("code") or "")
-            words = set(full.rsplit(".", 1)[-1].split("_"))
+            words = name_words(full)
             for attribute in ATTRIBUTES:
                 if attribute in own or (attribute == "to_additive" and words & _ADDITIVE_WORDS):
                     continue
