@@ -184,7 +184,11 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   imports every task package eagerly, so a `BaseLeanTask` subclass outside that tree cannot import
   `ape.tasks.base` without a cycle. Do not retry.
 - **Deleting `src/datasets/pr_review_v2`** — nine frozen manifests pin its roster file by path and
-  hash (see `.claude/rules/pull-requests.md`). **Deleting dead code as a route to the collapse** —
+  hash (see `.claude/rules/pull-requests.md`). A second reason, found 2026-10-06 when the codebase redesign
+  proposed it again (`docs/research/codebase-redesign-2026-10.md` §9): the code is live --
+  `retrieval/precedent_index.py` names `python -m src.datasets.pr_review_v2.corpus` as the way to
+  rebuild the precedent corpus. **Reopens if:** the corpus build moves to the PR store's projections.
+  **Deleting dead code as a route to the collapse** —
   reachability over ~56k lines found exactly one unreachable module; the generations had to be
   consolidated, not pruned.
 - **`lean_retrieve` in the review path** — silently returned empty (no per-commit index; the build is

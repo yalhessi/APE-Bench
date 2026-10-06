@@ -203,12 +203,13 @@ identity. The rule for knobs: **a knob is a typed optional field, omitted when u
 whose identity should fork when it is set** -- task data for anything the model sees or the
 submission enforces (so the orchestrator cache forks), the plan for evaluation settings. Never
 `task_config`, whose digest is resumable, so a knob changed there is silently resumed onto the old
-results. The framework half is one change in `generate_global_index`: hash with unset fields
-excluded, so that adding a field later leaves every existing identity where it is. That change
-moves every identity once, so it lands at a declared run boundary after the in-flight
-`pr5_F_fanout_heldout12_v2_rep1` finishes, with the loss stated in the commit. After it, the
-run-name rule keeps its human-readable half and loses its job as the only thing standing between a
-knob and a wrong resume.
+results. The framework half is one change in `generate_global_index`. *As built (2026-10-06,
+§11):* not "hash with unset fields excluded", which would have moved every existing identity once
+and needed a run boundary, but a marker: a field declared with `knob()` is left out of the hash
+while it is None, and no existing field carries it, so nothing on disk moves and no boundary is
+needed. A guard refuses a new review data field that is not a knob, and an old one that becomes
+one. The run-name rule keeps its human-readable half and loses its job as the only thing standing
+between a knob and a wrong resume.
 
 ### 4.4 Producers: the seam the next work needs
 
@@ -333,6 +334,15 @@ in the main tree, which is why every step is a worktree.
 
 ## 9. Decisions for the user
 
+*Decided 2026-10-06; the user: "You can decide whatever seems most reasonable."* (1) The v2
+package's code stays: beyond the roster nine manifests hash, `retrieval/precedent_index.py` names
+`python -m src.datasets.pr_review_v2.corpus` as the way to rebuild the precedent corpus, so the
+code is live. (2) No run boundary is needed: step 2 was built so that nothing moves (§4.3).
+(3) `packet_on_disk` waits for the next probe that launches reader sessions by hand, and is
+measured there. (4) Step 3 was split: the vocabulary and the refusals now; the producer
+interface, section delivery and bench with the first convention detector, their first
+implementation. The original questions:
+
 1. Whether to delete `datasets/pr_review_v2`'s code, keeping the directory and the roster: it
    closes the v2 selector line by fiat; the tag keeps the code.
 2. The run boundary for the one-time identity fork (§4.3): after `pr5_F_fanout_heldout12_v2_rep1`
@@ -412,10 +422,14 @@ working in the main checkout, and a fast-forward there rewrites files under them
 | 1 tool outcomes | built: `cli report tools --run <run>`, either scaffold, every attempt, nested arms. Same counts as the probe script on all 12 tools of an Opus run; reads a gpt (ape_agent) run the script could not; 333 attempts on `pr5_A_lead_heldout12_rep1` (12 leads, 321 arm sessions) | `01c101ed` |
 | 1 the run-reader and input lints | built, as exact allow-lists that only shrink: 23 results scripts, 9 configs; tracked files only | `c3a689ab` |
 | 1 the framework-fix note | built: a PostToolUse hook that notes, never refuses, a commit mixing a framework file with an exploration file; registered in `.claude/settings.json`, live once merged | `9005184f` |
-| 2 identity, omitted when unset | not started: needs the user's run boundary (§9.2) | -- |
-| 3 producers | not started: §9.4 | -- |
+| 2 identity, omitted when unset | built as `knob()`: no identity on disk moves (checked on 104,942 recorded arm payloads), so no run boundary; a guard freezes the 63 existing review data fields | `fca5a6cf` |
+| 3 producers, first half | built: one vocabulary (the trace Literal and the toolbox list derive from it); a tool outside it refused at the arm grant, a procedure variant's grant, `solo_context_tools` and registration. `cli plan` on the frozen hygiene config seals the same agenda as `develop` (f96210790c7a). A tool is three edits, not four | `e71f32a2` |
+| 3 producers, second half | waits for the first convention detector (after-structure §2): the producer interface, section delivery, the producer-alone bench, and step 3's threshold | -- |
 | 4 the design move | dropped (§4.5); per-stage route goes with the critic work | -- |
-| 5, 6 | not started | -- |
+| 5 the stage as the probe unit | waits for the next probe that launches sessions by hand (§9.3) | -- |
+| 6 hygiene | the deletions are dropped on the record: v2's code is live (§9.1); `legacy_pipeline`'s phase scripts are the authoritative producers of frozen releases (PROJECT-STATUS §7: "Do not archive"); `datasets/pr_review` is the published-paper reference (§2: "left as it is"); the spent v2/v4 configs are how frozen results were produced. The three pure pins (§10) go when a step first has to edit them | -- |
 
 Step 1's threshold -- the next thread's shared-machinery fixes land as their own commits, found
-through `report tools` rather than a new script -- is read on the next thread, not here.
+through `report tools` rather than a new script -- is read on the next thread, not here. So are
+step 2's (the next knob forks no run that does not set it) and step 3's (the first detector lands
+in at most three `src/` files, one fixture and no hub edit).

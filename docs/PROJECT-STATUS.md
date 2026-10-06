@@ -452,10 +452,12 @@ fast-closing PRs.
   Three seams (producers as one registry and vocabulary, design-owned run data, the stage as the
   probe unit), one identity rule and three guards, each with a threshold on the next planned
   work. A five-registry rewrite was drafted, adversarially reviewed and rejected; the write-up
-  keeps what was rejected and why. Steps 0 and 1 are built on branch `codebase-redesign`
+  keeps what was rejected and why. Built on branch `codebase-redesign` (write-up §11): steps 0-2
   (`report conditions` carries the per-obligation spine, `report tools`, two ratchet lints, a
-  post-commit note); step 2 waits on a run boundary, and the design move of step 4 was dropped on
-  reading the code (write-up §11).
+  post-commit note, `knob()` task-data fields that move no existing identity) and the first half of
+  step 3 (one tool vocabulary; unknown tools refused). Step 4's design move and step 6's deletions
+  were dropped on reading the code and the record; the rest waits for the first convention
+  detector and the next probe.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not
   until the agent is mature enough to be worth their time.
 
