@@ -1,0 +1,129 @@
+{
+ "facts": 101,
+ "prs": 973,
+ "prs_with_a_fact": 68,
+ "control_prs": 331,
+ "control_facts": 18,
+ "targets": 9,
+ "targets_with_a_graph": 9,
+ "targets_located": [
+  "v1057",
+  "v1096",
+  "v1490",
+  "v1935",
+  "v2081"
+ ],
+ "by_convention": {
+  "P113:asks": 6,
+  "P113:located": 4,
+  "P211:asks": 3,
+  "P211:located": 1
+ },
+ "demand_target": "5/101",
+ "demand_any_ask": "45/101",
+ "by_shape": {
+  "P113": 101
+ },
+ "validity_sample": [
+  {
+   "pr": 31222,
+   "at": "Mathlib/Algebra/Module/FinitePresentation.lean:100",
+   "fact": "`exists_fin'` is new, and `exists_fin` is declared at `Mathlib/Algebra/Module/FinitePresentation.lean:89`. `exists_fin'` concludes `∃ (n m : ℕ) (f : (Fin n → R) →ₗ[R] M) (g : (Fin m → R) →ₗ[R] (Fin n → R)), Function.Surjective f ∧ Function.Exact g f`; `exists_fin` concludes `∃ (n : ℕ) (K : Submodule R (Fin n → R)) (_ : M ≃ₗ[R] (Fin n → R) ⧸ K), K.FG`."
+  },
+  {
+   "pr": 36355,
+   "at": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:178",
+   "fact": "`integral_countable'` is new, and `integral_countable` is declared at `Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:185`. `integral_countable'` concludes `∫ x, f x ∂μ = ∑' x, μ.real {x} • f x`; `integral_countable` concludes `∫ x in s, f x ∂μ = ∑' x : s, μ.real {(x : X)} • f x`."
+  },
+  {
+   "pr": 34592,
+   "at": "Mathlib/RingTheory/Polynomial/Cyclotomic/Roots.lean:338",
+   "fact": "`sum_eq_zero_iff_eq_coeff'` is new, and `sum_eq_zero_iff_eq_coeff` is declared at `Mathlib/RingTheory/Polynomial/Cyclotomic/Roots.lean:236`. `sum_eq_zero_iff_eq_coeff'` concludes `∑ i : Fin p, (α i : K) * ζ ^ i.val = 0 ↔ ∀ i j : Fin p, α i = α j`; `sum_eq_zero_iff_eq_coeff` concludes `∑ i : Fin p, (α i : K) * ζ ^ i.val = 0 ↔ ∀ i j : Fin p, α i = α j`."
+  },
+  {
+   "pr": 31368,
+   "at": "Mathlib/Condensed/Light/InternallyProjective.lean:278",
+   "fact": "`free_lightProfinite_internallyProjective_iff_tensor_condition'` is new, and `free_lightProfinite_internallyProjective_iff_tensor_condition` is declared at `Mathlib/Condensed/Light/InternallyProjective.lean:244`. `free_lightProfinite_internallyProjective_iff_tensor_condition'` concludes `InternallyProjective ((free R).obj P.toCondensed) ↔ ∀ {A B : LightCondMod R} (e : A ⟶ B) [Epi e], (∀ (S : LightProfinite) (g : (free R).obj ((S ⊗ P).toCondensed`; `free_lightProfinite_internallyProjective_iff_tensor_condition` concludes `InternallyProjective ((free R).obj P.toCondensed) ↔ ∀ {A B : LightCondMod R} (e : A ⟶ B) [Epi e], (∀ (S : LightProfinite) (g : (free R).obj ((P ⊗ S).toCondensed`."
+  },
+  {
+   "pr": 30230,
+   "at": "Mathlib/MeasureTheory/Integral/SetToL1.lean:747",
+   "fact": "`setToFun_neg'` is new, and `setToFun_neg` is declared at `Mathlib/MeasureTheory/Integral/SetToL1.lean:739`. `setToFun_neg'` concludes `setToFun μ (-T) hT.neg f = -setToFun μ T hT f`; `setToFun_neg` concludes `setToFun μ T hT (-f) = -setToFun μ T hT f`."
+  },
+  {
+   "pr": 31362,
+   "at": "Mathlib/Combinatorics/Enumerative/PentagonalNumbers.lean:131",
+   "fact": "`even_neg_j_add_three_j_sq'` is new, and `even_neg_j_add_three_j_sq` is declared at `Mathlib/Combinatorics/Enumerative/PentagonalNumbers.lean:114`. `even_neg_j_add_three_j_sq'` concludes `Even (-j + 3 * j ^ 2)`; `even_neg_j_add_three_j_sq` concludes `2 ∣ (-j + 3 * j ^ 2)`."
+  },
+  {
+   "pr": 33247,
+   "at": "Mathlib/Algebra/Module/SpanRank.lean:348",
+   "fact": "`spanRank_eq_spanRank_of_equiv'` is new, and `spanRank_eq_spanRank_of_equiv` is declared at `Mathlib/Algebra/Module/SpanRank.lean:363`. `spanRank_eq_spanRank_of_equiv'` concludes `M₁.spanRank = N₁.spanRank`; `spanRank_eq_spanRank_of_equiv` concludes `M₁.spanRank = N₁.spanRank`."
+  },
+  {
+   "pr": 31007,
+   "at": "Mathlib/FieldTheory/Perfect.lean:75",
+   "fact": "`powMulEquiv_mul'` is new, and `powMulEquiv_mul` is declared at `Mathlib/FieldTheory/Perfect.lean:72`. `powMulEquiv_mul'` concludes `powMulEquiv M (p * q) = (powMulEquiv M q).trans (powMulEquiv M p)`; `powMulEquiv_mul` concludes `powMulEquiv M (p * q) = (powMulEquiv M p).trans (powMulEquiv M q)`."
+  },
+  {
+   "pr": 35978,
+   "at": "Mathlib/Topology/FiberBundle/Trivialization.lean:471",
+   "fact": "`apply_symm_apply'` is new, and `apply_symm_apply` is declared at `Mathlib/Topology/FiberBundle/Trivialization.lean:466`. `apply_symm_apply'` concludes `e (e.toOpenPartialHomeomorph.symm (b, x)) = (b, x)`; `apply_symm_apply` concludes `e (e.toOpenPartialHomeomorph.symm x) = x`."
+  },
+  {
+   "pr": 36574,
+   "at": "Mathlib/Order/Partition/Basic.lean:350",
+   "fact": "`apply_mem'` is new, and `apply_mem` is declared at `Mathlib/Order/Partition/Basic.lean:348`. `apply_mem'` concludes `p (f a)`; `apply_mem` concludes `f a ∈ u`."
+  },
+  {
+   "pr": 33879,
+   "at": "Mathlib/CategoryTheory/ComposableArrows/Basic.lean:603",
+   "fact": "`homMk₂_app_two'` is new, and `homMk₂_app_two` is declared at `Mathlib/CategoryTheory/ComposableArrows/Basic.lean:600`. `homMk₂_app_two'` concludes `(homMk₂ app₀ app₁ app₂ w₀ w₁).app ⟨2, by valid⟩ = app₂`; `homMk₂_app_two` concludes `(homMk₂ app₀ app₁ app₂ w₀ w₁).app 2 = app₂`."
+  },
+  {
+   "pr": 25735,
+   "at": "Mathlib/CategoryTheory/Limits/Sifted.lean:250",
+   "fact": "`of_final_functor_from_sifted'` is new, and `of_final_functor_from_sifted` is declared at `Mathlib/CategoryTheory/Limits/Sifted.lean:271`. `of_final_functor_from_sifted'` concludes `IsSifted D`; `of_final_functor_from_sifted` concludes `IsSifted D`."
+  },
+  {
+   "pr": 34727,
+   "at": "Mathlib/Data/Sum/Basic.lean:246",
+   "fact": "`elim_injective'` is new, and `elim_injective` is declared at `Mathlib/Data/Sum/Basic.lean:240`. `elim_injective'` concludes `Injective (Sum.elim f : (β → γ) → (α ⊕ β → γ))`; `elim_injective` concludes `Injective (Sum.elim f g) ↔ Injective f ∧ Injective g ∧ ∀ a b, f a ≠ g b where`."
+  },
+  {
+   "pr": 37067,
+   "at": "Mathlib/Tactic/AddGroup.lean:55",
+   "fact": "`zsmul_neg_trick'` is new, and `zsmul_neg_trick` is declared at `Mathlib/Tactic/AddGroup.lean:51`. `zsmul_neg_trick'` concludes `a + (-b) + n • b = a + ((-1) + n) • b`; `zsmul_neg_trick` concludes `a + n • b + (-b) = a + (n + (-1)) • b`."
+  },
+  {
+   "pr": 32540,
+   "at": "Mathlib/RingTheory/SurjectiveOnStalks.lean:185",
+   "fact": "`baseChange'` is new, and `baseChange` is declared at `Mathlib/RingTheory/SurjectiveOnStalks.lean:165`. `baseChange'` concludes `(Algebra.TensorProduct.includeRight (R := R) (A := S) (B := T)).SurjectiveOnStalks`; `baseChange` concludes `(algebraMap S (S ⊗[R] T)).SurjectiveOnStalks`."
+  },
+  {
+   "pr": 30402,
+   "at": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:614",
+   "fact": "`tendsto_of_limsup_measure_closed_le'` is new, and `tendsto_of_limsup_measure_closed_le` is declared at `Mathlib/MeasureTheory/Measure/Portmanteau.lean:637`. `tendsto_of_limsup_measure_closed_le'` concludes `Tendsto μs L (𝓝 μ)`; `tendsto_of_limsup_measure_closed_le` concludes `Tendsto μs L (𝓝 μ)`."
+  },
+  {
+   "pr": 32924,
+   "at": "Mathlib/RingTheory/Localization/Away/Basic.lean:329",
+   "fact": "`mul_of_isUnit'` is new, and `mul_of_isUnit` is declared at `Mathlib/RingTheory/Localization/Away/Basic.lean:324`. `mul_of_isUnit'` concludes `IsLocalization.Away (x * y) S`; `mul_of_isUnit` concludes `IsLocalization.Away (x * y) S`."
+  },
+  {
+   "pr": 36118,
+   "at": "Mathlib/NumberTheory/Padics/Complex.lean:233",
+   "fact": "`nnnorm_extends'` is new, and `nnnorm_extends` is declared at `Mathlib/NumberTheory/Padics/Complex.lean:228`. `nnnorm_extends'` concludes `‖(x : ℂ_[p])‖₊ = ‖x‖₊`; `nnnorm_extends` concludes `‖(x : ℂ_[p])‖₊ = ‖x‖₊`."
+  },
+  {
+   "pr": 31538,
+   "at": "Mathlib/CategoryTheory/Sites/Subcanonical.lean:196",
+   "fact": "`map_uliftYonedaEquiv'` is new, and `map_uliftYonedaEquiv` is declared at `Mathlib/CategoryTheory/Sites/Subcanonical.lean:186`. `map_uliftYonedaEquiv'` concludes `F.val.map g (J.uliftYonedaEquiv f) = f.val.app Y ⟨g.unop⟩`; `map_uliftYonedaEquiv` concludes `F.val.map g.op (J.uliftYonedaEquiv f) = f.val.app (op Y) ⟨g⟩`."
+  },
+  {
+   "pr": 34075,
+   "at": "Mathlib/SetTheory/Cardinal/ContinuumHypothesis.lean:46",
+   "fact": "`iff_continuum_eq_aleph_one'` is new, and `iff_continuum_eq_aleph_one` is declared at `Mathlib/SetTheory/Cardinal/ContinuumHypothesis.lean:51`. `iff_continuum_eq_aleph_one'` concludes `ContinuumHypothesis ↔ (𝔠 : Cardinal.{0}) = ℵ₁`; `iff_continuum_eq_aleph_one` concludes `ContinuumHypothesis ↔ (𝔠 : Cardinal.{u}) = ℵ₁`."
+  }
+ ]
+}

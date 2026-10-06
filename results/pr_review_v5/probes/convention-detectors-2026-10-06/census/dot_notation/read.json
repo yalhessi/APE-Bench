@@ -1,0 +1,149 @@
+{
+ "facts": 217,
+ "prs": 973,
+ "prs_with_a_fact": 114,
+ "control_prs": 331,
+ "control_facts": 46,
+ "targets": 49,
+ "targets_with_a_graph": 49,
+ "targets_located": [
+  "v0005",
+  "v0006",
+  "v0007",
+  "v0008",
+  "v0009",
+  "v0011",
+  "v0012",
+  "v0013",
+  "v0644",
+  "v1000",
+  "v1252",
+  "v1254",
+  "v1283",
+  "v1393",
+  "v1394",
+  "v1397",
+  "v1412",
+  "v1413",
+  "v1414",
+  "v1660",
+  "v1661",
+  "v2115"
+ ],
+ "by_convention": {
+  "P034:asks": 4,
+  "P034:located": 1,
+  "P057:asks": 29,
+  "P057:located": 17,
+  "P108:asks": 16,
+  "P108:located": 4
+ },
+ "demand_target": "19/217",
+ "demand_any_ask": "113/217",
+ "by_shape": {
+  "P057": 110,
+  "P108": 107
+ },
+ "validity_sample": [
+  {
+   "pr": 26186,
+   "at": "Mathlib/CategoryTheory/Limits/VanKampen.lean:784",
+   "fact": "`PullbackCone.IsLimit.lift ht` applies a `IsLimit` lemma to `ht : IsLimit …`; it can be written `ht.lift`."
+  },
+  {
+   "pr": 28011,
+   "at": "Mathlib/LinearAlgebra/RootSystem/Finite/G2.lean:180",
+   "fact": "`P.one_le_chainTopCoeff_of_root_add_mem h` applies a `P` lemma to `h : P …`; it can be written `h.one_le_chainTopCoeff_of_root_add_mem`."
+  },
+  {
+   "pr": 36355,
+   "at": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:94",
+   "fact": "`summable_of_dirac` concludes `Summable …` and is named beside that namespace; inside it, it is `Summable.of_dirac`."
+  },
+  {
+   "pr": 34145,
+   "at": "Mathlib/CategoryTheory/Sites/Sieves.lean:1085",
+   "fact": "`S.downward_closed hf` applies a `S` lemma to `hf : S …`; it can be written `hf.downward_closed`."
+  },
+  {
+   "pr": 36910,
+   "at": "Mathlib/CategoryTheory/Abelian/DiagramLemmas/Four.lean:166",
+   "fact": "`mono_of_epi_of_mono_of_mono_five₂` concludes `Mono …` and is named beside that namespace; inside it, it is `Mono.of_epi_of_mono_of_mono_five₂`."
+  },
+  {
+   "pr": 36910,
+   "at": "Mathlib/CategoryTheory/Abelian/DiagramLemmas/Four.lean:208",
+   "fact": "`isIso_of_epi_of_isIso_of_isIso_of_mono_five₁` concludes `IsIso …` and is named beside that namespace; inside it, it is `IsIso.of_epi_of_isIso_of_isIso_of_mono_five₁`."
+  },
+  {
+   "pr": 26186,
+   "at": "Mathlib/CategoryTheory/Limits/VanKampen.lean:807",
+   "fact": "`PullbackCone.IsLimit.lift ht` applies a `IsLimit` lemma to `ht : IsLimit …`; it can be written `ht.lift`."
+  },
+  {
+   "pr": 33006,
+   "at": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:164",
+   "fact": "`hasPointwiseLeftDerivedFunctor_of_inverts` concludes `F.HasPointwiseLeftDerivedFunctor …` and is named beside that namespace; inside it, it is `HasPointwiseLeftDerivedFunctor.of_inverts`."
+  },
+  {
+   "pr": 32103,
+   "at": "Mathlib/Algebra/Polynomial/Splits.lean:284",
+   "fact": "`Splits.eq_prod_roots hsplit` applies a `Splits` lemma to `hsplit : Splits …`; it can be written `hsplit.eq_prod_roots`."
+  },
+  {
+   "pr": 29121,
+   "at": "Mathlib/RingTheory/MvPolynomial/Symmetric/Eval.lean:56",
+   "fact": "`Fintype.equivOfCardEq h` applies a `Fintype` lemma to `h : Fintype …`; it can be written `h.equivOfCardEq`."
+  },
+  {
+   "pr": 32103,
+   "at": "Mathlib/Algebra/Polynomial/Splits.lean:273",
+   "fact": "`Splits.eq_prod_roots hsplit` applies a `Splits` lemma to `hsplit : Splits …`; it can be written `hsplit.eq_prod_roots`."
+  },
+  {
+   "pr": 35826,
+   "at": "Mathlib/Probability/ProbabilityMassFunction/TotalVariation.lean:290",
+   "fact": "`PMF.apply_ne_top p` applies a `PMF` lemma to `p : PMF …`; it can be written `p.apply_ne_top`."
+  },
+  {
+   "pr": 34773,
+   "at": "Mathlib/InformationTheory/Entropy.lean:108",
+   "fact": "`PMF.coe_le_one p` applies a `PMF` lemma to `p : PMF …`; it can be written `p.coe_le_one`."
+  },
+  {
+   "pr": 30402,
+   "at": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:614",
+   "fact": "`tendsto_of_limsup_measure_closed_le'` concludes `Tendsto …` and is named beside that namespace; inside it, it is `Tendsto.of_limsup_measure_closed_le'`."
+  },
+  {
+   "pr": 26186,
+   "at": "Mathlib/CategoryTheory/Limits/VanKampen.lean:809",
+   "fact": "`PullbackCone.IsLimit.hom_ext ht` applies a `IsLimit` lemma to `ht : IsLimit …`; it can be written `ht.hom_ext`."
+  },
+  {
+   "pr": 31509,
+   "at": "Mathlib/Algebra/Group/Hom/Basic.lean:301",
+   "fact": "`isMulCommutative_of_surjective` concludes `IsMulCommutative …` and is named beside that namespace; inside it, it is `IsMulCommutative.of_surjective`."
+  },
+  {
+   "pr": 31644,
+   "at": "Mathlib/RingTheory/Regular/ProjectiveDimension.lean:306",
+   "fact": "`Ideal.smulTopLinearMap I` applies a `Ideal` lemma to `I : Ideal …`; it can be written `I.smulTopLinearMap`."
+  },
+  {
+   "pr": 30350,
+   "at": "Mathlib/CategoryTheory/Bicategory/Adjunction/Cat.lean:89",
+   "fact": "`Adjunction.ofCat adj₂` applies a `Adjunction` lemma to `adj₂ : Bicategory.Adjunction …`; it can be written `adj₂.ofCat`."
+  },
+  {
+   "pr": 26117,
+   "at": "Mathlib/CategoryTheory/Limits/Shapes/Equalizers.lean:699",
+   "fact": "`Cofork.isColimitEquivOfIsos c` applies a `Cofork` lemma to `c : Cofork …`; it can be written `c.isColimitEquivOfIsos`."
+  },
+  {
+   "pr": 30543,
+   "at": "Mathlib/MeasureTheory/Constructions/BorelSpace/WithTop.lean:42",
+   "fact": "`measurable_of_measurable_comp_coe` concludes `Measurable …` and is named beside that namespace; inside it, it is `Measurable.of_measurable_comp_coe`."
+  }
+ ]
+}

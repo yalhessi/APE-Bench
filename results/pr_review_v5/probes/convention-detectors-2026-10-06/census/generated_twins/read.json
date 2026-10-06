@@ -1,0 +1,121 @@
+{
+ "facts": 21,
+ "prs": 973,
+ "prs_with_a_fact": 12,
+ "control_prs": 331,
+ "control_facts": 3,
+ "targets": 11,
+ "targets_with_a_graph": 11,
+ "targets_located": [],
+ "by_convention": {
+  "P201:asks": 11,
+  "P201:located": 0
+ },
+ "demand_target": "0/21",
+ "demand_any_ask": "11/21",
+ "by_shape": {
+  "P201": 21
+ },
+ "validity_sample": [
+  {
+   "pr": 34279,
+   "at": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:313",
+   "fact": "`iteratedDeriv_add` is written by hand; `@[to_additive]` on `iteratedDeriv_mul` (`Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:417`) generates it."
+  },
+  {
+   "pr": 27099,
+   "at": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean:101",
+   "fact": "`realize_zero` is written by hand; `@[to_additive]` on `FirstOrder.Language.presburger.realize_one` (`Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean:103`) generates it."
+  },
+  {
+   "pr": 31525,
+   "at": "Mathlib/Topology/UnitInterval.lean:309",
+   "fact": "`convexCombo_zero` is written by hand; `@[to_additive]` on `Set.Icc.convexCombo_one` (`Mathlib/Topology/UnitInterval.lean:313`) generates it."
+  },
+  {
+   "pr": 33054,
+   "at": "Mathlib/NumberTheory/Height/Basic.lean:158",
+   "fact": "`logHeight₁_zero` is written by hand; `@[to_additive]` on `Height.logHeight₁_one` (`Mathlib/NumberTheory/Height/Basic.lean:162`) generates it."
+  },
+  {
+   "pr": 30983,
+   "at": "Mathlib/RingTheory/Polynomial/Resultant/Basic.lean:168",
+   "fact": "`resultant_zero_right` is written by hand; `@[to_additive]` on `Polynomial.resultant_one_right` (`Mathlib/RingTheory/Polynomial/Resultant/Basic.lean:366`) generates it."
+  },
+  {
+   "pr": 29186,
+   "at": "Mathlib/Analysis/ODE/Transform.lean:76",
+   "fact": "`comp_add` is written by hand; `@[to_additive]` on `IsIntegralCurve.comp_mul` (`Mathlib/Analysis/ODE/Transform.lean:136`) generates it."
+  },
+  {
+   "pr": 32692,
+   "at": "Mathlib/RingTheory/MvPowerSeries/Restricted.lean:65",
+   "fact": "`add` is written by hand; `@[to_additive]` on `mul` (`Mathlib/RingTheory/MvPowerSeries/Restricted.lean:198`) generates it."
+  },
+  {
+   "pr": 30990,
+   "at": "Mathlib/LinearAlgebra/SModEq/Basic.lean:76",
+   "fact": "`add` is written by hand; `@[to_additive]` on `SModEq.mul` (`Mathlib/LinearAlgebra/SModEq/Basic.lean:106`) generates it."
+  },
+  {
+   "pr": 29186,
+   "at": "Mathlib/Analysis/ODE/Transform.lean:36",
+   "fact": "`comp_add` is written by hand; `@[to_additive]` on `IsIntegralCurveOn.comp_mul` (`Mathlib/Analysis/ODE/Transform.lean:98`) generates it."
+  },
+  {
+   "pr": 30990,
+   "at": "Mathlib/LinearAlgebra/SModEq/Basic.lean:96",
+   "fact": "`nsmul` is written by hand; `@[to_additive]` on `SModEq.pow` (`Mathlib/LinearAlgebra/SModEq/Basic.lean:122`) generates it."
+  },
+  {
+   "pr": 33054,
+   "at": "Mathlib/NumberTheory/Height/Basic.lean:152",
+   "fact": "`zero_le_mulHeight₁` is written by hand; `@[to_additive]` on `Height.one_le_mulHeight₁` (`Mathlib/NumberTheory/Height/Basic.lean:138`) generates it."
+  },
+  {
+   "pr": 30990,
+   "at": "Mathlib/LinearAlgebra/SModEq/Basic.lean:81",
+   "fact": "`sum` is written by hand; `@[to_additive]` on `SModEq.prod` (`Mathlib/LinearAlgebra/SModEq/Basic.lean:112`) generates it."
+  },
+  {
+   "pr": 26052,
+   "at": "Mathlib/Algebra/Star/StarProjection.lean:31",
+   "fact": "`zero` is written by hand; `@[to_additive]` on `IsStarProjection.one` (`Mathlib/Algebra/Star/StarProjection.lean:36`) generates it."
+  },
+  {
+   "pr": 33054,
+   "at": "Mathlib/NumberTheory/Height/Basic.lean:130",
+   "fact": "`mulHeight₁_zero` is written by hand; `@[to_additive]` on `Height.mulHeight₁_one` (`Mathlib/NumberTheory/Height/Basic.lean:134`) generates it."
+  },
+  {
+   "pr": 27089,
+   "at": "Mathlib/Analysis/InnerProductSpace/Positive.lean:99",
+   "fact": "`isPositive_zero` is written by hand; `@[to_additive]` on `LinearMap.isPositive_one` (`Mathlib/Analysis/InnerProductSpace/Positive.lean:102`) generates it."
+  },
+  {
+   "pr": 32692,
+   "at": "Mathlib/RingTheory/MvPowerSeries/Restricted.lean:35",
+   "fact": "`zero` is written by hand; `@[to_additive]` on `one` (`Mathlib/RingTheory/MvPowerSeries/Restricted.lean:57`) generates it."
+  },
+  {
+   "pr": 25574,
+   "at": "Mathlib/Data/ENat/Pow.lean:52",
+   "fact": "`zero_epow` is written by hand; `@[to_additive]` on `ENat.one_epow` (`Mathlib/Data/ENat/Pow.lean:57`) generates it."
+  },
+  {
+   "pr": 33562,
+   "at": "Mathlib/LinearAlgebra/ConvexSpace.lean:143",
+   "fact": "`convexComboPair_zero` is written by hand; `@[to_additive]` on `convexComboPair_one` (`Mathlib/LinearAlgebra/ConvexSpace.lean:148`) generates it."
+  },
+  {
+   "pr": 25574,
+   "at": "Mathlib/Data/ENat/Pow.lean:71",
+   "fact": "`epow_zero` is written by hand; `@[to_additive]` on `ENat.epow_one` (`Mathlib/Data/ENat/Pow.lean:75`) generates it."
+  },
+  {
+   "pr": 30983,
+   "at": "Mathlib/RingTheory/Polynomial/Resultant/Basic.lean:175",
+   "fact": "`resultant_zero_left` is written by hand; `@[to_additive]` on `Polynomial.resultant_one_left` (`Mathlib/RingTheory/Polynomial/Resultant/Basic.lean:363`) generates it."
+  }
+ ]
+}

@@ -207,3 +207,50 @@ rule above did not name: in a ring, `map_mul` and `map_add` are both primary lem
 pair. The `@[to_additive]` shape skips a multiplicative declaration whose signature names a
 ring-like class (`Semiring`, `Ring`, `CommRing`, `Field`, `DivisionRing`, `Algebra`, `Module`,
 `NonUnitalNonAssocSemiring`), and a pair split across two files.
+
+## Results, stages 2 and 3 (2026-10-06), read by the rules above
+
+The census structure was rebuilt with the current code: 973 change graphs, 0 failures; 2,306
+round-1 comments, the same ids as the committed events. Laid out as a probe set by `census_set.py`
+(1,833 labelled asks on 642 PRs; 331 control PRs with none). Per-detector summaries, facts and
+readings are under `census/`.
+
+**Stage 2, dot notation on the census.** 217 facts on 114 of 973 PRs; 46 on the 331 control PRs
+(0.14 per control PR). 22 of the 49 target asks are located (P057 17 of 29, P108 4 of 16, P034 1
+of 4). Read by hand, **9 are the fact exactly**: `hϕ.clm_apply_of_inCoordinates` (v0005), `d.count`
+(v0644), `Set.Infinite.of_accPt` (v1252 and its follow-up v1254), `hs.eq_iInter_nat` (v1397),
+`hp.ne_zero` (v1412-v1414), `A.toLin'` (v1661). The other 13 ask something else at the same
+change target -- mostly another dotted call the detector does not produce (`clm_bundle_apply`,
+whose receiver is not a binder), a different namespace choice (`IsUnit.splits` against the fact's
+`Splits.of_isUnit`), or something unrelated.
+- **Recall: 9 of 49 exact, 18% -- a narrow finder** (band 10-25%). By shape: method call 7 of 29,
+  placement 2 of 16, leading dot 0 of 4.
+- **Demand: 19 of 217 facts located at a target ask, 8.8%** -- above stage H's 5%, by the
+  pre-registered measure. Counted by exact match it is 8 of 217 (3.7%), within stage H's range.
+- **Validity: 13 of the 20 sampled facts valid as written** (at least half: met). The seven invalid
+  have three mechanisms: a call prefix in a namespace nested under the binder's type
+  (`PullbackCone.IsLimit.lift ht`, `ht : IsLimit …`, whose `ht.lift` is the general `IsLimit.lift`;
+  three facts) or a qualified binder type that differs from the prefix (`adj₂ : Bicategory.Adjunction`
+  against `Adjunction.ofCat`) -- the in-sample failure again; a capitalised variable taken for a
+  namespace (`P.lemma h`, `S.downward_closed hf`; two); and a relation-typed binder read as its
+  head (`h : Fintype.card α = …`; one).
+
+**Stage 3, primed names.** Probe sets: 7 facts, 0 on any control PR, all 7 true as stated; exact
+asks 1 in sample (`round_eq'`, d0048) and **1 out of sample** (43167, p0012: "`commutator_sup_left_of_normal`
+... rather than a prime"); three times a maintainer's own suggestion kept the prime (`Dense.ciSup'`,
+`Dense.ciInf'`, `exists_infinite_fiber'`). Census: 101 facts on 68 PRs, 18 on 331 control PRs
+(0.05 per control PR); **5 of the 9 target asks located, and all 5 are the fact exactly** (P113 4
+of 6, P211 1 of 3) -- **a finder** by the band, at nine targets where one ask moves it 11 points.
+Demand 5 of 101 (5.0%), at stage H's bound. The seeded sample: 20 of 20 true as stated (a fact
+here asserts a sibling and two conclusions, which the graph either has or does not).
+**Packet-ready by the rule**: no out-of-sample control emission, both out-of-sample facts valid.
+
+**Stage 3, generated twins.** The `@[to_additive]` shape is **0 of 29 valid** across every set (8
+on the probe sets, 21 on the census): lexical coincidences of `one`/`zero` and `mul`/`add` --
+evaluation lemmas (`epow_zero` beside `epow_one`), sums and products of meromorphic functions,
+ordinal arithmetic, modules (`SModEq`); amendment 2's ring-like filter matched whole words only
+and missed `NontriviallyNormedField`. The `@[to_fun]` shape is 11 of 11 valid and exactly the
+ask in sample (33117, d0018), and fires on no census or out-of-sample PR. Census recall 0 of 11.
+**Too noisy, by the rule; the failing shape is `@[to_additive]`.** The census's P201 asks are
+mostly a missing attribute on a lemma with no hand-written twin (as 43167's p0011, "Missing
+`@[to_additive]` here"), which neither shape can see.
