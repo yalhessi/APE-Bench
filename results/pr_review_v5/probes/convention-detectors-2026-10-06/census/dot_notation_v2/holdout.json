@@ -1,0 +1,102 @@
+[
+ {
+  "pr": 36912,
+  "at": "Mathlib/Algebra/MyNewProofs.lean:5",
+  "fact": "`Nat.add_comm a` applies a `Nat` lemma to `a : Nat …`; it can be written `a.add_comm`."
+ },
+ {
+  "pr": 36914,
+  "at": "Mathlib/Algebra/MyNewProofs.lean:5",
+  "fact": "`Nat.add_comm a` applies a `Nat` lemma to `a : Nat …`; it can be written `a.add_comm`."
+ },
+ {
+  "pr": 36915,
+  "at": "Mathlib/Algebra/MyNewProofs.lean:5",
+  "fact": "`Nat.add_comm a` applies a `Nat` lemma to `a : Nat …`; it can be written `a.add_comm`."
+ },
+ {
+  "pr": 29508,
+  "at": "Mathlib/Algebra/BigOperators/Group/Finset/Gaps.lean:38",
+  "fact": "`Finset.range F` applies a `Finset` lemma to `F : Finset …`; it can be written `F.range`."
+ },
+ {
+  "pr": 36809,
+  "at": "Mathlib/CategoryTheory/Opposites.lean:794",
+  "fact": "`subsingleton_of_unop` concludes `Subsingleton …` and is named beside that namespace; inside it, it is `Subsingleton.of_unop`."
+ },
+ {
+  "pr": 25735,
+  "at": "Mathlib/CategoryTheory/Limits/Sifted.lean:204",
+  "fact": "`isSiftedOrEmpty_of_colim_preservesBinaryProducts` concludes `IsSiftedOrEmpty …` and is named beside that namespace; inside it, it is `IsSiftedOrEmpty.of_colim_preservesBinaryProducts`."
+ },
+ {
+  "pr": 34773,
+  "at": "Mathlib/InformationTheory/Entropy.lean:74",
+  "fact": "`PMF.coe_le_one p` applies a `PMF` lemma to `p : PMF …`; it can be written `p.coe_le_one`."
+ },
+ {
+  "pr": 31037,
+  "at": "Mathlib/RingTheory/Flat/FaithfullyFlat/Descent.lean:45",
+  "fact": "`bijective_of_tensorProduct` concludes `Function.Bijective …` and is named beside that namespace; inside it, it is `Bijective.of_tensorProduct`."
+ },
+ {
+  "pr": 26989,
+  "at": "Mathlib/CategoryTheory/Subobject/ArtinianObject.lean:121",
+  "fact": "`isArtinianObject_of_mono` concludes `IsArtinianObject …` and is named beside that namespace; inside it, it is `IsArtinianObject.of_mono`."
+ },
+ {
+  "pr": 30402,
+  "at": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:620",
+  "fact": "`tendsto_of_limsup_measure_closed_le_nat` concludes `Tendsto …` and is named beside that namespace; inside it, it is `Tendsto.of_limsup_measure_closed_le_nat`."
+ },
+ {
+  "pr": 27841,
+  "at": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean:559",
+  "fact": "`Multipliable.tprod_eq_zero_mul hf` applies a `Multipliable` lemma to `hf : Multipliable …`; it can be written `hf.tprod_eq_zero_mul`."
+ },
+ {
+  "pr": 33885,
+  "at": "Mathlib/RingTheory/PowerSeries/Expand.lean:77",
+  "fact": "`HasSubst.const hf` applies a `HasSubst` lemma to `hf : HasSubst …`; it can be written `hf.const`."
+ },
+ {
+  "pr": 30540,
+  "at": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean:59",
+  "fact": "`tendstoInDistribution_of_not_aemeasurable_left` concludes `TendstoInDistribution …` and is named beside that namespace; inside it, it is `TendstoInDistribution.of_not_aemeasurable_left`."
+ },
+ {
+  "pr": 32103,
+  "at": "Mathlib/Algebra/Polynomial/Splits.lean:300",
+  "fact": "`Splits.eq_prod_roots h_splits` applies a `Splits` lemma to `h_splits : Splits …`; it can be written `h_splits.eq_prod_roots`."
+ },
+ {
+  "pr": 36145,
+  "at": "Mathlib/Data/Vector/Basic.lean:575",
+  "fact": "`Fin.castSucc i` applies a `Fin` lemma to `i : Fin …`; it can be written `i.castSucc`."
+ },
+ {
+  "pr": 28695,
+  "at": "Mathlib/RingTheory/LocalProperties/Exactness.lean:209",
+  "fact": "`injective_of_isLocalization_of_span_eq_top` concludes `Function.Injective …` and is named beside that namespace; inside it, it is `Injective.of_isLocalization_of_span_eq_top`."
+ },
+ {
+  "pr": 32692,
+  "at": "Mathlib/RingTheory/MvPowerSeries/Restricted.lean:137",
+  "fact": "`Filter.Tendsto.norm hg` applies a `Tendsto` lemma to `hg : Tendsto …`; it can be written `hg.norm`."
+ },
+ {
+  "pr": 32103,
+  "at": "Mathlib/Algebra/Polynomial/Factors.lean:95",
+  "fact": "`splits_of_isUnit` concludes `Splits …` and is named beside that namespace; inside it, it is `Splits.of_isUnit`."
+ },
+ {
+  "pr": 35208,
+  "at": "Mathlib/Order/Bounds/Basic.lean:554",
+  "fact": "`nonempty_of_not_bddAbove` concludes `Nonempty …` and is named beside that namespace; inside it, it is `Nonempty.of_not_bddAbove`."
+ },
+ {
+  "pr": 31860,
+  "at": "Mathlib/CategoryTheory/EffectiveEpi/Basic.lean:100",
+  "fact": "`epi_of_effectiveEpi` concludes `Epi …` and is named beside that namespace; inside it, it is `Epi.of_effectiveEpi`."
+ }
+]

@@ -278,3 +278,22 @@ facts, two invalid and one valid).
 
 **`generated_twins/2`** retires the `@[to_additive]` shape, wrong on 29 of 29 facts. Nothing is
 tuned: the `@[to_fun]` shape is unchanged, and its facts must be identical.
+
+## Results, stage 4 (2026-10-06), read by its rule
+
+**`dot_notation/2`.** Census: 217 -> 190 facts, 114 -> 103 PRs with a fact, control-PR facts
+46 -> 35 (0.11 per control PR). **All 9 exact census asks are still located** (bar: at most one
+lost). Dev: 7 -> 4 facts; R1 dropped the three `Ordinal.IsNormal` facts (the two that failed to
+compile and the one that compiled), and the four left are all valid (three compile, one is the
+maintainer's own suggestion). Validation small12 and post-cutoff: still 0.
+**Holdout: 19 of 20 valid as written** (`census/dot_notation_v2/holdout.json`; bar 15; stage 2's
+sample was 13 of 20). The one invalid fact is a parsing defect, not a convention error:
+`Finset.range F.card` was matched as `Finset.range F`, because the argument pattern stops before a
+projection. Two placement facts drop a qualifier from a dotted predicate (`s.Nonempty`, whose
+namespace is `Set.Nonempty`, stated as `Nonempty.of_…`; stage 2's `F.HasPointwiseLeftDerivedFunctor`
+likewise) and are counted valid, as stage 2 counted them, with the imprecision named here.
+**Passed on all three bars.** Three of the holdout facts are on PRs that add a toy
+`MyNewProofs.lean` (36912, 36914, 36915) -- valid, and a reminder that the census carries such PRs.
+
+**`generated_twins/2`.** The `@[to_fun]` facts are identical (11 on dev, 0 elsewhere); the
+`@[to_additive]` shape is gone.
