@@ -147,6 +147,11 @@ $R plan --config <cfg> --run-name <name>                             # preflight
 
 Tests that need a built Lean workspace under `data/code_execute/` fail on a fresh clone; expected.
 
+**A Lean build from a shell needs `ELAN_HOME=/research/projects/proofedit/ya475/.elan`.** Without it
+elan unpacks a missing toolchain into `~/.elan`, and the home directory is at quota: the first
+stage-5 base build (2026-10-06) died in `lake cache get` with "Quota exceeded (os error 122)" and left
+871 MB of partial unpacks there. The project's elan home holds the toolchains; `PATH` alone is not enough.
+
 **Never gate a commit on `pytest … | tail`.** A pipeline's status is its last command's, so
 `pytest … | tail -2 && git commit …` commits a red suite (2026-09-23: two failures went in that
 way and the commit had to be amended). Capture pytest's own exit code — redirect to a file and

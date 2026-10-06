@@ -40,6 +40,18 @@ receiver it cannot type (a proof-local `h`, a projection `hϕ.2`) or another cal
 4. *The rest of after-structure §2*: sibling propagation of a filed rename (a post-pass on a
    ledger), and the area census promoted to a section.
 
+**Where it stands (2026-10-06, later).** Item 3 was tried as stage 6 (`missing_attribute`): 8 of 19
+census facts valid as written, two mechanisms fixed in `/2`, and then silent on the 60-PR
+validation release, so a precise, nearly silent section with no census P201 ask reached.
+Item 1 is set up as stage 5 -- 16 census PRs (10 where a section states the exact ask, 6 where the
+sections fire unasked), a release cut from the sealed val1000 draw (`inputs/probes/census-detectors-v1`),
+S0/S1 configs differing only in `context_file`, the workspaces building -- and **is not run**: the
+two Pro subscription accounts now refuse ("organization has disabled Claude subscription access for
+Claude Code"), so a run would spend the user's own primary quota (seven_day at 67% that day), about
+two dev-run windows. Once the workspaces are built it is one command per condition:
+`ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`
+and the same with `..._hygiene_sections_claude_sub.yaml` and `..._s1_rep1`, read by hand by stage 5's rule.
+
 **Start here.**
 - read: the probe README above (rules, amendments 1-2, stages 1-4, the two corrections);
   `src/mathlib_review/producers/__init__.py`; `producers/dot_notation.py`, `primed_names.py`,
