@@ -156,10 +156,14 @@ def test_the_pinned_judge_is_still_pinned_and_paid():
     """The keeps tier is what every historical number was measured with; it does not move
     because a cheaper option now exists."""
 
+    # Moved once, by the user's decision on 2026-10-06, from `gpt_5_mini` (direct, the dated
+    # snapshot gpt-5-mini-2025-08-07) to `elm_gpt_5_mini`, because the OpenAI key died on
+    # 2026-10-05. ELM's bare `gpt-5-mini` alias is not guaranteed to be the same weights, so the
+    # move was checked rather than assumed: re-judging four judged runs agreed on 73 of 76 issue
+    # verdicts (results/pr_review_v5/probes/judge-elm-2026-10-06/), within the judge's ~90%
+    # self-agreement. It does not move again without a check of the same kind.
     pinned = load_yaml(Path("configs/bases/v5_judge.yaml"))
-    assert pinned["llm_config"]["model_name"] == "gpt_5_mini"
-    assert not _is_free("gpt_5_mini")
-    assert MODEL_MAPPINGS["gpt_5_mini"]["model_name"] == "gpt-5-mini-2025-08-07", (
-        "the pinned judge must keep a dated snapshot; ELM's bare `gpt-5-mini` alias is not "
-        "guaranteed to be the same weights."
-    )
+    assert pinned["llm_config"]["model_name"] == "elm_gpt_5_mini"
+    assert pinned["llm_config"]["reasoning_effort"] == "medium"
+    assert not _is_free("elm_gpt_5_mini")
+    assert MODEL_MAPPINGS["elm_gpt_5_mini"]["model_name"] == "gpt-5-mini"
