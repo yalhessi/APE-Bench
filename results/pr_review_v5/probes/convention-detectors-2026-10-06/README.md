@@ -137,3 +137,38 @@ before stating `x.lemma`, and the elaborated local context for proof-local names
 **Redesign step 3's footprint threshold** -- met: the detector landed in three `src/` files (the
 module, its registry line, a private helper made public), one new test file, no hub edit
 (`6128044d`).
+
+## Stage 2: recall and demand on the census PRs (pre-registered 2026-10-06, before the census change graphs exist)
+
+The three probe sets hold about 0.8 dot-notation asks out of sample, so recall was not readable
+there. The census holds enough: reader A filed **49 asks under P057 (28), P108 (17) and P034 (4)**,
+as primary or second label, on **28 PRs**, every one with a path and line; 9 are on AI-generated
+PRs. The census PRs are val1000's (`val1000-2025-06-2026-03-v1`), disjoint from every evaluation
+set. The detector was designed from the three codebook entries' statements and the two dev asks;
+no census ask was read.
+
+**Build.** The change graphs come from the val1000 structure build
+(`results/pr_review_v5/adjudications/arm-coverage-val1000-2025-06-2026-03-v1/provenance/build_structure.py`)
+and the round-1 bodies from `extract_draw_feedback.py`, both rebuilt with the current code. The
+census is laid out as a probe set (`census_set.py`, beside this file) so `cli producer bench` reads
+it unchanged: every reader-A-labelled ask is an ask, and a census PR with round-1 feedback but no
+labelled ask is a control.
+
+**Measures.**
+- *Recall.* Of the 49 target asks, how many share a change target with a fact (located), and how
+  many the fact states (exact, by hand: the fact names the dotted form the ask requests), by shape.
+- *Demand.* Of all facts, the share that share a change target with a target ask, and with any
+  labelled ask. Stage H measured every census rule raised at 5% or fewer of the places a blind
+  pinpointer flagged; this is the same quantity for a deterministic flagger.
+- *Volume.* Facts per PR and the share of PRs with any fact.
+- *Validity.* Census PRs have no reviewed workspaces, so no compile: a seeded sample of 20 facts
+  (seed `dot-notation-census-2026-10-06`) is read by hand, valid as written or not.
+
+**Reading rule.**
+- A **finder** if exact recall is at least **25%** of the 49; **narrow** at 10-25%; **not a finder**
+  below 10%. Recall is reported per shape, since a shape the detector does not target (a
+  proof-local hypothesis, a term that is not a binder) is a known gap, not a failure.
+- **Demand** is read against stage H: above **5%** of facts at a target ask is better demanded than
+  any rule stage H measured; at or below it, the detector shares stage H's limit, and a packet
+  section of these facts mostly tells the reviewer about places nobody asks about.
+- **Validity** at least half of the sample, as in stage 1.
