@@ -54,6 +54,15 @@ it for another.
 8. **Pre-registration.** Frame, strata, seed, exclusions (PRs used for development; a reviewed state that
    does not compile -- 33057 round 1 is the example; AI-generated PRs are labelled, not excluded, per the
    2026-09-24 ruling), controls, and the reading rule, frozen with a digest before anyone reads the new gold.
+   **The naming testbed's dev PRs (added 2026-09-24, on `naming-from-statement`).** `naming_parts` was
+   designed looking at the dev half of the rename testbed
+   (`docs/research/2026-09-24-naming-parts-testbed-preregistration.md`), whose renames come from 42 PRs
+   merged 2025-11-21..2026-03-04, 9 of them in January 2026: #32585 #33525 #33609 #33639 #34003 #34061
+   #34413 #34439 #34483. A review of one of them that asked for its rename is gold that tool was built
+   looking at. *2026-10-06:* none of the nine is in `eval-2025-06-2026-03-v1` or
+   `val-2025-06-2026-03-v1`, and the tool is parked (tag `parked/naming-from-statement`), so this binds
+   only a future draw made with it revived. The full list is the `item.pr` field of
+   `results/pr_review_v5/naming_testbed/dev_a2.json`'s records.
 
 ## Start here
 

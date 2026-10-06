@@ -1,0 +1,275 @@
+{
+  "funnel": {
+    "b_measurable_controls": [
+      97,
+      228
+    ],
+    "b_measurable_items": [
+      39,
+      78
+    ],
+    "dev": {
+      "leaf/nosource": 3,
+      "leaf/source": 71,
+      "namespace/nosource": 2,
+      "namespace/source": 9
+    },
+    "heldout": {
+      "leaf/nosource": 15,
+      "leaf/source": 78,
+      "namespace/nosource": 6,
+      "namespace/source": 30
+    }
+  },
+  "pins": {
+    "naming_corpus": "5108d95019454caf91f3c82fbcd49b2336bd42ed69ca899d9b7f463bd25dd145",
+    "src/mathlib_review/analysis/naming_testbed.py": "e2a37bd6eab6e7e599ba0e17749f91d9afa74964",
+    "src/mathlib_review/evidence/operators/naming_norm.py": "5e2e9d4e4fc531773df55d11111260ee3939ec43",
+    "src/mathlib_review/evidence/operators/naming_parts.py": "38a386ec79f98e4600826cbb7bd0bc11174f94ab",
+    "src/mathlib_review/retrieval/statement_export.lean": "4654dd65591161540a4ba31347278515aeb43083",
+    "src/mathlib_review/retrieval/statement_index.py": "6a2cd073062ed8d75278c92b888dbb641de4f42c",
+    "statement_index_manifest": "0cef0080716755f373978606d0b2776a8fb64395710c3cf39afe91c9669eea43"
+  },
+  "primary": {
+    "B": 0.03076923076923077,
+    "P": 0.0,
+    "component_mean_delta": -0.03125,
+    "components": 32,
+    "control_delta_interval": [
+      0.0,
+      0.06274509803921569
+    ],
+    "control_flag_rate_B": 0.017543859649122806,
+    "control_flag_rate_P": 0.04824561403508772,
+    "delta": -0.03076923076923077,
+    "interval": [
+      -0.10526315789473684,
+      0.0
+    ],
+    "items": 65,
+    "k": 1,
+    "matched": true,
+    "measure": "point",
+    "reading": "not shown to be >= 10 pp better (provisional)",
+    "tau": 0.866760761
+  },
+  "secondary": {
+    "b_measurable/point@1": {
+      "B": 0.0625,
+      "P": 0.09375,
+      "component_mean_delta": 0.05555555555555555,
+      "components": 18,
+      "control_delta_interval": [
+        -0.04395604395604396,
+        0.09523809523809523
+      ],
+      "control_flag_rate_B": 0.041237113402061855,
+      "control_flag_rate_P": 0.07216494845360824,
+      "delta": 0.03125,
+      "interval": [
+        -0.15789473684210525,
+        0.2222222222222222
+      ],
+      "items": 32,
+      "k": 1,
+      "matched": true,
+      "measure": "point",
+      "reading": "inconclusive",
+      "tau": 0.793238546
+    },
+    "by_shape/point@1": {
+      "added": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 9
+      },
+      "first": {
+        "B": 2.0,
+        "P": 0.0,
+        "items": 10
+      },
+      "interior": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 8
+      },
+      "last": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 12
+      },
+      "removed": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 6
+      },
+      "reordered": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 6
+      },
+      "several": {
+        "B": 0.0,
+        "P": 0.0,
+        "items": 27
+      }
+    },
+    "loc@1": {
+      "B": 0.05128205128205128,
+      "P": 0.02564102564102564,
+      "component_mean_delta": -0.02631578947368421,
+      "components": 38,
+      "control_delta_interval": [
+        0.0,
+        0.06274509803921569
+      ],
+      "control_flag_rate_B": 0.017543859649122806,
+      "control_flag_rate_P": 0.04824561403508772,
+      "delta": -0.02564102564102564,
+      "interval": [
+        -0.11494252873563218,
+        0.05555555555555555
+      ],
+      "items": 78,
+      "k": 1,
+      "matched": true,
+      "measure": "loc",
+      "reading": "not shown to be >= 10 pp better (provisional)",
+      "tau": 0.866760761
+    },
+    "loc_over_chance@1": {
+      "B": -0.0006410256410256416,
+      "P": 0.021367521367521368,
+      "component_mean_delta": 0.031140350877192982,
+      "components": 38,
+      "control_delta_interval": [
+        0.0,
+        0.06274509803921569
+      ],
+      "control_flag_rate_B": 0.017543859649122806,
+      "control_flag_rate_P": 0.04824561403508772,
+      "delta": 0.02200854700854701,
+      "interval": [
+        -0.026217228464419474,
+        0.07809523809523809
+      ],
+      "items": 78,
+      "k": 1,
+      "matched": true,
+      "measure": "loc_over_chance",
+      "reading": "not shown to be >= 10 pp better (provisional)",
+      "tau": 0.866760761
+    },
+    "loc_over_chance@3": {
+      "B": -0.0006410256410256416,
+      "P": 0.021367521367521368,
+      "component_mean_delta": 0.031140350877192982,
+      "components": 38,
+      "control_delta_interval": [
+        0.0,
+        0.06274509803921569
+      ],
+      "control_flag_rate_B": 0.017543859649122806,
+      "control_flag_rate_P": 0.04824561403508772,
+      "delta": 0.02200854700854701,
+      "interval": [
+        -0.026217228464419474,
+        0.07809523809523809
+      ],
+      "items": 78,
+      "k": 3,
+      "matched": true,
+      "measure": "loc_over_chance",
+      "reading": "not shown to be >= 10 pp better (provisional)",
+      "tau": 0.866760761
+    },
+    "point@3": {
+      "B": 0.03076923076923077,
+      "P": 0.0,
+      "component_mean_delta": -0.03125,
+      "components": 32,
+      "control_delta_interval": [
+        0.0,
+        0.06274509803921569
+      ],
+      "control_flag_rate_B": 0.017543859649122806,
+      "control_flag_rate_P": 0.04824561403508772,
+      "delta": -0.03076923076923077,
+      "interval": [
+        -0.10526315789473684,
+        0.0
+      ],
+      "items": 65,
+      "k": 3,
+      "matched": true,
+      "measure": "point",
+      "reading": "not shown to be >= 10 pp better (provisional)",
+      "tau": 0.866760761
+    },
+    "score_auc": {
+      "B": 0.529689608636977,
+      "P": 0.6676788124156545
+    },
+    "singleton_components/point@1": {
+      "B": 0.0,
+      "P": 0.0,
+      "component_mean_delta": 0.0,
+      "components": 13,
+      "control_delta_interval": [
+        -0.09803921568627451,
+        0.0392156862745098
+      ],
+      "control_flag_rate_B": 0.0392156862745098,
+      "control_flag_rate_P": 0.0196078431372549,
+      "delta": 0.0,
+      "interval": [
+        0.0,
+        0.0
+      ],
+      "items": 13,
+      "k": 1,
+      "matched": true,
+      "measure": "point",
+      "reading": "not shown to be >= 10 pp better (provisional)",
+      "tau": 0.866760761
+    },
+    "top_flag_kinds": {
+      "names_hypothesis": [
+        0,
+        1
+      ],
+      "unnamed_part": [
+        0,
+        1
+      ],
+      "word_mismatch": [
+        0,
+        2
+      ]
+    },
+    "unthresholded/point@1": {
+      "B": 0.03076923076923077,
+      "P": 0.4153846153846154,
+      "component_mean_delta": 0.4036458333333333,
+      "components": 32,
+      "control_delta_interval": [
+        0.9651741293532339,
+        0.9961685823754789
+      ],
+      "control_flag_rate_B": 0.017543859649122806,
+      "control_flag_rate_P": 1.0,
+      "delta": 0.38461538461538464,
+      "interval": [
+        0.23214285714285715,
+        0.5483870967741935
+      ],
+      "items": 65,
+      "k": 1,
+      "matched": true,
+      "measure": "point",
+      "reading": "inconclusive",
+      "tau": 0.0
+    }
+  },
+  "version": "naming-testbed/2"
+}

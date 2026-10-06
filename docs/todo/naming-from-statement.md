@@ -1,7 +1,12 @@
 # Naming evidence from the statement, not from the leading token
 
-**Status** — open, 2026-09-24, **for a fresh session** (its own thread and worktree: a redesign of the
-naming arm's evidence tool; the prefix-scoping fix `adcc7ba` is the last change to the current tool)
+**Status** — **built and measured 2026-09-24, not yet the lever** (branch `naming-from-statement`). The
+substrate, the evidence, the tool, a pre-registered testbed and the ~$1 judged check are done; see
+"Result" at the end. Open: the next designs listed there. **2026-10-06:** the measurements, the
+pre-registration and this write-up are on `develop`; the code (statement index, `naming_parts`, the
+`naming_statement` tool, `analysis/naming_testbed.py`) is parked on tag `parked/naming-from-statement`.
+It was built against the old `prefix_verdict`, which `develop` has since replaced with `norm_verdict`,
+so picking it up means porting it; `data/pr_review_v5/statement_index` (398 MB) is still on disk.
 **Cost** — design, build and the first measurement are free (no model calls); a judged check on the
 release's naming golds is ~$1 through `cli bench`
 **Motivating example** — `naming_norm` answers one question: across declarations about the same subject,
@@ -95,3 +100,44 @@ Related: `specialist-arm-contents.md` (the prefix-only and 0.80-bar defects, the
 `docs/dead-ends.md` "B1 naming generalisation" (a subject-general *prefix* rule failed its reach gate on
 2026-08-05; this is a different evidence shape, not a reopening of that rule), and `.claude/rules/mathlib-review.md`
 on `naming_norm` counting prefixes only.
+
+## Result (2026-09-24)
+
+**Built** (`d99aa97`..`dafa353`): `retrieval/statement_index.py` + `statement_export.lean` -- every
+theorem's elaborated statement per base snapshot from the built `.olean`s (33 s, 6.4 GB; explicit
+arguments only; `@[deprecated]` resolved by Lean; notation flag from the app-unexpander registry, so
+an infix relation is told from a prefix predicate with no hand list); `evidence/operators/
+naming_parts.py` -- an EM-learned word-for-constant lexicon (IBM Model 1 with NULL; grammar measured,
+not listed), token-to-part alignment, and rows with `k of n` and a reference class, never a verdict
+(`word_mismatch`, `unnamed_part`, `names_nothing`, `names_hypothesis`, `namespace`, `prime`,
+`same_lhs`, `analogue`); the `naming_statement` context tool, granted by procedure variant
+`statement_naming` only and withheld from the generalist control (`VARIANT_ONLY_CONTEXT_TOOLS`).
+
+**Testbed** (`docs/research/2026-09-24-naming-parts-testbed-preregistration.md`, pre-registered, held-out
+scored once): 1,128 renames between 36a2b22f and b72c0345 reduce to 78 held-out primary items whose
+statement did not change. Primary, point@1 at B's false-alarm rate: P 0 of 65, B 2 -- **not shown to be
+>= 10 pp better (provisional)**. Unthresholded, P's strongest row proposes the word Mathlib chose in
+**27 of 65 (41.5%)** against B's 2 (33 of 66 on dev), but flags every control; AUC 0.67 vs 0.53. A
+namer, not a detector.
+
+**Bench** (`results/pr_review_v5/benches/naming_statement_naming_a{1,2,3}.json`, $1.23): **0 of 3 at both
+misses**, sibling 3 of 3, wall unmoved. At the coercion lemma the elaborated corpus argues *against*
+the gold (`ContinuousLinearMap.toLinearMap` is named `coe` 62 of 72; the old 21-vs-7 for `toLinearMap_`
+was an artifact of bucketing by surface syntax). At `round_eq'` the arm read the prime row and judged
+the prime acceptable. Two new off-gold advisory renames in 3 of 3 attempts, both a construct read as a
+constant (`half` for `_ / 2`, `exists_int` for `∃ n : ℤ`); the merged tree keeps both spellings.
+
+**Next, each with its motivating measurement:**
+- **Construct words.** A word can name a subtree, not a constant: `half` = `HDiv _ 2`, `exists_int` =
+  `∃ n : ℤ`, `const` = a constant function (`continuous_mul_left` -> `continuous_const_mul`). Both bench
+  false filings and a testbed miss are this. Candidate: add depth-2 patterns as alignment sources.
+- **A kind-based detector.** On dev `word_mismatch` fires on 65% of renamed names and 34% of controls,
+  while its strength does not separate them; rank by kind, or by whether the name's own word is ever
+  used for the part. Needs a replication population (another snapshot pair) to be read.
+- **Presentation of the prime row.** The arm read "3,584 of 46,337 carry a prime" as permission beside
+  "18,678 name a right-hand-side part". Read the inputs first (they were complete); state the ratio.
+- Untried, from the pre-registration: an order model (`map_toCompacts` -> `toCompacts_map` gets nothing),
+  camelCase-aware tokens (`String.splitCase`), relations without parts.
+- **Where the value is**: P says *what* to rename to, at ~45%, when something else says *whether* --
+  precedent, a maintainer's habit, or the generalist. A test of that pairing needs out-of-sample naming
+  gold (the 46-PR window carries 11 naming obligations, 9 not leading-token edits).

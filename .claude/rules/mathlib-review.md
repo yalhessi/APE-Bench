@@ -276,6 +276,20 @@ paths:
   cannot say that its second choice was nearly as strong. Same family as the closed-vocabulary
   trap above, one level up: there a correct registration was dropped by a second list, here a
   correct observation was dropped by a ranking.
+- **The elaborated corpus names 33337's coercion `coe`, not `toLinearMap` (2026-09-24).** The
+  `toLinearMap_` 21 vs `coe_` 7 figure that the naming prompt, the arm and several records cite was
+  bucketed by the *surface* projection `.toLinearMap`; people who write the projection name it
+  `toLinearMap`. Read from the elaborated statements (`retrieval/statement_index.py`, on tag
+  `parked/naming-from-statement`), when
+  `ContinuousLinearMap.toLinearMap` heads a left-hand side the corpus names it `coe` 37 times and
+  `toLinearMap` 3 (aligned over all positions, 62 of 72). The gold ask is a judgement against the
+  corpus, and its "to reflect that the statement is about `.toLinearMap`" is the gold writer's inference.
+  Do not cite 21:7 as corpus support for it.
+- **`naming_statement` rows fire on most names, renamed or not (2026-09-24; the tool is on tag
+  `parked/naming-from-statement`).** On the rename testbed,
+  unthresholded they flag 100% of never-renamed controls while proposing the right word for 41.5% of
+  renames; a variant that grants the tool adds stable off-gold advisory renames (2 per attempt on
+  33421). A row is evidence for *what* a rename would be, not a reason to ask for one.
 - **`naming_norm` counts leaf PREFIXES only** (`naming_norm.py:122`, `leaf.split("_", 1)[0]`), so a
   convention expressed in a suffix is invisible to it at any threshold. PR 33421's gold ask renames
   `round_eq'` to `round_eq_div`; both are prefix `round`. Separate from the unreachable 0.80 bar
