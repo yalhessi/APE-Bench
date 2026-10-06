@@ -1,0 +1,135 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-10-06T15:33:54Z",
+  "dataset_id": "mathlib-pr-review-evaluation",
+  "derived_artifacts": [
+    {
+      "path": "derived/funnel.jsonl",
+      "records": 16,
+      "role": "eligibility_funnel",
+      "schema_version": "funnel1",
+      "sha256": "4521271c6ff11c6145f5dec74b21205222244139138d0d97d0e9fd1d5ffd06da"
+    },
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 16,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "4bf3e284b9e2e7642649a5e571612c417743f78aedd232360c838f6e8dce6c17"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 71,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "1baae8c6bee7b64b05569c6becb5de60817cdb3395a6c2f439b6c8955488d741"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 71,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "e77ac7e17336f3ddb78198fec4201544d41b285ffbda57e52b74aa22ae02fc23"
+    },
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 486,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "8770047d5c53b20f567ce3c46b989e2ac0e528047830e6edcb7203401771a798"
+    },
+    {
+      "path": "derived/evaluation_strata.jsonl",
+      "records": 16,
+      "role": "strata_and_ai_labels",
+      "schema_version": "evaluation-strata1",
+      "sha256": "ef25fe46d6d199c3ea552687bd711d87712c954a9bbdc31c77d899a21300ff51"
+    }
+  ],
+  "generator_git_commit": "6ef42f2f5b33c21829229e16f876fd8fbea98247",
+  "generator_tree_state": "dirty",
+  "generator_versions": {
+    "change_graph": "cg1_builder_v3",
+    "definitions": "pull-request-definitions/2",
+    "episodes": "raw_first_round_v1",
+    "events": "pull_request_store_v1",
+    "frame": "evaluation-frame/1",
+    "funnel": "raw_first_round_v1",
+    "inventory": "modification-inventory/1",
+    "renderer": "candidate-prompt/14",
+    "store": "pull-request-store/1",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 16,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "1bbd1c64fe8f36a90cf3ee393cf3f573be1519821388398de88f227b47c147e9"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 16,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "df2c1727d25713b01cd26ca0840fadbaa68d22fcf9c77a8c8b382a86af27b7d0"
+    }
+  ],
+  "pr_numbers": [
+    28484,
+    30645,
+    31007,
+    31077,
+    31793,
+    31961,
+    32540,
+    32610,
+    32674,
+    32715,
+    32992,
+    33006,
+    34241,
+    35807,
+    36355,
+    37009
+  ],
+  "release": "val1000-2025-06-2026-03-v1",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 1301,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "9bb2eb715956a8e5b7068c42b105054f6e0d301dc69ed5291df96823d79c0149"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "/research/projects/proofedit/ya475/APE-Bench/data/pull_requests",
+      "records": 16,
+      "role": "pull_request_store",
+      "schema_version": null,
+      "sha256": "71dc9c3325b2bc1e3391803be674c16ec1d090992d51b18c1772f7e5c64d8cc8"
+    },
+    {
+      "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+      "records": 64,
+      "role": "reviewer_roster",
+      "schema_version": null,
+      "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+    },
+    {
+      "path": "inputs/pull_requests/evaluation/val1000-2025-06-2026-03-v1/seal.json",
+      "records": 16,
+      "role": "evaluation_seal",
+      "schema_version": null,
+      "sha256": "fae46685717ab3352aa5bfbc40f300c25b3e6fd08d4dcc0f6c47424d2e05aaf8"
+    }
+  ],
+  "split": "test"
+}

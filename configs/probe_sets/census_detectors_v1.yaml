@@ -1,0 +1,10 @@
+# Stage 5 of results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md: the 10 census PRs
+# where a packet-ready detector states a maintainer's ask exactly (stratum A) and 6 seeded census PRs
+# where the detectors fire unasked (stratum B). Cut from the sealed val1000 draw by stage5_release.py.
+name: census_detectors_v1
+release: inputs/probes/census-detectors-v1
+dataset_config: configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml
+pr_numbers: [28484, 30645, 31007, 31077, 31793, 31961, 32540, 32610, 32674, 32715, 32992, 33006, 34241, 35807, 36355, 37009]
+feedback: {draw: val1000-2025-06-2026-03-v1}
+cid_prefix: v
+probe_dir: results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5
