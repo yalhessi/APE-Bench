@@ -1,0 +1,51 @@
+[
+ {
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean (module docstring; definition Int.IsFundamentalDiscr)",
+  "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but `Int.IsFundamentalDiscr` as defined holds for `D = 1` (1 % 4 = 1, 1 is not 4 * x, no odd prime square divides 1), and 1 is not the discriminant of any quadratic field. The documented correspondence is false for the definition given, and `isFundamentalDiscr_four_mul_add_one` (m = 0) also makes 1 a fundamental discriminant.",
+  "requested_change": "Make the docstring and the definition agree. Either reword the module docstring to say these are the discriminants of quadratic fields together with `1` (the Kronecker-symbol convention), or exclude 1 by adding `D ≠ 1` to `IsFundamentalDiscr` and update `isFundamentalDiscr_iff_squarefree` / `isFundamentalDiscr_four_mul_add_one` to match. Whichever you choose, state the convention in the docstring of `Int.IsFundamentalDiscr`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/NumberTheory/FundamentalDiscriminant.lean, adding before `end Int`: `example : IsFundamentalDiscr 1 := by rw [isFundamentalDiscr_iff_squarefree]; left; exact ⟨rfl, squarefree_one⟩` and a second proof straight from the definition (`refine ⟨by decide, fun x hx => ?_, fun p hp _ h => ?_⟩ ...`). outcome: compiled, no errors. So `IsFundamentalDiscr 1` holds, which contradicts the module docstring line 'These are exactly the discriminants of quadratic fields.'"
+ },
+ {
+  "target": "Int.IsFundamentalDiscr",
+  "claim": "The second conjunct `∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1` is hard to read. It quantifies over a stray `x` standing for `D / 4`, and it mixes `¬ 4 ∣ x` with `x % 4 ≠ 1` for what the docstring states as `D / 4 ≢ 0, 1 mod 4 when 4 ∣ D`. It also uses neither the spelling of `isFundamentalDiscr_iff_squarefree` (`D / 4 % 4 = 2 ∨ D / 4 % 4 = 3`) nor the module docstring's `m ≡ 2, 3 mod 4`.",
+  "requested_change": "State the conjunct directly as `(4 ∣ D → D / 4 % 4 = 2 ∨ D / 4 % 4 = 3)` in both `IsFundamentalDiscr` and `isFundamentalDiscr_def`, and change the docstring to `D / 4 ≡ 2, 3 mod 4 when 4 ∣ D`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 37-46 (definition plus `isFundamentalDiscr_def`) with the second conjunct `(4 ∣ D → D / 4 % 4 = 2 ∨ D / 4 % 4 = 3)` and nothing else changed: outcome compiled. `ne_zero`, `isFundamentalDiscr_iff_squarefree` (the grind proof as it stands), `four_mul_add_one` and `four_mul` all still go through. By contrast, the variant `(∀ x, D = 4 * x → x % 4 = 2 ∨ x % 4 = 3)` made the grind calls time out, so the `4 ∣ D → D / 4 ...` form is the one to use."
+ },
+ {
+  "target": "Odd.isCoprime_two",
+  "claim": "The name drops the position suffix that its analogues carry. `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` and `Int.isCoprime_two_left` (Mathlib/RingTheory/Int/Basic.lean:119-124), and the ℕ aliases `Odd.coprime_two_right : Odd n → n.Coprime 2` and `Odd.coprime_two_left` (Mathlib/Data/Nat/Prime/Basic.lean:158-159), all say which side the `2` is on. The mirrored `IsCoprime 2 x` version is also missing.",
+  "requested_change": "Rename to `Odd.isCoprime_two_right` (statement `IsCoprime x 2`), add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`, and update the use in `Int.isFundamentalDiscr_iff_squarefree`.",
+  "severity": "advisory",
+  "evidence": "content_search for `coprime_two` found `Int.isCoprime_two_left/right` (RingTheory/Int/Basic.lean:119,123) and `Nat.coprime_two_left/right` with `protected alias ⟨Coprime.odd_of_left, _root_.Odd.coprime_two_left⟩` and `..._right` (Data/Nat/Prime/Basic.lean:153-159). `Int.isCoprime_two_right` cannot replace the new lemma in the new file: lean_verify_edit gave 'Unknown constant Int.isCoprime_two_right.mpr' because it is not imported, so the general lemma should stay, under the aligned name. lean_verify_edit on RingTheory/Coprime/Basic.lean replacing lines 436-438 with `Odd.isCoprime_two_right` plus `Odd.isCoprime_two_left := h.isCoprime_two_right.symm`: outcome compiled."
+ },
+ {
+  "target": "IsCoprime.dvd_mul_left_iff",
+  "claim": "`IsCoprime.dvd_mul_left_iff` (and its sibling `IsCoprime.dvd_mul_right_iff`) add an `_iff` suffix that the library's analogous cancellation iffs do not use. `Nat.Coprime.dvd_mul_left (H : Coprime k m) : k ∣ m * n ↔ k ∣ n` and `Nat.Coprime.dvd_mul_right`, `IsUnit.dvd_mul_left (hu : IsUnit u) : a ∣ u * b ↔ a ∣ b` and `IsUnit.dvd_mul_right`, and `Units.dvd_mul_left/right` have exactly this shape and are all named without `_iff`. No non-iff `IsCoprime.dvd_mul_left` exists that the suffix would need to avoid.",
+  "requested_change": "Rename `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right`, and update the use in `Int.isFundamentalDiscr_iff_squarefree`.",
+  "severity": "advisory",
+  "evidence": "content_search `(theorem|lemma) [A-Za-z.]*\\.dvd_mul_(left|right)` and `(theorem|lemma) (dvd_mul_left|dvd_mul_right) ` found Nat/GCD/Basic.lean:101,104 (`Coprime.dvd_mul_right/left`, iff) and Algebra/Divisibility/Units.lean:38,55,82,104 (`Units.`/`IsUnit.dvd_mul_right/left`, iff). The only `dvd_mul_(left|right)_iff` declarations in the tree are the two this PR adds. declaration_search `IsCoprime.dvd_mul_left`: none exists, so there is no clash. lean_verify_edit on RingTheory/Coprime/Basic.lean replacing lines 110-114 with the two renamed theorems: outcome compiled."
+ },
+ {
+  "target": "Int.squarefree_iff_prime_sq_not_dvd",
+  "claim": "The proof builds a local `bridge` (a `show` with `push_cast; ring`, then `Int.natCast_dvd`) and assembles both directions of the iff by hand. A single `simp` with the same library lemmas closes the goal.",
+  "requested_change": "Replace the proof with `simp [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, ← Int.natCast_dvd, sq]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Nat/Squarefree.lean, declaration Int.squarefree_iff_prime_sq_not_dvd, statement unchanged, proof `by simp [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, ← Int.natCast_dvd, sq]`: outcome compiled. (`simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_dvd, Nat.cast_mul]` also compiled.)"
+ },
+ {
+  "target": "Nat.forall_prime_iff_two_and_odd",
+  "claim": "The backward direction is done by hand with `obtain rfl | hne := eq_or_ne p 2` and `hp.odd_of_ne_two hne`, but the existing `Nat.Prime.eq_two_or_odd' : p = 2 ∨ Odd p` gives the case split directly. The whole proof is a short term.",
+  "requested_change": "Write the proof as the term `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+  "severity": "advisory",
+  "evidence": "declaration_search `Nat.Prime.eq_two_or_odd'`: declared at Mathlib/Data/Nat/Prime/Basic.lean:45 (before this PR). lean_verify_edit on Mathlib/Data/Nat/Prime/Basic.lean replacing Nat.forall_prime_iff_two_and_odd with the term-mode proof above: outcome compiled."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "In the `4 ∣ D` branch, `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` uses `+contextual` for no reason. The rewrite needs no hypotheses from context.",
+  "requested_change": "Drop `+contextual` and write `simp only [Int.mul_ediv_cancel_left d four_ne_zero]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/NumberTheory/FundamentalDiscriminant.lean, declaration Int.isFundamentalDiscr_iff_squarefree, with the `simp +contextual only` line changed to `simp only [Int.mul_ediv_cancel_left d four_ne_zero]` and everything else unchanged: outcome compiled. (Removing the simp line entirely could not be checked: the tool returned environment_failure twice.)"
+ }
+]
