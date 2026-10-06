@@ -35,7 +35,7 @@ from src.mathlib_review.agenda.focused_specs import (
 )
 from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_bytes
 from src.mathlib_review.agenda.render_focused import render_focused_all, renderer_version_for
-from src.mathlib_review.schema.review import CONTEXT_TOOLS
+from src.mathlib_review.schema.review import CONTEXT_TOOLS, refuse_unknown_tools
 from src.mathlib_review.schema import (
     ChangeGraph,
     ModificationRecord,
@@ -168,6 +168,7 @@ def _arm_payload(base_payload: Dict[str, Any], *, arm: ReviewArm, invocation_id:
     from ape.tasks.lean_tasks.formal_math.review.focused_prompts import procedure_tool_grant
 
     granted = set(arm.context_tools) | set(procedure_tool_grant(procedure_variant, arm.arm_id))
+    refuse_unknown_tools(granted, f"procedure variant {procedure_variant!r} for arm {arm.arm_id!r}")
     payload["context_tools"] = [item for item in CONTEXT_TOOLS if item in granted]
     payload["task_id"] = "pr5_" + invocation_id.replace(":", "_").replace("#", "__")
     # The run's submission contract, on every payload -- the generalist's included, whose prompt

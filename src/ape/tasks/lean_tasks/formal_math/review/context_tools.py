@@ -885,6 +885,13 @@ def register_context_tools(task, mcp) -> None:
     """
 
     granted = list(getattr(task.data, "context_tools", None) or [])
+    # Refused, not skipped: a granted name with no registrar used to be passed over in silence,
+    # so the task ran without a tool its grant said it had. `lean_verify_edit` is the one
+    # granted name registered elsewhere. This runs before the conversation, so it costs nothing.
+    unknown = sorted(set(granted) - set(_REGISTRARS) - {"lean_verify_edit"})
+    if unknown:
+        raise ValueError(f"granted context tool(s) {unknown} have no registrar in "
+                         f"context_tools._REGISTRARS ({sorted(_REGISTRARS)})")
     for name in granted:
         registrar = _REGISTRARS.get(name)
         if registrar is not None:

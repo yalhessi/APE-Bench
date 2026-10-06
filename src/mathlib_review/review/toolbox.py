@@ -50,9 +50,13 @@ from typing import Any, Callable, Dict, Optional
 
 from src.mathlib_review.schema import ReviewEpisodeInput
 
-#: Every context tool a run can grant. `proof_profile` is registered but granted by no config.
-CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "naming_norm",
-                 "proof_profile")
+from src.mathlib_review.agenda.registry import UNIVERSAL_CONTEXT_TOOLS
+from src.mathlib_review.schema.review import CONTEXT_TOOLS as _VOCABULARY
+
+#: Every context tool a registrar registers: the vocabulary less what the review base registers
+#: for every task (`lean_verify_edit`). Derived, not copied -- this was the second of four
+#: copies. `proof_profile` is registered but granted by no config.
+CONTEXT_TOOLS = tuple(name for name in _VOCABULARY if name not in UNIVERSAL_CONTEXT_TOOLS)
 #: The workspace tools the arms run with (`task_config.enabled_tools` in the v5 configs).
 FILE_TOOLS = {"file_read", "content_search", "file_search"}
 

@@ -58,3 +58,64 @@ def test_the_naming_arm_can_reach_the_norm_tool():
 
     assert "naming_norm" in _grant_for("naming")
     assert "naming_norm" in _REGISTRARS
+
+
+# --- refused, never dropped (2026-10-06) ---------------------------------------------------
+#
+# The tests above catch a registry that names a tool the vocabulary lacks. The places below are
+# where a grant is *built*, and each used to filter an unknown name out in silence. Each now
+# refuses it, naming it, at plan time or before the conversation starts.
+
+import pytest
+
+
+def test_the_arm_grant_refuses_a_tool_outside_the_vocabulary(monkeypatch):
+    import src.mathlib_review.agenda.arms as arms
+
+    monkeypatch.setattr(arms, "context_grants", lambda: {"naming": ("naming_norm", "nmaing_norm")})
+    with pytest.raises(ValueError, match="nmaing_norm"):
+        arms._grant_for("naming")
+
+
+def test_solo_context_tools_refuses_a_misspelled_tool():
+    from src.mathlib_review.review.runner import V5DatasetConfig
+
+    fields = V5DatasetConfig.model_fields
+    assert "solo_context_tools" in fields
+    with pytest.raises(ValueError, match="precedent_serach"):
+        V5DatasetConfig._known_tools_only(["zulip_search", "precedent_serach"])
+    assert V5DatasetConfig._known_tools_only(["zulip_search"]) == ["zulip_search"]
+
+
+def test_registration_refuses_a_granted_tool_with_no_registrar(tmp_path):
+    from ape.tasks.lean_tasks.formal_math.review.arm import ARM_TASK_TYPE, ReviewArmData
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review.context_tools import register_context_tools
+    from ape.tasks.models import WorkspaceInfo
+
+    # The arms' real data model, built the way `review/toolbox.py` builds its stand-in.
+    task = BasePRReviewTask.__new__(BasePRReviewTask)
+    task.data = ReviewArmData(
+        task_type=ARM_TASK_TYPE, task_id="t", pr_number=1, diff="", episode_id="e",
+        target_workspace=WorkspaceInfo(name="mathlib4", path=tmp_path, commit_hash="0" * 40),
+        work_unit_id="wu", change_ids=[], entity_ids_by_change={}, primary_subjects_by_change={},
+        rendered_system_prompt="", rendered_user_prompt="", rendered_prompt_sha256="",
+        invocation_id="wu#a", arm_id="a", context_tools=["lean_verify_edit", "ghost_tool"])
+    with pytest.raises(ValueError, match="ghost_tool"):
+        register_context_tools(task, mcp=None)
+
+
+def test_the_trace_record_accepts_every_tool_in_the_vocabulary():
+    """The hand-written Literal it replaced had no `proof_profile`."""
+    from src.mathlib_review.schema.review import ContextCall
+
+    for tool in CONTEXT_TOOLS:
+        ContextCall(invocation_id="wu:a#x", tool=tool, query="q")
+    with pytest.raises(ValueError):
+        ContextCall(invocation_id="wu:a#x", tool="ghost_tool", query="q")
+
+
+def test_the_toolbox_holds_the_vocabulary_less_what_the_base_registers():
+    from src.mathlib_review.review.toolbox import CONTEXT_TOOLS as TOOLBOX
+
+    assert set(TOOLBOX) == set(CONTEXT_TOOLS) - set(UNIVERSAL_CONTEXT_TOOLS) == set(_REGISTRARS)

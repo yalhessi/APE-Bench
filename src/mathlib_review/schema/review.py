@@ -61,14 +61,30 @@ DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 #: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what
 #: the code does. Policy and its rationale belong together, which is why the reasoning is
 #: there and not here.
-#: A tool absent from this tuple is dropped from every grant SILENTLY: `arms._grant_for`
-#: returns `[name for name in CONTEXT_TOOLS if name in granted]`, so the registry can name a
-#: tool, the registrar can exist, and the arm can still never see it. That happened to
-#: `naming_norm` and cost a paid run (rep14) that looked like a null result about a contract
-#: and was a null result about a missing tuple entry. `test_every_granted_tool_survives_the_grant`
-#: exists so the next one fails in the suite instead of in a run.
+#: The one vocabulary (2026-10-06). It used to be one of four: `review/toolbox.py` kept its own
+#: tuple, `ContextCall.tool` its own Literal (missing `proof_profile`), and a name absent from
+#: this tuple was dropped from every grant SILENTLY -- `arms._grant_for` returned
+#: `[name for name in CONTEXT_TOOLS if name in granted]`, so the registry could name a tool, the
+#: registrar could exist, and the arm could still never see it. That happened to `naming_norm`
+#: and cost a paid run (rep14) that looked like a null result about a contract and was a null
+#: result about a missing tuple entry. Now the other two derive from this, and a name outside it
+#: is refused wherever a grant is built -- the arm grant, a procedure variant's grant,
+#: `solo_context_tools`, and registration in the task -- instead of dropped.
 CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "proof_profile",
                  "naming_norm", "lean_verify_edit")
+
+
+def refuse_unknown_tools(names, where: str) -> None:
+    """Raise, naming them, if any of `names` is not a context tool. Every place a grant is built
+    calls this instead of filtering, so a misspelled or unregistered tool stops the plan rather
+    than vanishing from the run."""
+
+    unknown = sorted(set(names) - set(CONTEXT_TOOLS))
+    if unknown:
+        raise ValueError(
+            f"{where} names context tool(s) {unknown} that are not in "
+            f"schema/review.py::CONTEXT_TOOLS {list(CONTEXT_TOOLS)}; a tool outside the "
+            "vocabulary would be dropped from the run without a word")
 
 
 class ReviewArm(StrictModel):
@@ -182,8 +198,9 @@ class ContextCall(StrictModel):
 
     schema_version: Literal["v5-context-call1"] = "v5-context-call1"
     invocation_id: str
-    tool: Literal["zulip_search", "precedent_search", "declaration_search",
-                  "naming_norm", "lean_verify_edit"]
+    #: Derived from `CONTEXT_TOOLS`, so a tool cannot be grantable and untraceable; the hand
+    #: copy this replaced had no `proof_profile`.
+    tool: Literal[CONTEXT_TOOLS]
     query: str
     #: **How** this call was bounded, stated positively.
     #:

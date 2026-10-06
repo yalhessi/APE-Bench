@@ -144,8 +144,10 @@ paths:
   `ape/bin/python -c "from src.mathlib_review.agenda.arms import _grant_for; print(_grant_for('naming'))"`,
   or `ape/bin/python -m pytest tests/datasets/test_context_tool_grants_survive.py -q`. After a
   paid run, `arm_pool.jsonl`'s `task_data.context_tools` is the record of what the arm actually
-  held. Adding an arm is two edits; adding a *tool* is four — registrar, `ARM_DEFINITIONS`,
-  `CONTEXT_TOOLS`, and `ContextCall.tool`.
+  held. Adding an arm is two edits; adding a *tool* is three -- its registrar in `_REGISTRARS`,
+  its name in `schema/review.py::CONTEXT_TOOLS` (the trace Literal and the toolbox list derive
+  from it, 2026-10-06), and a grant in `ARM_DEFINITIONS` or `solo_context_tools`. A name outside
+  the vocabulary is now refused wherever a grant is built, and at registration, not dropped.
 - **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
   up the name the PR introduced. It now also searches the PR's changed files in the reviewed
   overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays

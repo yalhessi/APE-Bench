@@ -37,7 +37,7 @@ from src.mathlib_review.agenda.registry import (
     ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
     DOCUMENTATION_KINDS as _DOCUMENTATION_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
 )
-from src.mathlib_review.schema.review import CONTEXT_TOOLS, ReviewArm
+from src.mathlib_review.schema.review import CONTEXT_TOOLS, ReviewArm, refuse_unknown_tools
 
 ARM_REGISTRY_VERSION = "v5-arm-registry/2"
 
@@ -195,6 +195,7 @@ def _grant_for(arm_id: str) -> List[str]:
     """
 
     granted = set(context_grants().get(arm_id, ())) | set(_UNIVERSAL_CONTEXT_TOOLS)
+    refuse_unknown_tools(granted, f"the registry's grant for arm {arm_id!r}")
     return [name for name in CONTEXT_TOOLS if name in granted]
 
 
@@ -299,6 +300,7 @@ def resolve_context_tools(arm: ReviewArm, available: Optional[List[str]] = None)
     exempt so it stays comparable with the runs before this one.
     """
 
+    refuse_unknown_tools(arm.context_tools, f"arm {arm.arm_id!r}")
     grant = [item for item in arm.context_tools if item in CONTEXT_TOOLS]
     if available is None:
         return grant

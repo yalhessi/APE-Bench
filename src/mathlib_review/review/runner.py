@@ -294,6 +294,15 @@ class V5DatasetConfig(BaseModel):
                 "registered in ape/tasks/lean_tasks/formal_math/review/__init__.py::DESIGNS")
         return value
 
+    @field_validator("solo_context_tools")
+    @classmethod
+    def _known_tools_only(cls, value):
+        # A misspelled tool was registered by nothing and dropped without a word; refused at load.
+        from src.mathlib_review.schema.review import refuse_unknown_tools
+
+        refuse_unknown_tools(value, "dataset.solo_context_tools")
+        return value
+
     @field_validator("arm_ids")
     @classmethod
     def _known_arms_only(cls, value):
