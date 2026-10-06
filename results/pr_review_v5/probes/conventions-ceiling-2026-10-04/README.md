@@ -805,6 +805,72 @@ the week. `run_stage_h.sh` meters every batch and stops starting work once the w
 the main account (`CLAUDE_CODE_OAUTH_TOKEN`; five-hour window 6%, week 55% when read, resetting
 Friday 10:00), not token C. Same model, route and caps; the runner reads the login from `TOKEN_VAR`.
 
+## Result 6 (2026-10-06): no decision design picks the places maintainers raise -- every rule is raised at 5% or less of its flagged places, and a model's guess is barely above chance
+
+Stage H as pre-registered above, on the main account, 04:30 to 05:30: 16 census pinpointers and eight
+deciders, every transcript audited clean; the week went from 55% to 59%. `stage_h.py score` prints
+the table.
+
+**The record.** On the 16 census PRs the same pinpointer flagged 205 places for the ten rules (12.8
+a PR), 6 of them at a round-1 ask (2.9%). The rate index (census asks per flagged place) runs from
+P005's 0.048 to P254's 0.0026: maintainers raise between one in 20 and one in 400 of the places a
+rule's situation is flagged. An 18x spread, all at or under 5%.
+
+**By the rule: every design is below the bar.**
+
+| design | raised | at an ask (of 12) | asks (of 8) | precision | recall |
+|---|---|---|---|---|---|
+| all (stage G) | 149 | 12 | 8 | 0.081 | 1.000 |
+| order (the pass's own, three a PR; seen before the rule) | 30 | 7 | 5 | 0.233 | 0.583 |
+| `judge` | 2 | 0 | 0 | 0 | 0 |
+| `examples` | 2 | 0 | 0 | 0 | 0 |
+| `examples_rate` | 2 | 0 | 0 | 0 | 0 |
+| `retrieve` | 5 | 0 | 0 | 0 | 0 |
+| `rate` | 30 | 2 | 2 | 0.067 | 0.167 |
+
+**Also read, as pre-registered: the probability ranking**, which does not depend on the deciders'
+threshold.
+
+| design | AUC of p | three a PR by p: at an ask (asks) | mean p, asked / not |
+|---|---|---|---|
+| order | 0.558 | 7 (5) | |
+| `examples` | 0.641 | 7 (6) | 0.091 / 0.083 |
+| `retrieve` | 0.591 | 7 (6) | 0.105 / 0.101 |
+| `examples_rate` | 0.585 | 6 (5) | 0.049 / 0.044 |
+| `judge` | 0.563 | 5 (4) | 0.100 / 0.108 |
+| `rate` | 0.602 | 2 (2) | |
+
+- **The deciders learned the base rate, not the selection.** Told that most flagged places are never
+  raised, they put p near 0.05-0.10 everywhere, which is about the true 0.08, and separated asked
+  from not asked hardly at all. Ranked three a PR, `examples` and `retrieve` tie the pass's own order
+  on candidates (7 of 12) and cover one ask more (6 of 8): within the two-candidate noise.
+- **The rate ranks the wrong rules first here.** P005, P011 and P018 have the highest index; on these
+  PRs maintainers asked as much under P048, P254 and P100.
+- **Their reasons at the 12 are the reviewer's.** "In a golf PR reviewers usually accept the golf as
+  is" (32875, where the maintainer asked for a further `simpa`); "a plausible nit, not commonly
+  enforced" (42814's `{D : ℤ}`); "the standard pattern" (43167's `_left`/`_right`). `retrieve` cited
+  closer not-asked examples for most of them.
+- **Raises at an ask under another rule:** one, `retrieve`'s P048 on 30458 at the `variable` asks
+  filed under P369. The "restore the old proof" raises on 30458 are not at its old-proof asks.
+
+**What it means, at this altitude.** Given the convention, the code at the place, and asked and
+not-asked examples, a model's guess at which places maintainers raise is barely above chance
+(AUC 0.56-0.64). That is where the record's artifact-only selectors stood (AUC 0.62,
+`docs/dead-ends.md`, "Selection from artifact-only signals"), now replicated with the convention
+and its demand side in hand. Exploratory: one decider run a design, 12 positives, rules chosen
+knowing the asks.
+
+**What it does not show, and the untried designs.**
+- **Whether the unasked departures are unwelcome.** The truth is round-1 asks, a lower bound. If a
+  maintainer would accept most of the 78 departures the pass decided by reading, the gap is in the
+  evaluation, not in the selection. Untried: adjudicate a sample of them ("would a maintainer accept
+  this if proposed?"), the socket `docs/todo/adjudication-rubric.md` describes.
+- **Signals outside the convention and the hunk:** the reviewer (one maintainer wrote 30 of dev's
+  52 round-1 comments); the PR's own theme (on a golf PR the maintainer asked for more golf, and the
+  deciders inferred the opposite); file-local regularity (42184's ask: "as this seems to be the
+  convention in this file").
+- More rules, more census PRs and a second decider run; scope by area and era.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
