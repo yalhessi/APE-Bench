@@ -482,7 +482,7 @@ That is on the machine's side of §1.1; the reviewer is reminding the author, no
 
 - **Grouping by object.** The family division's `design` held variant, sibling and extraction
   questions under one gate, fitted to one warrant: a changed statement that compiles
-  (`family-division-fanout4-review-2026-09.md` §2, on `arm-division`). The gate refused asks in 7
+  (`family-division-fanout4-review-2026-09.md` §2). The gate refused asks in 7
   of 11 jobs, turned the gold answer (a compiled order-dual derivation) into `no_issue`, and
   stopped nothing false.
 - **Splitting one block by flavour.** The ten's proof trio is the converse: one reference and one

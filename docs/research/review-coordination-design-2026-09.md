@@ -399,7 +399,7 @@ for compiling constructions, `context_by_invocation` on `render_focused` (a per-
 slot nothing fills with family context), `CoordinationPolicy.sibling_view = "blackboard"` as a
 refused value with its three-file implementation note, the `cli tool` workbench, the fold search
 and closer battery as probes, `naming_norm` (prefix only), the PR-level arm with its "Everything
-this PR changes" list (`arm-division`, unmerged).
+this PR changes" list (`arm-division`, unmerged; parked on tag `parked/arm-division` 2026-10-06).
 
 **Not built:** the model as an artifact; pass sequencing (the lead runs waves of arms); family-grain
 jobs; the twin pattern census; the area census (`conventions-nature.md`); open-PR overlap from the

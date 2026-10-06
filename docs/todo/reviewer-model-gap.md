@@ -362,7 +362,7 @@ It rests on one Gr1 run per set, so it is provisional.
   chasing such false duplicates, and 8 of the 10 built no edit at all. Submitting at the cap would
   have reached about 3 of the 19 asks. The fix exists twice, `be65387` on `arm-naming-bar` and
   `eec8d3a` on `arm-division`, and is on neither `develop` nor this branch. **Every run in this
-  thread used the defective tool.**
+  thread used the defective tool.** *(It reached `develop` on 2026-09-30 as `5e215ffe`.)*
 - **Two more asymmetries the record had not named:**
   - brief G dropped X's `notes.md`, the object-by-object account including objects checked and
     cleared;

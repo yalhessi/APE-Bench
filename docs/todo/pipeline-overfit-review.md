@@ -138,6 +138,9 @@ coverage matrix and thin for per-family rates, so report counts rather than rate
    - `3e6e240`: dev strings out of tool schemas, and the gate reads tool text for gold subjects.
    - `ebb1378`: text-only changes no longer draw the family division's arms; `formatting` loses
      16.5% of its val1000 units.
+
+   *2026-10-06:* `3e6e240` is on `develop` (`b325e69b`); `ebb1378` went with the family division
+   onto tag `parked/arm-division`.
 3. **`prebuild --reviewed` for small12**, then `cli plan` for both conditions.
 4. **Track B** measurement, with the reading rule fixed in the audit:
    - current ten arms against the proposed nine, fanout, three reps each;
