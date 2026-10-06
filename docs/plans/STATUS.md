@@ -214,3 +214,46 @@ names as the new reference baseline.
 * Built beside it: `run --resume` reopens a partial run, requeueing the sessions that failed on
   errors and keeping the successes (`ebee26c`, `9ceba2a`). Still open: a scheduler that starts no
   new session at the subscription's `allowed_warning`.
+
+## Added 2026-10-02 (on `review-designs`)
+
+* `2026-10-02-review-designs.md` is **partial**: built, not run. Built with tests: §2's
+  organization -- `dataset.design` selects a per-PR task from `DESIGNS`
+  (`src/ape/tasks/lean_tasks/formal_math/review/__init__.py`, beside the task registry), the
+  baseline frozen by digest (the two subscription configs, `brief_G2.md`, `solo.py`'s prompt
+  text), `configs/designs/` with the differs-only-in-design test, `ledgers.jsonl` as a run
+  artifact, `--of <run>` on `plan`/`run` for a chained design, and the spine
+  (`claude-models-2026-10-01/consistency.py`) taking `--runs`; §3's D1 `structured`
+  (`structured.py`: a verdict per declaration and concern, every edit compiled and every
+  duplicate or rename looked up at submission, refuted changes recorded and not filed,
+  unverifiable ones filed advisory), smoked on 33337 against the real reviewed workspace with
+  no model call (`results/pr_review_v5/probes/review-designs-2026-10-02/`); §4's D2
+  `structured_critic` (`structured_critic.py`) as the plan's **chained-stage fallback**, not
+  nested: it reads D1's `ledgers.jsonl` through `StageInput`, every cell gets a position
+  (`overturn`/`concede`, `confirm`/`refute`/`undecided`), the critic's changes go through D1's
+  verification, and the output is the union with stage and position labels; smoked on 33337
+  the same way, reading D1's smoke as its stage through the runner's `stage_rows_for`. Both designs
+  `plan` clean on the 15 dev PRs; `plan` reports D1's ledger at 336 cells on 33149 and 516 on
+  33294. Not run: D1 rep 1, D2 rep 1 (the user's subscription windows, after the hygiene reps).
+  Run on gpt-5.2 (the user, 2026-10-02: "Let's test with GPT models for now"; configs
+  `configs/designs/*_dev_gpt52.yaml`): two-PR tests, then one judged dev rep of each. D1 2 of 23
+  and D2 2 of 23 against the baseline's 2, at 0 control emission: not, as built, on that model
+  (one rep each; readings in `results/pr_review_v5/probes/review-designs-2026-10-02/README.md`).
+  The first test also changed D1's contract to six fixed concern cells per declaration, after the
+  multi-concern rows collapsed to one decision per object. On Claude Opus 5.5 (subscription), D1
+  dev rep 1: 10 of 23 against the hygiene reps' 9, 9, 7, control emission 1.5 per control PR --
+  plan §5's lever threshold, met at the boundary, one rep. Then, by the user's decision, fixes
+  before the reps: the end-of-file linter artifact (framework), compile reuse at submission, file
+  ledger cells (`structured/3`), D2's union keeping every finding, and design versions sealed into
+  the plan. `structured/3` dev rep 1 on Claude (2026-10-03, on the Pro accounts B and C, the
+  primary untouched): 10 of 23 again, control emission 1.5; the file cells reached 33305's line
+  wrap; the two D1 runs together reach 12, the four-pass union's count, at a fifth of its control
+  emission. D2 `structured_critic/2` dev rep 1 on Claude, reading `structured/3` rep 1 (2026-10-03,
+  2 sessions on C, 13 on the main account): 11 of 23, control emission 2.0 -- +1 against plan §5's
+  +2, so not, as built, at one rep. The +1 is the critic's verified overturn of 33285's golf, which
+  `structured/3` had lost and the three hygiene reps and `structured/2` reached; 28 overturns, 0
+  refutes of D1's 138 filings, the critic stage about as costly as D1. Not run: `structured/3`
+  reps 2 and 3, D2 reps.
+  Open: whether a critic session nests inside a Claude Code session on the subscription (plan
+  §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
+  in turns and tokens on the large PRs.

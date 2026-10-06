@@ -1,0 +1,442 @@
+# Review designs: the one-PR smokes, 2026-10-02
+
+The build session for `docs/plans/2026-10-02-review-designs.md` (branch `review-designs`).
+Nothing here called a model; every record is the task driven by hand against the real
+reviewed workspace. The dev runs of the designs are scheduled by the user per subscription
+window after the hygiene reps.
+
+## D1 `structured` on PR 33337 (`smoke_structured.py`, `smoke_structured.json`)
+
+*Re-run 2026-10-02 after the contract change (an entry per declaration with six fixed concern
+cells, recorded through `record_ledger`; see the gpt-5.2 section below for why): the same five
+outcomes, the first three entries recorded through the registered tool and the rest in the
+submission, 27 s and 13 s.*
+
+The task was built as `cli run` builds it from `configs/designs/structured_dev_claude_sub.yaml`
+restricted to 33337, set up on the reviewed workspace `a36c84ab…+ae229ca53e6b`, its tools
+registered (`declaration_search`, `lean_verify_edit`, `naming_norm`, `precedent_search`,
+`proof_profile`, `submit_findings`, `zulip_search`; the first and the grant are the hygiene
+config's, `proof_profile` included because the config's `solo_context_tools` is the base's), and
+its own `submit_findings` called with a full ledger (5 declarations x 6 concerns) carrying five
+`would_change` cells:
+
+| change | check at submission | outcome |
+|---|---|---|
+| `starProjection_le_starProjection_iff`, proof: the declaration as the PR leaves it, as an edit | whole-file compile of `Positive.lean`, linters on | **verified**, 0 warnings introduced |
+| `coe_starProjection_eq_isComplProjection`, proof: `exact nonexistent_lemma_for_the_smoke` | whole-file compile of `Submodule.lean` | **refuted**: "the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`" |
+| `IsSymmetricProjection.le_iff_range_le_range`, library: `duplicate_of: IsCompl.projection_range` | declaration lookup, base and reviewed | **verified**: declared in `Mathlib/LinearAlgebra/Projection.lean:186` before this PR |
+| `coe_orthogonalProjection_eq_linearProjOfIsCompl`, name: `rename_to: Submodule.starProjection` | declaration lookup of the new name | **refuted**: already declared at `Projection/Basic.lean:177` |
+| `orthogonalProjection_apply_eq_linearProjOfIsCompl`, docstring: a wording ask | nothing can check it | **filed advisory, unverified** |
+
+The first submission was handed back naming the two refuted changes with the tools' answers
+(27 s, two whole-file compiles and the baseline compile of the file with the error). The second
+dropped the clashing `rename_to` (the finding then files unverified) and kept the broken edit past
+the press bound: accepted in 11 s, "30 ledger cells, 4 findings filed, 1 refuted". The result
+carries the ledger with the outcome on each `would_change` cell, the four findings with the solo's
+keys plus `concern_label`, `declaration`, `concern` and `verification`, and the refuted row with
+Lean's error. The prompt is the solo's (23,245 characters for this PR) with the ledger contract
+appended and the `notes` line removed.
+
+What the smoke could not settle, and the first paid rep must: whether the Claude Code session
+writes the typed `ledger` and `findings` in one `submit_findings` call, and what the ledger costs
+in turns and tokens on the large PRs -- `plan` reports 336 cells on 33149 and 516 on 33294
+(86 declarations), which a row deciding several concerns at once brings down to at least 86 rows.
+
+## D2 `structured_critic` on PR 33337 (`smoke_structured_critic.py`, `smoke_structured_critic.json`)
+
+D1's smoke now also writes `stage_structured/ledgers.jsonl`, the row the runner's `_ledger_rows`
+writes for the PR (it was re-run for this: the same outcomes, 26 s and 12 s). The critic smoke
+reads that row as its first stage through the runner's own `stage_rows_for` -- `StageInput`
+pointed at the directory beside the script, since the smoke's stage is not under
+`results/pr_review_v5/runs/` -- builds the task as `cli run --of <run>` would from
+`configs/designs/structured_critic_dev_claude_sub.yaml`, sets it up on the same reviewed
+workspace, and drives its submission by hand. The payload line `plan` would print:
+"stage review_designs_smoke_structured: 30 cells, 5 would_change, 4 finding(s) filed, 1 refuted".
+The prompt (25,927 characters) renders D1's ledger, its filed changes and its refuted change.
+
+Positions: 23 `concede`, 2 `overturn`, 2 `confirm`, 2 `refute`, 1 `undecided`. The first
+submission was handed back in 18 s: the critic's rename of `le_iff_range_le_range` onto
+`Submodule.starProjection` is already declared at `Projection/Basic.lean`. Resubmitted without
+the name, it was accepted in 9 s: "30 cells, 6 findings in the union (2 the critic's), 0 refuted".
+
+| in the union | stage | critic's position | agreed | verification |
+|---|---|---|---|---|
+| `starProjection_le_starProjection_iff`, proof | structured | refute | false | verified |
+| `le_iff_range_le_range`, library | structured | confirm | true | verified |
+| `coe_orthogonalProjection_eq_linearProjOfIsCompl`, name | structured | undecided | none | unverified |
+| `orthogonalProjection_apply_eq_linearProjOfIsCompl`, docstring | structured | confirm | true | unverified |
+| `coe_orthogonalProjection_eq_linearProjOfIsCompl`, proof | critic | overturn | false | verified (identity edit compiles) |
+| `le_iff_range_le_range`, name | critic | overturn | false | unverified (the clashing name dropped) |
+
+The critic's `refute` of D1's verified identity edit is a label: the finding stays, carried as D1
+filed it. D1's change the tools refuted at its own submission is in neither stage's findings.
+
+What this smoke cannot settle: whether a Claude Code session argues with a ledger in this form,
+and what a critic session costs. That is D2's first paid rep, after D1's. Nesting the critic
+inside D1's session (the plan's first choice) was not built and not smoked: any test of it is a
+live Claude Code session on the subscription, and the chained form needs no nesting.
+
+## The first paid test: D1 on gpt-5.2, PRs 33315 and 33337 (2026-10-02)
+
+The user's "Let's test with GPT models for now": `configs/designs/structured_dev_gpt52.yaml`,
+run `probe_dev_structured_gpt52_Grc_contract2_smoke1`, $3.57 billed (33315 $0.99 in 24 turns,
+33337 $2.58 in 28), no retries, complete.
+
+- The contract ran: the typed ledger was filled and submitted in one call, with no refusals.
+  33315 (control): 6 cells, all `no_issue`, nothing filed, as the baseline g52v2 did. 33337: one
+  `would_change`, 3 filings, none verified, none refuted.
+- **The ledger collapsed.** Every declaration got one row over all six concerns with one shared
+  reason. The multi-concern row was this branch's compression, and it gave back one decision per
+  object. The contract now has an entry per declaration with a field per concern, each with its
+  own verdict and reason, through `record_ledger`; the second test reads whether that holds.
+- The one real filing is the baseline's own ask, renaming `coe_starProjection_eq_isComplProjection`
+  to `..._isCompl_projection`. The reviewer had called `naming_norm` on it and seen `toLinearMap_`
+  lead `coe_` 21 to 7 -- the gold direction on this PR -- and asked for the suffix change anyway.
+- The other two filings are a tool artifact: a `commandStart` linter warning at each changed
+  file's end, "will fail CI". `eof_linter_check.py` reproduces it with no spend: the Lean tool
+  strips the file's final newline before compiling. Recorded in
+  `docs/todo/framework-defects-2026-09.md`; not fixed here, since it changes the frozen
+  baseline's tools between hygiene reps.
+
+## The second D1 test and the D2 test on gpt-5.2 (2026-10-02)
+
+- D1 under the six-cell entries (`probe_dev_structured_gpt52_Grc_contract2_smoke2`, $1.79): six
+  distinct reasons for every declaration on both PRs, against one shared reason before; one
+  `record_ledger` call per session; 33315 nothing filed, 33337 the baseline's rename only.
+- D2 on that run (`probe_dev_structured_critic_gpt52_Grc_contract2_smoke2`, `--of` the D1 run,
+  $1.69): 35 cells conceded with their own evidence, the rename confirmed, nothing overturned.
+
+## D1 on gpt-5.2, dev rep 1: the reading rule, stated before the run
+
+Run `probe_dev_structured_gpt52_Grc_contract2_rep1` on the 15 dev PRs, judged with
+`configs/pr_review_v5_medium_heldout_judge.yaml` on the held-out 12 (23 obligations, judge v9).
+Read against its own baseline, gpt-5.2 contract v2 (`probe_dev_gpt52_Grc_contract2_rep1`, g52v2):
+**2 of 23**, 44 findings, control emission 0.0 per control PR.
+
+- **A lever on gpt-5.2:** at least 5 of 23 (the baseline plus 3, beyond the judge's one to two
+  obligations of noise on 23) with control emission at most 2.0 per control PR.
+- **Not, as built:** at most 3 of 23, or control emission above 2.0. Four is provisional either way.
+- Read beside it: hits per finding, control emission per claim and on the docs family separately,
+  how many findings are the end-of-file linter artifact, `unstated` cells, and whether the large
+  PRs (33149: 56 declarations, 33294: 86) recorded their ledgers.
+- One rep on dev is provisional whatever it shows, and says nothing yet about Claude: the
+  Claude rule (plan §5) is read on the subscription runs.
+
+## D1 on gpt-5.2, dev rep 1: read against the rule
+
+`probe_dev_structured_gpt52_Grc_contract2_rep1`: 15 of 15 sessions, $35.80 billed, judged for
+$0.08 (audit `probe-dev-structured-gpt52-Grc-contract2-rep1`).
+
+| | g52v2 (baseline) | D1 on gpt-5.2 |
+|---|---|---|
+| held-out obligations hit, of 23 | 2 | **2** (the same two: `3dacf72e`, `f54010d8`) |
+| findings | 44 | 46 (51 filed before merging) |
+| paired with gold | 11 | 11 |
+| control-PR findings | 0 | 0 |
+| change targets shared (Jaccard) | | 0.45 |
+
+**Not, as built, on gpt-5.2** (rule: at most 3 of 23). The contract was kept everywhere: 1,698
+cells, every declaration with six distinct reasons, nothing `unstated`, nothing refuted, the
+86-declaration ledger of 33294 recorded. But 1,660 cells (98%) are `no_issue`, and the 38
+`would_change` cells produce the baseline's volume, on the baseline's PRs. What gpt-5.2 lacks
+here is not an occasion to decide; it decides "nothing to ask" one cell at a time. Filed by
+concern: proof 16, docstring 10, placement 12, statement 8, name 5; 29 verified by a compile or a
+lookup, 22 unverified. Six filings are the end-of-file linter artifact.
+
+Altitude: one rep, one model, the design as built. Untried before anything is concluded: D1 on
+Claude (the model the plan measured the inconsistency on, `configs/designs/structured_dev_claude_sub.yaml`),
+D1 on gpt-5.5, D2 on this run (its job is exactly the 1,660 `no_issue` cells), and reps.
+
+## D2 on gpt-5.2, dev rep 1: the reading rule, stated before the run
+
+Run `probe_dev_structured_critic_gpt52_Grc_contract2_rep1`, `--of probe_dev_structured_gpt52_Grc_contract2_rep1`,
+judged the same way. Plan §5's D2 rule, against D1's 2 of 23 at 0.0 control emission:
+- **A lever:** at least 4 of 23 (D1 plus 2) with control emission at most 2.0 per control PR.
+- **Not, as built:** at most 2 of 23, or the critic's additions on the control PRs refuted or
+  above 2.0 per control PR. Three is provisional.
+- Read beside it: positions by kind (`overturn` / `concede` / `confirm` / `refute`), the critic's
+  filings and their verification, and which obligations an `overturn` reached.
+
+## D2 on gpt-5.2, dev rep 1: read against the rule
+
+`probe_dev_structured_critic_gpt52_Grc_contract2_rep1`, reading D1's dev rep 1 (15 ledger rows,
+sha256 83e333352ad5, after the empty-ledger fix): 15 of 15 sessions, $49.36 billed, judged for
+$0.08 (audit `probe-dev-structured-critic-gpt52-Grc-contract2-rep1`).
+
+| | g52v2 | D1 on gpt-5.2 | D2 on gpt-5.2 |
+|---|---|---|---|
+| held-out obligations hit, of 23 | 2 | 2 | **2** (the same two) |
+| findings | 44 | 46 | 56 |
+| paired with gold | 11 | 11 | 12 |
+| control-PR findings | 0 | 0 | 0 |
+| billed | $28.68 | $35.80 | $49.36 on top of D1 |
+
+**Not, as built, on gpt-5.2** (rule: at most 2 of 23). The critic took the task seriously and
+still agreed almost everywhere: 1,652 `concede`, 38 `confirm` (every D1 change), 0 `refute`, 8
+`overturn`, which with three file-level changes gave 11 critic filings, all verified, on 33149 (4),
+33321 (3), 33098, 33285, 33362 and 33421 (1 each), by concern docstring 4, statement 4, proof 2,
+name 1. None hit an obligation; one moved a site from nothing to `loc` (33321's module doc,
+`0bb42bd2`). D1 and D2 share their change targets at Jaccard 0.79.
+
+What the two designs say together, at this altitude (one rep each, one model, the designs as
+built): on gpt-5.2 the unit of decision is not what binds. Asked separately about every
+declaration under every concern, and then asked to argue every "nothing to ask", gpt-5.2 says
+"nothing to ask" with reasons in 98% of cells and reaches the same two obligations its unstructured
+baseline reaches. That is the reviewer-model gap's reading (docs/todo/reviewer-model-gap.md) seen
+from a new side, and says nothing about Claude, whose inconsistency the designs were built against.
+
+Untried, before anything is concluded about the designs: D1 and D2 on Claude Opus 5.5 on the
+subscription (the configs are ready), D1 on gpt-5.5, reps of either, and the confirmation sets.
+
+## D1 on Claude Opus 5.5 (subscription): the reading rule, stated before the run
+
+The user, 2026-10-02: "It's worth running this with claude to see if the design change pays off
+there." Config `configs/designs/structured_dev_claude_sub.yaml` (the frozen hygiene baseline plus
+`design: structured`, with the six-cell ledger of c3f24639). A two-PR shakeout first, 33145 and
+33315 (`probe_dev_structured_hygiene_claude_sub_smoke1`), then the dev rep
+`probe_dev_structured_hygiene_claude_sub_rep1`, judged as every dev run is. Started only after
+hygiene reps 2 and 3 have finished their resumes in the same five-hour window, since one window
+holds about one dev run.
+
+Plan §5, unchanged:
+- **A lever:** at least 10 of 23 with control emission at most 2.0 per control PR, against the
+  hygiene baseline (rep 1: 9 of 23; reps 2 and 3 to be read as mean / union / stable once judged).
+- **Not, as built:** at most 8 of 23, or control emission above 2.0. Nine is provisional.
+- **Against the four-pass union** (12 of 23 judged, ensemble-union reading): D1 alone within 1 of it
+  closes the consistency gap by structure.
+- Read beside it: hits per finding, control emission per claim and on the docs family separately,
+  the end-of-file linter artifact, `unstated` cells and distinct reasons per declaration, and
+  processed tokens per PR against the hygiene rep's.
+
+## D1 on Claude Opus 5.5, dev rep 1: read against the rule
+
+`probe_dev_structured_hygiene_claude_sub_rep1`: 15 of 15 sessions, containment clean and usable on
+all 15, 27.7M processed tokens on the subscription (five_hour utilization 0.15 to 0.45), judged
+for $0.43 (audit `probe-dev-structured-hygiene-claude-sub-rep1`). The hygiene reps 2 and 3 are
+read from the `hygiene-layer` worktree's audits, the four-pass union from `ensemble-union`'s.
+
+| | Hyg rep 1 | Hyg rep 2 | Hyg rep 3 | **D1** | four-pass union |
+|---|---|---|---|---|---|
+| obligations hit, of 23 | 9 | 9 | 7 | **10** | 12 |
+| findings | 93 | 103 | 102 | 128 | 375 |
+| paired with gold | 23 | 25 | 23 | 40 | 90 |
+| control findings (per control PR) | 2 (1.0) | 1 (0.5) | 4 (2.0) | 3 (1.5) | 14 (7.0) |
+| gold alignment | 0.118 | 0.126 | 0.108 | 0.188 | 0.104 |
+
+**A lever, at the threshold, provisional** (rule: at least 10 of 23 at control emission at most
+2.0). The hygiene reps' mean is 8.3, union 11, stable 6. D1 reaches two obligations no hygiene rep
+reached -- 33149's Parseval axiom replaced by the existing lemma (`61f68eed`) and one of 33145's
+duality asks (`e8e02821`) -- and loses one all three hit: `cc44bb99`, wrapping a long line on 33305,
+a PR that leaves no declaration in place and so has no ledger cells (see
+`docs/todo/review-designs-file-cells.md`). D1 together with the three hygiene reps reaches 13.
+Against the four-pass union it is 2 short, so the rule "within 1 closes the consistency gap" is
+not met. It files more and aims better: 40 findings paired at gold sites against 23-25, and gold
+alignment 0.188 against 0.108-0.126 (alignment is not precision; CLAUDE.md).
+
+The ledger: 1,698 cells, 115 `would_change` (6.8%, against gpt-5.2's 2.2%), nothing unstated or
+refuted; 169 of 283 declarations with six distinct reasons, the rest repeating a reason across
+two to three concerns. 134 filings, 93 verified by a compile or a lookup, 41 unverified. All three
+control findings are module-doc wording (33304, 33315 twice), the family no tool refutes; one
+filing is the end-of-file linter artifact.
+
+Altitude: one rep, inside a 9/9/7 baseline whose own spread is 2 and a judge whose self-agreement
+puts one to two obligations of noise on 23. Ten is the rule's threshold, met, not exceeded. It
+needs D1 reps 2 and 3 before it stands, and the confirmation sets before it means review rather
+than in-window memory (plan §5).
+
+## Where D1 rep 1's turns and tokens went (`session_waste.py`, `prompt_parts.py`, no spend)
+
+The user, 2026-10-02: "identify if there's any waste or repetition in the work observed in d1
+rep 1 that we can cut down". Read from the 15 Claude Code transcripts of
+`probe_dev_structured_hygiene_claude_sub_rep1` (347 turns, 27.7M processed tokens).
+
+**Not waste.**
+- No identical call repeated in any session; 12 re-reads of a file in 347 turns; no TodoWrite or
+  scratch Write/Edit at all.
+- The ledger is cheap: recorded late (turn 10-39 of 12-43), its text carried in context costs
+  about 1.0% of the run's tokens.
+- 56 calls came back with an error: almost all are exploratory compiles that failed
+  (`lean_verify` used as a `#check` probe, `lean_verify_edit` trying a proof), plus one malformed
+  JSON call and one import of a module that does not exist at that commit. That is the work.
+- Every session's last call reads "The user doesn't want to proceed with this tool use": it is the
+  scaffold ending the session after `submit_findings` recorded the review, not a refusal.
+
+**Waste, and what it costs.**
+
+| | measured | share | the reviewer's information changes if cut? |
+|---|---|---|---|
+| the first message, re-read on every turn | 15.3M of 27.7M processed tokens | 55% | -- (the whole packet) |
+| ... the PR model's "before the PR" code blocks (the diff carries the same lines) | 11.4% of the prompt | ~6% of tokens | yes: the packet differs from the frozen baseline's |
+| ... relation lines restating a pair in the other direction (230 of 996) | 2.7% of the prompt | ~1.5% | yes, in bytes; no, in content |
+| tool definitions re-read every turn | 17,800 characters, ~4,400 tokens a turn | ~5% | -- ; `proof_profile`'s 1,900 are a tool that answers nothing (0 calls; the baseline's grant) |
+| submitted edits compiled again at submission after compiling in the session | 79 of 92 | Lean time, not tokens | no |
+
+The prompt splits as PR model 60% (after-blocks 20%, before-blocks 11%, relations 12%), diff 25%,
+D1's contract 9%, brief 4%. Only the last row is pure repetition the reviewer never sees: it is cut
+(the next commits). The packet-level cuts change what the frozen baseline is compared on and are
+the user's decision; the gain they could buy is about 8% of a window per run.
+
+## The fixes before D1's next reps (2026-10-02, the user: "Let's make the fixes first")
+
+- **End-of-file linter artifact** (ac6cc10c): `execute` keeps the file's final newline; the
+  whole-file compile of 33337's `Projection/Submodule.lean` now reports 0 warnings through it.
+- **Compile reuse at submission** (7f16d971): an edit the reviewer compiled with `lean_verify_edit`
+  in the attempt is not compiled again. Smoke: the identity edit compiled by the reviewer in 10 s,
+  then reused by the submission (`"reused"` in its evidence); the handed-back submission took 12 s
+  against 27 s before.
+- **File-level ledger cells** (`structured/3`): one entry per changed file with `module_doc`,
+  `style` and `organization`; a change to a file as a whole sits on its file's cell. Smoke on
+  33337: 36 cells (30 + 6), a module-doc change filed on its file's cell. `plan` on the dev set:
+  33305 21 cells (was 0), 33294 549, 33149 339, and the control PRs 33304 51 and 33315 39 -- most of
+  them file cells on module-doc edits, the risk recorded in `docs/todo/review-designs-file-cells.md`.
+- **D2's union** (`structured_critic/2`): several first-stage findings at one cell are all kept
+  (keying by cell kept only the last); file positions when the first stage has file cells; the
+  site fold only for file changes a stage without file cells could not place.
+- **Design versions** sealed into the run plan (`design_version`), so a run cannot resume into a
+  changed contract. D1 rep 1 was `structured/2`; the next runs are `structured/3` and should be
+  named for it, e.g. `probe_dev_structured3_hygiene_claude_sub_rep1`.
+
+Packet-level cuts (the PR model's "before" blocks, mirrored relation lines) are not made: they
+change what the frozen baseline is compared on (see the waste reading above).
+
+## D1 `structured/3` on Claude Opus 5.5, dev rep 1: stated before the run (2026-10-03)
+
+Run `probe_dev_structured3_hygiene_claude_sub_rep1`, the fixes of 2026-10-02 in place (file
+ledger cells, compile reuse, the end-of-file linter fix). The user, 2026-10-03: "let's start
+running in pieces to try to use B and C first before we start using our primary account". So it
+starts on the Pro account B; each time an account's five-hour limit is spent the run closes
+partial and `run --resume` continues on the next (C, then the primary), requeueing exactly the
+sessions the limit failed -- the way H-claude rep 2 was finished on 2026-10-01. Same model, CLI
+and effort on every account; which sessions ran where is read from the attempts afterwards.
+
+Read by the same rule as `structured/2` rep 1 (plan §5): a lever at 10 of 23 or more with control
+emission at most 2.0 per control PR, not at 8 or fewer; against the hygiene reps (9, 9, 7) and
+`structured/2` rep 1 (10). Read beside it: the obligations at file-level targets (`cc44bb99`,
+`0bb42bd2`, `38e72250`), control findings by concern (the control PRs gain 39 and 33 file cells),
+end-of-file linter filings (expected 0), and submission compiles reused.
+
+## D1 `structured/3` on Claude, dev rep 1: read against the rule
+
+`probe_dev_structured3_hygiene_claude_sub_rep1`, run in pieces on the two Pro accounts (11
+sessions on B until its limit, 4 resumed on C; the primary untouched), judged for $0.38 (audit
+`probe-dev-structured3-hygiene-claude-sub-rep1`).
+
+| | Hyg 1 / 2 / 3 | D1 `structured/2` | **D1 `structured/3`** | four-pass union |
+|---|---|---|---|---|
+| obligations hit, of 23 | 9 / 9 / 7 | 10 | **10** | 12 |
+| findings | 93 / 103 / 102 | 128 | 130 | 375 |
+| paired with gold | 23 / 25 / 23 | 40 | 39 | 90 |
+| control findings (per control PR) | 1.0 / 0.5 / 2.0 | 1.5 | 1.5 | 7.0 |
+
+**A lever at the threshold again** (rule: at least 10 at control emission at most 2.0). Two D1
+runs, two contract versions, both at 10 against the hygiene mean of 8.3. Together they reach
+12 -- the four-pass union's count -- with 258 findings against its 375 and 1.5 control findings
+per control PR against its 7.0; stable across both, 8.
+
+- **The file cells reached their target.** `cc44bb99` (33305's line wrap, hit by every hygiene rep
+  and missed by `structured/2`, which had no cell there) is a hit; 26 of 252 file cells were
+  `would_change`, 30 file-level filings over 13 PRs. `38e72250` moved from nothing to `loc`.
+- **What moved the other way.** `585e5e0b` (33285's one-`simp` golf, hit by all three hygiene reps
+  and by `structured/2`) and `e8e02821` (a 33145 duality ask) are misses here. Two runs of two
+  versions cannot say whether that is the contract or the draw.
+- **Control PRs.** The judge counts 3 control findings, as for `structured/2`; the ledgers hold 4
+  control filings, every one a module-doc wording ask on a file the PR edits. The file cells added
+  no other kind of control finding.
+- **The fixes, as run.** End-of-file linter filings: 0 (the one `commandStart` mention is 33149's
+  real `set_option linter.style.commandStart false`). Compile reuse: 84 of 90 compile-checked
+  filings reused the reviewer's own compile. Ledger: 1,950 cells, 7.1% `would_change`.
+- **Cost.** 33.0M processed tokens, 3.0M of them in the four attempts B's limit cut off; the
+  prompt re-read is 59% (`session_waste.py`). A Pro window held about 19-20M.
+
+Altitude: one rep of `structured/3`, inside a baseline that spreads by 2. Reps 2 and 3 of
+`structured/3` decide whether 10 holds, and whether the golf ask's loss is the draw.
+
+## D2 `structured_critic/2` on Claude, reading `structured/3` rep 1: stated before the run (2026-10-03)
+
+Run `probe_dev_structured3_critic_hygiene_claude_sub_rep1`, `--of probe_dev_structured3_hygiene_claude_sub_rep1`.
+The user, 2026-10-03: "Let's start D2 on C and see how the results look like once we hit session
+limit" -- so it starts on the Pro account C and stops there; the sessions C finishes are read as an
+interim, forensic look (a partial run is not a measurement), and the rest is resumed later.
+
+The rule, when complete (plan §5): against its own first stage (10 of 23, control 1.5), **a lever**
+at 12 or more with control emission at most 2.0 per control PR; **not, as built**, at 10 or fewer,
+or if the critic's additions raise control emission above 2.0. Read beside it: obligations reached
+by critic-stage findings that the first stage did not reach (the attributable increment), positions
+by kind, overturns by concern, and control filings by concern (72 file cells sit on the controls).
+
+## D2 on Claude: the interim look at account C's limit (forensic, 2026-10-03)
+
+`probe_dev_structured3_critic_hygiene_claude_sub_rep1` on account C (0.64 used at the start):
+the limit was spent at 04:15 after **2 of 15** critic sessions finished (33304, a control, and
+33305; 1.9M tokens); 3 sessions in flight were cut off (6.9M tokens, one of them 4.3M), the rest
+failed at once, and the run closed partial. Both producing attempts audit clean and usable.
+
+- **33304 (control):** 51 cells -- 49 `concede`, 2 `confirm` (D1's two module-doc findings);
+  nothing overturned, so the critic added no control finding. The judge counts 1 control candidate
+  (0.5 per control PR) on the union.
+- **33305:** 21 cells -- 18 `concede`, 2 `confirm` (D1's wrong-file TODO and the 101-character
+  line), 1 `overturn`: the module doc's TODO points at `GroupCohomology/LowDegree.lean`, which the
+  critic opened and found to be a `deprecated_module` stub; filed as a verified module-doc change.
+- **Forensic judge** (audit `probe-dev-structured3-critic-hygiene-claude-sub-rep1-forensic-c`,
+  $0.006): `cc44bb99` stays a hit; 33305 has no other gold ask, so the critic's addition is
+  unaligned (gold is a lower bound, not a verdict). No increment was reachable on these two PRs.
+
+What it shows: the critic argues with evidence, overturns sparingly, and did not raise control
+emission on the control it reached. What it cannot show: whether D2 reaches obligations D1 missed;
+those sit on the PRs not yet run. Starting a D2 run on a part-spent Pro window cost more in cut-off
+sessions (6.9M) than it finished (1.9M); the remaining 13 sessions are best resumed on a fresh window.
+
+## D2 `structured_critic/2` on Claude, reading `structured/3` rep 1: read against the rule
+
+`probe_dev_structured3_critic_hygiene_claude_sub_rep1`, complete: 2 sessions on account C, the
+other 13 resumed on the main account (the user: "finish the run on the main account window"),
+none failed there. Containment clean and usable on all 15 producing attempts. Judged for $0.42
+(audit `probe-dev-structured3-critic-hygiene-claude-sub-rep1`); read with `read_critic.py`.
+
+| | D1 `structured/3` rep 1 | **D2 on it** | D1 `structured/2` ∪ `/3` |
+|---|---|---|---|
+| obligations hit, of 23 | 10 | **11** | 12 |
+| findings | 130 | 158 | 258 |
+| paired with gold | 39 | 42 | |
+| control findings (per control PR) | 1.5 | 2.0 | |
+| processed tokens | 33.0M | 37.6M (6.9M of it cut off on C) | |
+
+**Not, as built, by plan §5's rule** (a lever at +2 obligations with control emission at most
+2.0; "fewer" is not as built). The critic added **+1**. The restatement above ("not at 10 or
+fewer") left 11 between its two bars; plan §5 was written first and is stricter, and this reads
+by it. One rep, one obligation: at the altitude of the designs tried so far, not a verdict on
+critics.
+
+- **The +1 is the critic's own and is a recovery, not a new reach.** `585e5e0b` (33285's
+  one-`simp` golf) was hit by all three hygiene reps and by `structured/2`, and lost by
+  `structured/3`. The critic overturned D1's `no_issue` on that proof with a verified one-line
+  term proof (`symm_apply_eq.2 rfl`), judged an issue and resolution match. No D1 finding changed
+  status under the re-judging: the other 10 hits are D1's, and nothing was lost.
+- **Positions.** 1,950 cells: 1,784 `concede`, **28 `overturn`** (1.5% of `no_issue` cells),
+  137 `confirm`, 1 `undecided`, **0 `refute`**. The critic disagreed with none of D1's 138 filings.
+  Overturns by concern: statement 14, library 4, proof 3, organization 2, module doc 2, docstring,
+  name, placement 1 each; 25 filed verified, 3 unverified, none refuted at submission. They
+  cluster on 33421 (6), 33149 (5), 33098 (4) and 33294 (4).
+- **What the 27 unaligned overturns are.** They are concrete and evidenced. Examples: a docstring
+  that states a false result (33362), `spectralCurl` missing a 2π (33149), a 28-line proof of a
+  library lemma (33098, `Metric.IsCover.of_maximal_isSeparated`), deprecated shims whose
+  hypothesis silently changed meaning (33294), and redundant imports (33321). Gold is a lower
+  bound, so unaligned is not wrong; nothing here adjudicates them.
+- **Control PRs.** Two control findings became four (judge: 1.5 → 2.0 per control PR, at the
+  ceiling). The critic's one addition is on 33315: a module doc the PR edits still names
+  declarations that do not exist, filed verified. It is the same kind of ask as D1's four
+  module-doc control filings, and the critic refuted none of them.
+- **Cost.** The critic stage cost about as much as D1 itself (30.7M in finished sessions against
+  D1's 33.0M; where its tokens went is not measured). Against the cost-matched alternative, two
+  independent D1 passes reach 12 together. They are two contract versions, so that comparison is
+  suggestive, not clean.
+
+Untried critic designs, before anything is concluded about critics:
+
+- a critic on a different model from the first stage (here both were Opus 5.5, so they share
+  blind spots: 0 refutes may be agreement or deference);
+- a critic that sees the first stage's evidence (tool outputs, compiles) rather than its ledger
+  reasons alone;
+- a critic aimed at the concerns where the misses sit (convention and mechanism knowledge), rather
+  than at every `no_issue` cell evenly;
+- K independent first-stage passes unioned, the cost-matched rival above (plan of 2026-10-01).

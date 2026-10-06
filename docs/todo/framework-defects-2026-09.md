@@ -513,6 +513,17 @@ task". It was written for a tool filtered out of a grant. Here the tool is grant
 `configs/bases/v5_solo.yaml`'s grant. The Opus dev runs had added 1 refusal in 2 calls to the count.
 The first option, a `cli plan` refusal for a granted tool with no backing store, is not built.
 
+**Correction (2026-10-02, `review-designs`): the close reached the base and not the dev set.**
+`configs/pr_review_v5_dev_medium_gpt52.yaml` restates `solo_context_tools` with `proof_profile`
+in it, and a child's list replaces the parent's, so every dev config extending it still grants the
+tool: the hygiene baseline resolves to `[zulip_search, precedent_search, declaration_search,
+naming_norm, proof_profile]`, against its own header ("less `proof_profile`, which left the base
+grant"), and the D1 smoke registered it. Hygiene rep 1 never called it (trace: declaration_search
+49, naming_norm 8, zulip_search 7, precedent_search 6), so no measured number moved. The baseline
+is frozen and the designs extend it, so the designs hold the same grant and the design comparison
+is at parity; the fix belongs to the next baseline, not to this one. What would close it: drop the
+tool from the dev gpt52 config's list when a new baseline is cut, or build the first option.
+
 ## Claude Code aborts an MCP tool call after 300 s of silence, the compile tool's own timeout (found 2026-10-02)
 
 In hygiene rep 2, seven `lean_verify` / `lean_verify_edit` calls in two sessions came back as
@@ -537,6 +548,43 @@ Also seen in the same rep: one `lean_verify_edit` call refused by the CLI as mal
 a deletion, but the model still writes the key with no value, which the CLI refuses before the
 tool sees it. The description says "omit it to delete the span"; a separate `delete_span: true`
 argument would be a shape the model has a value for.
+
+## Every whole-file compile reports a `commandStart` warning at the end of the file (found 2026-10-02)
+
+`LeanVerifyToolsProvider.execute` (`src/ape/toolkits/execute/lean/tools.py`) compiles
+`code.strip()`, so a reviewed file loses its final newline before Lean sees it, and with Mathlib's
+standard linter set on for whole-file compiles (`WHOLE_FILE_OPTIONS`, hygiene layer, 2026-10-01)
+`linter.style.commandStart` fires on the last command: "'' starts on column 9, but all commands
+should start at the beginning of the line". Reproduced on 33337's reviewed
+`Projection/Submodule.lean`, which ends with `end Dense\n`: stripped, 1 warning; with the final
+newline, 0 (`results/pr_review_v5/probes/review-designs-2026-10-02/eof_linter_check.py`, no spend).
+
+**Motivating example.** The D1 test on gpt-5.2 (`probe_dev_structured_gpt52_Grc_contract2_smoke1`,
+2026-10-02) filed 3 findings on 33337; 2 of them are this warning, one per changed file, claimed as
+"will fail CI style linting" at the files' last lines (both unanchored, so diagnostic). Claude's
+hygiene rep 1 saw the same tool and filed none of it. An edit-mode compile is not misled -- the
+warning is in the baseline compile too, so `warnings_introduced_by_your_edit` stays empty -- but the
+as-is `lean_verify_edit` shows it to the reviewer as the file's own warning, and on a control PR it
+is a false finding waiting for a reviewer that reads warnings literally.
+
+**What would close it.** Compile the text as given, or strip only leading whitespace and keep one
+final newline, in `execute`; then re-run `eof_linter_check.py`, which must print 0 warnings for the
+stripped case too. A test beside it: a whole-file compile of a file ending in a newline reports no
+`commandStart` warning.
+
+**Risk / sequencing.** It changes what every reviewer's compile reports, the frozen solo baseline's
+included: fixed between hygiene reps 1 and 2, the reps would no longer share their tools. Fix it at a
+rep boundary, with the decision recorded beside the reps.
+
+**Closed 2026-10-02 (`review-designs`), at the hygiene reps' boundary** (reps 1-3 all run and
+judged): `execute` now compiles `code.strip() + "\n"`, the source as a file holds it
+(`tests/ape/test_lean_verify_paths.py::test_execute_hands_lean_the_source_with_its_final_newline`).
+`eof_linter_check.py` re-run: the reviewer's as-is `lean_verify_edit` on 33337's
+`Projection/Submodule.lean` no longer mentions `commandStart`, and the compile through `execute`
+reports 0 warnings. Every run from here sees one warning fewer per reviewed file than hygiene reps
+1-3 and D1 rep 1 did; the decision, the user's (2026-10-02: "Let's make the fixes first"), is to
+fix before D1 reps 2 and 3, so those reps are of the fixed tools.
+
 ## The no-submission prompts named `submit_result` and told a finished reviewer to keep working (found and fixed 2026-10-05)
 
 A batch session's result is what its submission tool records, so a turn with no tool call cannot be

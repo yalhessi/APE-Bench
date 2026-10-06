@@ -14,10 +14,17 @@ the committed runs' `findings.jsonl`, and prints:
 
 Run from the repository root: `ape/bin/python results/pr_review_v5/probes/claude-models-2026-10-01/consistency.py`.
 Written for `docs/plans/2026-10-01-beyond-the-solo-baseline.md`.
+
+`--runs a,b,c` adds cells for further judged runs -- a design's reps beside the baseline's
+(`docs/plans/2026-10-02-review-designs.md` §2) -- each labelled by its run name (or `label=run`),
+its audit found by the judge's convention (`pr_review_v5_judge_<run>` resolves to the audit directory
+named like the run with `_` as `-`); a run with no audit yet is reported and skipped. `--cells` keeps
+only the named labels, so a design can be read against the cells it is compared with.
 """
 
 from __future__ import annotations
 
+import argparse
 import glob
 import json
 import os
@@ -73,7 +80,11 @@ def spine(reports: dict) -> None:
         print(f"| `{ob[11:19]}` | " + " | ".join(status[k].get(ob, "?") for k in reports) + " |")
     hits = {k: {ob for ob, s in v.items() if s == "HIT"} for k, v in status.items()}
     print("\n| cells | hit per cell | union | stable (all) |\n|---|---|---|---|")
-    for name, cells in (("same config (H55 r1, r2)", SAME_CONFIG), ("Opus 5.x, all six", OPUS5X), ("every cell", list(reports))):
+    for name, cells in (("same config (H55 r1, r2)", SAME_CONFIG), ("Opus 5.x", OPUS5X), ("every cell", list(reports))):
+        cells = [c for c in cells if c in hits]
+        if not cells:
+            continue
+        name = f"{name} ({len(cells)} cells)" if name != "every cell" else name
         sets = [hits[c] for c in cells]
         union = set().union(*sets)
         stable = set.intersection(*sets)
@@ -137,14 +148,49 @@ def sessions(run: str) -> None:
     print(f"- submissions truncated by the finding budget: {truncations}")
 
 
-def main() -> int:
-    reports = {label: report(audit) for label, (audit, _) in CELLS.items() if (AUDITS / audit).is_dir()}
-    runs = {label: findings(run) for label, (_, run) in CELLS.items() if run and (RUNS / run).is_dir()}
+def audit_of(run: str) -> str:
+    """The audit directory a judge run of `run` writes, by the judge's naming convention."""
+    return run.replace("_", "-")
+
+
+def cells_for(runs_arg: str | None, only: str | None) -> dict:
+    """`CELLS` plus one cell per `--runs` entry, restricted to `--cells` when given."""
+    cells = dict(CELLS)
+    for item in [piece.strip() for piece in (runs_arg or "").split(",") if piece.strip()]:
+        label, _, run = item.rpartition("=")
+        label = label or run
+        audit = audit_of(run)
+        if not (AUDITS / audit).is_dir():
+            print(f"(no audit `{audit}` for run `{run}`: judge it first; cell `{label}` skipped)")
+            continue
+        cells[label] = (audit, run if (RUNS / run).is_dir() else None)
+    if only:
+        wanted = [piece.strip() for piece in only.split(",") if piece.strip()]
+        unknown = [name for name in wanted if name not in cells]
+        if unknown:
+            print(f"(unknown cell(s) {unknown}; known: {sorted(cells)})")
+        cells = {name: cells[name] for name in wanted if name in cells}
+    return cells
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--runs", default=None,
+                        help="comma-separated run names (or label=run) to add as cells")
+    parser.add_argument("--cells", default=None, help="comma-separated labels to keep")
+    args = parser.parse_args(argv)
+    cells = cells_for(args.runs, args.cells)
+    reports = {label: report(audit) for label, (audit, _) in cells.items() if (AUDITS / audit).is_dir()}
+    runs = {label: findings(run) for label, (_, run) in cells.items() if run and (RUNS / run).is_dir()}
+    if not reports:
+        print("no cells to read")
+        return 1
     spine(reports)
     overlap(runs)
     emission(reports)
     for label in SAME_CONFIG:
-        sessions(CELLS[label][1])
+        if label in cells:
+            sessions(cells[label][1])
     return 0
 
 

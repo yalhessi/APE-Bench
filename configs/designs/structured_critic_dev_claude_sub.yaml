@@ -1,0 +1,19 @@
+# Design D2, `structured_critic` (docs/plans/2026-10-02-review-designs.md §4): a second session
+# with D1's packet and tools, handed D1's ledger for the PR and told to argue the opposite of every
+# "nothing to ask" cell with evidence or concede it, and to confirm or refute every change; its
+# findings go through D1's verification, and the output is the union of the two stages, each
+# finding labelled with the stage that raised it and the other stage's position
+# (src/ape/tasks/lean_tasks/formal_math/review/structured_critic.py).
+#
+# A chained stage: it reads a finished `structured` run's ledgers.jsonl, named at the invocation,
+#   --run-name probe_dev_structured_critic_hygiene_claude_sub_rep1 --of probe_dev_structured_hygiene_claude_sub_rep1
+# `plan` without --of preflights everything but the stage and says so; `run` refuses without it.
+# This file states the design and nothing else (tests/datasets/test_pr_review_v5_designs.py).
+#
+# Reading rule (plan §5): against D1, +2 obligations at control emission <= 2.0 per control PR is
+# a lever; fewer, or the critic's additions refuted at the controls, is not, as built. Control
+# emission is read per claim beside per finding, and the docs family separately.
+extends: ../pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml
+
+dataset:
+  design: structured_critic

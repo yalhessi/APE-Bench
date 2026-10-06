@@ -201,6 +201,18 @@ class V5DatasetConfig(BaseModel):
     solo_cost_cap: float = 1.50
     #: `solo` only, the token twin of `solo_cost_cap`. 0 disables it.
     solo_token_cap: int = 1_800_000
+    #: `solo` only. Which per-PR reviewer runs: a name in `DESIGNS`
+    #: (`ape/tasks/lean_tasks/formal_math/review/__init__.py`). `solo` is the frozen baseline;
+    #: a design is a task that ends in the same submission contract, so anchoring, finalization
+    #: and the judge read every design alike (`docs/plans/2026-10-02-review-designs.md` §2).
+    #: Sealed into the plan's evaluation settings when it is not the baseline, and carried in
+    #: the run name by convention, so a resumed run cannot be a different design.
+    design: str = "solo"
+    #: A chained design (`reads_stage`) reads its first stage's per-PR output -- the verdict
+    #: ledgers of a finished run of the stage before it -- through `StageInput`. Supplied at
+    #: the invocation (`--of <run_name>`), like the judge's, never checked into a config: a
+    #: config describes a design, and which run it reads is part of the repetition.
+    stage_input_run: Optional[str] = None
     #: `solo` only. The retrieval grant, defaulting to the generalist arm's four — the
     #: scheduled design's own control keeps all of them "because that is the point of a
     #: control", and a narrower grant here would make an information difference read as an
@@ -250,6 +262,17 @@ class V5DatasetConfig(BaseModel):
     #: with their count instead of refusing, and `agenda_report.json` lists them. Sealed into the
     #: plan's evaluation settings; unset, the agenda is byte-identical to one built before it.
     arm_ids: Optional[List[str]] = None
+
+    @field_validator("design")
+    @classmethod
+    def _known_design_only(cls, value):
+        from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+
+        if value not in DESIGNS:
+            raise ValueError(
+                f"unknown design {value!r}; expected one of {sorted(DESIGNS)}. A design is "
+                "registered in ape/tasks/lean_tasks/formal_math/review/__init__.py::DESIGNS")
+        return value
 
     @field_validator("arm_ids")
     @classmethod
@@ -457,7 +480,8 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
 
 
 def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str],
-                    trace_path: Path) -> List[Dict[str, Any]]:
+                    trace_path: Path, graphs=(), stage_rows: Optional[Dict[str, Any]] = None,
+                    ) -> List[Dict[str, Any]]:
     """`solo`: one agent per episode, handed the whole PR and no work units.
 
     Built from the episodes rather than from `agenda.proposals`, because the proposals are the
@@ -467,18 +491,24 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
 
     The retrieval cutoff is carried even though no work unit is: it is gold-free and it is what
     stops a retrieval tool answering from after the review happened.
+
+    Which per-PR reviewer runs is `dataset.design`: the task type, the task-id prefix and the
+    design's own payload come from the registered class, so this function has no design
+    branch. For `solo` the payload is exactly what it was before designs existed.
     """
 
-    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_TASK_TYPE
+    from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 
+    design_cls = DESIGNS[dataset.design]
+    graph_by_episode = {graph.episode_id: graph for graph in graphs}
     wanted = {item.episode_id for item in agenda.proposals}
     data = []
     for episode in sorted(episodes, key=lambda item: item.episode_id):
         if episode.episode_id not in wanted:
             continue
         data.append({
-            "task_type": SOLO_TASK_TYPE,
-            "task_id": f"pr5solo_{episode.episode_id.replace(':', '_')}",
+            "task_type": design_cls.task_type,
+            "task_id": f"pr5{dataset.design}_{episode.episode_id.replace(':', '_')}",
             "episode_id": episode.episode_id,
             "pr_number": episode.pr_number,
             "pr_title": episode.title.text or "",
@@ -510,8 +540,115 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
                 "repo_url": "https://github.com/leanprover-community/mathlib4.git",
                 "default_target": "Mathlib",
             },
+            **design_cls.design_payload(
+                episode=episode, graph=graph_by_episode.get(episode.episode_id),
+                dataset=dataset,
+                stage=(stage_rows or {}).get(episode.episode_id)),
         })
     return data
+
+
+def stage_rows_for(dataset, selected_prs: List[int], logger, *, dry_run: bool = False,
+                   ) -> Optional[Dict[str, Any]]:
+    """The first stage's per-PR ledgers, keyed by episode, for a design that reads one.
+
+    `None` for a design that reads nothing. A chained design with no `--of` is refused before
+    anything is spent; in a dry run it is reported instead, so `plan` can still check the
+    agenda, the budget, the cutoffs and the workspaces of a stage whose input does not exist
+    yet. The stage run is read through `StageInput`, which hashes exactly the artifact consumed
+    and refuses a run whose manifest says it did not cover what it promised, and the PR set
+    must be covered: a critic given no ledger for a PR has nothing to argue with, and a run
+    that quietly reviewed fewer PRs than its config names would be scored on the wrong
+    denominator.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+
+    if not DESIGNS[dataset.design].reads_stage:
+        return None
+    if not dataset.stage_input_run:
+        message = (f"design {dataset.design!r} reads the ledgers of a finished run of its "
+                   "first stage; name it with --of <run_name>")
+        if dry_run:
+            logger.warning("%s -- the real run is refused without it", message)
+            return None
+        raise ValueError(message)
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.of(dataset.stage_input_run, require=["ledgers"])
+    rows = {row["episode_id"]: row for row in jsonl_rows(stage.path("ledgers"))}
+    covered = {row["pr_number"] for row in rows.values()}
+    missing = sorted(set(selected_prs) - covered)
+    if missing:
+        raise ValueError(
+            f"stage run {dataset.stage_input_run!r} holds ledgers for {len(covered)} PR(s) and "
+            f"none for {missing}: every PR this run reviews needs its first-stage ledger")
+    logger.info("stage input: %s (%d ledger rows, ledgers sha256 %s)",
+                dataset.stage_input_run, len(rows), stage.consumed["ledgers"][:12])
+    return rows
+
+
+def _design_preflight(agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs,
+                      stage_rows, logger) -> None:
+    """What `plan` says about a design's task data, since `plan` never builds a task.
+
+    "Before spending on a run that tests a new capability, assert the capability reaches the
+    task" (`.claude/rules/mathlib-review.md`): the payload is what the task will be handed, so
+    the per-PR line each design describes is the cheapest honest preflight of it. A chained
+    design planned without its stage run has no payload to build -- its task data needs the
+    first stage's rows -- so the preflight says how many PRs would read one and stops there.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+
+    design_cls = DESIGNS[dataset.design]
+    if design_cls.reads_stage and stage_rows is None:
+        wanted = {item.episode_id for item in agenda.proposals}
+        logger.info("design=%s task_type=%s: %d PR(s) would each read a first-stage ledger; "
+                    "the task data is built once --of names the stage run",
+                    dataset.design, design_cls.task_type,
+                    sum(1 for episode in episodes if episode.episode_id in wanted))
+        return
+    data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
+                           graphs=graphs, stage_rows=stage_rows)
+    logger.info("design=%s task_type=%s tasks=%d", dataset.design, design_cls.task_type,
+                len(data))
+    for payload in data:
+        line = design_cls.describe_design_payload(payload)
+        if line:
+            logger.info("  %s: %s", payload["pr_number"], line)
+
+
+def _ledger_rows(results, design: str) -> List[Dict[str, Any]]:
+    """One row per successful per-PR result that carries a verdict ledger.
+
+    The design's own record of a PR -- the ledger, what it refuted, what a later stage said --
+    kept beside `findings.jsonl` rather than only in the uncommitted `.ape` tree, because a
+    chained design reads it and the reading of a design is made from it. Every key the result
+    declares beyond the base review result travels, and so do the filed `findings` as the task
+    recorded them (before anchoring and merging), which is what a critic stage argues against;
+    the rest of the base keys (the message, the verdict, the bookkeeping) are in the run's
+    other artifacts.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewResult
+
+    base_keys = set(SoloReviewResult.model_fields) - {"findings"}
+    rows = []
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        # The key, not its truthiness: a PR that leaves no declaration in place has an empty
+        # ledger, and it is still a ledger. Testing `raw.get("ledger")` dropped 33305's row from
+        # D1's first dev run, and the critic stage refused the run for the missing PR
+        # (2026-10-02). A solo result has no `ledger` key at all.
+        if not raw.get("success") or not raw.get("episode_id") or "ledger" not in raw:
+            continue
+        rows.append({
+            "episode_id": raw["episode_id"], "pr_number": raw.get("pr_number"),
+            "design": design,
+            **{key: value for key, value in raw.items() if key not in base_keys},
+        })
+    return sorted(rows, key=lambda row: row["episode_id"])
 
 
 def _direct_arm_task_data(agenda, pool: Dict[str, Dict[str, Any]],
@@ -654,7 +791,8 @@ def _solo_candidate(finding: Dict[str, Any], unit) -> Dict[str, Any]:
         # The free-text label beside the closed family. An arm's is its spec's own phrasing;
         # a whole-PR reviewer has no spec, so the family is the most it can honestly say and
         # inventing a richer label here would be this module putting words in its mouth.
-        "concern_label": finding.get("concern_family") or "other",
+        "concern_label": (finding.get("concern_label") or finding.get("concern_family")
+                          or "other"),
         "issue_kind": finding.get("issue_kind"),
         "severity": finding.get("severity") or "advisory",
         "claim": finding.get("claim") or "",
@@ -957,6 +1095,14 @@ def evaluation_settings(dataset) -> Dict[str, Any]:
         settings["submission_verification_policy"] = dataset.submission_verification_policy
     if dataset.arm_ids:
         settings["arm_ids"] = list(dataset.arm_ids)
+    if dataset.design != "solo":
+        from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+
+        settings["design"] = dataset.design
+        if DESIGNS[dataset.design].design_version:
+            settings["design_version"] = DESIGNS[dataset.design].design_version
+    if dataset.stage_input_run:
+        settings["stage_input_run"] = dataset.stage_input_run
     return settings
 
 
@@ -1756,15 +1902,20 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
 
 
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
-    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
-    assert_the_model_keeps_its_reasoning(scaffold)
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
+    if dataset.design != "solo" and dataset.routing_mode != "solo":
+        raise ValueError(
+            f"design {dataset.design!r} is a per-PR reviewer and runs under routing_mode: "
+            f"solo; this config says {dataset.routing_mode!r}")
+    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
+    assert_the_model_keeps_its_reasoning(scaffold)
 
     release = load_release(dataset)
     units, episodes = select_units_and_episodes(dataset, release)
     selected_prs = sorted({unit.pr_number for unit in units})
+    stage_rows = stage_rows_for(dataset, selected_prs, logger, dry_run=dataset.dry_run)
 
     agenda, pool = build_agenda(
         run_name=dataset.run_name, routing_mode=dataset.routing_mode,
@@ -1796,8 +1947,12 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         assert_the_judge_model_is_pinned(dataset, logger)
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
         # read would have been impossible.
-        cutoffs_by_episode(episodes)
+        cutoff_by_episode = cutoffs_by_episode(episodes)
         logger.info("retrieval cutoffs resolve for all %d episode(s)", len(episodes))
+        if dataset.routing_mode == "solo":
+            _design_preflight(agenda, episodes, dataset, cutoff_by_episode,
+                              run_dir(dataset.run_name) / "context_trace.jsonl",
+                              release["graphs"], stage_rows, logger)
         # Same for the verification environment: a dry run must say whether the real run
         # would verify against the PR's own build products or the base commit's.
         missing = await assert_reviewed_workspaces_prebuilt(
@@ -1870,7 +2025,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         # No census, no arm pool, no journal: there is nothing to route. The agenda was still
         # built and sealed above, which is what makes this run's `agenda_report.json` scope
         # identically to the `lead` run on the same config.
-        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path)
+        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
+                               graphs=release["graphs"], stage_rows=stage_rows)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
         scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     else:
@@ -1907,6 +2063,13 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
             report["anchored"], report["findings_in"],
             100 * report["unanchored_rate"], report["work_units_reached"],
             report["by_failure"] or "no failures")
+        ledgers = _ledger_rows(results, dataset.design)
+        if ledgers:
+            # Only when a design wrote one: a solo run's artifact set stays what it was.
+            from src.mathlib_review.run_state import RUN_ARTIFACTS
+
+            write_once(out / RUN_ARTIFACTS["ledgers"].filename, jsonl_bytes(ledgers))
+            logger.info("ledgers: %d PR(s) carry a verdict ledger", len(ledgers))
     else:
         responses = _responses_from_results(results, dataset.routing_mode)
     delegations = _delegations_from_results(results, dataset.routing_mode, agenda,

@@ -583,6 +583,17 @@ Also from that folder:
   measured case for an ensemble harness: decorrelated runs, union, agreement-ranked. Untested as a
   design.
 
+**Added 2026-10-02 (`review-designs`): structure does not move gpt-5.2.** Two per-PR designs on
+gpt-5.2, contract v2, dev held-out 12, one rep each (results/pr_review_v5/probes/review-designs-2026-10-02/):
+D1 `structured` asks a verdict with its reason for every declaration under each of six concerns
+and compiles or looks up every change before filing; D2 `structured_critic` then has a second
+session argue every "nothing to ask" cell. Both reach 2 of 23, the baseline's same two
+(`3dacf72e`, `f54010d8`), at 0 control emission: 1,660 of 1,698 cells (98%) `no_issue`, every
+declaration with six distinct reasons; the critic conceded 1,652 cells, overturned 8, refuted 0.
+The reviewer was given an occasion to decide every cell and decided "nothing" one cell at a time,
+which points at the filing decision, not attention or the unit of work. $92.37 for both runs and
+the two smoke tests.
+
 ## Is the effort we ask for the effort OpenAI runs? Yes; and `xhigh` exists (2026-10-02, $0.25)
 
 **Checked from OpenAI's side, not from our configs.** A Responses body echoes the settings the server

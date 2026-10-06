@@ -1,0 +1,19 @@
+# Design D1, `structured` (docs/plans/2026-10-02-review-designs.md §3): the hygiene baseline's
+# packet, tools, brief, caps and PR set, with the unit of decision changed -- a verdict per
+# declaration and concern, and every `would_change` compiled or looked up at submission before it
+# is filed (src/ape/tasks/lean_tasks/formal_math/review/structured.py).
+#
+# This file states the design and nothing else: tests/datasets/test_pr_review_v5_designs.py
+# asserts that a design config differs from its baseline in `dataset.design` and the design's
+# own knobs alone, so a design result is never a policy contrast in disguise. Run names carry the
+# design and the rep, e.g. --run-name probe_dev_structured_hygiene_claude_sub_rep1.
+#
+# Reading rule (plan §5): against the hygiene baseline's mean / union / stable on the held-out
+# 12, a lever at >= 10 of 23 with control emission <= 2.0 per control PR; not, as built, at <= 8
+# or control emission > 2.0; against the four-pass union, within 1 of its judged count closes
+# the consistency gap. Control emission is read per claim beside per finding, and the docs
+# family separately, since no tool contradicts a wording (ensemble-union reading, 2026-10-02).
+extends: ../pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml
+
+dataset:
+  design: structured

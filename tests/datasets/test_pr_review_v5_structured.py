@@ -1,0 +1,676 @@
+"""Design D1, `structured`: a verdict per declaration and concern, verified before filing.
+
+What is pinned: the design keeps the solo's packet and prompts and appends its contract; its
+submission is the arms' verdict contract generalized to the whole PR (every cell answered, every
+`would_change` a finding, missing cells pressed then `unstated`); verification at submission is
+refutation by fact and nothing else (an edit that does not compile, a duplicate that does not
+exist, a rename onto an existing name), an unverified change files as advisory, and the result
+carries the ledger the critic stage and the reading consume. The Lean compile and the lookups are
+replaced by fakes here; the one-PR smoke against the real reviewed workspace is
+results/pr_review_v5/probes/review-designs-2026-10-02/.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from ape.tasks.base import EvaluationResult, get_task_class
+from ape.tasks.models import WorkspaceInfo
+from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+from ape.tasks.lean_tasks.formal_math.review.structured import (
+    CONCERNS, FILE_CONCERNS, LEDGER_PRESSES, REFUTED, STRUCTURED_TASK_TYPE, UNVERIFIED, VERIFIED,
+    DeclarationVerdicts, FileVerdicts, StructuredFinding, StructuredReviewData,
+    StructuredReviewResult, StructuredReviewTask, declarations_of, resolve_declaration,
+)
+from ape.tasks.lean_tasks.formal_math.review.candidates import UNSTATED_VERDICT
+
+DECLARATIONS = [
+    {"name": "Submodule.foo_bar", "kind": "theorem", "path": "Mathlib/A.lean", "change_id": "change:1"},
+    {"name": "Submodule.baz", "kind": "lemma", "path": "Mathlib/A.lean", "change_id": "change:2"},
+]
+
+
+def _data(**overrides):
+    payload = dict(
+        task_id="d1-1", pr_number=33337, pr_title="chore: rename lemmas",
+        pr_description="A description.", diff="--- a/Mathlib/A.lean\n+++ b/Mathlib/A.lean\n",
+        changed_files=["Mathlib/A.lean"], episode_id="ep:33337",
+        invocation_id="ep:33337#solo_agent", declarations=list(DECLARATIONS),
+        target_workspace=WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x"),
+    )
+    payload.update(overrides)
+    return StructuredReviewData(**payload)
+
+
+def _task(**data_overrides):
+    """A real task under the hygiene settings, with no workspace and a test logger."""
+
+    import logging
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    config = ApeAgentConfig()
+    task_config = StructuredReviewTask.task_config_class(
+        filing_bar="request", review_notes=True, notes_form="per_object_family",
+        user_prompt="v2", finding_budget=40)
+    config = config.model_copy(update={"task_config": task_config}, deep=True)
+    task = StructuredReviewTask(_data(**data_overrides), config)
+    task.logger = logging.getLogger("structured-test")
+    task.termination_callback = None
+    return task
+
+
+FILE = "Mathlib/A.lean"
+
+
+def _typed(entry):
+    return FileVerdicts(**entry) if "file" in entry else DeclarationVerdicts(**entry)
+
+
+def _submit(task, ledger, findings=(), **kwargs):
+    """`submit_findings` with the ledger passed in the submission itself."""
+    return asyncio.run(task._submit([StructuredFinding(**item) for item in findings],
+                                    [_typed(entry) for entry in ledger],
+                                    kwargs.get("confidence"), kwargs.get("message", "")))
+
+
+def _entry(name, verdicts=None):
+    verdicts = verdicts or {}
+    return {"declaration": name, **{concern: {"reason": f"checked {concern}",
+                                              "verdict": verdicts.get(concern, "no_issue")}
+                                    for concern in CONCERNS}}
+
+
+def _file_entry(path=FILE, verdicts=None):
+    verdicts = verdicts or {}
+    return {"file": path, **{concern: {"reason": f"checked the file's {concern}",
+                                       "verdict": verdicts.get(concern, "no_issue")}
+                             for concern in FILE_CONCERNS}}
+
+
+def _full_ledger(verdicts=None):
+    """One entry per declaration and per changed file, every cell `no_issue` except the pairs in
+    `verdicts`."""
+
+    verdicts = verdicts or {}
+    def mine(name):
+        return {concern: verdict for (subject, concern), verdict in verdicts.items() if subject == name}
+    return ([_entry(decl["name"], mine(decl["name"])) for decl in DECLARATIONS]
+            + [_file_entry(FILE, mine(FILE))])
+
+
+CELLS = len(DECLARATIONS) * len(CONCERNS) + len(FILE_CONCERNS)
+
+
+def _record(task, ledger):
+    return task._record_entries([_typed(entry) for entry in ledger])
+
+
+def _finding(**overrides):
+    item = {"declaration": "Submodule.foo_bar", "concern": "proof", "path": "Mathlib/A.lean",
+            "line_start": 10, "claim": "foo_bar's proof is three lines of simp.",
+            "suggested_fix": "simp [bar]", "severity": "blocking"}
+    item.update(overrides)
+    return item
+
+
+# --- registration and inheritance -------------------------------------------------------------
+
+
+def test_it_is_a_registered_design_with_the_v5_spelling():
+    assert STRUCTURED_TASK_TYPE == "lean_pr_review_v5_structured"
+    assert get_task_class(STRUCTURED_TASK_TYPE) is StructuredReviewTask
+    assert DESIGNS["structured"] is StructuredReviewTask
+    assert StructuredReviewTask.reads_stage is False
+
+
+def test_it_keeps_the_solo_packet_and_satisfies_the_context_tools_contract():
+    from tests.datasets.test_pr_review_v5_solo_task import _attributes_the_context_tools_read
+
+    names = [cls.__name__ for cls in StructuredReviewTask.__mro__]
+    assert "SoloReviewTask" in names and "LeanPRReviewV4CandidateTask" not in names
+    missing = sorted(name for name in _attributes_the_context_tools_read()
+                     if name not in StructuredReviewData.model_fields)
+    assert not missing, missing
+
+
+def test_the_result_carries_the_ledger_the_critic_and_the_reading_consume():
+    fields = StructuredReviewResult.model_fields
+    assert {"ledger", "refuted", "findings", "episode_id", "invocation_id"} <= set(fields)
+    assert StructuredReviewResult.model_fields["design"].default == "structured"
+
+
+# --- the payload -----------------------------------------------------------------------------
+
+
+def _graph():
+    def target(change_id, kind, name, reviewed, path="Mathlib/A.lean"):
+        return SimpleNamespace(change_id=change_id, kind=kind, declaration_name=name,
+                               declaration_kind="theorem" if kind == "declaration" else None,
+                               path=path, reviewed_code=reviewed)
+    return SimpleNamespace(targets=[
+        target("change:b", "declaration", "Ns.second", "theorem second : True := trivial"),
+        target("change:a", "declaration", "Ns.first", "theorem first : True := trivial"),
+        target("change:c", "declaration", "Ns.gone", ""),           # removed by the PR
+        target("change:d", "doc_comment", None, "/-- doc -/"),      # not a declaration
+        target("change:e", "declaration", "Other.x", "def x := 1", path="Mathlib/B.lean"),
+    ])
+
+
+def test_the_payload_lists_the_declarations_the_pr_leaves_in_place_in_the_pr_models_order():
+    payload = StructuredReviewTask.design_payload(
+        episode=SimpleNamespace(episode_id="ep:1"), graph=_graph(), dataset=None, stage=None)
+    assert [row["name"] for row in payload["declarations"]] == ["Ns.first", "Ns.second", "Other.x"]
+    assert payload["declarations"][0]["kind"] == "theorem"
+    payload["changed_files"] = ["Mathlib/A.lean", "Mathlib/B.lean"]
+    assert "3 declaration(s) x 6 concerns + 2 file(s) x 3 = 24 ledger cells" == \
+        StructuredReviewTask.describe_design_payload(payload)
+
+
+def test_an_episode_without_a_graph_is_refused_not_given_an_empty_ledger():
+    with pytest.raises(ValueError, match="no change graph"):
+        StructuredReviewTask.design_payload(
+            episode=SimpleNamespace(episode_id="ep:1"), graph=None, dataset=None, stage=None)
+
+
+RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
+
+
+@pytest.mark.skipif(not (RELEASE / "derived/change_graphs.jsonl").is_file(),
+                    reason="needs the dev-medium release on disk")
+def test_on_the_real_release_33337_has_five_declarations_in_place():
+    from src.mathlib_review.io import jsonl_rows
+    from src.mathlib_review.schema import ChangeGraph
+
+    graph = next(ChangeGraph.model_validate(row)
+                 for row in jsonl_rows(RELEASE / "derived/change_graphs.jsonl")
+                 if row["pr_number"] == 33337)
+    rows = declarations_of(graph)
+    assert len(rows) == 5, [row["name"] for row in rows]
+    assert "Submodule.coe_starProjection_eq_isComplProjection" in {row["name"] for row in rows}
+
+
+def test_a_declaration_resolves_by_its_full_name_or_a_unique_dotted_suffix():
+    names = ["Submodule.foo_bar", "Other.foo_bar", "Submodule.baz"]
+    assert resolve_declaration("Submodule.baz", names) == "Submodule.baz"
+    assert resolve_declaration("baz", names) == "Submodule.baz"
+    assert resolve_declaration("foo_bar", names) is None, "ambiguous"
+    assert resolve_declaration("nothing", names) is None
+
+
+# --- the prompt ------------------------------------------------------------------------------
+
+
+def test_the_prompt_is_the_solos_without_the_notes_line_plus_the_contract():
+    from ape.tasks.lean_tasks.formal_math.review.solo import NOTES_LINE_FAMILY
+
+    task = _task()
+    prompt = asyncio.run(task.create_user_prompt())
+    assert task._review_notes() is False
+    assert NOTES_LINE_FAMILY.strip() not in prompt, "the account is the ledger, not prose"
+    assert "and your `notes`" not in prompt
+    assert "## The ledger" in prompt
+    for decl in DECLARATIONS:
+        assert f"`{decl['name']}`" in prompt
+    for concern in CONCERNS + FILE_CONCERNS:
+        assert f"`{concern}`" in prompt
+    assert "Files this PR changes" in prompt and f"- `{FILE}`" in prompt
+    assert "submit_findings" in prompt and "record_ledger" in prompt
+    assert "Each concern is its own decision" in prompt
+    assert "Nothing ranks or withholds" in prompt
+    # The solo's own text is still the body: the diff, the request bar's severity line.
+    assert "## The diff" in prompt and "Advisory findings count in full" in prompt
+
+
+def test_the_system_prompt_is_the_solos():
+    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_SYSTEM
+
+    assert asyncio.run(_task().create_system_prompt()) == SOLO_SYSTEM
+
+
+# --- the tools -------------------------------------------------------------------------------
+
+
+class _CapturingMCP:
+    def __init__(self):
+        self.tools = {}
+
+    def tool(self, **kwargs):
+        def decorate(fn):
+            self.tools[fn.__name__] = (fn, kwargs)
+            return fn
+        return decorate
+
+
+def test_it_registers_its_own_submission_beside_the_base_grant_and_not_the_bases():
+    task = _task(context_tools=["declaration_search", "naming_norm"])
+    mcp = _CapturingMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    assert {"lean_verify_edit", "declaration_search", "naming_norm", "record_ledger",
+            "submit_findings"} <= set(mcp.tools)
+    assert "ledger" in mcp.tools["record_ledger"][1]["description"]
+
+
+def test_the_submission_schema_has_no_properties_less_object():
+    from tests.datasets.test_pr_review_v5_tool_schemas import _freeform_objects, _schemas
+
+    schemas = _schemas(_task())
+    for name in ("record_ledger", "submit_findings"):
+        assert _freeform_objects(schemas[name]) == [], name
+    assert {"ledger", "files"} <= set(schemas["submit_findings"]["properties"])
+    assert {"entries", "files"} <= set(schemas["record_ledger"]["properties"])
+
+
+# --- the ledger: entries, recording, the check ------------------------------------------------
+
+
+def test_an_entry_has_a_cell_per_concern_in_the_vocabularys_order_and_each_is_required():
+    """The schema is what keeps the decision per concern: the first contract's multi-concern
+    row let gpt-5.2 write one reason for all six (2026-10-02)."""
+
+    fields = [name for name in DeclarationVerdicts.model_fields if name != "declaration"]
+    assert tuple(fields) == CONCERNS
+    assert all(DeclarationVerdicts.model_fields[name].is_required() for name in fields)
+    file_fields = [name for name in FileVerdicts.model_fields if name != "file"]
+    assert tuple(file_fields) == FILE_CONCERNS
+    assert all(FileVerdicts.model_fields[name].is_required() for name in file_fields)
+    with pytest.raises(Exception):
+        DeclarationVerdicts(declaration="Submodule.foo_bar",
+                            proof={"reason": "r", "verdict": "no_issue"})
+
+
+def test_a_complete_consistent_ledger_flattens_to_one_cell_per_declaration_and_concern():
+    task = _task()
+    recorded, problems = _record(task, _full_ledger({("Submodule.foo_bar", "proof"): "would_change"}))
+    assert problems == [] and recorded == ["Submodule.foo_bar", "Submodule.baz", FILE]
+    cells, refusal = task._check_ledger([StructuredFinding(**_finding())])
+    assert refusal is None
+    assert len(cells) == CELLS
+    assert cells[0] == {"declaration": "Submodule.foo_bar", "kind": "declaration", "concern": "proof",
+                        "verdict": "would_change", "reason": "checked proof"}
+    assert cells[-1] == {"declaration": FILE, "kind": "file", "concern": "organization",
+                         "verdict": "no_issue", "reason": "checked the file's organization"}
+
+
+def test_recording_is_all_or_nothing_and_a_later_entry_replaces_an_earlier_one():
+    task = _task()
+    bad = [_entry("Submodule.foo_bar"), _entry("Nope")]
+    bad[0]["name"]["reason"] = "  "
+    recorded, problems = _record(task, bad)
+    assert recorded == [] and task._recorded() == {}
+    assert any("not one of this PR's listed declarations" in p for p in problems)
+    assert any("(Submodule.foo_bar, name) has an empty reason" in p for p in problems)
+    _record(task, [_entry("foo_bar")])  # a unique dotted suffix resolves
+    _record(task, [_entry("Submodule.foo_bar", {"proof": "cannot_determine"})])
+    assert task._recorded()["Submodule.foo_bar"]["proof"]["verdict"] == "cannot_determine"
+    _, problems = _record(task, [_entry("Submodule.baz"), _entry("Submodule.baz")])
+    assert any("two entries in one call" in p for p in problems)
+
+
+def test_the_record_tool_reports_what_is_still_to_record(tmp_path):
+    task = _task()
+    task.attempt_path = tmp_path
+    reply = task._record_reply([DeclarationVerdicts(**_entry("Submodule.foo_bar"))])
+    assert reply["success"] and reply["recorded"] == ["Submodule.foo_bar"]
+    assert reply["progress"] == "1 of 3 declarations and files recorded"
+    assert reply["remaining"] == ["Submodule.baz", FILE]
+    saved = json.loads((tmp_path / "ledger_progress.json").read_text())
+    assert saved["Submodule.foo_bar"]["docstring"] == {"verdict": "no_issue", "reason": "checked docstring"}
+    refused = task._record_reply([DeclarationVerdicts(**_entry("Nope"))])
+    assert refused["success"] is False and refused["error"].startswith("Nothing recorded")
+
+
+def test_an_inconsistent_ledger_is_refused_by_name():
+    task = _task()
+    _record(task, _full_ledger())
+    # A finding at a cell whose verdict is no_issue.
+    _, refusal = task._check_ledger([StructuredFinding(**_finding())])
+    assert "not `would_change`" in refusal
+    # A would_change with no finding.
+    _record(task, [_entry("Submodule.baz", {"name": "would_change"})])
+    _, refusal = task._check_ledger([])
+    assert "(Submodule.baz, name) is a `would_change` with no finding" in refusal
+
+
+def test_missing_declarations_are_asked_for_a_bounded_number_of_times_then_recorded_unstated():
+    task = _task()
+    _record(task, _full_ledger()[:1])  # baz and the file never recorded
+    for attempt in range(1, LEDGER_PRESSES + 1):
+        cells, refusal = task._check_ledger([])
+        assert cells is None and f"(attempt {attempt} of {LEDGER_PRESSES})" in refusal
+        assert f"Not recorded: Submodule.baz, {FILE}" in refusal and "record_ledger" in refusal
+    cells, refusal = task._check_ledger([])
+    assert refusal is None
+    unstated = [cell for cell in cells if cell["verdict"] == UNSTATED_VERDICT]
+    assert [(c["declaration"], c["concern"]) for c in unstated] == (
+        [("Submodule.baz", c) for c in CONCERNS] + [(FILE, c) for c in FILE_CONCERNS])
+
+
+def test_a_change_to_a_file_as_a_whole_sits_on_its_files_cell_under_a_file_concern():
+    """33305 leaves no declaration in place, and D1 rep 1 lost the one ask all three hygiene reps
+    hit there (a line wrap) because a file had no cell (2026-10-02)."""
+
+    task = _task()
+    module_doc = _finding(declaration=FILE, concern="module_doc", claim="The module doc names the wrong file.")
+    _record(task, _full_ledger({(FILE, "module_doc"): "would_change"}))
+    cells, refusal = task._check_ledger([StructuredFinding(**module_doc)])
+    assert refusal is None and len(cells) == CELLS
+    # Through `target/`, as a reviewer may spell it.
+    cells, refusal = task._check_ledger([StructuredFinding(**{**module_doc, "declaration": f"target/{FILE}"})])
+    assert refusal is None
+    # A declaration concern does not apply to a file, nor a file concern to a declaration.
+    _, refusal = task._check_ledger([StructuredFinding(**{**module_doc, "concern": "docstring"})])
+    assert "not one of its concerns" in refusal
+    _, refusal = task._check_ledger([StructuredFinding(**_finding(concern="style"))])
+    assert "not one of its concerns" in refusal
+    # And the file's cell must be the `would_change`.
+    _record(task, _full_ledger())
+    _, refusal = task._check_ledger([StructuredFinding(**module_doc)])
+    assert "not `would_change`" in refusal
+
+
+def test_a_pr_that_leaves_no_declaration_still_has_its_files_cells():
+    task = _task(declarations=[])
+    cells, refusal = task._check_ledger([])
+    assert cells is None and f"Not recorded: {FILE}" in refusal
+    _record(task, [_file_entry(FILE, {"style": "would_change"})])
+    style = _finding(declaration=FILE, concern="style", claim="Line 12 is 104 characters long.")
+    cells, refusal = task._check_ledger([StructuredFinding(**style)])
+    assert refusal is None and [c["concern"] for c in cells] == list(FILE_CONCERNS)
+
+
+def test_entries_recorded_as_the_review_goes_and_entries_in_the_submission_combine(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch)
+    captured = _captured_result(task)
+    _record(task, _full_ledger()[:1])
+    out = _submit(task, _full_ledger()[1:])
+    assert out["evaluation_result"].success
+    assert len(captured["result"].ledger) == CELLS
+
+
+# --- verification and recording -------------------------------------------------------------
+
+
+def _fake_checks(task, monkeypatch, *, compile_outcome=VERIFIED, lookup_count=1, base_hits=0):
+    async def compile_edit(finding):
+        return compile_outcome, {"check": "compile", "answer": f"fake compile: {compile_outcome}"}
+
+    async def lookup(this, identifier, limit=5, *, trace=True):
+        assert trace is False, "a submission-time lookup must not write the reviewer's trace"
+        return {"success": True, "count": lookup_count, "declared_before_this_pr": base_hits,
+                "declared_in_this_pr": lookup_count - base_hits, "results": f"hits for {identifier}"}
+
+    async def census(this, declaration, *, trace=True):
+        assert trace is False
+        return {"success": True, "verdict": "emerging", "results": "census text"}
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+
+    monkeypatch.setattr(task, "_compile_edit", compile_edit)
+    monkeypatch.setattr(context_tools, "lookup_declaration", lookup)
+    monkeypatch.setattr(context_tools, "naming_census", census)
+
+
+def _captured_result(task):
+    captured = {}
+
+    async def terminate(result):
+        captured["result"] = result
+
+    task.termination_callback = terminate
+    return captured
+
+
+def test_a_verified_edit_files_with_its_severity_and_the_ledger_records_the_outcome(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch, compile_outcome=VERIFIED)
+    captured = _captured_result(task)
+    finding = _finding(edit={"declaration_name": "Submodule.foo_bar",
+                             "new_declaration": "theorem foo_bar : True := by simp [bar]"})
+    out = _submit(task, _full_ledger({("Submodule.foo_bar", "proof"): "would_change"}), [finding])
+    assert out["evaluation_result"].success, out
+    result = captured["result"]
+    assert isinstance(result, StructuredReviewResult)
+    [filed] = result.findings
+    assert filed["severity"] == "blocking" and filed["verified"] is True
+    assert filed["concern_label"] == "proof" and filed["declaration"] == "Submodule.foo_bar"
+    assert filed["verification"] == VERIFIED
+    assert json.loads(filed["evidence"])[0]["check"] == "compile"
+    # The solo's v2 stamping, so the review channel reads this design as the baseline.
+    assert filed["concern_family"] == "other" and filed["issue_kind"] == "style_norm_violation"
+    cell = next(c for c in result.ledger if c["declaration"] == "Submodule.foo_bar" and c["concern"] == "proof")
+    assert cell["outcome"] == VERIFIED and result.refuted == []
+    assert result.episode_id == "ep:33337" and result.invocation_id == "ep:33337#solo_agent"
+
+
+def test_an_unverifiable_change_files_as_advisory_and_unverified(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch)
+    captured = _captured_result(task)
+    finding = _finding(concern="docstring", claim="foo_bar has no docstring.", severity="blocking")
+    out = _submit(task, _full_ledger({("Submodule.foo_bar", "docstring"): "would_change"}), [finding])
+    assert out["evaluation_result"].success
+    [filed] = captured["result"].findings
+    assert filed["severity"] == "advisory" and filed["verified"] is False
+    assert filed["verification"] == UNVERIFIED and filed["evidence"] is None
+
+
+def test_a_refuted_change_is_handed_back_then_recorded_refuted_and_not_filed(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch, compile_outcome=REFUTED)
+    captured = _captured_result(task)
+    ledger = _full_ledger({("Submodule.foo_bar", "proof"): "would_change"})
+    finding = _finding(edit={"declaration_name": "Submodule.foo_bar", "new_declaration": "theorem foo_bar : True := by exact nope"})
+    for attempt in range(1, LEDGER_PRESSES + 1):
+        out = _submit(task, ledger, [finding])
+        assert not out["evaluation_result"].success
+        assert "contradicted by the tools" in out["evaluation_result"].message
+        assert f"(attempt {attempt} of {LEDGER_PRESSES})" in out["evaluation_result"].message
+    out = _submit(task, ledger, [finding])
+    assert out["evaluation_result"].success
+    result = captured["result"]
+    assert result.findings == [], "a refuted change is not filed"
+    [refuted] = result.refuted
+    assert refuted["declaration"] == "Submodule.foo_bar" and refuted["evidence"][0]["check"] == "compile"
+    cell = next(c for c in result.ledger if c["concern"] == "proof" and c["declaration"] == "Submodule.foo_bar")
+    assert cell["verdict"] == "would_change" and cell["outcome"] == REFUTED
+
+
+def test_a_duplicate_that_does_not_exist_is_refuted_and_one_that_does_is_verified(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch, lookup_count=0)
+    outcome, evidence = asyncio.run(task._verify_finding(StructuredFinding(**_finding(
+        concern="library", duplicate_of="Mathlib.Nothing.here"))))
+    assert outcome == REFUTED and "no declaration of" in evidence[0]["answer"]
+    _fake_checks(task, monkeypatch, lookup_count=2)
+    outcome, evidence = asyncio.run(task._verify_finding(StructuredFinding(**_finding(
+        concern="library", duplicate_of="Finset.sum_comm"))))
+    assert outcome == VERIFIED and evidence[0]["check"] == "duplicate_of"
+
+
+def test_a_rename_onto_an_existing_name_is_refuted_and_otherwise_unverified_with_the_census(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch, lookup_count=1, base_hits=1)
+    outcome, evidence = asyncio.run(task._verify_finding(StructuredFinding(**_finding(
+        concern="name", rename_to="Submodule.taken"))))
+    assert outcome == REFUTED and "already declared" in evidence[0]["answer"]
+    _fake_checks(task, monkeypatch, lookup_count=0)
+    outcome, evidence = asyncio.run(task._verify_finding(StructuredFinding(**_finding(
+        concern="name", rename_to="Submodule.free"))))
+    assert outcome == UNVERIFIED
+    assert evidence[0]["naming_norm_verdict"] == "emerging", "the census is evidence, never a refutation"
+
+
+def test_a_refutation_wins_over_a_verification_on_one_finding(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch, compile_outcome=VERIFIED, lookup_count=0)
+    outcome, evidence = asyncio.run(task._verify_finding(StructuredFinding(**_finding(
+        concern="library", duplicate_of="Nope.x",
+        edit={"declaration_name": "Submodule.foo_bar", "new_declaration": "theorem foo_bar : True := trivial"}))))
+    assert outcome == REFUTED and [e["check"] for e in evidence] == ["compile", "duplicate_of"]
+
+
+def test_an_edit_that_cannot_be_applied_is_refuted_and_a_compile_that_never_ran_is_unverified(monkeypatch):
+    """The real `_compile_edit`, with the compile faked at the Lean tool."""
+
+    task = _task()
+    finding = StructuredFinding(**_finding(edit={"declaration_name": "Submodule.foo_bar",
+                                                 "new_declaration": "theorem foo_bar : True := trivial"}))
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: (None, "reviewed file not found: Mathlib/A.lean"))
+    outcome, evidence = asyncio.run(task._compile_edit(finding))
+    assert outcome == REFUTED and "could not be applied" in evidence["answer"]
+
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial", ""))
+
+    class Tool:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, options=None):
+            assert options == {"weak.linter.mathlibStandardSet": "true"}, "linters on"
+            return {"outcome": "timeout", "message": "lean timed out"}
+
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Tool)
+    outcome, evidence = asyncio.run(task._compile_edit(finding))
+    assert outcome == UNVERIFIED and "did not finish" in evidence["answer"]
+
+    class Red(Tool):
+        async def execute(self, code, max_messages=20, options=None):
+            return {"outcome": "compile_errors", "errors": [{"data": "unknown identifier 'nope'"}]}
+
+    async def attribute(path, result):
+        return {**result, "errors_introduced_by_your_edit": result["errors"]}
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Red)
+    monkeypatch.setattr(task, "_attribute_errors", attribute)
+    outcome, evidence = asyncio.run(task._compile_edit(finding))
+    assert outcome == REFUTED and "unknown identifier" in evidence["answer"]
+
+
+def test_the_budget_refuses_rather_than_truncates(monkeypatch):
+    task = _task()
+    task.config.task_config.finding_budget = 1
+    _fake_checks(task, monkeypatch)
+    ledger = _full_ledger({("Submodule.foo_bar", "proof"): "would_change",
+                           ("Submodule.foo_bar", "name"): "would_change"})
+    out = _submit(task, ledger, [_finding(), _finding(concern="name", claim="foo_bar is misnamed.")])
+    assert not out["evaluation_result"].success and "exceed this review's budget" in out["evaluation_result"].message
+
+
+# --- downstream: the runner's projection reads the design's concern as a label ------------------
+
+
+def test_the_runner_projects_the_concern_as_the_candidates_label_not_its_family():
+    from src.mathlib_review.review.runner import _solo_candidate
+
+    unit = SimpleNamespace(entity_ids_by_change={}, primary_subjects_by_change={"change:1": "Submodule.foo_bar"})
+    finding = {"primary_change_id": "change:1", "change_ids": ["change:1"], "claim": "c",
+               "suggested_fix": "f", "severity": "advisory", "concern_family": "other",
+               "issue_kind": "style_norm_violation", "concern_label": "proof"}
+    candidate = _solo_candidate(finding, unit)
+    assert candidate["concern_family"] == "other" and candidate["concern_label"] == "proof"
+    # And a solo finding, which carries no label, projects exactly as before.
+    del finding["concern_label"]
+    assert _solo_candidate(finding, unit)["concern_label"] == "other"
+
+
+# --- a submitted edit the reviewer already compiled is not compiled again ------------------------
+
+
+def test_lean_verify_edit_remembers_an_edit_compile_and_the_key_ignores_surrounding_whitespace(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+
+    async def attribute(path, result):
+        return {**result, "errors_introduced_by_your_edit": []}
+
+    monkeypatch.setattr(task, "_attribute_errors", attribute)
+
+    class Tool:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, options=None):
+            return {"outcome": "compiled", "success": True, "errors": []}
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Tool)
+    mcp = _CapturingMCP()
+    task._register_lean_verify_edit(mcp)
+    tool, _ = mcp.tools["lean_verify_edit"]
+    asyncio.run(tool(path="Mathlib/A.lean", declaration_name="Submodule.foo_bar",
+                     new_declaration="theorem foo_bar : True := trivial\n\n"))
+    key = edit_key("target/Mathlib/A.lean", None, None, None, "Submodule.foo_bar",
+                   "  theorem foo_bar : True := trivial")
+    assert task._edit_compiles()[key]["outcome"] == "compiled"
+    # An as-is compile (no edit) answers a different question and is not remembered.
+    asyncio.run(tool(path="Mathlib/A.lean"))
+    assert len(task._edit_compiles()) == 1
+
+
+def _no_compile(monkeypatch):
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    class Forbidden:
+        def __init__(self, **_kwargs):
+            raise AssertionError("the edit was compiled again")
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Forbidden)
+
+
+def _edit_finding():
+    return StructuredFinding(**_finding(edit={"declaration_name": "Submodule.foo_bar",
+                                              "new_declaration": "theorem foo_bar : True := trivial"}))
+
+
+def test_a_submitted_edit_compiled_in_the_session_reuses_that_result_either_way(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+    _no_compile(monkeypatch)
+    key = edit_key("Mathlib/A.lean", None, None, None, "Submodule.foo_bar", "theorem foo_bar : True := trivial")
+    task._edit_compiles()[key] = {"outcome": "compiled", "errors": [], "errors_introduced_by_your_edit": []}
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == VERIFIED and "reused" in evidence
+    task._edit_compiles()[key] = {"outcome": "compile_errors",
+                                  "errors_introduced_by_your_edit": [{"data": "unknown identifier 'x'"}]}
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == REFUTED and "unknown identifier" in evidence["answer"] and "reused" in evidence
+
+
+def test_a_compile_that_did_not_finish_in_the_session_is_compiled_again(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+    key = edit_key("Mathlib/A.lean", None, None, None, "Submodule.foo_bar", "theorem foo_bar : True := trivial")
+    task._edit_compiles()[key] = {"outcome": "timeout", "errors": []}
+    compiled = []
+
+    class Tool:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, options=None):
+            compiled.append(code)
+            return {"outcome": "compiled", "errors": []}
+
+    async def attribute(path, result):
+        return {**result, "errors_introduced_by_your_edit": []}
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Tool)
+    monkeypatch.setattr(task, "_attribute_errors", attribute)
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == VERIFIED and compiled and "reused" not in evidence

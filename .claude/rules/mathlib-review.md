@@ -17,6 +17,15 @@ paths:
 - **Adding an arm is exactly two edits:** `ARM_DEFINITIONS` in `src/mathlib_review/agenda/registry.py` and a `FOCUSED_PROMPTS`
   entry in `src/ape/tasks/lean_tasks/formal_math/review/focused_prompts.py`. Spec, tool grant, bench
   roster and concern vocabulary derive from those. Do not add a third place.
+- **Adding a per-PR review design is three edits** (2026-10-02, `docs/plans/2026-10-02-review-designs.md`):
+  a task module under `src/ape/tasks/lean_tasks/formal_math/review/` subclassing `SoloReviewTask`
+  (its result keeps the solo's `findings`/`episode_id`; it may override `design_payload`,
+  `describe_design_payload` and `reads_stage`), one line in `DESIGNS` in that package's
+  `__init__.py`, and one `configs/designs/<design>_<set>_<route>.yaml` extending the frozen
+  baseline and stating `dataset.design` alone. Never a branch in the runner, and never an edit to
+  `solo.py`'s prompts or the two baseline configs: `test_pr_review_v5_designs.py` pins them by
+  digest and refuses a design config that differs from its baseline in anything else. A design that
+  reads a finished run (`reads_stage`) takes it as `--of <run>` on `plan`/`run`, through `StageInput`.
 - **Concern vocabulary:** arms say `documentation`, gold says `docs`; both spellings are hashed into
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.

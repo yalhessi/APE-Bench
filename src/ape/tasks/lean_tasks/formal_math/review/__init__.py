@@ -45,6 +45,24 @@ from .solo import (
     SOLO_RENDERER_VERSION, SOLO_TASK_TYPE, SoloReviewConfig, SoloReviewData,
     SoloReviewResult, SoloReviewTask,
 )
+from .structured import STRUCTURED_TASK_TYPE, StructuredReviewTask
+from .structured_critic import CRITIC_TASK_TYPE, StructuredCriticTask
+
+#: The per-PR review designs, by the name a config gives `dataset.design`.
+#:
+#: A design is a task that reads the whole PR and ends in the solo submission contract --
+#: findings with a path, a line, a claim, a fix and a severity -- so everything after the
+#: submission (anchoring, finalization, the judge, the probe harness) is design-agnostic
+#: (`docs/plans/2026-10-02-review-designs.md` §2). The runner's `routing_mode: solo` path
+#: builds one task per episode from this table: the task type, the task-id prefix and the
+#: design's own payload (`design_payload`) come from the class, so adding a design is one
+#: module, one line here and one config, not a branch in the runner. `solo` is the frozen
+#: baseline and is never edited again; every other design is read against it.
+DESIGNS = {
+    "solo": SoloReviewTask,
+    "structured": StructuredReviewTask,
+    "structured_critic": StructuredCriticTask,
+}
 
 __all__ = [
     "BasePRReviewConfig", "BasePRReviewData", "BasePRReviewResult", "BasePRReviewTask",
@@ -61,4 +79,6 @@ __all__ = [
     "LEAD_TASK_TYPE", "ReviewLeadConfig", "ReviewLeadData", "ReviewLeadTask",
     "SOLO_RENDERER_VERSION", "SOLO_TASK_TYPE", "SoloReviewConfig", "SoloReviewData",
     "SoloReviewResult", "SoloReviewTask",
+    "DESIGNS", "STRUCTURED_TASK_TYPE", "StructuredReviewTask",
+    "CRITIC_TASK_TYPE", "StructuredCriticTask",
 ]

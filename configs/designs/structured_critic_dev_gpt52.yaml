@@ -1,0 +1,7 @@
+# Design D2, `structured_critic`, on gpt_5.2 (docs/plans/2026-10-02-review-designs.md §4), on the
+# same baseline as configs/designs/structured_dev_gpt52.yaml. A chained stage: name the D1 run it
+# reads at the invocation, `--of <structured gpt52 run>`. States the design and nothing else.
+extends: ../pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+dataset:
+  design: structured_critic

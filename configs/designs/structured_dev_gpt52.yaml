@@ -1,0 +1,12 @@
+# Design D1, `structured`, on gpt_5.2 (docs/plans/2026-10-02-review-designs.md §3): the contract v2
+# baseline on gpt_5.2 at high effort with reasoning carried (`probe_dev_gpt52_Grc_contract2_rep1`,
+# judged as `g52v2` in the spine), with the unit of decision changed as on the Claude route
+# (configs/designs/structured_dev_claude_sub.yaml). Added 2026-10-02 so the designs can be tested on
+# the relay before the subscription windows free up. States the design and nothing else
+# (tests/datasets/test_pr_review_v5_designs.py).
+#
+# Read against its own baseline's run, not against the Claude hygiene baseline: the model differs.
+extends: ../pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+dataset:
+  design: structured

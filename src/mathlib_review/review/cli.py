@@ -95,6 +95,19 @@ def _add_set(parser: argparse.ArgumentParser) -> None:
         help="override a config key, e.g. --set dataset.pr_numbers='[33117]'. Repeatable.")
 
 
+def _add_stage_input(parser: argparse.ArgumentParser) -> None:
+    """The first stage's run, for a chained per-PR design (`DESIGNS[...].reads_stage`).
+
+    The judge's `--of` and this are the same idea: which finished run a stage reads is part of
+    the invocation, never of the config. The runner refuses a chained design without it and a
+    stage run whose ledgers do not cover the PR set.
+    """
+
+    parser.add_argument(
+        "--of", dest="of_run", default=None,
+        help="for a chained design: the run whose per-PR ledgers this stage reads")
+
+
 def _add_execute(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--execute", action="store_true",
@@ -110,11 +123,13 @@ def build_parser() -> argparse.ArgumentParser:
     plan = sub.add_parser("plan", help="render and price a run; call no model")
     plan.add_argument("--config", type=Path, required=True)
     _add_run_name(plan)
+    _add_stage_input(plan)
     _add_set(plan)
 
     run = sub.add_parser("run", help="a generation run")
     run.add_argument("--config", type=Path, required=True)
     _add_run_name(run)
+    _add_stage_input(run)
     _add_set(run)
     again = run.add_mutually_exclusive_group()
     again.add_argument("--redo", action="store_true",
@@ -339,7 +354,8 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _plan(config: Path, overrides, logger, *, resume: bool = False) -> int:
+def _plan(config: Path, overrides, logger, *, resume: bool = False,
+          of_run: Optional[str] = None) -> int:
     """Render, price and check the budget. Writes nothing and calls nothing.
 
     `resume` is `run --resume` without `--execute`: the dry run then says what the resume
@@ -351,6 +367,7 @@ def _plan(config: Path, overrides, logger, *, resume: bool = False) -> int:
 
     dataset, scaffold, task_overrides = load_run(config, overrides)
     dataset.dry_run = True
+    dataset.stage_input_run = of_run
     asyncio.run(run(dataset, scaffold, task_overrides, logger, resume=resume))
     return 0
 
@@ -361,9 +378,11 @@ def _run(args, overrides, logger) -> int:
     if not args.execute:
         _say_nothing_ran("run", {"config": str(args.config),
                                  "run name": getattr(args, "run_name", None) or "(from config)"})
-        return _plan(args.config, overrides, logger, resume=args.resume)
+        return _plan(args.config, overrides, logger, resume=args.resume,
+                     of_run=getattr(args, "of_run", None))
 
     dataset, scaffold, task_overrides = load_run(args.config, overrides)
+    dataset.stage_input_run = getattr(args, "of_run", None)
     if dataset.dry_run:
         # Same rule as the judge. Generation works today only because its base happens not to
         # set `dry_run`; relying on that is how the judge's `--execute` came to mean nothing.
@@ -680,7 +699,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     logger = create_logger()
 
     if args.command == "plan":
-        return _plan(args.config, overrides, logger)
+        return _plan(args.config, overrides, logger, of_run=args.of_run)
     if args.command == "run":
         return _run(args, overrides, logger)
     if args.command == "judge":

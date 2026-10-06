@@ -1,0 +1,14 @@
+{
+  "anchored": 1,
+  "by_failure": {
+    "unresolved_line": 2
+  },
+  "by_method": {
+    "review_line_entity": 1,
+    "unresolved": 2
+  },
+  "findings_in": 3,
+  "unanchored": 2,
+  "unanchored_rate": 0.6667,
+  "work_units_reached": 1
+}
