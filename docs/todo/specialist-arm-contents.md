@@ -105,9 +105,11 @@ reason, so this is an amendment to an existing decision, not a new finding. (Cor
    failure inside the tool, not a corpus fact. Separate "subject not resolved" (a tool limitation,
    reportable with the weakness stated) from "resolved, corpus has no opinion". Pure re-parse over
    snapshots on disk, no spend.
-2. **Recompute the three naming verdicts** on the 238 recorded counted populations under a lower
+2. ~~**Recompute the three naming verdicts** on the 238 recorded counted populations under a lower
    `MIN_SUPPORT_RATIO` with a conflict-ratio guard, and check against the naming golds before paying
-   for any rerun. Half of this is free.
+   for any rerun. Half of this is free.~~ **Refuted 2026-09-15 on `arm-naming-bar`, do not redo**
+   (`docs/dead-ends.md`, "Lowering `naming_norm`'s `MIN_SUPPORT_RATIO`"): no verdict moves from 0.80
+   down to 0.20, and the bar is what suppresses bound-variable subjects.
 3. **Make the verification sentence conditional on the registry's `checkable` flag** and report
    per-arm publication split by checkable/non-checkable, so the admission gate's effect is never
    read as arm quality. Note the causal direction: the verify instruction is what *opens* publication

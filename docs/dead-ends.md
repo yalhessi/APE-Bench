@@ -256,6 +256,31 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
       surface change where the maintainer asked for a substantive one.
     - Prompting is now tried; what remains is a stronger model or supplying the knowledge
       (deterministic candidate asks the model vets).
+- **The family division of the specialist arms** (2026-09-24, branch `arm-division`; parked
+  2026-10-06 on tag `parked/arm-division`).
+  - *Tried:* seven opt-in "family" arms in place of the ten specialists, plus a `pr_level` arm and
+    multi-concern arms (`a3881e5`, `53161eb`, `cd6fa9f`, `ebb1378`), on the four fanout PRs.
+  - *Evidence:* 1 of 10 obligations against the ten arms' 3 (`pr5_FD_family_fanout4_rep1`). The
+    per-job review of all 124 jobs (`docs/research/family-division-fanout4-review-2026-09.md`) put
+    most of the wrong output on shared machinery, not the division: `declaration_search`'s leaf
+    match, the artifact join and the half-edit false green, all three since fixed.
+  - *Why it stopped:* `docs/research/review-work-structure-2026-09.md` §7.6 replaced the division as
+    a design before it was read off dev, and the four-PR run sat where the dev-fitted prompt text
+    was. *Provisional:* one rep, four PRs, on the defective tools.
+  - **Reopens if:** a per-family roster is wanted again; the informative test is the validation set,
+    not the fanout four. The `pr_level` arm (`53161eb`) is the piece to lift first: by the replication
+    (`pipeline-overfit-2026-09-replication.md` §4) PR-level asks are 16% of AI-generated PRs' asks
+    against 5% of the rest.
+- **Lowering `naming_norm`'s `MIN_SUPPORT_RATIO`** (2026-09-15, branch `arm-naming-bar`; recorded
+  here 2026-10-06).
+  - *Evidence:* swept over the 397 recorded calls that reached a counted population, no verdict
+    changes from 0.80 down to 0.20 (25 `established` / 19 `emerging` at every bar), and 9 calls move
+    at 0.15. The bar is also what keeps bound-variable subjects (`a` -> `mul_` 497/3,899) from becoming
+    rename proposals. The throttle was subject resolution (1,014 of 1,044 zero answers were the tool,
+    not the corpus), since fixed on `develop` (`b9acfe31`, `973b978c`).
+  - Measured on code before `adcc7ba`'s `naming_norm` rewrite. `docs/research/naming-misses-2026-09.md`
+    on tag `parked/arm-naming-bar` has the three naming misses and why each needs a different fix.
+  - **Reopens if:** a re-run of the sweep on the current `norm_verdict` moves a gold naming verdict.
 
 ## Retracted conclusions — do not re-derive
 
@@ -303,6 +328,14 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   `Path(WorkspaceInfo)`.
 
 
+- **Naming from the elaborated statement — the code** (2026-09-24, parked 2026-10-06 on tag
+  `parked/naming-from-statement`). The measurements are on `develop` and the todo stays open
+  (`docs/todo/naming-from-statement.md`): a namer, not a detector. The statement index,
+  `naming_parts` and the `naming_statement` tool were built against the pre-`norm_verdict`
+  `naming_norm`, so picking them up means porting them.
+- **The convening review demo** (`review_demo.py`, ~1,300 lines of JS and CSS; 2026-09-17, parked
+  2026-10-06 on tag `parked/convening-demo`). Built for the 2026-09 AI4Math convening; its rendered
+  page is committed in the deck repository. Its two fixes landed (`51707d1e`, `24735ba0`).
 - Recruited Mathlib annotators and the inter-annotator ceiling — not until the agent is worth their time.
 - Phase-D scale-up to 150–200 PRs — affordable about three times ever; needs a stopping point first.
 - Norm store (L0), generalised checkers (L1), calibration, the thesis experiment, a clean v5
