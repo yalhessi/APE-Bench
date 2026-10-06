@@ -448,6 +448,11 @@ fast-closing PRs.
 - **Finish the generalist evidence chain** so the gate stops admitting everything as
   `diagnostic`. Until then published recall is a measurement of the gate.
 - **Replication.** Multi-seed, more models, error bars on everything in §4.
+- **The codebase, after the 2026-10-06 review** (`docs/research/codebase-redesign-2026-10.md`).
+  Three seams (producers as one registry and vocabulary, design-owned run data, the stage as the
+  probe unit), one identity rule and three guards, each with a threshold on the next planned
+  work. A five-registry rewrite was drafted, adversarially reviewed and rejected; the write-up
+  keeps what was rejected and why.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not
   until the agent is mature enough to be worth their time.
 

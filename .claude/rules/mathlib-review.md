@@ -26,6 +26,18 @@ paths:
   `solo.py`'s prompts or the two baseline configs: `test_pr_review_v5_designs.py` pins them by
   digest and refuses a design config that differs from its baseline in anything else. A design that
   reads a finished run (`reads_stage`) takes it as `--of <run>` on `plan`/`run`, through `StageInput`.
+- **What moves a hash, and what does not** (2026-10-06, `docs/research/codebase-redesign-2026-10.md` §4.3).
+  Renaming a class or moving a module moves nothing: no `__name__` or `__module__` enters an identity.
+  Identity is: a task `type` string (`FocusedAgentSpec.identity()`, and resume's `get_task_class`),
+  prompt text (`prompt_sha256` → spec → agenda → plan), the *field set* of any `sealed_model` record
+  or task data class (`src/ape/tasks/base.py:109` hashes `model_dump` with defaults, so one added
+  field moves every task's `global_index` even where it is unset, and every resume misses),
+  `DESIGNS` keys (they prefix `task_id`), `*_VERSION` constants, and the serializer. Three objects
+  carry a knob and they differ: a `dataset` field reaches the plan through `evaluation_settings`,
+  written only when set and not resumable; a `task_config` key reaches `scaffold_config_sha256`,
+  which *is* resumable, so a knob changed there is silently resumed onto the old results; a
+  task-data field reaches `global_index`. A knob the model sees or the submission enforces goes on
+  task data, typed and optional, omitted when unset -- never on `task_config`.
 - **Concern vocabulary:** arms say `documentation`, gold says `docs`; both spellings are hashed into
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.
