@@ -183,6 +183,11 @@ overstated by the 60-PR sample in the direction of the families it happened to o
      - Of reader A's 34 unowned redundancy (F5) asks, 28 mention deprecation, renaming or removal.
        That is a keyword match, not a re-read.
      - So §1's fourth unowned block, redundancy's 30 asks, is mostly this knob.
+   - **Read closely on 2026-09-25** (`removed-declarations-2026-09.md`):
+     - 38% of the 912 are not removals (an inventory lifecycle defect), and 37% keep their name
+       elsewhere. 140 retire a name.
+     - Of the 65 round-1 asks about retiring a name, 16 sit on a removed declaration. So opening
+       the lifecycle rule to `removed` would not reach most of them.
 5. **The required-row cap holds, and it binds on one PR in six:** 160 of 970 (60 PRs: 20%).
    - In those PRs, 724 of 1,484 units with an eligible specialist get a required one (49%).
    - In the 37 with more than 10 eligible units, the share is 29%.
