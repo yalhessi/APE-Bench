@@ -640,8 +640,28 @@ def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str
         }
         for label in loaded}
 
+    # The spine: each obligation's status in every repetition of every condition. Three probe
+    # scripts each rebuilt this table from `semantic_report.json` by hand (`consistency.py`,
+    # `ensemble-union/reading.py`, `read_critic.py`), which is how a reading drifts from the
+    # report it reads. `located` is a finding at the gold change without the gold issue -- not a
+    # quality signal (CLAUDE.md), printed because it says where a reviewer looked.
+    def status(row):
+        if row.get("issue_status") == "hit":
+            return "hit"
+        return "located" if row.get("location_hit") else "miss"
+
+    per_obligation: Dict[str, Dict[str, List[str]]] = {ob: {} for ob in reference}
+    for label, ps in loaded.items():
+        for p in ps:
+            by_id = {row["obligation_id"]: status(row) for row in p.get("per_obligation") or []}
+            for ob in reference:
+                per_obligation[ob].setdefault(label, []).append(by_id[ob])
+
     out: Dict[str, Any] = {
         "denominator": n,
+        "per_obligation": per_obligation,
+        "never_hit": sorted(ob for ob, cells in per_obligation.items()
+                            if not any("hit" in reps for reps in cells.values())),
         # A single flipped verdict moves the headline by this much; printed so a rate is never
         # read at a precision it cannot bear.
         "one_flip_pp": round(100.0 / n, 1) if n else None,

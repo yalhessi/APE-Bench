@@ -133,6 +133,31 @@ def test_union_and_exclusive_sets_are_the_output_not_just_the_rates(tmp_path, mo
     assert issue["combined_union_recall"] == 1.0
 
 
+def test_every_obligation_has_a_status_per_repetition_and_the_never_hit_are_listed(
+        tmp_path, monkeypatch):
+    """The spine three probe scripts rebuilt by hand from `semantic_report.json`: per
+    obligation, per condition, one status per repetition -- `hit`, `located` (a finding at the
+    gold change without the gold issue) or `miss` -- and the obligations nothing reached."""
+
+    obs = ["ob:1", "ob:2", "ob:3"]
+    _audit(tmp_path, "a1", identity="j", obligations=obs,
+           hits={"location": ["ob:1", "ob:2"], "issue": ["ob:1"], "resolution": []})
+    _audit(tmp_path, "a2", identity="j", obligations=obs,
+           hits={"location": ["ob:2"], "issue": [], "resolution": []})
+    _audit(tmp_path, "b", identity="j", obligations=obs,
+           hits={"location": [], "issue": [], "resolution": []})
+    _point_audits_at(monkeypatch, tmp_path)
+
+    out = report_module.conditions({"A": ["a1", "a2"], "B": "b"})
+
+    assert out["per_obligation"] == {
+        "ob:1": {"A": ["hit", "miss"], "B": ["miss"]},
+        "ob:2": {"A": ["located", "located"], "B": ["miss"]},
+        "ob:3": {"A": ["miss", "miss"], "B": ["miss"]},
+    }
+    assert out["never_hit"] == ["ob:2", "ob:3"]
+
+
 # --- examination depth: the claim that one call does not look deeply -------------------------
 
 PROBE_RUN = "pr5_solo_ape_33438_probe"
