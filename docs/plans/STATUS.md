@@ -257,3 +257,15 @@ names as the new reference baseline.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.
+
+## Added 2026-10-06 (on `codebase-redesign`)
+
+* `2026-10-03-after-structure.md` §2 (conventions as detectors) is **partial**: the first detector,
+  `dot_notation` (census P057 and P108), is built as the first member of the producer seam
+  (`src/mathlib_review/producers/`) and measured alone under a pre-registered rule
+  (`results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`): one exact in-sample
+  ask, no emission on any control PR, silent on 21 of 21 out-of-sample PRs, so the validity bar is
+  unmeasured out of sample. Not built: the other four detectors of §2, and any reviewer run with the
+  section. Open: `docs/todo/convention-detectors.md`.
+* `docs/research/codebase-redesign-2026-10.md` is a design write-up, not a plan in this directory;
+  its own §11 records what is built.
