@@ -65,6 +65,7 @@ class Producer(Protocol):
 #: asked for.
 PRODUCERS: Dict[str, str] = {
     "dot_notation": "src.mathlib_review.producers.dot_notation:DOT_NOTATION",
+    "primed_names": "src.mathlib_review.producers.primed_names:PRIMED_NAMES",
 }
 
 
