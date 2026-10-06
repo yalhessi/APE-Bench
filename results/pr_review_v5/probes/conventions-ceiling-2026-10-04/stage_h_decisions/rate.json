@@ -1,0 +1,896 @@
+[
+ {
+  "cid": "c72953e",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ce7af7f",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c8c918c",
+  "raise": true,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c2e55fe",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c97d393",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ccbe5c1",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7f9dc4",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cd0a35f",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb7c84d",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cce257a",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c5c5191",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc0b477",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4d83e1",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c46e601",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc4aa99",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c33eb4f",
+  "raise": true,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c839bcf",
+  "raise": true,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb35f8c",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ccdad97",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4de185",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c65dfdc",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb7091d",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c79ce2b",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cecb026",
+  "raise": true,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cce7d52",
+  "raise": true,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c42b714",
+  "raise": true,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c5b27b2",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c337c9d",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cec77c0",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "caedeea",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca41dfe",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c02bde3",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c44fb2d",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c18ed33",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c17afd8",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cade8f1",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c876128",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c47bfa7",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cfc72ad",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c23ba0f",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7e2acc",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cbf9d8e",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ccfdb92",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c3af5d4",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb808b3",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9cb7d2",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc37928",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc15f27",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cee72f4",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c742ab1",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ceaeffb",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c863742",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c6271df",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9f1c3f",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c428fec",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca29e9a",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c2fd7d3",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c0e9f6d",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf18974",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ced8392",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4d9f45",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cd97805",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c251853",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb91eb9",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c629280",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c5ab6ba",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c6d177a",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cffcd29",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c14ca72",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c1721fb",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c544636",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c5e6ab8",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4e2775",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc836a0",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c084c60",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c848b15",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf10b73",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7142b5",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca6708c",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca5f039",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf4ed8d",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cd4b87a",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cbec1b5",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c2a2afc",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7cf9f3",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf7c9f9",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c99b9b7",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c3cf0e7",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c36e4f6",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c306e3e",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9ad5b7",
+  "raise": true,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c905386",
+  "raise": true,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cfda496",
+  "raise": true,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf86889",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c572443",
+  "raise": true,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca72784",
+  "raise": true,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cdeae9c",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c77f9c8",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c0757b2",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9c95bb",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c408911",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c0fc3a3",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ccde78d",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc4ac1e",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c92b22f",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cefa9e1",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9216dd",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc59f86",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4d6de6",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cdb41f1",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7a80fb",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf57706",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cda88ae",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c279c41",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c954791",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cd6985c",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ce477e2",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c02a0ed",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c453521",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4039f7",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c340799",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cac351d",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c23bc2f",
+  "raise": true,
+  "p": 0.0481,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf4ee0d",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c700817",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ce3c52e",
+  "raise": false,
+  "p": 0.0451,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c83d2ac",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c3ff654",
+  "raise": false,
+  "p": 0.0424,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cff4d13",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cc9fde0",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c3d7be2",
+  "raise": false,
+  "p": 0.0278,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ceb3977",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c63c5aa",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c72458f",
+  "raise": false,
+  "p": 0.0233,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf7ae96",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf9bfc2",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ca3e65f",
+  "raise": false,
+  "p": 0.0169,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c598362",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cf6e80a",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "ce656ac",
+  "raise": false,
+  "p": 0.0143,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c759176",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c209cc8",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c988408",
+  "raise": false,
+  "p": 0.014,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c7a4a42",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c080b6d",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c36956d",
+  "raise": false,
+  "p": 0.0052,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c9172e2",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "cb23b23",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ },
+ {
+  "cid": "c4d9c93",
+  "raise": false,
+  "p": 0.0026,
+  "basis": "rule index"
+ }
+]

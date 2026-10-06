@@ -1,0 +1,72 @@
+{
+ "P005": {
+  "flagged_in_sample": 20,
+  "asked_in_sample": 0,
+  "census_asks": 60,
+  "flagged_per_pr": 1.25,
+  "index": 0.0481
+ },
+ "P010": {
+  "flagged_in_sample": 18,
+  "asked_in_sample": 1,
+  "census_asks": 19,
+  "flagged_per_pr": 1.12,
+  "index": 0.0169
+ },
+ "P011": {
+  "flagged_in_sample": 17,
+  "asked_in_sample": 4,
+  "census_asks": 48,
+  "flagged_per_pr": 1.06,
+  "index": 0.0451
+ },
+ "P018": {
+  "flagged_in_sample": 15,
+  "asked_in_sample": 0,
+  "census_asks": 40,
+  "flagged_per_pr": 0.94,
+  "index": 0.0424
+ },
+ "P040": {
+  "flagged_in_sample": 15,
+  "asked_in_sample": 0,
+  "census_asks": 22,
+  "flagged_per_pr": 0.94,
+  "index": 0.0233
+ },
+ "P048": {
+  "flagged_in_sample": 6,
+  "asked_in_sample": 0,
+  "census_asks": 11,
+  "flagged_per_pr": 0.38,
+  "index": 0.0278
+ },
+ "P100": {
+  "flagged_in_sample": 26,
+  "asked_in_sample": 0,
+  "census_asks": 23,
+  "flagged_per_pr": 1.62,
+  "index": 0.0143
+ },
+ "P254": {
+  "flagged_in_sample": 31,
+  "asked_in_sample": 0,
+  "census_asks": 5,
+  "flagged_per_pr": 1.94,
+  "index": 0.0026
+ },
+ "P084": {
+  "flagged_in_sample": 23,
+  "asked_in_sample": 1,
+  "census_asks": 20,
+  "flagged_per_pr": 1.44,
+  "index": 0.014
+ },
+ "P126": {
+  "flagged_in_sample": 34,
+  "asked_in_sample": 0,
+  "census_asks": 11,
+  "flagged_per_pr": 2.12,
+  "index": 0.0052
+ }
+}
