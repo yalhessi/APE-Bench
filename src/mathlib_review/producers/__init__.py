@@ -67,6 +67,7 @@ PRODUCERS: Dict[str, str] = {
     "dot_notation": "src.mathlib_review.producers.dot_notation:DOT_NOTATION",
     "primed_names": "src.mathlib_review.producers.primed_names:PRIMED_NAMES",
     "generated_twins": "src.mathlib_review.producers.generated_twins:GENERATED_TWINS",
+    "missing_attribute": "src.mathlib_review.producers.missing_attribute:MISSING_ATTRIBUTE",
 }
 
 
