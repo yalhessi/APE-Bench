@@ -1,0 +1,116 @@
+{
+ "facts": 19,
+ "prs": 973,
+ "prs_with_a_fact": 10,
+ "control_prs": 331,
+ "control_facts": 0,
+ "targets": 11,
+ "targets_with_a_graph": 11,
+ "targets_located": [],
+ "by_convention": {
+  "P201:asks": 11,
+  "P201:located": 0
+ },
+ "demand_target": "0/19",
+ "demand_any_ask": "4/19",
+ "by_shape": {
+  "P201": 19
+ },
+ "validity_sample": [
+  {
+   "pr": 25886,
+   "at": "Mathlib/Algebra/Regular/Pi.lean:34",
+   "fact": "`isSMulRegular_iff` carries no `@[to_additive]`; 3 of the 3 other declarations in this file do."
+  },
+  {
+   "pr": 34882,
+   "at": "Mathlib/Order/SuccPred/Basic.lean:426",
+   "fact": "`succ_min` carries no `@[to_dual]`; 4 of the 5 other declarations in this file do."
+  },
+  {
+   "pr": 25886,
+   "at": "Mathlib/Algebra/Regular/ULift.lean:49",
+   "fact": "`isSMulRegular_iff` carries no `@[to_additive]`; 6 of the 6 other declarations in this file do."
+  },
+  {
+   "pr": 26591,
+   "at": "Mathlib/Algebra/Order/Group/Cyclic.lean:81",
+   "fact": "`genLTOne_mem` carries no `@[to_additive]`; 3 of the 5 other declarations in this file do."
+  },
+  {
+   "pr": 33942,
+   "at": "Mathlib/Algebra/Group/Subgroup/Defs.lean:80",
+   "fact": "`HasMemOrNegMem` carries no `@[to_additive]`; 3 of the 3 other declarations in this file do."
+  },
+  {
+   "pr": 37431,
+   "at": "Mathlib/Algebra/Group/Submonoid/Pointwise.lean:86",
+   "fact": "`closure_pow_le` carries no `@[to_additive]`; 7 of the 7 other declarations in this file do."
+  },
+  {
+   "pr": 27318,
+   "at": "Mathlib/Algebra/Group/Hom/Instances.lean:31",
+   "fact": "`instNatSMul` carries no `@[to_additive]`; 6 of the 9 other declarations in this file do."
+  },
+  {
+   "pr": 32614,
+   "at": "Mathlib/Algebra/Order/Group/Unbundled/Basic.lean:35",
+   "fact": "`NegAntiClass` carries no `@[to_additive]`; 30 of the 31 other declarations in this file do."
+  },
+  {
+   "pr": 33942,
+   "at": "Mathlib/Algebra/Group/Submonoid/Support.lean:41",
+   "fact": "`IsPointed` carries no `@[to_additive]`; 11 of the 12 other declarations in this file do."
+  },
+  {
+   "pr": 26846,
+   "at": "Mathlib/Algebra/Order/Group/Cyclic.lean:103",
+   "fact": "`genLTOne_unique` carries no `@[to_additive]`; 3 of the 4 other declarations in this file do."
+  },
+  {
+   "pr": 28702,
+   "at": "Mathlib/Algebra/Group/Defs.lean:313",
+   "fact": "`AddZero` carries no `@[to_additive]`; 3 of the 4 other declarations in this file do."
+  },
+  {
+   "pr": 34882,
+   "at": "Mathlib/Order/SuccPred/Basic.lean:425",
+   "fact": "`succ_max` carries no `@[to_dual]`; 4 of the 5 other declarations in this file do."
+  },
+  {
+   "pr": 26591,
+   "at": "Mathlib/Algebra/Order/Group/Cyclic.lean:107",
+   "fact": "`genLTOne_unique` carries no `@[to_additive]`; 3 of the 5 other declarations in this file do."
+  },
+  {
+   "pr": 34786,
+   "at": "Mathlib/GroupTheory/IsSubnormal.lean:83",
+   "fact": "`IsSubnormal` carries no `@[to_additive]`; 10 of the 11 other declarations in this file do."
+  },
+  {
+   "pr": 33942,
+   "at": "Mathlib/Algebra/Group/Submonoid/Support.lean:49",
+   "fact": "`IsSpanning` carries no `@[to_additive]`; 11 of the 12 other declarations in this file do."
+  },
+  {
+   "pr": 26591,
+   "at": "Mathlib/Algebra/Order/Group/Cyclic.lean:85",
+   "fact": "`genLTOne_unique` carries no `@[to_additive]`; 3 of the 5 other declarations in this file do."
+  },
+  {
+   "pr": 27318,
+   "at": "Mathlib/Algebra/Group/Hom/Instances.lean:55",
+   "fact": "`instIntSMul` carries no `@[to_additive]`; 6 of the 9 other declarations in this file do."
+  },
+  {
+   "pr": 25886,
+   "at": "Mathlib/Algebra/Regular/Prod.lean:46",
+   "fact": "`isSMulRegular_iff` carries no `@[to_additive]`; 6 of the 6 other declarations in this file do."
+  },
+  {
+   "pr": 26846,
+   "at": "Mathlib/Algebra/Order/Group/Cyclic.lean:81",
+   "fact": "`genLTOne_unique` carries no `@[to_additive]`; 3 of the 4 other declarations in this file do."
+  }
+ ]
+}

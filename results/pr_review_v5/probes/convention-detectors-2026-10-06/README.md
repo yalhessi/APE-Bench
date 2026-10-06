@@ -360,3 +360,27 @@ validation small12 and post-cutoff otherwise unread for this shape) and the cens
 half the facts valid as written, by reading (all if 20 or fewer, else a seeded sample of 20, seed
 `missing-attribute-2026-10-06`) -- valid meaning the attribute would apply to the declaration as
 stated; census recall in the stage-2 bands.
+
+## Results, stage 6 (2026-10-06), read by its rule
+
+| set | facts | PRs with a fact | control-PR facts | asks located |
+|---|---|---|---|---|
+| dev | 0 | 0 | 0 | -- |
+| validation small12 | 0 | 0 | 0 | -- |
+| post-cutoff | 3 | 1 (43167) | 0 | p0010-p0012 |
+| census | 19 | 10 | 0 on 331 | 0 of 11 P201 targets |
+
+On 43167 the three facts are the three places of one ask exactly -- p0011, "Missing `@[to_additive]`
+here, on line 357, and on the private lemma" (`commutator_sup_left` at 337, `commutator_sup_right`
+at 357, the private `commutator_sup_left'` at 326) -- but that ask motivated the detector, so it is
+in sample. **Census validity: 8 of 19**, under the half bar: **too noisy, by the rule.** The eleven
+invalid have two mechanisms, both visible in the code:
+- *the declaration is itself the additive form* (8): `AddZero`, `NegAntiClass`, `HasMemOrNegMem`,
+  `instNatSMul`, `instIntSMul`, and `AddSubmonoid.IsSpanning`, `AddSubmonoid.IsPointed`,
+  `AddSubgroup.IsSubnormal` -- the additive-word skip read `_`-separated leaf words only, not
+  camelCase parts or the namespace;
+- *a parsing defect* (3): `@[to_dual] lemma succ_max` and `@[to_additive] lemma closure_pow_le` carry the
+  attribute on the keyword's own line, and the attribute block was read only when the keyword
+  started a line.
+The 8 valid are `isSMulRegular_iff` (three files) and the `genLTOne_*` lemmas (two PRs). Census
+recall 0 of 11: the census's P201 asks sit elsewhere than these facts.

@@ -1,0 +1,111 @@
+{
+  "producer": "missing_attribute",
+  "version": "missing_attribute/1",
+  "set": "postcutoff_2026_07_08_v1",
+  "prs": 10,
+  "asks": 16,
+  "facts": 3,
+  "facts_per_pr": {
+    "41271": 0,
+    "41280": 0,
+    "41314": 0,
+    "41930": 0,
+    "42184": 0,
+    "42238": 0,
+    "42814": 0,
+    "43024": 0,
+    "43167": 3,
+    "43192": 0
+  },
+  "control_prs": [
+    41271,
+    41280,
+    41314,
+    42238
+  ],
+  "control_facts": {
+    "41271": 0,
+    "41280": 0,
+    "41314": 0,
+    "42238": 0
+  },
+  "asks_located": [
+    "p0010",
+    "p0011",
+    "p0012"
+  ],
+  "located": [
+    {
+      "pr_number": 43167,
+      "cid": "p0010",
+      "fact": "`commutator_sup_right` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": ":robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_left`. So `⁅H ⊔ K, N⁆` would be `commutator_sup_right`, and `⁅N, H ⊔ K⁆` at line 357 `commutator_sup_left`."
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0011",
+      "fact": "`commutator_sup_right` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": "Missing `@[to_additive]` here, on line 357, and on the private lemma"
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0012",
+      "fact": "`commutator_sup_right` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask": "`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime."
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0010",
+      "fact": "`commutator_sup_left'` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": ":robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_left`. So `⁅H ⊔ K, N⁆` would be `commutator_sup_right`, and `⁅N, H ⊔ K⁆` at line 357 `commutator_sup_left`."
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0011",
+      "fact": "`commutator_sup_left'` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": "Missing `@[to_additive]` here, on line 357, and on the private lemma"
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0012",
+      "fact": "`commutator_sup_left'` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask": "`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime."
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0010",
+      "fact": "`commutator_sup_left` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": ":robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_left`. So `⁅H ⊔ K, N⁆` would be `commutator_sup_right`, and `⁅N, H ⊔ K⁆` at line 357 `commutator_sup_left`."
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0011",
+      "fact": "`commutator_sup_left` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask": "Missing `@[to_additive]` here, on line 357, and on the private lemma"
+    },
+    {
+      "pr_number": 43167,
+      "cid": "p0012",
+      "fact": "`commutator_sup_left` carries no `@[to_additive]`; 8 of the 10 other declarations in this file do.",
+      "at": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "ask_at": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+      "ask": "`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime."
+    }
+  ]
+}
