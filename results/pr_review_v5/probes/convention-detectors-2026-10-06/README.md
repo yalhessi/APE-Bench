@@ -384,3 +384,14 @@ invalid have two mechanisms, both visible in the code:
   started a line.
 The 8 valid are `isSMulRegular_iff` (three files) and the `genLTOne_*` lemmas (two PRs). Census
 recall 0 of 11: the census's P201 asks sit elsewhere than these facts.
+
+## Stage 6b: the two fixes, on a holdout (pre-registered 2026-10-06, before either is written)
+
+**`missing_attribute/2`**: the attribute block is read up to the first declaration keyword wherever
+it sits (comments and strings masked), and the additive skip reads every word of the full name --
+`.`- and `_`-separated, then camelCase parts (`AddSubmonoid`, `NegAntiClass`) -- not the leaf's
+`_` words alone. Nothing else changes. Since both were read off the census facts, the measurement
+is a **holdout**: every `/2` fact on the 60-PR validation release
+(`inputs/pr_review_v4/releases/val-2025-06-2026-03-v1`, change graphs only, no asks read), by hand,
+seeded sample of 20 if more (seed `missing-attribute-2-holdout`). **Bar:** at least half valid as
+written. The census count under `/2` is reported, in sample.
