@@ -89,3 +89,51 @@ workspace (`cli tool lean_verify_edit`, line mode, the line with `N.lemma x` rep
 `x.lemma`), and as invalid when it does not. A placement fact (P108) is a rename, which a compile
 cannot judge, so it is read: the predicate's namespace exists and the dotted name is not already
 declared (`cli tool declaration_search`). The pooled half-valid bar is unchanged.
+
+## Results (2026-10-06), read by the rule above
+
+| set | PRs | facts | PRs with a fact | control PRs, facts each | asks located | exact |
+|---|---|---|---|---|---|---|
+| dev (in-sample) | 15 | 7 | 2 | 0, 0, 0 | 4 of 47 | 1 (`d0038`) |
+| validation small12 | 11 | **0** | 0 | 0, 0, 0 | 0 of 30 | 0 |
+| post-cutoff | 10 | **0** | 0 | 0, 0, 0, 0 | 0 of 16 | 0 |
+
+**Out of sample the detector is silent.** Not for a structural reason: the two sets' change
+graphs carry the same fields (103 and 43 declaration targets with added lines, 49 predicate
+conclusions, 9 `_of_` names, 75 capitalised `N.lemma x` applications), and every near miss was read
+and is excluded correctly -- a head that differs (`Kernel.compProd_apply_prod hs` with
+`hs : MeasurableSet s`; presheaf functors and objects), an `_of_` name the PR did not introduce
+(`tendsto_of_…_le'`), a stem that does not match (`Ioi_disjoint_Iio_of_le`). These 21 PRs hold
+no situation of either shape.
+
+**By the rule.** Control emission is 0 on every set (bar: at most 1.0 per control PR) -- met. The
+validity bar, at least half the facts valid as written pooled over the two out-of-sample sets, is
+**unmeasured**: there are no facts to judge. So the section is neither shown packet-ready nor shown
+too noisy out of sample; what is shown is that it costs nothing on clean code and on 21 of 21
+out-of-sample PRs says nothing.
+
+**Validity, in sample only** (`dev_medium_0_3_0/validity.jsonl`). 5 of 7 facts are valid as written.
+Four of the six method-call edits compile in the reviewed workspace, checked against a negative
+control (`H.map_sSupp` fails with "the environment does not contain `Order.IsNormal.map_sSupp`").
+The placement fact is the maintainer's own suggestion. The two invalid ones are one mechanism: the
+binder is `H : Ordinal.IsNormal f`, and `H.lemma` resolves in `Ordinal.IsNormal` first, where a
+lemma of the same name exists -- a deprecated wrapper with another signature at line 253, the
+declaration being defined at line 271. Comparing only the last component of the namespace (the
+shape as fixed) cannot see that; a declaration lookup of `<binder namespace>.<lemma>` could.
+
+**The in-sample located asks, by hand.** `d0038` is the fact exactly. `d0014`-`d0016` (33098) share
+the change target of the `Set.eq_empty_or_nonempty A` fact and ask other things (`by_cases!`, an
+`IsCover` lemma, a `calc` indent); `d0015`'s suggestion itself keeps `Set.eq_empty_or_nonempty A`,
+so at that place a maintainer wrote the long form -- the fact is valid and not wanted there.
+
+**What it says.** Dot notation, stated deterministically, is a quiet section: one exact ask in
+sample, no emission anywhere, and the asked move (`Order.IsNormal.map_* H` -> `H.map_*`) stated at
+five sibling places where the maintainer commented once. It is not shown to be a lever. Recall
+needs a set with enough dot-notation asks, which these three are not (about 0.8 expected out of
+sample); the census PRs are (33 asks under P057 and P034). Two refinements are named by the
+in-sample misses, neither tested: a declaration lookup that checks the binder's own namespace
+before stating `x.lemma`, and the elaborated local context for proof-local names (`d0039`).
+
+**Redesign step 3's footprint threshold** -- met: the detector landed in three `src/` files (the
+module, its registry line, a private helper made public), one new test file, no hub edit
+(`6128044d`).

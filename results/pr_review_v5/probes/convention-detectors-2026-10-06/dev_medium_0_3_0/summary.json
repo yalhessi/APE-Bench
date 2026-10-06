@@ -1,0 +1,75 @@
+{
+  "producer": "dot_notation",
+  "version": "dot_notation/1",
+  "set": "dev_medium_0_3_0",
+  "prs": 15,
+  "asks": 47,
+  "facts": 7,
+  "facts_per_pr": {
+    "33066": 0,
+    "33098": 1,
+    "33117": 0,
+    "33145": 0,
+    "33149": 0,
+    "33285": 0,
+    "33294": 6,
+    "33304": 0,
+    "33305": 0,
+    "33315": 0,
+    "33321": 0,
+    "33337": 0,
+    "33362": 0,
+    "33421": 0,
+    "33438": 0
+  },
+  "control_prs": [
+    33304,
+    33315,
+    33438
+  ],
+  "control_facts": {
+    "33304": 0,
+    "33315": 0,
+    "33438": 0
+  },
+  "asks_located": [
+    "d0014",
+    "d0015",
+    "d0016",
+    "d0038"
+  ],
+  "located": [
+    {
+      "pr_number": 33098,
+      "cid": "d0014",
+      "fact": "`Set.eq_empty_or_nonempty A` applies a `Set` lemma to `A : Set …`; it can be written `A.eq_empty_or_nonempty`.",
+      "at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:404",
+      "ask_at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:400",
+      "ask": "We now have `by_cases!` to automatically push your negations in the alternate branch. And we have this nice `IsCover.coveringNumber_le_encard` lemma, we might as well use it. :smiley:\n```suggestion\n  by_cases! h_top : packingNumber ε A ≠ ⊤\n  · rw [← encard_maximalSeparatedSet h_top]\n    exact isCover_maximalSeparatedSet h_top |>.coveringNumber_le_encard maximalSeparatedSet_subset\n  · simp [h_top]\n```"
+    },
+    {
+      "pr_number": 33098,
+      "cid": "d0015",
+      "fact": "`Set.eq_empty_or_nonempty A` applies a `Set` lemma to `A : Set …`; it can be written `A.eq_empty_or_nonempty`.",
+      "at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:404",
+      "ask_at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:405",
+      "ask": "```suggestion\n  rcases Set.eq_empty_or_nonempty A with (rfl | h_nonempty)\n  · simp\n```"
+    },
+    {
+      "pr_number": 33098,
+      "cid": "d0016",
+      "fact": "`Set.eq_empty_or_nonempty A` applies a `Set` lemma to `A : Set …`; it can be written `A.eq_empty_or_nonempty`.",
+      "at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:404",
+      "ask_at": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:411",
+      "ask": "otherwise style guidelines would require to indent all lines below the first `calc` line.\n```suggestion\n    coveringNumber ε A ≤ coveringNumber (ε / 2) B := calc\n  coveringNumber ε A\n```"
+    },
+    {
+      "pr_number": 33294,
+      "cid": "d0038",
+      "fact": "`isFundamentalSequence_of_isNormal` concludes `IsFundamentalSequence …` and is named beside that namespace; inside it, it is `IsFundamentalSequence.of_isNormal`.",
+      "at": "Mathlib/SetTheory/Cardinal/Cofinality.lean:535",
+      "ask_at": "Mathlib/SetTheory/Cardinal/Cofinality.lean:535",
+      "ask": "```suggestion\r\ntheorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)\r\n```"
+    }
+  ]
+}
