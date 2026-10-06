@@ -27,7 +27,11 @@ receiver it cannot type (a proof-local `h`, a projection `hϕ.2`) or another cal
 1. *Does a section move a reviewer?* One run with `primed_names` and `dot_notation/3` sections in the
    packet (`cli producer context ... --base <the set's model_context.jsonl>`), read against the
    same reviewer without them, on asks the sections can reach. The stage-G lesson applies: a reviewer
-   handed the right convention at the right place may verify it and still not file.
+   handed the right convention at the right place may verify it and still not file. **Not on the
+   current probe sets** (checked 2026-10-06): `primed_names` and `dot_notation/3` fire on 1 of 11
+   validation small12 PRs and 0 of 10 post-cutoff PRs, so a window there would read one fact. The
+   run needs a set drawn where the sections fire -- census-like PRs outside every evaluation set, with
+   reviewed workspaces built -- which is the design step before any spend.
 2. *Typing the receivers the text shape cannot*: proof-local names and projections, by elaboration
    (the try-it battery, after-structure §3).
 3. *The P201 asks the twin shape cannot see*: most are a missing attribute on a lemma with no
