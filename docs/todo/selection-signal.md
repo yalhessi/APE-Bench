@@ -77,6 +77,16 @@ emission under a keep-2-of-3 rule; then whether a cheaper source of agreement (r
 passes only, or reordered targets as Bugbot does) keeps the effect. Full table and method:
 `docs/research/code-review-systems-survey-2026-09.md` §1.
 
+*Measured on runs not used to find it, 2026-10-02* (`results/pr_review_v5/probes/ensemble-union-2026-10-02/README.md`):
+over the four Opus solo passes on the dev set, unioned and judged once, the pass-agreement label
+`passes_agreeing` (site-and-kind key, k = 1..4) gives hit rates 0.50, 0.67, 0.29, 0.44 over 90
+judge-paired findings and a within-PR AUC of **0.482**. Not monotone, and chance. The reason is
+visible in the data: whole-PR passes anchor at nearly every gold change, so 64 of the 90 paired
+findings have k=4 and the label is constant where the question is asked. The lead-rep table above
+stands as measured on per-site arms; the signal does not transfer to agreement between solo passes
+of one model family. Still untested: agreement across model families, and on a finer identity
+than site and kind (the exact ask recurred 6 times in 381, too few to read).
+
 ## Corrections to the plan document and commit `5691ade`
 
 - The stated spread "0.22–0.90" is wrong: the artifact range is **0.12–0.92** (median 0.38).

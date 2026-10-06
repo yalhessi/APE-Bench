@@ -1,0 +1,2468 @@
+{
+  "collapsed_identical_asks": 6,
+  "control_findings": {
+    "33304": 6,
+    "33315": 8
+  },
+  "control_findings_per_run": {
+    "probe_dev_opus55_contract2_claude_sub_rep1": {
+      "33304": 1,
+      "33315": 1
+    },
+    "probe_dev_opus55_contract2_claude_sub_rep2": {
+      "33304": 0,
+      "33315": 2
+    },
+    "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": {
+      "33304": 1,
+      "33315": 1
+    },
+    "probe_dev_opus5_contract2_claude_sub_rep1": {
+      "33304": 4,
+      "33315": 4
+    }
+  },
+  "control_pr_numbers": [
+    33304,
+    33315
+  ],
+  "derived_run": "union_dev_opus_4pass_v1",
+  "dropped_not_in_review_channel": 0,
+  "findings_per_run": {
+    "probe_dev_opus55_contract2_claude_sub_rep1": 99,
+    "probe_dev_opus55_contract2_claude_sub_rep2": 97,
+    "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 93,
+    "probe_dev_opus5_contract2_claude_sub_rep1": 92
+  },
+  "grouping_key": "(pr_number, change_ids, concern_family, action_key)",
+  "inputs": 381,
+  "k_identical_ask": {
+    "1": 369,
+    "2": 6
+  },
+  "k_site_and_kind": {
+    "1": 45,
+    "2": 40,
+    "3": 69,
+    "4": 221
+  },
+  "k_site_and_kind_keys": {
+    "1": 45,
+    "2": 20,
+    "3": 23,
+    "4": 49
+  },
+  "label_key": "finding_key: (pr_number, primary_change_id, issue_kind)",
+  "members": {
+    "finding:00a4f8b765e1903c7506414e": [
+      {
+        "finding_id": "finding:761539e95c2ce16970235c10",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0108089eb8a9465162200ff3": [
+      {
+        "finding_id": "finding:71546b2d30e73b3626f87643",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:020b898496fa35e9ae8b6d1b": [
+      {
+        "finding_id": "finding:bbe4fb26edec610a9a2eea43",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      },
+      {
+        "finding_id": "finding:f87b02bc6f3e26e7a343c7cf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:028acd82e2ac0bb4e0dfdec3": [
+      {
+        "finding_id": "finding:f63a9bad9f15ca31d3a83693",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0425941e24d056c9bd40d90f": [
+      {
+        "finding_id": "finding:ed3d398fee804da2830bec79",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:05bcf5f633e82687b3e259d7": [
+      {
+        "finding_id": "finding:9622264e528966d613930558",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      },
+      {
+        "finding_id": "finding:f318c4c2785e830740cff2ab",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:05ca3c6657f8cfad82bcb442": [
+      {
+        "finding_id": "finding:7e81a51b8ad760622e5875d0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:06130f35d7dde5b707f9ed43": [
+      {
+        "finding_id": "finding:631b446f3bfa438f9ebc159d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:07675631ea52a5de0f8f967d": [
+      {
+        "finding_id": "finding:9031b5a3511b170c27df0d24",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:076994574838c26876ba0218": [
+      {
+        "finding_id": "finding:c1301c96dd8ad2d76eda7b78",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:07b4e372f508f2adde02526d": [
+      {
+        "finding_id": "finding:8eb12ff6123c1a9b1d3dd2ad",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:082ba70736dfc4f6806943fd": [
+      {
+        "finding_id": "finding:6c127063e6b6443c04898305",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:08635906e9bff8bcc912dfcb": [
+      {
+        "finding_id": "finding:7602e4d588a1731144422120",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0881a833b495a7541c2b6426": [
+      {
+        "finding_id": "finding:4f729b014b628c676a5d1446",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:093a33a1a13920c1cea1791e": [
+      {
+        "finding_id": "finding:9b562230dd9c56ea1e1a556d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:0b5541d885de5e9b0da2c35d": [
+      {
+        "finding_id": "finding:627dbe1c6b654720640af70f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0c7994b2f357a81a858803dc": [
+      {
+        "finding_id": "finding:3775c8963ceef2c90682410e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0c7aff826067432c1893a255": [
+      {
+        "finding_id": "finding:ccf5f63db6716582087d5c8d",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:0c84616a27ae08d63097a3d4": [
+      {
+        "finding_id": "finding:8bb9199cb5e0b89c3a752d35",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0da4623440cbc331399e6b87": [
+      {
+        "finding_id": "finding:15d65e43514f3e78dfb59192",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0df8f7786e334df47ce32df9": [
+      {
+        "finding_id": "finding:14be7f138165f4acbc7e1896",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:0e1fd06840e00e1c3b07758d": [
+      {
+        "finding_id": "finding:6952634bcc0dc98714dd0c96",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:0eeba62e3e7a3e92d224918b": [
+      {
+        "finding_id": "finding:333de05fa237d0f1bc78683e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:0f3bb3d963612a0f790621f6": [
+      {
+        "finding_id": "finding:f0d90aca598211ba4cd13203",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:103cfa242f0346e334656903": [
+      {
+        "finding_id": "finding:4aa1618a5ce7db233e4e0a07",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:106daf1f964d50bd0135b76a": [
+      {
+        "finding_id": "finding:416e10a6a87ebde9e99fbbeb",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:1207425fcf19aff53d99a913": [
+      {
+        "finding_id": "finding:aa5d57b906109da7b770e420",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:1256f9895d123ea55f57dbfe": [
+      {
+        "finding_id": "finding:6041d0aaf2e55a346a239c40",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:126acd4722a038caeda32caa": [
+      {
+        "finding_id": "finding:09c64fcc7f694f927e2b79c1",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:12e1c23421241d4d4d4e3eb3": [
+      {
+        "finding_id": "finding:ecc9852f51cd1cefd80dbc8b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:12fa299eb022851a0ca0651f": [
+      {
+        "finding_id": "finding:912b51a56fcd25d8c66bbeda",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:14a054a0cf305856cb9d2ad0": [
+      {
+        "finding_id": "finding:e2f4cdf81c91349163630b29",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:152b2c781e52bf4ae1bbe1df": [
+      {
+        "finding_id": "finding:47b39d5b4999d72f180b9d3b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:1548498efb1577b2ccfbcaf3": [
+      {
+        "finding_id": "finding:a75508d6d318e60dbc92c30b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:15cad3a29e55a6c6498c5162": [
+      {
+        "finding_id": "finding:4a327f06b93ae2adfec25917",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:160ce4c5bea63c06875ba70f": [
+      {
+        "finding_id": "finding:ac70a585e98f19320b15c689",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:1912b318f467fe39fee1434c": [
+      {
+        "finding_id": "finding:405bc50e213ce4e95178e864",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:195464ab742e4560e48adbd9": [
+      {
+        "finding_id": "finding:5359428a1c29fbac9c165ec9",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:1a567874fde071401c233658": [
+      {
+        "finding_id": "finding:d9e5c3203da99f460c461318",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:1b84188358bddfa800a0b9af": [
+      {
+        "finding_id": "finding:e2ec5a6d72b3bf209d050f24",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:1bb4a6b85c73ee3f2c2afaec": [
+      {
+        "finding_id": "finding:7f8337f9574d4549c3c345cd",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:1c7aa8c70c90f256f59c289f": [
+      {
+        "finding_id": "finding:80712f16f8a65d4b2bd27a3e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:1cbbf5e885bf23a12efe12b1": [
+      {
+        "finding_id": "finding:ab1c4876e4ee77497558a0a0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:1cf0160388bf6f77f62402fb": [
+      {
+        "finding_id": "finding:7eb1e5cc90146bde4c460f9e",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:1dca1fe87497ca1c42ed6901": [
+      {
+        "finding_id": "finding:e6bbda003a4d3f694a5c5da7",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:1e521ef7e817db47e7b5f031": [
+      {
+        "finding_id": "finding:80efec2c286f6b30a2a30fb9",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:1e81d980d01f670796e351f8": [
+      {
+        "finding_id": "finding:665381f2875c7276e014d052",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:1f95f64c5422bd53bce200ee": [
+      {
+        "finding_id": "finding:d87398c7a6ee375f212d73d3",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:204e945236ca912ceeb20e21": [
+      {
+        "finding_id": "finding:1bc66e8495299fea28cbfa7d",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:209b38a75b2f38ffd81ddde4": [
+      {
+        "finding_id": "finding:81717e39085d242b990caaa4",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:20f901bbd3caaa6a4d86adc4": [
+      {
+        "finding_id": "finding:fab34466d74b4d6c185db4f3",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:224693a21f7227f7021f5a6b": [
+      {
+        "finding_id": "finding:5f99c5de955b08dfdbd58276",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:228c7439723ca9a66e4239b3": [
+      {
+        "finding_id": "finding:99fcc5befef49eade2bc19e8",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:228ef27e83822b4ddf25343f": [
+      {
+        "finding_id": "finding:4df4ab3e44eb3080a86ad1ff",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:22f0d0292f348a1a8cab415c": [
+      {
+        "finding_id": "finding:a3c1c1f1fbb932aa810d3767",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:23579ef33e71118f0dbc8bd9": [
+      {
+        "finding_id": "finding:2ef14418f4042d375c96f3e6",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:23a93971338aaa7ce6bc3e28": [
+      {
+        "finding_id": "finding:0e670e38e0a0e2356b764893",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:241f6af241284434cf314cbd": [
+      {
+        "finding_id": "finding:30e282fd5ec8eaeb11dd5e94",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2467322ef884581d5b3ab20e": [
+      {
+        "finding_id": "finding:1d8238b18b181dd2ff185d87",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2513b791bf8483aa3d91390f": [
+      {
+        "finding_id": "finding:becb6c990b409372cc95f7dd",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:267bd1443bbca3296be2f0f0": [
+      {
+        "finding_id": "finding:01a72f74ac0a544f24ff17c4",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:268a25e003432626325decd4": [
+      {
+        "finding_id": "finding:e8b5be8ea589bb163fa9b2e5",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:26b4fa10548e31304e7b0fdc": [
+      {
+        "finding_id": "finding:06fb64ab8a196e2d5de929db",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:277ad344aeacc1dc755c0afa": [
+      {
+        "finding_id": "finding:4e3a750babf2bd423dfe2a58",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:2791a570b5a0308facc56ee6": [
+      {
+        "finding_id": "finding:b954d92838c5493e34b37072",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2901bd947c887977f8d926c0": [
+      {
+        "finding_id": "finding:a87bbbf841c3507079382fe2",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:299ba8adbb402b3ec8b83643": [
+      {
+        "finding_id": "finding:cda1b37ced446021f97d232f",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2a04205436e1971692880b08": [
+      {
+        "finding_id": "finding:bfc8880cea640fe63b4df244",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:2a0d537c02a7aa315f30f890": [
+      {
+        "finding_id": "finding:863e5800c001e42984ba3537",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2a79fbd5bb9ae7d5e6f2fbdd": [
+      {
+        "finding_id": "finding:663db3fa17a0b1f53f64bcbf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:2ac330fe727f9e56aee62970": [
+      {
+        "finding_id": "finding:1efb2916b0a7de4a111a4f53",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2c09136a73bef1748b1774cb": [
+      {
+        "finding_id": "finding:c2aa4ca3710599d30d9a812e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:2c9e319b23eec5f3777ea4a3": [
+      {
+        "finding_id": "finding:7dbeb945b28e268d921a7480",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:2cab11bad0fea673c336d936": [
+      {
+        "finding_id": "finding:d716717f31385e035ebce28f",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:2d080748e883768defafb5e6": [
+      {
+        "finding_id": "finding:a088d906ded8336367443aca",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:2dc9193c92d353c395b26563": [
+      {
+        "finding_id": "finding:da4d19b0a52bd9a525d983f5",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:2e0c4fe183fff7b38539611c": [
+      {
+        "finding_id": "finding:9bc9444fe10f4464ccc9f81e",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3162e471ce5844aa79a0287c": [
+      {
+        "finding_id": "finding:79036da363933d9013ce4b3c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:32f2d48781ebbb3137359363": [
+      {
+        "finding_id": "finding:5957c6f19865f188cf5c824c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:3329e781f1ef2140989f2f09": [
+      {
+        "finding_id": "finding:cc2f11472f8e026f943222e2",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:3343c3e0c4ec57fbf6203f91": [
+      {
+        "finding_id": "finding:b2405ad1b0300b24485f9590",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:33ecb54ddc7be27314843466": [
+      {
+        "finding_id": "finding:069e6ff7e9988336e7e60354",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:353b9ac1d8f1851aeb5c92c7": [
+      {
+        "finding_id": "finding:11bf74e9283c8063265a7152",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:369a939cc309d07d8a8f00dc": [
+      {
+        "finding_id": "finding:1b4dfcb7583d2dbb7bd5ce76",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:381e88b76e582558e4a5396f": [
+      {
+        "finding_id": "finding:9e70667bfab6afb14211b426",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:382166cab20aeccf3f159962": [
+      {
+        "finding_id": "finding:fb7e2ecea3d0928985ee8175",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:39333a76730a81b91d9f32d1": [
+      {
+        "finding_id": "finding:a5b61cc9d454750fb8c82e3b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3a6cb9194f58745097e5d7d0": [
+      {
+        "finding_id": "finding:dc888cfa6f45429a488ec69a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3a99aed2495dbb75ed3a615d": [
+      {
+        "finding_id": "finding:3495a714e261f0ea9165766e",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:3b066b388d545d2d5dca441a": [
+      {
+        "finding_id": "finding:6d4effdcf5d474043fdc4072",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:3bf02fa717d99b9d2b4396be": [
+      {
+        "finding_id": "finding:8fe06aad21809b2b7804854f",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3c4f403aefee611765b2cdd4": [
+      {
+        "finding_id": "finding:6bddbd23e68f63d1f49d6d91",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:3c7b4f741477871306f417c9": [
+      {
+        "finding_id": "finding:d88352393bc4413017361719",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3c93d567d7038e18341484d8": [
+      {
+        "finding_id": "finding:f9df4315ab77577ac0d3c41a",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3dc334b3f7d16eec10875bf3": [
+      {
+        "finding_id": "finding:401decf5387ea3932f23447b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3e0c8642108eda18d58daeb6": [
+      {
+        "finding_id": "finding:504cf9ce80f2d0332931f500",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:3e7597c81507dea90cdf85d6": [
+      {
+        "finding_id": "finding:d42dba95ab03ba1c726cd9d3",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:3ea391ee8fe2288ed7b721b4": [
+      {
+        "finding_id": "finding:f9644f1a5a406b7df74e6d40",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:40440ef51c29093df435b155": [
+      {
+        "finding_id": "finding:748ef671d4ea38cf88187789",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:411277ef3a77473fccf1f6b9": [
+      {
+        "finding_id": "finding:6a1d7675aa6e4f2e69c4cb93",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:41b4c9ac0b930136dc3e7fcf": [
+      {
+        "finding_id": "finding:2a6a1ce95ae3983bb605b3bf",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:42296bdd41c5438cee338b17": [
+      {
+        "finding_id": "finding:4effedba73a2c86e6ab879ae",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4240a300e69f1e633496e914": [
+      {
+        "finding_id": "finding:a30a26c8eb9769ef4dce9514",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:42dec65f904f51ec2fb0955b": [
+      {
+        "finding_id": "finding:10070c5a3e81fb0f932ef6d8",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:4336599a6edad3d85f4690ca": [
+      {
+        "finding_id": "finding:518c360b9d06813e7a93364e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:4575327ae4953d351132ed74": [
+      {
+        "finding_id": "finding:c8bb96725505c5108a206b41",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:46a1b56331d8a45c8446c1ff": [
+      {
+        "finding_id": "finding:3955b9374d4c03031bb89ecf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:473205176b2424c48282780e": [
+      {
+        "finding_id": "finding:32e14dfc435c372c63148306",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:475f2345eb3b12bf5b457a22": [
+      {
+        "finding_id": "finding:7cff307d81d1c378a2914641",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:47664921a3a7e0975029d235": [
+      {
+        "finding_id": "finding:d34700536a7494f63ed39053",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:476a7ab6efd701b16d30c695": [
+      {
+        "finding_id": "finding:e9da2c620e7e522c70576543",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:47df5a66f5d949d061e58910": [
+      {
+        "finding_id": "finding:cb8c92c2dd736e10f28a023f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:485784fcebec053223026dbe": [
+      {
+        "finding_id": "finding:8ef0eef3cef896bb6bb2f135",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:48a8e9630521fc42fbbce1e3": [
+      {
+        "finding_id": "finding:ce8fd8d48cc64d063de60ecf",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:48d0031d462c98c11532bb8b": [
+      {
+        "finding_id": "finding:ff9be45d47e7d459b2cebb81",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:49c18eb68349310b5069a78d": [
+      {
+        "finding_id": "finding:ce553b3f3b5febec062f15a7",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:4a549fb7f304ea45002d30f2": [
+      {
+        "finding_id": "finding:9fc118ee09de9c36b0fc2b49",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4ad9552904afae6a7a7b460d": [
+      {
+        "finding_id": "finding:0cb8f5075cf4daae6c80d81d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:4ba30556b821f28be92ed68a": [
+      {
+        "finding_id": "finding:9532dd9da77ec2448398e421",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4c7e6573d9c711c552a1290b": [
+      {
+        "finding_id": "finding:ac86ca5bde476bc5d9d3a683",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4ca8060f1c77e62614d68f30": [
+      {
+        "finding_id": "finding:6aa2f2d525853a81aa592d67",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4cbc0d19035f834202ceaa4f": [
+      {
+        "finding_id": "finding:db96ac04e65c815a7ece5b7f",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:4d41090efc4d6569f5326e72": [
+      {
+        "finding_id": "finding:4de2db7e199a1ffc44d1b7b1",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4d7467becb192dfdfd4df5b8": [
+      {
+        "finding_id": "finding:87d4339e0adef7cca2140fcd",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:4dce409e5a31903def20b231": [
+      {
+        "finding_id": "finding:5ec9bc7d92a59d2654a276ef",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4dd04193fcbf4c50d8427836": [
+      {
+        "finding_id": "finding:c70b8c8bad830910b4585b5f",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:4e351642b4ad2ed5736b07c3": [
+      {
+        "finding_id": "finding:ddb52f622d63ede816d9246a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:4e39575206dc39ce253b1bab": [
+      {
+        "finding_id": "finding:d8bf6adba8a443612682ecb0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:4e4712d216a80645fa41268a": [
+      {
+        "finding_id": "finding:1ac4891c043799f9a7e39e29",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:4e471fc1a6e9938ff08382af": [
+      {
+        "finding_id": "finding:9e8634c125cd90a747ccca91",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:4f039abc5d0fa2ce07fdf5e2": [
+      {
+        "finding_id": "finding:ae8d8b203c066a1f5500de51",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:50ccda02ef760f187495b9b2": [
+      {
+        "finding_id": "finding:8223ff58828788a79e8c396e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:528cf920ec40446c0cf63300": [
+      {
+        "finding_id": "finding:4c5673e4e45aa2ac87ff6a2a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:52d8d9c3746c04fd28124260": [
+      {
+        "finding_id": "finding:819548bbb851e87a98d25d11",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:52ef6a880d2d80453bed4c19": [
+      {
+        "finding_id": "finding:130529b7fab3cb4a492c5d12",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:5341206c161d7b4a462af992": [
+      {
+        "finding_id": "finding:bfa0dd36a2fac4645e58a358",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:56fde0cb3391b131e8cfc2d6": [
+      {
+        "finding_id": "finding:e5e778a65d96742a8322b739",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:57d02fa8db0e07c289d7e9d9": [
+      {
+        "finding_id": "finding:35551079782a9bc3c6a2e02e",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:59154aa271c7a444580c91fb": [
+      {
+        "finding_id": "finding:c904bb8d8fc6640ae6a6755c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:5a413269178a173ad3075629": [
+      {
+        "finding_id": "finding:f3bc335289c4d40f1b163129",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:5cf7df4fd225f29f4937406a": [
+      {
+        "finding_id": "finding:f73aa4f1e9b4c8a7cecb06fa",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:5eb4381995ed586c63a6fb76": [
+      {
+        "finding_id": "finding:c41fbe21f4c9edbb98d1bc8c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:5ecde063b51e8a08fd099261": [
+      {
+        "finding_id": "finding:5e457351b49ca5b39c76e31b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:5ed50af01cfc6364c954cafd": [
+      {
+        "finding_id": "finding:8ccf053def3e57802e898941",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:61122bbfa8f1bf01067802f1": [
+      {
+        "finding_id": "finding:77c02daba069ad06b59c32a4",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:611ba0ad938e4c07946e3527": [
+      {
+        "finding_id": "finding:a4bfe09fdf1be043c2d32342",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:624c7a052a57de2b49d60f90": [
+      {
+        "finding_id": "finding:a7281d2b6e728976de2ef599",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:627bb6651bac28d4569b55c7": [
+      {
+        "finding_id": "finding:a4f731e97a24feb8ddc6a7fb",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:628e256f606228de1630c6e5": [
+      {
+        "finding_id": "finding:d933ecfdf59dfaed96641351",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:63c087fd231081347fc9c2af": [
+      {
+        "finding_id": "finding:01acc046d5c178e61236ac93",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:64d2473207d792d5fe952560": [
+      {
+        "finding_id": "finding:f1d848732cec2e7bf53ee5f7",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:652276f707d1eae5f9bdae9f": [
+      {
+        "finding_id": "finding:eb37551aaf33ebef399bb71e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:65813ed8df8dcb44dd7b3bfb": [
+      {
+        "finding_id": "finding:df4a790c6cdeedec6d372437",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:65cdadece004917f56282ee8": [
+      {
+        "finding_id": "finding:da33df49fe4830f9dee3c246",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:69c1b5cf963bca259750a8d6": [
+      {
+        "finding_id": "finding:c3b34a3689127867fe7e6e5e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:69cce167fb3c8bb9020622c2": [
+      {
+        "finding_id": "finding:b3b3dbae5b62ba79d484b36f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:6b938b58299b4f0cc37d9834": [
+      {
+        "finding_id": "finding:73d55bab74543f16c630ec41",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:6bcdf0dcdb9264e22c35c8fe": [
+      {
+        "finding_id": "finding:2b36785632c8ead2fd79fa4c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:6bdf05e83e32de4b567bc09c": [
+      {
+        "finding_id": "finding:9dc9614550f12814a7cf3ecf",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:6cd04384ce100f2d3110e52a": [
+      {
+        "finding_id": "finding:5097000d524f973accb14646",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:6dd3e58f7c691e1f7a7a62a0": [
+      {
+        "finding_id": "finding:9a1a7ea52045867d9b94ac93",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:6ec87206c16bec4e5b2e690c": [
+      {
+        "finding_id": "finding:9f489e4926036f2082256033",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:6f680a6608c69eff715c7d72": [
+      {
+        "finding_id": "finding:97385fecb014755fa76dfef9",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      },
+      {
+        "finding_id": "finding:b4be28fd9bc52b29b8fd09a8",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:70a63324250bfc2453dc4b10": [
+      {
+        "finding_id": "finding:b30e69d61c4df692765fd4a0",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:70d72c46f9a56e27bf99e76c": [
+      {
+        "finding_id": "finding:f3b90508dff1ff22ee997c3d",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:70e6f6498cc25fef2ad347b0": [
+      {
+        "finding_id": "finding:89436f8bc8da5ab1b82591bf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:713bc16d1839d78ec7566550": [
+      {
+        "finding_id": "finding:7e5f54159a04a58b004eaeb1",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:717ec33847bf5f148ade09ba": [
+      {
+        "finding_id": "finding:ca5932f97e5dc1da5689a9a4",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:71e9d314e756be66e08b8176": [
+      {
+        "finding_id": "finding:d369db7c75fb262ff10c857e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:74348c60e9ab94d3e8b6376e": [
+      {
+        "finding_id": "finding:cb6b0b5da0ee67cf0c9faeaf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:74d0ce58446c6c77e3179e50": [
+      {
+        "finding_id": "finding:e8382b6ea23b64d57bab39bc",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:7523eda947062f758dd24c1b": [
+      {
+        "finding_id": "finding:b32d129a9760bac272549491",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:75566b4849d17f013d1d2915": [
+      {
+        "finding_id": "finding:aead2bc00d708fb0a6e41fca",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:767334cd692167b86af9c578": [
+      {
+        "finding_id": "finding:3cc86f0159e7cf6a381ef6ee",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:76833b755144c7c2ca6f9a46": [
+      {
+        "finding_id": "finding:4065d2793c72109d9b4fe290",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:7725a752d5245d503a19f70f": [
+      {
+        "finding_id": "finding:a5e737275cd5c52fe747c2d7",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:77513e956299a520509b5136": [
+      {
+        "finding_id": "finding:b5391c88d47b538d63a1b59b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7768d62e4a2de4de4ff21a5b": [
+      {
+        "finding_id": "finding:297674e031c2bee90e6fe9fc",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:7781650c268217e1f681e734": [
+      {
+        "finding_id": "finding:e6631993719cb6b700820efe",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7799f0264e2946f016c452f6": [
+      {
+        "finding_id": "finding:1181392fe5be6c2099aed285",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:77a90fdb311008b067d0796f": [
+      {
+        "finding_id": "finding:b664bb665ae3f11ec84652a4",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:77e2903a74a496c55fc1fc86": [
+      {
+        "finding_id": "finding:1f1deb4b932019b24301418a",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:79da1fa2bb0471edc5cc5d00": [
+      {
+        "finding_id": "finding:c1f71e23c0be742c2f163205",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:79fcf8e517ce67145c2c294f": [
+      {
+        "finding_id": "finding:a95f1e646d62b5ada2b289dc",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7a9b408d4d9f68651308fb3b": [
+      {
+        "finding_id": "finding:6f04fc917157f4a3508afc6b",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:7b9daf4e43767529a534b67b": [
+      {
+        "finding_id": "finding:282a6d2720685db9d03aa864",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7b9ec532f29aae12a463d28e": [
+      {
+        "finding_id": "finding:f9c47d41ba4d409a8daaa87b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7bbdc10db5287d5e1f4626c9": [
+      {
+        "finding_id": "finding:765a1cc27cdfa391dcecfd0c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:7c7a53bcc4279f2b9eae8258": [
+      {
+        "finding_id": "finding:de40e1497eeb8fd8732e093b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7cd0edb7f9acb7cde54e8d05": [
+      {
+        "finding_id": "finding:ae7629719d2ba3e4fa19b10e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:7d7a8999dd05e24551d56bbd": [
+      {
+        "finding_id": "finding:a9dde6d378b4950780bf99cc",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:81b70b2bea6100221d40027e": [
+      {
+        "finding_id": "finding:3a9d05d1bcf76b5ed2ccca35",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:8200c1f34169a7ae276e6895": [
+      {
+        "finding_id": "finding:d26c7595c3b1e882397c7681",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:834231961d2c81b0895eb803": [
+      {
+        "finding_id": "finding:b24bbd8514f65da23736d43c",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:83662fcc21f09686f08253a6": [
+      {
+        "finding_id": "finding:f8ed9a14231856baa73902c6",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:83cdf7b0db58424cce9be92f": [
+      {
+        "finding_id": "finding:248859d8cec6549975f610a6",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:867b584008015f51fc827e5b": [
+      {
+        "finding_id": "finding:a86e05b698aa86ea7ef6cf2f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:87bb858db0e8203e3aa587e9": [
+      {
+        "finding_id": "finding:0198431891fed589bd0899e7",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:87d62ff8c584f375ba981030": [
+      {
+        "finding_id": "finding:b36cf275718d15138fdce2e1",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:882b9b2e3f9da4c5b0c59b79": [
+      {
+        "finding_id": "finding:4e5693f42b14dfa916a779db",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:883013bad0c4903569e0157a": [
+      {
+        "finding_id": "finding:f2ff6a53a3316367e5079c1c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:88d2ae4f07abcb857a2fe8fd": [
+      {
+        "finding_id": "finding:d47fdb466c66e62b003866cf",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:8979cf549531a3a95d6c95b5": [
+      {
+        "finding_id": "finding:2c0934d928ace17167f83b21",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:8b38448c88d0e11c81eddb8c": [
+      {
+        "finding_id": "finding:9f71a751565d6c3b1d5b7b99",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:8b40bb7487b90e73778c82e2": [
+      {
+        "finding_id": "finding:f055c566717af9342ce321a5",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:8c9b55ee6cb8e719b539569e": [
+      {
+        "finding_id": "finding:c11f2e807d90e2daf436fc59",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:8dbf01614e799aaf9bf66690": [
+      {
+        "finding_id": "finding:ddb00f42eecc3b3648310bde",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:8dd0464968f5ec71328c10f5": [
+      {
+        "finding_id": "finding:119d1431d8382f3c2d7792ea",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:90e69de39687c8984685b4a5": [
+      {
+        "finding_id": "finding:b15604509edaa08364eb7bbb",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:912015abcba33c9f76f4b245": [
+      {
+        "finding_id": "finding:e9c02adc834ab2224fb57076",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:93f86e2dabfa54e53ffd9aeb": [
+      {
+        "finding_id": "finding:12cc57691057d818911249d6",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      },
+      {
+        "finding_id": "finding:2687aaab9c31072b7af95f61",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:9407f065d6a356a21db3fb4c": [
+      {
+        "finding_id": "finding:e74ee2bcad3d34d7fd09bf5b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:9439c4720b6f9c3d820345a9": [
+      {
+        "finding_id": "finding:d9b6548f7abb0e03e7be7347",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:94ae7a71703740dc8751161e": [
+      {
+        "finding_id": "finding:bbb08b4749310a82be3e08c1",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:94e90f6cad0fd3d20a8d0d01": [
+      {
+        "finding_id": "finding:0351466a24bde62cdff7acd6",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:95647198d3b203950e93bbc1": [
+      {
+        "finding_id": "finding:7e511321dbd187d168069e24",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:95cc86e80653edb01de84ae3": [
+      {
+        "finding_id": "finding:6327f9ffe89f48b6b4dbe07b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:966b38375c666d58a75dc513": [
+      {
+        "finding_id": "finding:037ce6bf1862d0e9d38e6ab7",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:977d6b354efcd15904514972": [
+      {
+        "finding_id": "finding:b46a1f6a44946bd619583db2",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:980c2337e77e40a7bbdaed99": [
+      {
+        "finding_id": "finding:39434fe58325d373d3a79ca6",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:988d460cd217f0fc9565d92c": [
+      {
+        "finding_id": "finding:922e36099d2f804dab875d38",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:98b321f97ee99f9116dbbdc1": [
+      {
+        "finding_id": "finding:53913375e7a7973965ffc3de",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:998e8b1a01f863b82b7797e7": [
+      {
+        "finding_id": "finding:d72f16f734a6617b8f8c7c00",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:9a7755c9f46ac0ba8d422be7": [
+      {
+        "finding_id": "finding:0870d031a611f1c13bc67b99",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:9ac4b206f072874f49a02532": [
+      {
+        "finding_id": "finding:55df39efc57fef3c3c8018cd",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:9b1c9afa664c0532cca1190f": [
+      {
+        "finding_id": "finding:6f83a2f355de2bc10427fd5e",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:9c611e7f9f5e05a58128c36c": [
+      {
+        "finding_id": "finding:a5cc97ec4e96a5cb76647783",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:9ccee364786142bb96812408": [
+      {
+        "finding_id": "finding:876d3a99c88e1c4565a67ea2",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:9dd378408d8d6e782d1b7896": [
+      {
+        "finding_id": "finding:cfd3bc6eb5e3649a15b2cdcd",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:9e2291f6e405a7c7a9c2f0a6": [
+      {
+        "finding_id": "finding:321e676f9db6f3fdfa6a3b79",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:9f0b3f8008af9bcea4d5aee5": [
+      {
+        "finding_id": "finding:92aa1b4cfc8173eae2c7dd45",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:a02154c0eb95535fa5cb1ed5": [
+      {
+        "finding_id": "finding:17a502f0fc030542add9a3c4",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:a0ad4657c1083c2187a0db72": [
+      {
+        "finding_id": "finding:cd953a254a8f147bf9e5ca69",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:a178f7523a9f4fc312b3d7df": [
+      {
+        "finding_id": "finding:53e4db3b26a7d74d6461ffa0",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:a30b19536eaeaaaa1700d8c6": [
+      {
+        "finding_id": "finding:aa2b32b4b7aba721699ccbe6",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:a33f6169c1f31e1880011d42": [
+      {
+        "finding_id": "finding:8f3c8a85d0ce3036837f68b5",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:a3b425498f763bda5d801dae": [
+      {
+        "finding_id": "finding:8a8640f7de190f04155d296a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:a3e032850ba02ffbbad4fd3d": [
+      {
+        "finding_id": "finding:36e7a9155ab58bf4da62afd9",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:a62ad82c4c3097862d69b553": [
+      {
+        "finding_id": "finding:7bdf3be9ea6ba60f58969a1a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:a6dfb703c73b8e3a945d2c80": [
+      {
+        "finding_id": "finding:a58e4de61ebcde63e5f5ab7f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:a78108de6acf7a187b6c29d7": [
+      {
+        "finding_id": "finding:4c9bc0606471ac387f1c81ab",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:a8137a841701d857f011f11d": [
+      {
+        "finding_id": "finding:9438bd6f6be8799bf7971b48",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:a957f25638e8cca0f8d38161": [
+      {
+        "finding_id": "finding:cdc9d9247b5f3e7c9655026b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ac45d7ba00e304bcfdc0744b": [
+      {
+        "finding_id": "finding:ed0780d92391371d5bd7fe8d",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:ac5147210df3b7ae5eaa5c9a": [
+      {
+        "finding_id": "finding:33e63c5d88f508b5b5d9ba29",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:ac94b59dbe2b041c954384cf": [
+      {
+        "finding_id": "finding:434739ecdf2c1c5cfa5dbac1",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:acdfedf4ea6c2a176bbac8d0": [
+      {
+        "finding_id": "finding:6ef2edef76c2f7a0e41ebebf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ad2dfc1a43c25b23ea3d4238": [
+      {
+        "finding_id": "finding:d520a162e2fd14e9676b2838",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ad5e74d0054208aefe7c6f6b": [
+      {
+        "finding_id": "finding:adc295052308b6adb9fcd34f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:af54a6c8354b6e4a15761e18": [
+      {
+        "finding_id": "finding:6214c402d9c2dd262c508520",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b027bf7638308cb0d75a1e97": [
+      {
+        "finding_id": "finding:25fddd2dedeee44356becb00",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:b03fb1c304b94b49a5ea54b6": [
+      {
+        "finding_id": "finding:a74ae543f50e9ef247bfd5e1",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b06b7072e61edd9297312ae5": [
+      {
+        "finding_id": "finding:3b9848ad24ff429d9efd1911",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:b094480e1baa0ad785502ddb": [
+      {
+        "finding_id": "finding:eb72416000b308b767fc07ed",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:b238e2914c003f52e08c03fd": [
+      {
+        "finding_id": "finding:398ca9c545196ae3261f99b0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b24b9a0f0f0658b5c5cc99af": [
+      {
+        "finding_id": "finding:ec165ddc264aec3cc3304886",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b2eb2c9161ebbd4b787bd98e": [
+      {
+        "finding_id": "finding:89c71bd91f24a70369795c45",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:b415ab2c8bd0c4168752acc0": [
+      {
+        "finding_id": "finding:17411d6d5fbfe754ff76f531",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b4d9d56f52d259eb110f802d": [
+      {
+        "finding_id": "finding:a270590337a974e3bb8ee8cf",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b50e7bd609193757043ecd84": [
+      {
+        "finding_id": "finding:5427918f72f2c480675e6aa0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b5fe4a27c5534821a6cb92be": [
+      {
+        "finding_id": "finding:5a86c387751ebd82f136175f",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b64d8105787d8b50d6db5a39": [
+      {
+        "finding_id": "finding:edf4dd8137281e5bd29d99ec",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b80fade7a572303ca385c333": [
+      {
+        "finding_id": "finding:41c0afde6f34f9b98770aee1",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:b8d9f398356e63575f08a79f": [
+      {
+        "finding_id": "finding:453384c7102421ebf50af87b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:b9141973946a215d8fbd4126": [
+      {
+        "finding_id": "finding:3813d68076e5667540338ff8",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:b9ce7b486c1bd3ce868482fe": [
+      {
+        "finding_id": "finding:fc8f5d5a3837081d2229e62b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:babfcdb21b5cc3939e5db70f": [
+      {
+        "finding_id": "finding:9bcfa4f8d4de81e917a7f75a",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:bb3d5e068ef1418c04c42653": [
+      {
+        "finding_id": "finding:b30cc493e3b851e2be976efd",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:bb616a8528655931974181a3": [
+      {
+        "finding_id": "finding:629f6d75cfb61cf014360a74",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:bb805c317748a75fc8442297": [
+      {
+        "finding_id": "finding:e7f99f0da07b7a66ba012222",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:bbf0f6b4bc0401e065e6d53a": [
+      {
+        "finding_id": "finding:3f06a386bdede81c9b2cef1d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:bcc1033183a75b5b6055a0eb": [
+      {
+        "finding_id": "finding:b06a230fa30b9ee5420a6ed0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:be57f6c4b67b959be9d4c0cb": [
+      {
+        "finding_id": "finding:c075f867e17404a5721d4acf",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:be5acff68b5edaa10066da94": [
+      {
+        "finding_id": "finding:4ddf91ca1f74731acb841f0b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:be7ae0b984588463e58f33fb": [
+      {
+        "finding_id": "finding:8e2f4719465156ba3c2d27ec",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:beb33cfaba5644ba9fcdb7bf": [
+      {
+        "finding_id": "finding:3b33017e7d358afc7d79ff76",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:bee73d98288a38b353e78f38": [
+      {
+        "finding_id": "finding:002f4e6ff62d00e14faf62bb",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c025537c7186f22798b17cba": [
+      {
+        "finding_id": "finding:98aecd7ed13938ecbb83f446",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c02ac774534afa7e729a64a5": [
+      {
+        "finding_id": "finding:f36495329075159cc9650f66",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c03bc4a593f3fb8e1011a7fd": [
+      {
+        "finding_id": "finding:92763ccc6133582d0cbf6bea",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:c06c555e9ad70eaa0bf9d77f": [
+      {
+        "finding_id": "finding:c9d224fe8b1fd1a32b83fffd",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c150c85b3a3483af25e7e23e": [
+      {
+        "finding_id": "finding:971f743f6449f6a2901425ce",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c16106a78053cbe0b8dc86fc": [
+      {
+        "finding_id": "finding:08a412d012db8b3445143a7e",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c277bba5fc80f6bd46d01061": [
+      {
+        "finding_id": "finding:debf774b0791d04d43308948",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:c2aaa3c9ab99ea5b0d1a9abf": [
+      {
+        "finding_id": "finding:8710dd450d54d95de8fe4411",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:c34a18e71927926e51b51f06": [
+      {
+        "finding_id": "finding:847e521dfe06364f5a6e542d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c36eafe408a8b759f2b54b39": [
+      {
+        "finding_id": "finding:3e204a97bd1d5ce51584acb2",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c46fb9505e2af87be6f2e461": [
+      {
+        "finding_id": "finding:c5a41d915926345764a63d07",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:c49003c95c20a29fe9f688ea": [
+      {
+        "finding_id": "finding:2ae174616b7c491484836013",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c4aa92d434da38a2146e8a88": [
+      {
+        "finding_id": "finding:0341c36f9e9e2e4c64d555b9",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:c502e57835dd0138784d1538": [
+      {
+        "finding_id": "finding:7184b7242e31afde00d1519d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c53d1759b336c019b162d03b": [
+      {
+        "finding_id": "finding:dc8486e77514f6f844e8be1d",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c64cdf51f4d5e06667484543": [
+      {
+        "finding_id": "finding:83088dd22e886989e3a0f45b",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:c79c1bc435256cc44266b887": [
+      {
+        "finding_id": "finding:387bf5074909ea76eb963695",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:c7b142660c251958b473eae3": [
+      {
+        "finding_id": "finding:d0621e0022f1fad6edfea559",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:c85fd06cd16f84341bde8293": [
+      {
+        "finding_id": "finding:593747a5e70cfb23d4dc7357",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:c879bdb4fd3a3e8ed7f9d2da": [
+      {
+        "finding_id": "finding:0f3c6a86ce706fd96ba16f10",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:c90c55dbb11486a8639977f1": [
+      {
+        "finding_id": "finding:e02fafe6501ecb50aff4bd49",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ca2d0f90a95526f700214f9b": [
+      {
+        "finding_id": "finding:b4d00951c50efe27130a76fa",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ca994d87663d45cfd9b13c73": [
+      {
+        "finding_id": "finding:668abda72a452d07e043b823",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:cab5eb2172042b26130e368e": [
+      {
+        "finding_id": "finding:07be72890a0afd4105240ab2",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:cbdc39d15a5f557d2db59ea6": [
+      {
+        "finding_id": "finding:2775a2975d655b9b9fdc058a",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:cc8feab11f2a939b91f7b12e": [
+      {
+        "finding_id": "finding:ac8ef01c0e0c59cdfaba78d2",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:ccd424d9998271e28278440a": [
+      {
+        "finding_id": "finding:025354632740d30d950fdcb2",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:cf1c7d4dcd422e7df5f2a9ee": [
+      {
+        "finding_id": "finding:980a9ad2071087081a909f34",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d255beb56bba09e06b0ea894": [
+      {
+        "finding_id": "finding:d6bb42826cdccc04375a224c",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d26b584e0e39eb8d70121ce7": [
+      {
+        "finding_id": "finding:1460404e0b468d1f5cb3448c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d2bcecb47812b83778f17162": [
+      {
+        "finding_id": "finding:597dee4114cd63df55698341",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:d410b271ed10e367799e4264": [
+      {
+        "finding_id": "finding:508cbf78a10869b548be7f0b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d603aa8425f5391db7d47695": [
+      {
+        "finding_id": "finding:264df1949021e1b703ef028a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:d61e368360009217bdc357a6": [
+      {
+        "finding_id": "finding:ec08af88e7660d937b70927a",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d6720aebada32e44eb75493e": [
+      {
+        "finding_id": "finding:ff54a67585117462ec1ff59e",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:d76fd55d843c3d2c81353a14": [
+      {
+        "finding_id": "finding:306a473901c578fca7e0b87c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d805bc827956dbf5d2f134a1": [
+      {
+        "finding_id": "finding:fe1c76256fc88aaf5741bf40",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d88197c3af6b939d5d468ad9": [
+      {
+        "finding_id": "finding:317332b17ba1f7a21d8259d7",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:d94aefb582f31806f0be84d7": [
+      {
+        "finding_id": "finding:986a6ace217f004000026e33",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      },
+      {
+        "finding_id": "finding:c7aed82bcafddd3aaf8305ef",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:da152958e7f3f94a3ac313dd": [
+      {
+        "finding_id": "finding:82834ced2c2f6f3b52e397e6",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:dbf3436bf46ff535f02360c0": [
+      {
+        "finding_id": "finding:3a8109f5d3ece272abfef4c1",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:dc5f722c8369bf519d36550e": [
+      {
+        "finding_id": "finding:e526365ddced10c9e0d668ee",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:dc8dca6ccf55a8a00bfa3d83": [
+      {
+        "finding_id": "finding:61121a47cf7bcaf64d1c70b9",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      },
+      {
+        "finding_id": "finding:f3ced4705d6a6aad5f257d83",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:dcb66e8d01c25425f8997b21": [
+      {
+        "finding_id": "finding:c0840f313eadaf37170c8fa1",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:dd154343064c5e79eaf62653": [
+      {
+        "finding_id": "finding:3efde768a7616d0e625fc92c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:dd3e937d0a0cb37e36f325b8": [
+      {
+        "finding_id": "finding:4b1e44daa630ec8e67f985e5",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:dd75e3eec34d6afef4bc6279": [
+      {
+        "finding_id": "finding:31afc7026871ae9e663b3230",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:dda2d2e4223bed6696b71d1f": [
+      {
+        "finding_id": "finding:53e4c39d016168ed6417dcd3",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:de6e975aa25e34d273cac73d": [
+      {
+        "finding_id": "finding:90db245de044cd65fc615f13",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:de79827ca070ee5bf1293c7a": [
+      {
+        "finding_id": "finding:9b389b8ca22f4a0bb242d637",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:dec2a486f06445fe310b7b6b": [
+      {
+        "finding_id": "finding:dbb5d0c3bc02c35c6ce589b0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:df0b16129f49ef0131ea8a4f": [
+      {
+        "finding_id": "finding:67e5fad510f6a72b480929ae",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:dfa5d5cb9cbe65229ff56025": [
+      {
+        "finding_id": "finding:01d56a8f0535901dc086a3f9",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e0e70f9660123a2b9693d613": [
+      {
+        "finding_id": "finding:84078385618c88acba95c238",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:e143da216962f38d6982ce06": [
+      {
+        "finding_id": "finding:43bacc4d800d560a044b1af0",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e16579571b5f83e51aa24d97": [
+      {
+        "finding_id": "finding:cd25f8dc1037743e7330666d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e193ac24cd22f9cbc64014a0": [
+      {
+        "finding_id": "finding:d014d98443accf978cc9404c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:e1b30213cbd41c7536199c40": [
+      {
+        "finding_id": "finding:90db86218d2675eb84ca73d4",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:e260a48ead83b900a279efc0": [
+      {
+        "finding_id": "finding:e884abb7d046d11568edc968",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:e2ae13b782f0fe6ca3ad4c95": [
+      {
+        "finding_id": "finding:17384fa79560f737b121a767",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:e2d853f6dfe17bef1c91bf0d": [
+      {
+        "finding_id": "finding:4ed1b7e2d53aeb7a0dc36008",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:e349933f6f99a11a97a9206c": [
+      {
+        "finding_id": "finding:104f7d90bdda42c9924cd009",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e38cfb64c78da037bf9ca829": [
+      {
+        "finding_id": "finding:769ef56910a17c5b0835b637",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e4c9e7fa900401999c19351e": [
+      {
+        "finding_id": "finding:730a112667264e251a485eae",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e6393e7d96467c64312f52dc": [
+      {
+        "finding_id": "finding:76c249960a11fdd67e7a89a4",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:e7b16e5ea92bca5e90ecf8cc": [
+      {
+        "finding_id": "finding:c5ab2b430cd56ee8b3be181d",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:e8523c3c1f8e762908f0abce": [
+      {
+        "finding_id": "finding:ae9e6013e47b600e2cf2caf7",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ea1a43688d4d3b695a25b8a0": [
+      {
+        "finding_id": "finding:7109c8efa16007ed7b7f770e",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ea3a64494d6c6ed5c81952df": [
+      {
+        "finding_id": "finding:a8715acfca66063997f5e930",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:ea8ff867831595f21448b042": [
+      {
+        "finding_id": "finding:b9a0262220fc6b39affc6c4b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ebf689b7d2f132d0ddc8afc5": [
+      {
+        "finding_id": "finding:a8f161eaf7b03f76708faf8b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ed16d4873fce4b072f92c48e": [
+      {
+        "finding_id": "finding:921d91f6067b6d205075168f",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:ee6b63644d2efe8578205ed8": [
+      {
+        "finding_id": "finding:46d0b082e0f9e391bca74c4c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ef459647a8a2f6404371463f": [
+      {
+        "finding_id": "finding:4c1785c2534692691b6e6a72",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f187e7020326bdd3764254ae": [
+      {
+        "finding_id": "finding:c29ccaa327aab1b5bdb7def5",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f2784030010bb24259caceef": [
+      {
+        "finding_id": "finding:c9f42e5eb223cb71758e5e89",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f36be191cde8d3a6066ede91": [
+      {
+        "finding_id": "finding:60cb64f7cffed92b8848a1b4",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f3bb6559c42ca111d75ab699": [
+      {
+        "finding_id": "finding:975174167672898b0be0e96c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:f45422e2003f65499c5b6e58": [
+      {
+        "finding_id": "finding:78e71be10db99fb14bc72d80",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f561fd25e1a2aaffaf395d62": [
+      {
+        "finding_id": "finding:948b6f530fb7247228943b94",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:f5ae9b6689a3cb1178a65c0d": [
+      {
+        "finding_id": "finding:da3484902064801380470845",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f6931fefe66458117f8d5b28": [
+      {
+        "finding_id": "finding:d30881bf191d9f1cc715b84c",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:f6ada45329d6dcb6a4443daf": [
+      {
+        "finding_id": "finding:079d71b43d4407272e4863f0",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:f8ca65be586effcfabad530b": [
+      {
+        "finding_id": "finding:4b9af2764c925d777d21e06f",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:f9e4d90d31dd7f1605807b94": [
+      {
+        "finding_id": "finding:8cd3288277ab8b4a2ae7537c",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:fa23060eda8eed351311f5bb": [
+      {
+        "finding_id": "finding:9b8752e67641585678bbe700",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fac7a792d5fddac3dd0c7a52": [
+      {
+        "finding_id": "finding:d2a8593fac823746bb01c9b4",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fb1971dbcc91f5e32b66b067": [
+      {
+        "finding_id": "finding:f419eaddaf067e00bbbbf0b7",
+        "run": "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+      }
+    ],
+    "finding:fb65eae4593d6f1c5b1ad25f": [
+      {
+        "finding_id": "finding:a3d1e7af1054485bb7cd0274",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fdecf3b212e026539e8f56fc": [
+      {
+        "finding_id": "finding:e00a19298a580f32fcebf58b",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fe020b593117de716a6e82ec": [
+      {
+        "finding_id": "finding:0eb771c088ee67e4b548d6b2",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fe99aadd8d31f29d509b438b": [
+      {
+        "finding_id": "finding:4236532314a3801784c87549",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:feb5faad54f2b7399c703c59": [
+      {
+        "finding_id": "finding:ff49f8704329a75479efb334",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:fef517b732d05109d9095a34": [
+      {
+        "finding_id": "finding:f7032082a99d66979cd6db2b",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ff03217853b85042a0091fd1": [
+      {
+        "finding_id": "finding:fe368b3653a9f9100486ab47",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ff7bbadce113a20317089c33": [
+      {
+        "finding_id": "finding:198b642e378d26b3c11f146d",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ],
+    "finding:ffb060e36b8912d0ed4693e1": [
+      {
+        "finding_id": "finding:ea32e182ec3b11d903533f87",
+        "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+      }
+    ],
+    "finding:ffbe0f723809efe88f034937": [
+      {
+        "finding_id": "finding:33828ef58927c11a36f7d428",
+        "run": "probe_dev_opus5_contract2_claude_sub_rep1"
+      }
+    ]
+  },
+  "per_pr": {
+    "33066": 28,
+    "33098": 43,
+    "33117": 33,
+    "33145": 34,
+    "33149": 67,
+    "33285": 20,
+    "33294": 31,
+    "33304": 6,
+    "33305": 10,
+    "33315": 8,
+    "33321": 40,
+    "33337": 4,
+    "33362": 15,
+    "33421": 27,
+    "33438": 9
+  },
+  "per_pr_per_run": {
+    "33066": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 7,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 9,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 5,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 7
+    },
+    "33098": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 13,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 11,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 11,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 9
+    },
+    "33117": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 11,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 8,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 7,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 9
+    },
+    "33145": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 10,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 9,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 9,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 8
+    },
+    "33149": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 19,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 18,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 18,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 13
+    },
+    "33285": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 5,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 5,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 6,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 4
+    },
+    "33294": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 7,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 9,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 8,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 7
+    },
+    "33304": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 1,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 0,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 1,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 4
+    },
+    "33305": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 3,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 2,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 3,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 2
+    },
+    "33315": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 1,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 2,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 1,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 4
+    },
+    "33321": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 10,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 9,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 11,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 10
+    },
+    "33337": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 1,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 1,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 1,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 1
+    },
+    "33362": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 3,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 3,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 4,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 5
+    },
+    "33421": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 6,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 9,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 6,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 6
+    },
+    "33438": {
+      "probe_dev_opus55_contract2_claude_sub_rep1": 2,
+      "probe_dev_opus55_contract2_claude_sub_rep2": 2,
+      "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": 2,
+      "probe_dev_opus5_contract2_claude_sub_rep1": 3
+    }
+  },
+  "runs": [
+    "probe_dev_opus55_contract2_claude_sub_rep1",
+    "probe_dev_opus55_contract2_claude_sub_rep2",
+    "probe_dev_opus5_contract2_claude_sub_rep1",
+    "probe_dev_opus55_contract2_hygiene_claude_sub_rep1"
+  ],
+  "site_and_kind_keys": 137,
+  "sources": {
+    "probe_dev_opus55_contract2_claude_sub_rep1": {
+      "completion_status": "complete",
+      "state": "judged"
+    },
+    "probe_dev_opus55_contract2_claude_sub_rep2": {
+      "completion_status": "complete",
+      "state": "judged"
+    },
+    "probe_dev_opus55_contract2_hygiene_claude_sub_rep1": {
+      "completion_status": "complete",
+      "state": "judged"
+    },
+    "probe_dev_opus5_contract2_claude_sub_rep1": {
+      "completion_status": "complete",
+      "state": "judged"
+    }
+  },
+  "union": 375,
+  "union_version": "pass-union/1"
+}

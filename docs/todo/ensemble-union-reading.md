@@ -1,10 +1,60 @@
 # The ensemble's union, read for free from the passes already on disk
 
-**Status** — open, 2026-10-02; spawned as its own session (`ensemble-union`, off `hygiene-layer`).
-The free reading of Layer 2 in `docs/plans/2026-10-01-beyond-the-solo-baseline.md` §4, before any
-K-pass run is paid for. The user's direction (2026-10-02): do this reading in its own session.
-**Cost** — one judge call on the merged set, about $0.80 on `gpt_5_mini` (roughly 110 anchored
-pairs, 3 samples each), capped at $2; no generation spend.
+**Status** — **read, 2026-10-02** (session `ensemble-union`, off `hygiene-layer`): built
+(`cli report union`, `795398de`), the derived run `union_dev_opus_4pass_v1` written (`e97d5e18`)
+and judged (`1282eb4d`, $0.81), the reading in
+`results/pr_review_v5/probes/ensemble-union-2026-10-02/README.md`. **Not a lever, as built**: 12 of
+23 judged (the passes' own 11 plus one judge flip) at 7.0 findings per control PR against the
+rule's 2.0. One decision is open, below. The free reading of Layer 2 in
+`docs/plans/2026-10-01-beyond-the-solo-baseline.md` §4, before any K-pass run is paid for. The
+user's direction (2026-10-02): do this reading in its own session.
+**Cost** — one judge call on the merged set, $0.81 billed on `gpt_5_mini` (112 anchored pairs, 3
+samples each; cap was $2); no generation spend.
+
+## Result (2026-10-02)
+
+| | judged recall | control findings (33304, 33315) | per control PR | rule |
+|---|---|---|---|---|
+| passes, mean / union / stable | 7.75 / 11 / 6 | 1.0, 1.0, 4.0, 1.0 per pass | | |
+| union of the four | **12 of 23** (11 without one judge flip) | 6, 8 | **7.0** (4.0 distinct claims) | recall met, emission not |
+| K=2, H-claude reps 1+2 (after the fact) | 9 (8 in the passes' own audits) | 1, 3 | 2.0 | recall not met, emission at the bar |
+| K=3, + hygiene rep 1 (after the fact) | 12 (10 in the passes' own audits) | 2, 4 | 3.0 | recall met, emission not |
+
+- The union recovers exactly what the passes' audits recovered. Every one of the spine's 11 is
+  hit; the twelfth, `7fef913e`, is hygiene rep 1's finding judged miss in its own audit and hit
+  in the union's. On the 110 (finding, obligation) pairs the audits share verbatim the judge
+  agreed with itself on 106 (0.96); all four flips are listed in the README.
+- **Agreement does not separate hits on these passes** (the selection-signal close condition,
+  measured on runs not used to find it): hit rate by k = 0.50, 0.67, 0.29, 0.44 for k = 1..4 over
+  90 paired findings; within-PR AUC 0.482. The label is saturated at gold anchors: 64 of the 90
+  paired findings, and 36 of the 38 in the two PRs that enter the AUC, have k=4, because every
+  pass anchors at nearly every gold change. No cut proposed.
+- The 14 control findings are all docstring and comment wording. 8 of them are one ask in four
+  spellings (33315: the `Fintype/Basic.lean` link should read `Defs.lean`) and one in three
+  (33304: qualify `of_equivalence_target`); the exact-ask fold does not recognise rephrasings, and
+  the judge counts each as a finding. Opus 5 alone files 8 of the 14.
+
+**Built as.** The collapse is on the exact-ask key of `merge_findings`; the label
+`passes_agreeing` is on `finding_key` (site and issue kind), not on that key, because the exact
+key recurs across the four passes for 6 findings in 381, while site-and-kind spreads 137 keys
+over k = 1..4 (45, 20, 23, 49). Plan §4 said "union by `finding_key`"; folding on it would merge
+different asks at one site, which is lossy, so it is the label and not the fold.
+
+**Open decision (the user's or the spawning session's).** Plan §4 gates Layer 3, the
+refutation-only critic, on exactly this outcome: the union's control emission is past its rule.
+Two readings of what to do next, and the reading above does not choose:
+1. build Layer 3 as planned, gated on control emission alone;
+2. first change the union's fold so that one ask in several phrasings is one finding (a fold on
+   claim identity that keeps every distinct ask as a variant inside the finding, rather than
+   choosing a representative): the control emission would read 4.0 claims per PR for K=4 and 1.5
+   for K=3, still above and below the bar respectively, and it changes what the judge is shown,
+   not what a maintainer is shown. *Motivating example:* 33315's four spellings of the
+   `Defs.lean` fix, which a maintainer would read as one comment and the judge paired four times.
+   Whether the emission rule's unit is the finding or the claim is part of this decision.
+
+Not done here, and still the plan's confirmation step: the union's recall on validation small12
+and post-cutoff through the blind matchers; three ensemble repetitions; the decorrelators the
+plan names (reading order, a second round, a second model family).
 
 **Motivating example.** Four Opus 5.x passes on the dev set exist under the project harness, each
 judged on the held-out 12 (23 obligations, judge v9):

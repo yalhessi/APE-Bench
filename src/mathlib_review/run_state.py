@@ -177,6 +177,10 @@ _declare("ledgers", "ledgers.jsonl", "run",
 _declare("issues", "issues.jsonl", "run")
 _declare("conflicts", "conflicts.jsonl", "run")
 _declare("finalization_report", "finalization_report.json", "run")
+_declare("union_report", "union_report.json", "union",
+          hint="written by `report union` beside a derived run's findings: findings per source "
+               "run, the union's size, per-PR and control-PR counts, the agreement distribution "
+               "and every union finding's members")
 _declare("reviewed_workspaces", "reviewed_workspaces.json", "run")
 _declare("replay_outcomes", "replay_outcomes.jsonl", "replay")
 _declare("replay_report", "replay_report.json", "replay")

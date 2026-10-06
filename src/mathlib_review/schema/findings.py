@@ -324,6 +324,15 @@ class ReviewFinding(StrictModel):
     evidence_tier: EvidenceTier
     action_key: str
     sources: List[FindingSource]
+    #: Agreement across the passes of a union, kept as a LABEL. Set only by
+    #: `merge.union_findings` (`cli report union`): `passes` names the source runs that filed a
+    #: finding with this finding's `finding_key` -- site and issue kind, the claim identity
+    #: across runs that `docs/todo/selection-signal.md` measured -- and `passes_agreeing` is
+    #: their count, 1..K. A finding from a single run carries neither. Nothing reads the label
+    #: to rank, cut or gate: which findings reach a maintainer is selection, and that is parked
+    #: (`docs/dead-ends.md`, "Publication as selection").
+    passes_agreeing: Optional[int] = None
+    passes: List[str] = Field(default_factory=list)
     source_sha256: str
 
 

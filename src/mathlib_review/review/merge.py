@@ -20,7 +20,7 @@ Two things this module deliberately does not do:
 from __future__ import annotations
 
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from src.mathlib_review.io import sealed_model
@@ -423,3 +423,167 @@ def merge_findings(
         },
     }
     return kept, conflicts, report
+
+
+# ============================================================================
+# The union of several passes: identical asks collapse, agreement is a label
+# ============================================================================
+
+UNION_VERSION = "pass-union/1"
+
+#: What `union_findings` collapses on: the grouping key of `merge_findings`, and nothing weaker.
+UNION_GROUPING_KEY = "(pr_number, change_ids, concern_family, action_key)"
+#: What `passes_agreeing` counts over: the claim identity across runs (`finding_key`).
+UNION_LABEL_KEY = "finding_key: (pr_number, primary_change_id, issue_kind)"
+
+
+def union_findings(
+    by_run: Dict[str, Sequence[ReviewFinding]],
+    *,
+    control_pr_numbers: Iterable[int] = (),
+) -> Tuple[List[ReviewFinding], Dict]:
+    """The union of several passes' findings, with agreement kept as a label.
+
+    Layer 2 of `docs/plans/2026-10-01-beyond-the-solo-baseline.md`: K passes over one PR, their
+    findings unioned, nothing voted on. Two things here are deliberately not `merge_findings`:
+
+    * **only identical asks collapse** -- the grouping key `merge_findings` uses (PR, change
+      ids, concern family, canonical action), so nothing is lost but a duplicate sentence.
+      Measured on the four Opus passes of 2026-10-01, that key folds 6 of 375 findings; every
+      other finding is a distinct ask and survives;
+    * **the suppression step never runs.** Demoting alternatives at one anchor, resolving by
+      warrant and the per-PR limit are each a decision about which findings reach a
+      maintainer, and that is selection (`.claude/rules/mathlib-review.md`). A union is
+      generation.
+
+    Each surviving finding is stamped `passes` / `passes_agreeing`: the source runs that filed
+    a finding with the same `finding_key` (site and issue kind -- the claim identity across
+    runs, which recurs for about half of what is emitted where the full action key recurs
+    essentially never) and their count. It is a label for the reading `selection-signal.md`
+    asks for -- hit rate by k, with no cut -- and nothing here reads it.
+
+    The `review` channel only, every admission: a finding's `admission` was set by its own
+    run's merge and is carried on the representative, never recomputed. The report's
+    `members` map each union finding to the (run, finding_id) rows it stands for.
+    """
+
+    runs = list(by_run)
+    rows: List[Tuple[str, ReviewFinding]] = [
+        (run, finding) for run in runs for finding in by_run[run]
+        if "review" in finding.channels
+    ]
+    grouped: Dict[Tuple, List[Tuple[str, ReviewFinding]]] = defaultdict(list)
+    agreeing: Dict[str, set] = defaultdict(set)
+    for run, finding in rows:
+        grouped[(finding.pr_number, tuple(finding.change_ids), finding.concern_family,
+                 finding.action_key)].append((run, finding))
+        agreeing[finding_key(finding)].add(run)
+
+    merged: List[ReviewFinding] = []
+    members: Dict[str, List[Dict[str, str]]] = {}
+    k_identical: Counter = Counter()
+    for _key, group in sorted(grouped.items(), key=lambda item: item[0]):
+        representative = _merge_group([finding for _run, finding in group])
+        passes = sorted(agreeing[finding_key(representative)])
+        payload = representative.model_dump(mode="json", exclude={"finding_id", "source_sha256"})
+        payload["passes"] = passes
+        payload["passes_agreeing"] = len(passes)
+        finding = _seal(ReviewFinding, "finding", payload)
+        merged.append(finding)
+        members[finding.finding_id] = [
+            {"run": run, "finding_id": item.finding_id}
+            for run, item in sorted(group, key=lambda row: (row[0], row[1].finding_id))]
+        k_identical[len({run for run, _item in group})] += 1
+
+    controls = sorted(set(control_pr_numbers))
+    per_pr: Counter = Counter(finding.pr_number for finding in merged)
+    per_pr_per_run = {
+        run: Counter(finding.pr_number for finding in by_run[run] if "review" in finding.channels)
+        for run in runs}
+    report = {
+        "union_version": UNION_VERSION,
+        "grouping_key": UNION_GROUPING_KEY,
+        "label_key": UNION_LABEL_KEY,
+        "runs": runs,
+        "findings_per_run": {run: len(by_run[run]) for run in runs},
+        "inputs": len(rows),
+        "dropped_not_in_review_channel": sum(len(by_run[run]) for run in runs) - len(rows),
+        "union": len(merged),
+        "collapsed_identical_asks": len(rows) - len(merged),
+        "per_pr": {str(pr): per_pr[pr] for pr in sorted(per_pr)},
+        "per_pr_per_run": {
+            str(pr): {run: per_pr_per_run[run][pr] for run in runs} for pr in sorted(per_pr)},
+        "control_pr_numbers": controls,
+        "control_findings": {str(pr): per_pr.get(pr, 0) for pr in controls},
+        "control_findings_per_run": {
+            run: {str(pr): per_pr_per_run[run].get(pr, 0) for pr in controls} for run in runs},
+        # Two distributions, because they answer different questions. `k_identical_ask` is how
+        # many runs filed the very sentence a union finding stands for; `k_site_and_kind` is the
+        # label, how many runs filed something of its claim identity.
+        "k_identical_ask": {str(k): k_identical[k] for k in sorted(k_identical)},
+        "k_site_and_kind": {
+            str(k): n for k, n in sorted(Counter(f.passes_agreeing for f in merged).items())},
+        "site_and_kind_keys": len(agreeing),
+        "k_site_and_kind_keys": {
+            str(k): n for k, n in sorted(Counter(len(v) for v in agreeing.values()).items())},
+        "members": members,
+    }
+    return merged, report
+
+
+def write_union_run(run_names: Sequence[str], derived: str, *,
+                    control_pr_numbers: Iterable[int] = ()) -> Dict:
+    """Write the union of several finished runs as a derived run the judge reads like any other.
+
+    Each source is read through `StageInput` with `require=("findings",)`, which hashes what
+    was read and refuses a run whose manifest says it did not cover what it promised: a partial
+    pass would union in its silences. The derived run holds `findings.jsonl`, `union_report.json`
+    and a `union` row in its own `stages.jsonl` naming every source digest. It has no manifest
+    and no agenda -- it ran nothing -- and the judge reads such a run as unchecked rather than
+    refusing it, taking its PR scope from the judge config.
+
+    `write_once` binds the derived name to its inputs: the same sources regenerate it as a
+    no-op, and different ones are refused. A derived run that could be quietly rebuilt from
+    other passes under the same name would not be a run name (CLAUDE.md: every knob that
+    changes what a run does goes into the run name).
+    """
+
+    from src.mathlib_review.io import jsonl_bytes, load_jsonl, pretty_json_bytes, write_once
+    from src.mathlib_review.paths import run_dir
+    from src.mathlib_review.run_state import (
+        RUN_ARTIFACTS, StageInput, append_stage, digests_of, stage_record,
+    )
+
+    names = list(run_names)
+    if len(names) < 2 or len(set(names)) != len(names):
+        raise ValueError(f"a union needs two or more distinct runs, got {names}")
+    if derived in names:
+        raise ValueError(f"the derived run {derived!r} cannot be one of its own sources")
+
+    by_run: Dict[str, List[ReviewFinding]] = {}
+    consumed: Dict[str, str] = {}
+    sources: Dict[str, Dict] = {}
+    for name in names:
+        stage = StageInput.of(name, require=("findings",))
+        by_run[name] = load_jsonl(stage.path("findings"), ReviewFinding)
+        consumed[f"{name}/findings"] = stage.consumed["findings"]
+        sources[name] = {
+            "completion_status": (stage.manifest or {}).get("completion_status"),
+            "state": stage.state.value,
+        }
+
+    findings, report = union_findings(by_run, control_pr_numbers=control_pr_numbers)
+    out = run_dir(derived)
+    findings_path = out / RUN_ARTIFACTS["findings"].filename
+    report_path = out / RUN_ARTIFACTS["union_report"].filename
+    written = write_once(findings_path, jsonl_bytes(findings))
+    write_once(report_path, pretty_json_bytes(
+        {**report, "derived_run": derived, "sources": sources}))
+    if written:
+        append_stage(out, stage_record(
+            "union", run_name=derived, consumed=consumed,
+            produced=digests_of([findings_path, report_path]),
+            identity={"union_version": UNION_VERSION, "source_runs": names,
+                      "grouping_key": UNION_GROUPING_KEY, "label_key": UNION_LABEL_KEY}))
+    return {"derived_run": derived, "run_dir": str(out), "written": written,
+            **{key: value for key, value in report.items() if key != "members"}}
