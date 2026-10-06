@@ -107,10 +107,12 @@ def test_the_lead_instructions_quote_no_gold():
 # name. Tool schemas are also sealed nowhere (`docs/todo/framework-defects-2026-09.md`), so no
 # plan identity could show the change either.
 
-#: Modules whose string literals reach a model: the review tools, the prompts, and the arm
-#: rationales the lead reads.
+#: Modules whose string literals reach a model: the review tools, the prompts, the arm
+#: rationales the lead reads, and the producers' section titles, leads and fact templates
+#: (2026-10-06: a producer section is placed in the reviewer's packet by `context_file`).
 MODEL_TEXT_MODULES = (
     *sorted(Path("src/ape/tasks/lean_tasks/formal_math/review").glob("*.py")),
+    *sorted(Path("src/mathlib_review/producers").glob("*.py")),
     Path("src/mathlib_review/agenda/registry.py"),
     Path("src/mathlib_review/agenda/render_focused.py"),
     Path("src/mathlib_review/agenda/review_map.py"),
