@@ -343,3 +343,20 @@ stratum A's other facts): is there a finding that repeats it, in S0 and in S1?
   **no effect** at a difference of 1 or less; between, a second rep decides.
 - **Emission:** S1's findings that repeat an unasked fact, against S0's, per stratum-B PR. More than
   1.0 more per PR than S0 makes the section a volume lever, whatever it does to the asks.
+
+## Stage 6: a missing generator attribute (pre-registered 2026-10-06, before the detector is written)
+
+Stage 3 found most census P201 asks are a missing attribute on a lemma with no hand-written twin
+(43167's p0011, "Missing `@[to_additive]` here"), which no twin shape can see. **`missing_attribute`**
+states that fact from the file alone: a declaration the PR adds that carries none of a generator
+attribute -- `to_additive`, `to_dual` -- while **at least 3 of the file's other declarations, and at
+least half of them**, carry it (graph entities of the same path, either side). The fact names the
+attribute and the count. An additive-named declaration (`add`, `zero`, `sum`, `neg`, `sub`, `nsmul`,
+`vadd` among its leaf words) is skipped for `to_additive`, since it is what the attribute generates.
+
+Measured as stages 1-3: probe sets (dev in sample only in that 43167's ask was read in stage 3;
+validation small12 and post-cutoff otherwise unread for this shape) and the census, P201's 11 asks.
+**Bars:** control emission at most 1.0 per control PR on validation small12 and post-cutoff; at least
+half the facts valid as written, by reading (all if 20 or fewer, else a seeded sample of 20, seed
+`missing-attribute-2026-10-06`) -- valid meaning the attribute would apply to the declaration as
+stated; census recall in the stage-2 bands.
