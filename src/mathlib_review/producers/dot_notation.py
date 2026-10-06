@@ -23,7 +23,7 @@ from ape.toolkits.code.lean.lean_parser import mask_noncode_regions, parse_major
 from src.mathlib_review.conventions.facets import split_binders
 from src.mathlib_review.conventions.situations import predicate_head
 from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
-from src.mathlib_review.producers import Fact
+from src.mathlib_review.producers import Fact, added_lines, declarations
 
 #: `Order.IsNormal.map_iSup h`: a capitalised (possibly namespaced) prefix, a lowercase lemma, an
 #: argument. The prefix's last component is compared with the argument's type head.
@@ -36,11 +36,6 @@ def _lower_first(name: str) -> str:
     return name[:1].lower() + name[1:]
 
 
-def _added_lines(target: Dict[str, Any]) -> set:
-    return {line[1:].strip() for fragment in target.get("diff_fragments") or []
-            for line in fragment.split("\n") if line.startswith("+") and not line.startswith("+++")}
-
-
 class DotNotation:
     name = "dot_notation"
     version = "dot_notation/1"
@@ -51,21 +46,14 @@ class DotNotation:
             "would be.")
 
     def facts(self, graph: Dict[str, Any]) -> List[Fact]:
-        entities = {e["entity_id"]: e for e in graph.get("entities") or []}
         out: List[Fact] = []
-        for target in graph.get("targets") or []:
-            reviewed = [entities[e] for e in target.get("reviewed_entity_ids") or [] if e in entities]
-            if target.get("kind") != "declaration" or len(reviewed) != 1:
+        for target, entity, introduced in declarations(graph):
+            parsed = parse_major_declarations(entity.get("code") or "")
+            if len(parsed) != 1:
                 continue
-            entity = reviewed[0]
-            declarations = parse_major_declarations(entity.get("code") or "")
-            if len(declarations) != 1:
-                continue
-            signature = declarations[0].signature or ""
-            base_names = {entities[e]["fullname"] for e in target.get("base_entity_ids") or []
-                          if e in entities}
-            # An anonymous declaration (an instance, say) has no name to place.
-            if entity.get("fullname") and entity["fullname"] not in base_names:
+            signature = parsed[0].signature or ""
+            # Only a name the PR introduced is placed; an anonymous declaration has none.
+            if introduced:
                 out += self._placement(target, entity, signature)
             out += self._calls(target, entity, signature)
         return out
@@ -96,7 +84,7 @@ class DotNotation:
             return []
         code = entity.get("code") or ""
         masked = mask_noncode_regions(code)
-        added = _added_lines(target)
+        added = added_lines(target)
         out, seen = [], set()
         for match in _CALL.finditer(masked):
             prefix, lemma, argument = match.groups()

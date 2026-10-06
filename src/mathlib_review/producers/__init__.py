@@ -24,7 +24,7 @@ import importlib
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Protocol
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
 from src.mathlib_review.io import jsonl_rows
 
@@ -83,6 +83,40 @@ def change_graphs(release: Path, prs: Iterable[int]) -> Dict[int, Dict[str, Any]
     return {row["pr_number"]: row
             for row in jsonl_rows(Path(release) / "derived/change_graphs.jsonl")
             if row["pr_number"] in wanted}
+
+
+def declarations(graph: Dict[str, Any]) -> Iterable[Tuple[Dict[str, Any], Dict[str, Any], bool]]:
+    """`(target, reviewed entity, introduced)` for each changed declaration with exactly one reviewed
+    entity; `introduced` is whether the PR added or renamed it (its full name is not among the
+    target's base names). The one iteration every detector shares."""
+
+    entities = {e["entity_id"]: e for e in graph.get("entities") or []}
+    for target in graph.get("targets") or []:
+        reviewed = [entities[e] for e in target.get("reviewed_entity_ids") or [] if e in entities]
+        if target.get("kind") != "declaration" or len(reviewed) != 1:
+            continue
+        base_names = {entities[e].get("fullname") for e in target.get("base_entity_ids") or []
+                      if e in entities}
+        name = reviewed[0].get("fullname")
+        yield target, reviewed[0], bool(name) and name not in base_names
+
+
+def declared_names(graph: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Every full name the graph declares, either side, to its entity (reviewed side preferred)."""
+
+    out: Dict[str, Dict[str, Any]] = {}
+    for entity in graph.get("entities") or []:
+        name = entity.get("fullname")
+        if name and (name not in out or entity.get("side") == "reviewed"):
+            out[name] = entity
+    return out
+
+
+def added_lines(target: Dict[str, Any]) -> set:
+    """The stripped text of every line the target's diff fragments add."""
+
+    return {line[1:].strip() for fragment in target.get("diff_fragments") or []
+            for line in fragment.split("\n") if line.startswith("+") and not line.startswith("+++")}
 
 
 def section(item: Producer, facts: List[Fact]) -> Optional[Dict[str, str]]:
