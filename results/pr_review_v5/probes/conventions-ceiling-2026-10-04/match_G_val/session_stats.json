@@ -1,0 +1,110 @@
+{
+ "30641": {
+  "G1": {
+   "findings": 5,
+   "compiles": 7
+  },
+  "E1": {
+   "findings": 7,
+   "compiles": 13
+  },
+  "X1": {
+   "findings": 5,
+   "compiles": 7
+  },
+  "X2": {
+   "findings": 5,
+   "compiles": 8
+  }
+ },
+ "29842": {
+  "E1": {
+   "findings": 3,
+   "compiles": 8
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 5
+  },
+  "X2": {
+   "findings": 1,
+   "compiles": 4
+  },
+  "G1": {
+   "findings": 2,
+   "compiles": 3
+  }
+ },
+ "32875": {
+  "E1": {
+   "findings": 6,
+   "compiles": 26
+  },
+  "G1": {
+   "findings": 6,
+   "compiles": 27
+  },
+  "X2": {
+   "findings": 7,
+   "compiles": 49
+  },
+  "X1": {
+   "findings": 5,
+   "compiles": 35
+  }
+ },
+ "30458": {
+  "X2": {
+   "findings": 9,
+   "compiles": 14
+  },
+  "G1": {
+   "findings": 15,
+   "compiles": 14
+  },
+  "E1": {
+   "findings": 10,
+   "compiles": 13
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 16
+  }
+ },
+ "28649": {
+  "G1": {
+   "findings": 6,
+   "compiles": 1
+  },
+  "X1": {
+   "findings": 4,
+   "compiles": 4
+  },
+  "E1": {
+   "findings": 6,
+   "compiles": 5
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 5
+  }
+ },
+ "34091": {
+  "G1": {
+   "findings": 8,
+   "compiles": 4
+  },
+  "X1": {
+   "findings": 6,
+   "compiles": 11
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 10
+  },
+  "E1": {
+   "findings": 7,
+   "compiles": 10
+  }
+ }
+}
