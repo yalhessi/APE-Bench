@@ -395,3 +395,13 @@ is a **holdout**: every `/2` fact on the 60-PR validation release
 (`inputs/pr_review_v4/releases/val-2025-06-2026-03-v1`, change graphs only, no asks read), by hand,
 seeded sample of 20 if more (seed `missing-attribute-2-holdout`). **Bar:** at least half valid as
 written. The census count under `/2` is reported, in sample.
+
+## Results, stage 6b (2026-10-06)
+
+**Holdout: no facts.** `missing_attribute/2` states nothing on any of the 60 validation-release PRs,
+so the validity bar is **unmeasured** -- there is nothing to judge, as with dot notation's
+out-of-sample sets in stage 1. In sample: the census falls from 19 facts to 8, and the 8 left are
+exactly the 8 read valid in stage 6 (`isSMulRegular_iff` in three files, the `genLTOne_*` lemmas on
+26591 and 26846); 43167's three facts stand. **What it shows:** a precise but nearly silent section
+-- 8 facts on 3 of 973 census PRs, none on a control PR, none at any of the census's 11 P201 asks.
+It is not shown to be a lever, and on this evidence it rarely has anything to say.
