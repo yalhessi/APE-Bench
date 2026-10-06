@@ -5,6 +5,8 @@ ask. Nothing in a folder comes from a step that has seen a probe PR's feedback. 
 lines `run_claude_batch.sh @file` takes.
 
 usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <scratch dir> <set.yaml>:<pr> [...]
+An item `release=<dir>:<pr>` reads a release-shaped folder instead of a probe set (stage H's census
+sample, `build_census_sample.py`); its PR files are rendered by the same functions.
 """
 import hashlib
 import json
@@ -46,9 +48,13 @@ if __name__ == "__main__":
     root, rules = Path(sys.argv[1]), rules_markdown()
     for item in sys.argv[2:]:
         spec_path, pr = item.rsplit(":", 1)
-        spec = probes.load_probe_set(Path(spec_path))
-        models = probes.render_models(spec.release, [int(pr)], spec.inventory)
-        with (spec.release / "input/episodes.jsonl").open(encoding="utf-8") as handle:
+        if spec_path.startswith("release="):
+            release, inventory = Path(spec_path[len("release="):]), None
+        else:
+            spec = probes.load_probe_set(Path(spec_path))
+            release, inventory = spec.release, spec.inventory
+        models = probes.render_models(release, [int(pr)], inventory)
+        with (release / "input/episodes.jsonl").open(encoding="utf-8") as handle:
             episode = next(e for e in map(json.loads, handle) if e["pr_number"] == int(pr))
         d = root / f"pr{pr}"
         if d.exists():

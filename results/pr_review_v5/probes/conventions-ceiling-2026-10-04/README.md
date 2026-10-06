@@ -730,6 +730,77 @@ sessions and to 63% with the matchers. Two session audits flagged the project's 
 absolute path, on helper scripts in the packet's own `tmp/` and on `findings.json`; read, benign,
 committed by hand (`146bf67e`).
 
+## Stage H: which pinpointed departures would a maintainer raise? Five decisions over one record (pre-registered 2026-10-06, before any mining or decision)
+
+The design space and why: `docs/plans/2026-10-06-convention-decision-designs.md`. The user
+(2026-10-06): test several modifications at once on a few rules and PRs, with negatives, recorded
+examples, and an agent nudged to retrieve examples, "so we minimize model-specific judgement and
+thresholds." Nothing below has run.
+
+**What it tests.** Stage G's reviewer had the right convention at the right place and declined it,
+and maintainers asked at 9 of the 78 places the pinpointer judged departing. The missing piece is
+the selection. Stage H asks which decision procedure picks the places maintainers raise, before
+any reviewer session is spent on it.
+
+**The rules** (`stage_h_rules.json`): ten, chosen knowing the probe asks, as stage G's set was:
+P005, P010, P011, P018, P048, P100, P254 (each with a candidate at an ask on some probe PR and
+candidates without), P040 (candidates, no ask), P084 and P126 (the decoys with the most candidates).
+
+**The candidates** (`stage_h.py`, `probe_candidates`): stage G's pinpointed places for these rules
+on the ten PRs, 149, of which 12 sit at an in-census ask filed under the same rule (8 distinct
+asks, checked; the mechanical place test of stage G). That truth is never shown to a decider.
+
+**The record, from census PRs only.**
+- Positives: reader A's census asks under each rule (comment and code).
+- Negatives: the same blind pinpointer, rubric and 52 rules as stage G, run on 16 val1000 PRs
+  (`census_sample.json`, `build_census_sample.py`: seeded, at most 40 change targets, 3 AI-authored),
+  keeping places for the ten rules; a place at a round-1 ask under its rule is a positive, the rest
+  negatives.
+- The rate index: census asks under the rule over the 973 val1000 PRs, divided by the places flagged
+  per sample PR (plus a half) times 973.
+
+**The designs**, each deciding raise or not for all 149 candidates:
+- `judge`: the rule and the candidate's code alone (the control);
+- `examples`: four asked and four not-asked examples a rule, seeded;
+- `examples_rate`: as `examples`, with the rule's rate stated as the prior;
+- `retrieve`: one file a rule with every asked (up to 30) and not-asked example; the decider must
+  find the most similar for each candidate and cite them;
+- `rate`: no model; per PR, the three candidates whose rule has the highest index.
+
+Deciders are blind subagents, Opus 5.5 at xhigh on the headless route, two a design (PRs split in
+halves), decider rubric fixed in `stage_h.py`. Order: `examples`, `judge`, `retrieve`,
+`examples_rate`, so a budget-forced stop keeps the main contrast.
+
+**Reading rule, fixed now.** Per design, on the 149 candidates: candidates raised, raised at an ask
+(of 12), precision and recall. Base precision (raise all) is 12/149 = 0.08; the oracle is 1 and 1.
+
+| design, on its decisions | reading |
+|---|---|
+| recall ≥ 8/12 and precision ≥ 0.35 | **strong**: carry to reviewer sessions first |
+| recall ≥ 6/12 and precision ≥ 0.25 | **carry to reviewer sessions** |
+| otherwise | below the bar |
+
+**A baseline seen before this rule was fixed, stated as such.** A dry run of the scorer with all
+indices equal made design `rate` fall back to the pass's own order (departs first): three a PR, 30
+raised, 7 at an ask, precision 0.233, recall 0.583. The scorer reports it as `order`. A model design
+that does not beat it adds nothing over the pinpointer's own ranking, whatever its reading above.
+
+One candidate is 0.083 of recall, so two designs differing by fewer than two at-ask candidates are
+not distinguished. The contrasts are read as the plan states them. Exploratory: one decider run a
+design and half, ten rules chosen knowing the asks.
+
+**Also read:** the rate per rule (flagged per PR, asked); asks the pinpointer never flagged on the
+census sample (its recall there); per-PR raises; the `p` ranking of each model design.
+
+**Limits, stated before.** The rule set is chosen knowing the asks. Negatives are round-1 silences,
+so a later-round ask counts as not asked. The mechanical place test matches by declaration name and
+file. Sixteen census PRs give few negatives for rare rules.
+
+**Cost and tokens.** All on token C (B's login is disabled); at 04:18 the week stood at 64% and the
+five-hour window at 51% with another session drawing on it. Expected: 16 pinpointers at 4 to 16
+points of a window each, eight deciders at 5 to 15: about two windows, and about 8 to 12 points of
+the week. `run_stage_h.sh` meters every batch and stops starting work once the week reaches 80%.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences

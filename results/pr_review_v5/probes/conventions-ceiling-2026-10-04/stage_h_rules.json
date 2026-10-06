@@ -1,0 +1,4 @@
+{
+ "rules": ["P005", "P010", "P011", "P018", "P040", "P048", "P100", "P254", "P084", "P126"],
+ "why": "Stage H's ten rules, chosen from stage G's table (2026-10-06) knowing the probe asks: eight pool rules with candidates on four or more probe PRs, seven of them with a candidate at a maintainer's ask and elsewhere without one (P005 P010 P011 P018 P048 P100 P254), one with candidates and no ask on any probe PR (P040), and the two decoys with the most candidates (P084, 17 places decided as departing and none asked; P126, 21). On the probe PRs they hold 149 of stage G's 385 candidates, 12 of them at an ask. Check kinds: compile 4, lookup 4, read 2."
+}
