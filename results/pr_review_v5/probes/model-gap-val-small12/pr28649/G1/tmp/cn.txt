@@ -1,0 +1,56 @@
+     1|/-
+     2|Copyright (c) 2025 Rémy Degenne. All rights reserved.
+     3|Released under Apache 2.0 license as described in the file LICENSE.
+     4|Authors: Rémy Degenne, Lorenzo Luccioli
+     5|-/
+     6|import Mathlib.Probability.Kernel.Basic
+     7|
+     8|/-!
+     9|# Notation for the composition of a measure and a kernel
+    10|
+    11|This operation, for which we introduce the notation `∘ₘ`, takes `μ : Measure α` and
+    12|`κ : Kernel α β` and creates `κ ∘ₘ μ : Measure β`. The integral of a function against `κ ∘ₘ μ` is
+    13|`∫⁻ x, f x ∂(κ ∘ₘ μ) = ∫⁻ a, ∫⁻ b, f b ∂(κ a) ∂μ`.
+    14|
+    15|This file does not define composition but only introduces notation for
+    16|`MeasureTheory.Measure.bind μ κ`.
+    17|
+    18|## Notations
+    19|
+    20|* `κ ∘ₘ μ = MeasureTheory.Measure.bind μ κ`, for `κ` a kernel.
+    21|-/
+    22|
+    23|/- This file is only for lemmas that are direct specializations of `Measure.bind` to kernels,
+    24|anything more involved should go elsewhere (for example the `MeasureComp` file). -/
+    25|assert_not_exists ProbabilityTheory.Kernel.compProd
+    26|
+    27|open ProbabilityTheory
+    28|
+    29|namespace MeasureTheory.Measure
+    30|
+    31|variable {α β : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
+    32|  {μ : Measure α} {κ : Kernel α β}
+    33|
+    34|/-- Composition of a measure and a kernel.
+    35|
+    36|Notation for `MeasureTheory.Measure.bind` -/
+    37|scoped[ProbabilityTheory] notation:100 κ:101 " ∘ₘ " μ:100 => MeasureTheory.Measure.bind μ κ
+    38|
+    39|@[simp]
+    40|lemma comp_apply_univ [IsMarkovKernel κ] : (κ ∘ₘ μ) Set.univ = μ Set.univ := by
+    41|  simp [bind_apply .univ κ.aemeasurable]
+    42|
+    43|lemma deterministic_comp_eq_map {f : α → β} (hf : Measurable f) :
+    44|    Kernel.deterministic f hf ∘ₘ μ = μ.map f :=
+    45|  Measure.bind_dirac_eq_map μ hf
+    46|
+    47|@[simp]
+    48|lemma id_comp : Kernel.id ∘ₘ μ = μ := by rw [Kernel.id, deterministic_comp_eq_map, Measure.map_id]
+    49|
+    50|lemma swap_comp {μ : Measure (α × β)} : (Kernel.swap α β) ∘ₘ μ = μ.map Prod.swap :=
+    51|  deterministic_comp_eq_map measurable_swap
+    52|
+    53|@[simp]
+    54|lemma const_comp {ν : Measure β} : (Kernel.const α ν) ∘ₘ μ = μ Set.univ • ν := μ.bind_const
+    55|
+    56|end MeasureTheory.Measure

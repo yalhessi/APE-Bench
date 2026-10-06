@@ -1,0 +1,514 @@
+     1|/-
+     2|Copyright (c) 2023 Rémy Degenne. All rights reserved.
+     3|Released under Apache 2.0 license as described in the file LICENSE.
+     4|Authors: Rémy Degenne, Etienne Marion
+     5|-/
+     6|import Mathlib.Probability.Kernel.Composition.MeasureComp
+     7|import Mathlib.Probability.Kernel.MeasurableIntegral
+     8|
+     9|/-!
+    10|# Bochner integral of a function against the composition and the composition-products of two kernels
+    11|
+    12|We prove properties of the composition and the composition-product of two kernels.
+    13|
+    14|If `κ` is a kernel from `α` to `β` and `η` is a kernel from `β` to `γ`, we can form their
+    15|composition `η ∘ₖ κ : Kernel α γ`. We proved in `ProbabilityTheory.Kernel.lintegral_comp` that it
+    16|verifies `∫⁻ c, f c ∂((η ∘ₖ κ) a) = ∫⁻ b, ∫⁻ c, f c ∂(η b) ∂(κ a)`. In this file, we
+    17|prove the same equality for the Bochner integral.
+    18|
+    19|If `κ` is an s-finite kernel from `α` to `β` and `η` is an s-finite kernel from `α × β` to `γ`,
+    20|we can form their composition-product `κ ⊗ₖ η : Kernel α (β × γ)`.
+    21|We proved in `ProbabilityTheory.Kernel.lintegral_compProd` that it
+    22|verifies `∫⁻ bc, f bc ∂((κ ⊗ₖ η) a) = ∫⁻ b, ∫⁻ c, f (b, c) ∂(η (a, b)) ∂(κ a)`. In this file, we
+    23|prove the same equality for the Bochner integral.
+    24|
+    25|## Main statements
+    26|
+    27|* `ProbabilityTheory.integral_compProd`: the integral against the composition-product is
+    28|  `∫ z, f z ∂((κ ⊗ₖ η) a) = ∫ x, ∫ y, f (x, y) ∂(η (a, x)) ∂(κ a)`.
+    29|
+    30|* `ProbabilityTheory.integral_comp`: the integral against the composition is
+    31|  `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`.
+    32|
+    33|## Implementation details
+    34|
+    35|This file is to a large extent a copy of part of `Mathlib/MeasureTheory/Integral/Prod.lean`.
+    36|The product of two measures is a particular case of composition-product of kernels and
+    37|it turns out that once the measurability of the Lebesgue integral of a kernel is proved,
+    38|almost all proofs about integrals against products of measures extend with minimal modifications
+    39|to the composition-product of two kernels.
+    40|
+    41|The composition of kernels can also be expressed easily with the composition-product and therefore
+    42|the proofs about the composition are only simplified versions of the ones for the
+    43|composition-product. However it is necessary to do all the proofs once again because the
+    44|composition-product requires s-finiteness while the composition does not.
+    45|-/
+    46|
+    47|
+    48|noncomputable section
+    49|
+    50|open Set Function Real ENNReal MeasureTheory Filter ProbabilityTheory ProbabilityTheory.Kernel
+    51|open scoped Topology ENNReal MeasureTheory
+    52|
+    53|variable {α β γ E : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
+    54|  {mγ : MeasurableSpace γ} [NormedAddCommGroup E] {a : α}
+    55|
+    56|namespace ProbabilityTheory
+    57|
+    58|section compProd
+    59|
+    60|variable {κ : Kernel α β} [IsSFiniteKernel κ] {η : Kernel (α × β) γ} [IsSFiniteKernel η]
+    61|
+    62|theorem hasFiniteIntegral_prodMk_left (a : α) {s : Set (β × γ)} (h2s : (κ ⊗ₖ η) a s ≠ ∞) :
+    63|    HasFiniteIntegral (fun b => (η (a, b)).real (Prod.mk b ⁻¹' s)) (κ a) := by
+    64|  let t := toMeasurable ((κ ⊗ₖ η) a) s
+    65|  simp_rw [hasFiniteIntegral_iff_enorm, measureReal_def, enorm_eq_ofReal toReal_nonneg]
+    66|  calc
+    67|    ∫⁻ b, ENNReal.ofReal (η (a, b) (Prod.mk b ⁻¹' s)).toReal ∂κ a
+    68|    _ ≤ ∫⁻ b, η (a, b) (Prod.mk b ⁻¹' t) ∂κ a := by
+    69|      refine lintegral_mono_ae ?_
+    70|      filter_upwards [ae_kernel_lt_top a h2s] with b hb
+    71|      rw [ofReal_toReal hb.ne]
+    72|      exact measure_mono (preimage_mono (subset_toMeasurable _ _))
+    73|    _ ≤ (κ ⊗ₖ η) a t := le_compProd_apply _ _ _ _
+    74|    _ = (κ ⊗ₖ η) a s := measure_toMeasurable s
+    75|    _ < ⊤ := h2s.lt_top
+    76|
+    77|@[deprecated (since := "2025-03-05")]
+    78|alias hasFiniteIntegral_prod_mk_left := hasFiniteIntegral_prodMk_left
+    79|
+    80|theorem integrable_kernel_prodMk_left (a : α) {s : Set (β × γ)} (hs : MeasurableSet s)
+    81|    (h2s : (κ ⊗ₖ η) a s ≠ ∞) : Integrable (fun b => (η (a, b)).real (Prod.mk b ⁻¹' s)) (κ a) := by
+    82|  constructor
+    83|  · exact (measurable_kernel_prodMk_left' hs a).ennreal_toReal.aestronglyMeasurable
+    84|  · exact hasFiniteIntegral_prodMk_left a h2s
+    85|
+    86|@[deprecated (since := "2025-03-05")]
+    87|alias integrable_kernel_prod_mk_left := integrable_kernel_prodMk_left
+    88|
+    89|theorem _root_.MeasureTheory.AEStronglyMeasurable.integral_kernel_compProd [NormedSpace ℝ E]
+    90|    ⦃f : β × γ → E⦄ (hf : AEStronglyMeasurable f ((κ ⊗ₖ η) a)) :
+    91|    AEStronglyMeasurable (fun x => ∫ y, f (x, y) ∂η (a, x)) (κ a) :=
+    92|  ⟨fun x => ∫ y, hf.mk f (x, y) ∂η (a, x), hf.stronglyMeasurable_mk.integral_kernel_prod_right'', by
+    93|    filter_upwards [ae_ae_of_ae_compProd hf.ae_eq_mk] with _ hx using integral_congr_ae hx⟩
+    94|
+    95|theorem _root_.MeasureTheory.AEStronglyMeasurable.compProd_mk_left {δ : Type*} [TopologicalSpace δ]
+    96|    {f : β × γ → δ} (hf : AEStronglyMeasurable f ((κ ⊗ₖ η) a)) :
+    97|    ∀ᵐ x ∂κ a, AEStronglyMeasurable (fun y => f (x, y)) (η (a, x)) := by
+    98|  filter_upwards [ae_ae_of_ae_compProd hf.ae_eq_mk] with x hx using
+    99|    ⟨fun y => hf.mk f (x, y), hf.stronglyMeasurable_mk.comp_measurable measurable_prodMk_left, hx⟩
+   100|
+   101|/-! ### Integrability -/
+   102|
+   103|
+   104|theorem hasFiniteIntegral_compProd_iff ⦃f : β × γ → E⦄ (h1f : StronglyMeasurable f) :
+   105|    HasFiniteIntegral f ((κ ⊗ₖ η) a) ↔
+   106|      (∀ᵐ x ∂κ a, HasFiniteIntegral (fun y => f (x, y)) (η (a, x))) ∧
+   107|        HasFiniteIntegral (fun x => ∫ y, ‖f (x, y)‖ ∂η (a, x)) (κ a) := by
+   108|  simp only [hasFiniteIntegral_iff_enorm]
+   109|  rw [lintegral_compProd _ _ _ h1f.enorm]
+   110|  have : ∀ x, ∀ᵐ y ∂η (a, x), 0 ≤ ‖f (x, y)‖ := fun x => Eventually.of_forall fun y => norm_nonneg _
+   111|  simp_rw [integral_eq_lintegral_of_nonneg_ae (this _)
+   112|      (h1f.norm.comp_measurable measurable_prodMk_left).aestronglyMeasurable,
+   113|    enorm_eq_ofReal toReal_nonneg, ofReal_norm_eq_enorm]
+   114|  have : ∀ {p q r : Prop} (_ : r → p), (r ↔ p ∧ q) ↔ p → (r ↔ q) := fun {p q r} h1 => by
+   115|    rw [← and_congr_right_iff, and_iff_right_of_imp h1]
+   116|  rw [this]
+   117|  · intro h2f; rw [lintegral_congr_ae]
+   118|    filter_upwards [h2f] with x hx
+   119|    rw [ofReal_toReal]; finiteness
+   120|  · intro h2f; refine ae_lt_top ?_ h2f.ne; exact h1f.enorm.lintegral_kernel_prod_right''
+   121|
+   122|theorem hasFiniteIntegral_compProd_iff' ⦃f : β × γ → E⦄
+   123|    (h1f : AEStronglyMeasurable f ((κ ⊗ₖ η) a)) :
+   124|    HasFiniteIntegral f ((κ ⊗ₖ η) a) ↔
+   125|      (∀ᵐ x ∂κ a, HasFiniteIntegral (fun y => f (x, y)) (η (a, x))) ∧
+   126|        HasFiniteIntegral (fun x => ∫ y, ‖f (x, y)‖ ∂η (a, x)) (κ a) := by
+   127|  rw [hasFiniteIntegral_congr h1f.ae_eq_mk,
+   128|    hasFiniteIntegral_compProd_iff h1f.stronglyMeasurable_mk]
+   129|  apply and_congr
+   130|  · apply eventually_congr
+   131|    filter_upwards [ae_ae_of_ae_compProd h1f.ae_eq_mk.symm] with x hx using
+   132|      hasFiniteIntegral_congr hx
+   133|  · apply hasFiniteIntegral_congr
+   134|    filter_upwards [ae_ae_of_ae_compProd h1f.ae_eq_mk.symm] with _ hx using
+   135|      integral_congr_ae (EventuallyEq.fun_comp hx _)
+   136|
+   137|theorem integrable_compProd_iff ⦃f : β × γ → E⦄ (hf : AEStronglyMeasurable f ((κ ⊗ₖ η) a)) :
+   138|    Integrable f ((κ ⊗ₖ η) a) ↔
+   139|      (∀ᵐ x ∂κ a, Integrable (fun y => f (x, y)) (η (a, x))) ∧
+   140|        Integrable (fun x => ∫ y, ‖f (x, y)‖ ∂η (a, x)) (κ a) := by
+   141|  simp only [Integrable, hasFiniteIntegral_compProd_iff' hf, hf.norm.integral_kernel_compProd,
+   142|    hf, hf.compProd_mk_left, eventually_and, true_and]
+   143|
+   144|theorem _root_.MeasureTheory.Integrable.ae_of_compProd ⦃f : β × γ → E⦄
+   145|    (hf : Integrable f ((κ ⊗ₖ η) a)) : ∀ᵐ x ∂κ a, Integrable (fun y => f (x, y)) (η (a, x)) :=
+   146|  ((integrable_compProd_iff hf.aestronglyMeasurable).mp hf).1
+   147|
+   148|@[deprecated (since := "2025-02-28")]
+   149|alias _root_.MeasureTheory.Integrable.compProd_mk_left_ae :=
+   150|  _root_.MeasureTheory.Integrable.ae_of_compProd
+   151|
+   152|theorem _root_.MeasureTheory.Integrable.integral_norm_compProd ⦃f : β × γ → E⦄
+   153|    (hf : Integrable f ((κ ⊗ₖ η) a)) : Integrable (fun x => ∫ y, ‖f (x, y)‖ ∂η (a, x)) (κ a) :=
+   154|  ((integrable_compProd_iff hf.aestronglyMeasurable).mp hf).2
+   155|
+   156|theorem _root_.MeasureTheory.Integrable.integral_compProd [NormedSpace ℝ E]
+   157|    ⦃f : β × γ → E⦄ (hf : Integrable f ((κ ⊗ₖ η) a)) :
+   158|    Integrable (fun x => ∫ y, f (x, y) ∂η (a, x)) (κ a) :=
+   159|  Integrable.mono hf.integral_norm_compProd hf.aestronglyMeasurable.integral_kernel_compProd <|
+   160|    Eventually.of_forall fun x =>
+   161|      (norm_integral_le_integral_norm _).trans_eq <|
+   162|        (norm_of_nonneg <|
+   163|            integral_nonneg_of_ae <|
+   164|              Eventually.of_forall fun y => (norm_nonneg (f (x, y)) :)).symm
+   165|
+   166|/-! ### Bochner integral -/
+   167|
+   168|
+   169|variable [NormedSpace ℝ E] {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℝ E']
+   170|
+   171|theorem Kernel.integral_fn_integral_add ⦃f g : β × γ → E⦄ (F : E → E')
+   172|    (hf : Integrable f ((κ ⊗ₖ η) a)) (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   173|    ∫ x, F (∫ y, f (x, y) + g (x, y) ∂η (a, x)) ∂κ a =
+   174|      ∫ x, F (∫ y, f (x, y) ∂η (a, x) + ∫ y, g (x, y) ∂η (a, x)) ∂κ a := by
+   175|  refine integral_congr_ae ?_
+   176|  filter_upwards [hf.ae_of_compProd, hg.ae_of_compProd] with _ h2f h2g
+   177|  simp [integral_add h2f h2g]
+   178|
+   179|theorem Kernel.integral_fn_integral_sub ⦃f g : β × γ → E⦄ (F : E → E')
+   180|    (hf : Integrable f ((κ ⊗ₖ η) a)) (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   181|    ∫ x, F (∫ y, f (x, y) - g (x, y) ∂η (a, x)) ∂κ a =
+   182|      ∫ x, F (∫ y, f (x, y) ∂η (a, x) - ∫ y, g (x, y) ∂η (a, x)) ∂κ a := by
+   183|  refine integral_congr_ae ?_
+   184|  filter_upwards [hf.ae_of_compProd, hg.ae_of_compProd] with _ h2f h2g
+   185|  simp [integral_sub h2f h2g]
+   186|
+   187|theorem Kernel.lintegral_fn_integral_sub ⦃f g : β × γ → E⦄ (F : E → ℝ≥0∞)
+   188|    (hf : Integrable f ((κ ⊗ₖ η) a)) (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   189|    ∫⁻ x, F (∫ y, f (x, y) - g (x, y) ∂η (a, x)) ∂κ a =
+   190|      ∫⁻ x, F (∫ y, f (x, y) ∂η (a, x) - ∫ y, g (x, y) ∂η (a, x)) ∂κ a := by
+   191|  refine lintegral_congr_ae ?_
+   192|  filter_upwards [hf.ae_of_compProd, hg.ae_of_compProd] with _ h2f h2g
+   193|  simp [integral_sub h2f h2g]
+   194|
+   195|theorem Kernel.integral_integral_add ⦃f g : β × γ → E⦄ (hf : Integrable f ((κ ⊗ₖ η) a))
+   196|    (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   197|    ∫ x, ∫ y, f (x, y) + g (x, y) ∂η (a, x) ∂κ a =
+   198|      ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a + ∫ x, ∫ y, g (x, y) ∂η (a, x) ∂κ a :=
+   199|  (Kernel.integral_fn_integral_add id hf hg).trans <|
+   200|    integral_add hf.integral_compProd hg.integral_compProd
+   201|
+   202|theorem Kernel.integral_integral_add' ⦃f g : β × γ → E⦄ (hf : Integrable f ((κ ⊗ₖ η) a))
+   203|    (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   204|    ∫ x, ∫ y, (f + g) (x, y) ∂η (a, x) ∂κ a =
+   205|      ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a + ∫ x, ∫ y, g (x, y) ∂η (a, x) ∂κ a :=
+   206|  Kernel.integral_integral_add hf hg
+   207|
+   208|theorem Kernel.integral_integral_sub ⦃f g : β × γ → E⦄ (hf : Integrable f ((κ ⊗ₖ η) a))
+   209|    (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   210|    ∫ x, ∫ y, f (x, y) - g (x, y) ∂η (a, x) ∂κ a =
+   211|      ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a - ∫ x, ∫ y, g (x, y) ∂η (a, x) ∂κ a :=
+   212|  (Kernel.integral_fn_integral_sub id hf hg).trans <|
+   213|    integral_sub hf.integral_compProd hg.integral_compProd
+   214|
+   215|theorem Kernel.integral_integral_sub' ⦃f g : β × γ → E⦄ (hf : Integrable f ((κ ⊗ₖ η) a))
+   216|    (hg : Integrable g ((κ ⊗ₖ η) a)) :
+   217|    ∫ x, ∫ y, (f - g) (x, y) ∂η (a, x) ∂κ a =
+   218|      ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a - ∫ x, ∫ y, g (x, y) ∂η (a, x) ∂κ a :=
+   219|  Kernel.integral_integral_sub hf hg
+   220|
+   221|-- Porting note: couldn't get the `→₁[]` syntax to work
+   222|theorem Kernel.continuous_integral_integral :
+   223|    -- Continuous fun f : α × β →₁[(κ ⊗ₖ η) a] E => ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a := by
+   224|    Continuous fun f : (MeasureTheory.Lp (α := β × γ) E 1 (((κ ⊗ₖ η) a) : Measure (β × γ))) =>
+   225|        ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a := by
+   226|  rw [continuous_iff_continuousAt]; intro g
+   227|  refine
+   228|    tendsto_integral_of_L1 _ (L1.integrable_coeFn g).integral_compProd
+   229|      (Eventually.of_forall fun h => (L1.integrable_coeFn h).integral_compProd) ?_
+   230|  simp_rw [← lintegral_fn_integral_sub (‖·‖ₑ) (L1.integrable_coeFn _) (L1.integrable_coeFn g)]
+   231|  apply tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds _ (fun i => zero_le _) _
+   232|  · exact fun i => ∫⁻ x, ∫⁻ y, ‖i (x, y) - g (x, y)‖ₑ ∂η (a, x) ∂κ a
+   233|  swap; · exact fun i => lintegral_mono fun x => enorm_integral_le_lintegral_enorm _
+   234|  change
+   235|    Tendsto
+   236|      (fun i : β × γ →₁[(κ ⊗ₖ η) a] E => ∫⁻ x, ∫⁻ y : γ, ‖i (x, y) - g (x, y)‖ₑ ∂η (a, x) ∂κ a)
+   237|      (𝓝 g) (𝓝 0)
+   238|  have this (i : Lp (α := β × γ) E 1 (((κ ⊗ₖ η) a) : Measure (β × γ))) :
+   239|      Measurable fun z => ‖i z - g z‖ₑ :=
+   240|    ((Lp.stronglyMeasurable i).sub (Lp.stronglyMeasurable g)).enorm
+   241|  simp_rw [← lintegral_compProd _ _ _ (this _), ← L1.ofReal_norm_sub_eq_lintegral, ← ofReal_zero]
+   242|  refine (continuous_ofReal.tendsto 0).comp ?_
+   243|  rw [← tendsto_iff_norm_sub_tendsto_zero]
+   244|  exact tendsto_id
+   245|
+   246|theorem integral_compProd :
+   247|    ∀ {f : β × γ → E} (_ : Integrable f ((κ ⊗ₖ η) a)),
+   248|      ∫ z, f z ∂(κ ⊗ₖ η) a = ∫ x, ∫ y, f (x, y) ∂η (a, x) ∂κ a := by
+   249|  by_cases hE : CompleteSpace E; swap
+   250|  · simp [integral, hE]
+   251|  apply Integrable.induction
+   252|  · intro c s hs h2s
+   253|    simp_rw [integral_indicator hs, ← indicator_comp_right, Function.comp_def,
+   254|      integral_indicator (measurable_prodMk_left hs), MeasureTheory.setIntegral_const,
+   255|      integral_smul_const, measureReal_def]
+   256|    congr 1
+   257|    rw [integral_toReal]
+   258|    rotate_left
+   259|    · exact (Kernel.measurable_kernel_prodMk_left' hs _).aemeasurable
+   260|    · exact ae_kernel_lt_top a h2s.ne
+   261|    rw [Kernel.compProd_apply hs]
+   262|  · intro f g _ i_f i_g hf hg
+   263|    simp_rw [integral_add' i_f i_g, Kernel.integral_integral_add' i_f i_g, hf, hg]
+   264|  · exact isClosed_eq continuous_integral Kernel.continuous_integral_integral
+   265|  · intro f g hfg _ hf
+   266|    convert hf using 1
+   267|    · exact integral_congr_ae hfg.symm
+   268|    · apply integral_congr_ae
+   269|      filter_upwards [ae_ae_of_ae_compProd hfg] with x hfgx using
+   270|        integral_congr_ae (ae_eq_symm hfgx)
+   271|
+   272|theorem setIntegral_compProd {f : β × γ → E} {s : Set β} {t : Set γ} (hs : MeasurableSet s)
+   273|    (ht : MeasurableSet t) (hf : IntegrableOn f (s ×ˢ t) ((κ ⊗ₖ η) a)) :
+   274|    ∫ z in s ×ˢ t, f z ∂(κ ⊗ₖ η) a = ∫ x in s, ∫ y in t, f (x, y) ∂η (a, x) ∂κ a := by
+   275|  -- Porting note: `compProd_restrict` needed some explicit arguments
+   276|  rw [← Kernel.restrict_apply (κ ⊗ₖ η) (hs.prod ht), ← compProd_restrict hs ht, integral_compProd]
+   277|  · simp_rw [Kernel.restrict_apply]
+   278|  · rw [compProd_restrict, Kernel.restrict_apply]; exact hf
+   279|
+   280|theorem setIntegral_compProd_univ_right (f : β × γ → E) {s : Set β} (hs : MeasurableSet s)
+   281|    (hf : IntegrableOn f (s ×ˢ univ) ((κ ⊗ₖ η) a)) :
+   282|    ∫ z in s ×ˢ univ, f z ∂(κ ⊗ₖ η) a = ∫ x in s, ∫ y, f (x, y) ∂η (a, x) ∂κ a := by
+   283|  simp_rw [setIntegral_compProd hs MeasurableSet.univ hf, Measure.restrict_univ]
+   284|
+   285|theorem setIntegral_compProd_univ_left (f : β × γ → E) {t : Set γ} (ht : MeasurableSet t)
+   286|    (hf : IntegrableOn f (univ ×ˢ t) ((κ ⊗ₖ η) a)) :
+   287|    ∫ z in univ ×ˢ t, f z ∂(κ ⊗ₖ η) a = ∫ x, ∫ y in t, f (x, y) ∂η (a, x) ∂κ a := by
+   288|  simp_rw [setIntegral_compProd MeasurableSet.univ ht hf, Measure.restrict_univ]
+   289|
+   290|end compProd
+   291|
+   292|section comp
+   293|
+   294|variable {κ : Kernel α β} {η : Kernel β γ}
+   295|
+   296|theorem _root_.MeasureTheory.AEStronglyMeasurable.integral_kernel_comp [NormedSpace ℝ E]
+   297|    ⦃f : γ → E⦄ (hf : AEStronglyMeasurable f ((η ∘ₖ κ) a)) :
+   298|    AEStronglyMeasurable (fun x ↦ ∫ y, f y ∂η x) (κ a) :=
+   299|  ⟨fun x ↦ ∫ y, hf.mk f y ∂η x, hf.stronglyMeasurable_mk.integral_kernel, by
+   300|    filter_upwards [ae_ae_of_ae_comp hf.ae_eq_mk] with _ hx using integral_congr_ae hx⟩
+   301|
+   302|theorem _root_.MeasureTheory.AEStronglyMeasurable.comp {δ : Type*} [TopologicalSpace δ]
+   303|    {f : γ → δ} (hf : AEStronglyMeasurable f ((η ∘ₖ κ) a)) :
+   304|    ∀ᵐ x ∂κ a, AEStronglyMeasurable f (η x) := by
+   305|  filter_upwards [ae_ae_of_ae_comp hf.ae_eq_mk] with x hx using
+   306|    ⟨hf.mk f, hf.stronglyMeasurable_mk, hx⟩
+   307|
+   308|/-! ### Integrability with respect to composition -/
+   309|
+   310|theorem hasFiniteIntegral_comp_iff ⦃f : γ → E⦄ (hf : StronglyMeasurable f) :
+   311|    HasFiniteIntegral f ((η ∘ₖ κ) a) ↔
+   312|    (∀ᵐ x ∂κ a, HasFiniteIntegral f (η x)) ∧ HasFiniteIntegral (fun x ↦ ∫ y, ‖f y‖ ∂η x) (κ a) := by
+   313|  simp_rw [hasFiniteIntegral_iff_enorm, lintegral_comp _ _ _ hf.enorm]
+   314|  simp_rw [integral_eq_lintegral_of_nonneg_ae (ae_of_all _ fun y ↦ norm_nonneg _)
+   315|      hf.norm.aestronglyMeasurable, enorm_eq_ofReal toReal_nonneg, ofReal_norm_eq_enorm]
+   316|  have : ∀ {p q r : Prop} (_ : r → p), (r ↔ p ∧ q) ↔ p → (r ↔ q) := fun h ↦ by
+   317|    rw [← and_congr_right_iff, and_iff_right_of_imp h]
+   318|  rw [this]
+   319|  · intro h
+   320|    rw [lintegral_congr_ae]
+   321|    filter_upwards [h] with x hx
+   322|    rw [ofReal_toReal]
+   323|    finiteness
+   324|  · exact fun h ↦ ae_lt_top hf.enorm.lintegral_kernel h.ne
+   325|
+   326|theorem hasFiniteIntegral_comp_iff' ⦃f : γ → E⦄ (hf : AEStronglyMeasurable f ((η ∘ₖ κ) a)) :
+   327|    HasFiniteIntegral f ((η ∘ₖ κ) a) ↔
+   328|    (∀ᵐ x ∂κ a, HasFiniteIntegral f (η x)) ∧ HasFiniteIntegral (fun x ↦ ∫ y, ‖f y‖ ∂η x) (κ a) := by
+   329|  rw [hasFiniteIntegral_congr hf.ae_eq_mk, hasFiniteIntegral_comp_iff hf.stronglyMeasurable_mk]
+   330|  refine and_congr (eventually_congr ?_) (hasFiniteIntegral_congr ?_)
+   331|  · filter_upwards [ae_ae_of_ae_comp hf.ae_eq_mk.symm] with _ hx using
+   332|      hasFiniteIntegral_congr hx
+   333|  · filter_upwards [ae_ae_of_ae_comp hf.ae_eq_mk.symm] with _ hx using
+   334|      integral_congr_ae (EventuallyEq.fun_comp hx _)
+   335|
+   336|theorem integrable_comp_iff ⦃f : γ → E⦄ (hf : AEStronglyMeasurable f ((η ∘ₖ κ) a)) :
+   337|    Integrable f ((η ∘ₖ κ) a) ↔
+   338|    (∀ᵐ y ∂κ a, Integrable f (η y)) ∧ Integrable (fun y ↦ ∫ z, ‖f z‖ ∂η y) (κ a) := by
+   339|  simp only [Integrable, hf, hasFiniteIntegral_comp_iff' hf, true_and, eventually_and, hf.comp,
+   340|    hf.norm.integral_kernel_comp]
+   341|
+   342|theorem _root_.MeasureTheory.Integrable.ae_of_comp ⦃f : γ → E⦄ (hf : Integrable f ((η ∘ₖ κ) a)) :
+   343|    ∀ᵐ x ∂κ a, Integrable f (η x) := ((integrable_comp_iff hf.1).1 hf).1
+   344|
+   345|theorem _root_.MeasureTheory.Integrable.integral_norm_comp ⦃f : γ → E⦄
+   346|    (hf : Integrable f ((η ∘ₖ κ) a)) : Integrable (fun x ↦ ∫ y, ‖f y‖ ∂η x) (κ a) :=
+   347|  ((integrable_comp_iff hf.1).1 hf).2
+   348|
+   349|theorem _root_.MeasureTheory.Integrable.integral_comp [NormedSpace ℝ E] ⦃f : γ → E⦄
+   350|    (hf : Integrable f ((η ∘ₖ κ) a)) : Integrable (fun x ↦ ∫ y, f y ∂η x) (κ a) :=
+   351|  Integrable.mono hf.integral_norm_comp hf.1.integral_kernel_comp <|
+   352|    ae_of_all _ fun _ ↦ (norm_integral_le_integral_norm _).trans_eq
+   353|    (norm_of_nonneg <| integral_nonneg_of_ae <| ae_of_all _ fun _ ↦ norm_nonneg _).symm
+   354|
+   355|/-! ### Bochner integral with respect to the composition -/
+   356|
+   357|variable [NormedSpace ℝ E] {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℝ E']
+   358|
+   359|namespace Kernel
+   360|
+   361|theorem integral_fn_integral_add_comp ⦃f g : γ → E⦄ (F : E → E')
+   362|    (hf : Integrable f ((η ∘ₖ κ) a)) (hg : Integrable g ((η ∘ₖ κ) a)) :
+   363|    ∫ x, F (∫ y, f y + g y ∂η x) ∂κ a = ∫ x, F (∫ y, f y ∂η x + ∫ y, g y ∂η x) ∂κ a := by
+   364|  refine integral_congr_ae ?_
+   365|  filter_upwards [hf.ae_of_comp, hg.ae_of_comp] with _ h2f h2g
+   366|  simp [integral_add h2f h2g]
+   367|
+   368|theorem integral_fn_integral_sub_comp ⦃f g : γ → E⦄ (F : E → E')
+   369|    (hf : Integrable f ((η ∘ₖ κ) a)) (hg : Integrable g ((η ∘ₖ κ) a)) :
+   370|    ∫ x, F (∫ y, f y - g y ∂η x) ∂κ a = ∫ x, F (∫ y, f y ∂η x - ∫ y, g y ∂η x) ∂κ a := by
+   371|  refine integral_congr_ae ?_
+   372|  filter_upwards [hf.ae_of_comp, hg.ae_of_comp] with _ h2f h2g
+   373|  simp [integral_sub h2f h2g]
+   374|
+   375|theorem lintegral_fn_integral_sub_comp ⦃f g : γ → E⦄ (F : E → ℝ≥0∞)
+   376|    (hf : Integrable f ((η ∘ₖ κ) a)) (hg : Integrable g ((η ∘ₖ κ) a)) :
+   377|    ∫⁻ x, F (∫ y, f y - g y ∂η x) ∂κ a = ∫⁻ x, F (∫ y, f y ∂η x - ∫ y, g y ∂η x) ∂κ a := by
+   378|  refine lintegral_congr_ae ?_
+   379|  filter_upwards [hf.ae_of_comp, hg.ae_of_comp] with _ h2f h2g
+   380|  simp [integral_sub h2f h2g]
+   381|
+   382|theorem integral_integral_add_comp ⦃f g : γ → E⦄ (hf : Integrable f ((η ∘ₖ κ) a))
+   383|    (hg : Integrable g ((η ∘ₖ κ) a)) :
+   384|    ∫ x, ∫ y, f y + g y ∂η x ∂κ a = ∫ x, ∫ y, f y ∂η x ∂κ a + ∫ x, ∫ y, g y ∂η x ∂κ a :=
+   385|  (integral_fn_integral_add_comp id hf hg).trans <| integral_add hf.integral_comp hg.integral_comp
+   386|
+   387|theorem integral_integral_add'_comp ⦃f g : γ → E⦄ (hf : Integrable f ((η ∘ₖ κ) a))
+   388|    (hg : Integrable g ((η ∘ₖ κ) a)) :
+   389|    ∫ x, ∫ y, (f + g) y ∂η x ∂κ a = ∫ x, ∫ y, f y ∂η x ∂κ a + ∫ x, ∫ y, g y ∂η x ∂κ a :=
+   390|  integral_integral_add_comp hf hg
+   391|
+   392|theorem integral_integral_sub_comp ⦃f g : γ → E⦄ (hf : Integrable f ((η ∘ₖ κ) a))
+   393|    (hg : Integrable g ((η ∘ₖ κ) a)) :
+   394|    ∫ x, ∫ y, f y - g y ∂η x ∂κ a = ∫ x, ∫ y, f y ∂η x ∂κ a - ∫ x, ∫ y, g y ∂η x ∂κ a :=
+   395|  (integral_fn_integral_sub_comp id hf hg).trans <| integral_sub hf.integral_comp hg.integral_comp
+   396|
+   397|theorem integral_integral_sub'_comp ⦃f g : γ → E⦄ (hf : Integrable f ((η ∘ₖ κ) a))
+   398|    (hg : Integrable g ((η ∘ₖ κ) a)) :
+   399|    ∫ x, ∫ y, (f - g) y ∂η x ∂κ a = ∫ x, ∫ y, f y ∂η x ∂κ a - ∫ x, ∫ y, g y ∂η x ∂κ a :=
+   400|  integral_integral_sub_comp hf hg
+   401|
+   402|theorem continuous_integral_integral_comp :
+   403|    Continuous fun f : γ →₁[(η ∘ₖ κ) a] E ↦ ∫ x, ∫ y, f y ∂η x ∂κ a := by
+   404|  refine continuous_iff_continuousAt.2 fun g ↦ ?_
+   405|  refine tendsto_integral_of_L1 _ (L1.integrable_coeFn g).integral_comp
+   406|      (Eventually.of_forall fun h ↦ (L1.integrable_coeFn h).integral_comp) ?_
+   407|  simp_rw [← lintegral_fn_integral_sub_comp (‖·‖ₑ) (L1.integrable_coeFn _) (L1.integrable_coeFn g)]
+   408|  refine tendsto_of_tendsto_of_tendsto_of_le_of_le
+   409|    (h := fun i ↦ ∫⁻ x, ∫⁻ y, ‖i y - g y‖ₑ ∂η x ∂κ a)
+   410|    tendsto_const_nhds ?_ (fun _ ↦ zero_le _) ?_
+   411|  swap; · exact fun _ ↦ lintegral_mono fun _ ↦ enorm_integral_le_lintegral_enorm _
+   412|  have (i : γ →₁[(η ∘ₖ κ) a] E) : Measurable fun z ↦ ‖i z - g z‖ₑ :=
+   413|    ((Lp.stronglyMeasurable i).sub (Lp.stronglyMeasurable g)).enorm
+   414|  simp_rw [← lintegral_comp _ _ _ (this _), ← L1.ofReal_norm_sub_eq_lintegral, ← ofReal_zero]
+   415|  exact (continuous_ofReal.tendsto 0).comp (tendsto_iff_norm_sub_tendsto_zero.1 tendsto_id)
+   416|
+   417|theorem integral_comp : ∀ {f : γ → E} (_ : Integrable f ((η ∘ₖ κ) a)),
+   418|    ∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a := by
+   419|  by_cases hE : CompleteSpace E; swap
+   420|  · simp [integral, hE]
+   421|  apply Integrable.induction
+   422|  · intro c s hs ms
+   423|    simp_rw [integral_indicator hs, MeasureTheory.setIntegral_const, integral_smul_const,
+   424|      measureReal_def]
+   425|    congr
+   426|    rw [integral_toReal, Kernel.comp_apply' _ _ _ hs]
+   427|    · exact (Kernel.measurable_coe _ hs).aemeasurable
+   428|    · exact ae_lt_top_of_comp_ne_top a ms.ne
+   429|  · rintro f g - i_f i_g hf hg
+   430|    simp_rw [integral_add' i_f i_g, integral_integral_add'_comp i_f i_g, hf, hg]
+   431|  · exact isClosed_eq continuous_integral Kernel.continuous_integral_integral_comp
+   432|  · rintro f g hfg - hf
+   433|    convert hf using 1
+   434|    · exact integral_congr_ae hfg.symm
+   435|    · apply integral_congr_ae
+   436|      filter_upwards [ae_ae_of_ae_comp hfg] with x hfgx using integral_congr_ae (ae_eq_symm hfgx)
+   437|
+   438|theorem setIntegral_comp {f : γ → E} {s : Set γ} (hs : MeasurableSet s)
+   439|    (hf : IntegrableOn f s ((η ∘ₖ κ) a)) :
+   440|    ∫ z in s, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y in s, f y ∂η x ∂κ a := by
+   441|  rw [← restrict_apply (η ∘ₖ κ) hs, ← comp_restrict hs, integral_comp]
+   442|  · simp_rw [restrict_apply]
+   443|  · rwa [comp_restrict, restrict_apply]
+   444|
+   445|end Kernel
+   446|
+   447|end comp
+   448|
+   449|end ProbabilityTheory
+   450|
+   451|namespace MeasureTheory
+   452|
+   453|namespace Measure
+   454|
+   455|variable {α β E : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
+   456|  [NormedAddCommGroup E] {a : α} {κ : Kernel α β} {μ : Measure α} {f : β → E}
+   457|
+   458|section Integral
+   459|
+   460|lemma _root_.MeasureTheory.AEStronglyMeasurable.ae_of_compProd [SFinite μ] [IsSFiniteKernel κ]
+   461|    {E : Type*} [NormedAddCommGroup E] {f : α → β → E}
+   462|    (hf : AEStronglyMeasurable f.uncurry (μ ⊗ₘ κ)) :
+   463|    ∀ᵐ x ∂μ, AEStronglyMeasurable (f x) (κ x) := by
+   464|  simpa using hf.compProd_mk_left
+   465|
+   466|lemma integrable_compProd_iff [SFinite μ] [IsSFiniteKernel κ] {E : Type*} [NormedAddCommGroup E]
+   467|    {f : α × β → E} (hf : AEStronglyMeasurable f (μ ⊗ₘ κ)) :
+   468|    Integrable f (μ ⊗ₘ κ) ↔
+   469|      (∀ᵐ x ∂μ, Integrable (fun y => f (x, y)) (κ x)) ∧
+   470|        Integrable (fun x => ∫ y, ‖f (x, y)‖ ∂(κ x)) μ := by
+   471|  simp_rw [Measure.compProd, ProbabilityTheory.integrable_compProd_iff hf, Kernel.prodMkLeft_apply,
+   472|    Kernel.const_apply]
+   473|
+   474|lemma integral_compProd [SFinite μ] [IsSFiniteKernel κ] {E : Type*}
+   475|    [NormedAddCommGroup E] [NormedSpace ℝ E]
+   476|    {f : α × β → E} (hf : Integrable f (μ ⊗ₘ κ)) :
+   477|    ∫ x, f x ∂(μ ⊗ₘ κ) = ∫ a, ∫ b, f (a, b) ∂(κ a) ∂μ := by
+   478|  rw [Measure.compProd, ProbabilityTheory.integral_compProd hf]
+   479|  simp
+   480|
+   481|lemma setIntegral_compProd [SFinite μ] [IsSFiniteKernel κ] {E : Type*}
+   482|    [NormedAddCommGroup E] [NormedSpace ℝ E]
+   483|    {s : Set α} (hs : MeasurableSet s) {t : Set β} (ht : MeasurableSet t)
+   484|    {f : α × β → E} (hf : IntegrableOn f (s ×ˢ t) (μ ⊗ₘ κ)) :
+   485|    ∫ x in s ×ˢ t, f x ∂(μ ⊗ₘ κ) = ∫ a in s, ∫ b in t, f (a, b) ∂(κ a) ∂μ := by
+   486|  rw [Measure.compProd, ProbabilityTheory.setIntegral_compProd hs ht hf]
+   487|  simp
+   488|
+   489|end Integral
+   490|
+   491|section Integrable
+   492|
+   493|lemma integrable_compProd_snd_iff [SFinite μ] [IsSFiniteKernel κ]
+   494|    (hf : AEStronglyMeasurable f (κ ∘ₘ μ)) :
+   495|    Integrable (fun p ↦ f p.2) (μ ⊗ₘ κ) ↔ Integrable f (κ ∘ₘ μ) := by
+   496|  rw [← Measure.snd_compProd, Measure.snd, integrable_map_measure _ measurable_snd.aemeasurable,
+   497|    Function.comp_def]
+   498|  rwa [← Measure.snd, Measure.snd_compProd]
+   499|
+   500|lemma ae_integrable_of_integrable_comp (h_int : Integrable f (κ ∘ₘ μ)) :
+   501|    ∀ᵐ x ∂μ, Integrable f (κ x) := by
+   502|  rw [Measure.comp_eq_comp_const_apply, integrable_comp_iff h_int.1] at h_int
+   503|  exact h_int.1
+   504|
+   505|lemma integrable_integral_norm_of_integrable_comp (h_int : Integrable f (κ ∘ₘ μ)) :
+   506|    Integrable (fun x ↦ ∫ y, ‖f y‖ ∂κ x) μ := by
+   507|  rw [Measure.comp_eq_comp_const_apply, integrable_comp_iff h_int.1] at h_int
+   508|  exact h_int.2
+   509|
+   510|end Integrable
+   511|
+   512|end Measure
+   513|
+   514|end MeasureTheory

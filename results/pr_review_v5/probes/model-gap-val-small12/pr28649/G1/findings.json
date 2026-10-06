@@ -1,0 +1,44 @@
+[
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module docstring, Main results)",
+  "claim": "The PR changes 'their mgfs' / 'their cgfs' to 'their MGFs' / 'their CGFs'. The lowercase spelling was not a typo. The same docstring still says 'such that the cgf exists' three lines below (line 30), and every other prose use in Probability/Moments is lowercase: ComplexMGF.lean ('the mgf'), MGFAnalytic.lean ('the mgf at `t`'), SubGaussian.lean ('the mgf of a Gaussian'). After the PR these two lines are the only uppercase 'MGF'/'CGF' prose in Mathlib, so the edit makes the docstring and the area inconsistent.",
+  "requested_change": "Revert lines 25 and 27 of Mathlib/Probability/Moments/Basic.lean to 'and their mgfs are defined at `t`' and 'and their cgfs are defined at `t`', so they match 'the cgf exists' on line 30 and the rest of Probability/Moments.",
+  "severity": "advisory",
+  "evidence": "content_search '(the|an|its|their|a) (MGF|CGF)s?\\b' over target/Mathlib: only Moments/Basic.lean:25 and :27 (the PR's lines). The same search with lowercase 'mgf|cgf': Moments/Basic.lean:30 'the cgf exists', ComplexMGF.lean:18,20,21,32, MGFAnalytic.lean:20, SubGaussian.lean:32,107,110,458. precedent_search: ComplexMGF's module doc introduces the abbreviation as 'The moment generating function (mgf)', lowercase."
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_uncrossing_lt_top (docstring)",
+  "claim": "The PR rewrites 'bounded upcrossings and bounded liminfs' as 'bounded limit inferiors'. 'liminfs' was not a typo: it is the spelling Mathlib uses, for example the title of Order/LiminfLimsup.lean ('liminfs and limsups of functions and filters') and MeasureTheory/Constructions/BorelSpace/Order.lean:34. 'limit inferiors' is a questionable plural (the usual one is 'limits inferior'). So this is a third-party change of the author's wording that fixes no error, inside a PR titled as typo fixes.",
+  "requested_change": "Revert this docstring line in Mathlib/Probability/Martingale/Convergence.lean to 'A realization of a stochastic process with bounded upcrossings and bounded liminfs is'.",
+  "severity": "advisory",
+  "evidence": "content_search 'liminfs|limsups|limit inferiors|limits inferior|limit superiors|limits superior' over target/Mathlib: 'liminfs' at Order/LiminfLimsup.lean:11 and MeasureTheory/Constructions/BorelSpace/Order.lean:34. 'limit inferiors' occurs only at the PR's Convergence.lean:133. The hypothesis hf₁ is `liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞`, so the docstring's meaning is unchanged by the edit."
+ },
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module docstring, Main statements)",
+  "claim": "The PR edits this module docstring for a typo ('measurablity') but leaves a wrong entry in its Main statements list. Lines 30-31 cite `ProbabilityTheory.integral_comp`, which does not exist: the theorem is `ProbabilityTheory.Kernel.integral_comp` (line 417). The entry also states it with the Lebesgue integral, `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`, although this file, as its title says, is about the Bochner integral and the theorem is stated with `∫`.",
+  "requested_change": "Replace the bullet with: '* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.'",
+  "severity": "advisory",
+  "evidence": "declaration_search 'ProbabilityTheory.integral_comp': 'No declaration ... exists at the base commit or in the files this PR changes.' declaration_search 'ProbabilityTheory.Kernel.integral_comp': declared at IntegralCompProd.lean:417. file_read lines 417-418: `theorem integral_comp : ∀ {f : γ → E} (_ : Integrable f ((η ∘ₖ κ) a)), ∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`, inside `namespace Kernel` (line 359). The sibling bullet for `ProbabilityTheory.integral_compProd` (line 246, which exists) correctly uses `∫`."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Upcrossing.lean (module docstring 'Variant of the upcrossing estimate')",
+  "claim": "The PR edits this paragraph ('left-hand side'), but both of its displayed formulas misstate what the Lean code proves. (1) The target inequality is given as `(b - a) sup_N E[U_N(a, b)] ≤ sup_N E[f_N]`, but the paragraph presents it as the supremum of the original estimate `(b - a) E[U_N(a, b)] ≤ E[(f_N - a)^+]` (line 18), and `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part` bounds it by `⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺) ∂μ`. (2) The measurability argument reads `U_N(a, b) = Σ_{i=1}^N 1_{U_N(a, b) < N}`: the indicator does not depend on `i`, and the set should be `{τ_i < N}`. It then says this is measurable 'since U_N(a, b) is a stopping time', but the stopping time is the upper crossing time `τ_i`, not U_N. The Lean code (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) sums indicators of `{upperCrossingTime a b f N i ω < N}` and uses `isStoppingTime_upperCrossingTime`.",
+  "requested_change": "In that module docstring, change the first display to `(b - a) \\sup_N \\mathbb{E}[U_N(a, b)] \\le \\sup_N \\mathbb{E}[(f_N - a)^+].`, change the second to `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}`, and change the sentence after it to '$U_N(a, b)$ is measurable as $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a stopping time.' This uses the `\\tau_i` (upper crossing time) notation of the file's 'Proof outline' section, lines 79-83.",
+  "severity": "advisory",
+  "evidence": "file_read Upcrossing.lean 685-753: the docstring at 689-706. `upcrossingsBefore_eq_sum` (711-712) is `upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`. `Adapted.measurable_upcrossingsBefore` (736-744) uses `hf.isStoppingTime_upperCrossingTime.measurableSet_lt_of_pred N`. content_search: `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part` (783-785) concludes `ENNReal.ofReal (b - a) * ∫⁻ ω, upcrossings a b f ω ∂μ ≤ ⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺) ∂μ`. Module doc line 18 states the original estimate with `(f_N - a)^+`. Proof outline lines 79 and 83: `\\tau_{n+1}` is the upper crossing time and `U_N(a, b) := \\sup \\{n \\mid \\tau_n < N\\}`."
+ },
+ {
+  "target": "ProbabilityTheory.gaussianReal_add_gaussianReal_of_indepFun",
+  "claim": "The PR fixes Gaussian-related docstrings throughout Real.lean but misses this lemma's. It opens with `/-` instead of `/--` (line 600), so it is a plain comment and the lemma has no docstring. Its text also writes `v_1 + v_2` where the rest of it uses `v₁, v₂`. And it says the sum of two Gaussian 'variables' 'is a real Gaussian distribution', whereas the statement `P.map (X + Y) = gaussianReal (m₁ + m₂) (v₁ + v₂)` says the sum has a Gaussian law, under the independence hypothesis `hXY`, which the comment omits. The neighbouring docstrings (lines 358-388) use the 'has Gaussian law' phrasing.",
+  "requested_change": "Replace lines 600-601 with the docstring '/-- The sum of two independent real random variables with Gaussian laws with means `m₁, m₂` and\\nvariances `v₁, v₂` has Gaussian law with mean `m₁ + m₂` and variance `v₁ + v₂`. -/'.",
+  "severity": "advisory",
+  "evidence": "file_read Real.lean 589-611: line 600 begins `/- The sum of two real Gaussian variables`, line 601 ends `variance `v_1 + v_2`. -/`. lean_verify_edit (line mode, lines 600-601, the replacement above): outcome 'compiled', no errors or warnings. The first line of the replacement is 95 characters, under the 100-character limit."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Convergence.lean (file module docstring, Main results)",
+  "claim": "This typo-fix PR edits two docstrings in Convergence.lean but leaves three dropped words in the file's Main results list. Line 28 reads 'part a of the L¹ martingale convergence theorem', but lines 32, 35 and 38 read 'part b the L¹ martingale convergence theorem' and 'part c the L¹ martingale convergence theorem', missing 'of'.",
+  "requested_change": "In Mathlib/Probability/Martingale/Convergence.lean, change 'part b the L¹ martingale' (line 32) to 'part b of the L¹ martingale', and 'part c the L¹ martingale' (lines 35 and 38) to 'part c of the L¹ martingale'.",
+  "severity": "advisory",
+  "evidence": "file_read Convergence.lean 1-42: line 28 '* `MeasureTheory.Submartingale.tendsto_eLpNorm_one_limitProcess`: part a of the L¹ martingale', line 32 '...ae_eq_condExp_limitProcess`: part b the L¹ martingale convergence', line 35 '...tendsto_ae_condExp`: part c the L¹ martingale convergence theorem:', line 38 '...tendsto_eLpNorm_condExp`: part c the L¹ martingale convergence theorem:'."
+ }
+]
