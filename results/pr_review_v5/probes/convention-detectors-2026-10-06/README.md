@@ -201,3 +201,9 @@ by reading (every fact if there are 20 or fewer, else the seeded sample); census
 per convention against its target asks, a finder at >= 25% exact, narrow at 10-25%, not a finder
 below 10% -- at 9 and 11 targets these bands are coarse, and a single ask moves them; demand read
 against stage H's 5%.
+
+**Amendment 2 (before stage 3 ran).** Writing `generated_twins` showed one false-positive mode the
+rule above did not name: in a ring, `map_mul` and `map_add` are both primary lemmas, not a generated
+pair. The `@[to_additive]` shape skips a multiplicative declaration whose signature names a
+ring-like class (`Semiring`, `Ring`, `CommRing`, `Field`, `DivisionRing`, `Algebra`, `Module`,
+`NonUnitalNonAssocSemiring`), and a pair split across two files.
