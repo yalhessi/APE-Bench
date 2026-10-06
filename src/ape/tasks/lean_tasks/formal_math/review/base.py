@@ -577,7 +577,7 @@ class BasePRReviewTask(BaseLeanTask):
         async def lean_verify_edit(
             path: Annotated[str, Field(description="Reviewed file path, e.g. Mathlib/.../X.lean")],
             declaration_name: Annotated[Optional[str], Field(
-                description="Name of the declaration to replace whole (e.g. Subgroup.closure_pow_le)")] = None,
+                description="Full name of the declaration to replace whole, as it is declared")] = None,
             new_declaration: Annotated[Optional[str], Field(
                 description="Full replacement declaration (from its theorem/lemma/def keyword)")] = None,
             line_start: Annotated[Optional[int], Field(

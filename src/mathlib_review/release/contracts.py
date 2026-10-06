@@ -84,6 +84,9 @@ _MIN_LEAK_RUN = 7
 _GENERIC_LEAN_VOCABULARY = frozenset({
     "fun_prop", "to_fun", "simp_rw", "simp_all", "norm_num", "aesop", "omega",
     "gcongr", "linarith", "positivity", "gcongr_discharger", "gcongr_forward",
+    # The attribute, as `to_fun` is: gold names it on 33141 (`relevant_arg`) and 33208 (a
+    # docstring), neither in the dev release; D1's placement concern lists it beside `simp`.
+    "to_additive",
 })
 
 

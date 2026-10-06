@@ -98,6 +98,96 @@ def test_the_lead_instructions_quote_no_gold():
     assert not prompt_leaks(v5_prompts.LEAD_SYSTEM, gold)
 
 
+# --- tool text, and the declarations gold is about ---------------------------------------
+#
+# The pipeline-overfit audit (2026-09-24) found dev text the gate above could not see: tool and
+# argument descriptions are not prompts, and a gold *subject* -- the declaration a maintainer
+# asked about -- is not an answer. `lean_verify_edit`'s example was `Subgroup.closure_pow_le`,
+# 33401's gold target, so every arm reviewing 33401 was shown its own subject as the model
+# name. Tool schemas are also sealed nowhere (`docs/todo/framework-defects-2026-09.md`), so no
+# plan identity could show the change either.
+
+#: Modules whose string literals reach a model: the review tools, the prompts, and the arm
+#: rationales the lead reads.
+MODEL_TEXT_MODULES = (
+    *sorted(Path("src/ape/tasks/lean_tasks/formal_math/review").glob("*.py")),
+    Path("src/mathlib_review/agenda/registry.py"),
+    Path("src/mathlib_review/agenda/render_focused.py"),
+    Path("src/mathlib_review/agenda/review_map.py"),
+)
+
+
+def model_text(path: Path):
+    """Every string literal in a module except docstrings. The review tools declare their text
+    with `description=`, so a docstring there never reaches a model."""
+
+    import ast
+
+    tree = ast.parse(path.read_text())
+    docstrings = {
+        id(node.body[0].value) for node in ast.walk(tree)
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.body and isinstance(node.body[0], ast.Expr)
+        and isinstance(node.body[0].value, ast.Constant)
+    }
+    return "\n".join(node.value for node in ast.walk(tree)
+                     if isinstance(node, ast.Constant) and isinstance(node.value, str)
+                     and id(node) not in docstrings)
+
+
+def gold_subjects():
+    """Leaf names of the declarations every release's gold asks about, through its change graph.
+    Short or unseparated leaves (`le_refl`, `comm`) are ordinary vocabulary and are left out."""
+
+    out = {}
+    for release in sorted(RELEASES.glob("*")):
+        gold, graphs = release / "gold/judgments.jsonl", release / "derived/change_graphs.jsonl"
+        if not (gold.is_file() and graphs.is_file()):
+            continue
+        asked = {change for line in gold.read_text().splitlines() if line.strip()
+                 for obligation in (json.loads(line).get("obligations") or [])
+                 for change in (obligation.get("change_ids") or [])}
+        for line in graphs.read_text().splitlines():
+            if not line.strip():
+                continue
+            graph = json.loads(line)
+            for target in graph.get("targets") or []:
+                leaf = (target.get("declaration_name") or "").split(".")[-1]
+                if target.get("change_id") in asked and len(leaf) >= 8 and "_" in leaf:
+                    out[leaf] = graph["pr_number"]
+    return out
+
+
+def test_no_model_text_names_a_gold_subject_or_quotes_gold():
+    import re
+
+    subjects, gold = gold_subjects(), all_gold()
+    if not subjects:
+        pytest.skip("no gold available in this checkout")
+    offenders = {}
+    for path in MODEL_TEXT_MODULES:
+        text = model_text(path)
+        found = [f"{leaf} ({pr})" for leaf, pr in sorted(subjects.items())
+                 if re.search(r"(?<![\w'])" + re.escape(leaf) + r"(?![\w'])", text)]
+        found += prompt_leaks(text, gold)
+        if found:
+            offenders[str(path)] = found
+    assert not offenders, f"model-facing text names gold: {offenders}"
+
+
+def test_the_subject_sweep_would_have_caught_the_tool_example():
+    """`closure_pow_le` is what `lean_verify_edit` showed before this gate existed."""
+
+    import re
+
+    subjects = gold_subjects()
+    if not subjects:
+        pytest.skip("no gold available in this checkout")
+    assert subjects.get("closure_pow_le") == 33401
+    old = 'description="Name of the declaration to replace whole (e.g. Subgroup.closure_pow_le)"'
+    assert re.search(r"(?<![\w'])closure_pow_le(?![\w'])", old)
+
+
 # --- the detector itself, which was wrong the first time --------------------------------
 
 def test_it_catches_a_declaration_name_lifted_from_a_claim():

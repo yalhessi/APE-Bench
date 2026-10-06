@@ -184,7 +184,7 @@ def _register_zulip(task, mcp) -> None:
             if not terms:
                 response["note"] = (
                     "That query held no searchable term. Search for identifier fragments or "
-                    "words, e.g. `toLinearMap` or `naming convention`.")
+                    "words, e.g. part of a declaration name, or `naming convention`.")
             elif not count:
                 response["note"] = (
                     f"No message before the cutoff contains any of {terms}. This is a real "
@@ -862,7 +862,7 @@ def _register_naming_norm(task, mcp) -> None:
     )
     async def naming_norm(
         declaration: Annotated[str, Field(
-            description="Declaration this PR adds or renames, e.g. `Submodule.coe_starProjection_eq_x`")],
+            description="Full name of a declaration this PR adds or renames")],
     ) -> Dict[str, Any]:
         return await naming_census(task, declaration)
 
