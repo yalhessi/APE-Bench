@@ -189,6 +189,49 @@ per arm over the rendered JSON schemas of the tools its task registers, sealed b
 `tools_sha256`; it moves every plan's identity once, so it lands at a run boundary with its own
 dated reason.
 
+## Added 2026-09-24: three defects that put false claims in every v5 run, found in a per-job review
+
+Found reviewing all 124 jobs of `pr5_FD_family_fanout4_rep1` against the code
+(`docs/research/family-division-fanout4-review-2026-09.md`), and confirmed in the source. Each
+affects the ten-arm runs too, so each confounds any comparison of arm designs until fixed.
+
+1. **`declares_identifier` matches the leaf, strips primes, and echoes the query**
+   (`src/mathlib_review/evidence/evidence.py:172`, `searchable_identifiers` just above it).
+   - `declaration_search` then tells an arm that `Dense.continuous_inf` "is declared in
+     `Topology/Order/Lattice.lean` (before this PR)". The file holds the root `continuous_inf`;
+     no `Dense.continuous_inf` exists at base.
+   - Likewise `Int.ceil_natCast_add` is reported for what is really `ENat.ceil_natCast_add`.
+   - **Effect:** 12 of that run's 74 findings (9 published) were false "already exists" or
+     "collision" claims, from 6 of its 9 arms; at least 5 more in V3 on the same units.
+   - The evidence collector uses the same function, so such claims also draw `supports`.
+   - **Close it:** match the qualified name, tracking `namespace … end` blocks, or read the
+     elaborated names (`retrieval/statement_index.py` on the `naming-from-statement` branch); keep
+     primes; return the name actually found with `file:line`. Test on the two cases above.
+2. **Verification artifacts join on `(work_unit_id, candidate_ordinal)`** (`review/conditions.py:208`).
+   - Several arms share a unit and each arm's first candidate is ordinal 0, so an edit-less
+     candidate inherits another arm's compiled edit and is published as `verified_compile`.
+   - **Effect:** 7 findings in that run, 6 of them false claims from defect 1; 5 in V3.
+   - 12 of 28 join keys in that run are shared by more than one artifact.
+   - The artifact rows carry no arm or invocation id, so past runs cannot be re-joined, and every
+     published count in the v5 record carries some of this.
+   - **Close it:** write `invocation_id` on each artifact and join on it. Add a test with two arms
+     in one unit, one with an edit and one without.
+3. **`lean_verify_edit` with an empty `new_declaration` compiles the unedited file and reports
+   success** (`review/base.py:335`).
+   - 6 false greens in that run: library_fit 4, design 2.
+   - The submission validator refuses the same input, and `splice_declaration` documents it as a
+     deletion.
+   - **Close it:** decide once whether it means deletion, and make the tool splice it or refuse it.
+
+**All three closed (recorded 2026-10-06, at the worktree consolidation).**
+1. `5e215ffe` (2026-09-30, on `develop`): a declaration matches by its qualified name, primes kept,
+   and `declaration_search` reports the name it found at `path:line`.
+2. `e4341209` (`814ed69d` from `arm-division`): artifacts carry the invocation and the join uses it.
+   Rows written before it carry no invocation id, so older runs' `verified_compile` counts stay as
+   they were measured.
+3. `54263929` (`db07c835` from `arm-division`, adapted): half a declaration edit is refused. A line
+   span with no `replacement` is a deletion, as the hygiene layer made it (`0a3d7d33`).
+
 ## gpt_5.2's cached-input rate is gpt-5's (found 2026-09-30)
 
 `MODEL_MAPPINGS["gpt_5.2"]` prices cached input at $0.125 per 1M. OpenAI's pricing page gives $0.175

@@ -233,6 +233,16 @@ paths:
     generalist prompt, context slices.
 
   A clean gate is not evidence that a prompt is dev-free.
+- **A v5 run made before 2026-10-06 can carry two kinds of false claim (found 2026-09-24).**
+  - `declaration_search` reported a declaration as existing when only its last name component did
+    (fixed `5e215ffe`, 2026-09-30). 12 of 74 findings in the family-division run were false "already
+    exists" claims, 9 published; V3 had at least 5.
+  - Verification artifacts joined on `(work_unit_id, candidate_ordinal)`, so an edit-less claim
+    could be published on another arm's compile (fixed `e4341209`, 2026-10-06). 7 in that run, 5 in
+    V3. The old rows carry no invocation id, so those runs cannot be re-joined.
+  - So read an older run's "already exists" claims, and its `verified_compile` count, with that in
+    mind. A "moved declaration" story for such a claim was told once and was wrong: check base with
+    `git show <base>:<path>` first.
 - **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
   (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
   week as arms withholding findings, and a plan costed three interventions against it. Labelling
