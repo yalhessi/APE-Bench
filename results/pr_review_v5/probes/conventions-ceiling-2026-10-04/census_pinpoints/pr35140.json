@@ -1,0 +1,233 @@
+[
+  {
+    "id": "P011",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "Builds the natural transformation by hand-written `app` and `naturality` fields inside `IsTerminal.ofUniqueHom`, then `ext`/`hom_ext`, for limits in functor categories, which have pointwise-evaluation API.",
+    "status": "check"
+  },
+  {
+    "id": "P011",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "Builds the natural transformation by hand-written `app` and `naturality` fields inside `IsInitial.ofUniqueHom`, then `ext`/`hom_ext`, for colimits in functor categories, which have pointwise-evaluation API.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "variable command",
+    "fact": "The new `variable {C D : Type*} [Category* C] [Category D]` introduces the letters `C`, `D` for categories.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "New binders name the functor `{F : C ⥤ D}`, the hypothesis `hF`, and the other functor `G` in `fun G ↦`.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "New binders name the functor `{F : C ⥤ D}`, the hypothesis `hF`, and the other functor `G` in `fun G ↦`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "variable command",
+    "fact": "The category instance binder is spelled two ways on one line: `[Category* C]` for `C` but `[Category D]` for `D`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "`fun G ↦` names a binder the body never uses (it writes `(hF _).from _`), while the file's other unused binders are `_` (`fun _ _ ↦`, `app _`).",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "`fun G ↦` names a binder the body never uses (it writes `(hF _).to _`), while the file's other unused binders are `_` (`fun _ _ ↦`, `app _`).",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "The uniqueness goal in `fun _ _ ↦ by ext; apply (hF _).hom_ext` is closed by manual steps: `ext`, then an explicit `hom_ext` application.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "The uniqueness goal in `fun _ _ ↦ by ext; apply (hF _).hom_ext` is closed by manual steps: `ext`, then an explicit `hom_ext` application.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "The second argument of `IsTerminal.ofUniqueHom` is a short `by` block (`ext`, `apply (hF _).hom_ext`) assembling one lemma application, possibly writable as a term.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "The second argument of `IsInitial.ofUniqueHom` is a short `by` block (`ext`, `apply (hF _).hom_ext`) assembling one lemma application, possibly writable as a term.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "Arguments are passed as `_` placeholders: `(hF _).from _` and `(hF _).hom_ext _ _` in the `app` and `naturality` fields.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "Arguments are passed as `_` placeholders: `(hF _).to _` and `(hF _).hom_ext _ _` in the `app` and `naturality` fields.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "A new def stating a basic fact, that a functor which is terminal at every object is terminal, about notions (functor categories, `IsTerminal`, evaluation) the library already has.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "A new def stating a basic fact, that a functor which is initial at every object is initial, about notions (functor categories, `IsInitial`, evaluation) the library already has.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "New pointwise criterion named `Functor.isTerminal`, a counterpart of existing pointwise constructions of limits and terminal objects; its name and `CategoryTheory.Functor` namespace need comparing with theirs.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "New pointwise criterion named `Functor.isInitial`, a counterpart of existing pointwise constructions of colimits and initial objects; its name and `CategoryTheory.Functor` namespace need comparing with theirs.",
+    "status": "check"
+  },
+  {
+    "id": "P201",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "`isInitial` is hand-written as the dual of the neighbouring `isTerminal`, the same proof with `from`/`to` and terminal/initial swapped.",
+    "status": "check"
+  },
+  {
+    "id": "P190",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "imports",
+    "fact": "The new file imports `Limits.FunctorCategory.Basic` and `Limits.Shapes.Terminal`, while the statement needs only functor categories and `IsTerminal`/`IsInitial`; the defs might sit in an earlier file.",
+    "status": "check"
+  },
+  {
+    "id": "P030",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "imports",
+    "fact": "Adds `public import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic` and `public import Mathlib.CategoryTheory.Limits.Shapes.Terminal`; the proof uses only `ofUniqueHom`, `from`/`to`, `hom_ext` and `ext`.",
+    "status": "check"
+  },
+  {
+    "id": "P030",
+    "file": "Mathlib.lean",
+    "declaration": "imports",
+    "fact": "Adds `public import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Terminal` for the new file.",
+    "status": "check"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "module docstring",
+    "fact": "The new file's module docstring is titled 'Initial and terminal objects', but its body states only the terminal result; `isInitial` is not described.",
+    "status": "check"
+  },
+  {
+    "id": "P048",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "Its signature binds `{F : C ⥤ D}`, which the next declaration `isInitial` repeats, instead of declaring it once in the `variable` line.",
+    "status": "departs"
+  },
+  {
+    "id": "P048",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "Repeats the binder `{F : C ⥤ D}` from the preceding `isTerminal`'s signature instead of taking it from a shared `variable`.",
+    "status": "departs"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "docstring of isTerminal",
+    "fact": "The docstring names the value of `F` at `X` by the pasted dot-notation term `F.obj X` rather than in words.",
+    "status": "departs"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "docstring of isInitial",
+    "fact": "The docstring names the value of `F` at `X` by the pasted dot-notation term `F.obj X` rather than in words.",
+    "status": "departs"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "module docstring",
+    "fact": "The module docstring writes 'such that `F.obj X` is terminal', a pasted dot-notation term standing for the value of `F` at `X`.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isTerminal",
+    "fact": "The signature is broken before `IsTerminal F :=`, though the joined line is 83 characters; the docstring's 'then' would also fit on its 70-character first line.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "CategoryTheory.Functor.isInitial",
+    "fact": "The signature is broken before `IsInitial F :=`, though the joined line is 81 characters; the docstring's 'then' would also fit on its 69-character first line.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "module docstring",
+    "fact": "The prose breaks after the 60-character line '... such that `F.obj X`', although the next line's leading word 'is' (and more) would fit within 100 characters.",
+    "status": "departs"
+  },
+  {
+    "id": "P156",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "The title names only 'terminal object in functor categories', but the diff adds `isInitial`, the initial-object result, equally; that half of the change goes unmentioned.",
+    "status": "departs"
+  },
+  {
+    "id": "P041",
+    "file": "Mathlib/CategoryTheory/Limits/FunctorCategory/Shapes/Terminal.lean",
+    "declaration": "module docstring",
+    "fact": "New file and defs; the module docstring states the result but not why it is wanted or where it will be used, and the PR description is unrecoverable.",
+    "status": "departs"
+  }
+]
