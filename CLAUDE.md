@@ -203,7 +203,10 @@ refuses a run without it. A subscription bills nothing per token. Its five_hour 
 one dev run (20-24M processed tokens), and that window is shared with interactive use. So check the
 token before a run: a one-line `claude -p` with `HOME` set elsewhere reports its `rate_limit_event`.
 A spent limit fails the sessions it reaches, never as a short review, and `run --resume` then
-requeues exactly those. Configs: `configs/pr_review_v5_dev_medium_*_claude_sub.yaml`. Readings:
+requeues exactly those. **Since 2026-10-06 the two Pro accounts refuse** (`CLAUDE_CODE_OAUTH_TOKEN_B` and `_C`:
+"Your organization has disabled Claude subscription access for Claude Code"); only the primary
+token runs, and it is the user's interactive account (its seven_day window stood at 67% that day),
+so a run on it is the user's call, asked before, never assumed. Configs: `configs/pr_review_v5_dev_medium_*_claude_sub.yaml`. Readings:
 `results/pr_review_v5/probes/claude-models-2026-10-01/`.
 
 **A missing or rejected key does not fail; it retries for hours.** `llm_clients/client.py` retries
