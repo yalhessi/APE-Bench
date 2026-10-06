@@ -172,3 +172,32 @@ labelled ask is a control.
   any rule stage H measured; at or below it, the detector shares stage H's limit, and a packet
   section of these facts mostly tells the reviewer about places nobody asks about.
 - **Validity** at least half of the sample, as in stage 1.
+
+## Stage 3: two more detectors (pre-registered 2026-10-06, before either is written)
+
+The producer seam's claim is that a detector is one module and one registry line. Two more test it,
+the next two conventions by census recurrence that a deterministic check can state from the
+change graph alone. Both read only declarations the PR adds or renames, and both state a sibling
+the graph can see; neither guesses about the library beyond the PR's changed files.
+
+1. **`primed_names` (P113; P211 not targeted).** A declaration the PR adds or renames whose leaf
+   ends in `'`, when the unprimed full name is declared in the graph (either side): the fact names
+   the sibling and gives both conclusions, so the term that differs can be named. A primed name
+   with no visible sibling is skipped -- whether one exists elsewhere in Mathlib is not decidable
+   here, and P211 is about exactly that.
+2. **`generated_twins` (P201).** Two shapes. `@[to_fun]`: the PR adds `NS.fun_X` by hand while
+   `NS.X` is declared in the graph. `@[to_additive]`: the PR adds two declarations in one file whose
+   leaves are a multiplicative name and its additive translation (word for word: `mul`/`add`,
+   `one`/`zero`, `prod`/`sum`, `inv`/`neg`, `div`/`sub`, `pow`/`nsmul`, `zpow`/`zsmul`, `smul`/`vadd`,
+   and the capitalised forms), and the multiplicative one carries no `to_additive` attribute.
+
+In sample: dev's `6b02b611` (33421, `round_eq'` -> `round_eq_div`) and `57bcc9fd` (33117,
+`@[to_fun]`) were read while choosing these conventions. Census targets: P113 6 asks on 6 PRs,
+P211 3 on 3, P201 11 on 10.
+
+**Reading rule**, the same as stages 1 and 2 for each detector: control emission at most 1.0 fact
+per control PR on validation small12 and post-cutoff; at least half the facts valid as written,
+by reading (every fact if there are 20 or fewer, else the seeded sample); census recall reported
+per convention against its target asks, a finder at >= 25% exact, narrow at 10-25%, not a finder
+below 10% -- at 9 and 11 targets these bands are coarse, and a single ask moves them; demand read
+against stage H's 5%.
