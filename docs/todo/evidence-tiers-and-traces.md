@@ -21,6 +21,16 @@ What would close it: have v5 finalisation read the arm's `naming_norm` trace row
 and stamp the tier when the arm cites the verdict; pin the hop with a test in the style of
 `fe7a8a7`'s. Then re-report the tier distribution on the three committed reps.
 
+**Closed by a different route (`933ab7cf`, from `increment0-rebaseline`, landed 2026-10-06).** Not the
+trace-row hop above: `conditions.WARRANT_BY_ISSUE_KIND` gives a holistic finding the tier its evidence
+gate earned, for two issue kinds only -- `naming_convention_violation` (`naming_norm`, so
+`repository_measurement`) and `style_norm_violation` (`lint_policy`, so `lexical_rule`); every other
+kind stays at the floor, each pinned by a test (`tests/datasets/test_pr_review_v5_evidence_tier.py`).
+Replayed over the three held-out A reps' recorded findings it resolves two merge conflicts a rep, both
+on 33145's `Dense.continuous_*` renames, and `naming` publishes 2 where it published 0. It moves
+`post_publication` only, not the spine's recall. Still open: the re-report of the tier distribution
+on committed runs; the trace-row hop is unnecessary for these two kinds.
+
 ## 2. Two collectors can never say anything
 
 `pr5_A_lead_heldout12_v2_rep1`, assertions by collector: `local_context` **268 / 268 inconclusive**;
