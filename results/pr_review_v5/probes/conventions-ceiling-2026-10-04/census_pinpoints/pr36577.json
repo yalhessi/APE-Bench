@@ -1,0 +1,61 @@
+[
+  {"id": "P105", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_hom_left", "fact": "Binder renamed from `{Z : D}` to `{Y : D}`, so `Y` now names an object of `D` beside `{X : C}`; the dual it generates swaps these letters.", "status": "check"},
+  {"id": "P105", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_inv_left", "fact": "Binder renamed from `{Z : D}` to `{Y : D}` alongside `{X : C}`, letters for objects of two different categories.", "status": "check"},
+  {"id": "P105", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "New binder `{f : Y ⟶ X}` reverses the usual X-to-Y direction of the file's variables; the existential binds `inv`.", "status": "check"},
+
+  {"id": "P100", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_hom_right_assoc", "fact": "Marked `to_dual none` (and `cancel_natIso_inv_right_assoc` likewise) while the non-assoc cancel lemmas are dualised; no left `_assoc` counterpart exists.", "status": "check"},
+  {"id": "P100", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "hom_inv_id_app", "fact": "`+to_dual` added inside `reassoc` across the `hom_inv_id_app`/`_app_app`/`_app_app_app` family; analogous component lemmas elsewhere (e.g. for `IsIso` transformations) may not get it.", "status": "check"},
+  {"id": "P100", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "naturality_1'", "fact": "Primed naturality pair `naturality_1'`/`naturality_2'` gets `to_dual none`, as do `naturality_1`/`naturality_2` and `NatTrans.naturality_1`/`_2`.", "status": "check"},
+
+  {"id": "P363", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "Hypothesis `out` spells the inverse condition with conjuncts swapped (`inv ≫ f = 𝟙 X ∧ f ≫ inv = 𝟙 Y`) relative to `IsIso.out`.", "status": "check"},
+
+  {"id": "P126", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_hom_right_assoc", "fact": "Attribute written `@[simp, to_dual none]`, with `to_dual` last, while neighbours put it first.", "status": "check"},
+  {"id": "P126", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "naturality_1", "fact": "Attribute written `@[to_dual none, reassoc]`, with `to_dual` first, unlike `@[simp, to_dual none]` a few lines above.", "status": "check"},
+  {"id": "P126", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "isIso_inv_app", "fact": "`@[simp, push ←, to_dual self]` gives `simp` separately, while neighbours write `@[to_dual (attr := simp) …]`.", "status": "check"},
+
+  {"id": "P154", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "New theorem restates `IsIso.mk` with the conjuncts swapped, proved by one `simp_all only [and_comm]`.", "status": "check"},
+
+  {"id": "P201", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "Hand-written dual of `IsIso.mk` (its docstring says so), then registered with `@[to_dual existing mk]`.", "status": "check"},
+  {"id": "P201", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "naturality_2'", "fact": "Marked `to_dual none` and kept hand-written, though its statement reverses `naturality_1'` (inverse moved to the other end).", "status": "check"},
+  {"id": "P201", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "naturality_2", "fact": "Marked `to_dual none` and kept hand-written beside `naturality_1`, its hom/inv-swapped counterpart.", "status": "check"},
+
+  {"id": "P043", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "attribute [grind ←=] CategoryTheory.IsIso.inv_eq_of_hom_inv_id (removed)", "fact": "The PR deletes this grind annotation; the description's `to_dual` purpose does not mention it.", "status": "check"},
+  {"id": "P043", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "file", "fact": "Separate file edit: adds `IsIso.mk'` with `to_dual existing mk`, a part about `IsIso` rather than natural isomorphisms.", "status": "check"},
+
+  {"id": "P156", "file": "PR", "declaration": "description", "fact": "It says only that `to_dual` is used on NatIso theorems; it omits the new `IsIso.mk'` in Iso.lean and the removed `grind ←=` attribute on `IsIso.inv_eq_of_hom_inv_id`.", "status": "departs"},
+
+  {"id": "P254", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "New counterpart of `IsIso.mk`, named by appending a prime.", "status": "check"},
+  {"id": "P254", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "ofComponents", "fact": "`to_dual` names the generated dual construction `ofComponents'`, and its simps lemmas `ofComponents'_hom_app` and `ofComponents'_inv_app`.", "status": "check"},
+  {"id": "P254", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "inv_inv_app", "fact": "`to_dual` names the new dual `inv_hom_app` (and `inv_map_inv_app`'s dual `inv_map_hom_app`).", "status": "check"},
+
+  {"id": "P138", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "isIso_app_of_isIso", "fact": "Docstring change only moves the closing `-/` onto the text line; the wording is unchanged.", "status": "departs"},
+
+  {"id": "P014", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "The field proof is the terminal squeezed call `simp_all only [and_comm]`; nothing follows it.", "status": "departs"},
+
+  {"id": "P185", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "isIso_app_of_isIso", "fact": "Existing docstring reformatted: `-/` joined onto the first line, meaning unchanged.", "status": "check"},
+  {"id": "P185", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_hom_left", "fact": "Existing binder `{Z : D}` renamed to `{Y : D}` (with `g g'` types), statement meaning unchanged.", "status": "check"},
+  {"id": "P185", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_inv_left", "fact": "Existing binder `{Z : D}` renamed to `{Y : D}`, statement meaning unchanged.", "status": "check"},
+
+  {"id": "P006", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "New theorem binds `{f : Y ⟶ X}` in its own signature, while the file's `variable` commands supply `X`, `Y` and possibly morphisms.", "status": "check"},
+
+  {"id": "P086", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "New lemma: a basic constructor fact for `IsIso`, existence of a two-sided inverse with the conjuncts swapped.", "status": "check"},
+  {"id": "P086", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "ofComponents", "fact": "`to_dual` introduces a new definition `ofComponents'`, building a natural isomorphism from components with naturality checked the other way.", "status": "check"},
+  {"id": "P086", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "inv_inv_app", "fact": "`to_dual` introduces a new lemma `inv_hom_app`: `inv (e.hom.app X) = e.inv.app X`, a basic fact about existing operations.", "status": "check"},
+
+  {"id": "P211", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "Declares a primed name; the unprimed `IsIso.mk` is the sibling it would distinguish.", "status": "check"},
+  {"id": "P211", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "ofComponents", "fact": "The `to_dual` target name `ofComponents'` ends in a prime; `ofComponents'_hom_app`/`_inv_app` are referenced too.", "status": "check"},
+
+  {"id": "P060", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk'", "fact": "`simp_all only [and_comm]` rewrites hypothesis `out` into the conjunct order of the `IsIso.out` field, rather than citing a lemma directly.", "status": "check"},
+
+  {"id": "P084", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "ofComponents", "fact": "Attribute `@[to_dual (attr := simps (attr := grind =)) ofComponents'` breaks before its docstring `/-- The dual of `ofComponents` -/]`; joined, it is 92 characters.", "status": "departs"},
+  {"id": "P084", "file": "Mathlib/CategoryTheory/Iso.lean", "declaration": "IsIso.mk' docstring", "fact": "The first docstring line is 71 characters, yet the next line's first word `Please` is moved down rather than filling the line.", "status": "departs"},
+
+  {"id": "P045", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "module docstring", "fact": "The PR adds a definition `ofComponents'` via `to_dual` and replaces hand-written cancel and `inv_app_isIso` declarations with generated ones in a file with a module docstring.", "status": "check"},
+
+  {"id": "P315", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "inv_inv_app", "fact": "`to_dual` adds the equation `inv_hom_app` (`inv (e.hom.app X) = e.inv.app X`), carrying only `simp`, no `grind` attribute.", "status": "check"},
+  {"id": "P315", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "inv_map_inv_app", "fact": "`to_dual` adds the equation `inv_map_hom_app`, computing `inv ((F.map e.hom).app Z)`, with `simp` only and no `grind` attribute.", "status": "check"},
+
+  {"id": "P329", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_hom_left", "fact": "Existing statement rewritten: binder `{Z : D}` renamed `{Y : D}`, beyond adding the `to_dual` attribute.", "status": "check"},
+  {"id": "P329", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "cancel_natIso_inv_left", "fact": "Existing statement rewritten: binder `{Z : D}` renamed `{Y : D}`, beyond adding the `to_dual` attribute.", "status": "check"},
+  {"id": "P329", "file": "Mathlib/CategoryTheory/NatIso.lean", "declaration": "attribute [grind ←=] CategoryTheory.IsIso.inv_eq_of_hom_inv_id (removed)", "fact": "Existing grind annotation on `IsIso.inv_eq_of_hom_inv_id` is deleted rather than kept.", "status": "check"}
+]

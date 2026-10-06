@@ -15,7 +15,7 @@ while [ "$done_n" -lt "$total" ]; do
   n=$(( n + 1 ))
   sed -n "$(( done_n + 1 )),$(( done_n + 4 ))p" "$todo" > $S/pinpoint_b$n.prompts
   k=$(wc -l < $S/pinpoint_b$n.prompts)
-  wait_for_room $(( 6 * k )) 90 || { echo "no room for pinpointers"; exit 6; }
+  wait_for_room $(( 18 * k )) 97 85 || { echo "no room for pinpointers, or the week is at 85%"; exit 6; }
   echo "$(date '+%H:%M:%S') pinpoint batch pb$n: $k pinpointers"
   $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN_C pb$n $S/claude_logs - @$S/pinpoint_b$n.prompts
   python3 $P/batch_report.py $S/claude_logs/pb$n.jsonl $S/claude_logs/pb$n.prompt | grep -E '^Pinpointer|^five-hour|^result'

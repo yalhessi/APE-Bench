@@ -1,0 +1,212 @@
+[
+  {
+    "id": "P232",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "Title 'chore: remove unnecessary private and backward.privateInPublic' has a type keyword and description but no parenthesised area naming the edited directories or files.",
+    "status": "departs"
+  },
+  {
+    "id": "P043",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Three independent files (Analysis/Complex/Norm, Analysis/Normed/Module/Multilinear/Basic, RingTheory/OreLocalization/Basic) each drop private and backward.privateInPublic; each file's edit compiles without the others.",
+    "status": "check"
+  },
+  {
+    "id": "P036",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''_char",
+    "fact": "Now-public theorem binds sb, s₁, rb, s₂ explicitly although the later hypothesis hb : sb * s₁ = rb * s₂ determines them; call sites pass s₁, s₂ as _.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''_char",
+    "fact": "Dropping private shortens the first signature line to 72 characters; the next line's leading binder (hb : sb * s₁ = rb * s₂) now fits within 100.",
+    "status": "departs"
+  },
+  {
+    "id": "P113",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''",
+    "fact": "Now-public def add'' differs from sibling add only by primes; it adds two fractions given as numerator/denominator pairs, a nameable difference, and has no docstring.",
+    "status": "departs"
+  },
+  {
+    "id": "P113",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add'",
+    "fact": "Now-public def add' differs from sibling add only by a prime; it adds a fraction given as a pair (r₂, s₂) to an element, and has no docstring.",
+    "status": "departs"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_add_le'",
+    "fact": "Changed line declares public Complex.norm_add_le', ending in a prime; whether an unprimed Complex.norm_add_le exists for the prime to distinguish needs a search.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_map_zero'",
+    "fact": "Changed line declares public Complex.norm_map_zero', ending in a prime; whether an unprimed Complex.norm_map_zero exists needs a search.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_neg'",
+    "fact": "Changed line declares public Complex.norm_neg', ending in a prime; whether an unprimed Complex.norm_neg exists for the prime to distinguish needs a search.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_eq_zero_iff",
+    "fact": "Now-public special case for ℂ of the general iff norm_eq_zero, but named norm_eq_zero_iff, with an extra _iff suffix.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_map_zero'",
+    "fact": "Now-public special case for ℂ of the general norm_zero, named after the AddGroupNorm field map_zero' rather than its analogue.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_add_le'",
+    "fact": "Now-public ℂ special case of the general triangle inequality norm_add_le, named with a trailing prime instead of the analogue's name.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_nonneg",
+    "fact": "Now-public Complex.norm_nonneg states 0 ≤ ‖z‖, the content of the general norm_nonneg, and takes the same name inside namespace Complex.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_eq_zero_iff",
+    "fact": "Now-public ‖z‖ = 0 ↔ z = 0 for ℂ is what the general library lemma norm_eq_zero states once ℂ's normed group instance exists.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.nsmul",
+    "fact": "Now-public def nsmul is exactly nsmulRec marked irreducible: a definition expressed entirely by an existing library construction.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_nonneg",
+    "fact": "Now-public lemma proved by the one-liner Real.sqrt_nonneg _; its statement restates the general norm_nonneg for ℂ.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_eq_zero_iff",
+    "fact": "Now-public iff proved by chaining Real.sqrt_eq_zero and normSq_eq_zero; restates the general norm_eq_zero for ℂ.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_map_zero'",
+    "fact": "Now-public lemma ‖(0 : ℂ)‖ = 0 proved by norm_eq_zero_iff.mpr rfl, an instantiation of a sibling; restates the general norm_zero.",
+    "status": "check"
+  },
+  {
+    "id": "P063",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_nonneg",
+    "fact": "Statement 0 ≤ ‖z‖ fixes the concrete type ℂ where a variable with a seminormed additive group instance could stand.",
+    "status": "check"
+  },
+  {
+    "id": "P063",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_add_le'",
+    "fact": "Triangle inequality ‖z + w‖ ≤ ‖z‖ + ‖w‖ stated for concrete ℂ where a seminormed additive group variable could stand.",
+    "status": "check"
+  },
+  {
+    "id": "P063",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_neg'",
+    "fact": "‖-z‖ = ‖z‖ stated for concrete ℂ where a variable with a seminormed additive group instance could stand.",
+    "status": "check"
+  },
+  {
+    "id": "P315",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_eq_zero_iff",
+    "fact": "Now-public iff characterising ‖z‖ = 0 by z = 0 carries no grind attribute.",
+    "status": "check"
+  },
+  {
+    "id": "P315",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''_char",
+    "fact": "Now-public equation computing add'' r₁ s₁ r₂ s₂ as a single fraction (sb • r₁ + rb • r₂) /ₒ ⟨sb * s₁, h⟩ carries no grind attribute.",
+    "status": "check"
+  },
+  {
+    "id": "P315",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_neg'",
+    "fact": "Now-public equation ‖-z‖ = ‖z‖, computing the norm of a negation, carries no grind attribute.",
+    "status": "check"
+  },
+  {
+    "id": "P153",
+    "file": "Mathlib/Analysis/Complex/Norm.lean",
+    "declaration": "Complex.norm_eq_zero_iff",
+    "fact": "Now-public iff whose .mpr direction the file uses separately (norm_map_zero' := norm_eq_zero_iff.mpr rfl); the PR adds no named direction lemmas or alias.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Analysis/Normed/Module/Multilinear/Basic.lean",
+    "declaration": "ContinuousMultilinearMap.uniformity_eq_seminorm",
+    "fact": "Now-public conclusion spells entourages as {f | ‖-f.1 + f.2‖ < r} rather than ‖f.1 - f.2‖ or dist; the proof converts between spellings via have A.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''_char",
+    "fact": "Takes the membership hypothesis h : sb * s₁ ∈ S alongside hb : sb * s₁ = rb * s₂; whether h is needed or derivable needs a build.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''",
+    "fact": "Body uses only • by R and + on X, yet the def takes the section's [DistribMulAction R X] and [AddMonoid X]; weaker classes may suffice.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add''",
+    "fact": "add''/add'/add chain made public; the parallel scalar-multiplication auxiliary chain of the Ore localization may still be private with backward.privateInPublic.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/RingTheory/OreLocalization/Basic.lean",
+    "declaration": "OreLocalization.add",
+    "fact": "Changed line writes the lambda as fun x =>; the file has other lambdas (fun rs : X × S =>), and Mathlib also spells it with ↦.",
+    "status": "check"
+  }
+]

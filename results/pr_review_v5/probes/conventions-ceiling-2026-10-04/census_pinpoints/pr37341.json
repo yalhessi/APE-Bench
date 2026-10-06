@@ -1,0 +1,72 @@
+[
+  {
+    "id": "P126",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent_of_basis",
+    "fact": "Changed docstring lines spell 'collinear' and hyphenated '*right*-multiplication'; the module docstring writes 'right multiplications', 'left multiplication' unhyphenated. Check the file's other spellings.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent",
+    "fact": "Changed docstring lines spell 'collinear' and hyphenated '*right*-multiplication', while the module docstring writes 'right multiplications' unhyphenated. Check the file's other spellings.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "exists_eq_smul_id_of_forall_notLinearIndependent",
+    "fact": "Docstring changes 'colinear' to 'collinear'; whether any other docstring or comment in the file keeps 'colinear' needs checking.",
+    "status": "check"
+  },
+  {
+    "id": "P043",
+    "file": "Mathlib/LinearAlgebra/JordanChevalley.lean",
+    "declaration": "module docstring",
+    "fact": "The JordanChevalley.lean rewording and 'Algèbre' accent are independent of the Center.lean docstring corrections and could be reviewed on their own.",
+    "status": "check"
+  },
+  {
+    "id": "P138",
+    "file": "Mathlib/LinearAlgebra/JordanChevalley.lean",
+    "declaration": "module docstring",
+    "fact": "Hunk only rewords 'the coefficients are a perfect field' to 'the coefficient field is perfect' and accents the reference's link text 'Algèbre'; no factual error corrected.",
+    "status": "departs"
+  },
+  {
+    "id": "P138",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "exists_eq_smul_id_of_forall_notLinearIndependent",
+    "fact": "This docstring's hunk only changes the variant spelling 'colinear' to 'collinear'; meaning unchanged, no factual or egregious error corrected.",
+    "status": "departs"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/LinearAlgebra/JordanChevalley.lean",
+    "declaration": "module docstring",
+    "fact": "Third-party rewording 'the coefficients are a perfect field' to 'the coefficient field is perfect', and 'Algebre' to 'Algèbre'; meaning unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "exists_eq_smul_id_of_forall_notLinearIndependent",
+    "fact": "Docstring's only change is 'colinear' to 'collinear', a recognised variant spelling; meaning unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "module docstring",
+    "fact": "'an homothety' changed to 'a homothety' (article before h), meaning unchanged; the docstring's other edits fix real errors (free domain, linearly independent).",
+    "status": "check"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/LinearAlgebra/Center.lean",
+    "declaration": "module docstring",
+    "fact": "PR restates main results in the docstring: exists_eq_smul_id_of_forall_notLinearIndependent now 'of a free module'; rank-1 note now 'linearly dependent'. Compare with the theorems' statements.",
+    "status": "check"
+  }
+]

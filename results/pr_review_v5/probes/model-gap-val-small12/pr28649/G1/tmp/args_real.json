@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Distributions/Gaussian/Real.lean", "line_start": 600, "line_end": 601, "replacement": "/-- The sum of two independent real random variables with Gaussian laws with means `m\u2081, m\u2082` and\nvariances `v\u2081, v\u2082` has Gaussian law with mean `m\u2081 + m\u2082` and variance `v\u2081 + v\u2082`. -/"}

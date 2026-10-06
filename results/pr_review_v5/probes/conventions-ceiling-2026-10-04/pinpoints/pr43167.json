@@ -1,0 +1,401 @@
+[
+  {
+    "id": "P036",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "K occurs only in the conclusion ⁅H₁, K⁆ ≤ ⁅H₂, K⁆, not in hypothesis h, yet is bound implicitly through the file's variables.",
+    "status": "departs"
+  },
+  {
+    "id": "P036",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_right",
+    "fact": "H occurs only in the conclusion ⁅H, K₁⁆ ≤ ⁅H, K₂⁆, not in hypothesis h, yet is bound implicitly through the file's variables.",
+    "status": "departs"
+  },
+  {
+    "id": "P094",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "The `refine le_antisymm` step proves ⁅H, N⁆ ≤ ⁅H ⊔ K, N⁆ and ⁅K, N⁆ ≤ ⁅H ⊔ K, N⁆ by applying commutator_mono_left to le_sup_left / le_sup_right.",
+    "status": "check"
+  },
+  {
+    "id": "P011",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Fifteen-line proof: passes to M := H ⊔ K ⊔ N via subgroupOf, a quotient-based private auxiliary and normalizer bounds, for a statement about commutators, sups and normal subgroups.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "New binders name subgroups H K N, while the file's variables name subgroups H₁ H₂ H₃ K₁ K₂.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "New binders name subgroups N H K (N the normal one), differing from the file's subgroup letters H₁ H₂ K₁ K₂.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Consecutive `rw [...] at hH hK ⊢`, then `rw [map_sup]`, then `exact sup_le hH hK`: successive rewrites of the goal followed by exact.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "Subgroup.inf_normalizer_le_normalizer_sup",
+    "fact": "Renames normalizer_inf_normalizer_le_normalizer_sup to match inf_normalizer_le_normalizer_inf; other members of the normalizer inf/sup family may keep the old name pattern.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "Adds gcongr-tagged one-sided variants of commutator_mono (left and right); sibling commutator monotonicity lemmas may lack the matching variant or gcongr attribute.",
+    "status": "check"
+  },
+  {
+    "id": "P048",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Repeats (H K N : Subgroup G) from the preceding commutator_sup_left' and [N.Normal] shared with the following commutator_sup_right, instead of one variable command.",
+    "status": "departs"
+  },
+  {
+    "id": "P048",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "Repeats (N H K : Subgroup G) [N.Normal], the same names, types and instance argument as the consecutive commutator_sup_left.",
+    "status": "departs"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Takes [N.Normal]; the proof uses it for ⁅H, N⁆ ≤ N and ⁅K, N⁆ ≤ N (commutator_le_right), which a weaker normalizer hypothesis might give.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "Takes [N.Normal] for ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆, inherited from commutator_sup_left.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup (deprecated alias)",
+    "fact": "Its @[deprecated] attribute sits on its own line, while the adjacent Subgroup alias puts the same attribute inline before `alias`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "Subgroup.inf_normalizer_le_normalizer_sup",
+    "fact": "Declared with `lemma`, while the neighbouring le_normalizer_of_normal and inf_normalizer_le_normalizer_inf use `theorem`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Inside namespace Subgroup it writes Subgroup.map_eq_bot_iff and Subgroup.commutator_eq_bot_iff_le_centralizer qualified, but map_commutator and map_sup unqualified.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "Proof is the one-liner `commutator_mono h le_rfl`, specialising commutator_mono.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_right",
+    "fact": "Proof is the one-liner `commutator_mono le_rfl h`, specialising commutator_mono.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "Proof chains two existing lemmas: `(commutator_le_sup K₁ K₂).trans (sup_le h₁ h₂)`.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "The transfer to M rests on `simpa [← map_subtype_inj, map_sup, map_commutator, hHM, hKM, hNM] using ...` and an eight-hint `simp` after `convert`.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "The quotient argument is packed into one `rw [← QuotientGroup.ker_mk' ..., ← map_eq_bot_iff, map_commutator, commutator_eq_bot_iff_le_centralizer] at hH hK ⊢`.",
+    "status": "check"
+  },
+  {
+    "id": "P201",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup (deprecated alias)",
+    "fact": "Hand-written deprecated alias `_root_.AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup`, the additive twin of the adjacent Subgroup deprecated alias.",
+    "status": "check"
+  },
+  {
+    "id": "P043",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Bundles the move and rename of normalizer_inf_normalizer_le_normalizer_sup (deprecations, use-site edits, new Pointwise import) with the commutator distributivity result and its helper lemmas.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Names distributivity of ⁅·,·⁆ over ⊔ in the first slot `commutator_sup_left`, second slot `commutator_sup_right`; compare with analogues' names for such laws.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "Hypothesis affix `_of_le` for ⁅K₁, K₂⁆ ≤ K from K₁ ≤ K and K₂ ≤ K, a variant of commutator_le_sup.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "One-sided variants of commutator_mono named with positional affixes `_left` / `_right`.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Closes the ≤ direction by a four-lemma rw at hH hK ⊢, a second `rw [map_sup]`, then `exact sup_le hH hK`.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Closes the normality goal by `convert Subgroup.normal_subgroupOf_of_le_normalizer this` followed by `simp` with eight hints; the haves hHM, hKM by explicit lemma terms.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "Closes ⁅K₁, K₂⁆ ≤ K by the hand-built term `(commutator_le_sup K₁ K₂).trans (sup_le h₁ h₂)`.",
+    "status": "check"
+  },
+  {
+    "id": "P006",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "Subgroup.inf_normalizer_le_normalizer_sup",
+    "fact": "Binds (H K : Subgroup G) in its signature, while the neighbouring inf_normalizer_le_normalizer_inf takes H and K from the file's variables.",
+    "status": "check"
+  },
+  {
+    "id": "P006",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Binds (H K N : Subgroup G) although the file's variables already declare subgroups (H, K, H₁, H₂, K₁, K₂, used by commutator_mono_left/right).",
+    "status": "check"
+  },
+  {
+    "id": "P006",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "Binds (N H K : Subgroup G) in its signature while the file's variables declare subgroups of G.",
+    "status": "check"
+  },
+  {
+    "id": "P341",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Private auxiliary result declared with `theorem` and no docstring above it.",
+    "status": "departs"
+  },
+  {
+    "id": "P341",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "The PR's main new result is declared with `theorem` with no docstring above it.",
+    "status": "departs"
+  },
+  {
+    "id": "P341",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "Helper lemma declared `@[to_additive] theorem` with no docstring.",
+    "status": "departs"
+  },
+  {
+    "id": "P401",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Rewrites the goal backwards with `← QuotientGroup.ker_mk'` and `← Subgroup.map_eq_bot_iff` (then map_sup) into sup_le's form, then `exact sup_le hH hK`.",
+    "status": "check"
+  },
+  {
+    "id": "P113",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Named commutator_sup_left plus a prime; differs by assuming (⁅H, N⁆ ⊔ ⁅K, N⁆).Normal instead of N.Normal, and has no docstring explaining it.",
+    "status": "departs"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "New general monotonicity lemma ⁅H₁, K⁆ ≤ ⁅H₂, K⁆ from H₁ ≤ H₂, a basic fact about the subgroup commutator.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_right",
+    "fact": "New general monotonicity lemma ⁅H, K₁⁆ ≤ ⁅H, K₂⁆ from K₁ ≤ K₂, a basic fact about the subgroup commutator.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "New general lemma ⁅K₁, K₂⁆ ≤ K from K₁ ≤ K and K₂ ≤ K, a basic order fact about the subgroup commutator.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Short `by` block of refine, two haves, two rws and exact assembling lemma applications.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Declares the primed name commutator_sup_left' (unprimed commutator_sup_left added beside it) and cites QuotientGroup.ker_mk'.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_le_of_le",
+    "fact": "Weakens through commutator_le_sup K₁ K₂ (to K₁ ⊔ K₂) then composes with sup_le h₁ h₂ to reach ⁅K₁, K₂⁆ ≤ K.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Rewrites hH, hK and the goal into centralizer form via QuotientGroup.ker_mk', map_eq_bot_iff, map_commutator, commutator_eq_bot_iff_le_centralizer before closing with sup_le.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "`convert Subgroup.normal_subgroupOf_of_le_normalizer this` opens a side goal for adaptation; the third bullet routes through inf_normalizer_le_normalizer_sup and inf_idem.",
+    "status": "check"
+  },
+  {
+    "id": "P030",
+    "file": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+    "declaration": "imports",
+    "fact": "Adds `public import Mathlib.GroupTheory.Commutator.Basic`, though the file's other changes only remove a lemma and rename two uses.",
+    "status": "check"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_left",
+    "fact": "Statement line (65 characters) and proof `commutator_mono h le_rfl` would total 90 characters, yet are split over two lines.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_mono_right",
+    "fact": "Statement line (66 characters) and proof `commutator_mono le_rfl h` would total 91 characters, yet are split over two lines.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "The first `rw [...]` line (75 characters) could take the next line's leading `map_commutator,` within 100 (91 characters).",
+    "status": "departs"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "module docstring",
+    "fact": "Adds main results commutator_sup_left and commutator_sup_right (distributivity over ⊔ for normal N) to a file whose module docstring may list main results.",
+    "status": "check"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+    "declaration": "module docstring",
+    "fact": "normalizer_inf_normalizer_le_normalizer_sup moves out of Pointwise.lean, whose module docstring (`# Pointwise instances on Subgroup and AddSubgroups`) may mention it.",
+    "status": "check"
+  },
+  {
+    "id": "P315",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Equation ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ computes the commutator of a sup; it carries no attribute at all.",
+    "status": "check"
+  },
+  {
+    "id": "P315",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "Equation ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆ computes the commutator with a sup; it carries no attribute at all.",
+    "status": "check"
+  },
+  {
+    "id": "P329",
+    "file": "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+    "declaration": "Subgroup.inf_normalizer_le_normalizer_sup",
+    "fact": "Renames existing normalizer_inf_normalizer_le_normalizer_sup while moving it, and rewrites two Pointwise.lean use sites; the rename is a side change to the commutator result.",
+    "status": "check"
+  },
+  {
+    "id": "P263",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left",
+    "fact": "Subgroup commutator lemma without @[to_additive], while the PR's commutator_mono_left/right and commutator_le_of_le carry it.",
+    "status": "check"
+  },
+  {
+    "id": "P263",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_right",
+    "fact": "Subgroup commutator lemma ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆ without @[to_additive].",
+    "status": "check"
+  },
+  {
+    "id": "P263",
+    "file": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "declaration": "Subgroup.commutator_sup_left'",
+    "fact": "Private Subgroup auxiliary for commutator_sup_left without @[to_additive], which an additive commutator_sup_left would need.",
+    "status": "check"
+  }
+]

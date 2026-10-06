@@ -1,0 +1,44 @@
+[
+  {
+    "id": "P232",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "Title `fix: bug with set_option ... in in tactic analysis framework` has a type keyword and colon but no parenthesised area such as `(Tactic/TacticAnalysis)`.",
+    "status": "departs"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Tactic/TacticAnalysis.lean",
+    "declaration": "Mathlib.TacticAnalysis.tacticAnalysis",
+    "fact": "The fix makes this linter filter infotrees by the enclosing command syntax under `withSetOptionIn`; other `withSetOptionIn` linters filtering infotrees by inner syntax are parallel code paths.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Tactic/TacticAnalysis.lean",
+    "declaration": "Mathlib.TacticAnalysis.tacticAnalysis",
+    "fact": "Changed `run` spells its lambda `fun _ => do` (arrow `=>`, binder `_`, `|>` pipe) and puts a `/- ... -/` block comment inside the body.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "MathlibTest/TacticAnalysis.lean",
+    "declaration": "example : x = z (section setOptionIn)",
+    "fact": "Test example proves `x = z` by consecutive `rw [xy]` then `rw [yz]` at the goal, mergeable into `rw [xy, yz]` (deliberate: it exercises the rwMerge linter).",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "MathlibTest/TacticAnalysis.lean",
+    "declaration": "example : x = z (section setOptionIn)",
+    "fact": "Test example closes `x = z` by a manual rewrite chain `rw [xy]`, `rw [yz]` instead of one finishing tactic; the chain is the linter test's input.",
+    "status": "check"
+  },
+  {
+    "id": "P043",
+    "file": "MathlibTest/TacticAnalysis.lean",
+    "declaration": "section declarations",
+    "fact": "Besides the fix and its regression test, the PR wraps the existing rwMerge/replaceWithGrind tests in a new `section declarations`, a reorganisation the fix does not need.",
+    "status": "check"
+  }
+]

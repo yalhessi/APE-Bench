@@ -1,0 +1,121 @@
+[
+  {
+    "id": "P232",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "Title `feat: well-founded instances for ULift` has a type keyword and colon but no parenthesised area such as `(Order/WellFounded)` naming the edited file.",
+    "status": "departs"
+  },
+  {
+    "id": "P011",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "The `wf` field is proved by hand: destructuring `⟨x⟩`, `WellFoundedLT.induction` and `Acc.intro`, where pulling back along `ULift.down` (InvImage, an order iso or embedding) may give it directly.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "New `WellFoundedLT` instance for `ULift`; analogous structure `PLift` and sibling classes (`IsWellOrder`, `WellFoundedRelation`) may lack the corresponding instance.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "New `WellFoundedGT` instance for `ULift`; the parallel `PLift` instance is not added in this PR.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "Assumption and conclusion are spelled with `WellFoundedLT`, one of several equivalent classes (`IsWellFounded _ (· < ·)`, `WellFoundedGT` of the dual).",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "Uses `where` structure syntax, `↦` lambda arrows and an `induction ... with | ind x IH` alternative without `=>`; these spellings should match the file's other occurrences.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Proof is a term one-liner specialising the new `WellFoundedLT.ulift` at `αᵒᵈ`, restating the sibling's conclusion for the dual order.",
+    "status": "check"
+  },
+  {
+    "id": "P201",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Hand-written order-dual of the neighbouring `WellFoundedLT.ulift`, obtained by instantiating it at `αᵒᵈ`; a `to_dual` generator might produce it.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "Instance on another type is named in the class namespace (`WellFoundedLT.ulift`); analogous instances for other types may use the type namespace (`ULift.wellFoundedLT`-style).",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Counterpart instance named `WellFoundedGT.ulift`, class-namespace pattern; compare with how analogous `WellFoundedGT` instances on other types are named.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "The `wf` goal is closed by three manual steps (`refine`, `induction ... using WellFoundedLT.induction`, a hand-built `Acc.intro` term) rather than one finishing tactic.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "Adds a basic fact about the existing order on `ULift`: well-foundedness of `<` transfers from `α`; an existing instance may already provide it.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Adds `WellFoundedGT (ULift α)` from `WellFoundedGT α`, a basic fact about the existing `ULift` order that an existing instance or derivation may already state.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "The `wf := by` block is three tactics (`refine`, `induction`, `exact`) assembling `WellFoundedLT.induction` and `Acc.intro`; might be a single `⟨fun ⟨x⟩ ↦ ...⟩` term.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Passes the named argument `(α := αᵒᵈ)` to `WellFoundedLT.ulift`; check whether elaboration infers it from the expected type.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedLT.ulift",
+    "fact": "Passes `_` placeholders explicitly in `Acc.intro _` and `IH _ hy`.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/Order/WellFounded.lean",
+    "declaration": "WellFoundedGT.ulift",
+    "fact": "Reaches the goal indirectly, routing through the LT instance at `αᵒᵈ` and the defeq `ULift αᵒᵈ` / `(ULift α)ᵒᵈ`, rather than citing a direct lemma.",
+    "status": "check"
+  }
+]

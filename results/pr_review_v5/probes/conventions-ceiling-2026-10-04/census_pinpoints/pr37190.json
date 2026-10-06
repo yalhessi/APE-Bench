@@ -1,0 +1,331 @@
+[
+  {
+    "id": "P094",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Inequality steps use named monotonicity lemmas: `#(s.biUnion f) * k < #s * k` via `Nat.mul_lt_mul_right … |>.mpr`, and the sum bounds `hc'`, `infh` via `Finset.sum_le_sum`.",
+    "status": "check"
+  },
+  {
+    "id": "P011",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Proof instantiates the bipartite double-counting lemma, unfolds `bipartiteAbove`/`bipartiteBelow`, element-chases two filter equalities by `grind`, then rewrites with `sum_congr`: several steps for a counting identity.",
+    "status": "check"
+  },
+  {
+    "id": "P011",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Proof by contradiction assembles sum bounds by hand (`sum_le_sum`, `inf'_le`, `Nat.mul_lt_mul_right`) and `lia` for a pigeonhole statement beside the file's existing pigeonhole API.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "New binders name the family `B`, indices `j : α` and points `x : β`, while the bipartite section's lemmas use `a : α`, `b : β`.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Names the set-valued family `f`, the letter the file uses for the pigeon map `α → β`; pigeons are `j`, holes `x`, where the file uses `x`, `y`.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "In the `s.card * k ≤ ∑` step, `have infh := Finset.sum_le_sum h₄`, `simp only [...] at infh`, `exact infh` are consecutive calls one `simpa … using` could do.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "`rw [Finset.sum_congr rfl …] at g` is followed by `simp [hB', g]` closing the goal with `g`: a rewrite of a hypothesis then closing with it.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Adds one set-valued member (strict, cover count above the minimum) to the pigeonhole family, whose members come in lt/le, upper/lower and `Fintype` versions; no siblings added.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Cover count spelled `Finset.card {j | j ∈ s ∧ x ∈ f j}` (a `univ` filter), not `#{j ∈ s | …}`; `h₂` writes nonemptiness as positive card.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Conclusion counts covering indices as `Finset.card {j | j ∈ s ∧ x ∈ B j}`, a `univ` filter needing `Fintype α`, not `#{j ∈ s | …}`.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Takes `[Fintype α]` (used only by the `univ`-filter set-builder), `[DecidableEq α]`, and positivity hypothesis `h₂ : ∀ j ∈ s, 0 < Finset.card (f j)`.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Takes `[Fintype α]` and `[DecidableEq α]`; the statement only counts indices within `s`, so `Fintype α` serves only the `{j | j ∈ s ∧ …}` spelling.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Writes `Finset.card (f j)`, `(s.biUnion f).card`, `s.card` where the file writes `#s`, `#{x ∈ s | …}`; mixes `fun j ↦` with `fun x =>` and `fun _ =>`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Writes `Finset.card (B j)` and `Finset.card {…}` where neighbouring lemmas use `#t`, `#s`; lambdas spelled `fun j x =>` and `fun j hj =>`.",
+    "status": "check"
+  },
+  {
+    "id": "P154",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Restates `Finset.sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow` for relation `x ∈ B j` with `t := s.biUnion B`; the description calls it a corollary of that lemma.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Dense steps: `Nat.mul_lt_mul_right (…) |>.mpr (by lia)`, untyped `have hc' := Finset.sum_le_sum … (by grind)`, and a final `lia` carrying the contradiction.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Untyped `have g := …` is reshaped by `unfold … at g` and a `rw` with a nested `by rw` inside `sum_congr`, before `simp [hB', g]`.",
+    "status": "check"
+  },
+  {
+    "id": "P190",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "imports",
+    "fact": "Adds `public import Mathlib.Combinatorics.Enumerative.DoubleCounting`, needed only by the new proof; the new statement uses only `biUnion`, `inf'` and `card`.",
+    "status": "check"
+  },
+  {
+    "id": "P190",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Statement uses only `∑`, `biUnion` and filtered `card`, but the proof goes through the bipartite lemma `sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow` and its definitions.",
+    "status": "check"
+  },
+  {
+    "id": "P190",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Proof cites `Finset.sum_card_eq_sum_card_cover_biUnion` from DoubleCounting, which forces the new import, though the statement needs nothing Pigeonhole lacked.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "A variant of the file's `exists_lt_card_fiber_of_…` lemmas, named with new part `cover` and hypothesis part `card_biUnion_lt_card`.",
+    "status": "check"
+  },
+  {
+    "id": "P254",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Counterpart of `sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow`, named with new part `cover` and trailing `biUnion`.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Goals closed by manual chains: `s.card * k ≤ ∑` by have/simp only/exact, `h₄` by `unfold k; apply Finset.inf'_le`, `nek` by constructor/rw/grind/exact.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Main goal closed by `let`, `have g`, `unfold … at g`, two `grind` haves, `rw … at g` and `simp`, not one finishing tactic.",
+    "status": "check"
+  },
+  {
+    "id": "P014",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "`simp only [← Finset.sum_card_eq_sum_card_cover_biUnion f s, sum_const, smul_eq_mul] at hc'` produces `hc'`, used only by the closing `lia`.",
+    "status": "departs"
+  },
+  {
+    "id": "P006",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Binds `(s : Finset α)` and instance arguments in its signature, while the section's `variable`s supply `s`, `t`, `r` (used unbound by `card_le_card_of_forall_subsingleton'`).",
+    "status": "check"
+  },
+  {
+    "id": "P006",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Binds `{f : α → Finset β}`, `[DecidableEq α]`, `[Fintype α]` in its signature, while file `variable`s supply `s` (used unbound here) and a function `f`.",
+    "status": "check"
+  },
+  {
+    "id": "P278",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "docstring of Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Prose uses Lean terms for objects: 'less than `s.card`', 'an element `x ∈ s.biUnion f`', '(i.e., `k < #{j ∈ s | x ∈ f j}`)' where words would do.",
+    "status": "departs"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "A basic double-counting identity: the sum of `#(B j)` over `s` equals the sum over the union of covering-index counts; expressed entirely in existing notions.",
+    "status": "check"
+  },
+  {
+    "id": "P086",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "A set-valued pigeonhole lemma about `biUnion`, `inf'` and filtered card, a general fact about existing notions.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Short `by` blocks assembling lemma applications: `h₄` is `unfold k; apply Finset.inf'_le`; the `s.card * k ≤ ∑` step is `have`/`simp only`/`exact`.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Passes named arguments `(s := s)` and `(t := s.biUnion B)` to `Finset.sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow`.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Passes `(s := s.biUnion f) (ι := β) (f := …) (g := fun _ => k)` as named arguments to `Finset.sum_le_sum`.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Statement and `set k` refer to `Finset.inf'`, a declaration name ending in a prime.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "`rw [← Finset.lt_inf'_iff] at h₂` opens side goal `· exact h₁` to get `k ≠ 0`; `Nat.ne_zero_iff_zero_lt.mp nek.out` converts `NeZero` for `Nat.mul_lt_mul_right`.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Reaches the goal by rewriting the instantiated bipartite lemma `g` with `unfold`, `sum_congr` over `hB`, and `simp [hB']`.",
+    "status": "check"
+  },
+  {
+    "id": "P030",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "imports",
+    "fact": "Adds the line `public import Mathlib.Combinatorics.Enumerative.DoubleCounting`.",
+    "status": "check"
+  },
+  {
+    "id": "P024",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "`grind` closes `nek` after the rewrite of `h₂`, and `(by grind)` supplies the pointwise bound from `hc` to `Finset.sum_le_sum`.",
+    "status": "check"
+  },
+  {
+    "id": "P024",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "The filter-set equalities `hB` and `hB'` are proved by `grind`.",
+    "status": "check"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "Signature split one short binder per line (`[DecidableEq β]`, `(B : …)`, `(s : …)`); `have g … (t := …)` and `hB' … by grind` would fit within 100.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Signature binders `[DecidableEq α] [Fintype α]`, `{f : α → Finset β}`, `(h₁ : s.Nonempty)` and `h₂` each sit on short lines that could be filled within 100 characters.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "docstring of Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Prose lines end short: '… less than `s.card`, then' (73 chars) could take 'there'; '… may belong to' (79) could take 'multiple'.",
+    "status": "departs"
+  },
+  {
+    "id": "P182",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Hypothesis `h₂` binds `j` as `∀ j ∈ s, 0 < Finset.card (f j)` rather than `∀ ⦃j⦄, j ∈ s → …`; likewise the proof's `h₄`.",
+    "status": "departs"
+  },
+  {
+    "id": "P182",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "Finset.sum_card_eq_sum_card_cover_biUnion",
+    "fact": "The proof's `have hB : ∀ j ∈ s, {b ∈ s.biUnion B | b ∈ B j} = B j` binds `j` with `∀ j ∈ s,`.",
+    "status": "departs"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "module docstring",
+    "fact": "A new main pigeonhole lemma is added; the docstring gains a set-valued bullet but still says 'these pigeonhole principles along with 20 more'.",
+    "status": "check"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/Combinatorics/Enumerative/DoubleCounting.lean",
+    "declaration": "module docstring",
+    "fact": "Adds `sum_card_eq_sum_card_cover_biUnion` to the file's bipartite section; the diff leaves the module docstring unchanged.",
+    "status": "check"
+  },
+  {
+    "id": "P063",
+    "file": "Mathlib/Combinatorics/Pigeonhole.lean",
+    "declaration": "Finset.exists_lt_card_cover_of_card_biUnion_lt_card",
+    "fact": "Conclusion fixes the threshold to the specific value `Finset.inf' s h₁ (…)` (minimum card), where a variable `k` bounded by every `#(f j)` could stand.",
+    "status": "check"
+  }
+]

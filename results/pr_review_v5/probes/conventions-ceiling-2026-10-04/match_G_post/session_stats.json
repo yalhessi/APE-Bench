@@ -1,0 +1,74 @@
+{
+ "41930": {
+  "G1": {
+   "findings": 1,
+   "compiles": 2
+  },
+  "X2": {
+   "findings": 0,
+   "compiles": 1
+  },
+  "E1": {
+   "findings": 0,
+   "compiles": 1
+  },
+  "X1": {
+   "findings": 0,
+   "compiles": 1
+  }
+ },
+ "42814": {
+  "G1": {
+   "findings": 7,
+   "compiles": 16
+  },
+  "E1": {
+   "findings": 7,
+   "compiles": 9
+  },
+  "X1": {
+   "findings": 7,
+   "compiles": 18
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 11
+  }
+ },
+ "43167": {
+  "E1": {
+   "findings": 8,
+   "compiles": 11
+  },
+  "X1": {
+   "findings": 6,
+   "compiles": 15
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 10
+  },
+  "G1": {
+   "findings": 9,
+   "compiles": 15
+  }
+ },
+ "42184": {
+  "G1": {
+   "findings": 2,
+   "compiles": 2
+  },
+  "X2": {
+   "findings": 2,
+   "compiles": 3
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 3
+  },
+  "E1": {
+   "findings": 5,
+   "compiles": 6
+  }
+ }
+}

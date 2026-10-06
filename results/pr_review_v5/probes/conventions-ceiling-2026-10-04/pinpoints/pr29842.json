@@ -1,0 +1,135 @@
+[
+  {
+    "id": "P011",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Rewritten proof chases pointwise that `(c n)⁻¹ • c n • d n = d n` eventually, then uses `Tendsto.congr'` and `simpa`, for a Tendsto/smul statement with library API.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "`apply Tendsto.congr' this`, then `rw [tendsto_norm_atTop_iff_cobounded] at hc`, then `simpa using ...hc...` are consecutive calls a single `simpa`/term might combine.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] (before tangentConeAt_mono_nhds)",
+    "fact": "Generalises tangentConeAt.lim_zero, tangentConeAt_mono_nhds to tangentConeAt_inter_nhds to TVS; siblings tangentConeAt_closure and subset_tangentConeAt_prod_left stay in section Normed.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] [ContinuousSMul 𝕜 E] (before UniqueDiffWithinAt.mono_nhds)",
+    "fact": "Generalises UniqueDiffWithinAt.mono_nhds through IsOpen.uniqueDiffOn to TVS; parallel uniqueDiffWithinAt_closure, UniqueDiffWithinAt.mono_closure and UniqueDiffWithinAt.prod stay in section Normed.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] (before tangentConeAt_mono_nhds)",
+    "fact": "The TVS assumption is spelled `[ContinuousAdd E]` (with `[ContinuousSMul 𝕜 E]`); library TVS lemmas may instead use `[IsTopologicalAddGroup E]`, equivalent here.",
+    "status": "check"
+  },
+  {
+    "id": "P363",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] [ContinuousSMul 𝕜 E] (before UniqueDiffWithinAt.mono_nhds)",
+    "fact": "UniqueDiffWithinAt lemmas now assume `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`, one of several equivalent spellings (e.g. `[IsTopologicalAddGroup E]`) of a topological vector space.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] (before tangentConeAt_mono_nhds)",
+    "fact": "Adds ContinuousAdd E to tangentConeAt_mono_nhds through tangentConeAt_inter_nhds; their proofs may need only continuity of the translation `x + ·`.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "variable [ContinuousAdd E] [ContinuousSMul 𝕜 E] (before UniqueDiffWithinAt.mono_nhds)",
+    "fact": "Imposes both classes on UniqueDiffWithinAt.mono (s ⊆ t), proved via mono_nhds; tangentConeAt_mono and closure_mono might give it without either.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "New proof writes `fun n hn ↦`, while the same declaration's statement uses `fun n =>` and nearby IsOpen.uniqueDiffOn uses `fun _ hx =>`.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Proof golfed from eleven lines with stated `have`s to four; final `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd` packs inverse-to-zero, product limit and simplification.",
+    "status": "check"
+  },
+  {
+    "id": "P190",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Statement mentions only Tendsto, the norm on 𝕜 and smul, no tangent cone; rewritten proof uses tendsto_inv₀_cobounded and tendsto_norm_atTop_iff_cobounded.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Goal closed by manual steps: a `have` term built from inv_smul_smul₀, `apply Tendsto.congr'`, `rw ... at hc`, then `simpa`.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Short `by` block of `have`, `apply Tendsto.congr'`, `rw ... at hc`, `simpa using` assembling lemma applications; might be one term chain.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "The new proof refers to the primed name `Tendsto.congr'`.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "`rw [tendsto_norm_atTop_iff_cobounded] at hc` converts hypothesis hc into cobounded form only to feed `tendsto_inv₀_cobounded.comp hc`.",
+    "status": "check"
+  },
+  {
+    "id": "P024",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "tangentConeAt.lim_zero",
+    "fact": "Replaces the explicit norm argument (`rw [zero_mul] at C`, `tendsto_zero_iff_norm_tendsto_zero`, `exact D`) with an unsqueezed `simpa using`.",
+    "status": "check"
+  },
+  {
+    "id": "P012",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "section Normed (before tangentConeAt_closure)",
+    "fact": "Moved `section Normed` is directly followed by four `variable` commands, none separated from the next by a blank line.",
+    "status": "departs"
+  },
+  {
+    "id": "P012",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "section Normed (before uniqueDiffWithinAt_closure)",
+    "fact": "Moved `section Normed` is directly followed by four `variable` commands (𝕜', E, F, x y s t) with no blank lines between them.",
+    "status": "departs"
+  },
+  {
+    "id": "P045",
+    "file": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "declaration": "module docstring",
+    "fact": "PR moves the TVS/Normed boundary, restating tangentConeAt_mono_nhds, UniqueDiffWithinAt.mono_nhds and others for TVS, and moves the closure lemmas; the docstring may describe the setting.",
+    "status": "check"
+  }
+]

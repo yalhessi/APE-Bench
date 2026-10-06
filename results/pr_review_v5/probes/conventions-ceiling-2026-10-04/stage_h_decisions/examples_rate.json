@@ -1,0 +1,896 @@
+[
+ {
+  "cid": "c02bde3",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Golf PR; simp only then exact could become simpa, but reviewers of golf PRs rarely push further; P018 prior ~4%."
+ },
+ {
+  "cid": "c0e9f6d",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Mirrored IsCoprime 2 x variant is a plausible but uncommon request; P100 prior ~1.4%."
+ },
+ {
+  "cid": "c17afd8",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Two-line simp only/exact after a have; term form reads no better; P040 prior ~2%."
+ },
+ {
+  "cid": "c18ed33",
+  "raise": false,
+  "p": 0.09,
+  "basis": "simp only [this] used as rw then exact; a merged rw or simpa is a natural golf suggestion, still below prior-adjusted odds."
+ },
+ {
+  "cid": "c23ba0f",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Asking to golf an untouched sibling in a golf PR is rare; sibling already a one-liner."
+ },
+ {
+  "cid": "c251853",
+  "raise": false,
+  "p": 0.02,
+  "basis": "theorem vs lemma keyword choice is essentially never raised by Mathlib reviewers."
+ },
+ {
+  "cid": "c2e55fe",
+  "raise": false,
+  "p": 0.07,
+  "basis": "by_cases then rw [not_le] at could be by_cases!; reviewers occasionally suggest, low prior."
+ },
+ {
+  "cid": "c2fd7d3",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Both orientations already added; vague unnamed siblings resemble not-asked examples."
+ },
+ {
+  "cid": "c337c9d",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Rename-only fix PR keeps the existing line layout; reflow requests unlikely; P084 prior ~1.4%."
+ },
+ {
+  "cid": "c33eb4f",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Rewritten proof is already shorter and API-based; no obvious library composition to point to."
+ },
+ {
+  "cid": "c3af5d4",
+  "raise": false,
+  "p": 0.08,
+  "basis": "After rw, simp [bridge] likely closes the iff instead of hand-built term; plausible golf in a heavily reviewed new-API PR."
+ },
+ {
+  "cid": "c428fec",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Short block with a have; full term form is awkward; P040 prior ~2%."
+ },
+ {
+  "cid": "c42b714",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Speculative other eliminators elsewhere keeping C; rename PR already covers both in file."
+ },
+ {
+  "cid": "c44fb2d",
+  "raise": false,
+  "p": 0.09,
+  "basis": "Same place as c18ed33: simp only [this] then exact mergeable into rw list; modest chance in golf PR."
+ },
+ {
+  "cid": "c46e601",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Docstring delimiter placement consistency is rarely raised; P126 prior ~0.5%."
+ },
+ {
+  "cid": "c47bfa7",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Unclear the countably generated assumption is droppable; golf PR reviewers seldom revisit hypotheses."
+ },
+ {
+  "cid": "c4d83e1",
+  "raise": false,
+  "p": 0.03,
+  "basis": "lemma/theorem and docstring style mismatches resemble not-asked P126 examples."
+ },
+ {
+  "cid": "c4d9f45",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Breaking after iff with indentation is standard Mathlib style for long statements."
+ },
+ {
+  "cid": "c4de185",
+  "raise": false,
+  "p": 0.06,
+  "basis": "TVS generalization PR invites assumption scrutiny, but this specific weakening is speculative."
+ },
+ {
+  "cid": "c5ab6ba",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Naming affix concern is vague; P254 prior ~0.3%."
+ },
+ {
+  "cid": "c5b27b2",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Rename fix PR; reflowing recursor signature lines rarely requested."
+ },
+ {
+  "cid": "c5c5191",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Docstring line fill is almost never commented on."
+ },
+ {
+  "cid": "c6271df",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Case split proof as term would read worse; low P040 prior."
+ },
+ {
+  "cid": "c629280",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Nat.Coprime.dvd_mul_right analogues lack _iff; a naming-consistency remark is plausible but uncommon."
+ },
+ {
+  "cid": "c65dfdc",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Reviewer might ask to generalize tangentConeAt_closure too, but PR scopes to some lemmas."
+ },
+ {
+  "cid": "c6d177a",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Name differs from Nat sibling; possible naming remark in new-API PR, low prior."
+ },
+ {
+  "cid": "c72953e",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Case analysis on power and absolute value unlikely closable by one finishing tactic."
+ },
+ {
+  "cid": "c742ab1",
+  "raise": false,
+  "p": 0.06,
+  "basis": "rw then exact/simp mergeable; plausible golf in long new proof, low prior."
+ },
+ {
+  "cid": "c79ce2b",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Using ↦ in new code is preferred; nobody asks to switch to =>."
+ },
+ {
+  "cid": "c7e2acc",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Golfing untouched siblings is rarely requested in golf PRs."
+ },
+ {
+  "cid": "c7f9dc4",
+  "raise": false,
+  "p": 0.18,
+  "basis": "Classic Normed to SeminormedAddCommGroup generalization reviewers often spot; norm_sum_le holds seminormed. Still under half."
+ },
+ {
+  "cid": "c839bcf",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Already compact new proof; merging apply/rw/simpa marginal."
+ },
+ {
+  "cid": "c863742",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Two consecutive {m : ℤ} binders in new file; variable request possible, low prior."
+ },
+ {
+  "cid": "c876128",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Positivity hypothesis is genuinely needed (negative a gives wrong sign)."
+ },
+ {
+  "cid": "c8c918c",
+  "raise": false,
+  "p": 0.03,
+  "basis": "No direct library composition for posLog of powers evident."
+ },
+ {
+  "cid": "c97d393",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Binders differ in type of f; variable extraction unlikely requested."
+ },
+ {
+  "cid": "c9cb7d2",
+  "raise": false,
+  "p": 0.05,
+  "basis": "General irreducible-square lemma exists but derivation not clearly shorter."
+ },
+ {
+  "cid": "c9f1c3f",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Two-tactic obtain/exact could be a term; occasional golf, low prior."
+ },
+ {
+  "cid": "ca29e9a",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Ring needed: IsCoprime x 2 fails in semirings like ℕ."
+ },
+ {
+  "cid": "ca41dfe",
+  "raise": false,
+  "p": 0.06,
+  "basis": "simpa or rw could close it; golf PR, low P005 prior."
+ },
+ {
+  "cid": "cade8f1",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Same as c17afd8; term form not clearly better."
+ },
+ {
+  "cid": "caedeea",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Already golfed branch; further simpa merge possible but rarely asked."
+ },
+ {
+  "cid": "cb35f8c",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Term chain with rw at hc awkward; low prior."
+ },
+ {
+  "cid": "cb7091d",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Parallel lemmas left in Normed could be generalized; reviewer may ask, but scope limited."
+ },
+ {
+  "cid": "cb7c84d",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Short statement fits on one line; reviewers sometimes post a suggestion, P084 prior ~1.4%."
+ },
+ {
+  "cid": "cb808b3",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Destructuring Odd unlikely replaced by single finishing tactic."
+ },
+ {
+  "cid": "cb91eb9",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Variable naming in docstrings rarely raised."
+ },
+ {
+  "cid": "cbf9d8e",
+  "raise": false,
+  "p": 0.01,
+  "basis": "↦ lambda is the preferred spelling; no inconsistency worth raising."
+ },
+ {
+  "cid": "cc0b477",
+  "raise": false,
+  "p": 0.02,
+  "basis": "lemma vs theorem keyword and inline simp almost never raised."
+ },
+ {
+  "cid": "cc15f27",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Local haves might have library forms; possible in scrutinized new file, low prior."
+ },
+ {
+  "cid": "cc37928",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Short elementary proof; no obvious library lemma."
+ },
+ {
+  "cid": "cc4aa99",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Single finishing tactic unlikely to close Tendsto congruence."
+ },
+ {
+  "cid": "ccbe5c1",
+  "raise": false,
+  "p": 0.05,
+  "basis": "calc could collapse to a trans term; occasional golf suggestion."
+ },
+ {
+  "cid": "ccdad97",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Weakening ContinuousAdd to translation continuity is speculative."
+ },
+ {
+  "cid": "cce257a",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Signature exactly fits 100; reflow requests rare."
+ },
+ {
+  "cid": "cce7d52",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Other free-product eliminators may keep C; vague, outside file."
+ },
+ {
+  "cid": "ccfdb92",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Manual case split; grind might work but low prior."
+ },
+ {
+  "cid": "cd0a35f",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Norm variants for every sibling rarely demanded."
+ },
+ {
+  "cid": "cd97805",
+  "raise": false,
+  "p": 0.03,
+  "basis": "=> vs ↦ in ported file; rarely raised."
+ },
+ {
+  "cid": "ce7af7f",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Two-step calc unlikely replaced by finishing tactic."
+ },
+ {
+  "cid": "ceaeffb",
+  "raise": false,
+  "p": 0.1,
+  "basis": "New file repeats {D : ℤ} across four declarations, like asked example; still below half."
+ },
+ {
+  "cid": "cec77c0",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Odd congrFun rfl term might draw golf; low prior."
+ },
+ {
+  "cid": "cecb026",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Recursor motive binders are kept explicit in each signature."
+ },
+ {
+  "cid": "ced8392",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Docstring wrap near limit essentially never commented on."
+ },
+ {
+  "cid": "cee72f4",
+  "raise": false,
+  "p": 0.06,
+  "basis": "rw then exact mergeable; low prior."
+ },
+ {
+  "cid": "cf18974",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Docstring wrap at 93 chars not raised."
+ },
+ {
+  "cid": "cfc72ad",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Dual liminf version likely derived via OrderDual; golf of it not requested."
+ },
+ {
+  "cid": "c02a0ed",
+  "raise": false,
+  "p": 0.02,
+  "basis": "_left/_right slot naming matches commutator_mono_left/right; nothing a reviewer would rename; P254 asks are very rare."
+ },
+ {
+  "cid": "c0757b2",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Root namespace and name mirror tsum_nonneg and Finset.prod_nonneg; no visible naming departure."
+ },
+ {
+  "cid": "c080b6d",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Redundant qualification inside namespace Cardinal is cosmetic; P126 asks roughly 1 in 190 flags."
+ },
+ {
+  "cid": "c084c60",
+  "raise": false,
+  "p": 0.08,
+  "basis": "Forward branch is clunky, but a reviewer would more likely replace the whole proof by div_left_injective.eq_iff than merge steps."
+ },
+ {
+  "cid": "c0fc3a3",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Already a one-line term proof; no finishing tactic is clearly preferable."
+ },
+ {
+  "cid": "c14ca72",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Clunky proof likely golfed, but via mul_left_injective b⁻¹ term/simpa rather than a bare finishing tactic."
+ },
+ {
+  "cid": "c1721fb",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Original Mathlib proof moved verbatim; reviewers rarely revisit moved code."
+ },
+ {
+  "cid": "c209cc8",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Docstring fill by one word; like the not-asked docstring-fill examples."
+ },
+ {
+  "cid": "c23bc2f",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Short anonymous-constructor term after obtain is idiomatic; no clear finishing-tactic replacement."
+ },
+ {
+  "cid": "c279c41",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Rewrite-list line fill inside a private lemma; P084 asks are rare and this resembles not-asked cases."
+ },
+ {
+  "cid": "c2a2afc",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Asymmetric generalization is forced by which cancel class each lemma needs; not a missing sibling."
+ },
+ {
+  "cid": "c306e3e",
+  "raise": false,
+  "p": 0.01,
+  "basis": "intro vs fun binder spelling across lemmas is not something reviewers ask about."
+ },
+ {
+  "cid": "c340799",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Two-step side goal; possible golf, but low rate and the rewrite is needed."
+ },
+ {
+  "cid": "c36956d",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Set.univ qualification and kept hypothesis name are trivial; P126 rarely asked."
+ },
+ {
+  "cid": "c36e4f6",
+  "raise": false,
+  "p": 0.02,
+  "basis": "have vs obtain change is forced by the new proof shape; cosmetic."
+ },
+ {
+  "cid": "c3cf0e7",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Named binders are needed to pass b explicitly; not an inconsistency a reviewer flags."
+ },
+ {
+  "cid": "c3d7be2",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Repeated {β α} (f) binders are pre-existing file style; one changed hypothesis name only."
+ },
+ {
+  "cid": "c3ff654",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Rewrite then exact of a non-assumption term; merging is not straightforward."
+ },
+ {
+  "cid": "c4039f7",
+  "raise": false,
+  "p": 0.01,
+  "basis": "_left/_right affixes are the standard positional naming."
+ },
+ {
+  "cid": "c408911",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Long structural proof; no evidence a single finishing tactic closes the normality goal."
+ },
+ {
+  "cid": "c453521",
+  "raise": false,
+  "p": 0.03,
+  "basis": "commutator_le_of_le is a plausible name; P254 asks about 1 in 385 flags."
+ },
+ {
+  "cid": "c4d6de6",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Normality is used through commutator_sup_left; weakening would need new mathematics."
+ },
+ {
+  "cid": "c4d9c93",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Rename follows the TODO and sibling union_finset_finite_of_range_finite; iUnion suggestion possible but unlikely."
+ },
+ {
+  "cid": "c4e2775",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Original moved proof; FIXME deletion might draw a simpa remark, but unlikely."
+ },
+ {
+  "cid": "c544636",
+  "raise": false,
+  "p": 0.25,
+  "basis": "Original proof was mul_left_injective b⁻¹; the new verbose named-argument proof invites a golf, but just under raise."
+ },
+ {
+  "cid": "c572443",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Mirrors tsum_nonneg's by_cases proof; no evident shorter library route."
+ },
+ {
+  "cid": "c598362",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Primed variant keeps old API; asking for more primed variants is unlikely."
+ },
+ {
+  "cid": "c5e6ab8",
+  "raise": true,
+  "p": 0.33,
+  "basis": "Sibling div_right_inj right below is (div_right_injective ..).eq_iff; div_left_injective.eq_iff gives this directly, an obvious suggestion."
+ },
+ {
+  "cid": "c63c5aa",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Inner by-block could be a term, but it is small; low P040 rate."
+ },
+ {
+  "cid": "c700817",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Case split is the substance of the generalization; no evident library shortcut."
+ },
+ {
+  "cid": "c7142b5",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Term-to-tactic change was forced by explicit b; a reviewer might request term mode, unlikely."
+ },
+ {
+  "cid": "c72458f",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Tiny inner by-block; a ▸ term is possible but rarely requested."
+ },
+ {
+  "cid": "c759176",
+  "raise": false,
+  "p": 0.05,
+  "basis": "(by on its own line split over three lines is odd style, but P084 asks are rare."
+ },
+ {
+  "cid": "c77f9c8",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Binder letters x vs i are not a reviewed inconsistency."
+ },
+ {
+  "cid": "c7a4a42",
+  "raise": false,
+  "p": 0.01,
+  "basis": "rw vs simp_rw across lemmas is not a spelling inconsistency reviewers raise."
+ },
+ {
+  "cid": "c7a80fb",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Both left and right variants were added; no missing sibling."
+ },
+ {
+  "cid": "c7cf9f3",
+  "raise": false,
+  "p": 0.09,
+  "basis": "Gratuitous break of an 80-char variable line is noticeable, yet P084 asks run about 1 in 71."
+ },
+ {
+  "cid": "c83d2ac",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Rewrite then exact of a transitivity term; rwa does not apply."
+ },
+ {
+  "cid": "c848b15",
+  "raise": false,
+  "p": 0.15,
+  "basis": "Three variable lines repeat DivisionMonoid/DecidableEq/{s t}; restructuring suggestion plausible but not likely."
+ },
+ {
+  "cid": "c905386",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Hyphenation in a typo-fix PR; P126 asks very rare."
+ },
+ {
+  "cid": "c9172e2",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Prime for a weaker variant is standard naming."
+ },
+ {
+  "cid": "c9216dd",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Seven-step proof with rewrites at hypotheses is not a short term-able block."
+ },
+ {
+  "cid": "c92b22f",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Explicit (H K N) binders on a few main theorems are common file style."
+ },
+ {
+  "cid": "c954791",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Deprecated-alias attribute placement differs, but reviewers rarely comment on this."
+ },
+ {
+  "cid": "c988408",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Docstring fill by one word; resembles not-asked examples."
+ },
+ {
+  "cid": "c99b9b7",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Move broke a one-liner onto two lines; minor, rarely raised."
+ },
+ {
+  "cid": "c9ad5b7",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Typo PR capitalising MGFs; leftover 'the cgf' might be noted, unlikely."
+ },
+ {
+  "cid": "c9c95bb",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Rewrites at hypotheses then exact; no single finishing tactic evident."
+ },
+ {
+  "cid": "ca3e65f",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Both hypotheses are necessary for the statement."
+ },
+ {
+  "cid": "ca5f039",
+  "raise": false,
+  "p": 0.05,
+  "basis": "DivInvMonoid might suffice for the right lemma, a small further generalization reviewers seldom ask for."
+ },
+ {
+  "cid": "ca6708c",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Term-to-tactic change forced by explicit b; low P040 rate."
+ },
+ {
+  "cid": "ca72784",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Each typeclass is used by prod_nonneg, ge_of_tendsto' or 0≤1; looks minimal."
+ },
+ {
+  "cid": "cac351d",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Short rewrite-then-term steps; no clear finishing tactic."
+ },
+ {
+  "cid": "cb23b23",
+  "raise": false,
+  "p": 0.01,
+  "basis": "exists_uncountable_fiber parallels exists_infinite_fiber exactly."
+ },
+ {
+  "cid": "cbec1b5",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Misc generalization PR; asking every sibling to move is unlikely."
+ },
+ {
+  "cid": "cc4ac1e",
+  "raise": false,
+  "p": 0.04,
+  "basis": "rw at several locations then goal-only rw then exact; merge is awkward."
+ },
+ {
+  "cid": "cc59f86",
+  "raise": false,
+  "p": 0.05,
+  "basis": "Weakening to a normalizer hypothesis is conceivable for an expert, but rare (P010 ~1/59)."
+ },
+ {
+  "cid": "cc836a0",
+  "raise": false,
+  "p": 0.14,
+  "basis": "have-simpa then simpa could be one simpa using mul_left_injective; plausible golf, below raise."
+ },
+ {
+  "cid": "cc9fde0",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Repeated binders match the rest of the file; variable restructure rarely asked."
+ },
+ {
+  "cid": "ccde78d",
+  "raise": false,
+  "p": 0.06,
+  "basis": "Long proof could draw a simpler-approach comment, but no known library route."
+ },
+ {
+  "cid": "cd4b87a",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Both cancel classes and DivisionMonoid are needed by the two injectivity lemmas."
+ },
+ {
+  "cid": "cd6985c",
+  "raise": false,
+  "p": 0.005,
+  "basis": "lemma vs theorem is never asked."
+ },
+ {
+  "cid": "cda88ae",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Proof on its own line is normal Mathlib style even when it fits."
+ },
+ {
+  "cid": "cdb41f1",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Rename aligns with its counterpart; no evident siblings left."
+ },
+ {
+  "cid": "cdeae9c",
+  "raise": false,
+  "p": 0.04,
+  "basis": "A HasProd.nonneg variant might be requested, but such asks are rare."
+ },
+ {
+  "cid": "ce3c52e",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Case split is the substance of the generalization."
+ },
+ {
+  "cid": "ce477e2",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Mixed qualification in a rw list; cosmetic."
+ },
+ {
+  "cid": "ce656ac",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Generalizing set-domain siblings too is possible but seldom required."
+ },
+ {
+  "cid": "ceb3977",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Only the lemma name changed in pre-existing code; no reviewer golfs it."
+ },
+ {
+  "cid": "cefa9e1",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Explicit binders on a symmetric pair of theorems; common style."
+ },
+ {
+  "cid": "cf10b73",
+  "raise": true,
+  "p": 0.38,
+  "basis": "constructor/intro/have/rintro block next to term sibling div_right_inj; div_left_injective.eq_iff is the obvious suggestion, like pos:v0108."
+ },
+ {
+  "cid": "cf4ed8d",
+  "raise": false,
+  "p": 0.02,
+  "basis": "inv_injective needs involutive inverse, so DivisionMonoid is essentially required."
+ },
+ {
+  "cid": "cf4ee0d",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Finite branch via infinite_pigeonhole_card at ℵ₀ is natural; no clear shortcut."
+ },
+ {
+  "cid": "cf57706",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Proof on its own line is normal Mathlib style even when it fits."
+ },
+ {
+  "cid": "cf6e80a",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Missing codomain-uncountable variant is speculative; rarely asked."
+ },
+ {
+  "cid": "cf7ae96",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Both hypotheses needed; this is already the generalization."
+ },
+ {
+  "cid": "cf7c9f9",
+  "raise": false,
+  "p": 0.07,
+  "basis": "Unnecessarily split a former one-liner; a keep-diff-minimal remark is possible."
+ },
+ {
+  "cid": "cf86889",
+  "raise": false,
+  "p": 0.02,
+  "basis": "Two-branch proof mirroring tsum_nonneg; no single finishing tactic."
+ },
+ {
+  "cid": "cf9bfc2",
+  "raise": false,
+  "p": 0.01,
+  "basis": "Hypotheses are those needed; already weakened by the PR."
+ },
+ {
+  "cid": "cfda496",
+  "raise": false,
+  "p": 0.04,
+  "basis": "Typo PR; other lowercase 'gaussian' might be noted, unlikely."
+ },
+ {
+  "cid": "cff4d13",
+  "raise": false,
+  "p": 0.03,
+  "basis": "Repeated binders match file style."
+ },
+ {
+  "cid": "cffcd29",
+  "raise": false,
+  "p": 0.12,
+  "basis": "simp [div_eq_mul_inv] likely closes it, but reviewer more likely suggests the .eq_iff term."
+ }
+]

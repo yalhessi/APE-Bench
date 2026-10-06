@@ -1,0 +1,199 @@
+     1|/-
+     2|Copyright (c) 2022 Kexing Ying. All rights reserved.
+     3|Released under Apache 2.0 license as described in the file LICENSE.
+     4|Authors: Kexing Ying
+     5|-/
+     6|import Mathlib.MeasureTheory.Constructions.Polish.Basic
+     7|import Mathlib.MeasureTheory.Function.UniformIntegrable
+     8|import Mathlib.Probability.Martingale.Upcrossing
+     9|
+    10|/-!
+    11|
+    12|# Martingale convergence theorems
+    13|
+    14|The martingale convergence theorems are a collection of theorems characterizing the convergence
+    15|of a martingale provided it satisfies some boundedness conditions. This file contains the
+    16|almost everywhere martingale convergence theorem which provides an almost everywhere limit to
+    17|an L¹ bounded submartingale. It also contains the L¹ martingale convergence theorem which provides
+    18|an L¹ limit to a uniformly integrable submartingale. Finally, it also contains the Lévy upwards
+    19|theorems.
+    20|
+    21|## Main results
+    22|
+    23|* `MeasureTheory.Submartingale.ae_tendsto_limitProcess`: the almost everywhere martingale
+    24|  convergence theorem: an L¹-bounded submartingale adapted to the filtration `ℱ` converges almost
+    25|  everywhere to its limit process.
+    26|* `MeasureTheory.Submartingale.memLp_limitProcess`: the limit process of an Lᵖ-bounded
+    27|  submartingale is Lᵖ.
+    28|* `MeasureTheory.Submartingale.tendsto_eLpNorm_one_limitProcess`: part a of the L¹ martingale
+    29|  convergence theorem: a uniformly integrable submartingale adapted to the filtration `ℱ` converges
+    30|  almost everywhere and in L¹ to an integrable function which is measurable with respect to
+    31|  the σ-algebra `⨆ n, ℱ n`.
+    32|* `MeasureTheory.Martingale.ae_eq_condExp_limitProcess`: part b the L¹ martingale convergence
+    33|  theorem: if `f` is a uniformly integrable martingale adapted to the filtration `ℱ`, then
+    34|  `f n` equals `𝔼[g | ℱ n]` almost everywhere where `g` is the limiting process of `f`.
+    35|* `MeasureTheory.Integrable.tendsto_ae_condExp`: part c the L¹ martingale convergence theorem:
+    36|  given a `⨆ n, ℱ n`-measurable function `g` where `ℱ` is a filtration, `𝔼[g | ℱ n]` converges
+    37|  almost everywhere to `g`.
+    38|* `MeasureTheory.Integrable.tendsto_eLpNorm_condExp`: part c the L¹ martingale convergence theorem:
+    39|  given a `⨆ n, ℱ n`-measurable function `g` where `ℱ` is a filtration, `𝔼[g | ℱ n]` converges in
+    40|  L¹ to `g`.
+    41|
+    42|-/
+    43|
+    44|
+    45|open TopologicalSpace Filter MeasureTheory.Filtration
+    46|
+    47|open scoped NNReal ENNReal MeasureTheory ProbabilityTheory Topology
+    48|
+    49|namespace MeasureTheory
+    50|
+    51|variable {Ω : Type*} {m0 : MeasurableSpace Ω} {μ : Measure Ω} {ℱ : Filtration ℕ m0}
+    52|variable {a b : ℝ} {f : ℕ → Ω → ℝ} {ω : Ω} {R : ℝ≥0}
+    53|
+    54|section AeConvergence
+    55|
+    56|/-!
+    57|
+    58|### Almost everywhere martingale convergence theorem
+    59|
+    60|We will now prove the almost everywhere martingale convergence theorem.
+    61|
+    62|The a.e. martingale convergence theorem states: if `f` is an L¹-bounded `ℱ`-submartingale, then
+    63|it converges almost everywhere to an integrable function which is measurable with respect to
+    64|the σ-algebra `ℱ∞ := ⨆ n, ℱ n`.
+    65|
+    66|Mathematically, we proceed by first noting that a real sequence $(x_n)$ converges if
+    67|(a) $\limsup_{n \to \infty} |x_n| < \infty$, (b) for all $a < b \in \mathbb{Q}$ we have the
+    68|number of upcrossings of $(x_n)$ from below $a$ to above $b$ is finite.
+    69|Thus, for all $\omega$ satisfying $\limsup_{n \to \infty} |f_n(\omega)| < \infty$ and the number of
+    70|upcrossings of $(f_n(\omega))$ from below $a$ to above $b$ is finite for all $a < b \in \mathbb{Q}$,
+    71|we have $(f_n(\omega))$ is convergent.
+    72|
+    73|Hence, assuming $(f_n)$ is L¹-bounded, using Fatou's lemma, we have
+    74|$$
+    75|  \mathbb{E} \limsup_{n \to \infty} |f_n| \le \limsup_{n \to \infty} \mathbb{E}|f_n| < \infty
+    76|$$
+    77|implying $\limsup_{n \to \infty} |f_n| < \infty$ a.e. Furthermore, by the upcrossing estimate,
+    78|the number of upcrossings is finite almost everywhere implying $f$ converges pointwise almost
+    79|everywhere.
+    80|
+    81|Thus, denoting $g$ the a.e. limit of $(f_n)$, $g$ is $\mathcal{F}_\infty$-measurable as for all
+    82|$n$, $f_n$ is $\mathcal{F}_n$-measurable and $\mathcal{F}_n \le \mathcal{F}_\infty$. Finally, $g$
+    83|is integrable as $|g| \le \liminf_{n \to \infty} |f_n|$ so
+    84|$$
+    85|  \mathbb{E}|g| \le \mathbb{E} \limsup_{n \to \infty} |f_n| \le
+    86|    \limsup_{n \to \infty} \mathbb{E}|f_n| < \infty
+    87|$$
+    88|as required.
+    89|
+    90|In terms of implementation, we have `tendsto_of_no_upcrossings` which shows that
+    91|a bounded sequence converges if it does not visit below $a$ and above $b$ infinitely often
+    92|for all $a, b ∈ s$ for some dense set $s$. So, we may skip the first step provided we can prove
+    93|that the realizations are bounded almost everywhere. Indeed, suppose $|f_n(\omega)|$ is not
+    94|bounded, then either $f_n(\omega) \to \pm \infty$ or one of $\limsup f_n(\omega)$ or
+    95|$\liminf f_n(\omega)$ equals $\pm \infty$ while the other is finite. But the first case
+    96|contradicts $\liminf |f_n(\omega)| < \infty$ while the second case contradicts finite upcrossings.
+    97|
+    98|Furthermore, we introduce `Filtration.limitProcess` which chooses the limiting random variable
+    99|of a stochastic process if it exists, otherwise returning 0. Hence, instead of showing an
+   100|existence statement, we phrase the a.e. martingale convergence theorem by showing that a
+   101|submartingale converges to its `limitProcess` almost everywhere.
+   102|
+   103|-/
+   104|
+   105|
+   106|/-- If a stochastic process has bounded upcrossing from below `a` to above `b`,
+   107|then it does not frequently visit both below `a` and above `b`. -/
+   108|theorem not_frequently_of_upcrossings_lt_top (hab : a < b) (hω : upcrossings a b f ω ≠ ∞) :
+   109|    ¬((∃ᶠ n in atTop, f n ω < a) ∧ ∃ᶠ n in atTop, b < f n ω) := by
+   110|  rw [← lt_top_iff_ne_top, upcrossings_lt_top_iff] at hω
+   111|  replace hω : ∃ k, ∀ N, upcrossingsBefore a b f N ω < k := by
+   112|    obtain ⟨k, hk⟩ := hω
+   113|    exact ⟨k + 1, fun N => lt_of_le_of_lt (hk N) k.lt_succ_self⟩
+   114|  rintro ⟨h₁, h₂⟩
+   115|  rw [frequently_atTop] at h₁ h₂
+   116|  refine Classical.not_not.2 hω ?_
+   117|  push_neg
+   118|  intro k
+   119|  induction k with
+   120|  | zero => simp only [zero_le, exists_const]
+   121|  | succ k ih =>
+   122|    obtain ⟨N, hN⟩ := ih
+   123|    obtain ⟨N₁, hN₁, hN₁'⟩ := h₁ N
+   124|    obtain ⟨N₂, hN₂, hN₂'⟩ := h₂ N₁
+   125|    exact ⟨N₂ + 1, Nat.succ_le_of_lt <|
+   126|      lt_of_le_of_lt hN (upcrossingsBefore_lt_of_exists_upcrossing hab hN₁ hN₁' hN₂ hN₂')⟩
+   127|
+   128|/-- A stochastic process that frequently visits below `a` and above `b` has infinite upcrossings. -/
+   129|theorem upcrossings_eq_top_of_frequently_lt (hab : a < b) (h₁ : ∃ᶠ n in atTop, f n ω < a)
+   130|    (h₂ : ∃ᶠ n in atTop, b < f n ω) : upcrossings a b f ω = ∞ :=
+   131|  by_contradiction fun h => not_frequently_of_upcrossings_lt_top hab h ⟨h₁, h₂⟩
+   132|
+   133|/-- A realization of a stochastic process with bounded upcrossings and bounded limit inferiors is
+   134|convergent.
+   135|
+   136|We use the spelling `< ∞` instead of the standard `≠ ∞` in the assumptions since it is not as easy
+   137|to change `<` to `≠` under binders. -/
+   138|theorem tendsto_of_uncrossing_lt_top (hf₁ : liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞)
+   139|    (hf₂ : ∀ a b : ℚ, a < b → upcrossings a b f ω < ∞) :
+   140|    ∃ c, Tendsto (fun n => f n ω) atTop (𝓝 c) := by
+   141|  by_cases h : IsBoundedUnder (· ≤ ·) atTop fun n => |f n ω|
+   142|  · rw [isBoundedUnder_le_abs] at h
+   143|    refine tendsto_of_no_upcrossings Rat.denseRange_cast ?_ h.1 h.2
+   144|    rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩ hab
+   145|    exact not_frequently_of_upcrossings_lt_top hab (hf₂ a b (Rat.cast_lt.1 hab)).ne
+   146|  · obtain ⟨a, b, hab, h₁, h₂⟩ := ENNReal.exists_upcrossings_of_not_bounded_under hf₁.ne h
+   147|    exact
+   148|      False.elim ((hf₂ a b hab).ne (upcrossings_eq_top_of_frequently_lt (Rat.cast_lt.2 hab) h₁ h₂))
+   149|
+   150|/-- An L¹-bounded submartingale has bounded upcrossings almost everywhere. -/
+   151|theorem Submartingale.upcrossings_ae_lt_top' [IsFiniteMeasure μ] (hf : Submartingale f ℱ μ)
+   152|    (hbdd : ∀ n, eLpNorm (f n) 1 μ ≤ R) (hab : a < b) : ∀ᵐ ω ∂μ, upcrossings a b f ω < ∞ := by
+   153|  refine ae_lt_top (hf.adapted.measurable_upcrossings hab) ?_
+   154|  have := hf.mul_lintegral_upcrossings_le_lintegral_pos_part a b
+   155|  rw [mul_comm, ← ENNReal.le_div_iff_mul_le] at this
+   156|  · refine (lt_of_le_of_lt this (ENNReal.div_lt_top ?_ ?_)).ne
+   157|    · have hR' : ∀ n, ∫⁻ ω, ‖f n ω - a‖₊ ∂μ ≤ R + ‖a‖₊ * μ Set.univ := by
+   158|        simp_rw [eLpNorm_one_eq_lintegral_enorm] at hbdd
+   159|        intro n
+   160|        refine (lintegral_mono ?_ : ∫⁻ ω, ‖f n ω - a‖₊ ∂μ ≤ ∫⁻ ω, ‖f n ω‖₊ + ‖a‖₊ ∂μ).trans ?_
+   161|        · intro ω
+   162|          simp_rw [sub_eq_add_neg, ← nnnorm_neg a, ← ENNReal.coe_add, ENNReal.coe_le_coe]
+   163|          exact nnnorm_add_le _ _
+   164|        · simp_rw [lintegral_add_right _ measurable_const, lintegral_const]
+   165|          exact add_le_add (hbdd _) le_rfl
+   166|      refine ne_of_lt (iSup_lt_iff.2 ⟨R + ‖a‖₊ * μ Set.univ, ENNReal.add_lt_top.2
+   167|        ⟨ENNReal.coe_lt_top, by finiteness⟩,
+   168|        fun n => le_trans ?_ (hR' n)⟩)
+   169|      refine lintegral_mono fun ω => ?_
+   170|      rw [ENNReal.ofReal_le_iff_le_toReal, ENNReal.coe_toReal, coe_nnnorm]
+   171|      · by_cases hnonneg : 0 ≤ f n ω - a
+   172|        · rw [posPart_eq_self.2 hnonneg, Real.norm_eq_abs, abs_of_nonneg hnonneg]
+   173|        · rw [posPart_eq_zero.2 (not_le.1 hnonneg).le]
+   174|          exact norm_nonneg _
+   175|      · finiteness
+   176|    · simp only [hab, Ne, ENNReal.ofReal_eq_zero, sub_nonpos, not_le]
+   177|  · left; simp only [hab, Ne, ENNReal.ofReal_eq_zero, sub_nonpos, not_le]
+   178|  · left; finiteness
+   179|
+   180|theorem Submartingale.upcrossings_ae_lt_top [IsFiniteMeasure μ] (hf : Submartingale f ℱ μ)
+   181|    (hbdd : ∀ n, eLpNorm (f n) 1 μ ≤ R) : ∀ᵐ ω ∂μ, ∀ a b : ℚ, a < b → upcrossings a b f ω < ∞ := by
+   182|  simp only [ae_all_iff, eventually_imp_distrib_left]
+   183|  rintro a b hab
+   184|  exact hf.upcrossings_ae_lt_top' hbdd (Rat.cast_lt.2 hab)
+   185|
+   186|/-- An L¹-bounded submartingale converges almost everywhere. -/
+   187|theorem Submartingale.exists_ae_tendsto_of_bdd [IsFiniteMeasure μ] (hf : Submartingale f ℱ μ)
+   188|    (hbdd : ∀ n, eLpNorm (f n) 1 μ ≤ R) : ∀ᵐ ω ∂μ, ∃ c, Tendsto (fun n => f n ω) atTop (𝓝 c) := by
+   189|  filter_upwards [hf.upcrossings_ae_lt_top hbdd, ae_bdd_liminf_atTop_of_eLpNorm_bdd one_ne_zero
+   190|    (fun n => (hf.stronglyMeasurable n).measurable.mono (ℱ.le n) le_rfl) hbdd] with ω h₁ h₂
+   191|  exact tendsto_of_uncrossing_lt_top h₂ h₁
+   192|
+   193|theorem Submartingale.exists_ae_trim_tendsto_of_bdd [IsFiniteMeasure μ] (hf : Submartingale f ℱ μ)
+   194|    (hbdd : ∀ n, eLpNorm (f n) 1 μ ≤ R) :
+   195|    ∀ᵐ ω ∂μ.trim (sSup_le fun _ ⟨_, hn⟩ => hn ▸ ℱ.le _ : ⨆ n, ℱ n ≤ m0),
+   196|      ∃ c, Tendsto (fun n => f n ω) atTop (𝓝 c) := by
+   197|  letI := (⨆ n, ℱ n)
+   198|  rw [ae_iff, trim_measurableSet_eq]
+   199|  · exact hf.exists_ae_tendsto_of_bdd hbdd

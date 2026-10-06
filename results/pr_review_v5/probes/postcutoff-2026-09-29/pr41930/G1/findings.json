@@ -1,0 +1,9 @@
+[
+  {
+    "target": "PR description",
+    "claim": "The PR description says the PR will \"name the minor premises according to their contents\", but the diff renames only the motive `C` to `motive` in `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on`. The minor premises (`one`, `inl_mul`, `inr_mul` and `inl`, `inr`, `mul`) have exactly the same names before and after the PR, so the description, which becomes the squash commit message, claims a change the PR does not make.",
+    "requested_change": "Edit the PR description to say what the PR does: rename the motive `C` to `motive` in `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` and their `to_additive` versions. Drop the sentence about naming the minor premises, which already had content-based names.",
+    "severity": "advisory",
+    "evidence": "Compared the before/after statements in model.md and diff.patch: the only identifier change is `C` -> `motive`, plus a re-break of the `induction_on` signature. A `lean_verify_edit` run that added a MetaM `#eval` printing binder names after the PR's `induction_on` compiled (outcome `compiled`) and printed: Monoid.Coprod.induction_on' = [motive, m, one, inl_mul, inr_mul], Monoid.Coprod.induction_on = [motive, m, inl, inr, mul], AddMonoid.Coprod.induction_on' = [motive, m, zero, inl_add, inr_add], AddMonoid.Coprod.induction_on = [motive, m, inl, inr, add]. So the minor premises were already content-named, and to_additive already translates them. The PR changes none of them."
+  }
+]

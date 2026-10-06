@@ -1,0 +1,30 @@
+[
+  {
+    "id": "P232",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "Title `chore: generalize an instance to `ContinuousConstSMul`` has the type keyword `chore` but no parenthesised area such as `(Topology/Algebra/Module/FiniteDimension)`.",
+    "status": "departs"
+  },
+  {
+    "id": "P041",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Description says only 'Cleaning up old branches. I have no specific applications in mind right now', giving no reason the instance's generalisation to `ContinuousConstSMul` is wanted.",
+    "status": "departs"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Topology/Algebra/Module/FiniteDimension.lean",
+    "declaration": "variable command (section Field)",
+    "fact": "Swaps `[ContinuousSMul 𝕜 F]` for `[ContinuousConstSMul 𝕜 F]`; `[TopologicalSpace 𝕜]` stays though the weaker class no longer mentions it, so it may now be unneeded.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Topology/Algebra/Module/FiniteDimension.lean",
+    "declaration": "instance : FiniteDimensional 𝕜 (E →L[𝕜] F) (anonymous)",
+    "fact": "The instance takes the section's classes, now `ContinuousConstSMul 𝕜 F` with `IsTopologicalAddGroup F`, `TopologicalSpace 𝕜`, `Field 𝕜`; each is to check against what it uses.",
+    "status": "check"
+  }
+]

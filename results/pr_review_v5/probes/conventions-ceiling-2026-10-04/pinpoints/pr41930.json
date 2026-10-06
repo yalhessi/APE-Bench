@@ -1,0 +1,93 @@
+[
+  {
+    "id": "P156",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Description says the PR names the minor premises according to their contents, but the diff renames only the motive `C` to `motive`; `one`, `inl_mul`, `inr_mul`, `inl`, `inr`, `mul` are unchanged.",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "The PR re-breaks the signature; the 56-character first line could take the next line's leading binder `(inl : ∀ m, motive (inl m))` within 100 characters (84).",
+    "status": "departs"
+  },
+  {
+    "id": "P084",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "Changed signature lines leave room: line one could take `(one : motive 1)` (74 chars), and `(one : motive 1)` could take `(inl_mul : ...)` (69 chars).",
+    "status": "departs"
+  },
+  {
+    "id": "P182",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "Minor premises `inl_mul` and `inr_mul` (`∀ m x, motive x → …`) bind `x` explicitly; the next hypothesis `motive x` determines it.",
+    "status": "departs"
+  },
+  {
+    "id": "P182",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "Minor premise `mul : ∀ x y, motive x → motive y → …` binds `x`, `y` explicitly; the following hypotheses `motive x`, `motive y` determine them.",
+    "status": "departs"
+  },
+  {
+    "id": "P048",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "Consecutive changed theorems `induction_on'` and `induction_on` each bind `{motive : M ∗ N → Prop} (m : M ∗ N)` in their signatures rather than once by `variable`.",
+    "status": "departs"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "The PR renames this recursor's motive `C` to `motive`; sibling eliminators (other Coprod/CoprodI/free-product induction principles) may still name it `C`.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "Motive renamed `C` to `motive` in this `elab_as_elim` recursor; analogous induction principles elsewhere in the library may keep the old motive name.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "New binder name `motive` for the eliminator's predicate; `m` names both the major premise `m : M ∗ N` and the `M`-element bound in `inl_mul : ∀ m x`.",
+    "status": "check"
+  },
+  {
+    "id": "P105",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "New binder name `motive` replaces `C`; letter `m` names `m : M ∗ N` and also the `M`-element in `inl : ∀ m, motive (inl m)`.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "Existing theorem's statement changed only by renaming the bound motive `C` to `motive`; the proposition is unchanged up to the binder name.",
+    "status": "check"
+  },
+  {
+    "id": "P185",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on",
+    "fact": "Existing theorem changed only by renaming motive `C` to `motive` and re-breaking the signature lines; the statement is otherwise identical.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/GroupTheory/Coprod/Basic.lean",
+    "declaration": "Monoid.Coprod.induction_on'",
+    "fact": "Changed declaration line declares primed `induction_on'` (and its `to_additive` twin); unprimed `induction_on` appears in the same hunk.",
+    "status": "check"
+  }
+]

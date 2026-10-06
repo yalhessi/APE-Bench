@@ -1,0 +1,205 @@
+[
+  {
+    "id": "P232",
+    "file": "PR",
+    "declaration": "title",
+    "fact": "Title `chore: golf using grind and simp` has the type keyword and colon but no parenthesised area naming the edited directories.",
+    "status": "departs"
+  },
+  {
+    "id": "P156",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Description says the PR is batched to up to ~5 changed files, but the diff changes seven files.",
+    "status": "departs"
+  },
+  {
+    "id": "P014",
+    "file": "Mathlib/Data/Finset/Image.lean",
+    "declaration": "Finset.mem_map_equiv",
+    "fact": "`simp only [mem_map, Equiv.coe_toEmbedding]` is followed only by `grind`, a flexible finisher, so the squeezed list is not needed.",
+    "status": "departs"
+  },
+  {
+    "id": "P014",
+    "file": "Mathlib/Data/Rat/Lemmas.lean",
+    "declaration": "Rat.inv_intCast_den_of_pos",
+    "fact": "`simp only [den_inv, num_intCast]` is followed only by `grind`, a flexible finisher, so the squeezed list is not needed.",
+    "status": "departs"
+  },
+  {
+    "id": "P024",
+    "file": "Mathlib/Data/Finset/Image.lean",
+    "declaration": "Finset.mem_map_equiv",
+    "fact": "`grind` replaces the explicit two-direction anonymous-constructor term; description reports <10 ms before, 25 ms after.",
+    "status": "check"
+  },
+  {
+    "id": "P024",
+    "file": "Mathlib/Data/Rat/Lemmas.lean",
+    "declaration": "Rat.inv_intCast_den_of_pos",
+    "fact": "`grind` replaces a four-line rw/apply/exact proof via `den_div_eq_of_coprime`; description reports <10 ms before, 17 ms after.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/Order/LiminfLimsup.lean",
+    "declaration": "limsup_finset_sup'",
+    "fact": "Golf replaces the stated `use`/`suffices key`/`split_ands` argument with `simp only [...] at hb ⊢` plus one `fun` term, hiding intermediate claims.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/Data/Rat/Lemmas.lean",
+    "declaration": "Rat.inv_intCast_den_of_pos",
+    "fact": "The coprimality and denominator argument formerly spelled out is now carried entirely by a bare `grind` after `simp only`.",
+    "status": "check"
+  },
+  {
+    "id": "P168",
+    "file": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "declaration": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "fact": "Reindexing step that `congr`/`e.apply_symm_apply` showed is now hidden in `Fintype.prod_equiv _ _ _ (congrFun rfl)`.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "declaration": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "fact": "Consecutive `simp only [pi_pi, this]` then `exact Fintype.prod_equiv ...` on the goal; candidate for one `simpa ... using` or `rw`.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Rewrite `simp only [this]` then `exact (Kernel.compProd_apply_prod hs ht).symm`; could be one `rw [this, ...]` or `simpa ... using`.",
+    "status": "check"
+  },
+  {
+    "id": "P018",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Rewrite `simp only [this]` then `exact (compProd_apply_prod hs ht).symm`; could be one `rw [this, ...]` or `simpa ... using`.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "declaration": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "fact": "Final goal closed by `simp only [pi_pi, this]` plus a hand-built term `Fintype.prod_equiv _ _ _ (congrFun rfl)`.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Order/LiminfLimsup.lean",
+    "declaration": "limsup_finset_sup'",
+    "fact": "First `le_antisymm` branch closed by `simp only ... at hb ⊢` plus hand-built `fun i i_s ↦ eventually_lt_of_limsup_lt ...` term.",
+    "status": "check"
+  },
+  {
+    "id": "P005",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Goal closed by `simp only [this]` then explicit `exact (Kernel.compProd_apply_prod hs ht).symm` rather than one finishing tactic.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+    "declaration": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+    "fact": "Hypothesis `h` is rewritten by `simp only [...] at h` into the form of `tendsto_of_forall_isClosed_limsup_le`, then applied.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "declaration": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "fact": "Goal rewritten by `pi_pi, this`, then `Fintype.prod_equiv` adapted with `congrFun rfl` to fit the product reindexing.",
+    "status": "check"
+  },
+  {
+    "id": "P060",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Goal rewritten by `this` (disintegration) and closed by the converted `(compProd_apply_prod hs ht).symm`.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Proof is now a short `by` block: `have`, `simp only [this]`, `exact (Kernel.compProd_apply_prod hs ht).symm` assembling lemma applications.",
+    "status": "check"
+  },
+  {
+    "id": "P040",
+    "file": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "declaration": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "fact": "Proof is now a short `by` block: `have`, `simp only [this]`, `exact (compProd_apply_prod hs ht).symm` assembling lemma applications.",
+    "status": "check"
+  },
+  {
+    "id": "P089",
+    "file": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "declaration": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "fact": "`Fintype.prod_equiv _ _ _ (congrFun rfl)` passes three `_` placeholders in argument positions.",
+    "status": "check"
+  },
+  {
+    "id": "P211",
+    "file": "Mathlib/Topology/MetricSpace/Pseudo/Defs.lean",
+    "declaration": "Metric.exists_lt_mem_ball_of_mem_ball",
+    "fact": "New term proof refers to the primed lemma `exists_between'`.",
+    "status": "check"
+  },
+  {
+    "id": "P126",
+    "file": "Mathlib/Order/LiminfLimsup.lean",
+    "declaration": "limsup_finset_sup'",
+    "fact": "Added line spells a lambda `fun i i_s ↦ ...`; lambdas also occur elsewhere in the file.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Order/LiminfLimsup.lean",
+    "declaration": "limsup_finset_sup'",
+    "fact": "Proof golfed for the `limsup`/`sup'` member only; its dual (`liminf`/`inf'`) sibling is not touched by the PR.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/Data/Rat/Lemmas.lean",
+    "declaration": "Rat.inv_intCast_den_of_pos",
+    "fact": "Proof golfed for the `den` lemma only; its sibling `inv_intCast_num_of_pos`, just above, is not touched.",
+    "status": "check"
+  },
+  {
+    "id": "P100",
+    "file": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+    "declaration": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+    "fact": "Proof golfed for this primed `real` variant only; its unprimed and analogous Portmanteau siblings are not touched.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/Data/Rat/Lemmas.lean",
+    "declaration": "Rat.inv_intCast_den_of_pos",
+    "fact": "Changed declaration takes positivity hypothesis `ha0 : 0 < a`; new proof leaves its use implicit inside `grind`.",
+    "status": "check"
+  },
+  {
+    "id": "P010",
+    "file": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+    "declaration": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+    "fact": "Takes `[L.IsCountablyGenerated]`; the new proof now only calls `tendsto_of_forall_isClosed_limsup_le h`, which may not need it.",
+    "status": "check"
+  },
+  {
+    "id": "P043",
+    "file": "PR",
+    "declaration": "description",
+    "fact": "Eight independent proof golfs across seven unrelated files (Finset, Rat, measure theory, order, probability, metric spaces), none depending on another.",
+    "status": "check"
+  }
+]

@@ -1,0 +1,476 @@
+     1|/-
+     2|Copyright (c) 2022 Rémy Degenne. All rights reserved.
+     3|Released under Apache 2.0 license as described in the file LICENSE.
+     4|Authors: Rémy Degenne
+     5|-/
+     6|import Mathlib.Probability.IdentDistrib
+     7|
+     8|/-!
+     9|# Moments and moment generating function
+    10|
+    11|## Main definitions
+    12|
+    13|* `ProbabilityTheory.moment X p μ`: `p`th moment of a real random variable `X` with respect to
+    14|  measure `μ`, `μ[X^p]`
+    15|* `ProbabilityTheory.centralMoment X p μ`:`p`th central moment of `X` with respect to measure `μ`,
+    16|  `μ[(X - μ[X])^p]`
+    17|* `ProbabilityTheory.mgf X μ t`: moment generating function of `X` with respect to measure `μ`,
+    18|  `μ[exp(t*X)]`
+    19|* `ProbabilityTheory.cgf X μ t`: cumulant generating function, logarithm of the moment generating
+    20|  function
+    21|
+    22|## Main results
+    23|
+    24|* `ProbabilityTheory.IndepFun.mgf_add`: if two real random variables `X` and `Y` are independent
+    25|  and their MGFs are defined at `t`, then `mgf (X + Y) μ t = mgf X μ t * mgf Y μ t`
+    26|* `ProbabilityTheory.IndepFun.cgf_add`: if two real random variables `X` and `Y` are independent
+    27|  and their CGFs are defined at `t`, then `cgf (X + Y) μ t = cgf X μ t + cgf Y μ t`
+    28|* `ProbabilityTheory.measure_ge_le_exp_cgf` and `ProbabilityTheory.measure_le_le_exp_cgf`:
+    29|  Chernoff bound on the upper (resp. lower) tail of a random variable. For `t` nonnegative such that
+    30|  the cgf exists, `ℙ(ε ≤ X) ≤ exp(- t*ε + cgf X ℙ t)`. See also
+    31|  `ProbabilityTheory.measure_ge_le_exp_mul_mgf` and
+    32|  `ProbabilityTheory.measure_le_le_exp_mul_mgf` for versions of these results using `mgf` instead
+    33|  of `cgf`.
+    34|-/
+    35|
+    36|
+    37|open MeasureTheory Filter Finset Real
+    38|
+    39|noncomputable section
+    40|
+    41|open scoped MeasureTheory ProbabilityTheory ENNReal NNReal
+    42|
+    43|namespace ProbabilityTheory
+    44|
+    45|variable {Ω ι : Type*} {m : MeasurableSpace Ω} {X : Ω → ℝ} {p : ℕ} {μ : Measure Ω}
+    46|
+    47|/-- Moment of a real random variable, `μ[X ^ p]`. -/
+    48|def moment (X : Ω → ℝ) (p : ℕ) (μ : Measure Ω) : ℝ :=
+    49|  μ[X ^ p]
+    50|
+    51|/-- Central moment of a real random variable, `μ[(X - μ[X]) ^ p]`. -/
+    52|def centralMoment (X : Ω → ℝ) (p : ℕ) (μ : Measure Ω) : ℝ := by
+    53|  have m := fun (x : Ω) => μ[X] -- Porting note: Lean deems `μ[(X - fun x => μ[X]) ^ p]` ambiguous
+    54|  exact μ[(X - m) ^ p]
+    55|
+    56|@[simp]
+    57|theorem moment_zero (hp : p ≠ 0) : moment 0 p μ = 0 := by
+    58|  simp only [moment, hp, zero_pow, Ne, not_false_iff, Pi.zero_apply, integral_const,
+    59|    smul_eq_mul, mul_zero]
+    60|
+    61|@[simp]
+    62|lemma moment_zero_measure : moment X p (0 : Measure Ω) = 0 := by simp [moment]
+    63|
+    64|@[simp]
+    65|theorem centralMoment_zero (hp : p ≠ 0) : centralMoment 0 p μ = 0 := by
+    66|  simp only [centralMoment, hp, Pi.zero_apply, integral_const, smul_eq_mul,
+    67|    mul_zero, zero_sub, Pi.pow_apply, Pi.neg_apply, neg_zero, zero_pow, Ne, not_false_iff]
+    68|
+    69|@[simp]
+    70|lemma centralMoment_zero_measure : centralMoment X p (0 : Measure Ω) = 0 := by
+    71|  simp [centralMoment]
+    72|
+    73|theorem centralMoment_one' [IsFiniteMeasure μ] (h_int : Integrable X μ) :
+    74|    centralMoment X 1 μ = (1 - μ.real Set.univ) * μ[X] := by
+    75|  simp only [centralMoment, Pi.sub_apply, pow_one]
+    76|  rw [integral_sub h_int (integrable_const _)]
+    77|  simp only [sub_mul, integral_const, smul_eq_mul, one_mul]
+    78|
+    79|@[simp]
+    80|theorem centralMoment_one [IsZeroOrProbabilityMeasure μ] : centralMoment X 1 μ = 0 := by
+    81|  rcases eq_zero_or_isProbabilityMeasure μ with rfl | h
+    82|  · simp [centralMoment]
+    83|  by_cases h_int : Integrable X μ
+    84|  · rw [centralMoment_one' h_int]
+    85|    simp
+    86|  · simp only [centralMoment, Pi.sub_apply, pow_one]
+    87|    have : ¬Integrable (fun x => X x - integral μ X) μ := by
+    88|      refine fun h_sub => h_int ?_
+    89|      have h_add : X = (fun x => X x - integral μ X) + fun _ => integral μ X := by ext1 x; simp
+    90|      rw [h_add]
+    91|      fun_prop
+    92|    rw [integral_undef this]
+    93|
+    94|lemma centralMoment_two_eq_variance (hX : AEMeasurable X μ) : centralMoment X 2 μ = variance X μ :=
+    95|  (variance_eq_integral hX).symm
+    96|
+    97|section MomentGeneratingFunction
+    98|
+    99|variable {t : ℝ}
+   100|
+   101|/-- Moment generating function of a real random variable `X`: `fun t => μ[exp(t*X)]`. -/
+   102|def mgf (X : Ω → ℝ) (μ : Measure Ω) (t : ℝ) : ℝ :=
+   103|  μ[fun ω => exp (t * X ω)]
+   104|
+   105|/-- Cumulant generating function of a real random variable `X`: `fun t => log μ[exp(t*X)]`. -/
+   106|def cgf (X : Ω → ℝ) (μ : Measure Ω) (t : ℝ) : ℝ :=
+   107|  log (mgf X μ t)
+   108|
+   109|@[simp]
+   110|theorem mgf_zero_fun : mgf 0 μ t = μ.real Set.univ := by
+   111|  simp only [mgf, Pi.zero_apply, mul_zero, exp_zero, integral_const, smul_eq_mul, mul_one]
+   112|
+   113|@[simp]
+   114|theorem cgf_zero_fun : cgf 0 μ t = log (μ.real Set.univ) := by simp only [cgf, mgf_zero_fun]
+   115|
+   116|@[simp]
+   117|theorem mgf_zero_measure : mgf X (0 : Measure Ω) = 0 := by ext; simp [mgf]
+   118|
+   119|@[simp]
+   120|theorem cgf_zero_measure : cgf X (0 : Measure Ω) = 0 := by ext; simp [cgf]
+   121|
+   122|@[simp]
+   123|theorem mgf_const' (c : ℝ) : mgf (fun _ => c) μ t = μ.real Set.univ * exp (t * c) := by
+   124|  simp only [mgf, integral_const, smul_eq_mul]
+   125|
+   126|theorem mgf_const (c : ℝ) [IsProbabilityMeasure μ] : mgf (fun _ => c) μ t = exp (t * c) := by
+   127|  simp
+   128|
+   129|@[simp]
+   130|theorem cgf_const' [IsFiniteMeasure μ] (hμ : μ ≠ 0) (c : ℝ) :
+   131|    cgf (fun _ => c) μ t = log (μ.real Set.univ) + t * c := by
+   132|  simp only [cgf, mgf_const']
+   133|  rw [log_mul _ (exp_pos _).ne']
+   134|  · rw [log_exp _]
+   135|  · rw [Ne, measureReal_eq_zero_iff, Measure.measure_univ_eq_zero]
+   136|    simp only [hμ, not_false_iff]
+   137|
+   138|@[simp]
+   139|theorem cgf_const [IsProbabilityMeasure μ] (c : ℝ) : cgf (fun _ => c) μ t = t * c := by
+   140|  simp only [cgf, mgf_const, log_exp]
+   141|
+   142|@[simp]
+   143|theorem mgf_zero' : mgf X μ 0 = μ.real Set.univ := by
+   144|  simp only [mgf, zero_mul, exp_zero, integral_const, smul_eq_mul, mul_one]
+   145|
+   146|theorem mgf_zero [IsProbabilityMeasure μ] : mgf X μ 0 = 1 := by
+   147|  simp [mgf_zero']
+   148|
+   149|theorem cgf_zero' : cgf X μ 0 = log (μ.real Set.univ) := by simp only [cgf, mgf_zero']
+   150|
+   151|@[simp]
+   152|theorem cgf_zero [IsZeroOrProbabilityMeasure μ] : cgf X μ 0 = 0 := by
+   153|  rcases eq_zero_or_isProbabilityMeasure μ with rfl | h <;> simp [cgf_zero']
+   154|
+   155|theorem mgf_undef (hX : ¬Integrable (fun ω => exp (t * X ω)) μ) : mgf X μ t = 0 := by
+   156|  simp only [mgf, integral_undef hX]
+   157|
+   158|theorem cgf_undef (hX : ¬Integrable (fun ω => exp (t * X ω)) μ) : cgf X μ t = 0 := by
+   159|  simp only [cgf, mgf_undef hX, log_zero]
+   160|
+   161|theorem mgf_nonneg : 0 ≤ mgf X μ t := by
+   162|  unfold mgf; positivity
+   163|
+   164|theorem mgf_pos' (hμ : μ ≠ 0) (h_int_X : Integrable (fun ω => exp (t * X ω)) μ) :
+   165|    0 < mgf X μ t := by
+   166|  simp_rw [mgf]
+   167|  have : ∫ x : Ω, exp (t * X x) ∂μ = ∫ x : Ω in Set.univ, exp (t * X x) ∂μ := by
+   168|    simp only [Measure.restrict_univ]
+   169|  rw [this, setIntegral_pos_iff_support_of_nonneg_ae _ _]
+   170|  · have h_eq_univ : (Function.support fun x : Ω => exp (t * X x)) = Set.univ := by
+   171|      ext1 x
+   172|      simp only [Function.mem_support, Set.mem_univ, iff_true]
+   173|      exact (exp_pos _).ne'
+   174|    rw [h_eq_univ, Set.inter_univ _]
+   175|    refine Ne.bot_lt ?_
+   176|    simp only [hμ, ENNReal.bot_eq_zero, Ne, Measure.measure_univ_eq_zero, not_false_iff]
+   177|  · filter_upwards with x
+   178|    rw [Pi.zero_apply]
+   179|    exact (exp_pos _).le
+   180|  · rwa [integrableOn_univ]
+   181|
+   182|theorem mgf_pos [IsProbabilityMeasure μ] (h_int_X : Integrable (fun ω => exp (t * X ω)) μ) :
+   183|    0 < mgf X μ t :=
+   184|  mgf_pos' (IsProbabilityMeasure.ne_zero μ) h_int_X
+   185|
+   186|lemma mgf_pos_iff [hμ : NeZero μ] :
+   187|    0 < mgf X μ t ↔ Integrable (fun ω ↦ exp (t * X ω)) μ := by
+   188|  refine ⟨fun h ↦ ?_, fun h ↦ mgf_pos' hμ.out h⟩
+   189|  contrapose! h with h
+   190|  simp [mgf_undef h]
+   191|
+   192|lemma exp_cgf [hμ : NeZero μ] (hX : Integrable (fun ω ↦ exp (t * X ω)) μ) :
+   193|    exp (cgf X μ t) = mgf X μ t := by rw [cgf, exp_log (mgf_pos' hμ.out hX)]
+   194|
+   195|@[deprecated (since := "2025-03-08")]
+   196|alias exp_cgf_of_neZero := exp_cgf
+   197|
+   198|lemma mgf_map {Ω' : Type*} {mΩ' : MeasurableSpace Ω'} {μ : Measure Ω'} {Y : Ω' → Ω} {X : Ω → ℝ}
+   199|    (hY : AEMeasurable Y μ) {t : ℝ} (hX : AEStronglyMeasurable (fun ω ↦ exp (t * X ω)) (μ.map Y)) :
+   200|    mgf X (μ.map Y) t = mgf (X ∘ Y) μ t := by
+   201|  simp_rw [mgf, integral_map hY hX, Function.comp_apply]
+   202|
+   203|lemma mgf_id_map (hX : AEMeasurable X μ) : mgf id (μ.map X) = mgf X μ := by
+   204|  ext t
+   205|  rw [mgf_map hX, Function.id_comp]
+   206|  exact (measurable_const_mul _).exp.aestronglyMeasurable
+   207|
+   208|lemma mgf_congr {Y : Ω → ℝ} (h : X =ᵐ[μ] Y) : mgf X μ t = mgf Y μ t :=
+   209|  integral_congr_ae <| by filter_upwards [h] with ω hω using by rw [hω]
+   210|
+   211|lemma mgf_congr_identDistrib {Ω' : Type*} {mΩ' : MeasurableSpace Ω'} {μ' : Measure Ω'}
+   212|    {Y : Ω' → ℝ} (h : IdentDistrib X Y μ μ') :
+   213|    mgf X μ = mgf Y μ' := by
+   214|  rw [← mgf_id_map h.aemeasurable_fst, ← mgf_id_map h.aemeasurable_snd, h.map_eq]
+   215|
+   216|theorem mgf_neg : mgf (-X) μ t = mgf X μ (-t) := by simp_rw [mgf, Pi.neg_apply, mul_neg, neg_mul]
+   217|
+   218|theorem cgf_neg : cgf (-X) μ t = cgf X μ (-t) := by simp_rw [cgf, mgf_neg]
+   219|
+   220|theorem mgf_smul_left (α : ℝ) : mgf (α • X) μ t = mgf X μ (α * t) := by
+   221|  simp_rw [mgf, Pi.smul_apply, smul_eq_mul, mul_comm α t, mul_assoc]
+   222|
+   223|theorem mgf_const_add (α : ℝ) : mgf (fun ω => α + X ω) μ t = exp (t * α) * mgf X μ t := by
+   224|  rw [mgf, mgf, ← integral_const_mul]
+   225|  congr with x
+   226|  dsimp
+   227|  rw [mul_add, exp_add]
+   228|
+   229|theorem mgf_add_const (α : ℝ) : mgf (fun ω => X ω + α) μ t = mgf X μ t *  exp (t * α) := by
+   230|  simp only [add_comm, mgf_const_add, mul_comm]
+   231|
+   232|lemma mgf_add_measure {ν : Measure Ω}
+   233|    (hμ : Integrable (fun ω ↦ exp (t * X ω)) μ) (hν : Integrable (fun ω ↦ exp (t * X ω)) ν) :
+   234|    mgf X (μ + ν) t = mgf X μ t + mgf X ν t := by
+   235|  rw [mgf, integral_add_measure hμ hν, mgf, mgf]
+   236|
+   237|lemma mgf_sum_measure {ι : Type*} {μ : ι → Measure Ω}
+   238|    (hμ : Integrable (fun ω ↦ exp (t * X ω)) (Measure.sum μ)) :
+   239|    mgf X (Measure.sum μ) t = ∑' i, mgf X (μ i) t := by
+   240|  simp_rw [mgf, integral_sum_measure hμ]
+   241|
+   242|lemma mgf_smul_measure (c : ℝ≥0∞) : mgf X (c • μ) t = c.toReal * mgf X μ t := by
+   243|  rw [mgf, integral_smul_measure, mgf, smul_eq_mul]
+   244|
+   245|/-- The moment generating function is monotone in the random variable for `t ≥ 0`. -/
+   246|lemma mgf_mono_of_nonneg {Y : Ω → ℝ} (hXY : X ≤ᵐ[μ] Y) (ht : 0 ≤ t)
+   247|    (htY : Integrable (fun ω ↦ exp (t * Y ω)) μ) :
+   248|    mgf X μ t ≤ mgf Y μ t := by
+   249|  by_cases htX : Integrable (fun ω ↦ exp (t * X ω)) μ
+   250|  · refine integral_mono_ae htX htY ?_
+   251|    filter_upwards [hXY] with ω hω using by gcongr
+   252|  · rw [mgf_undef htX]
+   253|    exact mgf_nonneg
+   254|
+   255|/-- The moment generating function is antitone in the random variable for `t ≤ 0`. -/
+   256|lemma mgf_anti_of_nonpos {Y : Ω → ℝ} (hXY : X ≤ᵐ[μ] Y) (ht : t ≤ 0)
+   257|    (htX : Integrable (fun ω ↦ exp (t * X ω)) μ) :
+   258|    mgf Y μ t ≤ mgf X μ t := by
+   259|  by_cases htY : Integrable (fun ω ↦ exp (t * Y ω)) μ
+   260|  · refine integral_mono_ae htY htX ?_
+   261|    filter_upwards [hXY] with ω hω using exp_monotone <| mul_le_mul_of_nonpos_left hω ht
+   262|  · rw [mgf_undef htY]
+   263|    exact mgf_nonneg
+   264|
+   265|section IndepFun
+   266|
+   267|/-- This is a trivial application of `IndepFun.comp` but it will come up frequently. -/
+   268|theorem IndepFun.exp_mul {X Y : Ω → ℝ} (h_indep : IndepFun X Y μ) (s t : ℝ) :
+   269|    IndepFun (fun ω => exp (s * X ω)) (fun ω => exp (t * Y ω)) μ := by
+   270|  have h_meas : ∀ t, Measurable fun x => exp (t * x) := fun t => (measurable_id'.const_mul t).exp
+   271|  change IndepFun ((fun x => exp (s * x)) ∘ X) ((fun x => exp (t * x)) ∘ Y) μ
+   272|  exact IndepFun.comp h_indep (h_meas s) (h_meas t)
+   273|
+   274|theorem IndepFun.mgf_add {X Y : Ω → ℝ} (h_indep : IndepFun X Y μ)
+   275|    (hX : AEStronglyMeasurable (fun ω => exp (t * X ω)) μ)
+   276|    (hY : AEStronglyMeasurable (fun ω => exp (t * Y ω)) μ) :
+   277|    mgf (X + Y) μ t = mgf X μ t * mgf Y μ t := by
+   278|  simp_rw [mgf, Pi.add_apply, mul_add, exp_add]
+   279|  exact (h_indep.exp_mul t t).integral_mul_eq_mul_integral hX hY
+   280|
+   281|theorem IndepFun.mgf_add' {X Y : Ω → ℝ} (h_indep : IndepFun X Y μ) (hX : AEStronglyMeasurable X μ)
+   282|    (hY : AEStronglyMeasurable Y μ) : mgf (X + Y) μ t = mgf X μ t * mgf Y μ t := by
+   283|  have A : Continuous fun x : ℝ => exp (t * x) := by fun_prop
+   284|  have h'X : AEStronglyMeasurable (fun ω => exp (t * X ω)) μ :=
+   285|    A.aestronglyMeasurable.comp_aemeasurable hX.aemeasurable
+   286|  have h'Y : AEStronglyMeasurable (fun ω => exp (t * Y ω)) μ :=
+   287|    A.aestronglyMeasurable.comp_aemeasurable hY.aemeasurable
+   288|  exact h_indep.mgf_add h'X h'Y
+   289|
+   290|theorem IndepFun.cgf_add {X Y : Ω → ℝ} (h_indep : IndepFun X Y μ)
+   291|    (h_int_X : Integrable (fun ω => exp (t * X ω)) μ)
+   292|    (h_int_Y : Integrable (fun ω => exp (t * Y ω)) μ) :
+   293|    cgf (X + Y) μ t = cgf X μ t + cgf Y μ t := by
+   294|  by_cases hμ : μ = 0
+   295|  · simp [hμ]
+   296|  simp only [cgf, h_indep.mgf_add h_int_X.aestronglyMeasurable h_int_Y.aestronglyMeasurable]
+   297|  exact log_mul (mgf_pos' hμ h_int_X).ne' (mgf_pos' hμ h_int_Y).ne'
+   298|
+   299|theorem aestronglyMeasurable_exp_mul_add {X Y : Ω → ℝ}
+   300|    (h_int_X : AEStronglyMeasurable (fun ω => exp (t * X ω)) μ)
+   301|    (h_int_Y : AEStronglyMeasurable (fun ω => exp (t * Y ω)) μ) :
+   302|    AEStronglyMeasurable (fun ω => exp (t * (X + Y) ω)) μ := by
+   303|  simp_rw [Pi.add_apply, mul_add, exp_add]
+   304|  exact AEStronglyMeasurable.mul h_int_X h_int_Y
+   305|
+   306|theorem aestronglyMeasurable_exp_mul_sum {X : ι → Ω → ℝ} {s : Finset ι}
+   307|    (h_int : ∀ i ∈ s, AEStronglyMeasurable (fun ω => exp (t * X i ω)) μ) :
+   308|    AEStronglyMeasurable (fun ω => exp (t * (∑ i ∈ s, X i) ω)) μ := by
+   309|  classical
+   310|  induction s using Finset.induction_on with
+   311|  | empty =>
+   312|    simp only [sum_apply, sum_empty, mul_zero, exp_zero]
+   313|    exact aestronglyMeasurable_const
+   314|  | insert i s hi_notin_s h_rec =>
+   315|    have : ∀ i : ι, i ∈ s → AEStronglyMeasurable (fun ω : Ω => exp (t * X i ω)) μ := fun i hi =>
+   316|      h_int i (mem_insert_of_mem hi)
+   317|    specialize h_rec this
+   318|    rw [sum_insert hi_notin_s]
+   319|    apply aestronglyMeasurable_exp_mul_add (h_int i (mem_insert_self _ _)) h_rec
+   320|
+   321|theorem IndepFun.integrable_exp_mul_add {X Y : Ω → ℝ} (h_indep : IndepFun X Y μ)
+   322|    (h_int_X : Integrable (fun ω => exp (t * X ω)) μ)
+   323|    (h_int_Y : Integrable (fun ω => exp (t * Y ω)) μ) :
+   324|    Integrable (fun ω => exp (t * (X + Y) ω)) μ := by
+   325|  simp_rw [Pi.add_apply, mul_add, exp_add]
+   326|  exact (h_indep.exp_mul t t).integrable_mul h_int_X h_int_Y
+   327|
+   328|theorem iIndepFun.integrable_exp_mul_sum [IsFiniteMeasure μ] {X : ι → Ω → ℝ}
+   329|    (h_indep : iIndepFun X μ) (h_meas : ∀ i, Measurable (X i))
+   330|    {s : Finset ι} (h_int : ∀ i ∈ s, Integrable (fun ω => exp (t * X i ω)) μ) :
+   331|    Integrable (fun ω => exp (t * (∑ i ∈ s, X i) ω)) μ := by
+   332|  classical
+   333|  induction s using Finset.induction_on with
+   334|  | empty =>
+   335|    simp only [sum_apply, sum_empty, mul_zero, exp_zero]
+   336|    exact integrable_const _
+   337|  | insert i s hi_notin_s h_rec =>
+   338|    have : ∀ i : ι, i ∈ s → Integrable (fun ω : Ω => exp (t * X i ω)) μ := fun i hi =>
+   339|      h_int i (mem_insert_of_mem hi)
+   340|    specialize h_rec this
+   341|    rw [sum_insert hi_notin_s]
+   342|    refine IndepFun.integrable_exp_mul_add ?_ (h_int i (mem_insert_self _ _)) h_rec
+   343|    exact (h_indep.indepFun_finset_sum_of_notMem h_meas hi_notin_s).symm
+   344|
+   345|-- TODO(vilin97): weaken `h_meas` to `AEMeasurable (X i)` or `AEStronglyMeasurable (X i)` throughout
+   346|-- https://github.com/leanprover-community/mathlib4/issues/20367
+   347|theorem iIndepFun.mgf_sum {X : ι → Ω → ℝ}
+   348|    (h_indep : iIndepFun X μ) (h_meas : ∀ i, Measurable (X i))
+   349|    (s : Finset ι) : mgf (∑ i ∈ s, X i) μ t = ∏ i ∈ s, mgf (X i) μ t := by
+   350|  have : IsProbabilityMeasure μ := h_indep.isProbabilityMeasure
+   351|  classical
+   352|  induction s using Finset.induction_on with
+   353|  | empty => simp
+   354|  | insert i s hi_notin_s h_rec =>
+   355|    have h_int' : ∀ i : ι, AEStronglyMeasurable (fun ω : Ω => exp (t * X i ω)) μ := fun i =>
+   356|      ((h_meas i).const_mul t).exp.aestronglyMeasurable
+   357|    rw [sum_insert hi_notin_s,
+   358|      IndepFun.mgf_add (h_indep.indepFun_finset_sum_of_notMem h_meas hi_notin_s).symm (h_int' i)
+   359|        (aestronglyMeasurable_exp_mul_sum fun i _ => h_int' i),
+   360|      h_rec, prod_insert hi_notin_s]
+   361|
+   362|theorem iIndepFun.cgf_sum {X : ι → Ω → ℝ}
+   363|    (h_indep : iIndepFun X μ) (h_meas : ∀ i, Measurable (X i))
+   364|    {s : Finset ι} (h_int : ∀ i ∈ s, Integrable (fun ω => exp (t * X i ω)) μ) :
+   365|    cgf (∑ i ∈ s, X i) μ t = ∑ i ∈ s, cgf (X i) μ t := by
+   366|  have : IsProbabilityMeasure μ := h_indep.isProbabilityMeasure
+   367|  simp_rw [cgf]
+   368|  rw [← log_prod _ _ fun j hj => ?_]
+   369|  · rw [h_indep.mgf_sum h_meas]
+   370|  · exact (mgf_pos (h_int j hj)).ne'
+   371|
+   372|end IndepFun
+   373|
+   374|theorem mgf_congr_of_identDistrib
+   375|    (X : Ω → ℝ) {Ω' : Type*} {m' : MeasurableSpace Ω'} {μ' : Measure Ω'} (X' : Ω' → ℝ)
+   376|    (hident : IdentDistrib X X' μ μ') (t : ℝ) :
+   377|    mgf X μ t = mgf X' μ' t := hident.comp (measurable_const_mul t).exp |>.integral_eq
+   378|
+   379|theorem mgf_sum_of_identDistrib
+   380|    {X : ι → Ω → ℝ}
+   381|    {s : Finset ι} {j : ι}
+   382|    (h_meas : ∀ i, Measurable (X i))
+   383|    (h_indep : iIndepFun X μ)
+   384|    (hident : ∀ i ∈ s, ∀ j ∈ s, IdentDistrib (X i) (X j) μ μ)
+   385|    (hj : j ∈ s) (t : ℝ) : mgf (∑ i ∈ s, X i) μ t = mgf (X j) μ t ^ #s := by
+   386|  rw [h_indep.mgf_sum h_meas]
+   387|  exact Finset.prod_eq_pow_card fun i hi =>
+   388|    mgf_congr_of_identDistrib (X i) (X j) (hident i hi j hj) t
+   389|
+   390|section Chernoff
+   391|
+   392|/-- **Chernoff bound** on the upper tail of a real random variable. -/
+   393|theorem measure_ge_le_exp_mul_mgf [IsFiniteMeasure μ] (ε : ℝ) (ht : 0 ≤ t)
+   394|    (h_int : Integrable (fun ω => exp (t * X ω)) μ) :
+   395|    μ.real {ω | ε ≤ X ω} ≤ exp (-t * ε) * mgf X μ t := by
+   396|  rcases ht.eq_or_lt with ht_zero_eq | ht_pos
+   397|  · rw [ht_zero_eq.symm]
+   398|    simp only [neg_zero, zero_mul, exp_zero, mgf_zero', one_mul]
+   399|    gcongr
+   400|    exacts [measure_ne_top _ _, Set.subset_univ _]
+   401|  calc
+   402|    μ.real {ω | ε ≤ X ω} = μ.real {ω | exp (t * ε) ≤ exp (t * X ω)} := by
+   403|      congr 1 with ω
+   404|      simp only [Set.mem_setOf_eq, exp_le_exp]
+   405|      exact ⟨fun h => mul_le_mul_of_nonneg_left h ht_pos.le,
+   406|        fun h => le_of_mul_le_mul_left h ht_pos⟩
+   407|    _ ≤ (exp (t * ε))⁻¹ * μ[fun ω => exp (t * X ω)] := by
+   408|      have : exp (t * ε) * μ.real {ω | exp (t * ε) ≤ exp (t * X ω)} ≤
+   409|          μ[fun ω => exp (t * X ω)] :=
+   410|        mul_meas_ge_le_integral_of_nonneg (ae_of_all _ fun x => (exp_pos _).le) h_int _
+   411|      rwa [mul_comm (exp (t * ε))⁻¹, ← div_eq_mul_inv, le_div_iff₀' (exp_pos _)]
+   412|    _ = exp (-t * ε) * mgf X μ t := by rw [neg_mul, exp_neg]; rfl
+   413|
+   414|/-- **Chernoff bound** on the lower tail of a real random variable. -/
+   415|theorem measure_le_le_exp_mul_mgf [IsFiniteMeasure μ] (ε : ℝ) (ht : t ≤ 0)
+   416|    (h_int : Integrable (fun ω => exp (t * X ω)) μ) :
+   417|    μ.real {ω | X ω ≤ ε} ≤ exp (-t * ε) * mgf X μ t := by
+   418|  rw [← neg_neg t, ← mgf_neg, neg_neg, ← neg_mul_neg (-t)]
+   419|  refine Eq.trans_le ?_ (measure_ge_le_exp_mul_mgf (-ε) (neg_nonneg.mpr ht) ?_)
+   420|  · congr with ω
+   421|    simp only [Pi.neg_apply, neg_le_neg_iff]
+   422|  · simp_rw [Pi.neg_apply, neg_mul_neg]
+   423|    exact h_int
+   424|
+   425|/-- **Chernoff bound** on the upper tail of a real random variable. -/
+   426|theorem measure_ge_le_exp_cgf [IsFiniteMeasure μ] (ε : ℝ) (ht : 0 ≤ t)
+   427|    (h_int : Integrable (fun ω => exp (t * X ω)) μ) :
+   428|    μ.real {ω | ε ≤ X ω} ≤ exp (-t * ε + cgf X μ t) := by
+   429|  refine (measure_ge_le_exp_mul_mgf ε ht h_int).trans ?_
+   430|  rw [exp_add]
+   431|  exact mul_le_mul le_rfl (le_exp_log _) mgf_nonneg (exp_pos _).le
+   432|
+   433|/-- **Chernoff bound** on the lower tail of a real random variable. -/
+   434|theorem measure_le_le_exp_cgf [IsFiniteMeasure μ] (ε : ℝ) (ht : t ≤ 0)
+   435|    (h_int : Integrable (fun ω => exp (t * X ω)) μ) :
+   436|    μ.real {ω | X ω ≤ ε} ≤ exp (-t * ε + cgf X μ t) := by
+   437|  refine (measure_le_le_exp_mul_mgf ε ht h_int).trans ?_
+   438|  rw [exp_add]
+   439|  exact mul_le_mul le_rfl (le_exp_log _) mgf_nonneg (exp_pos _).le
+   440|
+   441|end Chernoff
+   442|
+   443|lemma mgf_dirac {x : ℝ} (hX : μ.map X = .dirac x) (t : ℝ) : mgf X μ t = exp (x * t) := by
+   444|  have : IsProbabilityMeasure (μ.map X) := by rw [hX]; infer_instance
+   445|  rw [← mgf_id_map (.of_map_ne_zero <| IsProbabilityMeasure.ne_zero _), mgf, hX, integral_dirac,
+   446|    mul_comm, id_def]
+   447|
+   448|lemma mgf_dirac' [MeasurableSingletonClass Ω] {ω : Ω} :
+   449|    mgf X (Measure.dirac ω) t = exp (t * X ω) := by
+   450|  rw [mgf, integral_dirac]
+   451|
+   452|end MomentGeneratingFunction
+   453|
+   454|lemma aemeasurable_exp_mul {X : Ω → ℝ} (t : ℝ) (hX : AEMeasurable X μ) :
+   455|    AEStronglyMeasurable (fun ω ↦ rexp (t * X ω)) μ :=
+   456|  (measurable_exp.comp_aemeasurable (hX.const_mul t)).aestronglyMeasurable
+   457|
+   458|lemma integrable_exp_mul_of_le [IsFiniteMeasure μ] {X : Ω → ℝ} (t b : ℝ) (ht : 0 ≤ t)
+   459|    (hX : AEMeasurable X μ) (hb : ∀ᵐ ω ∂μ, X ω ≤ b) :
+   460|    Integrable (fun ω ↦ exp (t * X ω)) μ := by
+   461|  refine .of_mem_Icc 0 (rexp (t * b)) (measurable_exp.comp_aemeasurable (hX.const_mul t)) ?_
+   462|  filter_upwards [hb] with ω hb
+   463|  exact ⟨by positivity, by gcongr⟩
+   464|
+   465|lemma integrable_exp_mul_of_mem_Icc [IsFiniteMeasure μ] {X : Ω → ℝ} {a b t : ℝ}
+   466|    (hm : AEMeasurable X μ) (hb : ∀ᵐ ω ∂μ, X ω ∈ Set.Icc a b) :
+   467|    Integrable (fun ω ↦ exp (t * X ω)) μ := by
+   468|  apply Integrable.of_mem_Icc (exp (min (a * t) (b * t))) (exp (max (a * t) (b * t)))
+   469|  · exact (measurable_exp.comp_aemeasurable (hm.const_mul t))
+   470|  filter_upwards [hb] with ω ⟨hl, hr⟩
+   471|  simp only [Set.mem_Icc, exp_le_exp, inf_le_iff, le_sup_iff]
+   472|  by_cases ht : 0 ≤ t
+   473|  · exact ⟨Or.inl (by nlinarith), Or.inr (by nlinarith)⟩
+   474|  · exact ⟨Or.inr (by nlinarith), Or.inl (by nlinarith)⟩
+   475|
+   476|end ProbabilityTheory

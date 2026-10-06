@@ -1,0 +1,352 @@
+[
+ {
+  "id": "P011",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "Equality proved by `ext` and element chasing (rintro, refine with `h.symm x`, obtain, `convert xz_mem using 1`, `h.injective`) about map along an AlgEquiv, which has library API.",
+  "status": "check"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Construction with hand-written carrier and zero_mem'/add_mem'/smul_mem' fields, each `rw` then `exact`; edited by the PR (`exact Submodule.zero_mem _`).",
+  "status": "check"
+ },
+ {
+  "id": "P011",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Rewritten proof chases elements by hand: destructures `⟨y', hy', xy'_eq_y⟩`, rewrites, applies `Set.smul_mem_smul_set`, for an iff about a pointwise smul of a set.",
+  "status": "check"
+ },
+ {
+  "id": "P105",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "`variable` commands (section ModuleSet)",
+  "fact": "New variable commands name the base ring `R` (CommSemiring) and the algebra `A` (Semiring, `Algebra R A`); compare with the letters the file uses for these.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "zero_mem' field: `rw [zero_mul]` then the changed `exact Submodule.zero_mem _`; add_mem' and smul_mem' are likewise rewrite then exact.",
+  "status": "check"
+ },
+ {
+  "id": "P018",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Reformatted forward direction: `rw [← xy'_eq_y]` then `exact h _ hy'` on consecutive lines.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mul_one_div_le_one",
+  "fact": "Left in the commutative section while its family moves to noncommutative A; the mirrored `1 / I * I ≤ 1`, true without commutativity, is not added.",
+  "status": "check"
+ },
+ {
+  "id": "P100",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.le_self_mul_one_div",
+  "fact": "Now stated for noncommutative A as `I ≤ I * (1 / I)`; its left/right mirror `I ≤ 1 / I * I` is not provided.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Now under `[Semiring A] [Algebra R A]` (was CommSemiring A); its fields use only `zero_mul`, `add_mul` and `Algebra.smul_mul_assoc`.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "Assumption on `B` changed to `[Semiring B] [Algebra R B]`; whether weaker classes would still serve the statement about `A ≃ₐ[R] B`.",
+  "status": "check"
+ },
+ {
+  "id": "P010",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "`variable` commands (section ModuleSet)",
+  "fact": "New `variable {A : Type v} [Semiring A] [Algebra R A]` replaces CommSemiring A for moduleSet, singleton_smul and siblings; whether weaker classes suffice.",
+  "status": "check"
+ },
+ {
+  "id": "P338",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Core `Div (Submodule R A)` generalized from commutative to noncommutative A, where `I / J` becomes a one-sided quotient; no use needing it is shown.",
+  "status": "check"
+ },
+ {
+  "id": "P012",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "`variable` commands (section ModuleSet)",
+  "fact": "`variable {R : Type u} [CommSemiring R]` is directly followed by `variable {A : Type v} …` with no blank line between the two commands.",
+  "status": "departs"
+ },
+ {
+  "id": "P043",
+  "file": "PR",
+  "declaration": "description",
+  "fact": "Diff bundles moving and generalizing section Quotient, generalizing ModuleSet and map_div, new `@[simp]`/`nolint simpNF` attributes, and incidental proof and layout edits.",
+  "status": "check"
+ },
+ {
+  "id": "P156",
+  "file": "PR",
+  "declaration": "title",
+  "fact": "`misc. generalizations by LLM` names nothing; the main subject, division of submodules generalized to noncommutative algebras, is unmentioned.",
+  "status": "departs"
+ },
+ {
+  "id": "P156",
+  "file": "PR",
+  "declaration": "description",
+  "fact": "Says only Codex found generalizations; omits the move of section Quotient into AlgebraSemiring, the new ModuleSet section, map_div's `Semiring B`, and the added simp/nolint attributes.",
+  "status": "departs"
+ },
+ {
+  "id": "P041",
+  "file": "PR",
+  "declaration": "description",
+  "fact": "Gives no reason or use for division of submodules over noncommutative algebras, nor for the new `@[simp]` attributes and `nolint simpNF` exemptions.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Signature split onto two lines though it fits in 98 characters, and the term proof re-laid out with a leading `, fun` line; meaning unchanged.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Signature, a 100-character single line before the PR, is split onto two lines; a layout-only change.",
+  "status": "departs"
+ },
+ {
+  "id": "P138",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "Signature reflowed over three lines although only `CommSemiring B` → `Semiring B` changed; the old two-line layout still fits.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Signature broken after `:` although the joined `theorem … :=` line is exactly 100 characters.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Signature broken after `:` although the joined line is 98 characters.",
+  "status": "departs"
+ },
+ {
+  "id": "P084",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "First signature line (64 characters) breaks before `(I J : Submodule R A)`, which fits on it (86 characters).",
+  "status": "departs"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Fields zero_mem', add_mem', smul_mem' each close their goal by `rw` then `exact` of a Submodule membership lemma, not a finishing tactic.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Forward direction closes its goal by `rw [← xy'_eq_y]` then `exact h _ hy'`.",
+  "status": "check"
+ },
+ {
+  "id": "P005",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "Reverse direction closes by `convert xz_mem using 1`, `apply h.injective`, `rw [map_mul, h.apply_symm_apply, hxz]`.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Existing statement and proof reformatted only: line breaks, `;` split, leading-comma layout; meaning unchanged.",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Existing proof `Iff.refl _` respelled `Iff.rfl` and signature re-broken; stylistic only (le_div_iff gets the same `Iff.rfl` edit).",
+  "status": "check"
+ },
+ {
+  "id": "P185",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Existing `apply Submodule.zero_mem` respelled `exact Submodule.zero_mem _` in the zero_mem' field; no change in meaning.",
+  "status": "check"
+ },
+ {
+  "id": "P401",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "`rw [← xy'_eq_y]` rewrites the goal backwards into the form of `h _ hy'`, which is then closed by `exact`.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Field proofs are short `by` blocks (`rw [zero_mul]`, `exact Submodule.zero_mem _`, and the add/smul analogues), candidates for single terms.",
+  "status": "check"
+ },
+ {
+  "id": "P040",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Nested `by` block `rw [← xy'_eq_y]`, `exact h _ hy'` in the forward direction, a candidate for one term.",
+  "status": "check"
+ },
+ {
+  "id": "P089",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Changed line passes a placeholder, `Submodule.zero_mem _`; the fields also pass `Submodule.add_mem _`, `Submodule.smul_mem _ _`, `ha _ hy`.",
+  "status": "check"
+ },
+ {
+  "id": "P089",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Reformatted line `exact h _ hy'` passes a `_` placeholder for `y'`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "`convert xz_mem using 1` adapts hypothesis `xz_mem` to the goal, opening a side goal closed by `apply h.injective` and a rewrite.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "zero_mem' rewrites the goal by `zero_mul` to fit `Submodule.zero_mem`; add_mem' and smul_mem' rewrite to fit `add_mem` and `smul_mem`.",
+  "status": "check"
+ },
+ {
+  "id": "P060",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Goal rewritten with `← xy'_eq_y` to fit `h _ hy'`.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Proof respelled `Iff.rfl` from `Iff.refl _`; compare the file's other definitional iff proofs.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.le_div_iff",
+  "fact": "Proof respelled `Iff.rfl` from `Iff.refl _`; compare the file's other definitional iff proofs.",
+  "status": "check"
+ },
+ {
+  "id": "P126",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_smul_subset",
+  "fact": "Rewritten lines use `fun … =>` and a leading-comma tuple layout; compare the file's lambda arrow and anonymous-constructor layout.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.le_div_iff",
+  "fact": "Newly `@[simp]`: simp now spells `I ≤ J / K` elementwise (`∀ x ∈ I, ∀ z ∈ K, …`) rather than set-level `I * K ≤ J`.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Newly `@[simp]`, normalising `x ∈ I / J` to elementwise `∀ y ∈ J, x * y ∈ I` rather than set-level `x • J ⊆ I`.",
+  "status": "check"
+ },
+ {
+  "id": "P363",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.one_le_one_div",
+  "fact": "Newly `@[simp, nolint simpNF]` on inequality spelling `1 ≤ 1 / I`, beside membership spelling `1 ∈ I / J` in one_mem_div.",
+  "status": "check"
+ },
+ {
+  "id": "P045",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "module docstring",
+  "fact": "`Div (Submodule R A)` and its lemmas move from AlgebraCommSemiring to AlgebraSemiring (noncommutative A); the docstring may still describe division only for commutative A.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Membership characterisation `x ∈ I / J ↔ ∀ y ∈ J, x * y ∈ I`; attributes changed to `@[simp]`, with no grind attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.le_div_iff",
+  "fact": "Characterisation of `I ≤ J / K`; attributes changed to `@[simp]`, with no grind attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P315",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.one_le_one_div",
+  "fact": "Iff `1 ≤ 1 / I ↔ I ≤ 1` newly tagged `@[simp, nolint simpNF]`, with no grind attribute.",
+  "status": "check"
+ },
+ {
+  "id": "P329",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "instance : Div (Submodule R A)",
+  "fact": "Pre-existing zero_mem' proof `apply Submodule.zero_mem` rewritten to `exact Submodule.zero_mem _`.",
+  "status": "check"
+ },
+ {
+  "id": "P329",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.mem_div_iff_forall_mul_mem",
+  "fact": "Pre-existing proof `Iff.refl _` rewritten to `Iff.rfl` (le_div_iff likewise).",
+  "status": "check"
+ },
+ {
+  "id": "P329",
+  "file": "Mathlib/Algebra/Algebra/Operations.lean",
+  "declaration": "Submodule.map_div",
+  "fact": "Pre-existing step `convert xz_mem` changed to `convert xz_mem using 1`.",
+  "status": "check"
+ }
+]

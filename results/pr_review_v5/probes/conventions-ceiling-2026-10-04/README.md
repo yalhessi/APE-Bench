@@ -636,12 +636,248 @@ sessions and the matching, meters each batch, and sleeps to the reset when a bat
 Sessions run in stage C's order, so a spent window or week leaves the most informative prefix, and
 a stage cut short is reported as partial on the PRs it ran.
 
+**Running notes (2026-10-05, written after the rules and nine pinpointings, before any reviewer session).**
+- **The rules:** 52, both writers audited clean, committed as written (`rules.json`, `60209444`).
+  Check kinds: of the 26 pool rules, compile 11, lookup 8, read 6, judge 1; of the 26 decoys,
+  read 14, lookup 6, judge 4, compile 2.
+- **The window cost about three times stage F's rate.** The writers ran at 17k weighted units a
+  point of the five-hour window, the first four pinpointers at 12k, against stage F's 23-31k. Part
+  of it is another session on token C (its window rose from 41% to 53% in six minutes before
+  this stage spent anything); the rest is unexplained. The second batch of four ran into the
+  limit: pr28649 and pr42184 finished; pr34091 wrote `candidates.json` at 10:10:55 and was cut off
+  before its own check, and the file passes every check the rubric names, so it stands, as the
+  census's b05 did; pr43167 wrote nothing and is rerun from a rebuilt folder after the 14:50 reset.
+- **A weekly guard, added now.** At that rate the ten sessions could take most of the remaining
+  week (52% at 10:15, resetting Friday 04:00), which the user's other sessions share. So
+  `run_stage_g.sh` now runs one session at a time, meters each against the dearest cost seen so
+  far, and starts none once the week reaches 72%. Matching runs on the PRs that finished while the
+  week is under 85%. A stage cut short reads as partial on the PRs it ran, in stage C's order, as
+  fixed above; both caps are environment variables.
+- **Brief length, read before any session:** 13 to 74 candidates a PR on the nine done (328 in
+  all, 183 from pool rules, 145 from decoys; 67 decided by reading, 261 checks). Stage F's 25
+  sentences diluted; this brief is longer, but each item carries a place and a check.
+
+## Result 5 (2026-10-06): guarded rules, pinpointed, move nothing -- the reviewer gets the right convention at the right place and decides it is not worth asking
+
+Stage G as pre-registered above. 52 rules, ten blind pinpointings, ten briefed sessions (G1), and
+one seal a set holding X1, X2, E1 and G1. `read_stage.py G G X --impute 26755 36822 43192` and
+`decompose_stage_g.py` print the tables.
+
+| per-session reach (issue recall), matcher 1 / 2 | X, unbriefed | G, pinpointed rules | E, exact |
+|---|---|---|---|
+| **in-census asks, pooled (39), the rule's measure** | 0.46 / 0.46 | **0.46 / 0.46** | 0.74 / 0.74 |
+| difference from X | | **+0.000 / +0.000** | +0.282 / +0.282 |
+| validation, in-census (25) | 0.48 | 0.48 | 0.76 |
+| post-cutoff, in-census (14) | 0.43 | 0.43 | 0.71 |
+| out-of-census (5) | 0.40 / 0.60 | 0.40 / 0.60 | 0.40 / 0.60 |
+
+**By the rule (`≤ +0.05` on both matchers): this delivery does not carry the ceiling either.** G
+differs from X on two asks, one each way. The ceiling replicates a third time under new matchers
+(E − X = +0.282 on both). Asks reached per finding on the ten run PRs: G 0.23 / 0.25 against X 0.27 /
+0.29 and E 0.42 / 0.44, so the side condition fails as stage F's did; G filed 61 findings, X 52.5 a
+session, E 59. Matchers agree on 102 of 108 cells on validation and 44 of 44 post-cutoff.
+Provisional: one session a PR, one writer a rule, one pinpointer a PR, and a pooled rule set.
+
+**Retrieval was not the gap.** A candidate carried an entry behind the ask for 28 of the 33
+in-census asks, at the ask's place for 21 by the mechanical test (stage F's sentences: 22 of 33,
+no place). The briefs ran from 13 to 74 items a PR, 385 in all (217 from pool rules, 168 from
+decoys; 78 decided by reading, 307 checks).
+
+**Application was** (matcher 1; matcher 2 the same within one ask):
+
+| | asks | X, a session | G | E |
+|---|---|---|---|---|
+| a candidate at the ask's place | 21 | 9.0 | 9 | 17 |
+| the entry delivered elsewhere | 7 | 3.0 | 3 | 5 |
+| no candidate | 5 | 0.0 | 0 | 1 |
+
+Of the 10 asks only the exact brief reached, G reaches none, and 8 had a candidate at the place.
+
+**What the notes say there.** The session verified the candidate and overrode it:
+- `gcongr` on 30641's monotone step: run, "did not make progress, because `posLog` has no gcongr
+  lemma. I dropped that item." The maintainer's ask was a question, "Can `gcongr` do this (or do you
+  need to provide the side condition manually)?"
+- `{D : ℤ}` repeated in four consecutive signatures on 42814, delivered as *departs*: "Missing
+  docstrings, line-wrapping and `variable {D}` items: Mathlib does not require these, so I would
+  not request them."
+- The primed private helper on 43167, delivered as *departs*: "The prime on a private helper is
+  acceptable, so I raised no naming ask."
+- The `HasProd` sibling on 42184: "would be natural follow-ups ... I would not" ask.
+- 28649's `MGFs`: the convention judged departed, and a different change filed (revert to
+  lowercase rather than spell it out): `partial`, as X.
+- 30458's `variable` sections: filed, as a different restructure: `partial`, as X.
+
+**What it means, at this altitude.** Stage F delivered the text without the place; stage G
+delivered the text, the place and the check; both read as X. What the exact brief carried and
+neither did is the assertion: a list of one to five conventions is a claim that maintainers ask
+for each of them here. Given a long list to verify, half of it decoys, with an instruction to drop
+what does not depart, the reviewer applies its own bar for what a maintainer would ask, and that
+bar is X's. This is the filing bar the post-carry-over plan names ("verified, withheld"), met on
+Claude.
+
+**Untried, and not concluded against.**
+- **The lead, isolated:** the exact entries delivered as pinpointed candidates under stage G's
+  verify-and-drop lead. At X, the lead is what removes the gain; near E, the decoys and length do.
+- **An asserting lead:** the same candidates, told that maintainers raise these and to file each,
+  as a question where a check fails ("can `gcongr` do this?"), unless the check refutes it.
+- Rules for all 438 with retrieval in front; checks run before delivery; a second session a PR.
+
+**How it ran.** Rules (two writers) and pinpointing (ten) on token C on 2026-10-05; two pinpointers
+were cut by the five-hour limit (pr34091's file, written before the cut, stands; pr43167 reran).
+Sessions one at a time from 15:01 to 01:12, three windows, each 6 to 16 points of the five-hour
+window at 27k to 36k weighted units a point, as stage F; the week went from 53% to 61% for the
+sessions and to 63% with the matchers. Two session audits flagged the project's Python run by
+absolute path, on helper scripts in the packet's own `tmp/` and on `findings.json`; read, benign,
+committed by hand (`146bf67e`).
+
+## Stage H: which pinpointed departures would a maintainer raise? Five decisions over one record (pre-registered 2026-10-06, before any mining or decision)
+
+The design space and why: `docs/plans/2026-10-06-convention-decision-designs.md`. The user
+(2026-10-06): test several modifications at once on a few rules and PRs, with negatives, recorded
+examples, and an agent nudged to retrieve examples, "so we minimize model-specific judgement and
+thresholds." Nothing below has run.
+
+**What it tests.** Stage G's reviewer had the right convention at the right place and declined it,
+and maintainers asked at 9 of the 78 places the pinpointer judged departing. The missing piece is
+the selection. Stage H asks which decision procedure picks the places maintainers raise, before
+any reviewer session is spent on it.
+
+**The rules** (`stage_h_rules.json`): ten, chosen knowing the probe asks, as stage G's set was:
+P005, P010, P011, P018, P048, P100, P254 (each with a candidate at an ask on some probe PR and
+candidates without), P040 (candidates, no ask), P084 and P126 (the decoys with the most candidates).
+
+**The candidates** (`stage_h.py`, `probe_candidates`): stage G's pinpointed places for these rules
+on the ten PRs, 149, of which 12 sit at an in-census ask filed under the same rule (8 distinct
+asks, checked; the mechanical place test of stage G). That truth is never shown to a decider.
+
+**The record, from census PRs only.**
+- Positives: reader A's census asks under each rule (comment and code).
+- Negatives: the same blind pinpointer, rubric and 52 rules as stage G, run on 16 val1000 PRs
+  (`census_sample.json`, `build_census_sample.py`: seeded, at most 40 change targets, 3 AI-authored),
+  keeping places for the ten rules; a place at a round-1 ask under its rule is a positive, the rest
+  negatives.
+- The rate index: census asks under the rule over the 973 val1000 PRs, divided by the places flagged
+  per sample PR (plus a half) times 973.
+
+**The designs**, each deciding raise or not for all 149 candidates:
+- `judge`: the rule and the candidate's code alone (the control);
+- `examples`: four asked and four not-asked examples a rule, seeded;
+- `examples_rate`: as `examples`, with the rule's rate stated as the prior;
+- `retrieve`: one file a rule with every asked (up to 30) and not-asked example; the decider must
+  find the most similar for each candidate and cite them;
+- `rate`: no model; per PR, the three candidates whose rule has the highest index.
+
+Deciders are blind subagents, Opus 5.5 at xhigh on the headless route, two a design (PRs split in
+halves), decider rubric fixed in `stage_h.py`. Order: `examples`, `judge`, `retrieve`,
+`examples_rate`, so a budget-forced stop keeps the main contrast.
+
+**Reading rule, fixed now.** Per design, on the 149 candidates: candidates raised, raised at an ask
+(of 12), precision and recall. Base precision (raise all) is 12/149 = 0.08; the oracle is 1 and 1.
+
+| design, on its decisions | reading |
+|---|---|
+| recall ≥ 8/12 and precision ≥ 0.35 | **strong**: carry to reviewer sessions first |
+| recall ≥ 6/12 and precision ≥ 0.25 | **carry to reviewer sessions** |
+| otherwise | below the bar |
+
+**A baseline seen before this rule was fixed, stated as such.** A dry run of the scorer with all
+indices equal made design `rate` fall back to the pass's own order (departs first): three a PR, 30
+raised, 7 at an ask, precision 0.233, recall 0.583. The scorer reports it as `order`. A model design
+that does not beat it adds nothing over the pinpointer's own ranking, whatever its reading above.
+
+One candidate is 0.083 of recall, so two designs differing by fewer than two at-ask candidates are
+not distinguished. The contrasts are read as the plan states them. Exploratory: one decider run a
+design and half, ten rules chosen knowing the asks.
+
+**Also read:** the rate per rule (flagged per PR, asked); asks the pinpointer never flagged on the
+census sample (its recall there); per-PR raises; the `p` ranking of each model design.
+
+**Limits, stated before.** The rule set is chosen knowing the asks. Negatives are round-1 silences,
+so a later-round ask counts as not asked. The mechanical place test matches by declaration name and
+file. Sixteen census PRs give few negatives for rare rules.
+
+**Cost and tokens.** All on token C (B's login is disabled); at 04:18 the week stood at 64% and the
+five-hour window at 51% with another session drawing on it. Expected: 16 pinpointers at 4 to 16
+points of a window each, eight deciders at 5 to 15: about two windows, and about 8 to 12 points of
+the week. `run_stage_h.sh` meters every batch and stops starting work once the week reaches 80%.
+
+**Running note (2026-10-06 04:30, before any batch ran).** At the user's direction the stage runs on
+the main account (`CLAUDE_CODE_OAUTH_TOKEN`; five-hour window 6%, week 55% when read, resetting
+Friday 10:00), not token C. Same model, route and caps; the runner reads the login from `TOKEN_VAR`.
+
+## Result 6 (2026-10-06): no decision design picks the places maintainers raise -- every rule is raised at 5% or less of its flagged places, and a model's guess is barely above chance
+
+Stage H as pre-registered above, on the main account, 04:30 to 05:30: 16 census pinpointers and eight
+deciders, every transcript audited clean; the week went from 55% to 59%. `stage_h.py score` prints
+the table.
+
+**The record.** On the 16 census PRs the same pinpointer flagged 205 places for the ten rules (12.8
+a PR), 6 of them at a round-1 ask (2.9%). The rate index (census asks per flagged place) runs from
+P005's 0.048 to P254's 0.0026: maintainers raise between one in 20 and one in 400 of the places a
+rule's situation is flagged. An 18x spread, all at or under 5%.
+
+**By the rule: every design is below the bar.**
+
+| design | raised | at an ask (of 12) | asks (of 8) | precision | recall |
+|---|---|---|---|---|---|
+| all (stage G) | 149 | 12 | 8 | 0.081 | 1.000 |
+| order (the pass's own, three a PR; seen before the rule) | 30 | 7 | 5 | 0.233 | 0.583 |
+| `judge` | 2 | 0 | 0 | 0 | 0 |
+| `examples` | 2 | 0 | 0 | 0 | 0 |
+| `examples_rate` | 2 | 0 | 0 | 0 | 0 |
+| `retrieve` | 5 | 0 | 0 | 0 | 0 |
+| `rate` | 30 | 2 | 2 | 0.067 | 0.167 |
+
+**Also read, as pre-registered: the probability ranking**, which does not depend on the deciders'
+threshold.
+
+| design | AUC of p | three a PR by p: at an ask (asks) | mean p, asked / not |
+|---|---|---|---|
+| order | 0.558 | 7 (5) | |
+| `examples` | 0.641 | 7 (6) | 0.091 / 0.083 |
+| `retrieve` | 0.591 | 7 (6) | 0.105 / 0.101 |
+| `examples_rate` | 0.585 | 6 (5) | 0.049 / 0.044 |
+| `judge` | 0.563 | 5 (4) | 0.100 / 0.108 |
+| `rate` | 0.602 | 2 (2) | |
+
+- **The deciders learned the base rate, not the selection.** Told that most flagged places are never
+  raised, they put p near 0.05-0.10 everywhere, which is about the true 0.08, and separated asked
+  from not asked hardly at all. Ranked three a PR, `examples` and `retrieve` tie the pass's own order
+  on candidates (7 of 12) and cover one ask more (6 of 8): within the two-candidate noise.
+- **The rate ranks the wrong rules first here.** P005, P011 and P018 have the highest index; on these
+  PRs maintainers asked as much under P048, P254 and P100.
+- **Their reasons at the 12 are the reviewer's.** "In a golf PR reviewers usually accept the golf as
+  is" (32875, where the maintainer asked for a further `simpa`); "a plausible nit, not commonly
+  enforced" (42814's `{D : ℤ}`); "the standard pattern" (43167's `_left`/`_right`). `retrieve` cited
+  closer not-asked examples for most of them.
+- **Raises at an ask under another rule:** one, `retrieve`'s P048 on 30458 at the `variable` asks
+  filed under P369. The "restore the old proof" raises on 30458 are not at its old-proof asks.
+
+**What it means, at this altitude.** Given the convention, the code at the place, and asked and
+not-asked examples, a model's guess at which places maintainers raise is barely above chance
+(AUC 0.56-0.64). That is where the record's artifact-only selectors stood (AUC 0.62,
+`docs/dead-ends.md`, "Selection from artifact-only signals"), now replicated with the convention
+and its demand side in hand. Exploratory: one decider run a design, 12 positives, rules chosen
+knowing the asks.
+
+**What it does not show, and the untried designs.**
+- **Whether the unasked departures are unwelcome.** The truth is round-1 asks, a lower bound. If a
+  maintainer would accept most of the 78 departures the pass decided by reading, the gap is in the
+  evaluation, not in the selection. Untried: adjudicate a sample of them ("would a maintainer accept
+  this if proposed?"), the socket `docs/todo/adjudication-rubric.md` describes.
+- **Signals outside the convention and the hunk:** the reviewer (one maintainer wrote 30 of dev's
+  52 round-1 comments); the PR's own theme (on a golf PR the maintainer asked for more golf, and the
+  deciders inferred the opposite); file-local regularity (42184's ask: "as this seems to be the
+  convention in this file").
+- More rules, more census PRs and a second decider run; scope by area and era.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
 picked from the diff do not move the reviewer, and the ceiling's gain was in the pinpointing. The
 design the two results point to is a pinpointing pass (above), which is code and a prompt, not a
-brief. Stage G, above, is its first test: the user asked for it on 2026-10-05.
+brief. Stage G, above, was its first test (2026-10-05): the place and the check arrived and the
+reviewer overrode them. What remains untested is the decision to file, listed under Result 5.
 
 ## What closes it
 

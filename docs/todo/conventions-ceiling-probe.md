@@ -46,6 +46,21 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   blind pass a PR lists where each trigger holds; the reviewer gets the place, the convention and the
   check. Its leak is the pooled rule set, so it is a best case for the delivery, not a floor. Rule:
   G − X within 0.05 of E − X recovers the ceiling; `≤ +0.05` does not carry it. Same README.
+- **Stage G read +0.000 on both matchers (2026-10-06): pinpointed rules move nothing.** A candidate
+  carried the right entry for 28 of 33 asks, at the ask's place for 21; the reviewer reaches 9 of
+  those 21, as unbriefed Claude does, where the exact brief reaches 17. Its notes show it verified
+  and overrode (`gcongr` failed so dropped; repeated `{D : ℤ}`: "Mathlib does not require
+  these"; a primed private helper: "acceptable"). So the gap is the decision to file, not
+  knowledge or location: the exact brief's short list asserts that maintainers ask for these.
+  Untried: the exact entries under G's verify-and-drop lead (isolates the lead); an asserting lead
+  that files a question where a check fails. README, Result 5.
+- **Stage H (2026-10-06): no decision design picks the places maintainers raise.** Five designs over one
+  record (rule, census asks, negatives mined on 16 census PRs, rate), on stage G's 149 places for ten
+  rules (12 at an ask): every model design raised 2-5, none at an ask; the rate design 2 of 12; the
+  pass's own order 7 of 12. Ranked by probability, AUC 0.56-0.64, the record's old artifact-only
+  level. Maintainers raise at most 5% of the places a rule's situation is flagged. Untried: whether
+  the unasked departures would be welcome (adjudication), and reviewer, PR-theme and file-local
+  signals. README, Result 6; designs in `docs/plans/2026-10-06-convention-decision-designs.md`.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

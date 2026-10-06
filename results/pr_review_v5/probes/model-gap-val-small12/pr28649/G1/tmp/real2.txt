@@ -1,0 +1,115 @@
+   500|
+   501|/-- The variance of a real Gaussian distribution `gaussianReal μ v` is
+   502|its variance parameter `v`. -/
+   503|@[simp]
+   504|lemma variance_fun_id_gaussianReal : Var[fun x ↦ x; gaussianReal μ v] = v := by
+   505|  rw [variance_eq_integral measurable_id'.aemeasurable]
+   506|  simp only [integral_id_gaussianReal]
+   507|  calc ∫ ω, (ω - μ) ^ 2 ∂gaussianReal μ v
+   508|  _ = ∫ ω, ω ^ 2 ∂(gaussianReal μ v).map (fun x ↦ x - μ) := by
+   509|    rw [integral_map (by fun_prop) (by fun_prop)]
+   510|  _ = ∫ ω, ω ^ 2 ∂(gaussianReal 0 v) := by simp [gaussianReal_map_sub_const]
+   511|  _ = iteratedDeriv 2 (mgf (fun x ↦ x) (gaussianReal 0 v)) 0 := by
+   512|    rw [iteratedDeriv_mgf_zero] <;> simp
+   513|  _ = v := by
+   514|    rw [mgf_fun_id_gaussianReal, iteratedDeriv_succ, iteratedDeriv_one]
+   515|    simp only [zero_mul, zero_add]
+   516|    have : deriv (fun t ↦ rexp (v * t ^ 2 / 2)) = fun t ↦ v * t * rexp (v * t ^ 2 / 2) := by
+   517|      ext t
+   518|      rw [_root_.deriv_exp (by fun_prop)]
+   519|      simp only [deriv_div_const, differentiableAt_const, differentiableAt_fun_id, Nat.cast_ofNat,
+   520|        DifferentiableAt.fun_pow, deriv_fun_mul, deriv_const', zero_mul, deriv_fun_pow,
+   521|        Nat.add_one_sub_one, pow_one, deriv_id'', mul_one, zero_add]
+   522|      ring
+   523|    rw [this, deriv_fun_mul (by fun_prop) (by fun_prop), deriv_fun_mul (by fun_prop) (by fun_prop)]
+   524|    simp
+   525|
+   526|/-- The variance of a real Gaussian distribution `gaussianReal μ v` is
+   527|its variance parameter `v`. -/
+   528|@[simp]
+   529|lemma variance_id_gaussianReal : Var[id; gaussianReal μ v] = v :=
+   530|  variance_fun_id_gaussianReal
+   531|
+   532|/-- All the moments of a real Gaussian distribution are finite. That is, the identity is in Lp for
+   533|all finite `p`. -/
+   534|lemma memLp_id_gaussianReal (p : ℝ≥0) : MemLp id p (gaussianReal μ v) :=
+   535|  memLp_of_mem_interior_integrableExpSet (by simp) p
+   536|
+   537|/-- All the moments of a real Gaussian distribution are finite. That is, the identity is in Lp for
+   538|all finite `p`. -/
+   539|lemma memLp_id_gaussianReal' (p : ℝ≥0∞) (hp : p ≠ ∞) : MemLp id p (gaussianReal μ v) := by
+   540|  lift p to ℝ≥0 using hp
+   541|  exact memLp_id_gaussianReal p
+   542|
+   543|end Moments
+   544|
+   545|section LinearMap
+   546|
+   547|variable {μ : ℝ} {v : ℝ≥0}
+   548|
+   549|lemma gaussianReal_map_linearMap (L : ℝ →ₗ[ℝ] ℝ) :
+   550|    (gaussianReal μ v).map L = gaussianReal (L μ) ((L 1 ^ 2).toNNReal * v) := by
+   551|  have : (L : ℝ → ℝ) = fun x ↦ L 1 * x := by
+   552|    ext x
+   553|    have : x = x • 1 := by simp
+   554|    conv_lhs => rw [this, L.map_smul, smul_eq_mul, mul_comm]
+   555|  rw [this, gaussianReal_map_const_mul]
+   556|  congr
+   557|  simp only [mul_one, left_eq_sup]
+   558|  positivity
+   559|
+   560|lemma gaussianReal_map_continuousLinearMap (L : ℝ →L[ℝ] ℝ) :
+   561|    (gaussianReal μ v).map L = gaussianReal (L μ) ((L 1 ^ 2).toNNReal * v) :=
+   562|  gaussianReal_map_linearMap L
+   563|
+   564|@[simp]
+   565|lemma integral_linearMap_gaussianReal (L : ℝ →ₗ[ℝ] ℝ) :
+   566|    ∫ x, L x ∂(gaussianReal μ v) = L μ := by
+   567|  have : ∫ x, L x ∂(gaussianReal μ v) = ∫ x, x ∂((gaussianReal μ v).map L) := by
+   568|    rw [integral_map (φ := L) (by fun_prop) (by fun_prop)]
+   569|  simp [this, gaussianReal_map_linearMap]
+   570|
+   571|@[simp]
+   572|lemma integral_continuousLinearMap_gaussianReal (L : ℝ →L[ℝ] ℝ) :
+   573|    ∫ x, L x ∂(gaussianReal μ v) = L μ := integral_linearMap_gaussianReal L
+   574|
+   575|@[simp]
+   576|lemma variance_linearMap_gaussianReal (L : ℝ →ₗ[ℝ] ℝ) :
+   577|    Var[L; gaussianReal μ v] = (L 1 ^ 2).toNNReal * v := by
+   578|  rw [← variance_id_map, gaussianReal_map_linearMap, variance_id_gaussianReal]
+   579|  · simp only [NNReal.coe_mul, Real.coe_toNNReal']
+   580|  · fun_prop
+   581|
+   582|@[simp]
+   583|lemma variance_continuousLinearMap_gaussianReal (L : ℝ →L[ℝ] ℝ) :
+   584|    Var[L; gaussianReal μ v] = (L 1 ^ 2).toNNReal * v :=
+   585|  variance_linearMap_gaussianReal L
+   586|
+   587|end LinearMap
+   588|
+   589|/-- The convolution of two real Gaussian distributions with means `m₁, m₂` and variances `v₁, v₂`
+   590|is a real Gaussian distribution with mean `m₁ + m₂` and variance `v₁ + v₂`. -/
+   591|lemma gaussianReal_conv_gaussianReal {m₁ m₂ : ℝ} {v₁ v₂ : ℝ≥0} :
+   592|    (gaussianReal m₁ v₁) ∗ (gaussianReal m₂ v₂) = gaussianReal (m₁ + m₂) (v₁ + v₂) := by
+   593|  refine Measure.ext_of_charFun ?_
+   594|  ext t
+   595|  simp_rw [charFun_conv, charFun_gaussianReal]
+   596|  rw [← Complex.exp_add]
+   597|  simp only [Complex.ofReal_add, NNReal.coe_add]
+   598|  ring_nf
+   599|
+   600|/- The sum of two real Gaussian variables with means `m₁, m₂` and variances `v₁, v₂` is a real
+   601|Gaussian distribution with mean `m₁ + m₂` and variance `v_1 + v_2`. -/
+   602|lemma gaussianReal_add_gaussianReal_of_indepFun {Ω} {mΩ : MeasurableSpace Ω} {P : Measure Ω}
+   603|    {m₁ m₂ : ℝ} {v₁ v₂ : ℝ≥0} {X Y : Ω → ℝ} (hXY : IndepFun X Y P)
+   604|    (hX : P.map X = gaussianReal m₁ v₁) (hY : P.map Y = gaussianReal m₂ v₂) :
+   605|    P.map (X + Y) = gaussianReal (m₁ + m₂) (v₁ + v₂) := by
+   606|  rw [hXY.map_add_eq_map_conv_map₀', hX, hY, gaussianReal_conv_gaussianReal]
+   607|  · apply AEMeasurable.of_map_ne_zero; simp [NeZero.ne, hX]
+   608|  · apply AEMeasurable.of_map_ne_zero; simp [NeZero.ne, hY]
+   609|  · rw [hX]; apply IsFiniteMeasure.toSigmaFinite
+   610|  · rw [hY]; apply IsFiniteMeasure.toSigmaFinite
+   611|
+   612|end GaussianReal
+   613|
+   614|end ProbabilityTheory
