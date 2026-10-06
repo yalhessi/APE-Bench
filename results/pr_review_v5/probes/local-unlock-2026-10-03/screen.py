@@ -21,6 +21,9 @@ RUNS = {
     **{f"{label} r{n}": f"iter_local397_unlock_{label}_rep{n}"
        for label in ["U", "O", "C", "T", "E", "B", "R", "D", "N", "V", "H", "S1", "S2", "S3", "Q", "K"]
        for n in range(1, 6)},
+    # ../local-ds41-2026-10-06/: the self-hosted DeepSeek-V4.1-Flash under contract v2.
+    **{f"ds41 high r{n}": f"iter_ds41_contract2_high_rep{n}" for n in range(1, 4)},
+    "ds41 none r1": "iter_ds41_contract2_none_rep1",
 }
 
 
