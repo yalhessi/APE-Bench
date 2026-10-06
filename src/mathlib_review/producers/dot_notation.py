@@ -1,8 +1,9 @@
 """Where the PR's new code could use dot notation: census conventions P057 and P108.
 
 Pre-registered, with its reading rule, in
-`results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`. Two shapes, both over the
-change graph alone and only on code the PR adds:
+`results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`; version 2 adds stage 4's
+three conditions to the method-call shape (R1-R3, below). Two shapes, both over the change graph
+alone and only on code the PR adds:
 
 1. **Placement.** A declaration the PR adds or renames, concluding a predicate `H …`, whose leaf
    name is `h_of_rest` (`h` = `H` with its first letter lowered): inside `H`'s namespace it would
@@ -24,6 +25,7 @@ from src.mathlib_review.conventions.facets import split_binders
 from src.mathlib_review.conventions.situations import predicate_head
 from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
 from src.mathlib_review.producers import Fact, added_lines, declarations
+from src.mathlib_review.retrieval.declaration_table import conclusion_head
 
 #: `Order.IsNormal.map_iSup h`: a capitalised (possibly namespaced) prefix, a lowercase lemma, an
 #: argument. The prefix's last component is compared with the argument's type head.
@@ -38,7 +40,7 @@ def _lower_first(name: str) -> str:
 
 class DotNotation:
     name = "dot_notation"
-    version = "dot_notation/1"
+    version = "dot_notation/2"
     title = "Where dot notation may apply"
     lead = ("Mathlib places a lemma about a predicate in that predicate's namespace, and applies a "
             "lemma to a hypothesis through the hypothesis (`h.lemma`). These places in the code this "
@@ -75,9 +77,13 @@ class DotNotation:
 
     def _calls(self, target, entity, signature: str) -> List[Fact]:
         heads: Dict[str, str] = {}
+        binder_names: set = set()
         for kind, text in split_binders(signature):
+            names = text[1:].split(":", 1)[0].split() if ":" in text else []
+            binder_names.update(names)
             match = _BINDER.match(text) if kind == "explicit" else None
-            if match:
+            # R3 (dot_notation/2): a relation-typed binder (`h : a = b`) is not a receiver.
+            if match and conclusion_head(text[1:-1].split(":", 1)[1]) == "other":
                 for name in match.group(1).split():
                     heads[name] = match.group(2)
         if not heads:
@@ -90,6 +96,14 @@ class DotNotation:
             prefix, lemma, argument = match.groups()
             head: Optional[str] = heads.get(argument)
             if not head or head.rsplit(".", 1)[-1] != prefix.rsplit(".", 1)[-1]:
+                continue
+            # R1 (dot_notation/2): a qualified binder head resolves `x.lemma` in its own
+            # namespace first, so the prefix must be exactly that head.
+            if "." in head and prefix != head:
+                continue
+            # R2 (dot_notation/2): a variable is not a namespace (`P.lemma h`, `S.closed hf`).
+            first = prefix.split(".", 1)[0]
+            if first in binder_names or len(first) == 1:
                 continue
             offset = match.start()
             end = code.find("\n", offset)

@@ -69,3 +69,26 @@ def test_the_in_sample_placement_ask_is_stated_exactly():
     """33294, `d0038`: the maintainer's suggestion is `isFundamentalSequence.of_isNormal`."""
     facts = DOT.facts(change_graphs(DEV, [33294])[33294])
     assert any("`IsFundamentalSequence.of_isNormal`" in f.text for f in facts)
+
+
+# --- dot_notation/2, stage 4: one test per condition -------------------------------------------
+
+def _one_call(signature_binders: str, call: str):
+    code = f"theorem baz {signature_binders} : Q := by\n  exact {call}\n"
+    return [f for f in DOT.facts(_graph(code, code.splitlines(), name="Ordinal.baz"))
+            if f.convention == "P057"]
+
+
+def test_r1_a_qualified_binder_head_must_be_the_prefix():
+    assert _one_call("(H : Ordinal.IsNormal f)", "Order.IsNormal.map_iSup H") == []
+    assert len(_one_call("(H : Order.IsNormal f)", "Order.IsNormal.map_iSup H")) == 1
+    assert len(_one_call("(H : IsNormal f)", "Order.IsNormal.map_iSup H")) == 1
+
+
+def test_r2_a_variable_is_not_a_namespace():
+    assert _one_call("(P : RootPairing ι R M N) (h : P.IsCrystallographic)", "P.chain_le h") == []
+    assert _one_call("(h : S x)", "S.closed h") == []
+
+
+def test_r3_a_relation_typed_binder_is_not_a_receiver():
+    assert _one_call("(h : Fintype.card α = Fintype.card β)", "Fintype.equivOfCardEq h") == []

@@ -1,4 +1,5 @@
-"""The `generated_twins` producer: census convention P201 (stage 3 of the detector probe)."""
+"""The `generated_twins` producer: census convention P201 (stage 3; version 2 retired the
+`@[to_additive]` shape, wrong on 29 of 29 facts)."""
 
 from __future__ import annotations
 
@@ -7,7 +8,6 @@ from pathlib import Path
 import pytest
 
 from src.mathlib_review.producers import change_graphs, producer
-from src.mathlib_review.producers.generated_twins import additive
 
 TWINS = producer("generated_twins")
 
@@ -26,11 +26,6 @@ def _graph(decls, base=()):
     return {"pr_number": 1, "entities": entities, "changed_ranges": [], "targets": targets}
 
 
-def test_the_additive_translation_is_word_for_word():
-    assert additive("Monoid.prod_mul_one") == "AddMonoid.sum_add_zero"
-    assert additive("Foo.bar") is None
-
-
 def test_a_hand_written_fun_form_beside_its_source_is_stated():
     graph = _graph([("Meromorphic.fun_add", "theorem fun_add : P := x")],
                    base=[("Meromorphic.add", "theorem add : P := x")])
@@ -44,14 +39,11 @@ def test_a_source_already_carrying_to_fun_is_silent():
     assert TWINS.facts(graph) == []
 
 
-def test_a_hand_written_additive_twin_is_stated_and_a_ring_pair_is_not():
-    group = _graph([("Group.prod_inv", "theorem prod_inv [CommGroup G] : P := x"),
-                    ("AddGroup.sum_neg", "theorem sum_neg [AddCommGroup G] : P := x")])
-    (fact,) = TWINS.facts(group)
-    assert fact.declaration == "AddGroup.sum_neg" and "`@[to_additive]`" in fact.text
-    ring = _graph([("RingHom.map_mul", "theorem map_mul [Semiring R] (f : R →+* S) : P := x"),
-                   ("RingHom.map_add", "theorem map_add [Semiring R] (f : R →+* S) : P := x")])
-    assert TWINS.facts(ring) == []
+def test_a_multiplicative_and_additive_pair_is_no_longer_a_fact():
+    """The retired shape: `posLog_zero` beside `posLog_one` is a coincidence of words, not a twin."""
+    graph = _graph([("Real.posLog_one", "theorem posLog_one : posLog 1 = 0 := x"),
+                    ("Real.posLog_zero", "theorem posLog_zero : posLog 0 = 0 := x")])
+    assert TWINS.facts(graph) == []
 
 
 DEV = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
