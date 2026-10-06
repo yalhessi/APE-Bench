@@ -110,3 +110,22 @@ run a set, and on validation one unbriefed run, through OpenAI directly at an ea
 $28.28 post-cutoff, 8.2 min); this morning's parity run billed a quarter of its recorded figure. The
 two stopped unbriefed runs add six sessions. The ELM key's own figure syncs daily. Matchers: about
 400k subagent tokens on the orchestrating session's login.
+
+## Also read (2026-10-06): what GE's reasoning summaries say at the 23 in-census asks it still misses
+
+Pre-registered above and not reported with the result. Read by hand after the fact, not blind: first
+by the session that drafted `docs/plans/2026-10-06-generation-without-suppression.md`, then every miss
+by an adversarial reviewer against the raw logs (`reasoning_content` in each task's last
+conversation file).
+
+| how GE missed the ask | asks |
+|---|---|
+| considered, then dropped on a guess about maintainers | 2: v0030 (t2, the census's full-words convention against `MGFs`: "I doubt that maintainers would request changes for commonly used acronyms"; `findings: []`); v0093 (a `simpa only ... using` close compiled early, then "not entirely confident about that choice", not filed) |
+| considered, rejected on the merits | 1: v0067 |
+| considered, untested, or the check failed | 7: v0068, v0092 (checks failed; a compiled `rw` alternative at v0092 left unfiled with no reason), p0005 (found the general lemma at t12, dropped with no reason), p0010, p0012, v0053, v0056 |
+| a different change filed (matcher `partial`) | 2: v0060, v0061 |
+| never considered | 11: v0029, v0055, v0062, v0063, v0064, v0090, v0105, p0000, p0003, p0004 at its place, p0006 |
+
+So the briefed gpt-5.5 mostly misses by never considering the asked change, as the unbriefed runs do
+(`../elm-parity-2026-10-05/`); withholding is real and small. GE also left a compiled `positivity`
+extension on 42184 unfiled (not an ask). One run a set, and the classification is not blind.
