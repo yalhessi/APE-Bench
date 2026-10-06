@@ -92,3 +92,10 @@ def test_r2_a_variable_is_not_a_namespace():
 
 def test_r3_a_relation_typed_binder_is_not_a_receiver():
     assert _one_call("(h : Fintype.card α = Fintype.card β)", "Fintype.equivOfCardEq h") == []
+
+
+def test_an_argument_followed_by_a_projection_is_not_the_receiver():
+    """dot_notation/3: `Finset.range F.card` applies `Finset.range` to `F.card`, not to `F`."""
+    assert _one_call("(F : Finset ℕ)", "Finset.range F.card") == []
+    assert _one_call("(h : IsNormal f)", "IsNormal.map_iSup h.1") == []
+    assert len(_one_call("(F : Finset ℕ)", "Finset.card_pos F")) == 1

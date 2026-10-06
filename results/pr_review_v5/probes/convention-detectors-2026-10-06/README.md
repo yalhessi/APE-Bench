@@ -297,3 +297,15 @@ likewise) and are counted valid, as stage 2 counted them, with the imprecision n
 
 **`generated_twins/2`.** The `@[to_fun]` facts are identical (11 on dev, 0 elsewhere); the
 `@[to_additive]` shape is gone.
+
+**`dot_notation/3` (2026-10-06, after the holdout).** Fixes the parsing defect the holdout found:
+an argument followed by a projection (`Finset.range F.card`, `X.lemma h.1`) is not the receiver.
+Census: 188 -> 180 distinct facts (9 removed, 1 added -- a call a projection occurrence had
+shadowed), control-PR facts 35 -> 33; dev unchanged (four facts); validation and post-cutoff still 0.
+
+**A correction to stage 2's exact count: 9 -> 8 of 49 (16%, still narrow).** One removed fact
+was the one credited as `v0005`'s exact match. Read at its own line it was wrong: line 430 is
+`ContinuousWithinAt.clm_apply_of_inCoordinates hϕ.2 hv hϕ.1`, whose receiver is `hϕ.2`, and the
+fact named `hϕ`. Its text matched `v0005`'s ask (at line 387, where there was no fact) by
+coincidence of the misparse. `v0006`, the ask at line 430, asks for `hϕ.2.clm_apply_of_inCoordinates`,
+which a binder-typed shape cannot state. Under `/3` neither is stated, and 8 of 49 are exact.

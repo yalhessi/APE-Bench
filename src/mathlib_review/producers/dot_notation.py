@@ -28,8 +28,10 @@ from src.mathlib_review.producers import Fact, added_lines, declarations
 from src.mathlib_review.retrieval.declaration_table import conclusion_head
 
 #: `Order.IsNormal.map_iSup h`: a capitalised (possibly namespaced) prefix, a lowercase lemma, an
-#: argument. The prefix's last component is compared with the argument's type head.
-_CALL = re.compile(r"(?<![\w.])((?:[A-Z][\w']*\.)*[A-Z][\w']*)\.([a-z_][\w']*)\s+([a-zA-Z_][\w']*)\b")
+#: argument. The prefix's last component is compared with the argument's type head. The argument
+#: must not be followed by a projection: in `Finset.range F.card` the argument is `F.card`, not `F`
+#: (dot_notation/3, found on the stage-4 holdout).
+_CALL = re.compile(r"(?<![\w.])((?:[A-Z][\w']*\.)*[A-Z][\w']*)\.([a-z_][\w']*)\s+([a-zA-Z_][\w']*)\b(?!\.)")
 #: `(h hf : Order.IsNormal f)`: the names, then the type's head identifier.
 _BINDER = re.compile(r"^\(\s*([^:()]+?)\s*:\s*((?:[A-Z][\w']*\.)*[A-Z][\w']*)\b")
 
@@ -40,7 +42,7 @@ def _lower_first(name: str) -> str:
 
 class DotNotation:
     name = "dot_notation"
-    version = "dot_notation/2"
+    version = "dot_notation/3"
     title = "Where dot notation may apply"
     lead = ("Mathlib places a lemma about a predicate in that predicate's namespace, and applies a "
             "lemma to a hypothesis through the hypothesis (`h.lemma`). These places in the code this "
