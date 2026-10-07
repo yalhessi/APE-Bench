@@ -487,3 +487,32 @@ me at 05:49 on a misread cost: the log's `cost=` is nominal ($65.44 for S0's sev
 1.8M tokens against about 18 and 0.8M). Resumed at 05:52, 7 kept and 4 started in each. The
 sessions in flight at each stop were lost and rerun from the start; none of them had submitted. Cost
 re-estimated: S0 and S1 about $60 billed, S2 about $30 more, which waits for the user's word.
+
+## Results, stage 5 on gpt-5.5, round 1 (2026-10-07), read by its rule
+
+S0 `probe_census_detectors_elmgpt55_s0_rep1` and S1 `..._s1_rep1`, 16 of 16 sessions each, billed
+$25.71 and $26.17. Marked by hand under the seal (`stage5/match_round1/marks.json`, committed in
+`a5053c9a` before the key was read), then unblinded (`stage5_read.py unblind round1`):
+
+| | S0 | S1 | S1 - S0 |
+|---|---|---|---|
+| target asks reached, of 13 | 0 | 1 (35807 v1935, the asked rename of `mk_of_mem'`) | **+1** |
+| partial | 4 (v1057; v1412-v1414, a proof rewrite that drops the term) | 1 (v1057) | |
+| unasked section facts repeated, per stratum-B PR | 0.17 (1 of 6 PRs) | 0.50 (3) | +0.33 |
+
+**By the rule: no effect** (a difference of 1 or less), and not a volume lever (+0.33 a stratum-B PR,
+under 1.0). The sections, stating 13 maintainers' asks word for word at their places, moved
+gpt-5.5 from 0 to 1 of them in one rep each. The record's prediction for Opus (stage G's override)
+holds on gpt-5.5 in this condition. Both sessions found `generalized_tube_lemma'` (31077) unprompted,
+so a section can repeat what the reviewer already sees. 33006: neither session filed anything.
+
+**Why S1 passed over them, from its reasoning summaries** (read after unblinding, not pre-registered,
+summaries only): at four PRs it considered the stated fact and dropped it -- 32674: *"the PR model
+that suggests using dot notation. Would maintainers request this as a style change? Maybe not"*;
+31961: it weighed `Set.Infinite.of_accPt` and filed a move instead; 30645: it folded the naming
+issue into a redundancy finding; 31007: renaming `ext'`, *"cautious about breaking compatibility"*.
+At four (28484, 32715, 34241, 36355) the summaries never mention it, which is not proof it went
+unconsidered. The first kind is what S2's paragraph addresses.
+
+**S2 is eligible** by the amendment's skip rule (S1 filed fewer than 10 of 13). Not launched: about
+$26 more, which waits on the user.
