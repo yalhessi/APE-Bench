@@ -63,6 +63,20 @@ Done when: <close condition from the todo>. Stop there and report.
 - It refuses inside a spawned session (`APE_SPAWNED_BY` is set there), so threads fan out one
   level only.
 
+**`claude --bg` does not survive the parent's restart.** Its daemon (`/tmp/cc-daemon-<uid>/…/control.sock`)
+lives in the login-session scope, and a restart of the spawning session tears that scope down: on
+2026-10-07 the `review-ir` child and its seven agents died at 07:46 with the parent, `claude logs`
+answering `ECONNREFUSED`, nothing committed since its start. CLAUDE.md records the same for paid runs
+(`setsid nohup` is not enough). What survived: a headless session as a systemd user unit, outside the
+scope -- `systemd-run --user --collect --unit=<topic>-session --working-directory=<worktree>
+--setenv=PATH=$PATH --setenv=HOME=$HOME --setenv=APE_SPAWNED_BY=<parent> /bin/bash -c "exec claude -p
+\"$(cat <brief>)\" --model … --effort … --permission-mode bypassPermissions --append-system-prompt
+\"$(cat <rules>)\" --output-format stream-json --verbose >> <log> 2>&1 < /dev/null"`, its cgroup under
+`user@<uid>.service/app.slice`. Print mode ends with its turn, so the rules must tell it to run its
+subagents in the foreground (several per message), never left in the background; watch it with
+`systemctl --user status <topic>-session` and the log. Until `spawn.sh` does this itself, use it for
+any child that must outlive the parent.
+
 Right after it prints `spawned <topic> · <id>`, arrange to be woken when it finishes: run
 `.claude/skills/spawn-session/spawn.sh wait <id>` with Bash `run_in_background`; the harness
 re-invokes you when it returns. Beside it, `SendMessage` with `to: "<topic>"`,
