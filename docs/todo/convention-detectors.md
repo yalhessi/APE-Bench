@@ -56,8 +56,12 @@ and the same with `..._hygiene_sections_claude_sub.yaml` and `..._s1_rep1`, read
 condition), blind hand reading: the sections took 0 to 1 of the 13 exactly stated asks (S0 against S1,
 one rep each, $52 billed), not a volume lever. S1's reasoning summaries show the stated fact considered
 and dropped at four PRs, once on an explicit guess about maintainers (32674), and unmentioned at four.
-S2, the disposition paragraph of `docs/plans/2026-10-06-generation-without-suppression.md`, is the
-next measurement and waits on the user. Opus untested; its configs stay built.
+S2, the disposition paragraph of `docs/plans/2026-10-06-generation-without-suppression.md`, run
+the same day: asks 1 to 5 of 13 (+4, or +3 on one close mark), but unasked facts 0.50 to 2.17 a
+stratum-B PR (13 of 14 filed), so **a volume lever** by the pre-registered gate: it files what the
+sections state, asked or not. Where it still missed, it conformed on precedent twice, which the
+paragraph excludes. What would move this: a reading of whether the unasked filings are welcome (the
+open adjudication), since the gate counts them as cost without knowing. Opus untested.
 
 **Start here.**
 - read: the probe README above (rules, amendments 1-2, stages 1-4, the two corrections);

@@ -526,3 +526,44 @@ against S2, a fresh seal) by the same rule.
 session's scope at 10 of 16 sessions, no retries or errors (the log stops mid-request). Resumed with
 `--resume` as a user systemd unit, `apebench-stage5-s2`, outside any session scope: 10 kept, 6
 rerun; it survived the Claude Code restart that followed.
+
+## Results, stage 5 on gpt-5.5, round 2 (2026-10-07), read by its rule
+
+S2 `probe_census_detectors_elmgpt55_s2_rep1`, 16 of 16, billed $25.35. Marked under a fresh seal
+(`stage5/match_round2/marks.json`, committed in `4feda8ef` before the key was read). **Only partly
+blind:** labels are drawn per PR, and S1's findings were read in round 1, so S1 was recognisable on
+several PRs. S1, marked in both rounds, reached the same asks both times (v1935 alone).
+
+| | S1 | S2 | S2 - S1 |
+|---|---|---|---|
+| target asks reached, of 13 | 1 (v1935) | 5 (v0644, v1252, v1254, v1661, v1935) | **+4** |
+| the same, v1661 read strictly as partial | 1 | 4 | +3 |
+| unasked section facts repeated, per stratum-B PR | 0.50 (3 of 14 facts) | **2.17 (13 of 14)** | **+1.67** |
+
+**By the rule: a volume lever.** The emission gate (more than 1.0 more a stratum-B PR) trips, and the
+amendment fixed that this decides "whatever it does to the asks". The asks move +4, in the lever
+band, but on one close mark (34241 v1661: the finding asks for `A.toLin'` in the asked statement,
+the maintainer for dot notation "throughout"); read strictly it is +3, between the bands. What S2
+does is file what the sections state, asked or not: 13 of 14 unasked stratum-B facts, each with a
+compiled edit, and 5 of the 13 asked. Gold is a lower bound, so the 13 are unasked, not shown wrong;
+nothing here says whether a maintainer would take them (`CLAUDE.md`, Reporting results).
+
+**Dispositions (the plan's C3), read from S2's submission messages after unblinding.** Every session
+gave them. At the 8 asks S2 still missed:
+- `conforms` on precedent, which the paragraph excludes as a ground ("what Mathlib usually accepts"):
+  36355 `integral_countable'` (cites the `lintegral_countable'` pair), 32992 `fourier_bilin_convolution_eq'`
+  (cites `fourier_eq'`);
+- `conforms` with lines that show the variant differs, not that its name says how: 31007's four primes,
+  `ext'` (v1096) among them;
+- `departs`, filed as a different change "covering" it: 32715's four `Prime.ne_zero hp` (proof
+  rewrites), 30645's `nontrivial'` (removal);
+- `departs` and not filed: 32674's `IsGδ.eq_iInter_nat hs`, "covered by" a rename finding that never
+  mentions it.
+Two `conforms` rest on a real check (36355's `summable_of_dirac` is used dotted from an `Integrable`
+hypothesis; 32674's `baireSpace_of_dense` sits in the `IsGδ` namespace with its receiver), and 32540's
+`surjective_of_tmul_eq_tmul_of_finite` was passed over as not new in the PR, which bears on the detector.
+
+**Stage 5 on gpt-5.5, in all:** sections alone, no effect (0 to 1 of 13); sections with the disposition
+paragraph, filed nearly everything stated (5 of 13 asked, 13 of 14 unasked), a volume lever by the
+pre-registered gate. One rep a condition, $77 billed for the three runs. Not tested: Opus, a second
+rep, and any reading of whether the unasked filings are welcome.
