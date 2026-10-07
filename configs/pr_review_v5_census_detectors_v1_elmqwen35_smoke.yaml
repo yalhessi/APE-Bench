@@ -1,0 +1,12 @@
+# The smoke before stage 5's gpt-5.5 runs (README, the 2026-10-07 amendment): S2's configuration on
+# elm_qwen_3.5 through ELM (priced 0) on two PRs -- the sessions start, the sections reach the prompt,
+# a submission lands. Plumbing only, never read for a result; run name iter_elmqwen35_*.
+extends: pr_review_v5_census_detectors_v1_elm_gpt55_Grc_request_sections_disposition.yaml
+llm_config:
+  model_name: elm_qwen_3.5
+  openai_api: chat_completions
+  openai_responses_reasoning_carryover: false
+  openai_responses_reasoning_summary: null
+  reasoning_effort: none
+dataset:
+  pr_numbers: [28484, 30645]
