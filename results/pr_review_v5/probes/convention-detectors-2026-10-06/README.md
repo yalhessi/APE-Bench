@@ -516,3 +516,8 @@ unconsidered. The first kind is what S2's paragraph addresses.
 
 **S2 is eligible** by the amendment's skip rule (S1 filed fewer than 10 of 13). Not launched: about
 $26 more, which waits on the user.
+
+**S2 launched (2026-10-07 06:31).** The user: *"Okay we can launch it"*. `probe_census_detectors_elmgpt55_s2_rep1`,
+detached, the configuration preflighted and smoke-tested before any session; first sessions writing
+turns within three minutes, no retries, the disposition section in each prompt. Read in round 2 (S1
+against S2, a fresh seal) by the same rule.
