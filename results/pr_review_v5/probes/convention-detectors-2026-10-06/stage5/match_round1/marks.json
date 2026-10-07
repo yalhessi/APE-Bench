@@ -1,0 +1,199 @@
+{
+ "asks": [
+  {
+   "pr": 28484,
+   "ask_id": "v0644",
+   "R1": "no",
+   "R1_finding": 1,
+   "R2": "no",
+   "R2_finding": 1,
+   "note": "Both deprecate count_eq_of_nodup at the line; neither asks for d.count."
+  },
+  {
+   "pr": 30645,
+   "ask_id": "v1057",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "Both ask to remove nontrivial' as redundant; moots the naming ask without naming it."
+  },
+  {
+   "pr": 31007,
+   "ask_id": "v1096",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Nothing on ext'."
+  },
+  {
+   "pr": 31961,
+   "ask_id": "v1252",
+   "R1": "no",
+   "R1_finding": 0,
+   "R2": "no",
+   "R2_finding": 0,
+   "note": "Both move infinite_of_accPt to Separation/Basic, keeping the name."
+  },
+  {
+   "pr": 31961,
+   "ask_id": "v1254",
+   "R1": "no",
+   "R1_finding": 0,
+   "R2": "no",
+   "R2_finding": 0,
+   "note": "As v1252: a move, not the Set.Infinite.of_accPt rename."
+  },
+  {
+   "pr": 32674,
+   "ask_id": "v1397",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Both rename isGd_induced; neither asks for hs.eq_iInter_nat."
+  },
+  {
+   "pr": 32715,
+   "ask_id": "v1412",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "R1 rewrites the proof so Prime.ne_zero hp disappears; not the dot form."
+  },
+  {
+   "pr": 32715,
+   "ask_id": "v1413",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "As v1412, same finding."
+  },
+  {
+   "pr": 32715,
+   "ask_id": "v1414",
+   "R1": "partial",
+   "R1_finding": 2,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "R1 rewrites ordCompl's proof (simpa with hp.pos); not the asked change."
+  },
+  {
+   "pr": 34241,
+   "ask_id": "v1661",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Neither asks for dot notation in ofLp_toLpLin."
+  },
+  {
+   "pr": 32992,
+   "ask_id": "v1490",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Nothing on renaming fourier_bilin_convolution_eq'."
+  },
+  {
+   "pr": 35807,
+   "ask_id": "v1935",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 3,
+   "note": "R2 renames mk_of_mem' to mk_of_mem_addSubgroup, the maintainer's suggestion."
+  },
+  {
+   "pr": 36355,
+   "ask_id": "v2081",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Nothing on integral_countable or its primed sibling."
+  }
+ ],
+ "repeats": {
+  "28484": {
+   "R1": [],
+   "R2": []
+  },
+  "30645": {
+   "R1": [],
+   "R2": []
+  },
+  "31007": {
+   "R1": [],
+   "R2": []
+  },
+  "31077": {
+   "R1": [
+    0
+   ],
+   "R2": [
+    0
+   ]
+  },
+  "31793": {
+   "R1": [],
+   "R2": []
+  },
+  "31961": {
+   "R1": [],
+   "R2": []
+  },
+  "32540": {
+   "R1": [
+    0
+   ],
+   "R2": []
+  },
+  "32610": {
+   "R1": [],
+   "R2": []
+  },
+  "32674": {
+   "R1": [],
+   "R2": []
+  },
+  "32715": {
+   "R1": [],
+   "R2": []
+  },
+  "32992": {
+   "R1": [],
+   "R2": []
+  },
+  "33006": {
+   "R1": [],
+   "R2": []
+  },
+  "34241": {
+   "R1": [],
+   "R2": []
+  },
+  "35807": {
+   "R1": [],
+   "R2": [
+    0
+   ]
+  },
+  "36355": {
+   "R1": [],
+   "R2": []
+  },
+  "37009": {
+   "R1": [],
+   "R2": [
+    0
+   ]
+  }
+ },
+ "reader": "Claude (this session), by hand, blind to the key; strict rule: reached only for the asked change or one that satisfies it",
+ "notes": "33006: both labels filed no findings."
+}
