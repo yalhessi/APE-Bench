@@ -192,3 +192,48 @@ the condition the pre-registration meant.
   - `probe_carry.py` added to the probes run before any review.
 
   The reading rule is unchanged. It applies to the mean of the three `keepthink` reps.
+
+## Result (2026-10-07): above the floor -- 8, 6, 9 of 23, mean 7.67
+
+The three `keepthink` reps, with each turn's thinking kept, read by the pre-registered rule.
+
+| run | obligations | resolutions | control findings | wall clock |
+|---|---|---|---|---|
+| `keepthink_high_rep1` | 8 | 5 | 0 | 45 min |
+| `keepthink_high_rep2` | 6 | 4 | 0 | 51 min |
+| `keepthink_high_rep3` | 9 | 6 | 2 | 53 min |
+| `none_rep1` (reasoning off) | 5 | 2 | 2 | (ran beside three reps) |
+
+- **The reading is above the floor:** the mean of 7.67 against the bar of 5. Per the
+  pre-registration, the model can carry design iteration, subject to a design pair run on both it
+  and Opus.
+- **Union 11, reached by all three reps 4:**
+  - 33145's rename;
+  - both of 33149's asks to remove the axioms;
+  - 33421's `round_eq'` rename.
+- **Beside Opus 5.5** (7, 7 over two reps: union 8, both reps 6):
+  - DeepSeek reaches 33337's `toLinearMap_` rename, 33362's namespace and 33421's rename, which
+    Opus did not.
+  - It never reaches 33285's golf, which Opus reached in both reps.
+  - It is less stable rep to rep.
+  - The comparison is not exact. Opus ran two reps under the Claude Code harness, and its audits
+    were judged on the direct gpt_5_mini before the move to ELM (73 of 76 issue verdicts agree).
+- **The thinking defect was the lever.** With it the reps took 52 minutes per finished session. The
+  morning's evidence says it would not have reached this either, though those reps were stopped,
+  not judged. Reasoning off gives 5. Keeping the thinking took it to 7.67 and cut a session's
+  output from ~215k tokens to ~62k.
+- **Speed.** 45-53 min a rep, all 15 sessions at once. The breakdown:
+  - a session waits on the model 90% of the time, at ~36 tokens/s, against gpt-5.5's 68 over the
+    API;
+  - it writes ~62k tokens to gpt-5.5's 13k, over the same ~24 turns;
+  - tools take 10%, mostly Lean compiles of ~17 s.
+
+  One rep uses about half the server: 47 sessions at once drew 972 tokens/s, one rep's 15 about 420.
+- **Caveats:**
+  - one condition (contract v2, solo, dev held-out 12);
+  - the dev PRs are inside DeepSeek-V4.1's training window, as for every reviewer on this scale;
+  - one obligation is inside the judge's noise;
+  - 33337's hit leans on `naming_norm`'s surface census, which the rules record as the wrong count.
+- **Next, per the rule: a design pair on both models.** Speculative decoding (DSpark) is being
+  measured as a speed lever (`run_ds41_dspark.sh`). On the Qwen 397B, MTP gave ~1.75x on a single
+  stream but only ~10% across a 12-session batch, so expect a modest gain at 15 sessions.

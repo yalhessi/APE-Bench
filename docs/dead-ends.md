@@ -254,6 +254,9 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
     harness does not move gpt); Qwen's recommended sampling (the run inherited temperature 1.0).
   - **Reopens if:** an open model reaches ≥ 5 of 23 on this same condition. Generation is free and
     the judge is about $0.05 a rep.
+  - **Reopened 2026-10-07 by DeepSeek-V4.1-Flash:** 8, 6, 9 of 23 (mean 7.67) at high effort with
+    each turn's thinking kept, 5 with reasoning off (`results/pr_review_v5/probes/local-ds41-2026-10-06/`).
+    This entry stays closed for Qwen3.5; the self-hosted direction continues on DeepSeek.
   - **Steering screen, 2026-10-03** (`results/pr_review_v5/probes/local-unlock-2026-10-03/`). 13
     settings over 23 judged runs; no single pass left the floor (best 3).
     - Over-file is the one direction that helps: 3, 3, 0, 1, 0, with a five-pass union of 4 and the

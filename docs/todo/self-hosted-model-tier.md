@@ -1,6 +1,11 @@
 # A self-hosted iteration model on `first`, with prompt caching that holds
 
-**Status** — open, 2026-10-02. Nothing built. The user's requirement (2026-10-02): if this route is
+**Status** — open, 2026-10-07: **DeepSeek-V4.1-Flash passes the level gate** on `first`, at 8, 6, 9 of
+23 (mean 7.67) with each turn's thinking kept, at 45-53 min a rep and $0
+(`results/pr_review_v5/probes/local-ds41-2026-10-06/`). Built on branch `local-deepseek`:
+`LLMProvider.LOCAL`, the keyless preflight, and a formatter that keeps the thinking. What closes
+this item: a design pair run on DeepSeek and Opus that moves both the same way. Until then it is
+a level, not responsiveness. (2026-10-02 status: nothing built.) The user's requirement (2026-10-02): if this route is
 taken, prompt caching must be handled, not assumed.
 
 **Hand test, 2026-10-02** (`results/pr_review_v5/probes/local-vllm-2026-10-02/`). Stage 1 used
