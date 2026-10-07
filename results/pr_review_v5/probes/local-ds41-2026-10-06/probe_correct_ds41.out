@@ -1,0 +1,22 @@
+17x19 -> '323': ok
+gsm8k  1: gold     18 got       18 ok
+gsm8k  2: gold      3 got        3 ok
+gsm8k  3: gold  70000 got    70000 ok
+gsm8k  4: gold    540 got      540 ok
+gsm8k  5: gold     20 got       20 ok
+gsm8k  6: gold     64 got       64 ok
+gsm8k  7: gold    260 got      260 ok
+gsm8k  8: gold    160 got      160 ok
+gsm8k  9: gold     45 got       45 ok
+gsm8k 10: gold    460 got      460 ok
+gsm8k 11: gold    366 got      366 ok
+gsm8k 12: gold    694 got      694 ok
+gsm8k 13: gold     13 got       12 x
+gsm8k 14: gold     18 got       18 ok
+gsm8k 15: gold     60 got       60 ok
+gsm8k 16: gold    125 got      125 ok
+gsm8k 17: gold    230 got      230 ok
+gsm8k 18: gold  57500 got    57500 ok
+gsm8k 19: gold      7 got        7 ok
+gsm8k 20: gold      6 got        6 ok
+gsm8k 19/20

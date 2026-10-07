@@ -125,3 +125,26 @@ The conclusion above holds for **stock** vLLM 0.30/0.31 only. Others serve DeepS
 Pitfalls reported there:
 - an FP8 KV-cache scale-layout corruption visible only past 100K tokens (#56700);
 - the FlashInfer cutlass MoE autotune hanging (use `--no-enable-flashinfer-autotune`).
+
+## It serves and computes correctly (2026-10-07, job 432906)
+
+The patch in `patch/` on vLLM nightly `0.31.1rc1.dev29+g42ecc8eeb`, with FlashInfer 0.7.1rc4
+(cubin + sm120f jit-cache, `FLASHINFER_DISABLE_VERSION_CHECK=1`) and CUDA 13.0.
+
+- **Serve flags:** `--kv-cache-dtype fp8 --attention-config
+  '{"backend":"FLASHINFER_MLA_SPARSE_DSV41","indexer_kv_dtype":"fp8"}'
+  --no-enable-flashinfer-autotune`, with DeepGEMM on (vLLM's default).
+- **Startup:** launch to serving in **4 min** with the weights already in `/tmp`.
+  - vLLM logged "Setting kv cache block size to 64 for
+    FLASHINFER_MLA_SPARSE_DSV41/DEEPSEEK_SPARSE_SWA/DEEPSEEK_V41_INDEXER/CompressorBackend";
+  - MoE on `DEEPGEMM_MXFP4`;
+  - KV cache 4,329,003 tokens; CUDA graphs captured.
+- **The first patched start (job 432885) had DeepGEMM off,** a holdover from the Qwen setup.
+  - The dense FP8 layers fell to FlashInfer's `mxfp8_gemm`, which autotuned for over 50 minutes
+    without finishing or saving its results; MoE fell to Marlin.
+  - DeepGEMM's JIT works here now with the node's CUDA 13.0 toolkit and gcc 13.
+- **`probe_correct.py`** (`probe_correct_ds41.out`): 17x19 -> `323`, and GSM8K **19/20** (the
+  miss off by one). This passes the bar of 17, so the per-layer geometry does not produce the
+  all-NaN output a wrong geometry gives.
+- **The gate script now runs as a Slurm job** (`ds41-gate`, no GPUs, 120 GB) on the same node. Run
+  under `setsid nohup`, it did not survive the Claude session that started it ending.

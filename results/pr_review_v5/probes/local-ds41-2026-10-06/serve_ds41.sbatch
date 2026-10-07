@@ -36,7 +36,10 @@ export TRITON_CACHE_DIR=$ROOT/cache/triton TORCHINDUCTOR_CACHE_DIR=$ROOT/cache/i
 mkdir -p $VLLM_CACHE_ROOT $XDG_CACHE_HOME $TRITON_CACHE_DIR $TORCHINDUCTOR_CACHE_DIR
 # As for Qwen (serve.sbatch): DeepGEMM's SM120 JIT needs a coherent CUDA >= 13 toolkit this node
 # lacks, and FlashInfer's sampler JIT-builds on first use.
-export VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0 VLLM_USE_FLASHINFER_SAMPLER=0
+# DeepGEMM is ON (vLLM's default) since job 432885: off, the dense FP8 layers fell to FlashInfer's
+# mxfp8_gemm, which autotuned for 50+ minutes without finishing, and MoE fell to Marlin. Its JIT
+# now has what it needs (CUDA 13.0 toolkit, gcc 13), as in the validated vllm#59203 stack.
+export VLLM_USE_FLASHINFER_SAMPLER=0
 # FlashInfer 0.7.1rc4 against the nightly's 0.7.0.post1 pin (the per-layer fix was validated on FlashInfer
 # main; vllm#59203 used this switch for the same mismatch).
 export FLASHINFER_DISABLE_VERSION_CHECK=1
