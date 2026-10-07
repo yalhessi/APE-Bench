@@ -567,3 +567,13 @@ hypothesis; 32674's `baireSpace_of_dense` sits in the `IsGδ` namespace with its
 paragraph, filed nearly everything stated (5 of 13 asked, 13 of 14 unasked), a volume lever by the
 pre-registered gate. One rep a condition, $77 billed for the three runs. Not tested: Opus, a second
 rep, and any reading of whether the unasked filings are welcome.
+
+**A detector defect the S2 dispositions surfaced (checked 2026-10-07 against the change graphs).**
+`dot_notation/3`'s placement shape fires on a declaration that already sits in its first explicit
+hypothesis's namespace, which is the form for dot notation on that hypothesis: 36355
+`Integrable.summable_of_dirac (hf : Integrable …)` and 32674 `IsGδ.baireSpace_of_dense (hG : IsGδ s)`,
+both stated as "inside [the conclusion's namespace] it is `Summable.of_dirac`" / "`BaireSpace.of_dense`".
+S2 conformed on both with a check. A fourth refinement (R4): skip a placement fact when the
+declaration's namespace is its first explicit binder's head type. Not built; its census count is
+unmeasured. Unverified: S2 passed over 32540's `RingHom.surjective_of_tmul_eq_tmul_of_finite` as
+pre-existing, but the change graph has it new with no base copy.
