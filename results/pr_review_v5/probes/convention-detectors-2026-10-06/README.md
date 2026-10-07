@@ -415,3 +415,56 @@ Pro subscription accounts now refuse Claude Code, so it would spend the user's p
 (about two five-hour windows; seven_day at 67% that day), which is the user's call. Commands:
 `ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`,
 then the `_hygiene_sections_` config as `probe_census_detectors_s1_rep1`.
+
+## Stage 5 on gpt-5.5, with S2 (amendment, pre-registered 2026-10-07, before any session)
+
+**The user (2026-10-07):** *"Okay let's run with GPT"* -- after the two Pro subscription accounts
+began refusing Claude Code and the primary account's week stood at 67%. **What changes is the
+reviewer**, and nothing about the set, the sections or the reading rule: Opus 5.5 under Claude Code
+becomes `elm_gpt_5.5` under APE-Agent in **stage W's condition** (branch `generation-suppression`,
+`results/pr_review_v5/probes/generation-suppression-2026-10-06/run_wide.sh`): high effort, reasoning
+carried, summaries on, brief G, the five context tools, `filing_bar: request`, $20 and 24M tokens a
+session. It is the condition in which the disposition paragraph moved gpt-5.5's in-census reach 0.43 to
+0.62 out of sample. So this measures whether the sections move **gpt-5.5**, not Opus; the Claude
+configs stay as the stage first written, built and unrun. GPT is the more informative reader for S1
+in any case: 11 of its 23 in-census misses in the conventions probe were never considered at the
+place (`conventions-ceiling-2026-10-04/cross_model.md`), the gap a section naming the place targets.
+
+**Conditions**, one run each, differing in `context_file` alone:
+- **S0**: each PR's pass-0 model (`stage5/model_context_s0.jsonl`, as built for the Claude stage);
+- **S1**: S0 then the `primed_names` and `dot_notation/3` sections (`stage5/model_context_s1.jsonl`);
+- **S2**: S1 then one closing section, the plan `2026-10-06-generation-without-suppression.md`'s C1 in
+  the form stage W measured (`probes.CONVENTIONS_DISPOSITION` on that branch), worded for places
+  rather than conventions, titled "Dispositions for the places above", text fixed now:
+
+  > Give every place listed in the sections above a disposition, and say in your submission's
+  > `message` which you gave and on what ground. `departs`: file the change its section describes,
+  > as a finding at that place. `conforms`: only if a check you ran, or a line of the code you quote,
+  > shows the required form already holds there. What Mathlib usually requires, accepts or enforces,
+  > how minor the change is, and whether a maintainer would insist on it are not grounds for either
+  > disposition. For these places this replaces the brief's instruction to emit only what you would
+  > actually request.
+
+**Order.** A smoke first: S2's configuration on `elm_qwen_3.5` (priced 0) on 30645 and 28484 --
+the sessions start, the sections reach the prompt, a submission lands; not read for any result. Then
+S0 and S1 together. S2 runs only if S1 files fewer than 10 of the 13 asks (the plan's skip rule: from
+10, S2 cannot gain 4).
+
+**Reading, by hand and blind to condition.** Round 1, S0 against S1: per PR, the two sessions'
+findings under labels shuffled by a seeded permutation (seed `stage5-gpt-round1`), the key written
+to disk before reading and opened after every mark. Round 2, if S2 runs: S1 against S2 the same way
+(seed `stage5-gpt-round2`), so S1 is marked twice and the two marks give my own agreement. Marks as
+stage 5 first said: per stratum-A ask, a finding at its place asking for its change; per unasked
+section fact, a finding that repeats it.
+
+**Rules**, each a difference between successive conditions on the 13 asks:
+- S1 - S0 **>= 4**: the sections move gpt-5.5; **<= 1**: no effect; between: a second rep decides.
+- S2 - S1, the same bands: the disposition is a lever on detector facts, or not.
+- **Emission gate**, as first written: stratum-B findings repeating an unasked fact, more than 1.0 more
+  a stratum-B PR than the condition before makes that step a volume lever, whatever it does to the asks.
+- **Also read (S2)**: the dispositions in `message`; places marked `departs` and not filed; `conforms`
+  with no check or quote (the plan's C3). Sessions stopped by a cap are reported, not dropped.
+
+**Cost.** Stage W billed $15.61 for 13 sessions, about $1.20 a session: 32-48 sessions is about
+$40-60 at list price, from the ELM key (GBP 458 left on 2026-10-07). The $20 session cap binds a
+session; the run caps are set to fit 16 of them, a ceiling, not a forecast.
