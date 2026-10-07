@@ -286,6 +286,30 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
     on tag `parked/arm-naming-bar` has the three naming misses and why each needs a different fix.
   - **Reopens if:** a re-run of the sweep on the current `norm_verdict` moves a gold naming verdict.
 
+- **Convention detectors as a recall lever** (2026-10-06 -> 10-07, `docs/todo/convention-detectors.md`,
+  `results/pr_review_v5/probes/convention-detectors-2026-10-06/`) -- deterministic checks state where
+  a PR's new code departs from a census convention, delivered as packet sections. The facts are valid
+  (dot notation 19 of 20 on a holdout, primed names 20 of 20) but narrow and seldom asked for: census
+  exact recall 8 of 49 and 5 of 9, maintainers asking at 4-9% of the places flagged; the
+  `@[to_additive]` twin shape was 0 of 29 valid and the missing-attribute shape nearly silent. Read by
+  a reviewer (stage 5, gpt-5.5, 16 census PRs holding 13 asks stated word for word, one run a
+  condition, $77 billed): the sections alone took 0 to 1 of the 13; with the disposition paragraph of
+  `docs/plans/2026-10-06-generation-without-suppression.md`, 5 of 13 but 13 of 14 unasked facts, a
+  pass-through of the detector and a volume lever by the pre-registered gate. **Why stopped: the
+  ceiling, not the uptake.** The census's 1,833 asks spread over 399 conventions -- the largest 3.1%,
+  the top 10 20%, the top 50 half, 286 with three asks or fewer; even the execution-checkable leaders
+  (a finishing tactic closes it, merged calls, existing API) hold 7% together. The detectors' four
+  conventions hold 54 asks (2.9%), their exactly stated asks 13 (0.7%). Anything that tells a reviewer
+  what to look for is capped by its coverage of that tail, and the goal is issue recall (the user,
+  2026-10-07: "there aren't a small number of detectors to capture most findings"). The code stays,
+  finished and unused (`src/mathlib_review/producers/`, `cli producer bench|context`). Untried: typing
+  proof-local receivers by elaboration, sibling propagation of a filed rename, the area census as a
+  section, Opus as the reader, placement facts skipped when a declaration already sits in its
+  hypothesis's namespace. **Reopens if:** precision becomes the goal (under the disposition paragraph
+  the reviewer's output on these conventions is the detector's, so its value is whether maintainers
+  would accept unasked filings, the open adjudication), or a detector family is found whose
+  conventions hold a large share of asks.
+
 ## Retracted conclusions — do not re-derive
 
 - *"Holistic dominates; stop decomposing"* (2026-06-18) — retracted twice. The location metric

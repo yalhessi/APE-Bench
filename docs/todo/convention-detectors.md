@@ -1,13 +1,12 @@
 # Convention detectors: what a deterministic check can state about the PR, and whether anyone asks
 
-**Status** — open, 2026-10-06; **three detectors built and measured alone, none yet read by a
-reviewer.** `src/mathlib_review/producers/` (the seam: `Fact`, `PRODUCERS`, delivery through the
+**Status** — **closed 2026-10-07 as a recall lever** (`docs/dead-ends.md`, "Convention detectors as a
+recall lever"): three detectors built and measured alone, then read by a reviewer on gpt-5.5 (stage 5). `src/mathlib_review/producers/` (the seam: `Fact`, `PRODUCERS`, delivery through the
 per-PR `context_file`), `analysis/producer_bench.py`, `cli producer bench|context`. Pre-registered
 stages 1-4 and their results: `results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`.
 Step 2 of `docs/plans/2026-10-03-after-structure.md`; the second half of step 3 of
 `docs/research/codebase-redesign-2026-10.md`.
-**Cost** — no spend so far. The next step is one reviewer run with the sections (a subscription
-window on validation small12 or dev), or judge-free reading as in the ceiling probe.
+**Cost** — $77 billed on the ELM key (stage 5's three gpt-5.5 runs); nothing else spent.
 
 **Motivating results** (census = val1000, 973 PRs, 1,833 reader-A asks; probe sets = dev,
 validation small12, post-cutoff):

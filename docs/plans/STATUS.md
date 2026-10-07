@@ -266,7 +266,8 @@ names as the new reference baseline.
   (`results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`, stages 1-4):
   `dot_notation/3` (8 of 49 census asks exact), `primed_names` (5 of 9), `generated_twins/2`
   (`@[to_fun]` only; the `@[to_additive]` shape retired at 0 of 29). Not built: sibling propagation
-  of a filed rename, the area census as a section. Not run: any reviewer with the sections. Open:
-  `docs/todo/convention-detectors.md`.
+  of a filed rename, the area census as a section. Read by a reviewer on gpt-5.5
+  (2026-10-07, stage 5) and **closed as a recall lever** (`docs/dead-ends.md`); the two not-built
+  items stay unbuilt (`docs/todo/convention-detectors.md`).
 * `docs/research/codebase-redesign-2026-10.md` is a design write-up, not a plan in this directory;
   its own §11 records what is built.
