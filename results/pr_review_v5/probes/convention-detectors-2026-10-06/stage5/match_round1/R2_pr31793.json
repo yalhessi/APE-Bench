@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Dynamics/Ergodic/MeasurePreserving.lean:93",
+  "claim": "`MeasurePreserving.map_of_comp` assumes `hf : Measurable f`, but the proof only needs `f` to be a.e.-measurable with respect to `μa`; the underlying measure identity is already available as `AEMeasurable.map_map_of_aemeasurable`. Keeping the stronger measurability hypothesis makes this basic pushforward lemma less reusable than the measure API supports.",
+  "requested_change": "Weaken the last hypothesis to `(hf : AEMeasurable f μa)`, prove the map equality with `AEMeasurable.map_map_of_aemeasurable hg.aemeasurable hf`, and update the downstream call in `MeasurePreserving.of_semiconj` to pass `hfm.aemeasurable`.",
+  "severity": "advisory"
+ }
+]

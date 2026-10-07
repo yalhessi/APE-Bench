@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/DiscreteSubset.lean:268",
+  "claim": "`infinite_of_accPt` is a basic T1 accumulation-point fact and its statement mentions neither codiscrete filters nor discrete subsets, so placing it in `Topology/DiscreteSubset.lean` hides it behind an unrelated import.",
+  "requested_change": "Move `infinite_of_accPt` to `Mathlib/Topology/Separation/Basic.lean`, next to the existing `infinite_of_mem_nhds`, and remove it from `DiscreteSubset.lean`. A proof there is:\n```lean\nlemma infinite_of_accPt {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by\n  rw [← frequently_cofinite_mem_iff_infinite]\n  exact (accPt_iff_frequently_nhdsNE.mp h).filter_mono (nhdsNE_le_cofinite x)\n```",
+  "severity": "advisory"
+ }
+]

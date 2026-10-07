@@ -1,0 +1,51 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/FieldTheory/Perfect.lean:51",
+  "claim": "The new `PerfectRing` instances are declared at the root namespace with the names `one`, `mul`, and `pow`, which exposes extremely generic global constants for these instances.",
+  "requested_change": "Rename these instances to descriptive names, for example `instPerfectRingOne`, `instPerfectRingMul`, and `instPerfectRingPow` (or put them in an appropriate namespace) instead of using the root names `one`, `mul`, and `pow`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/Perfection.lean:426",
+  "claim": "Changing `ModP` to `deriving CommRing` removes the previously public declaration `ModP.commRing` without a deprecation alias.",
+  "requested_change": "Add a deprecated alias for the generated instance, e.g. immediately after the `deriving CommRing` line add `@[deprecated (since := \"2025-10-28\")] alias ModP.commRing := instCommRingModP`, or keep the explicit named instance.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/FieldTheory/Perfect.lean:209",
+  "claim": "`instPerfectRingProd` is still restricted to commutative semirings with `ExpChar`, but after this PR the product instance only needs commutative monoids with perfect `p`-power maps.",
+  "requested_change": "Generalize `instPerfectRingProd` to `[CommMonoid M] [CommMonoid N] [PerfectRing M p] [PerfectRing N p]` (and preferably place it with the other monoid-level `PerfectRing` API).",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/FieldTheory/Perfect.lean:38",
+  "claim": "The documentation for `PerfectRing` still says it is a ring in prime characteristic and that its field is Frobenius-bijectivity, but the class now only assumes `[Pow R ℕ]` and is used for monoids as well.",
+  "requested_change": "Update the `PerfectRing` docstring and field docstring to describe bijectivity of the `p`-th power map at the generalized level, with the Frobenius/ring-in-characteristic-`p` interpretation described only as the semiring specialization.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/RingTheory/Perfection.lean:31",
+  "claim": "The docstring for `Perfection` uses the undeclared name `M` in the displayed implementation even though the parameter is named `α`.",
+  "requested_change": "Replace `M` by `α` in the displayed set in the `Perfection` docstring.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/RingTheory/Perfection.lean:115",
+  "claim": "The docstring for `Perfection.liftMonoidHom` says a homomorphism `M →+* N` is lifted, but the declaration is about monoid homomorphisms `M →* N`.",
+  "requested_change": "Change the docstring to say `M →* N` instead of `M →+* N`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Mathlib/RingTheory/Perfection.lean:278",
+  "claim": "The docstring for `Perfection.subring` says it is a semiring of `ℕ → R`, but the declaration constructs a `Subring`.",
+  "requested_change": "Change the docstring to say `subring` rather than `semiring`.",
+  "severity": "advisory"
+ }
+]

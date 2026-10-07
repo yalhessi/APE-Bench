@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Matrix/Spectrum.lean:40",
+  "claim": "`Matrix.spectrum_toLpLin` is stated only under the surrounding `RCLike 𝕜` assumptions, but the result is purely algebraic and the proof only needs the algebra equivalence between matrices and endomorphisms.",
+  "requested_change": "Generalize the theorem to an arbitrary commutative ring, e.g. `theorem spectrum_toLpLin {R : Type*} [CommRing R] {n : Type*} [Fintype n] [DecidableEq n] {A : Matrix n n R} (p : ENNReal) : spectrum R (toLpLin p p A) = spectrum R A := AlgEquiv.spectrum_eq (Matrix.toLpLinAlgEquiv p) _`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:78",
+  "claim": "`Matrix.toLpLinSymm_pow` uses a capitalized `Symm` component, unlike its sibling `.symm` lemmas `toLpLin_symm_id` and `toLpLin_symm_comp` and the usual snake-case naming for `symm` lemmas.",
+  "requested_change": "Rename `Matrix.toLpLinSymm_pow` to `Matrix.toLpLin_symm_pow`.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:60",
+  "claim": "`Real.fourier_bilin_convolution_eq'` does not compile: the `simpa` closing the domination proof at line 77 leaves the goal with `|‖B‖|` while the available inequality has `‖B‖`.",
+  "requested_change": "Replace that final `simpa` in the domination proof with `simpa [abs_of_nonneg (norm_nonneg B)]` (or an equivalent simplification of `|‖B‖|`).",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:95",
+  "claim": "`Real.fourier_bilin_convolution_eq` does not compile: the proof of the `integral_apply` integrability bound uses `simpa [← Circle.smul_def]`, but after `Circle.smul_def` the scalar is complex, so Lean still has to simplify the unit scalar norm and the `|‖B‖|` coefficient.",
+  "requested_change": "Replace the last line of that bound with `simpa [norm_smul, Circle.norm_coe, abs_of_nonneg (norm_nonneg B)] using le_opNorm B (f₁ x)`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:95",
+  "claim": "`Real.fourier_bilin_convolution_eq` and its primed/scalar/multiplication variants assume `Continuous f₁` and `Continuous f₂`, but the convolution Fourier identity only needs the two `Integrable` hypotheses; the continuity assumptions are not needed for the statement.",
+  "requested_change": "Remove the `hf₁' : Continuous f₁` and `hf₂' : Continuous f₂` arguments from `fourier_bilin_convolution_eq'`, `fourier_bilin_convolution_eq`, `fourier_smul_convolution_eq`, and `fourier_mul_convolution_eq`. In the proof, use the existing convolution measurability/integrability API, e.g. prove `integrable_prod_sub` from `hf₂.norm.convolution_integrand (ContinuousLinearMap.mul ℝ ℝ) hf₁.norm`, and use `hf₂.aestronglyMeasurable.convolution_integrand B.flip hf₁.aestronglyMeasurable` for the product integrand measurability.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:8",
+  "claim": "`Mathlib.Analysis.Fourier.Convolution` imports `Mathlib.Analysis.Distribution.FourierSchwartz`, which pulls the Distribution/Schwartz-space development into this Fourier-convolution file even though the file only uses the Fourier transform API, convolution API, and the Haar neg-invariance instance.",
+  "requested_change": "Replace the `FourierSchwartz` import with the narrower imports `Mathlib.Analysis.Fourier.FourierTransform`, `Mathlib.Analysis.Convolution`, and `Mathlib.MeasureTheory.Measure.Haar.Unique`.",
+  "severity": "advisory"
+ }
+]

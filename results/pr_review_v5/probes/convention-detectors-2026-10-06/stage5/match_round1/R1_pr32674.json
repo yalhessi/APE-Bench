@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/GDelta/Basic.lean:149",
+  "claim": "The docstring copied onto `IsGδ.iUnion` says this is the “bounded indexed union version”, but this declaration is the unbounded union over a `Finite` index type.",
+  "requested_change": "Change the docstring to say this is the indexed union over a finite type, for example: “The union of finitely many Gδ sets is a Gδ set, indexed union version.”",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/GDelta/Basic.lean:153",
+  "claim": "`isGδ_induced` proves preservation of `IsGδ` under continuous preimage, but the name is not in the `IsGδ` namespace and `_induced` is misleading for a preimage theorem.",
+  "requested_change": "Rename it to `IsGδ.preimage` and update the use in `LocallyCompactRegular.lean`, preferably with a docstring. A compiling replacement is `theorem IsGδ.preimage [TopologicalSpace Y] {f : X → Y} {s : Set Y} (hf : Continuous f) (hs : IsGδ s) : IsGδ (f ⁻¹' s) := ...`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/Constructions.lean:643",
+  "claim": "`exists_open_dense_of_open_dense_subtype` is stated only for subtype maps, but the proof only uses that the map is inducing with dense range.",
+  "requested_change": "Prove the reusable theorem for an inducing map with dense range, then derive the subtype lemma from `Topology.IsInducing.subtypeVal` and `hs.denseRange_val`. For example, add `Topology.IsInducing.exists_open_dense_of_open_dense {f : X → Y} (hf : Topology.IsInducing f) (hfd : DenseRange f) ... : ∃ v, IsOpen v ∧ Dense v ∧ f ⁻¹' v = u`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/Baire/LocallyCompactRegular.lean:62",
+  "claim": "`IsGδ.of_t2Space_locallyCompactSpace` manually constructs the homeomorphism between `((↑) ⁻¹' s : Set (closure s))` and `s`, duplicating the standard embedding homeomorphism API.",
+  "requested_change": "Replace the manual `Homeomorph` literal with `Topology.IsEmbedding.subtypeVal.homeomorphOfSubsetRange (by simpa using subset_closure)` and use its `.baireSpace`.",
+  "severity": "advisory"
+ }
+]

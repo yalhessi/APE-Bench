@@ -1,0 +1,23 @@
+[
+ {
+  "ask_id": "v2081",
+  "path": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean",
+  "code_at_comment": " (x i) :=\n+  (hasSum_integral_sum_dirac hc hf).tsum_eq.symm\n+\n+end Dirac\n+\n+section DiscreteSpace\n+\n+variable [CompleteSpace E] [MeasurableSingletonClass X] {μ : Measure X}\n+\n+theorem integral_countable' [Countable X] (hf : Integrable f μ) :\n+    ∫ x, f x ∂μ = ∑' x, μ.real {x} • f x := by\n+  rw [← Measure.sum_smul_dirac μ] at hf\n+  rw [← Measure.sum_smul_dirac μ, integral_sum_measure hf]\n+  congr 1 with a : 1\n+  rw [integral_smul_measure, integral_dirac, Measure.sum_smul_dirac, measureReal_def]\n+\n+theorem integral_countable (f : X → E) {s : Set X} (hs : s.Countable) (hf : IntegrableOn f s μ) :",
+  "comment": "```suggestion\ntheorem setIntegral_countable (f : X → E) {s : Set X} (hs : s.Countable) (hf : IntegrableOn f s μ) :\n```\nand you can remove the prime from the name of the lemma above.",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2082",
+  "path": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean",
+  "code_at_comment": "comap_subtype_coe, integrable_map_measure] at hf\n+    · apply hf\n+    · exact Integrable.aestronglyMeasurable hf\n+    · exact Measurable.aemeasurable measurable_subtype_coe\n+    · exact Countable.measurableSet hs\n+  rw [← integral_subtype_comap hs.measurableSet, integral_countable' hf']\n+  congr 1 with a : 1\n+  rw [measureReal_def, Measure.comap_apply Subtype.val Subtype.coe_injective\n+    (fun s' hs' ↦ MeasurableSet.subtype_image (Countable.measurableSet hs) hs') _\n+    (MeasurableSet.singleton a)]\n+  simp [measureReal_def]\n+\n+theorem integral_finset (s : Finset X) (hf : IntegrableOn f s μ) :",
+  "comment": "```suggestion\ntheorem setIntegral_finset (s : Finset X) (hf : IntegrableOn f s μ) :\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2083",
+  "path": null,
+  "code_at_comment": "",
+  "comment": "Thanks!\nThe two lemmas I want to rename are not new, so they will also need deprecations.",
+  "replies_to": null
+ }
+]

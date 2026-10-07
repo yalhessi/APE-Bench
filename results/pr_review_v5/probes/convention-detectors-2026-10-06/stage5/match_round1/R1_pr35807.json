@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:253",
+  "claim": "`Function.locallyFinsuppWithin.addSubmonoid` and the pointwise-addition API built from it are stated with `[AddMonoid Y]`, but the carrier, zero closure, and addition closure only need `[AddZeroClass Y]` (the class required by `AddSubmonoid` itself).",
+  "requested_change": "Lower `addSubmonoid`, `memAddSubmonoid`, `mk_of_mem`, the `Add` instance, and `coe_add` to `[AddZeroClass Y]`; keep only the `SMul ℕ`/`AddMonoid` structure at `[AddMonoid Y]` and lower `coe_zero` to `[Zero Y]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:300",
+  "claim": "The new `Zero (locallyFinsuppWithin U Y)` instance under `[AddMonoid Y]` duplicates the existing instance under `[Zero Y]` at the top of the file.",
+  "requested_change": "Remove this later `Zero` instance and use the existing `[Zero Y]` instance; `coe_zero` can be stated under `[Zero Y]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:293",
+  "claim": "The docstring for `Function.locallyFinsuppWithin.mk_of_mem` still says the input is a function in the subgroup, but the definition now takes membership in `locallyFinsuppWithin.addSubmonoid U`.",
+  "requested_change": "Change this docstring to say “submonoid” instead of “subgroup”.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:113",
+  "claim": "`Function.locallyFinsupp.locallyFiniteSupport` proves membership in `Set.univ` via `mem_of_subset_of_mem (fun _ a ↦ a) trivial`, which is an unnecessarily indirect proof of `trivial`.",
+  "requested_change": "Replace the proof with `fun z ↦ f.supportLocallyFiniteWithinDomain' z trivial`.",
+  "severity": "advisory"
+ }
+]

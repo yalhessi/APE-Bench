@@ -1,0 +1,23 @@
+[
+ {
+  "ask_id": "v1057",
+  "path": "Mathlib/RingTheory/Localization/FractionRing.lean",
+  "code_at_comment": "trivial S := by\n-  apply nontrivial_of_ne\n-  · intro h\n-    apply @zero_ne_one R\n-    exact\n-      IsLocalization.injective S (le_of_eq rfl)\n-        (((algebraMap R S).map_zero.trans h).trans (algebraMap R S).map_one.symm)\n+variable (R S : Type*) [CommSemiring R] [CommSemiring S] [Algebra R S] [h : IsFractionRing R S]\n+\n+protected theorem nontrivial [Nontrivial R] : Nontrivial S := by\n+  rw [← not_subsingleton_iff_nontrivial]\n+  intro\n+  obtain ⟨c, hc⟩ := h.exists_of_eq (x := 0) (y := 1) (Subsingleton.elim _ _)\n+  simp [eq_comm] at hc\n+\n+theorem nontrivial' [Nontrivial S] : Nontrivial R := by",
+  "comment": "Not sure about better names, but I don't know how I'd keep straight in my mind which one the primed/unprimed one is.",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1058",
+  "path": "Mathlib/RingTheory/Localization/FractionRing.lean",
+  "code_at_comment": ".map_nonZeroDivisors h).symm\n \n-protected theorem nontrivial (R S : Type*) [CommRing R] [Nontrivial R] [CommRing S] [Algebra R S]\n-    [IsFractionRing R S] : Nontrivial S := by\n-  apply nontrivial_of_ne\n-  · intro h\n-    apply @zero_ne_one R\n-    exact\n-      IsLocalization.injective S (le_of_eq rfl)\n-        (((algebraMap R S).map_zero.trans h).trans (algebraMap R S).map_one.symm)\n+variable (R S : Type*) [CommSemiring R] [CommSemiring S] [Algebra R S] [h : IsFractionRing R S]\n+\n+protected theorem nontrivial [Nontrivial R] : Nontrivial S := by\n+  rw [← not_subsingleton_iff_nontrivial]\n+  intro",
+  "comment": "Or\r\n```suggestion\r\n  by_contra!\r\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1059",
+  "path": "Mathlib/RingTheory/Localization/FractionRing.lean",
+  "code_at_comment": " [CommRing S] [Algebra R S]\n-    [IsFractionRing R S] : Nontrivial S := by\n-  apply nontrivial_of_ne\n-  · intro h\n-    apply @zero_ne_one R\n-    exact\n-      IsLocalization.injective S (le_of_eq rfl)\n-        (((algebraMap R S).map_zero.trans h).trans (algebraMap R S).map_one.symm)\n+variable (R S : Type*) [CommSemiring R] [CommSemiring S] [Algebra R S] [h : IsFractionRing R S]\n+\n+protected theorem nontrivial [Nontrivial R] : Nontrivial S := by\n+  rw [← not_subsingleton_iff_nontrivial]\n+  intro\n+  obtain ⟨c, hc⟩ := h.exists_of_eq (x := 0) (y := 1) (Subsingleton.elim _ _)\n+  simp [eq_comm] at hc",
+  "comment": "Maybe\r\n```suggestion\r\n  obtain ⟨c, hc⟩ := h.exists_of_eq (x := 1) (y := 0) (Subsingleton.elim _ _)\r\n  simp at hc\r\n```",
+  "replies_to": null
+ }
+]

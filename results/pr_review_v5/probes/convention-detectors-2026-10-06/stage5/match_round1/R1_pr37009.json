@@ -1,0 +1,58 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/Basic.lean:749",
+  "claim": "`IsUnit.cfcSqrt` was changed so that it no longer has an `IsUnit a` hypothesis, even though it remains in the `IsUnit` namespace; this needlessly breaks the existing API/dot-notation theorem and makes the name misleading.",
+  "requested_change": "Restore the old signature `lemma _root_.IsUnit.cfcSqrt (a : A) (ha_unit : IsUnit a) (ha : 0 ≤ a := by cfc_tac) : IsUnit (sqrt a)`. If a strict-positivity convenience theorem is wanted, put it under `IsStrictlyPositive` or use `ha.sqrt.isUnit`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean:31",
+  "claim": "`CFC.antitoneOn_ringInverse` reproves the unit inverse antitonicity theorem that already exists as `CStarAlgebra.inv_le_inv`.",
+  "requested_change": "Lift the two strictly positive operands to units and invoke `CStarAlgebra.inv_le_inv`, rewriting `Ring.inverse` with `Ring.inverse_unit`, instead of the current custom `conjSqrt`/CFC argument.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/Basic.lean:765",
+  "claim": "`CFC.inverse_rpow` unnecessarily assumes `x ≠ 0`; the formula also holds for `x = 0`.",
+  "requested_change": "Remove the `hx : x ≠ 0` argument, split on `x = 0`, prove the zero case with `rpow_zero` and `Ring.inverse_one`, and keep the current proof in the nonzero case.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:86",
+  "claim": "`CFC.conjSqrt_one` assumes `IsStrictlyPositive c`, but the identity only needs `0 ≤ c`.",
+  "requested_change": "Weaken the hypothesis to `(hc : 0 ≤ c := by cfc_tac)` and update positional call sites that pass strict positivity proofs to pass `.nonneg`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:39",
+  "claim": "`CFC.conjSqrt_apply` is the projection/apply lemma for a bundled continuous linear map, but it is not marked `[simp]`.",
+  "requested_change": "Add the `[simp]` attribute to `conjSqrt_apply`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/Algebra/Group/Units/Defs.lean:542",
+  "claim": "`IsUnit.mul_iff₃` manually constructs units even though the existing lemmas `Units.isUnit_mul_units` and `Units.isUnit_units_mul` give the result directly; it also omits the additive counterpart expected for this multiplicative units API.",
+  "requested_change": "Replace the proof by rewriting with `ha.unit_spec`, `hc.unit_spec`, `Units.isUnit_mul_units`, and `Units.isUnit_units_mul`, and add `@[to_additive (attr := grind =)]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Mathlib/Algebra/Algebra/StrictPositivity.lean:108",
+  "claim": "`isStrictlyPositive_iff_conjugate_of_isSelfAdjoint` manually proves the inverse direction, but it is exactly `IsUnit.isStrictlyPositive_star_right_conjugate_iff` after rewriting `star b = b`.",
+  "requested_change": "Replace the proof with `simpa [hb₂.star_eq] using hb.isStrictlyPositive_star_right_conjugate_iff (a := a)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:58",
+  "claim": "`CFC.conjSqrt_ringInverse_conjSqrt` and its sibling repeat rpow calculations to prove `sqrt (Ring.inverse c) * sqrt c = 1`, even though the file already has the canonical lemma `sqrt_ringInverse`.",
+  "requested_change": "Use `sqrt_ringInverse` together with `Ring.inverse_mul_cancel`/`Ring.mul_inverse_cancel` (or prove the second inverse lemma from the first) instead of duplicating the rpow calculation in both proofs.",
+  "severity": "advisory"
+ }
+]

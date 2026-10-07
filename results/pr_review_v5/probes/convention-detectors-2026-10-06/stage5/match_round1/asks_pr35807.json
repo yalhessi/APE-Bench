@@ -1,0 +1,23 @@
+[
+ {
+  "ask_id": "v1933",
+  "path": "Mathlib/Topology/LocallyFinsupp.lean",
+  "code_at_comment": "@@ -110,6 +110,10 @@ lemma LocallyFiniteSupport.finite_inter_support_of_isCompact {W : Set X}\n   rw [← lem f.support W]\n   exact Finite.image Subtype.val this\n \n+lemma Function.locallyFinsupp.locallyFiniteSupport [Zero Y] (f : locallyFinsupp X Y) :\n+    LocallyFiniteSupport f.toFun :=\n+  fun z ↦ f.supportLocallyFiniteWithinDomain' z (mem_of_subset_of_mem (fun _ a ↦ a) trivial)",
+  "comment": "\n```suggestion\n  (f.supportLocallyFiniteWithinDomain' · (by trivial))\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1934",
+  "path": "Mathlib/Topology/LocallyFinsupp.lean",
+  "code_at_comment": ", Set.Finite (t ∩ f.support)}\n+  __ := locallyFinsuppWithin.addSubmonoid U\n+  neg_mem' {f} hf := by simp_all\n+\n+protected lemma memAddSubgroup [AddGroup Y] (D : locallyFinsuppWithin U Y) :\n     (D : X → Y) ∈ locallyFinsuppWithin.addSubgroup U :=\n   ⟨D.supportWithinDomain, D.supportLocallyFiniteWithinDomain⟩\n \n /--\n Assign a function with locally finite support within `U` to a function in the subgroup.\n -/\n @[simps]\n-def mk_of_mem [AddCommGroup Y] (f : X → Y) (hf : f ∈ locallyFinsuppWithin.addSubgroup U) :\n+def mk_of_mem [AddMonoid Y] (f : X → Y) (hf : f ∈ locallyFinsuppWithin.addSubmonoid U) :",
+  "comment": "\n```suggestion\ndef mk_of_mem_addSubmonoid [AddMonoid Y] (f : X → Y) (hf : f ∈ locallyFinsuppWithin.addSubmonoid U) :\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1935",
+  "path": "Mathlib/Topology/LocallyFinsupp.lean",
+  "code_at_comment": "-instance [AddCommGroup Y] : Neg (locallyFinsuppWithin U Y) where\n-  neg D := mk_of_mem (-D) <| neg_mem D.memAddSubgroup\n+instance [AddMonoid Y] : SMul ℕ (locallyFinsuppWithin U Y) where\n+  smul n D := mk_of_mem (n • D) <| nsmul_mem D.memAddSubmonoid n\n \n-instance [AddCommGroup Y] : Sub (locallyFinsuppWithin U Y) where\n-  sub D₁ D₂ := mk_of_mem (D₁ - D₂) <| sub_mem D₁.memAddSubgroup D₂.memAddSubgroup\n+/--\n+Assign a function with locally finite support within `U` to a function in the subgroup.\n+-/\n+@[simps]\n+def mk_of_mem' [AddGroup Y] (f : X → Y) (hf : f ∈ locallyFinsuppWithin.addSubgroup U) :",
+  "comment": "\n```suggestion\ndef mk_of_mem_addSubgroup [AddGroup Y] (f : X → Y) (hf : f ∈ locallyFinsuppWithin.addSubgroup U) :\n```\nAlso, deprecate `mk_of_mem` to `mk_of_mem_addSubgroup`",
+  "replies_to": null
+ }
+]

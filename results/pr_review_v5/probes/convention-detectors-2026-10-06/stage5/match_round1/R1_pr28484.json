@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/ENNReal/Real.lean:346",
+  "claim": "`ENNReal.toReal_eq_toReal` is now just the old spelling of the existing `ENNReal.toReal_eq_toReal_iff'`, but it is left as a non-deprecated public theorem; this does not actually deprecate the old API name.",
+  "requested_change": "Add a deprecation attribute pointing to the replacement, e.g. `@[deprecated ENNReal.toReal_eq_toReal_iff' (since := \"2026-10-07\")]` immediately before `theorem toReal_eq_toReal`, and update any in-tree uses of the old name if the deprecation warning is triggered.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/List/Nodup.lean:158",
+  "claim": "`List.count_eq_of_nodup` is now only a wrapper around the canonical `List.Nodup.count`, but the old wrapper remains non-deprecated, so the PR leaves the duplicate API in place instead of deprecating it.",
+  "requested_change": "Add a deprecation attribute pointing to the replacement, e.g. `@[deprecated List.Nodup.count (since := \"2026-10-07\")]` immediately before `theorem count_eq_of_nodup`, and update any in-tree uses of the old name if the deprecation warning is triggered.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/LinearAlgebra/Matrix/Notation.lean:376",
+  "claim": "`Matrix.smul_mat_cons` is now just the matrix-specialized old spelling of the more general `Matrix.smul_cons`, but it is still exposed as a non-deprecated theorem; this misses the intended deprecation of the obsolete name.",
+  "requested_change": "Add a deprecation attribute pointing to the replacement, e.g. `@[deprecated Matrix.smul_cons (since := \"2026-10-07\")]` immediately before `theorem smul_mat_cons`, and update any in-tree uses of the old name if the deprecation warning is triggered.",
+  "severity": "blocking"
+ }
+]
