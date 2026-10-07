@@ -230,7 +230,12 @@ Claude Code background task dies with that process: stage 5's gpt-5.5 runs did a
 of 16. Start it as a user unit, which lives outside the session:
 `systemd-run --user --collect --unit=<name> /bin/bash -c "exec <command> >> <log> 2>&1 < /dev/null"`
 (it survived the next restart; `systemctl --user status <name>` to watch it). Lingering is off, so it
-lasts while any login session does; a Slurm job outlives even that. `run --resume` keeps the finished
+lasts while any login session does; a Slurm job outlives even that. **A user unit is still in
+`/user.slice`, and systemd-oomd kills there under memory pressure** (60% for 20 s, `oomctl`): it picks
+the cgroup with the most reclaim, not the biggest, so a 272 MB unit reading files died `oom-kill` at
+08:01 on 2026-10-07 while the `vllm-ds4` Slurm job held 1,000 GB of `first`'s 1,129 GB; the
+interactive sessions that died the same morning sit in the same slice. Before a long run, look at
+`squeue -w first` and `oomctl`; a Slurm job is outside `/user.slice`. `run --resume` keeps the finished
 sessions. The `completed with success (cost=$...)` log line is **nominal** cost, uncached list price;
 billed is `billed_cost` in each `tasks/*/task_outcome.json`, five times smaller on those runs ($65.44
 against $13.15 for seven sessions). Read as a bill, the log line stopped a run that was within budget.

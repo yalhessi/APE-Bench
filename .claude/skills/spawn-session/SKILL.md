@@ -75,7 +75,10 @@ scope -- `systemd-run --user --collect --unit=<topic>-session --working-director
 `user@<uid>.service/app.slice`. Print mode ends with its turn, so the rules must tell it to run its
 subagents in the foreground (several per message), never left in the background; watch it with
 `systemctl --user status <topic>-session` and the log. Until `spawn.sh` does this itself, use it for
-any child that must outlive the parent.
+any child that must outlive the parent. **It survives restarts, not systemd-oomd**: the unit is still
+in `/user.slice`, and the same relaunch died `oom-kill` six minutes in, while a vLLM Slurm job held
+most of the node's memory (CLAUDE.md, "Launch a paid run detached"). Check `squeue -w first` first;
+under such a job only a Slurm job of its own is safe.
 
 Right after it prints `spawned <topic> · <id>`, arrange to be woken when it finishes: run
 `.claude/skills/spawn-session/spawn.sh wait <id>` with Bash `run_in_background`; the harness
