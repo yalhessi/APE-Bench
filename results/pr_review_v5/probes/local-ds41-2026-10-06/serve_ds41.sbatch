@@ -37,6 +37,9 @@ mkdir -p $VLLM_CACHE_ROOT $XDG_CACHE_HOME $TRITON_CACHE_DIR $TORCHINDUCTOR_CACHE
 # As for Qwen (serve.sbatch): DeepGEMM's SM120 JIT needs a coherent CUDA >= 13 toolkit this node
 # lacks, and FlashInfer's sampler JIT-builds on first use.
 export VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0 VLLM_USE_FLASHINFER_SAMPLER=0
+# FlashInfer 0.7.1rc4 against the nightly's 0.7.0.post1 pin (the per-layer fix was validated on FlashInfer
+# main; vllm#59203 used this switch for the same mismatch).
+export FLASHINFER_DISABLE_VERSION_CHECK=1
 # DeepSeek V4.1's sparse attention on SM120 has only a FlashInfer backend, and vLLM counts FlashInfer
 # as present only with prebuilt cubins or an nvcc on PATH. Job 432149 had neither and died with
 # "requires a FlashInfer DSV4 sparse MLA decode specialization for (num_q_heads=8, top_k=128)" -- a

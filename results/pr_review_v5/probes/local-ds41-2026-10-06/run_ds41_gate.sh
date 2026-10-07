@@ -25,8 +25,14 @@ while true; do
 done
 say "server up: $(grep -E 'download took|Loading weights took|GPU KV cache size' "$SERVER_LOG" | tail -3 | sed 's/.*\] //' | tr '\n' ' ')"
 
-# 1. Basic probes; the gate stops on a failure here.
+# 0. Correctness first: a wrong KV geometry boots cleanly and returns garbage (vllm#59203).
 cd "$LM/probes" || exit 1
+timeout 3600 "$LM/vllm-env/bin/python" probe_correct.py "$URL" local-deepseek > "$LOGS/probe_correct_ds41.out" 2>&1
+rc=$?
+say "probe_correct exit $rc: $(grep -E '^17x19|^gsm8k [0-9]+/20' "$LOGS/probe_correct_ds41.out" | tr '\n' ' ')"
+if [ $rc -ne 0 ]; then say "STOP: the server does not compute correctly"; release; exit 1; fi
+
+# 1. Basic probes; the gate stops on a failure here.
 timeout 3600 "$LM/vllm-env/bin/python" probe_basic.py "$URL" local-deepseek > "$LOGS/probe_basic_ds41.out" 2>&1
 rc=$?
 verdict=$("$LM/vllm-env/bin/python" - "$LOGS/probe_basic_ds41.out" <<'EOF'
