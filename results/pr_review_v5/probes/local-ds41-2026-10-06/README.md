@@ -148,3 +148,23 @@ The patch in `patch/` on vLLM nightly `0.31.1rc1.dev29+g42ecc8eeb`, with FlashIn
   all-NaN output a wrong geometry gives.
 - **The gate script now runs as a Slurm job** (`ds41-gate`, no GPUs, 120 GB) on the same node. Run
   under `setsid nohup`, it did not survive the Claude session that started it ending.
+
+## Correction (2026-10-07): the thinking was dropped by our client, not by the encoder
+
+The pre-registration above says DeepSeek's encoder drops earlier turns' thinking. It does not do so
+here. `encoding.py` turns `drop_thinking` off whenever a message defines tools ("if any message has
+tools defined, don't drop thinking"), and even with it on, only turns before the last user message
+lose their thinking. Our client dropped it: `LLMProvider.LOCAL` used `OpenAIMessageFormatter`, which
+rebuilds each message from an allowlist without `reasoning_content`.
+
+- **Measured on the live server.** One tool round with 1,020 tokens of earlier thinking gives a
+  prompt of 355 tokens with no reasoning field and 1,375 with it, under either `reasoning_content`
+  or `reasoning`.
+- **Seen in the runs.** In `iter_ds41_contract2_high_rep1`, PR 33362 generated 189k tokens over 21
+  turns while its 21st prompt was 56.5k. Each turn re-derived its reasoning, about 8k tokens a turn.
+- **Fixed in `client.py`.** LOCAL now takes the plain `MessageFormatter`
+  (`tests/ape/test_elm_provider.py::test_a_local_model_gets_its_earlier_thinking_back`).
+
+So the four reps started on 2026-10-07 ran with every turn's thinking discarded. The `none` rep is
+unaffected, since it has no thinking to carry. The three `high` reps measure re-derived thinking, not
+the condition the pre-registration meant.
