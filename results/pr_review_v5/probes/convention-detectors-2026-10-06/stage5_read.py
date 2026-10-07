@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 from src.mathlib_review.analysis import probes
+from src.mathlib_review.io import jsonl_rows
 
 HERE = Path(__file__).parent / "stage5"
 SET = Path("configs/probe_sets/census_detectors_v1.yaml")
@@ -32,8 +33,7 @@ STRATUM_B = [31077, 31793, 32540, 32610, 33006, 37009]
 def facts(pr: int) -> list:
     """The section facts S1 shows on this PR, in order: (section title, bullet)."""
 
-    for line in (HERE / "model_context_s1.jsonl").read_text().splitlines():
-        row = json.loads(line)
+    for row in jsonl_rows(HERE / "model_context_s1.jsonl"):
         if row["pr_number"] == pr:
             return [(s["title"], b[2:]) for s in row["sections"][1:]
                     for b in s["text"].splitlines() if b.startswith("- ")]
