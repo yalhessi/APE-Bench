@@ -132,6 +132,13 @@ def _check_model_credential(scaffold: Any) -> Optional[Unmet]:
     llm = getattr(scaffold, "llm_config", None)
     if llm is None or getattr(llm, "model_name", None) is None:
         return None
+    from ape.llm_clients.config import PROVIDER_KEY_ENV_VARS
+
+    if PROVIDER_KEY_ENV_VARS.get(getattr(llm, "provider_type", None)) == ():
+        # A provider with no key by design: the project's own localhost vLLM (LLMProvider.LOCAL).
+        # Refused here, every iter_ds41 run stopped at `cli run` on 2026-10-07 though `cli plan`
+        # had sealed it.
+        return None
     if getattr(llm, "api_key", None):
         return _check_credential_survives_worker(llm)
     provider = getattr(getattr(llm, "provider_type", None), "value", "the provider")
