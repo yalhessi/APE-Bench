@@ -95,3 +95,33 @@ fixes"; installed alongside as `localmodel/vllm031-env` and checked statically, 
   unverified for correctness;
 - another serving engine;
 - datacenter GPUs (H100/H200/B200).
+
+## Correction (2026-10-07): not a hard limit. It runs with patches on the same hardware
+
+The conclusion above holds for **stock** vLLM 0.30/0.31 only. Others serve DeepSeek-V4.1-Flash on
+8x RTX PRO 6000 (SM120). The record, from `vllm-project/vllm#59203` (17 comments), `#56700`,
+`#53635`, `vllm-project/DeepGEMM#28` and `sgl-project/sglang#40877`:
+
+- **The cause is as diagnosed here.** V4.1 has compress-ratio 1 and 2 layers, and the indexer sees
+  `block_size // cr` states, while DeepGEMM's arch-12 FP8 path needs exactly 64. So block 128 hits
+  `attention.hpp:409`, our failure, and block 64 hits `attention.hpp:484`.
+- **2026-09-30, validated on 8x RTX PRO 6000:** correct output, GSM8K 99/100, ~90 tok/s single
+  stream. The stack was nightly `0.30.1rc1.dev382` with PR #57292 (64-token kernel blocks),
+  FlashInfer built from main (runtime page sizes, flashinfer#5197) and DeepGEMM from
+  vllm-project/DeepGEMM@17ca18f (page-32 support, #14). DeepGEMM was built into vLLM, needing
+  gcc >= 13, with `FLASHINFER_DISABLE_VERSION_CHECK=1`. An earlier geometry (#56509) started but
+  returned all-NaN logits, so a wrong geometry fails silently, not loudly.
+- **2026-10-07, the author's follow-up:** #57292 no longer suffices on newer nightlies. The fix is
+  per-layer block sizes, five Python-only changes:
+  - `get_supported_kernel_block_sizes()` returns `[64, 128]` on SM120 in `indexer.py`,
+    `deepseek_v41/sparse_mla.py` and `deepseek_v41/nvidia/flashinfer_sparse.py`;
+  - `deepseek_v41/attention.py` gives the MLA, indexer and SWA specs `block_size = 64 * max(1,
+    compress_ratio)`, so every indexer view is 64 states.
+
+  Validated on nightly dev738 (2026-10-06) with FlashInfer main and NCCL 2.32.3: 17x19=323, all
+  CUDA graphs captured, 117 tok/s at concurrency 1 and 1,061 at 32. Not yet a PR; vLLM main
+  unchanged as of 2026-10-07.
+
+Pitfalls reported there:
+- an FP8 KV-cache scale-layout corruption visible only past 100K tokens (#56700);
+- the FlashInfer cutlass MoE autotune hanging (use `--no-enable-flashinfer-autotune`).
