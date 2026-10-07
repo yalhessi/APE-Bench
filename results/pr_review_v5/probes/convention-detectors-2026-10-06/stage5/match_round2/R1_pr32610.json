@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Hom/Defs.lean:710",
+  "claim": "`MonoidHom.isDedekindFiniteMonoid_of_injective` is named under the hom namespace even though the declaration constructs an `IsDedekindFiniteMonoid`; this misses the predicate-namespace API shape for `IsDedekindFiniteMonoid` lemmas.",
+  "requested_change": "Rename the theorem to `_root_.IsDedekindFiniteMonoid.of_injective` (or move it outside `namespace MonoidHom` as `IsDedekindFiniteMonoid.of_injective`) and update its uses, e.g. in `MulEquivClass.isDedekindFiniteMonoid_iff`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Group/Invertible/Defs.lean:247",
+  "claim": "`invertibleOfLeftInverse` (and the adjacent `invertibleOfRightInverse`) unnecessarily inherits the surrounding `[Monoid α]` assumption, although the construction only needs `MulOne` plus `IsDedekindFiniteMonoid`.",
+  "requested_change": "Move these two definitions out of the `[Monoid α]` section and state them with `variable [MulOne α] [IsDedekindFiniteMonoid α] (a b : α)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Algebra/Group/Submonoid/Defs.lean:373",
+  "claim": "The `SubmonoidClass` instance transferring `IsDedekindFiniteMonoid` to a submonoid is not marked `@[to_additive]`, so the additive counterpart for `AddSubmonoidClass` is missing.",
+  "requested_change": "Add `@[to_additive]` to this instance so additive submonoids inherit `IsDedekindFiniteAddMonoid` as well.",
+  "severity": "advisory"
+ }
+]

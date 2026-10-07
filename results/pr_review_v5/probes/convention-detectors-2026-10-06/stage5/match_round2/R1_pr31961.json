@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/DiscreteSubset.lean:268",
+  "claim": "`infinite_of_accPt` is a general T1 accumulation-point lemma and does not depend on the codiscrete filter API introduced in this file, so placing it in `Topology/DiscreteSubset.lean` makes the lemma unavailable from the lower-level topology files where users of `AccPt` would expect it.",
+  "requested_change": "Move this declaration to `Mathlib/Topology/Separation/Basic.lean` near `infinite_of_mem_nhds` (or another lower-level AccPt/T1 section) and prove it directly from `accPt_iff_nhds`; remove the copy from `DiscreteSubset.lean`.",
+  "severity": "advisory"
+ }
+]

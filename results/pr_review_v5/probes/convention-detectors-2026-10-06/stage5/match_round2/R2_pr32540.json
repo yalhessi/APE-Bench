@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/RingTheory/SurjectiveOnStalks.lean:185",
+  "claim": "`RingHom.SurjectiveOnStalks.baseChange'` exposes a primed public name only to distinguish the `includeRight` variant of `baseChange`; the statement is about `Algebra.TensorProduct.includeRight`, so the prime does not describe the variant.",
+  "requested_change": "Rename this lemma to `SurjectiveOnStalks.includeRight` and update the private helper to use `Hf.includeRight` instead of `Hf.baseChange'`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/SurjectiveOnStalks.lean:205",
+  "claim": "`RingHom.SurjectiveOnStalks.tensorProductMap` only states the same-base specialization of `Algebra.TensorProduct.map`, although `map` also allows the left morphism to be an algebra map over a larger base `P`.",
+  "requested_change": "Generalize the statement to variables `{P A B C D}` with `[Algebra R P]`, towers `R → P → A` and `R → P → C`, `f : A →ₐ[P] C`, and `g : B →ₐ[R] D`; start the proof with `change (Algebra.TensorProduct.map (f.restrictScalars R) g).SurjectiveOnStalks` and then use the current factorization proof.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/RingTheory/TensorProduct/Finite.lean:197",
+  "claim": "`RingHom.Finite.tensorProductMap` only covers `Algebra.TensorProduct.map` when both input maps are over the same base `R`; the theorem can be stated at the full generality of `Algebra.TensorProduct.map` with the left map over a larger base `P`.",
+  "requested_change": "Generalize the public statement to `{R P A B C D}` with `[Algebra R P]`, towers `R → P → A` and `R → P → C`, `f : A →ₐ[P] C`, and `g : B →ₐ[R] D`; in the proof, `change` the target to the map using `f.restrictScalars R` and reuse the existing factorization through the private `_id` lemma.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/RingTheory/TensorProduct/Finite.lean:197",
+  "claim": "`RingHom.Finite.tensorProductMap` is API for `AlgHom.Finite` hypotheses and an `Algebra.TensorProduct.map` result, but it is declared in the `RingHom.Finite` namespace; as a result, dot notation such as `Hf.tensorProductMap Hg` does not work for the usual `Hf : f.Finite` algebra-hom hypothesis.",
+  "requested_change": "Move the public lemma to `AlgHom.Finite.tensorProductMap` (with conclusion `(Algebra.TensorProduct.map f g).Finite`) and rename the private helper consistently, or add that as the public API and use it for dot notation.",
+  "severity": "advisory"
+ }
+]

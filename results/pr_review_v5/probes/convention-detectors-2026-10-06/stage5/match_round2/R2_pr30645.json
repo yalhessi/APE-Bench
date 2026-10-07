@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/RingTheory/Localization/FractionRing.lean:494",
+  "claim": "`IsFractionRing.nontrivial` manually unfolds the localization equality criterion to prove nontriviality, but `LocalizationMap.nontrivial` is the canonical API for exactly this argument when the localized submonoid does not contain zero.",
+  "requested_change": "Replace the proof with `(IsLocalization.toLocalizationMap (nonZeroDivisors R) S).nontrivial zero_notMem_nonZeroDivisors`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/Localization/FractionRing.lean:500",
+  "claim": "`IsFractionRing.nontrivial'` duplicates the more general existing theorem `RingHom.domain_nontrivial`: the reverse implication from `Nontrivial S` to `Nontrivial R` holds for any algebra map and does not use the fraction-ring hypothesis.",
+  "requested_change": "Remove `IsFractionRing.nontrivial'` and use `(algebraMap R S).domain_nontrivial` directly in the iff theorem.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/RingTheory/Localization/FractionRing.lean:506",
+  "claim": "`IsFractionRing.nontrivial_iff_nontrivial` is redundantly named; in this namespace the subject is already the fraction-ring relation, and analogous equivalences such as `OreLocalization.nontrivial_iff` and `Valuation.Integers.nontrivial_iff` use the shorter `nontrivial_iff`.",
+  "requested_change": "Rename the theorem to `IsFractionRing.nontrivial_iff`.",
+  "severity": "advisory"
+ }
+]

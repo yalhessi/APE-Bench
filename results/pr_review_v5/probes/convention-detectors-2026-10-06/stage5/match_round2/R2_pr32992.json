@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:60",
+  "claim": "`Real.fourier_bilin_convolution_eq'` does not compile: the final `simpa` in the Fubini integrability bound leaves the goal with `|‖B‖|`, while the available bound has `‖B‖`.",
+  "requested_change": "Normalize the real norm of the operator norm in that proof step, e.g. change the last line of the bound to `simpa [Real.norm_of_nonneg (norm_nonneg B)]`, or replace the whole bound with the existing convolution integrability lemma.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:95",
+  "claim": "`Real.fourier_bilin_convolution_eq` does not compile: the `integral_apply` side-condition tries to use `le_opNorm B (f₁ x)` directly for `‖𝐞 (-inner ℝ x ξ) • B (f₁ x)‖`, but this also has the circle scalar and the RHS elaborates with `|‖B‖|`.",
+  "requested_change": "Replace that `simpa` with an explicit norm estimate using `Circle.smul_def`, `ContinuousLinearMap.opNorm_smul_le`, `Circle.norm_coe`, and `abs_of_nonneg (norm_nonneg B)`; the final comparison can be closed by `simp [abs_of_nonneg (norm_nonneg B)]`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:95",
+  "claim": "The public Fourier-convolution theorem family (`fourier_bilin_convolution_eq'`, `fourier_bilin_convolution_eq`, `fourier_smul_convolution_eq`, and `fourier_mul_convolution_eq`) unnecessarily assumes `Continuous f₁` and `Continuous f₂`; the proofs only need integrability, and the existing convolution API already provides the needed product integrability.",
+  "requested_change": "Remove the `Continuous f₁` and `Continuous f₂` hypotheses from the four public theorems, delete the private `integrable_prod_sub`, and in the swap step use `hf₂.convolution_integrand B.flip hf₁` (with the bounded character scalar) to supply the product integrability.",
+  "severity": "advisory"
+ }
+]

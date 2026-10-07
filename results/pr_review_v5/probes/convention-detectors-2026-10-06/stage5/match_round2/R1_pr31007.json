@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/FieldTheory/Perfect.lean:51",
+  "claim": "The new PerfectRing closure instances are named `one`, `mul`, and `pow` at the root namespace, so after importing this file unqualified `one`, `mul`, and `pow` refer to these PerfectRing instances. These names are far too generic for public root declarations.",
+  "requested_change": "Rename the three instances to instance-style names such as `instPerfectRingOne`, `instPerfectRingMul`, and `instPerfectRingPow` (or place equivalently specific names in the `PerfectRing` namespace).",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/Perfection.lean:424",
+  "claim": "Changing `ModP` to `deriving CommRing` silently removes the existing public declaration `ModP.commRing`; explicit references to `ModP.commRing` no longer elaborate.",
+  "requested_change": "Do not replace the named instance by an anonymous derived one: remove the `deriving CommRing` line and keep the existing `instance commRing : CommRing (ModP O p) := Ideal.Quotient.commRing ...`, or otherwise provide a deprecated `ModP.commRing` alias to a named replacement.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/FieldTheory/Perfect.lean:38",
+  "claim": "The `PerfectRing` docstring is stale after this PR: it still says this is a ring of prime characteristic and the field doc says Frobenius, but the class now only assumes `[Pow R ℕ]` and the new instances include arbitrary commutative monoids at `p = 1`.",
+  "requested_change": "Rewrite the class and field docstrings to say that `PerfectRing R p` means the `p`-th power map is bijective, and mention separately that for rings of prime characteristic this recovers the usual perfect-ring condition.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/RingTheory/Perfection.lean:31",
+  "claim": "The docstring for `Perfection` refers to an unbound `M` in the displayed implementation even though the declaration's parameter is named `α`.",
+  "requested_change": "Change the displayed implementation to use `α`, e.g. ``{ f : ℕ → α // ∀ n, f (n + 1) ^ p = f n }``.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/RingTheory/Perfection.lean:115",
+  "claim": "The docstring for `Perfection.liftMonoidHom` says a monoid homomorphism has type `M →+* N`, which is the notation for ring homomorphisms and is not the type of this declaration.",
+  "requested_change": "Change the docstring to say `M →* N` can be lifted to `M →* Perfection N p`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/RingTheory/Perfection.lean:278",
+  "claim": "The docstring for `Perfection.subring` says '`Perfection R p` as a semiring of `ℕ → R`', but the declaration constructs a `Subring`.",
+  "requested_change": "Change the docstring to '`Perfection R p` as a subring of `ℕ → R`'.",
+  "severity": "advisory"
+ }
+]

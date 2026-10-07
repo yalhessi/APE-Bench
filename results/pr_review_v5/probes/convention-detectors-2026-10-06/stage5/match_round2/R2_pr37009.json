@@ -1,0 +1,58 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/Basic.lean:749",
+  "claim": "`IsUnit.cfcSqrt` was changed so it no longer takes an `IsUnit a` hypothesis, despite being the existing `IsUnit`-namespace API. This breaks existing dot-notation uses such as `ha_unit.cfcSqrt a ha_nonneg` and duplicates the strict-positivity route already available via `IsStrictlyPositive.sqrt.isUnit`.",
+  "requested_change": "Restore the old signature `(a : A) (ha_unit : IsUnit a) (ha : 0 ≤ a := by cfc_tac) : IsUnit (sqrt a)` and prove it from `isUnit_sqrt_iff`; keep the new strict-positivity iff as a separate lemma if desired.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Algebra/StrictPositivity.lean:80",
+  "claim": "`IsStrictlyPositive.isStrictlyPositive_of_subsingleton` repeats the namespace in the leaf name, giving the fully qualified name `IsStrictlyPositive.isStrictlyPositive_of_subsingleton`.",
+  "requested_change": "Rename it to `IsStrictlyPositive.of_subsingleton` by declaring it as `lemma of_subsingleton ...` inside the `IsStrictlyPositive` namespace.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Algebra/Group/Units/Defs.lean:542",
+  "claim": "`IsUnit.mul_iff₃` is a generic multiplicative units lemma but lacks the additive counterpart that the surrounding `IsUnit` API provides via `to_additive`, and its proof manually constructs units instead of using the existing `Units.isUnit_units_mul`/`Units.isUnit_mul_units` lemmas.",
+  "requested_change": "Add `to_additive` and replace the proof with the existing units-multiplication API, e.g. `@[to_additive (attr := grind =), grind =] ... := by obtain ⟨u, rfl⟩ := ha; obtain ⟨v, rfl⟩ := hc; simp only [Units.isUnit_units_mul, Units.isUnit_mul_units]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Algebra/Algebra/StrictPositivity.lean:108",
+  "claim": "`isStrictlyPositive_iff_conjugate_of_isSelfAdjoint` reproves cancellation by `Ring.inverse`, but it is exactly the existing `IsUnit.isStrictlyPositive_star_right_conjugate_iff` after rewriting `star b = b`.",
+  "requested_change": "Replace the proof with `simpa [hb₂.star_eq] using hb.isStrictlyPositive_star_right_conjugate_iff (a := a)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:39",
+  "claim": "`CFC.conjSqrt_apply` is the projection/application lemma for the new bundled continuous linear map, but it is not marked `[simp]`, so users must unfold it manually in exactly the situations where `foo_apply` lemmas are normally simplified.",
+  "requested_change": "Add the `[simp]` attribute to `conjSqrt_apply`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:72",
+  "claim": "`CFC.conjSqrt_conjSqrt_ringInverse` duplicates the proof of `CFC.conjSqrt_ringInverse_conjSqrt` with the same two square-root inverse calculations.",
+  "requested_change": "Derive it from `conjSqrt_ringInverse_conjSqrt (Ring.inverse c) a` and rewrite `Ring.inverse_inverse hc.isUnit` instead of repeating the calculation.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean:37",
+  "claim": "`CFC.antitoneOn_ringInverse` introduces `hcont`, but that local hypothesis is never used in the proof.",
+  "requested_change": "Delete the unused `have hcont : ContinuousOn ...` block.",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean:71",
+  "claim": "`CFC.convexOn_ringInverse` introduces `zpos`, a duplicate of `hz`, and never uses it.",
+  "requested_change": "Remove the redundant `have zpos : IsStrictlyPositive z := by grind` line.",
+  "severity": "advisory"
+ }
+]

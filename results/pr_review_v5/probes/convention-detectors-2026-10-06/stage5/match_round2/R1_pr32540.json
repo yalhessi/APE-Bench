@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/RingTheory/SurjectiveOnStalks.lean:185",
+  "claim": "`RingHom.SurjectiveOnStalks.baseChange'` uses a prime to distinguish the variant whose conclusion is about `Algebra.TensorProduct.includeRight`, while the nearby unprimed `baseChange` concludes a statement about `algebraMap S (S ⊗[R] T)`. This makes the public API ambiguous instead of naming the term that changed.",
+  "requested_change": "Rename this lemma to `SurjectiveOnStalks.baseChange_includeRight` and update the private proof below to use `Hf.baseChange_includeRight`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/TensorProduct/Finite.lean:197",
+  "claim": "`RingHom.Finite.tensorProductMap` is an API lemma for `AlgHom.Finite` hypotheses and the algebra hom `Algebra.TensorProduct.map`, but it is placed in the `RingHom.Finite` namespace; as a result it does not support dot notation from an `AlgHom.Finite` hypothesis, unlike the existing `AlgHom.Finite.id/comp/of_surjective` API.",
+  "requested_change": "Move/rename the public lemma to `AlgHom.Finite.tensorProductMap`, preferably with conclusion `(Algebra.TensorProduct.map f g).Finite` (or after a `change`, the same underlying `toRingHom.Finite` statement).",
+  "severity": "advisory"
+ }
+]

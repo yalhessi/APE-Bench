@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:201",
+  "claim": "`MeasureTheory.integral_finset` moved an existing theorem but made the integrand `f` an implicit section variable, changing the old API shape `(s) (f) (hf)`; existing uses such as `rw [integral_finset s f hf]` no longer elaborate, and the theorem no longer matches the explicit-`f` sibling `lintegral_finset`.",
+  "requested_change": "Restore `f` as an explicit argument: `theorem integral_finset (s : Finset X) (f : X → E) (hf : IntegrableOn f s μ) : ...`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:205",
+  "claim": "`MeasureTheory.integral_fintype` also moved an existing theorem but changed its explicit integrand argument into an implicit section variable; this is the reason the PMF proof had to change from `integral_fintype _ .of_finite` to `integral_fintype .of_finite`, so the move unnecessarily breaks the old API.",
+  "requested_change": "Restore the explicit binder, `theorem integral_fintype [Fintype X] (f : X → E) (hf : Integrable f μ) : ...`, update its proof to call `integral_finset .univ f`, and revert the PMF call to `rw [integral_fintype _ .of_finite]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:99",
+  "claim": "The docstring for `MeasureTheory.integrable_sum_dirac_iff` states the Dirac-mass criterion as an iff with only the summability condition, but the theorem also assumes `hc : ∀ i, c i ≠ ∞`; omitting this in the prose is misleading, since `(∞ : ℝ≥0∞).toReal = 0` makes the displayed summability condition ignore infinite atoms.",
+  "requested_change": "Mention the finite-weight hypothesis in this docstring and in the corresponding module-doc bullet, e.g. “assuming all weights `c i` are finite”.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:12",
+  "claim": "The module documentation contains malformed integral notation in its displayed main statements: line 18 writes `∫ f x ∂μ i` without the integration binder, and line 36 writes `∫ x, f x, ∂...` with an extra comma.",
+  "requested_change": "Correct the snippets to valid notation, e.g. `∫ x, f x ∂μ i` and `∫ x, f x ∂Measure.sum (fun i ↦ (c i) • .dirac (x i))` (and make the same comma fix in the docstring for `integral_sum_dirac_eq_tsum`).",
+  "severity": "advisory"
+ }
+]

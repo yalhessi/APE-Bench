@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/ENNReal/Real.lean:346",
+  "claim": "`ENNReal.toReal_eq_toReal` has been changed to be just the old-name wrapper around `toReal_eq_toReal_iff'`, but it is not marked deprecated, so this PR does not actually deprecate the alias.",
+  "requested_change": "Add a deprecation attribute to the declaration, e.g. `@[deprecated toReal_eq_toReal_iff' (since := \"YYYY-MM-DD\")]`, keeping the body `toReal_eq_toReal_iff' ha hb`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/List/Nodup.lean:158",
+  "claim": "`List.count_eq_of_nodup` has been changed to be just the old-name wrapper around `Nodup.count`, but it is not marked deprecated, so this PR does not actually deprecate the alias.",
+  "requested_change": "Add a deprecation attribute to the declaration, e.g. `@[deprecated Nodup.count (since := \"YYYY-MM-DD\")]`, keeping a direct proof from the canonical lemma.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Data/List/Nodup.lean:160",
+  "claim": "In `List.count_eq_of_nodup`, the proof uses `Nodup.count d` even though this is a lemma in the namespace of the hypothesis `d : Nodup l`; the method form is available and is the more local spelling here.",
+  "requested_change": "Replace the proof term with `d.count`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/LinearAlgebra/Matrix/Notation.lean:376",
+  "claim": "`Matrix.smul_mat_cons` has been changed to be just the old-name wrapper around `smul_cons`, but it is not marked deprecated, so this PR does not actually deprecate the alias.",
+  "requested_change": "Add a deprecation attribute to the declaration, e.g. `@[deprecated smul_cons (since := \"YYYY-MM-DD\")]`, keeping the body `smul_cons x v A`.",
+  "severity": "blocking"
+ }
+]

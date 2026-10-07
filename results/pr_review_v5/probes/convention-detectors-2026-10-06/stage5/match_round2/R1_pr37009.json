@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Algebra/StrictPositivity.lean:79",
+  "claim": "`IsStrictlyPositive.isStrictlyPositive_of_subsingleton` repeats the predicate name inside the `IsStrictlyPositive` namespace; this should be the dot-notation-friendly `IsStrictlyPositive.of_subsingleton`.",
+  "requested_change": "Rename the lemma to `of_subsingleton` while keeping the existing statement and proof.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/Basic.lean:748",
+  "claim": "`IsUnit.cfcSqrt` no longer has an `IsUnit` hypothesis, so the lemma is misplaced in the `IsUnit` namespace and it unnecessarily breaks the existing `IsUnit.cfcSqrt` API/dot-notation use.",
+  "requested_change": "Restore the previous `IsUnit`-based statement, for example `lemma _root_.IsUnit.cfcSqrt (a : A) (ha_unit : IsUnit a) (ha : 0 ≤ a := by cfc_tac) : IsUnit (sqrt a) := (isUnit_sqrt_iff a ha).mpr ha_unit`. Users with strict positivity can use `isUnit_sqrt_iff_isStrictlyPositive` or `ha.sqrt.isUnit`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Algebra/Group/Units/Defs.lean:541",
+  "claim": "`IsUnit.mul_iff₃` manually constructs two units even though the existing `Units.isUnit_units_mul` and `Units.isUnit_mul_units` lemmas prove exactly the two cancellations needed; as a generic multiplicative lemma it also should get the additive version from `to_additive`.",
+  "requested_change": "Replace the proof with the existing unit-multiplication API and add `to_additive`, e.g. `@[to_additive, grind =] theorem mul_iff₃ ... := by rw [← ha.unit_spec, ← hc.unit_spec, Units.isUnit_mul_units, Units.isUnit_units_mul]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean:31",
+  "claim": "`CFC.antitoneOn_ringInverse` reproves the existing operator inverse antitonicity theorem `CStarAlgebra.inv_le_inv` instead of reusing it.",
+  "requested_change": "Lift the strictly positive elements to units and apply `CStarAlgebra.inv_le_inv`; the proof can be reduced to `intro a ha b hb hab; lift a to Aˣ using ha.isUnit; lift b to Aˣ using hb.isUnit; rw [Ring.inverse_unit, Ring.inverse_unit]; exact CStarAlgebra.inv_le_inv ha.nonneg hab`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean:71",
+  "claim": "`CFC.conjSqrt_conjSqrt_ringInverse` duplicates the proof of `CFC.conjSqrt_ringInverse_conjSqrt` instead of deriving the second inverse identity from the first with `c := Ring.inverse c`.",
+  "requested_change": "Prove it from `conjSqrt_ringInverse_conjSqrt (inverse c) a`, rewriting `Ring.inverse (Ring.inverse c)` with `Ring.inverse_inverse hc.isUnit`.",
+  "severity": "advisory"
+ }
+]

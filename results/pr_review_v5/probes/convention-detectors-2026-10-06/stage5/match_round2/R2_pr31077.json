@@ -1,0 +1,51 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/ContinuousOn.lean:28",
+  "claim": "The module documentation describes `𝓝ˢ[t] s` as `nhdsWithin s t`, but the declaration introduced by this PR is `nhdsSetWithin`; as written the docs point readers to the point-neighborhood-within filter instead of the new set-neighborhood-within filter.",
+  "requested_change": "Change this bullet to say that `𝓝ˢ[t] s` is the filter `nhdsSetWithin s t` of neighborhoods of a set `s` within a set `t`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Defs/Filter.lean:161",
+  "claim": "The docstring of `nhdsSetWithin` spells the notation as `𝓝[t] s`, omitting the superscript `ˢ`; this describes the existing point-neighborhood notation rather than the new set-neighborhood notation.",
+  "requested_change": "Replace `𝓝[t] s` in the docstring with `𝓝ˢ[t] s`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/Defs/Filter.lean:102",
+  "claim": "The notation list in the module doc for `Filter.lean` adds `nhdsSetWithin` to the main definitions but still only lists `𝓝ˢ s`, so the new public notation `𝓝ˢ[t] s` is omitted from the notation section.",
+  "requested_change": "Add a notation bullet for `𝓝ˢ[t] s` as `nhdsSetWithin s t` next to the existing `𝓝ˢ s` bullet.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/Compactness/Compact.lean:705",
+  "claim": "`generalized_tube_lemma'` is a new primed name whose unprimed sibling is `generalized_tube_lemma`; the statement differs by using `nhdsSetWithin`, so the name should describe that variant rather than appending a prime.",
+  "requested_change": "Rename `generalized_tube_lemma'` to `generalized_tube_lemma_nhdsSetWithin` (or another descriptive suffix naming the `nhdsSetWithin` formulation).",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Topology/ContinuousOn.lean:1467",
+  "claim": "`nhdsSetWithin_univ'` is a new primed name next to `nhdsSetWithin_univ`; the prime only distinguishes that `univ` is the first argument of `nhdsSetWithin`, so the name should say that explicitly.",
+  "requested_change": "Rename it to `nhdsSetWithin_univ_left`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/Topology/ContinuousOn.lean:1479",
+  "claim": "`nhdsSetWithin_empty'` is a new primed name next to `nhdsSetWithin_empty`; the prime only distinguishes that `∅` is the first argument of `nhdsSetWithin`, so the name should say that explicitly.",
+  "requested_change": "Rename it to `nhdsSetWithin_empty_left`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Mathlib/Topology/ContinuousOn.lean:1534",
+  "claim": "`ContinuousOn.preimage_mem_nhdsSetWithin_of_mem_nhdsSet` applies the `ContinuousOn` namespace lemma to the hypothesis `hf` using its fully-qualified name, even though dot notation applies here.",
+  "requested_change": "Change `ContinuousOn.preimage_mem_nhdsSetWithin hf ...` to `hf.preimage_mem_nhdsSetWithin ...`.",
+  "severity": "advisory"
+ }
+]

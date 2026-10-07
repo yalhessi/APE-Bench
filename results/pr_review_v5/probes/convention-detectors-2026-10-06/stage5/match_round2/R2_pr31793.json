@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Dynamics/Ergodic/Ergodic.lean:100",
+  "claim": "`MeasureTheory.MeasurePreserving.ergodic_of_ergodic_semiconj` is a theorem about transporting an `Ergodic` hypothesis, but it is placed under `MeasurePreserving` with the measure-preserving map as the dot-notation receiver; this leaves the main hypothesis `hf : Ergodic f μ` in a non-canonical secondary position.",
+  "requested_change": "Move/rename this declaration to the `Ergodic` namespace with the ergodicity hypothesis first, e.g. `theorem Ergodic.of_semiconj (hf : Ergodic f μ) (hg : MeasurePreserving g μ μ') {f' : β → β} (h_comm : Semiconj g f f') (hf' : Measurable f') : Ergodic f' μ' := ...`, so users can write `hf.of_semiconj hg h_comm hf'`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Dynamics/Ergodic/Ergodic.lean:93",
+  "claim": "`MeasureTheory.MeasurePreserving.preErgodic_of_preErgodic_conjugate` is named as a conjugacy result even though its only dynamical compatibility assumption is `Semiconj g f f'`; the new ergodic semiconjugacy theorem exposes this mismatch between the paired APIs.",
+  "requested_change": "Introduce the semiconjugacy-named version (preferably as `PreErgodic.of_semiconj` with the `PreErgodic` hypothesis first, or at least `MeasurePreserving.preErgodic_of_preErgodic_semiconj`), deprecate the old `_conjugate` name as an alias, and update the local uses to the semiconj-named theorem.",
+  "severity": "advisory"
+ }
+]
