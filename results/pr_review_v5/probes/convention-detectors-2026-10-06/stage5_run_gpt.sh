@@ -2,8 +2,9 @@
 # Stage 5 on gpt-5.5 (README, the 2026-10-07 amendment): one run a condition through ELM.
 # usage (any directory in the tree): stage5_run_gpt.sh <s0|s1|s2|smoke>   [PLAN_ONLY=1: preflight, spends nothing]
 #                                                                         [RESUME=1: continue an interrupted run]
-# Launch detached (setsid nohup ... &): the first S0 and S1 died with the Claude Code process that
-# started them (2026-10-07 05:40, 7 of 16 sessions each done).
+# Launch as a user unit, outside the login-session scope (CLAUDE.md, Running): S0 and S1 died with the
+# Claude Code process that started them (05:40), and S2 under setsid nohup when the session scope went
+# (07:18); a `systemd-run --user` unit survived the next restart.
 # `smoke` is S2's configuration on elm_qwen_3.5 (priced 0) on two PRs: plumbing only, never read for a result.
 set -euo pipefail
 cond=$1

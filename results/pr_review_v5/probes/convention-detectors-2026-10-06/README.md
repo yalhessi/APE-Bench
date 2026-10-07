@@ -521,3 +521,8 @@ $26 more, which waits on the user.
 detached, the configuration preflighted and smoke-tested before any session; first sessions writing
 turns within three minutes, no retries, the disposition section in each prompt. Read in round 2 (S1
 against S2, a fresh seal) by the same rule.
+
+**S2 interrupted (07:18), resumed (07:26).** Launched under `setsid nohup`, it died with the login
+session's scope at 10 of 16 sessions, no retries or errors (the log stops mid-request). Resumed with
+`--resume` as a user systemd unit, `apebench-stage5-s2`, outside any session scope: 10 kept, 6
+rerun; it survived the Claude Code restart that followed.
