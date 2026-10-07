@@ -479,3 +479,11 @@ both answered by ELM's Responses endpoint in their first minute with no retries.
 One change to the reading, made before any GPT session ended: the labels come from `cli probe seal`,
 a fresh draw from `secrets` written to disk before reading, rather than a permutation from a seed I
 named. The seeded one would have let me recompute the key.
+
+**Interruptions (2026-10-07).** S0 and S1 died with the Claude Code process that launched them at
+05:40, 7 of 16 sessions each done; relaunched detached with `--resume` at 05:46, and stopped again by
+me at 05:49 on a misread cost: the log's `cost=` is nominal ($65.44 for S0's seven), the bill is
+`billed_cost` ($13.15, $1.88 a session against stage W's $1.17-1.23; these sessions run 30 turns and
+1.8M tokens against about 18 and 0.8M). Resumed at 05:52, 7 kept and 4 started in each. The
+sessions in flight at each stop were lost and rerun from the start; none of them had submitted. Cost
+re-estimated: S0 and S1 about $60 billed, S2 about $30 more, which waits for the user's word.

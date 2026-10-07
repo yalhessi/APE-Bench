@@ -222,3 +222,10 @@ looks alive and bills nothing. Before `--execute`, confirm the provider's variab
 launching shell (`source ~/.config/secrets/env.zsh` in the same command); in the first minutes,
 confirm `completed with success` lines appear and "API call failed, retrying" does not. The fix is
 queued in `docs/todo/framework-defects-2026-09.md`.
+
+**Launch a paid run detached, and read its bill from the outcomes, not the log.** A run started as a
+Claude Code background task dies with that process: stage 5's gpt-5.5 runs did at 7 of 16 sessions
+(2026-10-07). Start it with `setsid nohup ... < /dev/null &`, and `run --resume` keeps the finished
+sessions. The `completed with success (cost=$...)` log line is **nominal** cost, uncached list price;
+billed is `billed_cost` in each `tasks/*/task_outcome.json`, five times smaller on those runs ($65.44
+against $13.15 for seven sessions). Read as a bill, the log line stopped a run that was within budget.
