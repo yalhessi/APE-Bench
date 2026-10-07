@@ -468,3 +468,14 @@ section fact, a finding that repeats it.
 **Cost.** Stage W billed $15.61 for 13 sessions, about $1.20 a session: 32-48 sessions is about
 $40-60 at list price, from the ELM key (GBP 458 left on 2026-10-07). The $20 session cap binds a
 session; the run caps are set to fit 16 of them, a ceiling, not a forecast.
+
+**Smoke (2026-10-07 05:12-05:17), passed.** `iter_elmqwen35_census_detectors_s2_smoke`: both sessions
+started and submitted (28484: 29 turns, 0.75M tokens; 30645: 32 turns, 1.42M), no retries, $0.00.
+Each prompt holds its PR model, its own detector section (28484 dot notation, 30645 primed names)
+and the disposition section. `probes._solo` loads the run's findings with their targets, so
+`cli probe match-inputs` can blind it. Not read for any result. S0 and S1 launched at 05:21,
+both answered by ELM's Responses endpoint in their first minute with no retries.
+
+One change to the reading, made before any GPT session ended: the labels come from `cli probe seal`,
+a fresh draw from `secrets` written to disk before reading, rather than a permutation from a seed I
+named. The seeded one would have let me recompute the key.
