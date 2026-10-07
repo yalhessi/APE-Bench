@@ -237,3 +237,23 @@ The three `keepthink` reps, with each turn's thinking kept, read by the pre-regi
 - **Next, per the rule: a design pair on both models.** Speculative decoding (DSpark) is being
   measured as a speed lever (`run_ds41_dspark.sh`). On the Qwen 397B, MTP gave ~1.75x on a single
   stream but only ~10% across a 12-session batch, so expect a modest gain at 15 sessions.
+
+## Speculative decoding (2026-10-07): 1.55x per session, the same reviews
+
+One keepthink rep on a server with DSpark, the draft stages shipped in the checkpoint:
+`--speculative-config '{"method":"dspark","num_speculative_tokens":5}'`. vLLM refuses the setting
+without `num_speculative_tokens`, so the first start failed. Its gate is `run_ds41_dspark.sh`.
+
+| | per-session tokens/s | session minutes (median / max) | rep | score |
+|---|---|---|---|---|
+| plain server, keepthink reps 1-3 | 35.7, 35.9, 36.3 | 28-31 / 42-51 | 45-53 min | 8, 6, 9 |
+| DSpark, keepthink rep | **55.6** | **21.2 / 31.5** | **34.5 min** | 6 |
+
+- **The draft is accepted.** Under the 15-session load, 2.9-3.7 tokens are accepted per step, and
+  3.3-4.1 for a single request. The single-request correctness probe ran in 34 s against 81.
+- **The reviews are unchanged within noise.** Output per session is the same (61k). Both probes
+  pass as before. The score sits inside the reps' 6-9, with all six hits in their union of 11.
+- **The gain holds at 15 sessions.** It is 1.55x, where Qwen's MTP gave ~10% at 12, presumably
+  because these sessions think long and the draft predicts thinking well.
+- **For later runs:** start the server with DSpark. Its speed is a server property, not in the run
+  plan, so a rep's wall clock should be read with the server's flags beside it.
