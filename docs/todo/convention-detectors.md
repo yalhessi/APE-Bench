@@ -52,6 +52,13 @@ two dev-run windows. Once the workspaces are built it is one command per conditi
 `ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`
 and the same with `..._hygiene_sections_claude_sub.yaml` and `..._s1_rep1`, read by hand by stage 5's rule.
 
+**Item 1 on gpt-5.5 (2026-10-07): no effect.** Run on gpt-5.5 instead (the user's call; stage W's
+condition), blind hand reading: the sections took 0 to 1 of the 13 exactly stated asks (S0 against S1,
+one rep each, $52 billed), not a volume lever. S1's reasoning summaries show the stated fact considered
+and dropped at four PRs, once on an explicit guess about maintainers (32674), and unmentioned at four.
+S2, the disposition paragraph of `docs/plans/2026-10-06-generation-without-suppression.md`, is the
+next measurement and waits on the user. Opus untested; its configs stay built.
+
 **Start here.**
 - read: the probe README above (rules, amendments 1-2, stages 1-4, the two corrections);
   `src/mathlib_review/producers/__init__.py`; `producers/dot_notation.py`, `primed_names.py`,
