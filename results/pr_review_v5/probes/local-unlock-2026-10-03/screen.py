@@ -26,6 +26,8 @@ RUNS = {
     # were stopped unfinished; `keepthink` is the rerun with it kept. The none rep is unaffected.
     **{f"ds41 keep r{n}": f"iter_ds41_contract2_keepthink_high_rep{n}" for n in range(1, 4)},
     "ds41 none r1": "iter_ds41_contract2_none_rep1",
+    # keepthink on a server with speculative decoding (DSpark): same reviews in distribution, faster.
+    "ds41 dspark r1": "iter_ds41_contract2_keepthink_dspark_high_rep1",
 }
 
 
