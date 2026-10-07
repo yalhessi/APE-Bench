@@ -2,10 +2,15 @@
 # Serve deepseek-ai/DeepSeek-V4.1-Flash with vLLM on `first`, bound to localhost (the harness runs on
 # this host). The weights are downloaded into /tmp (tmpfs) when the job starts, not before: the job
 # waits in the queue for a busy node, and a 510 GB copy would hold that much of its RAM meanwhile.
+# /tmp is tmpfs, so the copy is node RAM for as long as it sits there, and vLLM neither maps nor holds the
+# shards once loaded: deleting them while job 432906 served (2026-10-07 08:13) gave the node back 476 GB
+# with the server unaffected. Delete *.safetensors and .complete once serving; the next start downloads
+# again (493 s). /research is NFS (~75 MB/s, so ~1.8 h to read 476 GB); the node's local NVMe,
+# /data/local, is root-only.
 #SBATCH -p first
 #SBATCH -A first
 #SBATCH --gres=gpu:8
-#SBATCH --mem=1000G
+#SBATCH --mem=900G
 #SBATCH --time=08:00:00
 #SBATCH -J vllm-ds41
 #SBATCH -o /research/projects/proofedit/ya475/localmodel/logs/serve_ds41_%j.log
@@ -51,9 +56,19 @@ export FLASHINFER_DISABLE_VERSION_CHECK=1
 # is on PATH as well, for anything still compiled at startup.
 export CUDA_HOME=/usr/local/cuda-13.0
 export PATH=$VENV/bin:$CUDA_HOME/bin:$PATH
-echo "serving from $DEST with $($VENV/bin/vllm --version 2>/dev/null) ($VENV) at $(date -Is); extra: $*"
+# The shards are node RAM (tmpfs) and unused once loaded, so they go as soon as the server answers;
+# KEEP_WEIGHTS=1 keeps them for a quick restart (4 min against ~12).
+if [ "${KEEP_WEIGHTS:-0}" != 1 ]; then
+  ( until curl -sf "http://127.0.0.1:$PORT/v1/models" >/dev/null 2>&1; do sleep 30; done
+    rm -f "$DEST/.complete" "$DEST"/*.safetensors
+    echo "serving; weight shards deleted from $DEST at $(date -Is)" ) &
+fi
+# 262144 until 2026-10-07. With each turn's thinking kept in the prompt (5fd560ab), a high-effort
+# session adds ~8k tokens a turn and would pass it near turn 25-30; the model takes 1,048,576.
+MAX_LEN=${MAX_LEN:-1048576}
+echo "serving from $DEST with $($VENV/bin/vllm --version 2>/dev/null) ($VENV) at $(date -Is); max len $MAX_LEN; extra: $*"
 exec $VENV/bin/vllm serve "$DEST" --host 127.0.0.1 --port "$PORT" \
   --served-model-name local-deepseek deepseek-ai/DeepSeek-V4.1-Flash --tensor-parallel-size 8 \
   --tool-call-parser deepseek_v41 --reasoning-parser deepseek_v41 --enable-auto-tool-choice \
   --language-model-only --enable-prefix-caching --enable-prompt-tokens-details \
-  --max-model-len 262144 "$@"
+  --max-model-len "$MAX_LEN" "$@"

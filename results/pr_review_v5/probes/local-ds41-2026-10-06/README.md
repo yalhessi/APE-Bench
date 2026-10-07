@@ -168,3 +168,27 @@ rebuilds each message from an allowlist without `reasoning_content`.
 So the four reps started on 2026-10-07 ran with every turn's thinking discarded. The `none` rep is
 unaffected, since it has no thinking to carry. The three `high` reps measure re-derived thinking, not
 the condition the pre-registration meant.
+
+## How the runs went (2026-10-07)
+
+- **Rep 1 was slow.** `iter_ds41_contract2_high_rep1` started at 06:49 under `run_ds41_gate.sh`.
+  After 52 minutes one session of 15 had finished, at about 35 generated tokens a second per
+  session, 92% of them thinking. Run one after another, the four reps would not have fitted the
+  server job's 8 hours.
+- **The other three reps ran beside it.** At 08:01 the gate shell was paused with SIGSTOP, and
+  `run_ds41_parallel.sh` started high reps 2 and 3 and the none rep as a step of the gate job
+  (`srun --overlap`, launched from a systemd user unit). Total generation went from 420 to 972
+  tokens a second across 47 sessions; the KV pool was 37% full.
+- **The weight shards were deleted from `/tmp` while the server ran.** That gave the node back
+  476 GB (`serve_ds41.sbatch` now does it once the server answers).
+- **The three high reps were stopped at 08:52**, after the thinking defect above was found. High
+  rep 1 had finished 1 session, reps 2 and 3 none. The none rep finished at 08:54: 15 of 15
+  sessions, 54 findings.
+- **The rerun is `run_ds41_keepthink.sh`.** The high reps are `iter_ds41_contract2_keepthink_high_rep1..3`:
+  - new names, because the fix is in code and the old names would resume the defective runs;
+  - one rep at a time, all 15 sessions at once, since kept thinking grows every prompt;
+  - `--max-model-len 1048576`, the model's limit, up from 262144;
+  - a 900G reservation, down from 1000G;
+  - `probe_carry.py` added to the probes run before any review.
+
+  The reading rule is unchanged. It applies to the mean of the three `keepthink` reps.
