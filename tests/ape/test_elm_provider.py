@@ -404,6 +404,29 @@ def test_a_local_model_posts_to_localhost_with_no_key(model):
     assert "Authorization" not in headers
 
 
+def _session_with_a_thinking_turn():
+    from ape.llm_clients.models import ContentBlock, ConversationSession
+
+    session = ConversationSession()
+    session.add_user_message([ContentBlock.text_block("review this")], cwd="/")
+    session.add_assistant_message([ContentBlock.thinking_block("first I read the diff"),
+                                   ContentBlock.tool_use_block("call_1", "file_read", {"path": "A.lean"})],
+                                  cwd="/")
+    return session
+
+
+@pytest.mark.parametrize("model", LOCAL_MODELS)
+def test_a_local_model_gets_its_earlier_thinking_back(model):
+    """Both locally served models render every assistant turn's thinking since the last user
+    message, and vLLM accepts `reasoning_content`: on the OpenAI formatter it was dropped, and
+    DeepSeek re-derived ~8k thinking tokens on every turn (2026-10-07)."""
+
+    client = client_for(model)
+    assistant = client.message_formatter.format_for_api(_session_with_a_thinking_turn())[1]
+    assert assistant["reasoning_content"] == "first I read the diff"
+    assert assistant["tool_calls"][0]["function"]["name"] == "file_read"
+
+
 def test_a_local_model_sends_its_hf_id_tools_and_reasoning_effort():
     from ape.llm_clients.providers import LocalProvider
 
