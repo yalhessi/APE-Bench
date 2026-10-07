@@ -58,3 +58,40 @@ Caveats carried into any reading:
 - A one-obligation difference across the judge move is noise.
 - The dev PRs (2025-12) are inside DeepSeek-V4.1's training window, as they are for every
   reviewer on this scale.
+
+## Result (2026-10-07): it does not run on `first`'s GPUs. The gate was never reached
+
+Two server starts, both stopped by `run_ds41_gate.sh` at the traceback, with the node released at
+once. No review ran and nothing was spent.
+
+1. **Job 432149 (vLLM 0.30, 2026-10-06 19:37):** the weights downloaded in 493 s (476 GB). Startup
+   then died on "FLASHINFER_MLA_SPARSE_DSV4 on SM120 requires a FlashInfer DSV4 sparse MLA decode
+   specialization for (num_q_heads=8, top_k=128)".
+   - That shape *is* in the installed FlashInfer's table.
+   - The real cause: vLLM's `has_flashinfer()` is False without prebuilt cubins or an `nvcc` on
+     PATH, and every FlashInfer check after it reports a missing kernel.
+   - Fixed by installing `flashinfer-cubin` and `flashinfer-jit-cache` for cu130
+     (`python -m flashinfer download-kernels --cuda-version cu130`). The node's own CUDA 13.0
+     toolkit, `/usr/local/cuda-13.0` (the default `/usr/local/cuda` is 12.9), is now on PATH too.
+2. **Job 432871 (vLLM 0.30, 2026-10-07 04:48):** the model loaded (47.8 GiB a GPU in 116 s), then
+   died building attention metadata on DeepGEMM's `block_kv == 32 or block_kv == 64`.
+
+**Why no setting fixes it, in 0.30 or in 0.31.0** (released 2026-10-05 with "DeepGEMM ... SM120
+fixes"; installed alongside as `localmodel/vllm031-env` and checked statically, not run):
+- On SM120, V4.1's sparse attention has one backend, `FLASHINFER_MLA_SPARSE_DSV41`, whose only
+  kernel block size is 128.
+- Its indexer computes paged MQA logits with DeepGEMM: "DeepGEMM is required for the paged MQA
+  logits on CUDA devices". The only other implementations are for ROCm and CPU.
+- DeepGEMM's compiled assertion is the same in both versions: on arch 12 it accepts `block_kv` 64
+  for FP8, or 32/64 for FP4.
+- The indexer passes `block_size // tokens_per_state`, which differs by layer compression ratio,
+  so no single block size gives every layer 64.
+- The FP4 indexer cache, which would allow 32, is refused below SM10x ("requires Blackwell
+  datacenter GPUs").
+
+**What would reopen it:**
+- a vLLM release with an SM120 indexer path;
+- a local patch routing the CUDA indexer to the Triton kernel vLLM ships for ROCm, which is
+  unverified for correctness;
+- another serving engine;
+- datacenter GPUs (H100/H200/B200).
