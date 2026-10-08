@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:28",
+  "claim": "The docstring for `Matrix.toLpLin` says it is adapted for `PiLp R _`, but `PiLp` is indexed by the exponent(s) `p`/`q`, while `R` is the coefficient type; the declaration's actual endpoints are `WithLp p (n → R)` and `WithLp q (m → R)`.",
+  "requested_change": "Rewrite the docstring to name the actual spaces, for example: ``/-- `Matrix.toLin'` adapted for `WithLp p (_ → R)` and `WithLp q (_ → R)` (equivalently constant `PiLp` spaces). -/``",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:36",
+  "claim": "`Matrix.toLpLin_toLp` uses the undotted spelling `Matrix.toLin' A` even though the matrix `A` is the primary argument.",
+  "requested_change": "Change the right-hand side to `toLp _ (A.toLin' x)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:40",
+  "claim": "`Matrix.ofLp_toLpLin` uses the undotted spelling `Matrix.toLin' A` even though the matrix `A` is the primary argument.",
+  "requested_change": "Change the right-hand side to `A.toLin' (ofLp x)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Analysis/Matrix/Spectrum.lean:40",
+  "claim": "`Matrix.spectrum_toLpLin` rebuilds the same algebra equivalence via `Matrix.toLinAlgEquiv (PiLp.basisFun p 𝕜 n)` instead of using the new `Matrix.toLpLinAlgEquiv` API introduced by this PR.",
+  "requested_change": "Replace the proof with `AlgEquiv.spectrum_eq (toLpLinAlgEquiv p) _`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:68",
+  "claim": "The docstring for `Matrix.toLpLinAlgEquiv` repeats the misleading phrase `PiLp R _`; here too `R` is the coefficient type, while the actual space is `WithLp p (n → R)`.",
+  "requested_change": "Rewrite it to mention `WithLp p (_ → R)` or `PiLp p fun _ => R`, e.g. ``/-- `Matrix.toLinAlgEquiv'` adapted for `WithLp p (_ → R)` (equivalently a constant `PiLp p` space). -/``",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:78",
+  "claim": "`Matrix.toLpLinSymm_pow` uses camel-case `Symm` even though it is a lemma about `(toLpLin p p).symm`; the adjacent inverse lemmas are named `toLpLin_symm_id` and `toLpLin_symm_comp`, and existing names use `_symm_pow` for this pattern.",
+  "requested_change": "Rename the theorem to `toLpLin_symm_pow` (no deprecated alias is needed for a new declaration).",
+  "severity": "advisory"
+ }
+]

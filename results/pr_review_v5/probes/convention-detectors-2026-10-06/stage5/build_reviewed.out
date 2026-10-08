@@ -1,0 +1,138 @@
+2026-10-06 13:38:34 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 13:38:34 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+reviewed workspaces for 16 episode(s): 0 ready, 16 to build, 0 base not built
+  PR 28484  d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad  to build  (3 changed files)
+  PR 30645  4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad  to build  (1 changed files)
+  PR 31007  ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506  to build  (2 changed files)
+  PR 31077  bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4  to build  (3 changed files)
+  PR 31793  370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db  to build  (2 changed files)
+  PR 31961  2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab  to build  (1 changed files)
+  PR 32540  a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a  to build  (3 changed files)
+  PR 32610  4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab  to build  (15 changed files)
+  PR 32674  a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65  to build  (4 changed files)
+  PR 32715  ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235  to build  (2 changed files)
+  PR 32992  21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069  to build  (2 changed files)
+  PR 33006  a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb  to build  (3 changed files)
+  PR 34241  9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06  to build  (7 changed files)
+  PR 35807  3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197  to build  (1 changed files)
+  PR 36355  f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b  to build  (5 changed files)
+  PR 37009  c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640  to build  (9 changed files)
+2026-10-06 13:38:34 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-10-06 13:38:34 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-10-06 13:38:34 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 13:38:34 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-10-06 13:38:34 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-10-06 13:38:34 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-10-06 13:38:34 | INFO     | build_reviewed_workspaces:136 - PR 28484: building reviewed workspace d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad (3 changed files)
+2026-10-06 13:38:34 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad (base d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9)
+2026-10-06 13:46:43 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 50742 items (48612 files, 2130 directories)
+2026-10-06 13:46:46 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 50742/50742 processed
+2026-10-06 13:46:48 | INFO     | complete_build:360 - Build operation completed: d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad, success: True
+2026-10-06 13:46:48 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad in 493.8s
+2026-10-06 13:46:48 | INFO     | build_reviewed_workspaces:147 - PR 28484: built d9cecd1cf3eba11f90b01b6d6884f7f3a43178c9+b365f8f8ddad in 494s
+2026-10-06 13:46:48 | INFO     | build_reviewed_workspaces:136 - PR 30645: building reviewed workspace 4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad (1 changed files)
+2026-10-06 13:46:48 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad (base 4b0359cc77084a80d4e7e32ee99100ee1a92a040)
+2026-10-06 13:51:19 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 51461 items (49317 files, 2144 directories)
+2026-10-06 13:51:22 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 51461/51461 processed
+2026-10-06 13:51:23 | INFO     | complete_build:360 - Build operation completed: 4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad, success: True
+2026-10-06 13:51:23 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad in 275.5s
+2026-10-06 13:51:23 | INFO     | build_reviewed_workspaces:147 - PR 30645: built 4b0359cc77084a80d4e7e32ee99100ee1a92a040+f4d189c120ad in 275s
+2026-10-06 13:51:23 | INFO     | build_reviewed_workspaces:136 - PR 31007: building reviewed workspace ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506 (2 changed files)
+2026-10-06 13:51:23 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506 (base ed54e0989389bf7f9e14657648aec1d89ccd94ce)
+2026-10-06 13:57:35 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 51751 items (49591 files, 2160 directories)
+2026-10-06 13:57:39 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 51751/51751 processed
+2026-10-06 13:57:40 | INFO     | complete_build:360 - Build operation completed: ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506, success: True
+2026-10-06 13:57:40 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506 in 377.0s
+2026-10-06 13:57:40 | INFO     | build_reviewed_workspaces:147 - PR 31007: built ed54e0989389bf7f9e14657648aec1d89ccd94ce+491e9d6ad506 in 377s
+2026-10-06 13:57:40 | INFO     | build_reviewed_workspaces:136 - PR 31077: building reviewed workspace bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4 (3 changed files)
+2026-10-06 13:57:40 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4 (base bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2)
+2026-10-06 14:00:57 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 51890 items (49765 files, 2125 directories)
+2026-10-06 14:01:01 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 51890/51890 processed
+2026-10-06 14:01:02 | INFO     | complete_build:360 - Build operation completed: bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4, success: True
+2026-10-06 14:01:02 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4 in 202.0s
+2026-10-06 14:01:02 | INFO     | build_reviewed_workspaces:147 - PR 31077: built bfd2bc10ad73b7cfdf62b6c6d0530e7292cb0ee2+d6858d4ab4f4 in 202s
+2026-10-06 14:01:02 | INFO     | build_reviewed_workspaces:136 - PR 31793: building reviewed workspace 370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db (2 changed files)
+2026-10-06 14:01:02 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db (base 370d9705df1c68b0707ca1a9688a60e299264c5f)
+2026-10-06 14:07:05 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 52634 items (50510 files, 2124 directories)
+2026-10-06 14:07:08 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 52634/52634 processed
+2026-10-06 14:07:10 | INFO     | complete_build:360 - Build operation completed: 370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db, success: True
+2026-10-06 14:07:10 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db in 367.9s
+2026-10-06 14:07:10 | INFO     | build_reviewed_workspaces:147 - PR 31793: built 370d9705df1c68b0707ca1a9688a60e299264c5f+b4db88cb77db in 368s
+2026-10-06 14:07:10 | INFO     | build_reviewed_workspaces:136 - PR 31961: building reviewed workspace 2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab (1 changed files)
+2026-10-06 14:07:10 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab (base 2fc191a2c76719bffe2403726776d0ed3773a94d)
+2026-10-06 14:16:53 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 96086 items (93937 files, 2149 directories)
+2026-10-06 14:16:59 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 96086/96086 processed
+2026-10-06 14:17:01 | INFO     | complete_build:360 - Build operation completed: 2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab, success: True
+2026-10-06 14:17:01 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab in 590.7s
+2026-10-06 14:17:01 | INFO     | build_reviewed_workspaces:147 - PR 31961: built 2fc191a2c76719bffe2403726776d0ed3773a94d+e05f61835cab in 591s
+2026-10-06 14:17:01 | INFO     | build_reviewed_workspaces:136 - PR 32540: building reviewed workspace a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a (3 changed files)
+2026-10-06 14:17:01 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a (base a7462520609614c29c8b504c8e233685a19de5b6)
+2026-10-06 14:27:38 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 97788 items (95583 files, 2205 directories)
+2026-10-06 14:27:44 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 97788/97788 processed
+2026-10-06 14:27:46 | INFO     | complete_build:360 - Build operation completed: a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a, success: True
+2026-10-06 14:27:46 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a in 645.6s
+2026-10-06 14:27:46 | INFO     | build_reviewed_workspaces:147 - PR 32540: built a7462520609614c29c8b504c8e233685a19de5b6+0ad0d2ab381a in 646s
+2026-10-06 14:27:46 | INFO     | build_reviewed_workspaces:136 - PR 32610: building reviewed workspace 4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab (15 changed files)
+2026-10-06 14:27:46 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab (base 4416d9e74ce0c8e32be5035066434c5a790e7145)
+2026-10-06 14:45:04 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 100049 items (97701 files, 2348 directories)
+2026-10-06 14:45:10 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 100049/100049 processed
+2026-10-06 14:45:13 | INFO     | complete_build:360 - Build operation completed: 4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab, success: True
+2026-10-06 14:45:13 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab in 1046.3s
+2026-10-06 14:45:13 | INFO     | build_reviewed_workspaces:147 - PR 32610: built 4416d9e74ce0c8e32be5035066434c5a790e7145+127dad307dab in 1046s
+2026-10-06 14:45:13 | INFO     | build_reviewed_workspaces:136 - PR 32674: building reviewed workspace a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65 (4 changed files)
+2026-10-06 14:45:13 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65 (base a36c84ab8236a4869899268a42a44af07daa21ed)
+2026-10-06 14:49:03 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 99152 items (96952 files, 2200 directories)
+2026-10-06 14:49:08 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 99152/99152 processed
+2026-10-06 14:49:11 | INFO     | complete_build:360 - Build operation completed: a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65, success: True
+2026-10-06 14:49:11 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65 in 237.8s
+2026-10-06 14:49:11 | INFO     | build_reviewed_workspaces:147 - PR 32674: built a36c84ab8236a4869899268a42a44af07daa21ed+cc7a61a09e65 in 238s
+2026-10-06 14:49:11 | INFO     | build_reviewed_workspaces:136 - PR 32715: building reviewed workspace ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235 (2 changed files)
+2026-10-06 14:49:11 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235 (base ad8efb3c13c818e58dc2887af05805a2fa85ff02)
+2026-10-06 14:55:49 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 98690 items (96470 files, 2220 directories)
+2026-10-06 14:55:56 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 98690/98690 processed
+2026-10-06 14:56:00 | INFO     | complete_build:360 - Build operation completed: ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235, success: True
+2026-10-06 14:56:00 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235 in 409.1s
+2026-10-06 14:56:00 | INFO     | build_reviewed_workspaces:147 - PR 32715: built ad8efb3c13c818e58dc2887af05805a2fa85ff02+29d568811235 in 409s
+2026-10-06 14:56:00 | INFO     | build_reviewed_workspaces:136 - PR 32992: building reviewed workspace 21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069 (2 changed files)
+2026-10-06 14:56:00 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069 (base 21f7dcba68e7532c8c291f71767cb5032b1526e1)
+2026-10-06 15:01:37 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 98885 items (96695 files, 2190 directories)
+2026-10-06 15:01:44 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 98885/98885 processed
+2026-10-06 15:01:48 | INFO     | complete_build:360 - Build operation completed: 21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069, success: True
+2026-10-06 15:01:48 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069 in 348.6s
+2026-10-06 15:01:48 | INFO     | build_reviewed_workspaces:147 - PR 32992: built 21f7dcba68e7532c8c291f71767cb5032b1526e1+561e88bea069 in 349s
+2026-10-06 15:01:48 | INFO     | build_reviewed_workspaces:136 - PR 33006: building reviewed workspace a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb (3 changed files)
+2026-10-06 15:01:48 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb (base a06e2b664ad658aa0e96140ac942641ee8f5cd66)
+2026-10-06 15:14:06 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 98541 items (96325 files, 2216 directories)
+2026-10-06 15:14:12 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 98541/98541 processed
+2026-10-06 15:14:16 | INFO     | complete_build:360 - Build operation completed: a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb, success: True
+2026-10-06 15:14:16 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb in 747.9s
+2026-10-06 15:14:16 | INFO     | build_reviewed_workspaces:147 - PR 33006: built a06e2b664ad658aa0e96140ac942641ee8f5cd66+148d9bf7c5cb in 748s
+2026-10-06 15:14:16 | INFO     | build_reviewed_workspaces:136 - PR 34241: building reviewed workspace 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06 (7 changed files)
+2026-10-06 15:14:16 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06 (base 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561)
+2026-10-06 15:27:52 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 100079 items (97816 files, 2263 directories)
+2026-10-06 15:27:59 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 100079/100079 processed
+2026-10-06 15:28:03 | INFO     | complete_build:360 - Build operation completed: 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06, success: True
+2026-10-06 15:28:03 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06 in 826.3s
+2026-10-06 15:28:03 | INFO     | build_reviewed_workspaces:147 - PR 34241: built 9ffe92940ecaeb3dcd538bc6e1644e60c32d4561+c951b70fad06 in 826s
+2026-10-06 15:28:03 | INFO     | build_reviewed_workspaces:136 - PR 35807: building reviewed workspace 3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197 (1 changed files)
+2026-10-06 15:28:03 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197 (base 3e143864e89e46310b5eec17f86951d1b670999b)
+2026-10-06 15:44:09 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 101898 items (99642 files, 2256 directories)
+2026-10-06 15:44:16 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 101898/101898 processed
+2026-10-06 15:44:19 | INFO     | complete_build:360 - Build operation completed: 3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197, success: True
+2026-10-06 15:44:19 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197 in 976.5s
+2026-10-06 15:44:19 | INFO     | build_reviewed_workspaces:147 - PR 35807: built 3e143864e89e46310b5eec17f86951d1b670999b+8db45ce2d197 in 977s
+2026-10-06 15:44:19 | INFO     | build_reviewed_workspaces:136 - PR 36355: building reviewed workspace f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b (5 changed files)
+2026-10-06 15:44:19 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b (base f399585808431c47f1f635dc00d94351a6bd9390)
+2026-10-06 16:00:10 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 103153 items (100884 files, 2269 directories)
+2026-10-06 16:00:17 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 103153/103153 processed
+2026-10-06 16:00:21 | INFO     | complete_build:360 - Build operation completed: f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b, success: True
+2026-10-06 16:00:21 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b in 961.5s
+2026-10-06 16:00:21 | INFO     | build_reviewed_workspaces:147 - PR 36355: built f399585808431c47f1f635dc00d94351a6bd9390+1414c3ef652b in 962s
+2026-10-06 16:00:21 | INFO     | build_reviewed_workspaces:136 - PR 37009: building reviewed workspace c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640 (9 changed files)
+2026-10-06 16:00:21 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640 (base c45e34ab8fecdd7c5abe99e6325da0db6328811a)
+2026-10-06 16:28:40 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 106374 items (103996 files, 2378 directories)
+2026-10-06 16:28:47 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 106374/106374 processed
+2026-10-06 16:28:51 | INFO     | complete_build:360 - Build operation completed: c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640, success: True
+2026-10-06 16:28:51 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640 in 1710.0s
+2026-10-06 16:28:51 | INFO     | build_reviewed_workspaces:147 - PR 37009: built c45e34ab8fecdd7c5abe99e6325da0db6328811a+f0095c09d640 in 1710s
+built 16 of 16 reviewed workspace(s)

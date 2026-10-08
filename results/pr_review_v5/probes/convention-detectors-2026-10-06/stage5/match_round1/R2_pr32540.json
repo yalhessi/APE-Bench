@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/RingTheory/TensorProduct/Finite.lean:197",
+  "claim": "`RingHom.Finite.tensorProductMap` is an `AlgHom.Finite` theorem: its hypotheses are `Hf : f.Finite` and `Hg : g.Finite` for algebra homomorphisms, and its conclusion pretty-prints as `(Algebra.TensorProduct.map f g).Finite`. Keeping it in the `RingHom.Finite` namespace prevents the expected `Hf.tensorProductMap Hg` dot notation for `AlgHom.Finite`.",
+  "requested_change": "Rename/move the public lemma to `AlgHom.Finite.tensorProductMap`, state the conclusion as `(Algebra.TensorProduct.map f g).Finite`, and keep a `change (Algebra.TensorProduct.map f g).toRingHom.Finite` at the start of the proof if needed. Update the private helper comment/reference accordingly.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/RingTheory/SurjectiveOnStalks.lean:185",
+  "claim": "`RingHom.SurjectiveOnStalks.baseChange'` still uses the lower-level `surjectiveOnStalks_of_surjective (Algebra.TensorProduct.comm R T S).surjective` even though the PR adds the canonical `RingEquiv.surjectiveOnStalks` lemma immediately above.",
+  "requested_change": "Replace the proof body with `convert (Algebra.TensorProduct.comm R T S).toRingEquiv.surjectiveOnStalks.comp (hf.baseChange (S := T))`.",
+  "severity": "advisory"
+ }
+]

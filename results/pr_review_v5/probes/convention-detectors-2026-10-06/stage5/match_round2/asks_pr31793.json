@@ -1,0 +1,9 @@
+[
+ {
+  "ask_id": "v1237",
+  "path": null,
+  "code_at_comment": "",
+  "comment": "Thanks!\r\n\r\nI agree with your comment about naming (and I think I might be responsible for the bad name years ago). Please rename `preErgodic_of_preErgodic_conjugate` to `preErgodic_of_preErgodic_semiconj` and just below it add:\r\n```lean\r\n@[deprecated (since := \"2025-11-19\")]\r\nalias preErgodic_of_preErgodic_conjugate := preErgodic_of_preErgodic_semiconj\r\n```\r\n\r\n",
+  "replies_to": null
+ }
+]

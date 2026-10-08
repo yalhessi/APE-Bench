@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Submonoid/Defs.lean:373",
+  "claim": "The new `SubmonoidClass` instance for `IsDedekindFiniteMonoid S` is missing `@[to_additive]`, so the additive submonoid analogue is not generated even though this section systematically provides additive counterparts.",
+  "requested_change": "Add `@[to_additive]` to this instance so `AddSubmonoidClass` inherits `IsDedekindFiniteAddMonoid` from the ambient additive monoid.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/GroupTheory/DedekindFinite.lean:17",
+  "claim": "The finite-monoid instance is missing `@[to_additive]`, leaving no generated instance that finite additive monoids are `IsDedekindFiniteAddMonoid`.",
+  "requested_change": "Add `@[to_additive]` to the finite `IsDedekindFiniteMonoid` instance.",
+  "severity": "advisory"
+ }
+]

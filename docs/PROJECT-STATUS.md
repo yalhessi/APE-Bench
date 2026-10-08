@@ -456,7 +456,8 @@ fast-closing PRs.
   (`report conditions` carries the per-obligation spine, `report tools`, two ratchet lints, a
   post-commit note, `knob()` task-data fields that move no existing identity) and the first half of
   step 3 (one tool vocabulary; unknown tools refused), then the producer seam with three convention
-  detectors measured alone (`docs/todo/convention-detectors.md`). Step 4's design move and step 6's
+  detectors, measured alone, read by a gpt-5.5 reviewer, and closed 2026-10-07 as a recall lever
+  (`docs/dead-ends.md`, "Convention detectors as a recall lever"). Step 4's design move and step 6's
   deletions were dropped on reading the code and the record; step 5 waits for the next probe that
   launches sessions by hand.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not

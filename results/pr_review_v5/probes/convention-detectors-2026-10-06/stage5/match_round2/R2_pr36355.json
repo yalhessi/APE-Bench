@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:201",
+  "claim": "`MeasureTheory.integral_finset` was moved but its explicit `f` argument was accidentally made implicit, so existing calls of the old API such as `integral_finset s f hf` no longer elaborate.",
+  "requested_change": "Restore the moved theorem's old explicit binder: `theorem integral_finset (s : Finset X) (f : X → E) (hf : IntegrableOn f s μ) : ...`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:205",
+  "claim": "`MeasureTheory.integral_fintype` was moved but its explicit `f` argument was accidentally made implicit, breaking the pre-existing call shape `integral_fintype f hf` (the PR even has to change `PMF.integral_eq_sum` for this).",
+  "requested_change": "Restore the explicit function binder, i.e. declare `theorem integral_fintype [Fintype X] (f : X → E) (hf : Integrable f μ) : ...`, and update the PMF proof back to `rw [integral_fintype _ .of_finite]`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:159",
+  "claim": "`MeasureTheory.hasSum_integral_sum_dirac` assumes finite weights and summability of the weighted norms, but the HasSum conclusion only needs `Integrable f (Measure.sum (fun i ↦ (c i) • .dirac (x i)))`; the current hypotheses unnecessarily exclude integrable cases with infinite coefficients at zeros and also retain an unnecessary `[Countable ι]`.",
+  "requested_change": "State the core lemma with the weaker hypothesis `(hf : Integrable f (Measure.sum (fun i ↦ (c i) • .dirac (x i))))`, drop `hc`, the summability assumption, and add `omit [Countable ι] in`; derive the summability-facing form as a corollary if desired.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:167",
+  "claim": "`MeasureTheory.integral_sum_dirac_eq_tsum` has the same avoidable `hc` and norm-summability assumptions: the equality follows from the weaker integrability hypothesis, with no countability assumption on the index type.",
+  "requested_change": "Change the theorem to take `(hf : Integrable f (Measure.sum (fun i ↦ (c i) • .dirac (x i))))` and prove it from the generalized `hasSum_integral_sum_dirac`; users with the present hypotheses can pass `integrable_sum_dirac hc hf`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:35",
+  "claim": "The documentation for `integral_sum_dirac_eq_tsum` contains malformed integral notation (for example `∫ x, f x, ∂...`), and the module overview also has a malformed `∫ f x ∂μ i` display.",
+  "requested_change": "Correct the displayed formulas to valid notation, e.g. `∫ x, f x ∂Measure.sum (fun i ↦ (c i) • .dirac (x i)) = ∑' i, (c i).toReal • f (x i)` and `∫ x, f x ∂μ i`.",
+  "severity": "advisory"
+ }
+]

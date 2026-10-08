@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:79",
+  "claim": "`hasPointwiseRightKanExtension_of_hasPointwiseLeftDerivedFunctor` is a top-level `has...` name for a lemma whose conclusion is the predicate `HasPointwiseRightKanExtension`; this should live in the predicate namespace so it has the expected dotted name.",
+  "requested_change": "Rename it to `HasPointwiseRightKanExtension.of_hasPointwiseLeftDerivedFunctor` and update the references in this file (and the dual right-derived file if keeping the APIs synchronized).",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:86",
+  "claim": "`hasLeftDerivedFunctor_of_hasPointwiseLeftDerivedFunctor` is a top-level `has...` name for a lemma whose conclusion is `F.HasLeftDerivedFunctor W`; it should be in the `HasLeftDerivedFunctor` namespace for dot notation.",
+  "requested_change": "Rename it to `HasLeftDerivedFunctor.of_hasPointwiseLeftDerivedFunctor`, update the instance attribute and call sites, and update the dual right-derived counterpart if preserving the stated synchronization.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:164",
+  "claim": "`hasPointwiseLeftDerivedFunctor_of_inverts` concludes `F.HasPointwiseLeftDerivedFunctor W` but is not in the `HasPointwiseLeftDerivedFunctor` namespace, so it misses the standard `HasPointwiseLeftDerivedFunctor.of_inverts` dotted form.",
+  "requested_change": "Rename it to `HasPointwiseLeftDerivedFunctor.of_inverts` and update any uses; mirror the change on the right-derived side if the paired files are kept in sync.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:172",
+  "claim": "`isLeftDerivedFunctor_of_inverts` concludes `F'.IsLeftDerivedFunctor e.hom W` but is not placed in the `IsLeftDerivedFunctor` namespace, so it misses the expected `IsLeftDerivedFunctor.of_inverts` name.",
+  "requested_change": "Rename it to `IsLeftDerivedFunctor.of_inverts` and update the instance and iff proof to call that namespaced lemma; mirror the right-derived counterpart if keeping the files synchronized.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/CategoryTheory/Functor/Derived/PointwiseLeftDerived.lean:183",
+  "claim": "`isIso_of_isLeftDerivedFunctor_of_inverts` concludes `IsIso α` but is a top-level theorem rather than the dotted `IsIso.of_isLeftDerivedFunctor_of_inverts` form.",
+  "requested_change": "Rename it to `IsIso.of_isLeftDerivedFunctor_of_inverts` and update `isLeftDerivedFunctor_iff_of_inverts` to use the new name; mirror the analogous right-derived theorem if keeping the paired files synchronized.",
+  "severity": "advisory"
+ }
+]

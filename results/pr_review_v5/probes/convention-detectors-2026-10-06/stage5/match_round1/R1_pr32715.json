@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:221",
+  "claim": "`Nat.ordProj_PrimePow_eq_self` and the adjacent `Nat.ordCompl_PrimePow_eq_one`/`Nat.ordCompl_PrimePow_mul_eq_self` use the CamelCase segment `PrimePow` even though their statements are about the explicit expression `p ^ k`; analogous Mathlib theorem names for explicit prime powers use lower snake-case `prime_pow`.",
+  "requested_change": "Rename these declarations to `ordProj_prime_pow_eq_self`, `ordCompl_prime_pow_eq_one`, and `ordCompl_prime_pow_mul_eq_self`, and update the internal reference in the last proof.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:221",
+  "claim": "`Nat.ordProj_PrimePow_eq_self` proves a definitional simplification by factorization extensionality, but `ordProj[p] (p ^ k)` reduces directly using `Prime.factorization_pow`.",
+  "requested_change": "Replace the proof with:\n```lean\ntheorem ordProj_PrimePow_eq_self {p k : ℕ} (hp : Prime p) : ordProj[p] (p ^ k) = p ^ k := by\n  simp [Prime.factorization_pow hp]\n```",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:228",
+  "claim": "`Nat.ordCompl_PrimePow_eq_one` also uses factorization extensionality, although after simplifying the factorization it is just `p ^ k / p ^ k = 1`.",
+  "requested_change": "Replace the proof with:\n```lean\ntheorem ordCompl_PrimePow_eq_one {p k : ℕ} (hp : Prime p) : ordCompl[p] (p ^ k) = 1 := by\n  simpa [Prime.factorization_pow hp] using Nat.div_self (pow_pos hp.pos k)\n```",
+  "severity": "advisory"
+ }
+]

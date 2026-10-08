@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/DiscreteSubset.lean:268",
+  "claim": "`infinite_of_accPt` proves a `Set.Infinite` conclusion but is added as a global `infinite_of_...` name, so it does not live with the `Set.Infinite` API that this area already uses for accumulation-point existence lemmas.",
+  "requested_change": "Rename the declaration to `Set.Infinite.of_accPt` (equivalently `Infinite.of_accPt` in the `Set` namespace) and update any references.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/ENNReal/Real.lean:346",
+  "claim": "`ENNReal.toReal_eq_toReal` is left as an ordinary theorem even though this PR is replacing it by the existing canonical theorem `ENNReal.toReal_eq_toReal_iff'`; users of the old name will not get a deprecation warning.",
+  "requested_change": "Mark `ENNReal.toReal_eq_toReal` deprecated in favor of `toReal_eq_toReal_iff'` (using the PR's deprecation date), and update any in-library uses of the old name.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/List/Nodup.lean:158",
+  "claim": "`List.count_eq_of_nodup` is left as an ordinary theorem even though it is now only a wrapper around the canonical `List.Nodup.count`; users of the old name will not get a deprecation warning.",
+  "requested_change": "Mark `List.count_eq_of_nodup` deprecated in favor of `Nodup.count`/`List.Nodup.count` (using the PR's deprecation date), and update any in-library uses of the old name.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/LinearAlgebra/Matrix/Notation.lean:376",
+  "claim": "`Matrix.smul_mat_cons` is left as an ordinary theorem even though it is now only a less-general wrapper around the existing `Matrix.smul_cons`; users of the old name will not get a deprecation warning.",
+  "requested_change": "Mark `Matrix.smul_mat_cons` deprecated in favor of `smul_cons` (using the PR's deprecation date), and update any in-library uses of the old name.",
+  "severity": "blocking"
+ }
+]

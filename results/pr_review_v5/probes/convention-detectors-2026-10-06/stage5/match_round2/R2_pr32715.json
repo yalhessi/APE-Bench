@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:221",
+  "claim": "The new lemmas `Nat.ordProj_PrimePow_eq_self`, `Nat.ordCompl_PrimePow_eq_one`, and `Nat.ordCompl_PrimePow_mul_eq_self` use `PrimePow` for statements about an explicit prime power `p ^ k`; Mathlib names that phrase `prime_pow` (reserving `IsPrimePow`/`isPrimePow` for the predicate).",
+  "requested_change": "Rename these declarations to `ordProj_prime_pow_eq_self`, `ordCompl_prime_pow_eq_one`, and `ordCompl_prime_pow_mul_eq_self`, and update the reference in the last proof.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:221",
+  "claim": "The proof of `Nat.ordProj_PrimePow_eq_self` manually compares factorizations even though `simp [hp.factorization_pow]` proves the goal directly.",
+  "requested_change": "Replace the proof with:\n```lean\nby\n  simp [hp.factorization_pow]\n```",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:228",
+  "claim": "The proof of `Nat.ordCompl_PrimePow_eq_one` redoes a factorization comparison instead of using the immediately preceding `ordProj` computation and the definition of `ordCompl`.",
+  "requested_change": "Replace the proof with:\n```lean\nby\n  rw [Nat.ordProj_PrimePow_eq_self hp]\n  exact Nat.div_self (pow_pos hp.pos k)\n```\n(or the renamed `Nat.ordProj_prime_pow_eq_self` if the naming fix is applied).",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:239",
+  "claim": "`Nat.ordCompl_eq_self_iff_zero_or_not_dvd` unnecessarily assumes `hp : Prime p`; for non-prime `p`, `ordCompl_of_not_prime` gives the same equality, so the iff can cover all `p`.",
+  "requested_change": "Replace it by the stronger theorem\n```lean\ntheorem ordCompl_eq_self_iff (n p : ℕ) :\n    ordCompl[p] n = n ↔ ¬p.Prime ∨ n = 0 ∨ ¬p ∣ n := by\n  constructor\n  · intro h\n    by_cases hp : p.Prime\n    · right\n      by_cases n_zero : n = 0\n      · simp [n_zero]\n      · right\n        rw [← h]\n        exact not_dvd_ordCompl hp n_zero\n    · exact Or.inl hp\n  · rintro (not_prime | n_eq_zero | not_dvd)\n    · simp [not_prime]\n    · simp [n_eq_zero]\n    · have : n.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd not_dvd\n      rw [this]\n      simp\n```",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Data/Nat/BitIndices.lean:70",
+  "claim": "`Nat.bitIndices_nodup` proves nodup via `bitIndices_sorted.pairwise.nodup`, but `List.SortedLT` already exposes the canonical `.nodup` projection.",
+  "requested_change": "Change the proof to:\n```lean\nbitIndices_sorted.nodup\n```",
+  "severity": "advisory"
+ }
+]

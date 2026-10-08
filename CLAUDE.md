@@ -222,3 +222,20 @@ looks alive and bills nothing. Before `--execute`, confirm the provider's variab
 launching shell (`source ~/.config/secrets/env.zsh` in the same command); in the first minutes,
 confirm `completed with success` lines appear and "API call failed, retrying" does not. The fix is
 queued in `docs/todo/framework-defects-2026-09.md`.
+
+**Launch a paid run detached, and read its bill from the outcomes, not the log.** A run started as a
+Claude Code background task dies with that process: stage 5's gpt-5.5 runs did at 7 of 16 sessions
+(2026-10-07). **`setsid nohup` is not enough**: the shell sits in a login-session scope
+(`/proc/self/cgroup`), and tearing that scope down kills every process in it -- S2 died that way at 10
+of 16. Start it as a user unit, which lives outside the session:
+`systemd-run --user --collect --unit=<name> /bin/bash -c "exec <command> >> <log> 2>&1 < /dev/null"`
+(it survived the next restart; `systemctl --user status <name>` to watch it). Lingering is off, so it
+lasts while any login session does; a Slurm job outlives even that. **A user unit is still in
+`/user.slice`, and systemd-oomd kills there under memory pressure** (60% for 20 s, `oomctl`): it picks
+the cgroup with the most reclaim, not the biggest, so a 272 MB unit reading files died `oom-kill` at
+08:01 on 2026-10-07 while the `vllm-ds4` Slurm job held 1,000 GB of `first`'s 1,129 GB; the
+interactive sessions that died the same morning sit in the same slice. Before a long run, look at
+`squeue -w first` and `oomctl`; a Slurm job is outside `/user.slice`. `run --resume` keeps the finished
+sessions. The `completed with success (cost=$...)` log line is **nominal** cost, uncached list price;
+billed is `billed_cost` in each `tasks/*/task_outcome.json`, five times smaller on those runs ($65.44
+against $13.15 for seven sessions). Read as a bill, the log line stopped a run that was within budget.

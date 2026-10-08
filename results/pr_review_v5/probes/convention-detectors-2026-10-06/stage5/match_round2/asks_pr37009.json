@@ -1,0 +1,37 @@
+[
+ {
+  "ask_id": "v2218",
+  "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean",
+  "code_at_comment": "@@ -0,0 +1,112 @@\n+/-\n+Copyright (c) 2026 Frédéric Dupuis. All rights reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Frédéric Dupuis\n+-/\n+module\n+\n+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic\n+\n+/-!\n+# Conjugating by the square root of a positive operator",
+  "comment": "```suggestion\n# Conjugating by the square root of a positive element in a C⋆-algebra\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2219",
+  "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean",
+  "code_at_comment": " `conjSqrt c a` as `sqrt c * a * sqrt c`, and develops API for this operation.\n+\n+## Main declarations\n+\n+* `conjSqrt c`: the map `fun a => sqrt c * a * sqrt c`, bundled as a continuous linear map,\n+-/\n+\n+namespace CFC\n+\n+open Ring\n+\n+section ConjSqrt\n+\n+variable {A : Type*} [PartialOrder A] [Ring A] [StarRing A] [TopologicalSpace A]\n+  [StarOrderedRing A] [Algebra ℝ A] [ContinuousFunctionalCalculus ℝ A IsSelfAdjoint]\n+  [NonnegSpectrumClass ℝ A] [SeparatelyContinuousMul A]\n+  [IsTopologicalRing A] [T2Space A]\n+\n+/-- Conjugation by the square root of an operator, i.e. `sqrt c * a * sqrt c`. -/",
+  "comment": "```suggestion\n/-- Conjugation by the square root of an element, i.e. `sqrt c * a * sqrt c`. -/\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2220",
+  "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean",
+  "code_at_comment": "2 @@\n+/-\n+Copyright (c) 2026 Frédéric Dupuis. All rights reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Frédéric Dupuis\n+-/\n+module\n+\n+public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic\n+\n+/-!\n+# Conjugating by the square root of a positive operator\n+\n+This file defines `conjSqrt c a` as `sqrt c * a * sqrt c`, and develops API for this operation.\n+\n+## Main declarations\n+\n+* `conjSqrt c`: the map `fun a => sqrt c * a * sqrt c`, bundled as a continuous linear map,\n+-/\n+\n+namespace CFC\n+\n+open Ring\n+\n+section ConjSqrt",
+  "comment": "may as well make this public since all your results are public\n```suggestion\npublic section ConjSqrt\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2221",
+  "path": null,
+  "code_at_comment": "",
+  "comment": "I suspect a lot of these proofs can be golfed a lot. I can give it a shot sometime this week, unless you want to?",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v2222",
+  "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean",
+  "code_at_comment": "C⋆-algebras\n+\n+This file shows that `Ring.inverse` is antitone and convex on strictly positive operators.\n+\n+## Main declarations\n+\n+* `antitoneOn_ringInverse`: `Ring.inverse` is antitone on strictly positive operators, i.e.\n+  the inverse is operator antitone.\n+* `convexOn_ringInverse`: `Ring.inverse` is convex on strictly positive operators, i.e. the inverse\n+  is operator convex.\n+-/\n+\n+namespace CFC\n+\n+variable {A : Type*} [CStarAlgebra A] [PartialOrder A] [StarOrderedRing A]\n+\n+open Ring in\n+public lemma antitoneOn_ringInverse : AntitoneOn Ring.inverse {a : A | IsStrictlyPositive a} := by",
+  "comment": "I'm confused. We essentially already have this. It's [CStarAlgebra.inv_le_inv_iff](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.html#CStarAlgebra.inv_le_inv_iff), so there's no need to reprove it from scratch.",
+  "replies_to": null
+ }
+]

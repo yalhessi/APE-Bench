@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/GDelta/Basic.lean:148",
+  "claim": "The docstring for `IsGδ.iUnion` says this is the \"bounded indexed union version\", but the declaration is the unbounded finite indexed union `⋃ i, f i`.",
+  "requested_change": "Change the docstring to say \"finite indexed union version\" or \"unbounded indexed union version\" rather than \"bounded indexed union version\".",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/GDelta/Basic.lean:153",
+  "claim": "`isGδ_induced` is misnamed: the theorem is the general preimage theorem for a Gδ set under any continuous map, not a result specifically about induced topologies, and it is not in the `IsGδ` API namespace like the neighboring closure operations.",
+  "requested_change": "Rename it to `IsGδ.preimage`, turn the preceding ordinary comment into its docstring, and update the use in `LocallyCompactRegular.lean` to call `hG.preimage continuous_subtype_val` (or `IsGδ.preimage continuous_subtype_val hG`).",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/Baire/LocallyCompactRegular.lean:62",
+  "claim": "`IsGδ.of_t2Space_locallyCompactSpace` does not name its conclusion; in the `IsGδ` namespace this reads like a constructor for `IsGδ`, while the theorem proves a `BaireSpace` instance.",
+  "requested_change": "Rename it to `IsGδ.baireSpace_of_t2Space_locallyCompactSpace` (or the analogous `...locallyCompactSpace` spelling maintainers prefer) and update downstream references.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/Baire/LocallyCompactRegular.lean:70",
+  "claim": "`IsGδ.of_t2Space_locallyCompactSpace` hand-builds the homeomorphism between `((↑) ⁻¹' s : Set (closure s))` and `s`, but this is exactly the existing embedding API `Topology.IsEmbedding.subtypeVal.homeomorphOfSubsetRange`.",
+  "requested_change": "Replace the manual `Homeomorph` construction with:\n```lean\n  have h_homeo : ((↑) ⁻¹' s : Set (closure s)) ≃ₜ s :=\n    Topology.IsEmbedding.subtypeVal.homeomorphOfSubsetRange (by simpa using subset_closure)\n  exact h_homeo.baireSpace\n```",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Topology/Constructions.lean:643",
+  "claim": "`exists_open_dense_of_open_dense_subtype` manually reproves density by expanding `dense_iff_inter_open`, but the result follows directly from the dense-range image API for the subtype map.",
+  "requested_change": "Use `hs.denseRange_val.dense_of_mapsTo continuous_subtype_val hud` after choosing the ambient open set; for example:\n```lean\n  choose v hv1 hv2 using huo\n  refine ⟨v, hv1, hs.denseRange_val.dense_of_mapsTo continuous_subtype_val hud ?_, hv2⟩\n  intro x hx\n  show x.1 ∈ v\n  simpa [← hv2] using hx\n```",
+  "severity": "advisory"
+ }
+]

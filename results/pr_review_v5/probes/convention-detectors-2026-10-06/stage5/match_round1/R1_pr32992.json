@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:60",
+  "claim": "`Real.fourier_bilin_convolution_eq'` does not compile: the final `simpa` in the Fubini integrability bound leaves the goal with `|‖B‖|`, so the proof of the bound from `B.le_opNorm₂` is not accepted.",
+  "requested_change": "Replace that `simpa` by an explicit simplification of the phase norm and the norm of the nonnegative real bound, for example include `Function.uncurry`, `Circle.smul_def`, `norm_smul`, and `Real.norm_of_nonneg (norm_nonneg B)` (or otherwise prove the same bound explicitly).",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:95",
+  "claim": "`Real.fourier_bilin_convolution_eq` does not compile: the proof of the integrability needed for `integral_apply` does not simplify the norm of the unit-circle scalar, and the expected bound still contains `|‖B‖|`.",
+  "requested_change": "Change the bound proof to simplify the circle scalar via `Circle.smul_def`/`norm_smul` and remove `|‖B‖|` via `Real.norm_of_nonneg (norm_nonneg B)`, e.g. use `simpa [Circle.smul_def, norm_smul, Real.norm_of_nonneg (norm_nonneg B)] using le_opNorm B (f₁ x)`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:60",
+  "claim": "`Real.fourier_bilin_convolution_eq'` and the downstream public convolution Fourier lemmas assume `Continuous f₁` and `Continuous f₂`, but the convolution/Fubini integrability needed here is already available from the two `Integrable` hypotheses; the continuity assumptions unnecessarily restrict the API.",
+  "requested_change": "Use `MeasureTheory.Integrable.convolution_integrand` (with `B.flip`) for the product integrability, delete the private `integrable_prod_sub`, and remove the `hf₁' : Continuous f₁` and `hf₂' : Continuous f₂` arguments from `fourier_bilin_convolution_eq'`, `fourier_bilin_convolution_eq`, `fourier_smul_convolution_eq`, and `fourier_mul_convolution_eq`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Analysis/Fourier/Convolution.lean:8",
+  "claim": "`Mathlib.Analysis.Fourier.Convolution` imports the higher-level distribution/Schwartz module `Mathlib.Analysis.Distribution.FourierSchwartz`, although this file only needs the Fourier transform API, convolution API, and Haar invariance instances; this makes a Fourier file depend on the Distribution hierarchy unnecessarily.",
+  "requested_change": "Replace the `FourierSchwartz` import with lower-level imports, for example `Mathlib.Analysis.Fourier.FourierTransform`, `Mathlib.Analysis.Convolution`, and the Haar invariance module such as `Mathlib.MeasureTheory.Measure.Haar.Unique`.",
+  "severity": "advisory"
+ }
+]

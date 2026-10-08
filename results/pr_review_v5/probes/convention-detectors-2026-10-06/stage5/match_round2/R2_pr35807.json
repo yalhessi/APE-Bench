@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:113",
+  "claim": "`Function.locallyFinsupp.locallyFiniteSupport` proves membership in `Set.univ` via `mem_of_subset_of_mem (fun _ a ↦ a) trivial`, but this argument is definitionally just `trivial`.",
+  "requested_change": "Replace the proof with `fun z ↦ f.supportLocallyFiniteWithinDomain' z trivial`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:253",
+  "claim": "`Function.locallyFinsuppWithin.addSubmonoid` manually proves the support of a sum is contained in the union of the two supports, redoing the existing `Function.support_add` API.",
+  "requested_change": "In `add_mem'`, use `Function.support_add f g` both for the support-subset goal and for the finite-neighborhood subset, rather than the manual `contrapose!`/`simp_all` argument.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:293",
+  "claim": "The docstring for `Function.locallyFinsuppWithin.mk_of_mem` still says it assigns a function to the subgroup, but the declaration now takes membership in `locallyFinsuppWithin.addSubmonoid`.",
+  "requested_change": "Change this docstring to say “submonoid” instead of “subgroup”.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:313",
+  "claim": "`Function.locallyFinsuppWithin.mk_of_mem'` is a new primed sibling of `mk_of_mem` with the same conclusion; the difference is the membership hypothesis (`addSubgroup` instead of `addSubmonoid`), so the name should record that difference rather than use a prime.",
+  "requested_change": "Rename `mk_of_mem'` to a descriptive name such as `mk_of_mem_addSubgroup`, and update the `Neg`, `Sub`, and `SMul ℤ` instances to call the renamed declaration.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:569",
+  "claim": "`Function.locallyFinsuppWithin.restrictMonoidHom` still assumes `[AddCommGroup Y]`, but after this PR the source and target have additive monoid structure under `[AddMonoid Y]`, and the proof of this homomorphism uses no negatives or commutativity.",
+  "requested_change": "Generalize `restrictMonoidHom` and `restrictMonoidHom_apply` from `[AddCommGroup Y]` to `[AddMonoid Y]`, and update the docstring to call it an additive monoid homomorphism.",
+  "severity": "advisory"
+ }
+]

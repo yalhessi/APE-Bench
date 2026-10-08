@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/RingTheory/Localization/FractionRing.lean:500",
+  "claim": "`IsFractionRing.nontrivial'` is not a fraction-ring-specific fact: from `[Algebra R S]` and `[Nontrivial S]`, `Nontrivial R` already follows from the existing `RingHom.domain_nontrivial` applied to `algebraMap R S`, so this new theorem duplicates an existing, strictly more general API under extra hypotheses.",
+  "requested_change": "Remove `IsFractionRing.nontrivial'` and prove the reverse direction of `nontrivial_iff_nontrivial` directly with `(algebraMap R S).domain_nontrivial`.",
+  "severity": "advisory"
+ }
+]

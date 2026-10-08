@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:113",
+  "claim": "`Function.locallyFinsupp.locallyFiniteSupport` proves membership in the univ domain via `mem_of_subset_of_mem (fun _ a ↦ a) trivial`, even though the second argument of `supportLocallyFiniteWithinDomain'` is just a proof of membership in `Set.univ`.",
+  "requested_change": "Replace the proof by `fun z ↦ f.supportLocallyFiniteWithinDomain' z trivial`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:293",
+  "claim": "The docstring for `Function.locallyFinsuppWithin.mk_of_mem` still says it assigns a function to the subgroup, but the declaration now takes membership in `locallyFinsuppWithin.addSubmonoid`.",
+  "requested_change": "Change the docstring to say “additive submonoid” (or “addSubmonoid”) instead of “subgroup”.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:300",
+  "claim": "The `[AddMonoid Y] : Zero (locallyFinsuppWithin U Y)` instance duplicates the earlier `[Zero Y] : Zero (locallyFinsuppWithin U Y)` instance, adding another overlapping way to synthesize the same zero structure.",
+  "requested_change": "Delete this later `Zero` instance and use the existing `[Zero Y]` instance; the following additive structure can still use `coe_zero`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:313",
+  "claim": "The new public declaration `Function.locallyFinsuppWithin.mk_of_mem'` is a primed sibling of `mk_of_mem` whose distinguishing feature is that the membership proof is in `addSubgroup` rather than `addSubmonoid`. Mathlib names such variants by the differing hypothesis/object rather than by a bare prime.",
+  "requested_change": "Rename it to a descriptive name such as `mk_of_mem_addSubgroup`, and update the `Neg`, `Sub`, and `SMul ℤ` instances to use the new name.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:569",
+  "claim": "`Function.locallyFinsuppWithin.restrictMonoidHom` still requires `[AddCommGroup Y]`, but after this PR the source and target only need the newly available `AddMonoid` structure, and the proof uses only zero and addition.",
+  "requested_change": "Weaken `restrictMonoidHom` and its simp lemma `restrictMonoidHom_apply` to `[AddMonoid Y]`; while doing so, update the docstring from “group morphism” to “monoid morphism”.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Mathlib/Topology/LocallyFinsupp.lean:586",
+  "claim": "`Function.locallyFinsuppWithin.restrictLatticeHom` still requires `[AddCommGroup Y]`, but its construction only uses `restrict` and the lattice operations; the existing lattice instance for `locallyFinsuppWithin` needs only `[Zero Y] [Lattice Y]`.",
+  "requested_change": "Weaken `restrictLatticeHom` and `restrictLatticeHom_apply` to `[Zero Y] [Lattice Y]`.",
+  "severity": "advisory"
+ }
+]

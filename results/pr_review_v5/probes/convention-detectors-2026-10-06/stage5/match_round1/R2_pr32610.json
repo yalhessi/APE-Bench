@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/GroupTheory/DedekindFinite.lean:17",
+  "claim": "The finite-monoid instance is multiplicative-only even though the new class has an additive counterpart, so a finite noncommutative `AddMonoid` cannot synthesize `IsDedekindFiniteAddMonoid`.",
+  "requested_change": "Add `@[to_additive]` to this instance so the finite additive-monoid instance is generated as well.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Group/Submonoid/Defs.lean:373",
+  "claim": "The inherited Dedekind-finiteness instance for submonoids is missing its additive analogue, so additive submonoids of a Dedekind-finite additive monoid cannot infer `IsDedekindFiniteAddMonoid`.",
+  "requested_change": "Add `@[to_additive]` to the `SubmonoidClass` instance.",
+  "severity": "advisory"
+ }
+]

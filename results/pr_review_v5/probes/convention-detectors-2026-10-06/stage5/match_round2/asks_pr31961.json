@@ -1,0 +1,30 @@
+[
+ {
+  "ask_id": "v1251",
+  "path": "Mathlib/Topology/DiscreteSubset.lean",
+  "code_at_comment": "xact tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _\n       continuous_subtype_val.continuousWithinAt <| eventually_mem_nhdsWithin.mono (by simp)\n \n+section T1Space\n+\n+variable [T1Space X]\n+\n+lemma codiscrete_le_cofinite : codiscrete X ≤ cofinite := by\n+  intro s hs\n+  rw [← compl_compl s, compl_mem_codiscrete_iff]\n+  exact ⟨hs.isClosed, hs.to_subtype.instDiscreteTopology⟩\n+\n+lemma Set.Finite.compl_mem_codiscrete {S : Set X} (hs : S.Finite) : Sᶜ ∈ codiscrete X :=\n+  codiscrete_le_cofinite (by simpa)\n+\n+lemma infinite_of_accPt {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by",
+  "comment": "I feel like this one isn't really specific to the codiscrete filter which seems to be what this section is about. Can you move it?",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1252",
+  "path": "Mathlib/Topology/DiscreteSubset.lean",
+  "code_at_comment": "xact tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _\n       continuous_subtype_val.continuousWithinAt <| eventually_mem_nhdsWithin.mono (by simp)\n \n+section T1Space\n+\n+variable [T1Space X]\n+\n+lemma codiscrete_le_cofinite : codiscrete X ≤ cofinite := by\n+  intro s hs\n+  rw [← compl_compl s, compl_mem_codiscrete_iff]\n+  exact ⟨hs.isClosed, hs.to_subtype.instDiscreteTopology⟩\n+\n+lemma Set.Finite.compl_mem_codiscrete {S : Set X} (hs : S.Finite) : Sᶜ ∈ codiscrete X :=\n+  codiscrete_le_cofinite (by simpa)\n+\n+lemma infinite_of_accPt {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by",
+  "comment": "I think you can leave it here, but I would change the name.\n```suggestion\nlemma AccPt.setInfinite {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by\n```\nOr `Set.Infinite.of_accPt`",
+  "replies_to": "I feel like this one isn't really specific to the codiscrete filter which seems to be what this section is about. Can you move it?"
+ },
+ {
+  "ask_id": "v1253",
+  "path": "Mathlib/Topology/DiscreteSubset.lean",
+  "code_at_comment": "xact tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _\n       continuous_subtype_val.continuousWithinAt <| eventually_mem_nhdsWithin.mono (by simp)\n \n+section T1Space\n+\n+variable [T1Space X]\n+\n+lemma codiscrete_le_cofinite : codiscrete X ≤ cofinite := by\n+  intro s hs\n+  rw [← compl_compl s, compl_mem_codiscrete_iff]\n+  exact ⟨hs.isClosed, hs.to_subtype.instDiscreteTopology⟩\n+\n+lemma Set.Finite.compl_mem_codiscrete {S : Set X} (hs : S.Finite) : Sᶜ ∈ codiscrete X :=\n+  codiscrete_le_cofinite (by simpa)\n+\n+lemma infinite_of_accPt {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by",
+  "comment": "I think we should have `principal` somewhere in the name since it uses `Filter.principal`",
+  "replies_to": "I feel like this one isn't really specific to the codiscrete filter which seems to be what this section is about. Can you move it?"
+ },
+ {
+  "ask_id": "v1254",
+  "path": "Mathlib/Topology/DiscreteSubset.lean",
+  "code_at_comment": "xact tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _\n       continuous_subtype_val.continuousWithinAt <| eventually_mem_nhdsWithin.mono (by simp)\n \n+section T1Space\n+\n+variable [T1Space X]\n+\n+lemma codiscrete_le_cofinite : codiscrete X ≤ cofinite := by\n+  intro s hs\n+  rw [← compl_compl s, compl_mem_codiscrete_iff]\n+  exact ⟨hs.isClosed, hs.to_subtype.instDiscreteTopology⟩\n+\n+lemma Set.Finite.compl_mem_codiscrete {S : Set X} (hs : S.Finite) : Sᶜ ∈ codiscrete X :=\n+  codiscrete_le_cofinite (by simpa)\n+\n+lemma infinite_of_accPt {S : Set X} {x : X} (h : AccPt x (𝓟 S)) : S.Infinite := by",
+  "comment": "> I don't think `Set.Infinite.of_accPt` makes sense because `S.Infinite` is not a hypothesis.\r\n\r\nThe reason this makes sense is that if you have the expected type being `Set.Infinite _` then you can write `.of_accPt hAccPt`. This pattern is also present on e.g. `Filter.Eventually.of_forall` and `RegularSpace.of_exists_mem_nhds_isClosed_subset`.",
+  "replies_to": "I feel like this one isn't really specific to the codiscrete filter which seems to be what this section is about. Can you move it?"
+ }
+]

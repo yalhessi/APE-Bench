@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Dynamics/Ergodic/MeasurePreserving.lean:93",
+  "claim": "`MeasurePreserving.map_of_comp` unnecessarily requires `f` to be everywhere measurable; the proof only needs `f` to be a.e. measurable with respect to the source measure, since `f` only appears through `μa.map f`.",
+  "requested_change": "Weaken the last hypothesis to `(hf : AEMeasurable f μa)` and prove the map equality with `hg.aemeasurable.map_map_of_aemeasurable hf`; update the call in `MeasurePreserving.of_semiconj` to pass `hfm.aemeasurable`.",
+  "severity": "advisory"
+ }
+]

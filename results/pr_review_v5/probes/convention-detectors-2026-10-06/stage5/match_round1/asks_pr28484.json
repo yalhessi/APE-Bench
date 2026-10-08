@@ -1,0 +1,23 @@
+[
+ {
+  "ask_id": "v0644",
+  "path": "Mathlib/Data/List/Nodup.lean",
+  "code_at_comment": "@@ -156,10 +156,8 @@ theorem count_eq_one_of_mem [DecidableEq α] {a : α} {l : List α} (d : Nodup l\n   _root_.le_antisymm (nodup_iff_count_le_one.1 d a) (Nat.succ_le_of_lt (count_pos_iff.2 h))\n \n theorem count_eq_of_nodup [DecidableEq α] {a : α} {l : List α} (d : Nodup l) :\n-    count a l = if a ∈ l then 1 else 0 := by\n-  split_ifs with h\n-  · exact count_eq_one_of_mem d h\n-  · exact count_eq_zero_of_not_mem h\n+    count a l = if a ∈ l then 1 else 0 :=\n+  Nodup.count d",
+  "comment": "If you're golfing, I'd suggest:\n```suggestion\n  d.count\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v0645",
+  "path": null,
+  "code_at_comment": "",
+  "comment": "I wonder if these should just be aliases or even deprecated in favor of the lemmas used in the proofs? If we keep them then we should maybe mention in the docstrings why we have these slightly different (?) variants.",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v0646",
+  "path": null,
+  "code_at_comment": "",
+  "comment": "I agree with Bryan, I think all of these are just duplicate lemmas and in each pair, one should be deprecated for the other. ",
+  "replies_to": null
+ }
+]

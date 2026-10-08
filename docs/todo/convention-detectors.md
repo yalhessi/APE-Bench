@@ -1,13 +1,12 @@
 # Convention detectors: what a deterministic check can state about the PR, and whether anyone asks
 
-**Status** — open, 2026-10-06; **three detectors built and measured alone, none yet read by a
-reviewer.** `src/mathlib_review/producers/` (the seam: `Fact`, `PRODUCERS`, delivery through the
+**Status** — **closed 2026-10-07 as a recall lever** (`docs/dead-ends.md`, "Convention detectors as a
+recall lever"): three detectors built and measured alone, then read by a reviewer on gpt-5.5 (stage 5). `src/mathlib_review/producers/` (the seam: `Fact`, `PRODUCERS`, delivery through the
 per-PR `context_file`), `analysis/producer_bench.py`, `cli producer bench|context`. Pre-registered
 stages 1-4 and their results: `results/pr_review_v5/probes/convention-detectors-2026-10-06/README.md`.
 Step 2 of `docs/plans/2026-10-03-after-structure.md`; the second half of step 3 of
 `docs/research/codebase-redesign-2026-10.md`.
-**Cost** — no spend so far. The next step is one reviewer run with the sections (a subscription
-window on validation small12 or dev), or judge-free reading as in the ceiling probe.
+**Cost** — $77 billed on the ELM key (stage 5's three gpt-5.5 runs); nothing else spent.
 
 **Motivating results** (census = val1000, 973 PRs, 1,833 reader-A asks; probe sets = dev,
 validation small12, post-cutoff):
@@ -51,6 +50,17 @@ Claude Code"), so a run would spend the user's own primary quota (seven_day at 6
 two dev-run windows. Once the workspaces are built it is one command per condition:
 `ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`
 and the same with `..._hygiene_sections_claude_sub.yaml` and `..._s1_rep1`, read by hand by stage 5's rule.
+
+**Item 1 on gpt-5.5 (2026-10-07): no effect.** Run on gpt-5.5 instead (the user's call; stage W's
+condition), blind hand reading: the sections took 0 to 1 of the 13 exactly stated asks (S0 against S1,
+one rep each, $52 billed), not a volume lever. S1's reasoning summaries show the stated fact considered
+and dropped at four PRs, once on an explicit guess about maintainers (32674), and unmentioned at four.
+S2, the disposition paragraph of `docs/plans/2026-10-06-generation-without-suppression.md`, run
+the same day: asks 1 to 5 of 13 (+4, or +3 on one close mark), but unasked facts 0.50 to 2.17 a
+stratum-B PR (13 of 14 filed), so **a volume lever** by the pre-registered gate: it files what the
+sections state, asked or not. Where it still missed, it conformed on precedent twice, which the
+paragraph excludes. What would move this: a reading of whether the unasked filings are welcome (the
+open adjudication), since the gate counts them as cost without knowing. Opus untested.
 
 **Start here.**
 - read: the probe README above (rules, amendments 1-2, stages 1-4, the two corrections);

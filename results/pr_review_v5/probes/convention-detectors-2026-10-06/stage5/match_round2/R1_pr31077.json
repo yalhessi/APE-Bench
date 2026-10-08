@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/ContinuousOn.lean:1489",
+  "claim": "`mem_nhdsSet_induced` manually reproves the induced-topology neighborhood-set calculation that is already provided by `Topology.IsInducing.nhdsSet_eq_comap`.",
+  "requested_change": "Move `nhdsSet_induced` before `mem_nhdsSet_induced`, prove it with `(Topology.IsInducing.induced f).nhdsSet_eq_comap s`, and then prove `mem_nhdsSet_induced` by `rw [nhdsSet_induced, mem_comap]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Compactness/Compact.lean:705",
+  "claim": "`generalized_tube_lemma'` introduces a public primed name for the `nhdsSetWithin` version of `generalized_tube_lemma`, so the name does not describe how this variant differs from the existing theorem.",
+  "requested_change": "Rename it to a descriptive name such as `generalized_tube_lemma_nhdsSetWithin` and wrap the declaration line to stay under the line-length limit.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/ContinuousOn.lean:28",
+  "claim": "The module docstring describes `𝓝ˢ[t] s` as the filter `nhdsWithin s t`, which is the point-neighborhood-within definition and has the wrong meaning here.",
+  "requested_change": "Change this bullet to say that `𝓝ˢ[t] s` is the filter `nhdsSetWithin s t` of neighborhoods of a set `s` within a set `t`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/Defs/Filter.lean:161",
+  "claim": "The documentation for `nhdsSetWithin` misprints its notation as `𝓝[t] s`, and the file's notation list still omits the new `𝓝ˢ[t] s` notation.",
+  "requested_change": "In the `nhdsSetWithin` docstring, replace `𝓝[t] s` with `𝓝ˢ[t] s`; also add a notation-list bullet for `𝓝ˢ[t] s` as `nhdsSetWithin s t`.",
+  "severity": "advisory"
+ }
+]

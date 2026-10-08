@@ -1,0 +1,5 @@
+# S1 of stage 5 on gpt-5.5: S0 with the primed_names and dot_notation/3 sections after each PR's model.
+extends: pr_review_v5_census_detectors_v1_elm_gpt55_Grc_request.yaml
+
+task_config:
+  context_file: results/pr_review_v5/probes/convention-detectors-2026-10-06/stage5/model_context_s1.jsonl

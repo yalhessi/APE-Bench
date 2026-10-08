@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:201",
+  "claim": "`integral_finset` is a moved public theorem, but its binder shape was changed from the existing API `integral_finset s f hf` to `integral_finset s hf` by making `f` implicit. This unnecessarily breaks callers for a declaration that is otherwise just being moved.",
+  "requested_change": "Restore the explicit function argument: `theorem integral_finset (s : Finset X) (f : X → E) (hf : IntegrableOn f s μ) : ...`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:205",
+  "claim": "`integral_fintype` is also a moved public theorem whose explicit `f` argument was dropped, changing the existing API from `integral_fintype f hf` to `integral_fintype hf` without a mathematical reason.",
+  "requested_change": "Restore the explicit function argument, `theorem integral_fintype [Fintype X] (f : X → E) (hf : Integrable f μ) : ...`, and then revert the downstream use in `PMF.integral_eq_sum` to `rw [integral_fintype _ .of_finite]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:66",
+  "claim": "`Integrable.summable_integral` is named as if it summed the integrals of `f`, but its conclusion is summability of the integrals of `‖f‖`. Nearby API uses the phrase `summable_integral_norm` for this condition (`hasSum_integral_of_summable_integral_norm`, `integral_tsum_of_summable_integral_norm`, `integrableOn_iUnion_of_summable_integral_norm`).",
+  "requested_change": "Rename it to `Integrable.summable_integral_norm` and update its two uses in this file.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/MeasureTheory/Integral/Bochner/SumMeasure.lean:35",
+  "claim": "The documentation for `integral_sum_dirac_eq_tsum` contains malformed integral notation (`∫ x, f x, ∂...`) and the main-statements bullet states the equality in the opposite direction from the theorem named `_eq_tsum`.",
+  "requested_change": "Rewrite the bullet, and the matching declaration docstring below, as `∫ x, f x ∂Measure.sum (fun i ↦ (c i) • .dirac (x i)) = ∑' i, (c i).toReal • f (x i)` with no comma before `∂`.",
+  "severity": "advisory"
+ }
+]

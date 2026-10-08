@@ -405,3 +405,175 @@ exactly the 8 read valid in stage 6 (`isSMulRegular_iff` in three files, the `ge
 26591 and 26846); 43167's three facts stand. **What it shows:** a precise but nearly silent section
 -- 8 facts on 3 of 973 census PRs, none on a control PR, none at any of the census's 11 P201 asks.
 It is not shown to be a lever, and on this evidence it rarely has anything to say.
+
+**Stage 5, ready and not run (2026-10-06).** The workspaces are built: 14 base snapshots (two
+existed), restored, then 16 of 16 reviewed workspaces (`stage5/build.log`; 11:45-16:29 after a
+first launch died on the home-directory quota, `stage5/build_*_attempt1.*`). `cli plan` preflights
+both conditions clean with the login exported: 16 of 16 workspaces prebuilt, both plans seal (S0
+agenda `6a9532d20371`, S1 `c3f0e42ed4b4`, 702 prompt hashes each). The run is not launched: the two
+Pro subscription accounts now refuse Claude Code, so it would spend the user's primary quota
+(about two five-hour windows; seven_day at 67% that day), which is the user's call. Commands:
+`ape/bin/python -m src.mathlib_review.review.cli run --config configs/pr_review_v5_census_detectors_v1_opus55_hygiene_claude_sub.yaml --run-name probe_census_detectors_s0_rep1 --execute`,
+then the `_hygiene_sections_` config as `probe_census_detectors_s1_rep1`.
+
+## Stage 5 on gpt-5.5, with S2 (amendment, pre-registered 2026-10-07, before any session)
+
+**The user (2026-10-07):** *"Okay let's run with GPT"* -- after the two Pro subscription accounts
+began refusing Claude Code and the primary account's week stood at 67%. **What changes is the
+reviewer**, and nothing about the set, the sections or the reading rule: Opus 5.5 under Claude Code
+becomes `elm_gpt_5.5` under APE-Agent in **stage W's condition** (branch `generation-suppression`,
+`results/pr_review_v5/probes/generation-suppression-2026-10-06/run_wide.sh`): high effort, reasoning
+carried, summaries on, brief G, the five context tools, `filing_bar: request`, $20 and 24M tokens a
+session. It is the condition in which the disposition paragraph moved gpt-5.5's in-census reach 0.43 to
+0.62 out of sample. So this measures whether the sections move **gpt-5.5**, not Opus; the Claude
+configs stay as the stage first written, built and unrun. GPT is the more informative reader for S1
+in any case: 11 of its 23 in-census misses in the conventions probe were never considered at the
+place (`conventions-ceiling-2026-10-04/cross_model.md`), the gap a section naming the place targets.
+
+**Conditions**, one run each, differing in `context_file` alone:
+- **S0**: each PR's pass-0 model (`stage5/model_context_s0.jsonl`, as built for the Claude stage);
+- **S1**: S0 then the `primed_names` and `dot_notation/3` sections (`stage5/model_context_s1.jsonl`);
+- **S2**: S1 then one closing section, the plan `2026-10-06-generation-without-suppression.md`'s C1 in
+  the form stage W measured (`probes.CONVENTIONS_DISPOSITION` on that branch), worded for places
+  rather than conventions, titled "Dispositions for the places above", text fixed now:
+
+  > Give every place listed in the sections above a disposition, and say in your submission's
+  > `message` which you gave and on what ground. `departs`: file the change its section describes,
+  > as a finding at that place. `conforms`: only if a check you ran, or a line of the code you quote,
+  > shows the required form already holds there. What Mathlib usually requires, accepts or enforces,
+  > how minor the change is, and whether a maintainer would insist on it are not grounds for either
+  > disposition. For these places this replaces the brief's instruction to emit only what you would
+  > actually request.
+
+**Order.** A smoke first: S2's configuration on `elm_qwen_3.5` (priced 0) on 30645 and 28484 --
+the sessions start, the sections reach the prompt, a submission lands; not read for any result. Then
+S0 and S1 together. S2 runs only if S1 files fewer than 10 of the 13 asks (the plan's skip rule: from
+10, S2 cannot gain 4).
+
+**Reading, by hand and blind to condition.** Round 1, S0 against S1: per PR, the two sessions'
+findings under labels shuffled by a seeded permutation (seed `stage5-gpt-round1`), the key written
+to disk before reading and opened after every mark. Round 2, if S2 runs: S1 against S2 the same way
+(seed `stage5-gpt-round2`), so S1 is marked twice and the two marks give my own agreement. Marks as
+stage 5 first said: per stratum-A ask, a finding at its place asking for its change; per unasked
+section fact, a finding that repeats it.
+
+**Rules**, each a difference between successive conditions on the 13 asks:
+- S1 - S0 **>= 4**: the sections move gpt-5.5; **<= 1**: no effect; between: a second rep decides.
+- S2 - S1, the same bands: the disposition is a lever on detector facts, or not.
+- **Emission gate**, as first written: stratum-B findings repeating an unasked fact, more than 1.0 more
+  a stratum-B PR than the condition before makes that step a volume lever, whatever it does to the asks.
+- **Also read (S2)**: the dispositions in `message`; places marked `departs` and not filed; `conforms`
+  with no check or quote (the plan's C3). Sessions stopped by a cap are reported, not dropped.
+
+**Cost.** Stage W billed $15.61 for 13 sessions, about $1.20 a session: 32-48 sessions is about
+$40-60 at list price, from the ELM key (GBP 458 left on 2026-10-07). The $20 session cap binds a
+session; the run caps are set to fit 16 of them, a ceiling, not a forecast.
+
+**Smoke (2026-10-07 05:12-05:17), passed.** `iter_elmqwen35_census_detectors_s2_smoke`: both sessions
+started and submitted (28484: 29 turns, 0.75M tokens; 30645: 32 turns, 1.42M), no retries, $0.00.
+Each prompt holds its PR model, its own detector section (28484 dot notation, 30645 primed names)
+and the disposition section. `probes._solo` loads the run's findings with their targets, so
+`cli probe match-inputs` can blind it. Not read for any result. S0 and S1 launched at 05:21,
+both answered by ELM's Responses endpoint in their first minute with no retries.
+
+One change to the reading, made before any GPT session ended: the labels come from `cli probe seal`,
+a fresh draw from `secrets` written to disk before reading, rather than a permutation from a seed I
+named. The seeded one would have let me recompute the key.
+
+**Interruptions (2026-10-07).** S0 and S1 died with the Claude Code process that launched them at
+05:40, 7 of 16 sessions each done; relaunched detached with `--resume` at 05:46, and stopped again by
+me at 05:49 on a misread cost: the log's `cost=` is nominal ($65.44 for S0's seven), the bill is
+`billed_cost` ($13.15, $1.88 a session against stage W's $1.17-1.23; these sessions run 30 turns and
+1.8M tokens against about 18 and 0.8M). Resumed at 05:52, 7 kept and 4 started in each. The
+sessions in flight at each stop were lost and rerun from the start; none of them had submitted. Cost
+re-estimated: S0 and S1 about $60 billed, S2 about $30 more, which waits for the user's word.
+
+## Results, stage 5 on gpt-5.5, round 1 (2026-10-07), read by its rule
+
+S0 `probe_census_detectors_elmgpt55_s0_rep1` and S1 `..._s1_rep1`, 16 of 16 sessions each, billed
+$25.71 and $26.17. Marked by hand under the seal (`stage5/match_round1/marks.json`, committed in
+`a5053c9a` before the key was read), then unblinded (`stage5_read.py unblind round1`):
+
+| | S0 | S1 | S1 - S0 |
+|---|---|---|---|
+| target asks reached, of 13 | 0 | 1 (35807 v1935, the asked rename of `mk_of_mem'`) | **+1** |
+| partial | 4 (v1057; v1412-v1414, a proof rewrite that drops the term) | 1 (v1057) | |
+| unasked section facts repeated, per stratum-B PR | 0.17 (1 of 6 PRs) | 0.50 (3) | +0.33 |
+
+**By the rule: no effect** (a difference of 1 or less), and not a volume lever (+0.33 a stratum-B PR,
+under 1.0). The sections, stating 13 maintainers' asks word for word at their places, moved
+gpt-5.5 from 0 to 1 of them in one rep each. The record's prediction for Opus (stage G's override)
+holds on gpt-5.5 in this condition. Both sessions found `generalized_tube_lemma'` (31077) unprompted,
+so a section can repeat what the reviewer already sees. 33006: neither session filed anything.
+
+**Why S1 passed over them, from its reasoning summaries** (read after unblinding, not pre-registered,
+summaries only): at four PRs it considered the stated fact and dropped it -- 32674: *"the PR model
+that suggests using dot notation. Would maintainers request this as a style change? Maybe not"*;
+31961: it weighed `Set.Infinite.of_accPt` and filed a move instead; 30645: it folded the naming
+issue into a redundancy finding; 31007: renaming `ext'`, *"cautious about breaking compatibility"*.
+At four (28484, 32715, 34241, 36355) the summaries never mention it, which is not proof it went
+unconsidered. The first kind is what S2's paragraph addresses.
+
+**S2 is eligible** by the amendment's skip rule (S1 filed fewer than 10 of 13). Not launched: about
+$26 more, which waits on the user.
+
+**S2 launched (2026-10-07 06:31).** The user: *"Okay we can launch it"*. `probe_census_detectors_elmgpt55_s2_rep1`,
+detached, the configuration preflighted and smoke-tested before any session; first sessions writing
+turns within three minutes, no retries, the disposition section in each prompt. Read in round 2 (S1
+against S2, a fresh seal) by the same rule.
+
+**S2 interrupted (07:18), resumed (07:26).** Launched under `setsid nohup`, it died with the login
+session's scope at 10 of 16 sessions, no retries or errors (the log stops mid-request). Resumed with
+`--resume` as a user systemd unit, `apebench-stage5-s2`, outside any session scope: 10 kept, 6
+rerun; it survived the Claude Code restart that followed.
+
+## Results, stage 5 on gpt-5.5, round 2 (2026-10-07), read by its rule
+
+S2 `probe_census_detectors_elmgpt55_s2_rep1`, 16 of 16, billed $25.35. Marked under a fresh seal
+(`stage5/match_round2/marks.json`, committed in `4feda8ef` before the key was read). **Only partly
+blind:** labels are drawn per PR, and S1's findings were read in round 1, so S1 was recognisable on
+several PRs. S1, marked in both rounds, reached the same asks both times (v1935 alone).
+
+| | S1 | S2 | S2 - S1 |
+|---|---|---|---|
+| target asks reached, of 13 | 1 (v1935) | 5 (v0644, v1252, v1254, v1661, v1935) | **+4** |
+| the same, v1661 read strictly as partial | 1 | 4 | +3 |
+| unasked section facts repeated, per stratum-B PR | 0.50 (3 of 14 facts) | **2.17 (13 of 14)** | **+1.67** |
+
+**By the rule: a volume lever.** The emission gate (more than 1.0 more a stratum-B PR) trips, and the
+amendment fixed that this decides "whatever it does to the asks". The asks move +4, in the lever
+band, but on one close mark (34241 v1661: the finding asks for `A.toLin'` in the asked statement,
+the maintainer for dot notation "throughout"); read strictly it is +3, between the bands. What S2
+does is file what the sections state, asked or not: 13 of 14 unasked stratum-B facts, each with a
+compiled edit, and 5 of the 13 asked. Gold is a lower bound, so the 13 are unasked, not shown wrong;
+nothing here says whether a maintainer would take them (`CLAUDE.md`, Reporting results).
+
+**Dispositions (the plan's C3), read from S2's submission messages after unblinding.** Every session
+gave them. At the 8 asks S2 still missed:
+- `conforms` on precedent, which the paragraph excludes as a ground ("what Mathlib usually accepts"):
+  36355 `integral_countable'` (cites the `lintegral_countable'` pair), 32992 `fourier_bilin_convolution_eq'`
+  (cites `fourier_eq'`);
+- `conforms` with lines that show the variant differs, not that its name says how: 31007's four primes,
+  `ext'` (v1096) among them;
+- `departs`, filed as a different change "covering" it: 32715's four `Prime.ne_zero hp` (proof
+  rewrites), 30645's `nontrivial'` (removal);
+- `departs` and not filed: 32674's `IsGδ.eq_iInter_nat hs`, "covered by" a rename finding that never
+  mentions it.
+Two `conforms` rest on a real check (36355's `summable_of_dirac` is used dotted from an `Integrable`
+hypothesis; 32674's `baireSpace_of_dense` sits in the `IsGδ` namespace with its receiver), and 32540's
+`surjective_of_tmul_eq_tmul_of_finite` was passed over as not new in the PR, which bears on the detector.
+
+**Stage 5 on gpt-5.5, in all:** sections alone, no effect (0 to 1 of 13); sections with the disposition
+paragraph, filed nearly everything stated (5 of 13 asked, 13 of 14 unasked), a volume lever by the
+pre-registered gate. One rep a condition, $77 billed for the three runs. Not tested: Opus, a second
+rep, and any reading of whether the unasked filings are welcome.
+
+**A detector defect the S2 dispositions surfaced (checked 2026-10-07 against the change graphs).**
+`dot_notation/3`'s placement shape fires on a declaration that already sits in its first explicit
+hypothesis's namespace, which is the form for dot notation on that hypothesis: 36355
+`Integrable.summable_of_dirac (hf : Integrable …)` and 32674 `IsGδ.baireSpace_of_dense (hG : IsGδ s)`,
+both stated as "inside [the conclusion's namespace] it is `Summable.of_dirac`" / "`BaireSpace.of_dense`".
+S2 conformed on both with a check. A fourth refinement (R4): skip a placement fact when the
+declaration's namespace is its first explicit binder's head type. Not built; its census count is
+unmeasured. Unverified: S2 passed over 32540's `RingHom.surjective_of_tmul_eq_tmul_of_finite` as
+pre-existing, but the change graph has it new with no base copy.

@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:221",
+  "claim": "The new lemmas `Nat.ordProj_PrimePow_eq_self`, `Nat.ordCompl_PrimePow_eq_one`, and `Nat.ordCompl_PrimePow_mul_eq_self` use `PrimePow` for an argument of the form `p ^ k` under a `Prime p` hypothesis. In theorem names Mathlib uses the snake-case token `prime_pow` for this situation; the `PrimePow` spelling is used for CamelCase definitions or for names involving the `IsPrimePow` predicate.",
+  "requested_change": "Rename these declarations to `ordProj_prime_pow_eq_self`, `ordCompl_prime_pow_eq_one`, and `ordCompl_prime_pow_mul_eq_self`, and update the reference in the last proof accordingly.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Data/Nat/Factorization/Basic.lean:239",
+  "claim": "`Nat.ordCompl_eq_self_iff_zero_or_not_dvd` is only the prime/divisibility specialization of a more reusable equivalence: `ordCompl[p] n = n` is exactly `n.factorization p = 0`, with no `Prime p` hypothesis and also covering the zero and non-prime cases.",
+  "requested_change": "Add the general lemma\n```lean\ntheorem ordCompl_eq_self_iff_factorization_eq_zero (n p : ℕ) :\n    ordCompl[p] n = n ↔ n.factorization p = 0 := by\n  constructor\n  · intro h\n    have := DFunLike.congr_fun (factorization_ordCompl n p) p\n    rwa [h, Finsupp.erase_same] at this\n  · intro h\n    by_cases hn : n = 0\n    · simp [hn]\n    · apply Nat.eq_of_factorization_eq (ordCompl_pos p hn).ne' hn\n      intro q\n      rw [factorization_ordCompl]\n      by_cases hq : q = p\n      · simp [hq, h]\n      · simp [Finsupp.erase_ne hq]\n```\nThen either replace the current declaration with this one, or keep the current divisibility form as a short corollary using `factorization_eq_zero_iff` and `hp`.",
+  "severity": "advisory"
+ }
+]

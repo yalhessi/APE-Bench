@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Matrix/Spectrum.lean:40",
+  "claim": "`Matrix.spectrum_toLpLin` is unnecessarily restricted by the surrounding `[RCLike 𝕜]` variables, even though the statement and proof only use the algebra equivalence behind `toLpLin`; this prevents using the lemma for matrices over an arbitrary commutative ring.",
+  "requested_change": "State `spectrum_toLpLin` in a generic commutative-ring section, e.g. with `{R : Type*} [CommRing R] {A : Matrix n n R}`, and prove it via `AlgEquiv.spectrum_eq (Matrix.toLpLinAlgEquiv p) _`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/Normed/Lp/Matrix.lean:78",
+  "claim": "`Matrix.toLpLinSymm_pow` uses a camel-case `Symm` component, while the surrounding API names lemmas about `(toLpLin ...).symm` with an underscore, as in `toLpLin_symm_id`.",
+  "requested_change": "Rename `toLpLinSymm_pow` to `toLpLin_symm_pow`.",
+  "severity": "advisory"
+ }
+]

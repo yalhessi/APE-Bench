@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/ContinuousOn.lean:28",
+  "claim": "The module documentation entry for `𝓝ˢ[t] s` names the wrong underlying filter: it says this notation is `nhdsWithin s t`, but the PR introduces `nhdsSetWithin s t`.",
+  "requested_change": "Replace `nhdsWithin s t` with `nhdsSetWithin s t` in this notation bullet.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Defs/Filter.lean:161",
+  "claim": "The docstring for `nhdsSetWithin` displays the wrong notation, `𝓝[t] s`, which is the point-within notation rather than the new set-within notation `𝓝ˢ[t] s`.",
+  "requested_change": "Change the docstring to say that elements of `𝓝ˢ[t] s` are sets containing the intersection of `t` and a neighborhood of `s`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/Defs/Filter.lean:112",
+  "claim": "The `## Notation` section of the module documentation omits the new notation `𝓝ˢ[t] s` introduced in this file.",
+  "requested_change": "Add a notation bullet for `𝓝ˢ[t] s`, e.g. `* `𝓝ˢ[t] s`: the filter `nhdsSetWithin s t` ...`, and adjust the preceding `𝓝ˢ s` bullet punctuation accordingly.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/Topology/Compactness/Compact.lean:705",
+  "claim": "The new public theorem `generalized_tube_lemma'` uses a prime even though its distinguishing feature is the `nhdsSetWithin` formulation, so the name is less descriptive than its sibling names `generalized_tube_lemma_left` and `generalized_tube_lemma_right`.",
+  "requested_change": "Rename `generalized_tube_lemma'` to a descriptive name such as `generalized_tube_lemma_nhdsSetWithin`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Topology/Compactness/Compact.lean:703",
+  "claim": "The three local commands `open Topology Set in` before the new tube lemmas are redundant, because this file already has `open Set Filter Topology TopologicalSpace Function` at the top and the preceding `IsCompact.nhdsSetWithin_prod_eq` uses the same notation without them.",
+  "requested_change": "Delete the redundant `open Topology Set in` lines before `generalized_tube_lemma'`, `generalized_tube_lemma_left`, and `generalized_tube_lemma_right`.",
+  "severity": "advisory"
+ }
+]

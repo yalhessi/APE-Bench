@@ -1,0 +1,51 @@
+[
+ {
+  "ask_id": "v1658",
+  "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean",
+  "code_at_comment": "@@ -1257,4 +1258,5 @@ open Matrix LinearMap EuclideanSpace in\n theorem InnerProductSpace.symm_toEuclideanLin_rankOne {𝕜 m n : Type*} [RCLike 𝕜] [Fintype m]\n     [Fintype n] [DecidableEq n] (x : EuclideanSpace 𝕜 m) (y : EuclideanSpace 𝕜 n) :\n     toEuclideanLin.symm (rankOne 𝕜 x y) = .vecMulVec x (star y) := by\n-  simp [toEuclideanLin, toMatrix', ← ext_iff, vecMulVec_apply, inner_single_right, mul_comm]\n+  simp [toLpLin, toMatrix', ← ext_iff, vecMulVec_apply, inner_single_right,\n+    mul_comm]",
+  "comment": "```suggestion\r\n  simp [toLpLin, toMatrix', ← ext_iff, vecMulVec_apply, inner_single_right, mul_comm]\r\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1659",
+  "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean",
+  "code_at_comment": "@@ -1176,35 +1177,35 @@ namespace Matrix\n \n variable [Fintype n] [DecidableEq n]\n \n-/-- `Matrix.toLin'` adapted for `EuclideanSpace 𝕜 _`. -/\n-def toEuclideanLin : Matrix m n 𝕜 ≃ₗ[𝕜] EuclideanSpace 𝕜 n →ₗ[𝕜] EuclideanSpace 𝕜 m :=\n-  Matrix.toLin' ≪≫ₗ\n-    LinearEquiv.arrowCongr (WithLp.linearEquiv _ 𝕜 (n → 𝕜)).symm\n-      (WithLp.linearEquiv _ 𝕜 (m → 𝕜)).symm\n+/-- A shorthand for `Matrix.toLpLin 2 2`. -/\n+abbrev toEuclideanLin : Matrix m n 𝕜 ≃ₗ[𝕜] EuclideanSpace 𝕜 n →ₗ[𝕜] EuclideanSpace 𝕜 m :=\n+  toLpLin 2 2\n \n-@[simp]\n+@[simp, deprecated toLpLin_toLp (since := \"2026-01-22\")]",
+  "comment": "should we really be deprecating them if they're also good simp lemmas?",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1660",
+  "path": "Mathlib/Analysis/Normed/Lp/Matrix.lean",
+  "code_at_comment": "ormed.Lp.PiLp\n+\n+/-!\n+# Matrices are isomorphic with linear maps between Lp spaces\n+\n+This file provides a `WithLp` version of `Matrix.toLin'`.\n+-/\n+\n+@[expose] public section\n+\n+open Matrix ENNReal\n+\n+variable {m n o R : Type*}\n+\n+namespace Matrix\n+variable [Fintype n] [DecidableEq n] [CommRing R] (p q r : ℝ≥0∞)\n+\n+open WithLp (toLp ofLp)\n+\n+/-- `Matrix.toLin'` adapted for `PiLp R _`. -/\n+def toLpLin : Matrix m n R ≃ₗ[R] WithLp p (n → R) →ₗ[R] WithLp q (m → R) :=\n+  Matrix.toLin' ≪≫ₗ\n+    LinearEquiv.arrowCongr (WithLp.linearEquiv _ R (n → R)).symm\n+      (WithLp.linearEquiv _ R (m → R)).symm",
+  "comment": "```suggestion\r\n  toLin' ≪≫ₗ\r\n    (WithLp.linearEquiv _ R (n → R)).symm.arrowCongr\r\n      (WithLp.linearEquiv _ R (m → R)).symm\r\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1661",
+  "path": "Mathlib/Analysis/Normed/Lp/Matrix.lean",
+  "code_at_comment": "leEq n] [CommRing R] (p q r : ℝ≥0∞)\n+\n+open WithLp (toLp ofLp)\n+\n+/-- `Matrix.toLin'` adapted for `PiLp R _`. -/\n+def toLpLin : Matrix m n R ≃ₗ[R] WithLp p (n → R) →ₗ[R] WithLp q (m → R) :=\n+  Matrix.toLin' ≪≫ₗ\n+    LinearEquiv.arrowCongr (WithLp.linearEquiv _ R (n → R)).symm\n+      (WithLp.linearEquiv _ R (m → R)).symm\n+\n+@[simp]\n+lemma toLpLin_toLp (A : Matrix m n R) (x : n → R) :\n+    Matrix.toLpLin p q A (toLp _ x) = toLp _ (Matrix.toLin' A x) := rfl\n+\n+@[simp]\n+theorem ofLp_toLpLin (A : Matrix m n R) (x : WithLp p (n → R)) :\n+    ofLp (Matrix.toLpLin p q A x) = Matrix.toLin' A (ofLp x) :=",
+  "comment": "I feel like dot notation would look better throughout\r\n```suggestion\r\n    (A.toLpLin p q x).ofLp = A.toLin' x.ofLp :=\r\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1662",
+  "path": "Mathlib/Analysis/Normed/Lp/Matrix.lean",
+  "code_at_comment": ": WithLp p (n → R)) :\n+    ofLp (Matrix.toLpLin p q A x) = Matrix.toLin' A (ofLp x) :=\n+  rfl\n+\n+theorem toLpLin_apply (M : Matrix m n R) (v : WithLp p (n → R)) :\n+    toLpLin p q M v = toLp _ (M *ᵥ ofLp v) := rfl\n+\n+theorem toLpLin_eq_toLin [Finite m] :\n+    toLpLin p q = Matrix.toLin (PiLp.basisFun p R n) (PiLp.basisFun q R m) :=\n+  rfl\n+\n+@[simp]\n+theorem toLpLin_one : toLpLin p p (1 : Matrix n n R) = LinearMap.id := by ext; simp\n+\n+/-- Note that applying this theorem needs an explicit choice of `q`. -/\n+theorem toLpLin_mul [Fintype o] [DecidableEq o] (A : Matrix m n R) (B : Matrix n o R) :",
+  "comment": "Maybe also add a `simp` version of this for `(A * B).toLpLin p p`?\r\nOr maybe for `toEuclideanLin`?",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1663",
+  "path": "Mathlib/Analysis/Normed/Lp/Matrix.lean",
+  "code_at_comment": "\n+    toLpLin p q M v = toLp _ (M *ᵥ ofLp v) := rfl\n+\n+theorem toLpLin_eq_toLin [Finite m] :\n+    toLpLin p q = Matrix.toLin (PiLp.basisFun p R n) (PiLp.basisFun q R m) :=\n+  rfl\n+\n+@[simp]\n+theorem toLpLin_one : toLpLin p p (1 : Matrix n n R) = LinearMap.id := by ext; simp\n+\n+/-- Note that applying this theorem needs an explicit choice of `q`. -/\n+theorem toLpLin_mul [Fintype o] [DecidableEq o] (A : Matrix m n R) (B : Matrix n o R) :\n+    toLpLin p r (A * B) = toLpLin q r A ∘ₗ toLpLin p q B := by\n+  ext; simp\n+\n+@[simp]\n+theorem toLpLin_symm_id : (toLpLin p p).symm .id = (1 : Matrix n n R) :=",
+  "comment": "am I wrong in thinking that we decided that we should prefix the naming unless there's notation involved and special cases like `injective` etc? same thing below?\r\n```suggestion\r\ntheorem symm_toLpLin_id : (toLpLin p p).symm .id = (1 : Matrix n n R) :=\r\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1664",
+  "path": "Mathlib/Analysis/Normed/Lp/Matrix.lean",
+  "code_at_comment": "WithLp q (n → R)) :\n+    (toLpLin p r).symm (A ∘ₗ B) = (toLpLin q r).symm A * (toLpLin p q).symm B :=\n+  toLpLin p r |>.injective <| by simp [toLpLin_mul (q := q)]\n+\n+/-- `Matrix.toLinAlgEquiv'` adapted for `PiLp R _`. -/\n+@[simps!]\n+def toLpLinAlgEquiv : Matrix n n R ≃ₐ[R] Module.End R (WithLp p (n → R)) :=\n+  .ofLinearEquiv (toLpLin p p) (toLpLin_one p) (toLpLin_mul p p p)\n+\n+@[simp]\n+theorem toLpLin_pow (A : Matrix n n R) (k : ℕ) : toLpLin p p (A ^ k) = toLpLin p p A ^ k :=\n+  map_pow (toLpLinAlgEquiv p) A k\n+\n+@[simp]\n+theorem toLpLinSymm_pow (A : Module.End R (WithLp p (n → R))) (k : ℕ) :",
+  "comment": "```suggestion\r\ntheorem symm_toLpLin_pow (A : Module.End R (WithLp p (n → R))) (k : ℕ) :\r\n```",
+  "replies_to": null
+ }
+]

@@ -1,0 +1,30 @@
+[
+ {
+  "ask_id": "v1487",
+  "path": "Mathlib/Analysis/Fourier/Convolution.lean",
+  "code_at_comment": "0 +1,147 @@\n+/-\n+Copyright (c) 2025 Moritz Doll. All rights reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Moritz Doll\n+-/\n+module\n+\n+public import Mathlib.Analysis.Distribution.FourierSchwartz\n+public import Mathlib.Analysis.Convolution\n+\n+/-! # The Fourier transform of the convolution\n+\n+In this file we calculate the Fourier transform of a convolution.\n+\n+## Main statements\n+* `Real.fourier_bilin_convolution_eq`: the Fourier transform of a convolution is the multiplication\n+of the Fourier transform of the functions in terms of a general bilinear map.",
+  "comment": "```suggestion\n  of the Fourier transform of the functions in terms of a general bilinear map.\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1488",
+  "path": "Mathlib/Analysis/Fourier/Convolution.lean",
+  "code_at_comment": ")‖ * ‖f₂ x‖) := by\n+      grw [B.le_opNorm₂ (f₁ (y - x)) (f₂ x), mul_assoc]\n+    simpa\n+  _ = ∫ y, ∫ x, 𝐞 (-inner ℝ (y + x) ξ) • B (f₁ x) (f₂ y) := by\n+    congr\n+    ext y\n+    -- Linear change of variables\n+    convert integral_sub_right_eq_self _ y (μ := volume)\n+    congr\n+    simp\n+\n+variable [CompleteSpace F₁] [CompleteSpace F₂] [CompleteSpace F₃]\n+  [NormedSpace ℂ F₁] [NormedSpace ℂ F₂]\n+\n+open ContinuousLinearMap\n+\n+/-- The Fourier transform of the convolution is given by the multiplication of the Fourier transform\n+of the individual functions.\n+\n+Version for general bilinear forms. -/",
+  "comment": "I realize you're saying \"multiplication\" because this is the standard choice for `B`, but since you have the specialized version below, can you state this more accurately? Something like:\n\n```suggestion\n/-- The Fourier transform of the convolution with respect to a bilinear form `B` is given by applying\nthe bilinear form to the Fourier transform of the individual functions.\n\nWhen `B` is multiplication, this is the familiar fact that the Fourier transform\nof a convolution\nis the product of the Fourier transforms of the individual functions.\nSee `fourier_mul_convolution_eq`. -/\n```",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1489",
+  "path": "Mathlib/Analysis/Fourier/Convolution.lean",
+  "code_at_comment": " MeasureTheory Convolution\n+\n+variable [NontriviallyNormedField 𝕜] [NormedAddCommGroup E]\n+  [NormedAddCommGroup F₁] [NormedAddCommGroup F₂] [NormedAddCommGroup F₃]\n+  [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]\n+  [NormedSpace 𝕜 F₁] [NormedSpace 𝕜 F₂] [NormedSpace 𝕜 F₃]\n+\n+private theorem integrable_prod_sub (B : F₁ →L[𝕜] F₂ →L[𝕜] F₃) {f₁ : E → F₁} {f₂ : E → F₂}\n+    (hf₁ : Integrable f₁) (hf₂ : Integrable f₂) (hf₁' : Continuous f₁) (hf₂' : Continuous f₂) :\n+    Integrable (fun (p : E × E) ↦ ‖B‖ * (‖f₁ (p.1 - p.2)‖ * ‖f₂ p.2‖)) (volume.prod volume) := by",
+  "comment": "```suggestion\n/-- This can be used to show that under these hypotheses, the convolution with respect to a bilinear\nform `B` is integrable. -/\ntheorem integrable_prod_sub (B : F₁ →L[𝕜] F₂ →L[𝕜] F₃) {f₁ : E → F₁} {f₂ : E → F₂}\n    (hf₁ : Integrable f₁) (hf₂ : Integrable f₂) (hf₁' : Continuous f₁) (hf₂' : Continuous f₂) :\n    Integrable (fun (p : E × E) ↦ ‖B‖ * (‖f₁ (p.1 - p.2)‖ * ‖f₂ p.2‖)) (volume.prod volume) := by\n```\nI think we should have docstrings even for private theorems, for otherwise we'll just end up with tons of `private` technical statements throughout Mathlib and you have to hunt for the reason they exist. Admittedly, in this case, it's reasonably clear, so I'm talking about the situation more generally.\n\nBut also, I don't think this lemma needs to be `private`. It could be useful.",
+  "replies_to": null
+ },
+ {
+  "ask_id": "v1490",
+  "path": "Mathlib/Analysis/Fourier/Convolution.lean",
+  "code_at_comment": ".comp_sub_right x).norm.mul_const _\n+  have : Integrable (fun x ↦ ((∫ y, ‖f₁ y‖) * ‖f₂ x‖)) := by\n+    apply hf₂.norm.bdd_mul (by measurability) (c := ‖(∫ y, ‖f₁ y‖)‖)\n+    filter_upwards with; rfl\n+  convert this using 1\n+  ext x\n+  simp_rw [norm_mul, norm_norm]\n+  rw [integral_mul_const]\n+  congr 1\n+  convert integral_sub_right_eq_self _ x (μ := volume)\n+  rfl\n+\n+open FourierTransform\n+\n+variable [NormedSpace ℂ F₃]\n+\n+/-- Calculate the Fourier transform of the convolution as a symmetric integral. -/\n+theorem fourier_bilin_convolution_eq' (B : F₁ →L[𝕜] F₂ →L[𝕜] F₃) {f₁ : E → F₁} {f₂ : E → F₂}",
+  "comment": "Just so that the name is more informative, as the statement is pretty different from the version without `'`.\n```suggestion\ntheorem fourier_bilin_convolution_eq_integral (B : F₁ →L[𝕜] F₂ →L[𝕜] F₃) {f₁ : E → F₁} {f₂ : E → F₂}\n```",
+  "replies_to": null
+ }
+]
