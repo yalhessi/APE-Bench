@@ -1,6 +1,8 @@
 #!/bin/bash
 # Serve deepseek-ai/DeepSeek-V4.1-Flash with vLLM on `first`, bound to localhost (the harness runs on
-# this host). The weights are downloaded into /tmp (tmpfs) when the job starts, not before: the job
+# this host). Start it with a bare `sbatch serve_ds41.sbatch`: the patched nightly, its attention
+# backend, DSpark and a 1M context are the defaults (2026-10-07); ~12 min to serving (8 to download,
+# 4 to load). The weights are downloaded into /tmp (tmpfs) when the job starts, not before: the job
 # waits in the queue for a busy node, and a 510 GB copy would hold that much of its RAM meanwhile.
 # /tmp is tmpfs, so the copy is node RAM for as long as it sits there, and vLLM neither maps nor holds the
 # shards once loaded: deleting them while job 432906 served (2026-10-07 08:13) gave the node back 476 GB
@@ -16,9 +18,10 @@
 #SBATCH -o /research/projects/proofedit/ya475/localmodel/logs/serve_ds41_%j.log
 set -euo pipefail
 ROOT=/research/projects/proofedit/ya475/localmodel
-# Which vLLM environment serves: VENV=<dir> sbatch serve_ds41.sbatch. vllm-env is 0.30.0;
-# vllm031-env is 0.31.0 (DeepGEMM SM120 fixes), tried after 0.30 failed on job 432871.
-VENV=${VENV:-$ROOT/vllm-env}
+# Which vLLM environment serves: VENV=<dir> sbatch serve_ds41.sbatch. The default, vllm-nightly-env
+# (0.31.1rc1.dev29), carries the SM120 per-layer block patch (patch/ beside the probe README) and is the
+# only one that serves V4.1 on first's GPUs; vllm-env (0.30.0) and vllm031-env (0.31.0) do not.
+VENV=${VENV:-$ROOT/vllm-nightly-env}
 DEST=/tmp/ya475-models/DeepSeek-V4.1-Flash
 PORT=${PORT:-8012}
 echo "host $(hostname) gpus $CUDA_VISIBLE_DEVICES start $(date -Is)"
@@ -66,9 +69,19 @@ fi
 # 262144 until 2026-10-07. With each turn's thinking kept in the prompt (5fd560ab), a high-effort
 # session adds ~8k tokens a turn and would pass it near turn 25-30; the model takes 1,048,576.
 MAX_LEN=${MAX_LEN:-1048576}
-echo "serving from $DEST with $($VENV/bin/vllm --version 2>/dev/null) ($VENV) at $(date -Is); max len $MAX_LEN; extra: $*"
+# Speculative decoding with the checkpoint's own DSpark draft, on by default since 2026-10-07: 55.6
+# tokens/s per session against ~36 at 15 sessions, a rep in 34.5 min against 45-53, the same reviews
+# (results/pr_review_v5/probes/local-ds41-2026-10-06/README.md). vLLM refuses it without
+# num_speculative_tokens. SPEC=0 serves without it.
+SPEC_ARGS=()
+if [ "${SPEC:-1}" = 1 ]; then
+  SPEC_ARGS=(--speculative-config '{"method":"dspark","num_speculative_tokens":5}')
+fi
+echo "serving from $DEST with $($VENV/bin/vllm --version 2>/dev/null) ($VENV) at $(date -Is); max len $MAX_LEN; spec ${SPEC:-1}; extra: $*"
 exec $VENV/bin/vllm serve "$DEST" --host 127.0.0.1 --port "$PORT" \
   --served-model-name local-deepseek deepseek-ai/DeepSeek-V4.1-Flash --tensor-parallel-size 8 \
   --tool-call-parser deepseek_v41 --reasoning-parser deepseek_v41 --enable-auto-tool-choice \
   --language-model-only --enable-prefix-caching --enable-prompt-tokens-details \
-  --max-model-len "$MAX_LEN" "$@"
+  --max-model-len "$MAX_LEN" "${SPEC_ARGS[@]}" \
+  --kv-cache-dtype fp8 --attention-config '{"backend":"FLASHINFER_MLA_SPARSE_DSV41","indexer_kv_dtype":"fp8"}' \
+  --no-enable-flashinfer-autotune "$@"
