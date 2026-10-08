@@ -1,9 +1,15 @@
 # Convention dossiers and exams: does a model understand a convention before it applies one?
 
-**Status** — open, 2026-10-08, **for a fresh session**. Nothing built, nothing run. **The first step is
-an adversarial review and a steelman, before any run** (the user, 2026-10-08: *"We should still run the
-adversarial review and try to steelman the idea as much as possible before we commit to a lot of
-running and replicating with various models."*).
+**Status** — open, **narrowed by the adversarial round (2026-10-08, branch `conventions-dossiers`;
+`docs/research/conventions-dossiers-review-2026-10.md`)**. Nothing built, nothing run but counting.
+All four reviewers say narrow. The question to answer first is not whether a dossier teaches better
+than a sentence. It is whether anything carries DP's gain once the asks are no longer given. The
+remaining order is "After the round" below. The original first slice (head conventions, sentence
+against dossier) is rejected with its evidence.
+
+The user asked for the round (2026-10-08): *"We should still run the adversarial review and try to
+steelman the idea as much as possible before we commit to a lot of running and replicating with
+various models."*
 
 **The user (2026-10-08).** *"A question that needs answering in this project, now that conventions play
 such a fundamental role, is 1) how do we get models to strictly adhere to conventions, 2) what are the
@@ -92,18 +98,87 @@ None of these measured whether the model understands a convention before it uses
   evaluation set. DeepSeek-V4.1's training window may cover all of them.
 - Not training a model: dossiers and exams are inputs and measurements, not fine-tuning data.
 
+## The adversarial round (2026-10-08): narrow
+
+The record: `docs/research/conventions-dossiers-review-2026-10.md`, with the briefs, the four reports
+and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
+- **How it ran.** Three attackers (mechanism; measurement; ceiling, cost and record) and a steelman:
+  Opus 5.5 subagents, read-only, 563k tokens in all. The primary token's week went from 93% to 94%.
+- **What the four agree on.**
+  - **As specified, the exam measures itself.**
+    - It hands over the convention and the place, where stages F and G show review fails.
+    - Its three groups, scored separately, read a push to file as understanding.
+    - No exam score can be tied to recall across conventions: 14 probe asks on 7 head entries, power 0.36.
+  - **The planned head slice is where examples did nothing.**
+    - By entry rank, DX1 / DE1 / DP1 reach 1 / 3 / 3 of 8 on the top 10, 3 / 3 / 7 of 10 on ranks
+      11-50, and 1 / 7 / 11 of 16 past rank 100.
+    - The head misses are failed checks and search: try-it work for the closer battery.
+  - **Understanding is real and separable, but small.**
+    - The test that separates it is a claim that the code conforms, made where it does not.
+    - It is a quarter to a half of DP1's 16 misses: at most about +0.08 to +0.15 of in-census asks,
+      and that is with the asks given.
+  - **The assertion carried the gain, not the wording.**
+    - At the 10 asks only the exact brief reached, stage G's reviewer, holding the same sentence at
+      the same place, filed a different change at 6 (matcher 2: 5).
+    - Every delivery that did not assert the convention moved nothing.
+  - **"Passed means strict" is the disposition paragraph,** a volume lever.
+  - **The map cannot be read cell by cell.**
+- **The steelman's strongest form.** Precedent retrieval chooses the conventions in play: the nearest
+  census hunks, their conventions delivered with DP's examples and precedence. Dossiers come only for
+  the judgement conventions, examined by before/after pairs. Its own limit: every positive result on
+  record needed the asks.
+- **Found beside it.** 45% of census asks carry a ```` ```suggestion ```` block, an exact before and
+  after.
+  - Mechanical entries nearly always have one (P017 30/32).
+  - The judgement entries where understanding misses sit rarely do (P004 2/43, P063 3/27, P100 2/24).
+
 **What would close it.**
-- The adversarial round's verdict: proceed, narrow, or drop, with the rejected proposals kept.
-- If it proceeds, the first slice's pre-registered reading: does a dossier raise exam scores over the
-  sentence on the head conventions?
-- Drop if it does not, or if the review shows the tail cap leaves too little recall to pursue.
-  Either way the reading goes here and, if dropped, into `docs/dead-ends.md`.
+- **Drop the dossier line as a recall lever** (a `docs/dead-ends.md` entry, listing self-study and
+  index browsing as untried) if either of these reads as stated in "Start here":
+  - step 0: DP − DE ≤ +0.03 over three reps;
+  - step 3: AP or RP − DX ≤ +0.05, or a gain that fails the volume guard.
+- **Proceed to dossiers (V2), for the judgement conventions at ranks 11-50,** only if step 3 reads
+  ≥ +0.10 on both matchers within the guard and step 2 finds ≥ 7 of 22 misses that a richer
+  representation could fix.
 
-**Cost.** The review costs subagent rounds on the primary subscription. Its seven-day window stood at
-91% on 2026-10-08 and resets Friday 2026-10-09 10:00, so check it first. The first slice is GPU time on
-`first` (CLAUDE.md, the self-hosted DeepSeek), and $0.
+**Cost.**
+- Step 1: CPU only.
+- Steps 2 and 3: DeepSeek on `first`, $0, about two to three hours of the 8-GPU node in all.
+- Matchers: about 0.5-1M subscription tokens, after the week resets on Friday 2026-10-09 10:00.
 
-## Start here
+## Start here (after the round)
+
+The full table, with each step's cost, threshold and recall ceiling, is §6 of the review.
+
+0. **Read stage D's three-rep result when it lands** (thread `conventions-ds41`; reps 2-3 finished at
+   07:52 on 2026-10-08, unmatched).
+   - If DP − DE ≤ +0.03 over three reps, examples and precedence do not move DeepSeek even with the
+     asks given, and the line stops.
+   - Sort DP's stable misses by the separating test in the review's §2.3.
+1. **V1, retrieval as the selector, CPU only, now.**
+   - For each probe PR, rank census entries by the nearest census hunks to the PR's own hunks. The
+     embedding is MiniLM, the precedent index's model, which is on disk.
+   - Score whether each in-census ask's entry is in its PR's top 5.
+   - Two baselines: the census's global top 5, and stage F's selector's first five.
+   - Pre-register it in a README beside its script before it runs.
+2. **The oracle ladder at ask level** (DeepSeek, under an hour of server time).
+   - Each of DE's and DP's misses gets three forms: "does it conform?", "a maintainer asked for this
+     here", and the same with DP's examples; plus a hunk-only floor.
+   - It diagnoses where misses come from. In-sample, so it is not a gain.
+3. **The recall test without asks** (DeepSeek, about 1.5 hours of the 8-GPU node).
+   - AP: stage F's blind selections, each entry with DP's two examples, under DP's precedence
+     paragraph. Or RP: step 1's retrieved entries, if step 1 passes.
+   - The ten stage C PRs, three reps, one seal with DX1-3 and Claude's X1/X2 as anchors.
+   - **≥ +0.10 over DX on both matchers, with findings a PR at most DX + 3.0:** a lever exists without
+     the asks.
+   - **≤ +0.05:** drop.
+   - Recall ceiling: +0.30 in theory on the top-50 asks; +0.09 optimistic; about +0.02 on the record.
+4. **Dossiers, only if 3 moves.**
+   - Self-written by DeepSeek from census asks on half the census PRs, examined by pair ordering on
+     the other half.
+   - For the judgement conventions at ranks 11-50, never the head 10.
+
+## The original start (done or replaced 2026-10-08)
 
 1. **Read** stage D's result (`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`,
    Stage D, on branch `conventions-ds41` until it is merged), and stages C, F, G and H in the same README.
@@ -125,7 +200,8 @@ None of these measured whether the model understands a convention before it uses
    - What is the cheapest experiment that could falsify it?
 
    Keep the rejected proposals with their evidence.
-3. **Only then, the first slice**, pre-registered with its threshold:
+3. **Only then, the first slice** (*replaced by the round: it is aimed at the head, where DP did
+   nothing; see the review's §7*), pre-registered with its threshold:
    - 5-10 head conventions with the most census asks;
    - the sentence against a dossier;
    - exam scores on held-out census cases;
