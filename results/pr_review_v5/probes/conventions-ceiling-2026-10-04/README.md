@@ -1188,6 +1188,115 @@ from each session's reasoning and submission `message`, not blind):
   - The merits judgements the paragraph rules out still decide five asks.
 - One rep cannot carry a verdict. Per-ask stability (mean / union / stable) needs reps 2 and 3.
 
+## Result 7 (2026-10-08): three reps -- DeepSeek carries the ceiling (+0.22 / +0.25), and precedence with examples moves it a further +0.20 / +0.18, with no volume effect
+
+**How it was matched.** Reps 2-3 were matched as the interim look's procedure fixed: a second seal a
+set, `D23`, over X1, X2, DX2-3, DE2-3 and DP2-3 (`blinding_D23_<set>_SEALED.json`, committed before any
+cell was judged, `c39eb332`); `cli probe match-inputs` with `sources_D_<set>.json`; no condition cue
+in any reviewer file. Four blind matchers ran, two a set, as subagents of the session that wrote this
+(Opus 5.5, CLI 2.1.292), each handed its generated prompt verbatim (checked against the transcripts).
+- Matcher tokens: 181k, 176k, 127k and 127k, about 0.61M in all, on the primary subscription.
+- `check_matches.py` passed all four.
+- `cli probe audit` on each transcript: 51 tool calls, 0 flagged. `audit_batch.py` reads a headless
+  parent's stream, so its inner audit was run on each transcript directly.
+- Matcher agreement, reached against not: 233 of 240 cells (validation) and 128 of 128 (post-cutoff).
+  Over both seals, 382 of 390 and 208 of 208.
+- **The anchors across the two seals:** X1 and X2's cells agree between D1 and D23 on 92 of 92
+  (matcher 1) and 88 of 92 (matcher 2). On matcher 1 they reach 36 of 78 in-census cells in both
+  rounds; on matcher 2, 36 against 32. So the two matcher pairs read alike, and reps under different
+  seals can be pooled.
+
+**The reading.** `read_stage.py D1,D23 DE DX` and `read_stage.py D1,D23 DP DE`: three reps, 117
+in-census cells a condition.
+
+| per-session reach, in-census asks, matcher 1 / 2 | DX | DE | DP | Claude X (D23 seal) |
+|---|---|---|---|---|
+| validation (25) | 0.21 / 0.19 | 0.44 / 0.45 | 0.67 / 0.65 | 0.48 / 0.40 |
+| post-cutoff (14) | 0.24 | 0.45 | 0.60 | 0.43 |
+| **pooled (39)** | **0.22 / 0.21** | **0.44 / 0.45** | **0.64 / 0.63** | 0.46 / 0.41 |
+| asks reached a rep, mean (of 39) | 8.7 / 8.0 | 17.3 / 17.7 | 25.0 / 24.7 | |
+| union over three reps | 11 / 9 | 22 / 23 | 29 / 29 | |
+| stable, all three reps | 7 / 7 | 13 / 13 | 19 / 19 | |
+| `partial` cells, in-census | 7 / 7 | 10 / 8 | 4 / 5 | |
+| out-of-census (7 asks, 21 cells), the control | 13 | 14 | 15 | |
+| findings a PR, the 14 ask PRs (`session_stats`) | 2.62 | 2.86 | 3.48 | |
+| asks reached a finding, all asks | 0.36 / 0.34 | 0.55 / 0.56 | 0.62 / 0.61 | 0.32 / 0.29 |
+
+- **1. DE − DX = +0.222 / +0.248: DeepSeek carries the ceiling** (rule: ≥ +0.15 on both matchers).
+  The side condition holds: asks reached a finding rise from 0.36 to 0.55.
+  - The ceiling has now replicated on Claude (+0.26 / +0.28), gpt-5.5 (+0.22) and DeepSeek, and failed
+    on Qwen3.5 (+0.05).
+- **2. DP − DE = +0.197 / +0.179: the conventions given precedence, with examples, move the reviewer
+  beyond the exact brief** (rule: ≥ +0.10 on both matchers).
+- **The volume guard is far from binding.** DP files 0.62 findings a PR more than DE, against the
+  +3.0 guard, and its asks reached a finding rise.
+- **DP − DX = +0.419 / +0.427.**
+- **Rep 1 held.** Each rep's reach is within three asks of the others: DP 24, 27, 24 and DE 17, 17, 18
+  on matcher 1.
+  - Rep 1's interim DP − DE (+0.179 / +0.154) sits a little below the three-rep figure.
+  - The control moved by one cell in each comparison.
+
+**Where the gain sits, by the census rank of the ask's entry** (cells reached over three reps, matcher
+1; matcher 2 within two cells; ranks as `docs/research/conventions-dossiers-review-2026-10/factsheet.txt`):
+
+| entry rank | asks | cells | DX | DE | DP |
+|---|---|---|---|---|---|
+| 1-10 | 8 | 24 | 4 | 7 | 9 |
+| 11-50 | 10 | 30 | 9 | 12 | 21 |
+| 51-100 | 5 | 15 | 9 | 10 | 11 |
+| > 100 | 16 | 48 | 4 | 23 | 34 |
+
+DP's gain over DE is +2 cells on the head and +9 on ranks 11-50; the exact sentences' gain over DX is
+largest in the tail (+19 cells).
+
+**At the asks that differ by two reps or more** (DP − DE, sessions reaching of three, both matchers):
+- 28649 v0029 ("please revert" a wording change): 3 against 1.
+- 30458 v0062 and v0063 ("does the old proof not work?"): 3 against 0.
+- 30641 v0068 (`gcongr`, rep 1's leading "check failed" miss): 2 against 0.
+- 41930 p0000 (a PR-level motivation ask): 2 against 0.
+- 42814 p0007 (`variable {D : ℤ}`, stage G's verified-and-dropped case): 3 against 1.
+- 32875 v0090 (the `grind` tag): 2 and 1 against 0.
+
+The one loss is 43192 p0014 (the `cat_disch` default), 2 against 3.
+
+**DP's stable misses: 10 of 39, reached in no rep on matcher 1.**
+- In the head 10 there are five:
+  - v0067: `positivity`;
+  - v0092 and v0093: the merged `simpa` forms;
+  - v0105: a one-line proof from `infinite_pigeonhole_card_lt`;
+  - p0005: generalise to a UFD.
+- Outside the head there are five:
+  - v0053 (rank 23): motivation tied to #24163;
+  - v0064 (rank 64): the area's variable letters, which the maintainer called optional;
+  - p0004 (past 100): an `alias` for an iff;
+  - p0010 (past 100): `_left`/`_right` against the library's orientation;
+  - p0016 (past 100): `homMk` against `mkHom`.
+
+Rep 1's reasoning sorted these as search and execution, merits judgements and wrong comparisons (the
+interim table above). v0068 is no longer a miss, so rep 1's "check failed" class was partly noise.
+
+**Also read, mechanically.**
+- **DP filed no finding in question form,** over 131 anchored findings on the ask PRs. The paragraph
+  asks for a question where the change cannot be made or checked.
+- **One DP finding cites another PR, an example or precedence.** Whether the examples steer the
+  reasoning is not read here.
+- Sessions without a submission: none (147 of 147 ok, `ds41_conv_gate.status`).
+- The reasoning at the asks that differ, and at DP's 10 stable misses, is not read beyond rep 1's
+  interim reading.
+
+**What it means, at this altitude.** Three reps of one local model, 39 asks, a ceiling by
+construction.
+- **The pre-registered answers are both yes.**
+  - A strong local model carries the exact conventions as Claude and gpt-5.5 did.
+  - Telling it that maintainers' examples outrank its own judgement of the code moves it by another
+    seven to eight asks of 39 a rep, without filing much more.
+- **The bundle is not separated.** DP carries the examples, the precedence paragraph and a longer
+  section (2.8k to 12.6k characters a PR, against DE's 0.5k to 1.2k). The ablations named before the run are now called for: the disposition
+  paragraph on DeepSeek, and DP without its examples.
+- **Like DE, DP is built from the asks.** Whether any of it survives choosing the conventions without
+  them is untested. It is the convention-dossiers thread's next question
+  (`docs/research/conventions-dossiers-review-2026-10.md` §6, on branch `conventions-dossiers`).
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences

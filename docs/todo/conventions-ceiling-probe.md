@@ -103,6 +103,22 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   paragraph asks for a question, five merits judgements, three the right convention in another form,
   one a wrong comparison, three never at the place. Reps 2-3 run under the gate; their matching is a
   second seal (`D23`, read as `D1,D23`). README, "Interim result (rep 1)".
+- **Stage D, three reps (2026-10-08, by the pre-registered rule; README, "Result 7").**
+  - **Both answers are yes, on both matchers.** In-census reach over 117 cells: DX 0.22 / 0.21, DE
+    0.44 / 0.45, DP 0.64 / 0.63.
+    - DE − DX = +0.222 / +0.248 (bar +0.15): DeepSeek carries the ceiling, as Claude and gpt-5.5 did.
+    - DP − DE = +0.197 / +0.179 (bar +0.10): precedence with examples moves it further.
+  - **Not volume, and rep 1 held.** DP files 3.48 findings a PR against DE's 2.86 (guard +3.0).
+    Union 11 / 22 / 29 and stable 7 / 13 / 19 asks of 39. The control moved one cell.
+  - **Where the gain sits.** DP's gain over DE is +2 cells of 24 on the census's top 10 entries and +9
+    of 30 on ranks 11-50.
+  - **What DP still misses.** Its 10 stable misses include five of the eight head asks (`positivity`,
+    two merged `simpa` forms, a one-line library proof, a generalisation). It files no question,
+    though its paragraph asks for one where a check fails.
+  - **What is left.** The bundle is not separated: examples, precedence and a longer section. The
+    ablations named before the run are now called for: the disposition paragraph on DeepSeek, and DP
+    without its examples. And all of it is still built from the asks; choosing the conventions
+    without them is the convention-dossiers thread's question.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 
