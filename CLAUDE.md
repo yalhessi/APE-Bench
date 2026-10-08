@@ -187,8 +187,10 @@ go through the University of Edinburgh gateway. The OpenAI key stopped working o
 Responses with `openai_responses_reasoning_carryover: true`**: Chat Completions, or carry-over off,
 drops its reasoning every turn, so both are refused before the first request and at `cli plan`
 (`reasoning_drop_refusal`, user, 2026-10-05). 103 of the 129 GPT configs then on disk were written for
-the old paths and are refused rather than reinterpreted; a new GPT config states both lines. The judge base still pins
-`gpt_5_mini`, and moving it to `elm_gpt_5_mini` forks its cache. The ELM key has a fixed **£500**
+the old paths and are refused rather than reinterpreted; a new GPT config states both lines. The judge base
+pins `elm_gpt_5_mini` since 2026-10-06 (the same snapshot as the old `gpt_5_mini`; 73 of 76 issue
+verdicts agree, `results/pr_review_v5/probes/judge-elm-2026-10-06/`), and the move forked its cache: an
+audit judged before then does not resume into one judged after. The ELM key has a fixed **£500**
 limit (GBP, not dollars): `ape/bin/python -m ape.llm_clients.elm_budget` prints what is left, from
 ELM's `GET /api/v1/costs` (spec at `/swagger-ui/`). ELM syncs that figure periodically (`asOf`), so
 spend since the last sync is not in it, and the run caps are USD list-price estimates, not ELM's bill. Separate variables on purpose — both are usually
@@ -213,6 +215,24 @@ requeues exactly those. **Since 2026-10-06 the two Pro accounts refuse** (`CLAUD
 token runs, and it is the user's interactive account (its seven_day window stood at 67% that day),
 so a run on it is the user's call, asked before, never assumed. Configs: `configs/pr_review_v5_dev_medium_*_claude_sub.yaml`. Readings:
 `results/pr_review_v5/probes/claude-models-2026-10-01/`.
+
+**The self-hosted model is DeepSeek-V4.1-Flash on `first`: the free iteration tier** (2026-10-07). It
+reaches 8, 6, 9 of 23 on the dev held-out 12 (Opus 5.5: 7, 7), at about 35 min a rep and $0.
+`local_deepseek_v4.1_flash` is `LLMProvider.LOCAL` (no key, `http://127.0.0.1:8012`); config
+`configs/pr_review_v5_dev_medium_local_ds41_contract2.yaml`.
+- **Server:** `sbatch /research/projects/proofedit/ya475/localmodel/serve_ds41.sbatch` (8 GPUs, ~12 min
+  to serving), then the probes `probe_correct.py` and `probe_carry.py` before any review.
+  - The defaults are the only working setup: a vLLM nightly with an SM120 patch, DSpark speculative
+    decoding and a 1M context.
+  - It deletes its 476 GB `/tmp` weight copy, which is node RAM, once serving.
+- **Run the harness as a Slurm job on `first`** (`run_ds41_keepthink.sh` is the pattern), not from a
+  session: the server binds to localhost.
+- **Earlier thinking must reach the server.** A local model takes the plain `MessageFormatter`,
+  because `OpenAIMessageFormatter` drops `reasoning_content`
+  (`test_a_local_model_gets_its_earlier_thinking_back`). With it dropped, DeepSeek re-derived ~8k
+  thinking tokens a turn, and a session wrote ~215k tokens against ~62k.
+- **Qwen3.5-397B is the floor tier** (`docs/dead-ends.md`).
+- Readings: `results/pr_review_v5/probes/local-ds41-2026-10-06/`.
 
 **A missing or rejected key does not fail; it retries for hours.** `llm_clients/client.py` retries
 every exception except four, authentication included: 100 attempts, waits up to 60 s plus jitter,
