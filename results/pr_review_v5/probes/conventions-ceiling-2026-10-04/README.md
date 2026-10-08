@@ -1085,6 +1085,40 @@ figures they are not.
   into `match_D_<set>/unblinded.json`; `read_stage.py D DE DX` and `read_stage.py D DP DE`; then the
   also-reads above and Result 7 here and in the todo.
 
+### Interim look at rep 1 (2026-10-08 05:30, at the user's request, before any rep-1 cell was matched)
+
+The user (05:25): *"We should judge the runs that finished, before we waste time replicating the same
+negative result."* **This is a deviation from the pre-registration,** which reads three reps under
+one seal a set. Rep 1 of every condition finished at 05:21:50 (DX1, DE1, DP1 on both sets: 49
+sessions, none failed). Reps 2 and 3 are running under the same gate and are left alone.
+
+**The procedure is the pre-registered one, on rep 1 only.** One seal a set over Claude's X1 and X2
+with DX1, DE1 and DP1 (`blinding_D1_<set>_SEALED.json`), two blind matchers a set as subagents under
+the harness's rubric, the audit, then `cli probe unblind` into `match_D1_<set>/`. `read_stage.py D1`
+reads it.
+
+**What one rep can support, and what it cannot.**
+- It can show a direction, and what the sessions did at each ask: their reasoning at the misses.
+- It cannot give a reading by the rule:
+  - one rep is 39 in-census cells a condition, so one ask is 0.026;
+  - the semantic judge's self-agreement puts one obligation at n≈8 near ±12 points (CLAUDE.md);
+  - DeepSeek moved 6 to 9 of 23 rep to rep on the dev set.
+- So the thresholds above are not applied to rep 1 as a verdict. The rule stays the three-rep one,
+  and every rep-1 figure here is provisional.
+- **Whether to stop the gate after this look is the user's decision.** This session does not stop,
+  edit or restart the gate or its server.
+
+**How the full reading adds reps 2 and 3 without re-matching rep 1.** It needs a second seal a set
+over X1, X2, DX2-3, DE2-3 and DP2-3 (`D23`), read together as `read_stage.py D1,D23`.
+- Within each seal, every condition is judged by the same two matchers. So each rep's differences
+  stay within one seal, though the three reps are no longer under one.
+- X1 and X2 sit in both seals as the anchors. Their cells in the two rounds measure how far one
+  matcher pair drifts from the other.
+- `read_stage.py` merged rounds by replacing a whole ask's row, which suits rounds on disjoint PRs
+  (stage C). It now merges rows by session, so two rounds on the same asks add up.
+- Re-matching all 11 sessions a PR under one seal, as pre-registered, would instead cost four more
+  matcher runs at 11 sessions a PR, on top of the four run now.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
