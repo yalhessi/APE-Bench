@@ -61,6 +61,29 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   level. Maintainers raise at most 5% of the places a rule's situation is flagged. Untried: whether
   the unasked departures would be welcome (adjudication), and reviewer, PR-theme and file-local
   signals. README, Result 6; designs in `docs/plans/2026-10-06-convention-decision-designs.md`.
+- **Picked up on DeepSeek-V4.1-Flash, 2026-10-08, at the user's direction** ("a good opportunity
+  to replicate those results and try one alternate design of how conventions get used: models still
+  don't seem to understand how we want them to use conventions, and that the examples of conventions
+  should count as stronger evidence than their internal judgement"). The self-hosted DeepSeek reaches
+  8, 6, 9 of 23 on the dev held-out 12 with its thinking kept (Opus 5.5: 7, 7), free on `first`
+  (CLAUDE.md; `results/pr_review_v5/probes/local-ds41-2026-10-06/`). Two steps, both pre-registered
+  before any session runs:
+  1. **Replicate stage L on DeepSeek:** X against the exact brief, on both sets, three reps a
+     condition, matched as stage L was. Read against Qwen +0.05, gpt-5.5 +0.22 and Claude
+     +0.26 / +0.28: does a strong local model carry the ceiling?
+  2. **One alternate design of how the conventions are used,** where the listed conventions and their
+     examples outrank the reviewer's own judgement of the code. Stage G's notes show the reviewer
+     verifying and then overriding; stage W's disposition paragraph (branch `generation-suppression`,
+     unmerged; `docs/plans/2026-10-06-generation-without-suppression.md` there) removed the guess about
+     maintainers and moved gpt-5.5 by +0.189 out of sample. Build on it: either the disposition
+     paragraph itself on DeepSeek, or a variant that states precedence outright. Say which, and
+     why, against that record before running.
+  - **Generation is free; matching is not run as a paid call.** The server and the `cli run` reps
+    are GPU time on `first`. Run them as one unattended Slurm gate (server, the probes, every rep,
+    release the node; `run_ds41_keepthink.sh` is the pattern), never a session waiting for hours.
+    The two blind matchers run as the probe harness runs them.
+  - **The node may be busy.** On 2026-10-08 gg676's jobs held 5 of `first`'s 8 GPUs for 7.5-12 h,
+    and the server needs all 8. Queue the gate and prepare while it waits.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 
