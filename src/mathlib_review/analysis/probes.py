@@ -431,18 +431,66 @@ CONVENTIONS_DISPOSITION = (
     "conventions this replaces the brief's instruction to emit only what you would actually request.")
 
 
+#: Stage D's closing paragraph (DeepSeek-V4.1-Flash; the probe README's stage D): the conventions, and
+#: maintainers' asks for them on other PRs, outrank the reviewer's own judgement of the code. With the
+#: exact section the reviewers weighed a convention and passed the code on its merits: Claude "also
+#: compiles as a term. That is a matter of taste, not an ask", "does not apply, since this is a
+#: generalization"; the local Qwen "`gcongr` doesn't apply here as verified". The disposition paragraph
+#: above rules out guesses about maintainers; this one rules out the reviewer's view of the code as
+#: well, lets the examples decide where a convention applies, and turns a change it cannot make into
+#: a question. Each sentence carries its examples (`exemplified`).
+CONVENTIONS_PRECEDENCE = (
+    "Under each convention are up to two comments in which a maintainer asked for it on another PR, "
+    "each with the code it was on. Take the conventions and these examples as the standard for this "
+    "review: they show what maintainers ask for, and they outrank your own judgement of this code. "
+    "Where the changed code is in a situation like an example's, file the change its convention calls "
+    "for, as a finding at that place. None of these is a reason to leave it out: that the code is "
+    "correct, clear or idiomatic as it stands; that the change is minor or a matter of taste; that "
+    "this file, its author or its neighbours do it differently; that Mathlib does not require it or a "
+    "maintainer might not insist on it; that the convention's wording does not quite fit, where the "
+    "code is like an example's. Where you cannot make or check the change, file it as a question to "
+    "the author that names the convention and the change. Leave a place unfiled only where a line of "
+    "the code you quote, or a check you ran, shows it already has the form the convention calls for. "
+    "In your submission's `message`, list each convention with the places you filed and any place "
+    "you left, with that line or check. For these conventions this replaces the brief's instructions "
+    "to emit only what you would actually request and not to raise questions.")
+
+
+def exemplified(principle: str, examples: List[Dict[str, str]]) -> str:
+    """A convention's sentence with maintainers' asks for it on other PRs beneath it, each a comment
+    (`comment`), the file it was on (`path`, None for a comment on the PR as a whole) and the code
+    (`code`), indented to sit inside the sentence's list item in `conventions_section`."""
+
+    def indented(text: str, prefix: str) -> str:
+        return "\n".join(prefix + line if line.strip() else prefix.rstrip() for line in text.splitlines())
+
+    parts = [principle]
+    for n, ex in enumerate(examples, 1):
+        where = f"at `{ex['path']}`" if ex.get("path") else "on the PR as a whole"
+        parts.append(f"\n\n  Example {n}, asked on another PR {where}. The maintainer's comment:\n\n"
+                     + indented(ex["comment"], "  > "))
+        if ex.get("code"):
+            parts.append("\n\n  The code it was on:\n\n  ```\n" + indented(ex["code"], "  ") + "\n  ```")
+    return "".join(parts)
+
+
 def conventions_section(principles: List[str], closing: str = "") -> str:
     """The section's text; `closing`, when given, is a paragraph after the sentences."""
     return (CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
             + (f"\n{closing}\n" if closing else ""))
 
 
-def load_conventions(briefs: Path, codebook: Path) -> Dict[int, List[str]]:
+def load_conventions(briefs: Path, codebook: Path,
+                     examples: Optional[Dict[str, List[Dict[str, str]]]] = None) -> Dict[int, List[str]]:
     """A level's briefs as sentences: `briefs` is `{"prs": {pr: [entry ids]}}`, `codebook` a census
-    codebook. Sentences come in codebook order whatever order the brief lists its ids in."""
+    codebook. Sentences come in codebook order whatever order the brief lists its ids in. With
+    `examples` (entry id -> its examples), each sentence carries its own (`exemplified`); an entry
+    with none reads as its sentence."""
 
     principle = {entry["id"]: entry["principle"] for entry in json.loads(Path(codebook).read_text())}
-    return {int(pr): [principle[i] for i in sorted(set(ids))]
+    text = ((lambda i: exemplified(principle[i], examples.get(i, []))) if examples is not None
+            else (lambda i: principle[i]))
+    return {int(pr): [text(i) for i in sorted(set(ids))]
             for pr, ids in json.loads(Path(briefs).read_text())["prs"].items()}
 
 

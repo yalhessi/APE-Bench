@@ -553,6 +553,29 @@ def test_a_brief_is_its_entries_sentences_in_codebook_order(tmp_path):
     assert probes.load_conventions(briefs, codebook) == {7: ["first", "second"], 8: []}
 
 
+def test_a_convention_can_carry_maintainers_asks_beneath_it_inside_its_list_item(tmp_path):
+    codebook, briefs = tmp_path / "codebook.json", tmp_path / "briefs.json"
+    codebook.write_text(json.dumps([{"id": "P001", "principle": "first"}, {"id": "P002", "principle": "second"}]))
+    briefs.write_text(json.dumps({"prs": {"7": ["P002", "P001"], "8": []}}))
+    examples = {"P001": [{"path": "Mathlib/A.lean", "comment": "Use `simp`.\n\nPlease.", "code": "@@ -1 +1 @@\n\n+x"},
+                         {"path": None, "comment": "Why?", "code": ""}]}
+    first = ("first\n\n  Example 1, asked on another PR at `Mathlib/A.lean`. The maintainer's comment:\n\n"
+             "  > Use `simp`.\n  >\n  > Please.\n\n  The code it was on:\n\n  ```\n  @@ -1 +1 @@\n\n  +x\n  ```"
+             "\n\n  Example 2, asked on another PR on the PR as a whole. The maintainer's comment:\n\n  > Why?")
+    held = probes.load_conventions(briefs, codebook, examples)
+    assert held == {7: [first, "second"], 8: []}
+    # The sentences and the lead are the exact section's; the examples sit inside each item, the
+    # precedence paragraph after the list.
+    section = probes.conventions_section(held[7], probes.CONVENTIONS_PRECEDENCE)
+    assert section == (probes.CONVENTIONS_LEAD + f"\n\n- {first}\n- second\n\n"
+                       + probes.CONVENTIONS_PRECEDENCE + "\n")
+    assert probes.conventions_section(["first", "second"]) == probes.conventions_section(
+        probes.load_conventions(briefs, codebook)[7])
+    for ground in ("outrank your own judgement", "matter of taste", "does not require it",
+                   "file it as a question", "not to raise questions"):
+        assert ground in probes.CONVENTIONS_PRECEDENCE
+
+
 def test_a_new_packet_goes_where_the_prs_earlier_sessions_live(tmp_path):
     spec = POST.model_copy(update={"probe_dir": tmp_path / "probe", "sessions_from": {43192: tmp_path / "old"}})
     moved, plain = probes.write_packets(spec, ["E1"], tmp_path / "scratch", prs=[43192, 43024])
