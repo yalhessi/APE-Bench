@@ -150,8 +150,10 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 The full table, with each step's cost, threshold and recall ceiling, is §6 of the review.
 
-0. **Read stage D's three-rep result when it lands** (thread `conventions-ds41`; reps 2-3 finished at
-   07:52 on 2026-10-08, unmatched).
+0. **Stage D's three-rep result: read 2026-10-08, continue** (`conventions-ds41`, Result 7, `18f7c3c1`).
+   - DP − DE = +0.197 / +0.179 and DE − DX = +0.222 / +0.248 over three reps, findings a PR +0.62.
+   - On the head 10, DP adds 2 of 24 cells, and five of its 10 stable misses are head asks.
+   - The rule as written before the read:
    - If DP − DE ≤ +0.03 over three reps, examples and precedence do not move DeepSeek even with the
      asks given, and the line stops.
    - Sort DP's stable misses by the separating test in the review's §2.3.
