@@ -1119,6 +1119,75 @@ over X1, X2, DX2-3, DE2-3 and DP2-3 (`D23`), read together as `read_stage.py D1,
 - Re-matching all 11 sessions a PR under one seal, as pre-registered, would instead cost four more
   matcher runs at 11 sessions a PR, on top of the four run now.
 
+### Interim result (rep 1), provisional: not a null -- the exact section moves DeepSeek by +0.23, and precedence with examples by a further +0.15 to +0.18
+
+Rep 1 alone, matched as recorded above. All four matcher transcripts audit clean (41 tool calls, none
+flagged), and the prompts were handed over verbatim. The matchers agree on 149 of 150 cells
+(validation) and 80 of 80 (post-cutoff). Matcher tokens: 128k, 131k, 87k and 87k, about 0.43M in
+all, on the primary subscription. `read_stage.py D1 DE DX` and `read_stage.py D1 DP DE` print the
+tables.
+
+| per-session reach, in-census asks, matcher 1 / 2 | DX1 | DE1 | DP1 | Claude X (X1, X2), same seal |
+|---|---|---|---|---|
+| validation (25) | 0.20 | 0.44 | 0.64 / 0.60 | 0.48 |
+| post-cutoff (14) | 0.21 | 0.43 | 0.57 | 0.43 |
+| **pooled (39)** | **0.21** (8/39) | **0.44** (17/39) | **0.62 / 0.59** (24 / 23 of 39) | 0.46 |
+| out-of-census (7), the control | 4/7 | 5/7 | 6/7 | 7/14 |
+| findings a PR, the 14 ask PRs | 2.64 | 3.14 | 3.29 | 4.86 |
+| asks reached a finding, all asks | 0.32 | 0.50 | 0.65 / 0.63 | 0.32 |
+
+- **DE1 − DX1 = +0.231 on both matchers** (9 in-census asks gained, none lost). The rule's
+  three-rep bar for "DeepSeek carries the ceiling" is +0.15. Gained: 28649 v0030 (spell out `mgf`),
+  32875 v0094 and v0095 (`simpa`), 34091 v0106-v0108 (instance-implicit class hypotheses), 43167
+  p0012 (`_of_normal` rather than a prime), 43192 p0014 and p0015 (`by cat_disch` defaults).
+- **DP1 − DE1 = +0.179 / +0.154**, a net gain of 7 / 6 asks. The rule's three-rep bar is +0.10.
+  - Gained (both matchers unless marked): 28649 v0029 ("please revert" a wording change); 30458
+    v0060 and v0061 (no sections, collect the common `variable`s); 30458 v0062 and v0063 ("does the
+    old proof not work?"); 32875 v0090 (the `grind` tag; matcher 1 only); 41930 p0000 (why the old
+    names are bad, a PR-level motivation ask); 42814 p0006 (`mk_iff`); 42814 p0007 (one `variable
+    {D : ℤ}`).
+  - Lost: 30641 v0066 (prove the `≤` version directly) and 43192 p0014 (`cat_disch` default on `mk`).
+  - p0007 is the ask stage G's Claude session verified and dropped ("Mathlib does not require
+    these"). p0000 is one of the three PR-level motivation asks Claude E1 set aside as "too minor".
+- **The volume guard is far from binding.** DP1 files 0.14 findings a PR more than DE1, against the
+  +3.0 guard, and its asks reached a finding rise (0.50 to 0.65 / 0.63).
+- **The control moved, and both moves are tied to the brief.** DE1 gained 28649 v0031 ("I'm not
+  sure about this one"), which shares the docstring hunk with the in-census v0030, as in stage L.
+  DP1 gained 30641 v0065 (`h₂a` → `ha`), which it filed under the brief's variable-naming entry
+  (P105). So the out-of-census asks are not a clean control here either.
+- **Against Claude.** DE1 reaches about what unbriefed Claude does in the same seal (0.44 against
+  0.46), and DP1 more (0.62 / 0.59). Stage C's briefed Claude (0.74) was matched under another seal
+  and is not compared here.
+- **DP1's messages follow the paragraph's form.** Each lists the conventions with the places filed
+  and the places left, with the check or line. Twice the reasoning still weighs maintainer
+  insistence: "would a maintainer ask? ... maybe 50% likelihood" (30641, filed), and "not a change I
+  would insist on" (43192, an unused `open`, not an ask).
+
+**What DP1's sessions show at the 16 in-census asks it still misses** (15 on matcher 1; read by me
+from each session's reasoning and submission `message`, not blind):
+
+| how it was missed | asks | what the session says |
+|---|---|---|
+| **a check failed, and the place was left rather than filed as a question** (the paragraph asks for a question) | 4: 30641 v0068, 32875 v0092, 32875 v0093, 43192 p0014 | v0068: "the code does NOT use gcongr, but gcongr doesn't work here (verified), so the code is fine". v0092: "`simpa only [pi_pi, this] using …` does not elaborate", and a different change filed there. v0093: tested `exact … h` without the `simp`, "a type mismatch, so the `at h` simplification is not redundant". p0014: "`by cat_disch` cannot discharge them here … so requiring them is correct" (DE1 filed it). |
+| **weighed on the merits, and the code judged conforming or necessary** | 5: 30641 v0064, 34091 v0105, 42814 p0005, 43167 p0010, 43192 p0016 | v0105: "the extra case split … is necessary". p0005: "its ℤ-specific content is used … not an instance of the general" lemma. p0010: "`_left`/`_right` is the first/second argument here exactly as in `commutator_le_left`" (local siblings, as Claude E1 did). p0016: `homMk` ~25 files against `mkHom` ~7, "NOT a clear naming violation". v0064: "everything else uses the area's letters" (the maintainer called it optional). |
+| **the right convention filed, in another form or place** (`partial`) | 3 on matcher 2 (2 on matcher 1): 29842 v0053 and v0056, 32875 v0090 | A motivation finding at the module docstring ("the PR's description is empty"), where the maintainer asked about #24163 and the downstream plan. The `grind` tag put on `mem_map_equiv` itself. |
+| **considered against the wrong comparison** | 1: 42184 p0003 | "`HasProd.nonneg` does not exist, but neither does the additive twin" (the ask is the `HasProd` sibling in this file). |
+| **the convention swept, never at the ask's place** | 3: 30641 v0066, 30641 v0067, 42814 p0004 | The direct-lemma check at `this.le`, not at `rw [not_le] at h₂a` (DE1 and DX1 reached v0066). `positivity` used for other arguments, with `simp [Finset.sum_nonneg …]` kept. The alias check on the file's other iffs, not `forall_prime_iff_two_and_odd`. |
+
+**What it means, at this altitude (one rep).**
+- The pick-up's fear, that this would replicate the negative, does not hold on rep 1.
+  - DeepSeek behaves like the strong reviewers (Claude +0.26 / +0.28, gpt-5.5 +0.22), not like
+    Qwen (+0.05).
+  - Stating the conventions' precedence, with examples, moved it further, both ways counted.
+  - Both differences clear their three-rep bars on one rep, by two to three asks.
+- The mechanism reads as intended where it worked: the asks gained include the ones on record as
+  verified and dropped.
+- Where it did not work, the leading cause is new.
+  - A failed check is still read as the code conforming, though the paragraph says to file a
+    question where the change cannot be made.
+  - The merits judgements the paragraph rules out still decide five asks.
+- One rep cannot carry a verdict. Per-ask stability (mean / union / stable) needs reps 2 and 3.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences

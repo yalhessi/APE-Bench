@@ -95,6 +95,14 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   which the disposition paragraph leaves alone, and examples are the record's untried delivery.
   Rules: DE − DX at the todo's +0.15 / +0.05; DP − DE `≥ +0.10` moves, `≤ +0.03` does not, with
   stage W's +3.0 findings-a-PR volume guard. One Slurm gate runs it (`run_stage_d_gate.sh`).
+- **Stage D, interim look at rep 1 (2026-10-08, at the user's request; provisional, one rep):** in-census
+  reach DX1 0.21, DE1 0.44, DP1 0.62 / 0.59 (unbriefed Claude 0.46 in the same seal). DE1 − DX1 = +0.231,
+  nine asks gained and none lost: DeepSeek behaves like the strong reviewers, not like Qwen. DP1 − DE1 =
+  +0.179 / +0.154, net seven / six asks, among them stage G's dropped `variable {D}` and a PR-level
+  motivation ask, at 0.14 more findings a PR. DP1's 16 misses: four a failed check left unfiled where the
+  paragraph asks for a question, five merits judgements, three the right convention in another form,
+  one a wrong comparison, three never at the place. Reps 2-3 run under the gate; their matching is a
+  second seal (`D23`, read as `D1,D23`). README, "Interim result (rep 1)".
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 
