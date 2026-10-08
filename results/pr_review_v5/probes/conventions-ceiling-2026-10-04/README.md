@@ -1042,7 +1042,7 @@ unblind` into `match_D_<set>/unblinded.json`, `read_stage.py D DE DX` and `read_
 
 ### The gate, and what it costs
 
-`run_stage_d_gate.sh`, one Slurm job on `first` (12 CPUs, 120 GB, no GPU):
+`run_stage_d_gate.sh`, one Slurm job on `first` (120 GB, no GPU; the cluster refuses a CPU count):
 - starts the server with `sbatch serve_ds41.sbatch` and waits for it, stopping on a traceback;
 - runs `probe_correct.py` and `probe_carry.py`, and stops and releases the node if either fails;
 - runs the 18 runs rep-major (rep 1 of every condition and set first, so a gate cut short leaves
@@ -1065,6 +1065,25 @@ server waits for the node.
 construction (built from the asks), and DP carries the same leak plus census examples from PRs
 disjoint from the probe sets. The comparisons are within one seal; against Claude's published X
 figures they are not.
+
+**Running note (2026-10-08 03:15, after the pre-registration was committed, before any session).**
+- **Submitted:** gate job 434256 (running, waiting for its server) and the server it submitted, job
+  434257, pending on Resources. gg676's `mp_meas` (434156) holds one of `first`'s GPUs under a 12-hour
+  limit from about 02:17, so the server can start by 14:17 at the latest. Another session's 7-GPU
+  pipeline-parallel test of the same server (434255, "TP1 x PP7") ran from 03:12 and was cancelled at
+  03:15:08, before this gate was submitted.
+- **Do not edit `run_stage_d_gate.sh` until the status file reads "finished".** Bash reads it as it
+  runs; a comment edit made after submission was reverted to the submitted bytes (7f6070f5) at once,
+  while the gate slept inside `start_server`. Its usage line still shows `-c 12`, which the cluster
+  refuses; it was submitted without `-c`.
+- **What is left, in order** (nothing below has run): when the status file reads "stage D gate
+  finished", commit each run's `results/pr_review_v5/runs/iter_ds41_conv_*` by path; per set, `cli
+  probe seal --set <set yaml> --sessions X1 X2 DX1 DX2 DX3 DE1 DE2 DE3 DP1 DP2 DP3 --out
+  blinding_D_<set>_SEALED.json` (the PRs with asks, by default), then `cli probe match-inputs` with
+  `sources_D_<set>.json` into a scratch folder outside every packet, as `run_stage_m.sh` lines 80-81;
+  two blind matchers a set as subagents; `audit_batch.py` on their transcripts; `cli probe unblind`
+  into `match_D_<set>/unblinded.json`; `read_stage.py D DE DX` and `read_stage.py D DP DE`; then the
+  also-reads above and Result 7 here and in the todo.
 
 ## What follows
 
