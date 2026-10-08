@@ -871,6 +871,201 @@ knowing the asks.
   convention in this file").
 - More rules, more census PRs and a second decider run; scope by area and era.
 
+## Stage D: DeepSeek-V4.1-Flash -- stage L replicated, and the conventions given precedence over the reviewer's judgement (pre-registered 2026-10-08, before any session)
+
+The user (2026-10-08): DeepSeek is *"a good opportunity to replicate those results and try one
+alternate design of how conventions get used: models still don't seem to understand how we want them
+to use conventions, and that the examples of conventions should count as stronger evidence than their
+internal judgement."* The self-hosted DeepSeek-V4.1-Flash reaches 8, 6, 9 of 23 on the dev held-out 12
+with its thinking kept (Opus 5.5: 7, 7), free on `first` (`../local-ds41-2026-10-06/`). Nothing below
+has run.
+
+**Two questions, one gate.**
+1. **Replication: does a strong local model carry the ceiling?** DE against DX, as stage L read LE
+   against LB. The record: Qwen3.5-397B +0.05 (stage L), gpt-5.5 +0.22 (stage M), Claude +0.26 / +0.28
+   (stage C).
+2. **The alternate design: do the conventions, with maintainers' asks for them, move the reviewer
+   further when they are stated to outrank its own judgement of the code?** DP against DE.
+
+**Sets: stage L's two, unchanged.** Validation small12 (30 asks on 8 PRs, 3 controls) and post-cutoff
+(16 asks on 6 PRs, 4 controls); 39 in-census asks (25 and 14), stage L's labels and exact briefs.
+DeepSeek-V4.1 was released 2026-09-10 and its training cutoff is not public, so the validation PRs,
+and perhaps the post-cutoff ones, may be in its training data. Only differences between conditions
+are read; all three share the same memory.
+
+**Conditions.** Model `local_deepseek_v4.1_flash`, `reasoning_effort: high`, each turn's thinking kept
+(the dev keepthink condition), contract v2 under `ape_agent`. The configs
+`configs/pr_review_v5_{val_small12,probe_2026_07_08_v1}_local_ds41_contract2.yaml` are each set's
+gpt_5.2 contract-v2 config (stage L's base) with the model lines of
+`configs/pr_review_v5_dev_medium_local_ds41_contract2.yaml`. The server is `serve_ds41.sbatch` with its
+defaults (the patched nightly, DSpark, a 1M context). A condition differs from another only in its
+context file.
+
+| label | the reviewer reads | PRs | reps | run name |
+|---|---|---|---|---|
+| DX | the PR model (`context_<set>_base.jsonl`, stage L's file) | all 11 and 10 | 3 | `iter_ds41_conv_<val\|post>_base_rep<n>` |
+| DE | the PR model, then the exact section (`context_<set>_exact.jsonl`, stage L's) | the 8 and 6 with asks | 3 | `iter_ds41_conv_<val\|post>_exact_rep<n>` |
+| DP | the PR model, then the exact section with examples and the precedence paragraph (`context_<set>_prec.jsonl`) | the 8 and 6 with asks | 3 | `iter_ds41_conv_<val\|post>_prec_rep<n>` |
+
+`build_context.py base` and `exact` rebuild stage L's two files byte for byte (checked 2026-10-08).
+`cli plan` passes for all 18 runs (`run_ds41.sh <set> <level> <rep> plan`, the gate's own arguments;
+2026-10-08: reviewed workspaces 11 of 11, 10 of 10, 8 of 8 and 6 of 6, token budget 16.08M a PR).
+
+### The alternate design: P, the conventions and their examples over the reviewer's judgement
+
+**The text.** DP's section is DE's lead and sentences byte for byte, with up to two examples beneath
+each sentence and this paragraph after the list (`probes.CONVENTIONS_PRECEDENCE`):
+
+> Under each convention are up to two comments in which a maintainer asked for it on another PR, each
+> with the code it was on. Take the conventions and these examples as the standard for this review:
+> they show what maintainers ask for, and they outrank your own judgement of this code. Where the
+> changed code is in a situation like an example's, file the change its convention calls for, as a
+> finding at that place. None of these is a reason to leave it out: that the code is correct, clear or
+> idiomatic as it stands; that the change is minor or a matter of taste; that this file, its author or
+> its neighbours do it differently; that Mathlib does not require it or a maintainer might not insist
+> on it; that the convention's wording does not quite fit, where the code is like an example's. Where
+> you cannot make or check the change, file it as a question to the author that names the convention
+> and the change. Leave a place unfiled only where a line of the code you quote, or a check you ran,
+> shows it already has the form the convention calls for. In your submission's `message`, list each
+> convention with the places you filed and any place you left, with that line or check. For these
+> conventions this replaces the brief's instructions to emit only what you would actually request and
+> not to raise questions.
+
+An example reads "Example n, asked on another PR at `<file>`. The maintainer's comment:" with the
+comment quoted, then "The code it was on:" and the hunk (`probes.exemplified`).
+
+**The examples, chosen mechanically and not read against the probe asks.** For each of the 28 entries
+in the exact briefs: reader A's census asks filed under it (primary label) on val1000 and
+outside_years PRs, in stage G's seeded order (`stage-g-2026-10-05`), first two. These are the first
+two of the four each stage G rule writer saw for the entry, cut as stage G cut them (comment to 900
+characters, the hunk's last 800). 25 entries have two, P315 and P401 one, P392 none (it reads as its
+sentence). None is on a probe PR (asserted). The rule was fixed before any example was read; one
+PR's section (32875) was then printed to check the rendering, and nothing was changed after.
+`examples_prec.json` records them by id. Census bodies are
+never committed, so the two `context_*_prec.jsonl` files are not: `build_context.py prec <bodies>`
+rebuilds them from `materialise_bodies.py`'s output, byte for byte (twice, 2026-10-08), and
+`context_prec.sha256` holds their digests, which `run_ds41.sh` and the gate refuse to run without.
+The section is 2.8k to 12.6k characters a PR against DE's 0.5k to 1.2k, so length is part of the
+design.
+
+**How it differs from DE:** the examples and the closing paragraph. Nothing else in the run differs.
+
+**How it differs from the disposition paragraph** (`probes.CONVENTIONS_DISPOSITION`, branch
+`generation-suppression`, cherry-picked here as `a1ff423f`; stage W moved gpt-5.5 by +0.189 with it):
+
+| | disposition paragraph (stage W) | precedence (DP) |
+|---|---|---|
+| examples | none | up to two maintainers' asks a convention |
+| grounds it rules out | what Mathlib usually requires, accepts or enforces; minorness; whether a maintainer would insist | those, and the reviewer's view of the code: correct, clear or idiomatic as it stands; a matter of taste; the file's, author's or neighbours' practice; the wording not quite fitting |
+| where a convention applies | "each place in the changed code where its situation occurs": the reviewer's call | "a situation like an example's": the examples decide |
+| precedence | implied (`conforms` needs a check or a quoted line) | stated: "they outrank your own judgement of this code" |
+| a change it cannot make or check | not covered (`departs` or `conforms` only) | a question to the author naming the convention and the change |
+| leaving a place | `conforms`: a check or a quoted line shows the required form | the same |
+| the filing bar | stage W also moved gpt-5.5 to `filing_bar: request` | contract v2 has no merge-bar clauses; nothing changed |
+
+**Why this design and not the disposition paragraph as it stands.**
+- **The user's direction names the examples,** and asks that they count for more than the model's own
+  judgement. The disposition paragraph has no examples and leaves the merits of the code to the
+  reviewer.
+- **What the exact brief leaves missed is mostly the reviewer's judgement of the code, not its guess
+  about maintainers.**
+  - Claude E1's ten misses (Result 3): six conventions weighed and the condition judged unmet ("a
+    matter of taste, not an ask"; "inherently specific"; three motivation asks set aside as "a
+    generalization rather than a new concept" or "too minor"); two right conventions at a
+    neighbouring place; one comparison too general to pick; one never attended.
+  - Qwen LE (Result 2): "`gcongr` doesn't apply here as verified"; a convention quoted as one the PR
+    already follows.
+  - Stage G (Result 5): "Mathlib does not require these", and "the prime on a private helper is
+    acceptable".
+  - The disposition paragraph's grounds reach "too minor" and "Mathlib does not require". The rest are
+    judgements of the code or of the convention's fit, which DP reaches and it does not.
+- **Examples are the record's untried delivery,** listed after stage L ("exemplars"), stage F ("a past
+  ask as an exemplar of each entry") and in the todo's low-ceiling list. For the neighbouring-place
+  misses and the comparison too general to pick (43167's `left`/`right`), an example of the change
+  asked for is what was missing.
+- **What the choice costs.** DP bundles the examples, the precedence and a longer section, so a gain
+  does not say which carried it. The ablations are the disposition paragraph on DeepSeek and DP
+  without its examples, run only if DP moves. A null does not separate them either: it says this
+  bundle did not move this model.
+
+### Reading rule, fixed before any session runs
+
+**The measure** is stage L's: per-session reach on the 39 in-census asks (`reached` cells; `partial`
+is not reached), on each of two blind matchers, pooled over the two sets and reported per set. Three
+reps make 117 cells a condition. `read_stage.py D <treated> <control>` prints it.
+
+**1. DE − DX, the replication** (the todo's thresholds, as stage L):
+
+| DE − DX, both matchers, pooled | reading |
+|---|---|
+| **≥ +0.15** | **DeepSeek carries the ceiling**, as Claude and gpt-5.5 did: the exact conventions move a strong local model. |
+| **≤ +0.05** | **it does not**, as Qwen did not: a stated convention does not become the ask on this model. |
+| between | inconclusive at this size: read the transcripts before saying more. |
+
+Side condition (the todo's): asks reached per finding under DE no lower than under DX.
+
+**2. DP − DE, the alternate design:**
+
+| DP − DE, both matchers, pooled | reading |
+|---|---|
+| **≥ +0.10** (12 cells of 117, about four asks a rep) | **the conventions given precedence, with examples, move the reviewer beyond the exact brief.** |
+| **≤ +0.03** (3 cells or fewer) | **they do not.** |
+| between, or the matchers disagree | inconclusive: read the reasoning at the asks that differ. |
+
+**Volume guard** (stage W's): DP's findings a PR on the 14 ask PRs, mean over reps, more than 3.0
+above DE's makes it a volume effect, whatever the reach. DP − DX is reported beside it.
+
+One ask moving in every rep is 3 cells, 0.026.
+
+**Also read, not in the rule:**
+- mean, union and stable reach per condition (asks reached in any rep, in all three), per set;
+- the out-of-census asks (7), the within-session control, minding stage L's lesson that one sharing a
+  hunk with an in-census ask is not a control;
+- findings a PR and asks reached a finding per condition; DX's findings on the 7 control PRs;
+- `partial` cells per condition;
+- at every in-census ask whose reach differs by two reps or more between DP and DE, and at DP's
+  misses: what the kept reasoning (`reasoning_content`) says at the ask's place, sorted as
+  `cross_model.md` sorted GE1's misses: weighed and dropped (on what ground), filed as another change,
+  or never considered;
+- whether DP's `message` lists the places it left with a quoted line or a check, as the paragraph asks;
+- DP findings that are questions, and how many matched asks are among them;
+- DP findings whose place is not in this PR's diff (an example's code restated);
+- sessions that ended without a submission.
+
+### Matching (after the gate)
+
+One seal a set on the PRs with asks, holding Claude's X1 and X2 (the anchors, as in stage L), DX1-3,
+DE1-3 and DP1-3: 11 sessions a PR (`sources_D_<set>.json`, written now). Then as stage L: `cli probe
+seal`, `cli probe match-inputs` with the sources, two blind matchers a set as subagents under the
+harness's rubric (labels shuffled per PR, condition cues redacted), `cli probe audit`, `cli probe
+unblind` into `match_D_<set>/unblinded.json`, `read_stage.py D DE DX` and `read_stage.py D DP DE`.
+
+### The gate, and what it costs
+
+`run_stage_d_gate.sh`, one Slurm job on `first` (16 CPUs, 160 GB, no GPU):
+- starts the server with `sbatch serve_ds41.sbatch` and waits for it, stopping on a traceback;
+- runs `probe_correct.py` and `probe_carry.py`, and stops and releases the node if either fails;
+- runs the 18 runs rep-major (rep 1 of every condition and set first, so a gate cut short leaves
+  whole reps), three at a time (at most 29 sessions: one 15-session rep peaked at 34% of the KV cache);
+- starts no run with under 60 minutes left on the server's 8 hours; when the runs in flight finish
+  it releases the server and starts another, at most three in all; an interrupted run resumes and a
+  complete one is skipped;
+- stops on a run that keeps retrying, and releases the node at the end.
+
+Progress: `/research/projects/proofedit/ya475/localmodel/logs/ds41_conv_gate.status`; each run's log
+is `cli_iter_ds41_conv_<set>_<level>_rep<n>.log` beside it.
+
+**Cost.** GPU time on `first` only: 147 sessions. A 15-session dev rep took 34.5 minutes with DSpark,
+so about 3 to 5 hours of server time. Matching is four subagent matcher runs; stage L's took 87k to
+185k tokens each at 8 sessions a PR, so about 150k to 250k each at 11. No reader runs and no paid API
+call. On 2026-10-08 gg676's jobs held 3 to 5 of `first`'s 8 GPUs with 8 to 12 hours to run, so the
+server waits for the node.
+
+**Limits, stated before.** One model, three reps, 39 asks. The exact brief is a ceiling by
+construction (built from the asks), and DP carries the same leak plus census examples from PRs
+disjoint from the probe sets. The comparisons are within one seal; against Claude's published X
+figures they are not.
+
 ## What follows
 
 The ladder's question is answered for the one ask-free delivery tried: conventions as sentences

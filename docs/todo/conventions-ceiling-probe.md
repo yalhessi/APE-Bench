@@ -84,6 +84,17 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
     The two blind matchers run as the probe harness runs them.
   - **The node may be busy.** On 2026-10-08 gg676's jobs held 5 of `first`'s 8 GPUs for 7.5-12 h,
     and the server needs all 8. Queue the gate and prepare while it waits.
+- **Stage D, pre-registered 2026-10-08 before any session** (README, "Stage D"): DX, DE and DP on both
+  sets, three reps each, 18 runs on `local_deepseek_v4.1_flash` (reasoning high, thinking kept), `cli
+  plan` passing for every one. **The alternate design is P, not the disposition paragraph as it
+  stands:** the exact section with up to two census asks beneath each convention (stage G's writers'
+  first two, chosen by seed) and a closing paragraph saying the conventions and examples outrank the
+  reviewer's judgement of the code, with taste, local practice and imperfect fit ruled out as grounds
+  beside the disposition paragraph's uptake grounds, and a question where the change cannot be made.
+  Why: the exact brief's misses on record are mostly the reviewer's judgement of the code or of fit,
+  which the disposition paragraph leaves alone, and examples are the record's untried delivery.
+  Rules: DE − DX at the todo's +0.15 / +0.05; DP − DE `≥ +0.10` moves, `≤ +0.03` does not, with
+  stage W's +3.0 findings-a-PR volume guard. One Slurm gate runs it (`run_stage_d_gate.sh`).
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 
