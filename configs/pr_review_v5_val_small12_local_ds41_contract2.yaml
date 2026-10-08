@@ -1,0 +1,15 @@
+# Contract v2 under ape_agent on the self-hosted DeepSeek-V4.1-Flash, validation small12: the set's gpt_5.2
+# contract-v2 config with the model lines of pr_review_v5_dev_medium_local_ds41_contract2.yaml and its
+# keepthink condition's reasoning (high; 8, 6, 9 of 23 on the dev held-out 12). Written for the
+# conventions ceiling probe's stage D (results/pr_review_v5/probes/conventions-ceiling-2026-10-04/),
+# whose conditions each set their own context file. The server is serve_ds41.sbatch on `first`.
+extends: pr_review_v5_val_small12_gpt52_Grc_contract2.yaml
+
+llm_config:
+  model_name: local_deepseek_v4.1_flash
+  openai_api: chat_completions
+  openai_responses_reasoning_carryover: false
+  reasoning_effort: high
+
+execution:
+  max_concurrency: 12

@@ -227,6 +227,10 @@ reaches 8, 6, 9 of 23 on the dev held-out 12 (Opus 5.5: 7, 7), at about 35 min a
   - It deletes its 476 GB `/tmp` weight copy, which is node RAM, once serving.
 - **Run the harness as a Slurm job on `first`** (`run_ds41_keepthink.sh` is the pattern), not from a
   session: the server binds to localhost.
+- **Never edit a gate script while its job runs.** Bash reads a script as it goes (fd 255 holds the
+  next command's offset), so an edit above that offset reroutes the gate mid-line. On 2026-10-08 a
+  comment edit to `run_stage_d_gate.sh` under job 434256 was caught at offset 5412 and the submitted
+  bytes restored. Edit after the job ends, or submit a copy.
 - **Earlier thinking must reach the server.** A local model takes the plain `MessageFormatter`,
   because `OpenAIMessageFormatter` drops `reasoning_content`
   (`test_a_local_model_gets_its_earlier_thinking_back`). With it dropped, DeepSeek re-derived ~8k

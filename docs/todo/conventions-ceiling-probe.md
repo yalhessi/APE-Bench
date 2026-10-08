@@ -84,6 +84,41 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
     The two blind matchers run as the probe harness runs them.
   - **The node may be busy.** On 2026-10-08 gg676's jobs held 5 of `first`'s 8 GPUs for 7.5-12 h,
     and the server needs all 8. Queue the gate and prepare while it waits.
+- **Stage D, pre-registered 2026-10-08 before any session** (README, "Stage D"): DX, DE and DP on both
+  sets, three reps each, 18 runs on `local_deepseek_v4.1_flash` (reasoning high, thinking kept), `cli
+  plan` passing for every one. **The alternate design is P, not the disposition paragraph as it
+  stands:** the exact section with up to two census asks beneath each convention (stage G's writers'
+  first two, chosen by seed) and a closing paragraph saying the conventions and examples outrank the
+  reviewer's judgement of the code, with taste, local practice and imperfect fit ruled out as grounds
+  beside the disposition paragraph's uptake grounds, and a question where the change cannot be made.
+  Why: the exact brief's misses on record are mostly the reviewer's judgement of the code or of fit,
+  which the disposition paragraph leaves alone, and examples are the record's untried delivery.
+  Rules: DE − DX at the todo's +0.15 / +0.05; DP − DE `≥ +0.10` moves, `≤ +0.03` does not, with
+  stage W's +3.0 findings-a-PR volume guard. One Slurm gate runs it (`run_stage_d_gate.sh`).
+- **Stage D, interim look at rep 1 (2026-10-08, at the user's request; provisional, one rep):** in-census
+  reach DX1 0.21, DE1 0.44, DP1 0.62 / 0.59 (unbriefed Claude 0.46 in the same seal). DE1 − DX1 = +0.231,
+  nine asks gained and none lost: DeepSeek behaves like the strong reviewers, not like Qwen. DP1 − DE1 =
+  +0.179 / +0.154, net seven / six asks, among them stage G's dropped `variable {D}` and a PR-level
+  motivation ask, at 0.14 more findings a PR. DP1's 16 misses: four a failed check left unfiled where the
+  paragraph asks for a question, five merits judgements, three the right convention in another form,
+  one a wrong comparison, three never at the place. Reps 2-3 run under the gate; their matching is a
+  second seal (`D23`, read as `D1,D23`). README, "Interim result (rep 1)".
+- **Stage D, three reps (2026-10-08, by the pre-registered rule; README, "Result 7").**
+  - **Both answers are yes, on both matchers.** In-census reach over 117 cells: DX 0.22 / 0.21, DE
+    0.44 / 0.45, DP 0.64 / 0.63.
+    - DE − DX = +0.222 / +0.248 (bar +0.15): DeepSeek carries the ceiling, as Claude and gpt-5.5 did.
+    - DP − DE = +0.197 / +0.179 (bar +0.10): precedence with examples moves it further.
+  - **Not volume, and rep 1 held.** DP files 3.48 findings a PR against DE's 2.86 (guard +3.0).
+    Union 11 / 22 / 29 and stable 7 / 13 / 19 asks of 39. The control moved one cell.
+  - **Where the gain sits.** DP's gain over DE is +2 cells of 24 on the census's top 10 entries and +9
+    of 30 on ranks 11-50.
+  - **What DP still misses.** Its 10 stable misses include five of the eight head asks (`positivity`,
+    two merged `simpa` forms, a one-line library proof, a generalisation). It files no question,
+    though its paragraph asks for one where a check fails.
+  - **What is left.** The bundle is not separated: examples, precedence and a longer section. The
+    ablations named before the run are now called for: the disposition paragraph on DeepSeek, and DP
+    without its examples. And all of it is still built from the asks; choosing the conventions
+    without them is the convention-dossiers thread's question.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

@@ -1,0 +1,538 @@
+{
+ "asks": 16,
+ "1": {
+  "reach": {
+   "DE2": 0.5,
+   "DE3": 0.5625,
+   "DP2": 0.6875,
+   "DP3": 0.625,
+   "DX2": 0.3125,
+   "DX3": 0.375,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "DE": 0.53125,
+   "DP": 0.65625,
+   "DX": 0.34375,
+   "X": 0.46875
+  },
+  "stable": {
+   "DE": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DP": [
+    "p0002",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DX": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "DE": [
+    "p0002",
+    "p0006",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DP": [
+    "p0000",
+    "p0002",
+    "p0003",
+    "p0006",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DX": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "reached",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "reached",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "DE2": "reached",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "DE2": "no",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "DE2": "no",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0013": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "2": {
+  "reach": {
+   "DE2": 0.5,
+   "DE3": 0.5625,
+   "DP2": 0.6875,
+   "DP3": 0.625,
+   "DX2": 0.3125,
+   "DX3": 0.375,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "DE": 0.53125,
+   "DP": 0.65625,
+   "DX": 0.34375,
+   "X": 0.46875
+  },
+  "stable": {
+   "DE": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DP": [
+    "p0002",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DX": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "DE": [
+    "p0002",
+    "p0006",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DP": [
+    "p0000",
+    "p0002",
+    "p0003",
+    "p0006",
+    "p0007",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "DX": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0016"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "reached",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "reached",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "DE2": "reached",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "DE2": "no",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "DE2": "no",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0013": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "reached",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "DE2": "reached",
+    "DE3": "reached",
+    "DP2": "reached",
+    "DP3": "reached",
+    "DX2": "no",
+    "DX3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "DE2": "no",
+    "DE3": "no",
+    "DP2": "no",
+    "DP3": "no",
+    "DX2": "no",
+    "DX3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "agreement": {
+  "cells": 128,
+  "three_valued": 128,
+  "reached_or_not": 128
+ }
+}
