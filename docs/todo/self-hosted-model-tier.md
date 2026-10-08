@@ -17,7 +17,11 @@ taken, prompt caching must be handled, not assumed.
   it shows what serving can do, not what the 397B will do.
 - Starting it needed `VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0` and
   `VLLM_USE_FLASHINFER_SAMPLER=0` (`serve.sbatch` there).
-- NFS reads cap near 75 MB/s, so a cold 397B load is about 90 minutes and saturates the share.
+- ~~NFS reads cap near 75 MB/s~~ -- corrected 2026-10-08: the rate depends on the request size, not a
+  cap. Single-stream direct reads of cold files ran 0.61-0.95 GB/s in 16 MB requests, 228 MB/s in
+  128 KB (the mount's rsize) and 15 MB/s in 4 KB. The 75 MB/s was small-request access (xet's chunk
+  cache on NFS, mmap page faults). Read in large blocks, NFS is about as fast as the download; both
+  share `first`'s one 10 Gb/s link. Parallel pre-reads still load the shared server.
 
 **Stage 2, the 397B on 8 GPUs.**
 - **Weights in `/tmp`.** tmpfs, kept across jobs, cleared only after 30 days unused or on a reboot.

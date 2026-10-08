@@ -7,7 +7,10 @@
 # /tmp is tmpfs, so the copy is node RAM for as long as it sits there, and vLLM neither maps nor holds the
 # shards once loaded: deleting them while job 432906 served (2026-10-07 08:13) gave the node back 476 GB
 # with the server unaffected. Delete *.safetensors and .complete once serving; the next start downloads
-# again (493 s). /research is NFS (~75 MB/s, so ~1.8 h to read 476 GB); the node's local NVMe,
+# again (493 s). /research is NFS v3 on one TCP connection: 2026-10-08 single-stream direct reads ran
+# 0.61-0.95 GB/s in 16 MB requests, 228 MB/s in 128 KB (the rsize) and 15 MB/s in 4 KB, so the old
+# ~75 MB/s was small-request access (xet's chunk cache, mmap faults), not a cap. Even read well it is no
+# faster than the download, which runs near the one 10 Gb/s link both share (1.25 GB/s); the node's local NVMe,
 # /data/local, is root-only.
 #SBATCH -p first
 #SBATCH -A first
