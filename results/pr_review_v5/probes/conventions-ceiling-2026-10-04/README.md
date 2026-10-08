@@ -1042,7 +1042,7 @@ unblind` into `match_D_<set>/unblinded.json`, `read_stage.py D DE DX` and `read_
 
 ### The gate, and what it costs
 
-`run_stage_d_gate.sh`, one Slurm job on `first` (16 CPUs, 160 GB, no GPU):
+`run_stage_d_gate.sh`, one Slurm job on `first` (12 CPUs, 120 GB, no GPU):
 - starts the server with `sbatch serve_ds41.sbatch` and waits for it, stopping on a traceback;
 - runs `probe_correct.py` and `probe_carry.py`, and stops and releases the node if either fails;
 - runs the 18 runs rep-major (rep 1 of every condition and set first, so a gate cut short leaves

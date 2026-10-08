@@ -10,8 +10,9 @@
 #   runs in flight are done the server is released and a new one started, at most $MAX_SERVERS in all.
 #   An interrupted run resumes (`run_ds41.sh`: --resume), a complete one is skipped.
 # - It stops and releases the node on a server traceback, a failed probe, or a run that keeps retrying.
-# Usage (from any shell on first):
-#   sbatch -p first -A first -c 16 --mem=160G --time=2-00:00:00 -J ds41-conv-gate \
+# Usage (from any shell on first). 120 GB: with the server's 900 GB and one 100 GB job beside them the node
+# (1,156 GB) still fits all three; 160 GB would make the server wait on memory as well as GPUs.
+#   sbatch -p first -A first -c 12 --mem=120G --time=2-00:00:00 -J ds41-conv-gate \
 #     -o /research/projects/proofedit/ya475/localmodel/logs/ds41_conv_gate_%j.log --wrap "<this file> [server job id]"
 # Progress: /research/projects/proofedit/ya475/localmodel/logs/ds41_conv_gate.status
 # No `set -u`: this bash (5.2.21) aborts on "${!A[@]}" of an empty associative array under it.
@@ -42,7 +43,8 @@ start_server() {
   if [ -z "$JOB" ]; then
     servers=$((servers + 1))
     if [ "$servers" -gt "$MAX_SERVERS" ]; then say "STOP: $MAX_SERVERS server starts used, ${#QUEUE[@]} runs left"; exit 1; fi
-    JOB=$(sbatch --parsable "$LM/serve_ds41.sbatch") || { say "STOP: sbatch serve_ds41.sbatch failed"; exit 1; }
+    # The gate is itself a job: its SLURM_* variables must not reach the server's submission.
+    JOB=$(env $(env | awk -F= '/^SLURM_/ {print "-u " $1}') sbatch --parsable "$LM/serve_ds41.sbatch") || { say "STOP: sbatch serve_ds41.sbatch failed"; exit 1; }
     say "server job $JOB submitted (start $servers of $MAX_SERVERS)"
   fi
   local log=$LOGS/serve_ds41_$JOB.log
