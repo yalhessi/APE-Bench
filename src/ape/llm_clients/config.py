@@ -16,6 +16,11 @@ class LLMProvider(Enum):
     #: the field that says which model produced a run: routing `gpt_5.2` through ELM under
     #: its own name would make two runs against different endpoints read identically there.
     ELM = "elm"
+    #: A vLLM server this project starts on its own GPUs, bound to localhost
+    #: (`results/pr_review_v5/probes/local-vllm-2026-10-02/`). Its own provider for the same reason
+    #: as ELM: the 2026-10-02 local Qwen runs went through `elm_qwen_3.5` with `base_url` set, and
+    #: their run plans name ELM's model -- only `scaffold_config_sha256` tells them apart.
+    LOCAL = "local"
 
 
 #: Which environment variable holds each provider's key, in the order they are tried.
@@ -30,6 +35,8 @@ PROVIDER_KEY_ENV_VARS: Dict[LLMProvider, tuple] = {
     LLMProvider.OPENAI: ("OPENAI_API_KEY",),
     LLMProvider.GEMINI: ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
     LLMProvider.ELM: ("ELM_API_KEY",),
+    #: None: the server is bound to 127.0.0.1 and started without `--api-key`.
+    LLMProvider.LOCAL: (),
 }
 
 MODEL_MAPPINGS = {
@@ -257,6 +264,35 @@ MODEL_MAPPINGS = {
         #: Measured 2026-09-22; see `LLMConfig.reasoning_effort`. Reasoning is ON when
         #: nothing is sent, and `none` is the only way to turn it off.
         "reasoning_efforts": ("none", "high"),
+    },
+    # The project's own vLLM server (`LLMProvider.LOCAL`). The name says which weights the server
+    # must be serving; it answers to the HF id as an alias (`serve*.sbatch`). Priced at 0.0, like
+    # the ELM open-weight models, so `cli plan` requires the token block.
+    "local_qwen_3.5": {
+        "model_name": "Qwen/Qwen3.5-397B-A17B-FP8",
+        "provider": LLMProvider.LOCAL,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        # Measured on the local server 2026-10-02: 29 of 29 and 23 of 23 tool calls schema-valid
+        # under auto; reasoning ON when nothing is sent, `none` turns it off.
+        "supports_tools": True,
+        "reasoning_efforts": ("none", "high"),
+    },
+    "local_deepseek_v4.1_flash": {
+        "model_name": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "provider": LLMProvider.LOCAL,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        # vLLM's `deepseek_v41` tool parser (DSML tool calls).
+        "supports_tools": True,
+        #: vLLM's DeepSeek V4.1 encoder (`vllm/tokenizers/deepseek_v41.py`) thinks when nothing is
+        #: sent; `none` turns thinking off, and the request's `reasoning_effort` reaches it through
+        #: the chat-template kwargs.
+        "reasoning_efforts": ("none", "low", "high", "xhigh", "max"),
     },
     "elm_mistral_small_4": {
         "model_name": "mistralai/Mistral-Small-4-119B-2603",

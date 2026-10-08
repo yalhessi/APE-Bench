@@ -376,3 +376,65 @@ def test_the_direct_openai_provider_has_no_repair():
     assert not hasattr(OpenAIProvider, "postprocess_nodes") or \
         "repair" not in (OpenAIProvider.postprocess_nodes.__doc__ or "").lower()
     assert not hasattr(OpenAIProvider, "REPAIR_STRINGIFIED_ARGUMENTS")
+
+
+# --- the project's own vLLM server (LLMProvider.LOCAL, 2026-10-06) -----------------------------
+
+LOCAL_MODELS = sorted(k for k, v in MODEL_MAPPINGS.items() if v["provider"] is LLMProvider.LOCAL)
+
+
+def test_the_local_table_names_the_weights_it_serves():
+    assert LOCAL_MODELS == ["local_deepseek_v4.1_flash", "local_qwen_3.5"]
+    assert LLMConfig(model_name="local_deepseek_v4.1_flash").formal_model_name == "deepseek-ai/DeepSeek-V4.1-Flash"
+
+
+@pytest.mark.parametrize("model", LOCAL_MODELS)
+def test_a_local_model_posts_to_localhost_with_no_key(model):
+    """No key is resolved or sent, even with both real keys in the shell."""
+
+    from ape.llm_clients.providers import LocalProvider
+
+    with mock.patch.dict(os.environ, {"ELM_API_KEY": "elm-k", "OPENAI_API_KEY": "sk-k"}, clear=False):
+        config = LLMConfig(model_name=model)
+        provider = client_for(model).provider
+        url, headers = provider.get_request_info("session")
+    assert config.api_key is None
+    assert isinstance(provider, LocalProvider)
+    assert url == "http://127.0.0.1:8012/v1/chat/completions"
+    assert "Authorization" not in headers
+
+
+def _session_with_a_thinking_turn():
+    from ape.llm_clients.models import ContentBlock, ConversationSession
+
+    session = ConversationSession()
+    session.add_user_message([ContentBlock.text_block("review this")], cwd="/")
+    session.add_assistant_message([ContentBlock.thinking_block("first I read the diff"),
+                                   ContentBlock.tool_use_block("call_1", "file_read", {"path": "A.lean"})],
+                                  cwd="/")
+    return session
+
+
+@pytest.mark.parametrize("model", LOCAL_MODELS)
+def test_a_local_model_gets_its_earlier_thinking_back(model):
+    """Both locally served models render every assistant turn's thinking since the last user
+    message, and vLLM accepts `reasoning_content`: on the OpenAI formatter it was dropped, and
+    DeepSeek re-derived ~8k thinking tokens on every turn (2026-10-07)."""
+
+    client = client_for(model)
+    assistant = client.message_formatter.format_for_api(_session_with_a_thinking_turn())[1]
+    assert assistant["reasoning_content"] == "first I read the diff"
+    assert assistant["tool_calls"][0]["function"]["name"] == "file_read"
+
+
+def test_a_local_model_sends_its_hf_id_tools_and_reasoning_effort():
+    from ape.llm_clients.providers import LocalProvider
+
+    config = LLMConfig(model_name="local_deepseek_v4.1_flash", reasoning_effort="none",
+                       base_url="http://127.0.0.1:9000/v1/chat/completions")
+    provider = LocalProvider(config)
+    payload = provider.build_request_payload([{"role": "user", "content": "x"}], tools=[TOOL])
+    assert payload["model"] == "deepseek-ai/DeepSeek-V4.1-Flash"
+    assert payload["tools"] == [TOOL]
+    assert payload["reasoning_effort"] == "none"
+    assert provider.get_request_info()[0] == "http://127.0.0.1:9000/v1/chat/completions"

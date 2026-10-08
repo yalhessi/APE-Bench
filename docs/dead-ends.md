@@ -244,11 +244,19 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
     design change cannot register on this model. It stays as the early-testing tier: does a change
     run, do tools parse, does the output conform. `results/pr_review_v5/probes/local-quality-2026-10-02/`.
   - *Provisional:* one model, one harness and prompt, and one reasoning-`high` rep.
+  - **The reasoning-`high` reading ran on a defect (found 2026-10-07).** The local provider used the
+    OpenAI formatter, which drops `reasoning_content`, so every turn's thinking was discarded although
+    Qwen3.5's template renders it after the last user message. Its 0 (and the screen's "reasoning: no
+    effect") measures thinking re-derived from scratch on each turn, not thinking. The reasoning-off
+    readings are unaffected. Fixed in `client.py` (LOCAL takes the plain formatter).
   - *Untried:* open models too large for this node at FP8 (GLM-5.2 ~750B, Kimi K3, DeepSeek V4:
     4-bit, or a second node); this model under Claude Code through the relay (the record says
     harness does not move gpt); Qwen's recommended sampling (the run inherited temperature 1.0).
   - **Reopens if:** an open model reaches ≥ 5 of 23 on this same condition. Generation is free and
     the judge is about $0.05 a rep.
+  - **Reopened 2026-10-07 by DeepSeek-V4.1-Flash:** 8, 6, 9 of 23 (mean 7.67) at high effort with
+    each turn's thinking kept, 5 with reasoning off (`results/pr_review_v5/probes/local-ds41-2026-10-06/`).
+    This entry stays closed for Qwen3.5; the self-hosted direction continues on DeepSeek.
   - **Steering screen, 2026-10-03** (`results/pr_review_v5/probes/local-unlock-2026-10-03/`). 13
     settings over 23 judged runs; no single pass left the floor (best 3).
     - Over-file is the one direction that helps: 3, 3, 0, 1, 0, with a five-pass union of 4 and the

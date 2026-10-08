@@ -1,0 +1,71 @@
+diff -ru tree/vllm/models/deepseek_v41/attention.py tree_patched/vllm/models/deepseek_v41/attention.py
+--- tree/vllm/models/deepseek_v41/attention.py	2026-10-07 05:18:50.172781789 -0400
++++ tree_patched/vllm/models/deepseek_v41/attention.py	2026-10-07 05:18:59.941157149 -0400
+@@ -561,7 +561,8 @@
+             prefix=f"{prefix}.swa_cache",
+             cache_config=cache_config,
+             backend_cls=self.swa_backend_cls,
+-            block_size=32,
++            block_size=(64 * max(1, self.compress_ratio) if current_platform.is_device_capability_family(120)
++                        else 32),  # SM120 per-layer blocks (vllm#59203)
+             packed_bytes_per_token=self.swa_bytes_per_token,
+             packed_page_alignment=self.kv_page_alignment,
+             bounded_replay=swa_bounded_replay,
+@@ -1119,7 +1120,8 @@
+         # use natural element-size pages.
+         uses_fp8_ds_mla_layout = self.kv_cache_dtype in ("fp8_ds_mla", "nvfp4_ds_mla")
+         return MLAAttentionSpec(
+-            block_size=vllm_config.cache_config.block_size,
++            block_size=(64 * max(1, self.compress_ratio) if current_platform.is_device_capability_family(120)
++                        else vllm_config.cache_config.block_size),  # SM120 per-layer blocks (vllm#59203)
+             num_kv_heads=1,
+             head_size=self.head_dim,
+             dtype=torch.uint8 if uses_fp8_ds_mla_layout else self.kv_cache_torch_dtype,
+@@ -1189,7 +1191,8 @@
+             576 if uses_fp8_ds_mla_layout and not _use_v41_mxfp8_kv_record() else 512
+         )
+         return MLAAttentionSpec(
+-            block_size=self.cache_config.block_size,
++            block_size=(64 * max(1, self.compress_ratio) if current_platform.is_device_capability_family(120)
++                        else self.cache_config.block_size),  # SM120 per-layer blocks (vllm#59203)
+             num_kv_heads=1,
+             head_size=self.head_dim,
+             dtype=self.dtype,
+diff -ru tree/vllm/models/deepseek_v41/nvidia/flashinfer_sparse.py tree_patched/vllm/models/deepseek_v41/nvidia/flashinfer_sparse.py
+--- tree/vllm/models/deepseek_v41/nvidia/flashinfer_sparse.py	2026-10-07 05:18:50.172132941 -0400
++++ tree_patched/vllm/models/deepseek_v41/nvidia/flashinfer_sparse.py	2026-10-07 05:18:59.941120730 -0400
+@@ -115,6 +115,10 @@
+ 
+     @staticmethod
+     def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
++        from vllm.platforms import current_platform
++
++        if current_platform.is_device_capability_family(120):
++            return [64, 128]  # SM120 per-layer blocks (vllm#59203)
+         return [128]
+ 
+     @staticmethod
+diff -ru tree/vllm/models/deepseek_v41/sparse_mla.py tree_patched/vllm/models/deepseek_v41/sparse_mla.py
+--- tree/vllm/models/deepseek_v41/sparse_mla.py	2026-10-07 05:18:50.171351086 -0400
++++ tree_patched/vllm/models/deepseek_v41/sparse_mla.py	2026-10-07 05:18:59.941102680 -0400
+@@ -87,6 +87,8 @@
+ 
+     @staticmethod
+     def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
++        if current_platform.is_device_capability_family(120):
++            return [64, 128]  # SM120 per-layer blocks (vllm#59203)
+         return [64 if current_platform.is_device_capability_family(90) else 128]
+ 
+     @staticmethod
+diff -ru tree/vllm/v1/attention/backends/mla/indexer.py tree_patched/vllm/v1/attention/backends/mla/indexer.py
+--- tree/vllm/v1/attention/backends/mla/indexer.py	2026-10-07 05:18:50.170326325 -0400
++++ tree_patched/vllm/v1/attention/backends/mla/indexer.py	2026-10-07 05:18:59.941070681 -0400
+@@ -297,6 +297,8 @@
+ 
+     @staticmethod
+     def get_supported_kernel_block_sizes(kv_cache_spec=None) -> list[int | MultipleOf]:
++        if current_platform.is_device_capability_family(120):
++            return [64, 128]  # SM120 per-layer blocks (vllm#59203)
+         return [64 if current_platform.is_device_capability_family(90) else 128]
+ 
+ 

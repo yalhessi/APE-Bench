@@ -19,7 +19,8 @@ from .config import (
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
 from .providers import (
-    BaseProvider, ElmProvider, ElmResponsesProvider, OpenAIProvider, OpenAIResponsesProvider)
+    BaseProvider, ElmProvider, ElmResponsesProvider, LocalProvider, OpenAIProvider,
+    OpenAIResponsesProvider)
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -46,9 +47,19 @@ class LLMClient:
     #: that is merely *missing* from this mapping does not fail loudly -- it POSTs to the
     #: literal URL "None?ak=<key>" and logs the first 100 characters of it. Anything
     #: OpenAI-compatible belongs on the OpenAI row.
+    #: LOCAL takes the plain `MessageFormatter`, which keeps an assistant turn's
+    #: `reasoning_content`; `OpenAIMessageFormatter` rebuilds each message from an allowlist
+    #: that omits it. Both models served locally render the thinking of every assistant turn
+    #: since the last user message (DeepSeek-V4.1's encoder whenever tools are defined;
+    #: Qwen3.5's template after `last_query_index`), and vLLM accepts the field. On the
+    #: OpenAI formatter every turn's thinking was discarded and re-derived: DeepSeek's
+    #: high-effort sessions ran ~8k thinking tokens a turn against a prompt that held none of
+    #: it (2026-10-07, iter_ds41_contract2_high_rep1: 189k generated over 21 turns, the
+    #: 21st prompt 56.5k).
     _PROVIDER_IMPLEMENTATIONS = {
         LLMProvider.OPENAI: (OpenAIProvider, OpenAIMessageFormatter),
         LLMProvider.ELM: (ElmProvider, OpenAIMessageFormatter),
+        LLMProvider.LOCAL: (LocalProvider, MessageFormatter),
     }
 
     def _implementation(self):

@@ -247,6 +247,22 @@ class ElmProvider(OpenAIProvider):
         return parsed
 
 
+
+class LocalProvider(ElmProvider):
+    """Chat Completions against this project's own vLLM server (`LLMProvider.LOCAL`).
+
+    Everything `ElmProvider` does carries over, because the server is the same software: vLLM
+    does not constrain tool arguments under `tool_choice: auto`, so the argument repair applies,
+    and the tool and reasoning refusals read the same `MODEL_MAPPINGS` fields. Only the address
+    and the key differ: localhost (override per run with `llm_config.base_url`), and no key,
+    since the server is bound to 127.0.0.1 and started without `--api-key`.
+    """
+
+    DEFAULT_BASE_URL = "http://127.0.0.1:8012/v1/chat/completions"
+
+    def get_request_info(self, session_id: Optional[str] = None):
+        return self.config.base_url or self.DEFAULT_BASE_URL, {"Content-Type": "application/json"}
+
 class ElmResponsesProvider(OpenAIResponsesProvider):
     """OpenAI's `/v1/responses` for the OpenAI models ELM proxies, at the gateway's address.
 

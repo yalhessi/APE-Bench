@@ -9,7 +9,19 @@ llm_config:
   # record hash, so changing either forks the cache and forfeits every cached verdict. Any
   # name in MODEL_MAPPINGS is accepted by validation, so this is a real hazard rather than a
   # theoretical one — it is stated here once instead of in six places.
-  model_name: gpt_5_mini
+  #
+  # Moved from `gpt_5_mini` (direct) to `elm_gpt_5_mini`, the same snapshot through the ELM gateway,
+  # on 2026-10-06 by the user's decision: the OpenAI key died on 2026-10-05. The cache forked with
+  # it, so audits before the move carry the old identity. Re-judging four judged runs agreed on 73
+  # of 76 issue verdicts (results/pr_review_v5/probes/judge-elm-2026-10-06/), within the judge's
+  # own ~90% self-agreement, so a one-obligation difference across the move is noise. An OpenAI
+  # model runs only on Responses with its reasoning carried (`reasoning_drop_refusal`).
+  model_name: elm_gpt_5_mini
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+  # Stated because an ELM config must state it (test_model_tiers.py). `medium` is gpt-5-mini's
+  # default, which is what the direct judge and the 2026-10-06 agreement check ran at.
+  reasoning_effort: medium
   max_tokens: 4000
   thinking_budget_tokens: 3000
 

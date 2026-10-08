@@ -125,3 +125,17 @@ def test_every_provider_has_a_key_variable():
     """A provider missing from the table resolves no key and reports no variable to export."""
 
     assert set(PROVIDER_KEY_ENV_VARS) == set(LLMProvider)
+
+
+def test_preflight_accepts_a_keyless_local_provider_and_still_refuses_a_keyed_one():
+    """LLMProvider.LOCAL has no key by design (2026-10-07: every iter_ds41 run was refused here)."""
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from src.mathlib_review.review.preflight import _check_model_credential
+
+    with mock.patch.dict(os.environ, {}, clear=True):
+        local = ApeAgentConfig(llm_config=LLMConfig(model_name="local_deepseek_v4.1_flash"))
+        elm = ApeAgentConfig(llm_config=LLMConfig(model_name="elm_qwen_3.5"))
+        assert PROVIDER_KEY_ENV_VARS[LLMProvider.LOCAL] == ()
+        assert _check_model_credential(local) is None
+        refused = _check_model_credential(elm)
+    assert refused is not None and "ELM_API_KEY" in refused.remedy
