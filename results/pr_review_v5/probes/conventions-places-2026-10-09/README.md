@@ -137,3 +137,21 @@ bound.
    - The suppression of entries whose non-asked departs rate on the other PRs exceeds 0.5, 0.3 and
      0.1.
    - For each policy: asked pairs kept, and filings per PR.
+
+## Also read, added during the run (2026-10-09 ~09:15), before any reading
+
+These come from the third adversarial round's measurement reviewer
+(`docs/research/deployable-reviewer-review-2026-10/`). They are not part of the rule, and they are
+read before the rule's verdict is used.
+
+- **Within-PR AUC,** pooled over the PRs that have both asked and decoy pairs. In the record, a
+  pooled AUC has been one PR before: 0.749 fell to 0.511 without 33145. Here 32875 holds 9 of the 42
+  asked pairs.
+- **The leave-one-PR-out range** of the asked-vs-decoy AUC.
+- **The AUC on sample 1 only,** for asked and exact pairs alike, because asked pairs average two
+  samples and decoys have one.
+- **Asked pairs kept on asks that DX misses** (reached in at most 1 of its 3 reps): what the engine
+  would add over solo.
+- **The cap reading is optimistic,** and this is said whatever it reads. It ranks against 5 decoys a
+  PR, where a deployment would rank against 25 picks plus the gates. Three PRs with asked pairs
+  (26755, 36822, 43192) have no decoys at all.
