@@ -62,11 +62,28 @@ reviewer.
    - Its value depends on whether those unasked departures would be welcome, which nobody has judged.
    - Under the 2026-09-22 ruling it is measured as a generator; caps are selection.
 
+## Since the summary was first written: DeepSeek as the selector (`results/pr_review_v5/probes/conventions-selector-2026-10-09/`)
+
+**The test.** Can DeepSeek choose AP's conventions itself, in one turn, with stage F's rubric?
+
+| on the 10 stage F PRs (33 asks) | DeepSeek, mean of 3 samples | the union of its 3 samples | Opus |
+|---|---|---|---|
+| recall@25 | **0.43** | 0.64 (at ~38 picks a PR) | **0.67** |
+| recall@10 | 0.25 | | 0.45 |
+
+**The verdict.** By the rule (≤ 0.45), one DeepSeek turn cannot replace Opus. The union of three
+samples comes near Opus at half again as many picks. So for now AP's gain needs Opus's picks: one Opus
+call a PR, on the subscription route.
+
 ## The recommended path
 
-1. **Make AP fully deployable and self-hosted.** Replace the Opus picks with DeepSeek's own selector,
-   and measure that selector alone first: about 300 calls on `first`, $0, with a bar of recall@10 ≥
-   0.60 against Opus's 0.45. A better selector is where AP's remaining gain is.
+1. **Improve the selector, because that is where AP's remaining gain is.**
+   - One DeepSeek turn reaches 0.43 at 25 against Opus's 0.67 (measured, above).
+   - Next, cheapest first:
+     - AP with the union of three DeepSeek samples (0.64 at ~38 picks);
+     - a selector that reads one file at a time and unions its picks;
+     - two stages: DeepSeek proposes, then ranks.
+   - Opus picks are the deployable fallback.
 2. **Combine AP with a solo rep.** AP_i ∪ DX_i is 0.36 against solo run twice at 0.19. That costs two
    sessions a PR.
 3. **Test out of sample** on the fresh set: 40 validation-window PRs that no design has touched, 75

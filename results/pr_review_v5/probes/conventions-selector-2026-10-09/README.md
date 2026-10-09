@@ -49,3 +49,33 @@ solo reviewer to get a better deployable reviewer."*
 necessary for AP's gain, not sufficient: application still decides, as Result AP's split shows.
 
 **Cost.** About 39 calls, under an hour on `first` including the server's start. $0.
+
+## Result (2026-10-09): DeepSeek in one turn selects well below Opus; the union of three samples comes near, with half again as many picks
+
+**How it ran.** 39 answers, 13:03 to 13:30 (`3482bbc7`), read with `selector.py read`. Every answer
+parsed, none truncated, and the median list held 25 entries.
+
+| on the 10 stage F PRs (33 asks) | DeepSeek, three samples | mean | Opus (stage F) |
+|---|---|---|---|
+| recall@5 | 0.15, 0.06, 0.09 | 0.101 | 0.182 |
+| recall@10 | 0.27, 0.24, 0.24 | 0.253 | 0.455 |
+| **recall@25** | 0.45, 0.48, 0.36 | **0.434** | **0.667** |
+
+- **The union of the three samples' picks,** a mean 38.5 a PR: recall 0.636.
+- **Overlap with Opus's 25:** a mean of 12.8 entries a sample.
+- **On all 13 probe PRs with in-census asks** (39 asks; the script's label says 14):
+  - recall@25 0.46 (mean of samples);
+  - union 0.667 at 36 picks a PR.
+
+**By the rule: it cannot replace Opus at one turn** (0.434 ≤ 0.45). The rule leaves the union of
+samples or Opus. The union reaches 0.64, near Opus's 0.67, but at about 38 picks a PR against 25: a
+longer section, and stage F showed that length dilutes.
+
+**What it means, at this altitude** (three samples, in-sample PRs).
+- **A self-hosted AP needs a better selector than one DeepSeek turn.** The candidates, none tried:
+  - the union of three samples, at the cost of a longer section;
+  - a selector that reads one file or declaration at a time and unions its picks (open-code-review's
+    pass per file);
+  - two stages: DeepSeek proposes 50, then ranks them.
+- **Opus stays the selector for AP's measured gain.** One Opus selector call a PR is deployable on the
+  subscription route.
