@@ -7,6 +7,7 @@ asserted. Three samples each. Single turn, no tools.
 
   build <bodies.json>        prompts (uncommitted: the X arms quote census bodies) and items.json
   run <base_url> <model>     the calls, resumable, into outputs.jsonl (answers) and reasoning.jsonl
+  retry <base_url> <model> [max_tokens] [workers]   deviation 1: the calls that stopped at max_tokens
   match-inputs <out dir>     the seal and two blind matcher folders
   unblind                    matcher files -> unblinded.json
   read                       the pre-registered reading
@@ -172,6 +173,51 @@ def run(base: str, model: str, workers: str = "24") -> None:
                       f"{row['completion_tokens']} tokens, {row['seconds']} s)", flush=True)
 
 
+def retry(base: str, model: str, max_tokens: str = "131072", workers: str = "8") -> None:
+    """Deviation 1 (README): re-send each call that stopped at the pre-registered `max_tokens` with no
+    answer, same prompt and settings but `max_tokens`, into outputs_retry.jsonl (resumable). The
+    original rows stay in outputs.jsonl; `match-inputs` uses a retried row where one exists."""
+    import concurrent.futures, threading, time
+    items = {(i["cid"], i["arm"]): i for i in json.loads((HERE / "items.json").read_text())["items"]}
+    out = HERE / "outputs_retry.jsonl"
+    done = {(r["cid"], r["arm"], r["sample"]) for r in map(json.loads, out.open())} if out.exists() else set()
+    todo = []
+    for r in map(json.loads, (HERE / "outputs.jsonl").open()):
+        if r["finish_reason"] != "length" or (r["cid"], r["arm"], r["sample"]) in done:
+            continue
+        item = items[(r["cid"], r["arm"])]
+        text = (PROMPTS / f"{item['cid']}__{item['arm']}.txt").read_text()
+        if digest(text) != item["sha256"]:
+            sys.exit(f"{item['cid']} {item['arm']}: the prompt is not the pre-registered bytes")
+        todo.append((item, text, r["sample"]))
+    lock = threading.Lock()
+    print(f"{len(done)} retried, {len(todo)} to retry at max_tokens {max_tokens}", flush=True)
+
+    def one(job):
+        item, text, n = job
+        started = time.time()
+        r = chat(base, {"model": model, "messages": [{"role": "user", "content": text}],
+                        "reasoning_effort": "high", "max_tokens": int(max_tokens)}, timeout=7200)
+        message, usage = r["choices"][0]["message"], r.get("usage") or {}
+        row = {"cid": item["cid"], "arm": item["arm"], "sample": n, "content": message.get("content") or "",
+               "finish_reason": r["choices"][0].get("finish_reason"), "prompt_tokens": usage.get("prompt_tokens"),
+               "completion_tokens": usage.get("completion_tokens"), "seconds": round(time.time() - started, 1),
+               "max_tokens": int(max_tokens)}
+        with lock:
+            with out.open("a") as f:
+                f.write(json.dumps(row) + "\n")
+            with (HERE / "reasoning.jsonl").open("a") as f:
+                f.write(json.dumps({k: row[k] for k in ("cid", "arm", "sample")} | {"retry": True,
+                        "reasoning": message.get("reasoning_content") or message.get("reasoning") or ""}) + "\n")
+        return row
+
+    with concurrent.futures.ThreadPoolExecutor(int(workers)) as pool:
+        for n, future in enumerate(concurrent.futures.as_completed([pool.submit(one, j) for j in todo]), 1):
+            row = future.result()
+            print(f"{time.strftime('%H:%M:%S')} {n}/{len(todo)} {row['cid']} {row['arm']} {row['sample']}: "
+                  f"{row['finish_reason']}, {row['completion_tokens']} tokens, {row['seconds']} s", flush=True)
+
+
 def change(content: str) -> str:
     """The answer's CHANGE line(s): what a matcher sees. Without one, the whole answer, cut."""
     m = re.search(r"CHANGE:\s*(.*?)(?:\n\s*WHY:|\Z)", content, flags=re.S)
@@ -182,6 +228,10 @@ def match_inputs(out_dir: str) -> None:
     outputs = defaultdict(dict)
     for r in map(json.loads, (HERE / "outputs.jsonl").open()):
         outputs[r["cid"]][(r["arm"], r["sample"])] = r
+    # the retry (README, "Deviation 1"): a call that stopped at max_tokens, re-sent, replaces its row
+    if (HERE / "outputs_retry.jsonl").exists():
+        for r in map(json.loads, (HERE / "outputs_retry.jsonl").open()):
+            outputs[r["cid"]][(r["arm"], r["sample"])] = r
     asks, feedback = asks_in_census(), {r["cid"]: r for f in FEEDBACK for r in json.loads(Path(f).read_text())["rows"]}
     missing = [(c, k) for c in asks for k in [(a, n) for a in ARMS for n in range(1, SAMPLES + 1)] if k not in outputs[c]]
     if missing:
@@ -290,4 +340,4 @@ def read() -> None:
 
 if __name__ == "__main__":
     command, args = sys.argv[1], sys.argv[2:]
-    {"build": build, "run": run, "match-inputs": match_inputs, "unblind": unblind, "read": read}[command](*args)
+    {"build": build, "run": run, "retry": retry, "match-inputs": match_inputs, "unblind": unblind, "read": read}[command](*args)

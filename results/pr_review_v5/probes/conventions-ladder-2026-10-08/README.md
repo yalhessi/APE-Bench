@@ -179,3 +179,25 @@ reading above, and every figure here is provisional.
 **The user (2026-10-09):** DP without its examples is not a pressing question; choosing conventions
 without the asks is the most important one. So the blind matching waits, and the thread turns to
 selection.
+
+## Deviation 1 (2026-10-09, recorded before it runs, at the user's word): the truncated calls are re-sent
+
+**What happened.** 66 of the 585 answers stopped at the pre-registered `max_tokens` (32768) while
+still thinking, and returned no answer: F 27, A 15, AX 10, U 9, UX 5. They concentrate on hard asks:
+p0002 10, p0003 7, v0066 6, v0105 6, p0010 5. An empty answer would be judged `no`, so three of DP's
+12 misses (p0003, p0005, p0010) would sort into "fails even when told" for want of room, not of
+understanding.
+
+**The change.** The user (2026-10-09): *"Yes let's queue the retry."*
+- Each of the 66 calls is re-sent once (`ladder.py retry`): the same prompt, checked against its
+  digest, and the same settings, but with `max_tokens` 131072.
+- The answers go to `outputs_retry.jsonl`. `outputs.jsonl` stays as committed.
+- `match-inputs` uses a retried row wherever one exists.
+- A call that stops at the limit again is reported, and is matched as no answer.
+
+**It runs** while the places test holds the server (`../conventions-places-2026-10-09/`), eight at a
+time, as its own Slurm job on `first`.
+
+**What it does not change.** Nothing is sealed or matched yet. The reading rule, the arms, the prompts
+and the other 519 answers are untouched. The unblinded look in the running note above was made before
+the retry and stays as written.
