@@ -148,6 +148,24 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-09, a second adversarial round on the user's decompose-and-shrink idea**
+(`docs/research/decompose-and-shrink-review-2026-10.md`). The user's two questions were: how to
+decompose a PR so that each part needs only a subset of conventions, and whether a correct subset can
+be chosen from a partial PR.
+- **Q1:** decompose into overlapping lenses, keeping the whole PR in view. These are the declaration,
+  family, file and PR lenses `components.py` already builds. Context, emission and demand are the
+  limits; places are not. Nothing shows that splitting the reviewer itself adds recall.
+- **Q2:** an applicable subset can be chosen, a demanded one cannot, and "sound" with "5-10" cannot
+  both hold.
+  - Part kind cuts ~400 to 134-234 and leaks 19-25%.
+  - Part kind with frequency gets the right entry into the top 10 for 0.36-0.46 of asks in era and
+    0.22 out of it. Stage F's Opus selector reached 0.45.
+- **What binds is behaviour.** Nobody knows the false-departure rate at unasked places, or whether
+  DP's licence survives wrong conventions.
+- **Four measurements, none decided:** M1, decomposition and syntactic shrink, CPU; M2, a model ranker
+  per part, DeepSeek; M3, the bare sentence at unasked places, DeepSeek; M4, DP with decoys, DeepSeek
+  plus matchers.
+
 **2026-10-09: the priority is selection.** The user: DP without its examples is not pressing; *"choosing
 conventions without the asks is the most important question to address at this point."*
 - The oracle ladder ran (step 2, `results/pr_review_v5/probes/conventions-ladder-2026-10-08/`). It is
