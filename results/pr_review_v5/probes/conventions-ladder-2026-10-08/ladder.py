@@ -26,6 +26,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from src.mathlib_review.analysis import probes
+from src.mathlib_review.io import jsonl_rows
 
 HERE = Path(__file__).parent
 CEILING = HERE.parent / "conventions-ceiling-2026-10-04"
@@ -92,8 +93,7 @@ def build(bodies_path: str) -> None:
     episodes = {}
     for path in SETS.values():
         spec = probes.load_probe_set(Path(path))
-        for line in (spec.release / "input/episodes.jsonl").read_text().splitlines():
-            e = json.loads(line)
+        for e in jsonl_rows(spec.release / "input/episodes.jsonl"):
             episodes[e["pr_number"]] = e
     principle = {e["id"]: e["principle"] for e in json.loads(CODEBOOK.read_text())}
     chosen = json.loads((CEILING / "examples_prec.json").read_text())["entries"]
