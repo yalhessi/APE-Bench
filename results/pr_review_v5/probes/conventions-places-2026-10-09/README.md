@@ -257,3 +257,25 @@ sample).
   - Read with its failed measure set aside, the engine is a moderately discriminating, high-volume
     generator whose value turns on whether its unasked departures are welcome. That is the open
     adjudication (`docs/todo/adjudication-rubric.md`).
+
+## Also read, added after the reading: a simulated deployable engine against solo run twice (`simulate_engine.py`)
+
+**The setup.** An in-sample estimate from measured parts, not a run. The ten stage F PRs and their 33
+in-census asks, with three parts:
+- **selection:** stage F's 25 blind picks a PR, chosen without the asks;
+- **the check:** the ladder's blind bare-sentence cells at the ask's place, counting an ask only if its
+  entry is among the picks;
+- **volume:** this test's decoy `departs` rate × places × 25.
+
+**In-census reach, matcher 1 / matcher 2:**
+
+| solo DX, one rep | solo run twice, unioned | the engine alone | the engine ∪ one solo rep |
+|---|---|---|---|
+| 0.162 / 0.141 | 0.192 / 0.152 | 0.485 / 0.485 | **0.552 / 0.552** |
+
+**The volume:** filings a PR at a median of 68, ranging from 25 (42184) to 490 (30458, 43 places).
+Solo DX files about 2.6.
+
+**So the engine as specified would roughly triple recall on these PRs, at about 25 times the
+filings.** That is the trade the round's remaining measurements and the user's selection ruling
+decide.
