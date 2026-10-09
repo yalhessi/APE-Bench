@@ -132,3 +132,93 @@ Tricorder's definition — a false positive is anything the user did not want to
 project's thesis in static-analysis language: a verified-correct finding a maintainer would not ask
 for is, to the maintainer, a false positive. It argues for keeping "valid but not an ask" as its own
 label in adjudication rather than folding it into "correct".
+
+## Revisited 2026-10-09: what the systems say about the conventions designs
+
+This survey predates the conventions work: the census, the ceiling probe, the ladder, and the two
+adversarial rounds (`docs/research/conventions-dossiers-review-2026-10.md`,
+`decompose-and-shrink-review-2026-10.md`, `ceiling-residual-2026-10.md`). Read against them, one
+verdict above is out of date, and four lessons bear directly on the designs now under test.
+
+**The rule-taxonomy verdict is out of date.** Above, BitsAI's taxonomy (219 rules, precision
+16.8% → 57.0%) was "not borrowable", because guideline injection was null here ("statute", N=115).
+That was the right reading of a guide appended to one prompt. Since then, the census gives about 400
+rules at the same order of magnitude as BitsAI's 219. Given at the right place, they move strong
+reviewers +0.22 to +0.28; dumped as a list, they move nothing (stage F +0.03).
+
+**BitsAI's shape is the per-place engine now under test.** Its shape is taxonomy → a per-rule checker
+at a place → a filter. AutoCommenter predicts the place and the rule together. Tricorder runs one
+narrow analyzer per rule. The per-place engine is architecture B, tested by
+`results/pr_review_v5/probes/conventions-places-2026-10-09/`. The deployed versions differ from ours
+in two ways that matter:
+- their checkers are trained (BitsAI fine-tuned; AutoCommenter's T5 on ~800k norm-citing comments);
+- their precision comes from outcome data at scale.
+
+We prompt, and our outcome data is 1,833 census asks.
+
+**Lesson 1: precision is managed per rule, not by a global filter or a demand predictor.**
+- AutoCommenter keeps a confidence threshold per URL: 80% of the predictions under the global
+  threshold were correct. Suppressing 22 URLs raised usefulness from 54% to 66%.
+- Tricorder disables an analyzer whose "not useful" rate passes about 10%.
+- BitsAI decommissions rules that hold precision but whose comments are not acted on.
+- Applied here:
+  - Stage H's failure (no model predicts which places maintainers raise, AUC 0.56-0.64) does not
+    close the volume problem. The deployed answer is coarser: calibrate or switch off each rule by its
+    measured record.
+  - The places test produces exactly that record: departs rates and confidences per entry, at asked,
+    unasked and decoy places.
+  - A per-rule policy (threshold, or suppress the noisiest rules) can be simulated on its outputs
+    before any end-to-end run.
+
+**Lesson 2: aggregation is the industrial answer to instability, our largest gap component.**
+- Bugbot ran 8 passes over a randomised diff order, then a majority vote.
+- SWR-Bench's multi-review aggregation raised F1 by up to 43.7%.
+- uReview re-runs the reviewer 5× to decide addressed-ness.
+- Applied here:
+  - A DP session reaches about 25 of 39 in-census asks, its three-rep union 29, and the union over
+    models 34 (`ceiling-residual-2026-10.md`).
+  - Union over passes buys recall, and agreement across passes ranks for precision. Cross-run
+    agreement already measured 0.89 hit rate at 2 of 2 here, in sample (§1 above).
+  - For the per-place engine, agreement across samples of one (rule, place) is a gold-free confidence.
+    The places test's two samples per exact pair measure it at no extra cost.
+
+**Lesson 3: value gates beat truth gates, and value is learned from outcomes.**
+- RovoDev's factual judge did little, while its actionability gate trained on 50k resolutions moved
+  15-20pp.
+- uReview gained most by suppressing whole low-value categories.
+- Applied here:
+  - Validity checks (a quoted line, a compile, a lookup) keep filings true but will not make them
+    wanted.
+  - Our only outcome data is the census: asked situations, and unasked ones that can be mined as stage
+    H did.
+  - So the nearer-term value gate is per rule (lesson 1), and maybe per area. A learned per-place gate
+    needs data we do not have (0.68% of 104,093 reviewer comments cite a norm source; above).
+
+**Lesson 4: decompose by evidence source, not only by code part or convention.**
+- Anthropic's open code-review plugin runs reviewers by the source they read: the conventions file,
+  bugs, git history, prior PR comments on the touched files, code comments.
+- Qodo's recommendation agent reads past PRs so accepted patterns are not re-flagged.
+- Applied here: two of the six asks no ceiling session ever reached need exactly that kind of source.
+  - v0053 needs the history of PRs #24163 and #21065.
+  - p0010 needs the library's `_left`/`_right` orientation (`inf_sup_left`).
+- This axis is orthogonal to the decompose-and-shrink lenses, and no design here has tried it.
+  A history reviewer differs from precedent priming (Mode A, `dead-ends.md`): it reads one PR's own
+  history for facts, not other PRs' comments as examples.
+
+**Two lessons that confirm what the record found:**
+- **OCR's grouping cut recall 20.0% → 12.7%** because secondary files starved, silent 68% of the time.
+  Their fix gated completion on a pass per file. That is our "at the right place, asked something
+  else", and it argues for small units with a verdict per (place, rule).
+- **Bugbot needed "aggressive" prompts once restraint made the agent too cautious.** That is DP's
+  precedence paragraph, and `forbid_abstention` (0.20 → 0.50).
+
+**Does this re-orient the exploration?** It reinforces the current direction rather than turning it.
+- **The convergent industrial design is per-rule checkers, per-rule calibration and aggregation.**
+  The places test is the right first measurement for that design.
+- **The survey changes what follows the places test**, in three ways:
+  - volume control by per-rule calibration and suppression, simulated on the places outputs, before
+    any demand predictor;
+  - agreement across samples as the confidence signal;
+  - an evidence-source axis (history, library analogues) for the residual that no packet carries.
+- **Their caution applies too.** The deployed checkers that reach high precision are trained on
+  outcome data we lack. A prompted engine may top out lower, and only a run will tell.

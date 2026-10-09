@@ -116,3 +116,24 @@ confidences, which are mechanical.
 - **Time:** at the ladder's rate it is about four to seven hours, inside one server's eight. A cut-off
   resumes on rerun.
 - **Money:** $0 for generation. No subscription tokens before the matching above.
+
+## Also read, added during the run (2026-10-09 ~08:40), before any reading
+
+**Why.** Prompted by the code-review systems survey, revisited the same morning
+(`docs/research/code-review-systems-survey-2026-09.md`, "Revisited 2026-10-09"): deployed per-rule
+checkers manage precision per rule, and use agreement across passes as confidence.
+
+**What had been seen before this was written.** A format check of the first 112 answers, mostly
+asked pairs: finish reasons, the presence of a verdict and a confidence, and the counts of verdicts.
+No group was compared.
+
+**Neither reading below is part of the rule above.** Both are in-sample, and each is reported as a
+bound.
+
+1. **Agreement as confidence.** For exact pairs, the two samples are counted as both, one or neither
+   saying `departs`. The asked share is reported in each bucket, beside the stated confidence's AUC.
+2. **Per-rule policies, simulated.**
+   - A per-entry confidence threshold, set leaving the PR out.
+   - The suppression of entries whose non-asked departs rate on the other PRs exceeds 0.5, 0.3 and
+     0.1.
+   - For each policy: asked pairs kept, and filings per PR.
