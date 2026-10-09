@@ -201,3 +201,72 @@ time, as its own Slurm job on `first`.
 **What it does not change.** Nothing is sealed or matched yet. The reading rule, the arms, the prompts
 and the other 519 answers are untouched. The unblinded look in the running note above was made before
 the retry and stays as written.
+
+## Result (2026-10-09): at the place, the convention's sentence carries the ask; DP's gains were within the bare sentence's reach; DP's examples lower the model's verdicts
+
+**How it was matched.**
+- **The answers:** 585, with deviation 1's retried rows used where present (`d2cf4c53`). One answer is
+  empty (p0003 A, sample 1), truncated twice.
+- **The seal:** committed before any judging (`15c8b3e2`).
+- **The matchers:** two blind matchers, subagents of the session, each handed its generated prompt
+  verbatim. Each saw only each answer's `CHANGE`, shuffled per ask.
+  - Audit: 14 tool calls each, 0 flagged.
+  - Totals: 322 and 355 `reached`; agreement on reached-or-not 552 of 585.
+  - Tokens: 132k and 128k on the primary subscription, after the weekly reset.
+- **The reading:** `ladder.py unblind`, then `ladder.py read`.
+
+**Arms passing at the 39 asks** (at least 2 of 3 samples `reached`), matcher 1 / matcher 2:
+
+| F (told, no convention) | U (sentence, judged) | UX (with examples, judged) | A (sentence, told) | AX (with examples, told) |
+|---|---|---|---|---|
+| 5 / 6 | 25 / 29 | 21 / 25 | 29 / 29 | 27 / 29 |
+
+**By the rule, on both matchers:**
+- **1. The floor holds:** F passes at 5 / 6 of 39, far under 24. So the place alone does not carry the
+  asks, and the contrasts below say something.
+  - **The convention's sentence is what carries them:** A against F gains 24 / 23 asks and loses
+    none.
+- **2. DP's 12 misses: mixed**, on both matchers.
+
+  | class | matcher 1 | matcher 2 |
+  |---|---|---|
+  | u (UX passes) | 4 | 6 |
+  | s (UX fails, AX passes) | 3 | 3 |
+  | f (both fail) | 5 | 3 |
+
+  - **Neither band is reached:** u would need 8 or more, s 4 or more.
+  - **Stable across both matchers:**
+    - **u:** p0004, p0016, v0067, v0092. These are lost in review to where it looked or to its
+      decision.
+    - **s:** p0005, v0064, v0093. These are judged conforming with examples, and written when told.
+    - **f:** p0003, p0010, v0105.
+  - **The matchers split on v0053 and v0056** (matcher 2: u; matcher 1: f), the two PR-description
+    asks.
+- **3. DP's 7 gains: the sentence alone already passes at the place**, for 5 of 7 (matcher 1) and 6
+  of 7 (matcher 2): p0007, v0029, v0062, v0063, v0068, plus v0090 on matcher 2. That is the band "not
+  understanding at the place". DP's gain in review was where the session looked, or what it was
+  licensed to file.
+
+**Also read.**
+- **The examples lower the judged verdicts.** UX against U is +1 / −5 on matcher 1 and +0 / −4 on
+  matcher 2. Told, they are about neutral: AX against A is +1 / −3 and +2 / −2. The provisional
+  look's direction holds blind.
+- **Being told helps a little:** A against U is +4 / −0 and +3 / −3.
+- **At the place, the sentence reaches more than the review did.**
+  - Matcher 1: U passes at 25 asks. DE's review reached 17 (at least 2 of 3 reps).
+  - Of U's passes, 13 are asks DE's review did not reach, and only 5 asks go the other way.
+  - DP's review gets 18 / 17 of what UX gets at the place; UX passes at 4 / 7 asks DP's review did
+    not reach.
+
+**What it means, at this altitude** (one model, one turn without tools, in sample, two matchers).
+- **The knowledge in the sentence is enough for most asks once the place is fixed.** What the
+  reviewer lacks in review is putting the question at the place: attention, plus the licence to file.
+- **A richer representation (more examples) did not help understanding at the place;** in the
+  judged form it hurt. So the dossier thread's understanding hypothesis, as a lever for DeepSeek,
+  finds no support here.
+  - What remains of "understanding" is three stable s asks and three f asks.
+  - The f asks need a fact (p0010's orientation), a search (v0105), or the right comparison (p0003's
+    `HasProd` sibling).
+- **This is the measured ground for the per-place engine,** which asks every convention's question
+  at every place. Whether that question also says `departs` where no maintainer asked is the places
+  test's question (`../conventions-places-2026-10-09/`).
