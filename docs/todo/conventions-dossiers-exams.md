@@ -148,6 +148,14 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-09: the priority is selection.** The user: DP without its examples is not pressing; *"choosing
+conventions without the asks is the most important question to address at this point."*
+- The oracle ladder ran (step 2, `results/pr_review_v5/probes/conventions-ladder-2026-10-08/`). It is
+  unmatched, and its unblinded look is provisional.
+- What that look says: at the place, the bare sentence already writes 6 of DP's 7 gains, and DP's
+  examples sometimes narrowed the model's reading. So the gain was not understanding, and the open
+  lever is choosing which conventions are in play.
+
 The full table, with each step's cost, threshold and recall ceiling, is §6 of the review.
 
 0. **Stage D's three-rep result: read 2026-10-08, continue** (`conventions-ds41`, Result 7, `18f7c3c1`).

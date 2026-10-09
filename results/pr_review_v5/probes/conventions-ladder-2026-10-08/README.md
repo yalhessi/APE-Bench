@@ -153,3 +153,29 @@ One ask is 1 of 12 in reading 2 and 1 of 7 in reading 3, so only the bands above
 - **Matching.** Two matchers, 585 short answers, about 100k to 200k tokens each on the primary
   subscription (95% of its week when last read on 2026-10-08, resetting Friday 10:00). They wait for the
   user's word on when.
+
+## Running note (2026-10-09): generated, not matched, and a provisional unblinded look
+
+**Generated.** 585 of 585 answers, 11:18 to 13:21 on 2026-10-08 (`c0b90d93`). 66 stopped at the
+pre-registered `max_tokens` with no answer, concentrated on hard asks: p0002 10, p0003 7, v0066 6,
+v0105 6, p0010 5. No retry has run, and nothing is sealed or matched.
+
+**An unblinded look, by the session that wrote this, at the 19 asks in the two groups.** It is not the
+reading above, and every figure here is provisional.
+- **DP's gains: the sentence alone (U) writes the maintainer's change at the place for 6 of the 7.**
+  p0007, v0029, v0062, v0063, v0068 and v0090; p0000 is the exception. That is reading 3's first band:
+  DP's gain in review was where the session looked, or what it would file, not understanding at the
+  place.
+- **DP's misses**, sorted into the three classes:
+  - **u:** about 4-5 (p0004, p0016, v0056, v0092; p0005 borderline);
+  - **s:** about 4-5 (p0003, v0064, v0067, v0093; v0105 borderline);
+  - **f:** 2-3 (p0010, v0053; v0105 borderline).
+- **In three of the s asks (v0064, v0067, v0093), U passes and UX does not.** With DP's examples the
+  model judged the place `conforms`, where the bare sentence judged it `departs`. Over all 39 asks,
+  `departs` verdicts are 93 of 117 for U against 88 for UX: UX is lower on 7 asks and higher on 4.
+- **So the s band is reached, but not as the dossier idea needs it.** The applicability misses are
+  ones that adding examples narrowed, not ones a richer representation would open.
+
+**The user (2026-10-09):** DP without its examples is not a pressing question; choosing conventions
+without the asks is the most important one. So the blind matching waits, and the thread turns to
+selection.
