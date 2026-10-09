@@ -1395,3 +1395,67 @@ One ask moving in every rep is 3 cells, 0.030.
   serve. $0.
 - **Matching:** four matcher runs, about 0.4-0.6M tokens on the primary subscription. Its week reset
   at 10:00 on 2026-10-09.
+
+## Result AP (2026-10-09): the conventions chosen without the asks move DeepSeek +0.18 on both matchers; the yield guard misses by 0.014
+
+**How it ran.**
+- **The runs:** six, 30 sessions, none failed (gate 443397, 11:56 to 12:38; `23028b47`).
+- **The seal:** one a set on the ten PRs, committed before any judging (`f189c546`).
+- **The matchers:** four blind matchers, subagents with the generated prompts verbatim.
+  - `check_matches.py` passed all four.
+  - Audit: 9-13 tool calls each, 0 flagged.
+  - Agreement on reached-or-not: 216 of 216 and 88 of 88.
+  - Tokens: 164k, 168k, 105k and 106k.
+- **The reading:** `read_stage.py AP AP DX`.
+
+| in-census reach (33 asks, 99 cells), matcher 1 / 2 | DX (solo DeepSeek) | **AP** | Claude X (same seal) |
+|---|---|---|---|
+| validation (22) | 0.11 / 0.11 | 0.36 / 0.36 | 0.41 |
+| post-cutoff (11) | 0.27 / 0.27 | 0.30 / 0.30 | 0.27 |
+| **pooled** | **0.16 / 0.16** | **0.34 / 0.34** | 0.36 |
+| all asks (38, 114 cells) | 0.22 | 0.38 | 0.39 |
+| findings a session-PR | 2.70 | 4.87 | 5.25 |
+| asks reached a finding | 0.309 | 0.295 | 0.286 |
+
+**By the rule.**
+- **Reach: AP − DX = +0.182 on both matchers,** against the +0.10 bar.
+- **The volume guard:**
+  - findings a PR rise by 2.17, inside the +3.0 guard;
+  - **asks reached a finding fall from 0.309 to 0.295.** The rule required them no lower, so read as
+    written it labels the gain a volume effect. The miss is 0.014, about two asks of 146 findings.
+
+**Also read, as pre-registered.**
+- **The added findings hit asks at near solo's rate.** AP gains 18 cells for 65 more findings, 0.28
+  a finding, against DX's own 0.31. Stage F's 25 sentences fell to 0.18 against 0.27, and the
+  detectors under the disposition filed 13 of 14 unasked facts.
+- **Against solo run twice,** paired by rep: AP_i ∪ DX_i reaches **0.364**, against DX_i ∪ DX_j
+  **0.192**, on both matchers.
+- **The split by selection:**
+
+  | | asks | AP | DX |
+  |---|---|---|---|
+  | the ask's entry among the picks | 22 | **0.50** | 0.20 |
+  | not among them | 11 | 0.03 | 0.09 |
+
+- **Union over three reps:** AP 15, DX 7 of 33. Stable in all three reps: AP 7, DX 4.
+- **Against DP on these asks** (stage D's seals, not a reading): DP reaches 0.61, so AP keeps about
+  40% of DP's gain over DX with ask-free selection.
+- **Asks gained, in every rep or most:**
+  - 28649 v0029 ("please revert");
+  - 30458 v0062 and v0063 (the old proof);
+  - 34091 v0106-v0108 (instance-implicit classes);
+  - 32875 v0094 and v0095 (`simpa`);
+  - 42814 p0007 (`variable`).
+- **Ask lost:** 30641 v0066, which DX reaches 3 of 3 and AP 1 of 3.
+- **The out-of-census asks did not move:** 9 of 15 cells for both.
+
+**What it means, at this altitude** (one model, three reps, 33 asks, in-sample PRs, Opus-made picks).
+- **This is the first ask-free convention delivery in the record to move a reviewer by the rule's
+  reach bar.** DeepSeek given 25 conventions picked from the diff, each with two maintainers' asks
+  and the precedence paragraph, reaches what unbriefed Claude Opus reaches on these PRs, at fewer
+  findings.
+- **Its gain sits on the asks whose convention the selector picked.** So selection quality is now
+  the lever: the picks held the entry for 22 of 33.
+- **The guard's narrow miss is reported as a miss.** Whether the extra 2.2 findings a PR are welcome
+  is the open adjudication.
+- **Before any claim:** a fresh set, and the picks made by the reviewer's own model.
