@@ -155,3 +155,14 @@ read before the rule's verdict is used.
 - **The cap reading is optimistic,** and this is said whatever it reads. It ranks against 5 decoys a
   PR, where a deployment would rank against 25 picks plus the gates. Three PRs with asked pairs
   (26755, 36822, 43192) have no decoys at all.
+
+## Running note (2026-10-09 ~09:30): an interim verdict count was seen by a reviewer
+
+**What happened.** The third adversarial round's mechanics reviewer read interim rows of
+`outputs.jsonl` for throughput. Its report also states an interim unasked-exact `departs` rate of
+about 0.29, from rows written before about 09:10. That is a verdict count, though not the
+pre-registered asked-against-decoy reading.
+
+**What it means for the reading.** The orchestrating session has not read any group's verdicts. The
+rule, its thresholds and the readings declared above were all fixed before the report arrived. The
+note is here so the reading can be judged knowing it.
