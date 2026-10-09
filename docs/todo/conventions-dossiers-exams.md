@@ -148,6 +148,17 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-09, why the ceiling is not 100%** (`docs/research/ceiling-residual-2026-10.md`). The census
+holds the knowledge behind what is missed.
+- **What nothing reaches:** 6 of 46 asks, the union of every ceiling session over three models. Five
+  are in census, and of the 7 asks outside the census, 6 are reached.
+- **Most of the per-session gap is instability and model differences.** A DP session reaches about 25
+  of 39, its three-rep union 29, the union over all models 34.
+- **The rest is reviewers at the right place asking something else** (golfing, judging on merits,
+  applying the convention next door), where the convention's question asked alone gets the change.
+- **The smaller causes:** failed checks read as conforming; information outside the packet (a PR's
+  history, the library's orientation).
+
 **2026-10-09, a second adversarial round on the user's decompose-and-shrink idea**
 (`docs/research/decompose-and-shrink-review-2026-10.md`). The user's two questions were: how to
 decompose a PR so that each part needs only a subset of conventions, and whether a correct subset can

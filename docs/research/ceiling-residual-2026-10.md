@@ -39,8 +39,8 @@ Nothing new was run.
 What no condition has ever reached is **6 asks of 46**.
 
 **Asks outside the census are not the obstacle.** Of the 7 out-of-census asks, ceiling sessions
-reach 6. They are mostly facts about the PR that unbriefed reviewers also find (four of the six are
-reached unbriefed too).
+reach 6. They are mostly facts about the PR that unbriefed reviewers also find (five of the six are
+reached unbriefed too: v0065, v0109, v0110, p0008, p0013).
 
 ## 2. The six asks nothing reaches
 
