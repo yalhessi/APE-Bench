@@ -1,0 +1,101 @@
+# Beating the solo reviewer with conventions: the picture on 2026-10-09
+
+**The question** (the user, 2026-10-09): *"I want to have a clearer picture of how to improve on the
+solo reviewer to get a better deployable reviewer. I still believe sticking to the conventions is a
+good direction."*
+
+**Scope.** Every number below is DeepSeek-V4.1-Flash, self-hosted, on stage L/D's probe sets: 14
+Mathlib PRs, matched blind by two matchers. All of it is in-sample, and it is a direction, not a
+claim. "Deployable" means the reviewer never sees the maintainers' asks.
+
+## In one paragraph
+
+Conventions are the right direction, and today was the first time an ask-free version moved a
+reviewer.
+- **AP (ask-free conventions in the reviewer's context) reached 0.34 of in-census asks** on the ten
+  PRs, against solo DeepSeek's 0.16. That is about what unbriefed Claude Opus reaches (0.36), at fewer
+  findings. AP gives the solo reviewer 25 conventions chosen from the diff alone, each with two
+  real maintainer asks for it from other PRs, and tells it they outrank its own judgement.
+- **The gain sits where the selector picked the right convention:** 0.50 against 0.20. So the lever
+  now is choosing conventions well.
+- **A finer-grained alternative, asking each convention's question at each changed place,** would
+  reach more (about 0.55, simulated), but files about 25 times as much.
+- **Simply unioning solo runs** adds a little, at no design cost.
+
+## What was measured
+
+| reviewer | deployable? | in-census reach, 10 PRs (33 asks) | findings a PR | evidence |
+|---|---|---|---|---|
+| solo DeepSeek, one rep | yes | 0.16 | 2.7 | stage D, matched again under AP's seal |
+| solo, two reps unioned | yes | 0.19 | ~5 (union) | same seal |
+| **AP: 25 ask-free conventions + examples + precedence** | **yes** (picks made by Opus from the diff) | **0.34** | 4.9 | stage AP, three reps, both matchers |
+| AP unioned with one solo rep | yes | 0.36 | ~7.6 | same seal |
+| per-place engine ∪ one solo rep (each picked convention asked at each changed place, one turn) | yes, but heavy | ~0.55 (simulated from measured parts) | ~68 (median) | places test + ladder, in-sample estimate |
+| *ceiling:* the conventions behind the PR's own asks, with examples and precedence (DP) | no | 0.61 | 3.5 | stage D |
+| *reference:* unbriefed Claude Opus | yes | 0.36 | 5.3 | same seal |
+
+## What we learned
+
+1. **The knowledge is in the census conventions.**
+   - At the right place, the convention's one sentence is enough for the model to write the
+     maintainer's change for most asks. With the sentence it gets 29 of 39; told only "a maintainer
+     asked here", 5 of 39 (the ladder, blind).
+   - Of the 6 asks no condition ever reached, 5 are in the census (`ceiling-residual-2026-10.md`).
+2. **"Understanding" is not the bottleneck; attention and licence are.**
+   - DP's gains were already within the bare sentence's reach at the place.
+   - Adding examples made the model more conservative at the place, not more accurate. So
+     per-convention dossiers, a richer representation, are not supported as the lever.
+3. **The ask-free delivery works when it has precedence and examples.**
+   - Earlier ask-free tries (Claude without precedence) moved nothing: +0.03, +0.00.
+   - AP on DeepSeek moved +0.18.
+   - Its added findings hit asks at nearly solo's own rate (0.28 against 0.31 a finding), so it is
+     not a flood. It does miss its pre-registered yield guard by 0.014.
+4. **Selection is the lever now.**
+   - AP's gain is all on the 22 of 33 asks whose convention the selector picked: 0.50 against solo's
+     0.20.
+   - It is nothing on the other 11: 0.03 against 0.09.
+   - The picks came from an Opus selector reading only the diff, holding 0.67 of the right entries at
+     25.
+5. **The per-place engine is a high-recall, low-precision generator.**
+   - It says "departs" at 70% of asked places and 28-30% of others, so about 7% of its filings are
+     asks (the places test).
+   - Its value depends on whether those unasked departures would be welcome, which nobody has judged.
+   - Under the 2026-09-22 ruling it is measured as a generator; caps are selection.
+
+## The recommended path
+
+1. **Make AP fully deployable and self-hosted.** Replace the Opus picks with DeepSeek's own selector,
+   and measure that selector alone first: about 300 calls on `first`, $0, with a bar of recall@10 ≥
+   0.60 against Opus's 0.45. A better selector is where AP's remaining gain is.
+2. **Combine AP with a solo rep.** AP_i ∪ DX_i is 0.36 against solo run twice at 0.19. That costs two
+   sessions a PR.
+3. **Test out of sample** on the fresh set: 40 validation-window PRs that no design has touched, 75
+   agreed asks on 34 of them, and 6 no-ask PRs as controls.
+   - First, build its reviewed workspaces: 39 of 40 are missing, about 6-7 hours of CPU and 110 GB.
+   - Then AP against solo, three reps, by the rule in `deployable-reviewer-review-2026-10.md` §4.
+4. **Keep the per-place engine as the high-recall option,** if extra volume is acceptable. Its cheaper
+   forms need a fidelity test first, because as specified it costs about 1,000 calls a PR.
+
+## Decisions for you
+
+- **Is AP's narrow yield miss acceptable?** 0.295 against 0.309 asks a finding, for +2.2 findings a
+  PR. Or should the next AP variant tighten the section, for example the top 10 picks rather than 25?
+- **Building the fresh set's workspaces:** 6-7 hours of CPU and 110 GB.
+- **The per-place engine:** pursue it as a high-volume generator, or set it aside until adjudication
+  says whether unasked departures are welcome?
+
+## Where it all is (branch `conventions-dossiers`)
+
+- **Stage AP:**
+  - `results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`, "Stage AP" and
+    "Result AP";
+  - stage D (DP) in the same file.
+- **The ladder:** `results/pr_review_v5/probes/conventions-ladder-2026-10-08/README.md`, "Result".
+- **The places test and the engine simulation:**
+  `results/pr_review_v5/probes/conventions-places-2026-10-09/README.md`.
+- **Why the ceiling is not 100%:** `docs/research/ceiling-residual-2026-10.md`.
+- **The three adversarial rounds:**
+  - `docs/research/conventions-dossiers-review-2026-10.md`;
+  - `docs/research/decompose-and-shrink-review-2026-10.md`;
+  - `docs/research/deployable-reviewer-review-2026-10.md`.
+- **The code-review systems survey,** revisited today: `docs/research/code-review-systems-survey-2026-09.md`.

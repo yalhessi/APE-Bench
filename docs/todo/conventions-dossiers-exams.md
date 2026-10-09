@@ -148,6 +148,17 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-09, stage AP: the first ask-free convention delivery to move a reviewer**
+(`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`, Result AP; the picture is in
+`docs/research/beating-solo-2026-10.md`).
+- **What it is:** stage F's 25 blind picks a PR, delivered as DP delivers the exact ones.
+- **What it moved:** DeepSeek's in-census reach from 0.16 to 0.34 on both matchers (+0.182), against
+  unbriefed Claude's 0.36.
+- **Where the gain sits:** on the asks whose convention was picked, 0.50 against 0.20.
+- **The guard:** the yield guard misses by 0.014.
+- **Next:** DeepSeek's own selector, measured alone; AP combined with a solo rep; then the fresh
+  40-PR set, whose workspaces must be built first.
+
 **2026-10-09, the ladder matched blind** (`results/pr_review_v5/probes/conventions-ladder-2026-10-08/`,
 Result).
 - **The place alone does not carry the asks:** told only that a maintainer asked, the model passes at
