@@ -1310,3 +1310,88 @@ reviewer overrode them. What remains untested is the decision to file, listed un
 The table above, per matcher and per set, here and in the todo. The Claude exact step then runs or
 does not on the todo's own terms; the only way this stage stops it is by showing that most asks are
 out of census, or that the machinery is wrong.
+
+## Stage AP: the conventions chosen without the asks, delivered as DP delivers them (pre-registered 2026-10-09, before any session)
+
+The user (2026-10-09): *"Clearly, choosing conventions without the asks is the most important question
+to address at this point."* Later the same day, asked to pick the next run: *"You can pick... I want to
+have a clearer picture of how to improve on the solo reviewer to get a better deployable reviewer. I
+still believe sticking to the conventions is a good direction."*
+
+**Why this stage.**
+- **DP moved DeepSeek +0.20 over the exact sentences** (Result 7). But DP was built from the asks.
+- **Every ask-free delivery so far moved nothing:** stage F +0.03 and stage G +0.00, both on Claude
+  and without the precedence paragraph.
+- **AP is the untried combination:** the ask-free picks, delivered with DP's examples and precedence,
+  on DeepSeek. It is the simplest deployable form of "stick to the conventions", a section in the solo
+  reviewer's context, and the third adversarial round named it the engine's cheaper rival
+  (`docs/research/deployable-reviewer-review-2026-10.md`).
+
+**Its gap to the ceiling.** It sits between DP and DX by construction. It keeps the selector's
+retrieval (the right entry is in the 25 for 22 of these PRs' 33 in-census asks), and it pays for the
+section's length.
+
+**The design.**
+- **The PRs:** the ten stage C PRs with stage F's picks: validation 28649, 29842, 30458, 30641,
+  32875, 34091; post-cutoff 41930, 42184, 42814, 43167. They hold 33 in-census asks.
+- **The section:** stage F's blind Opus picks (`briefs_applicable.json`, 25 a PR, 142 distinct
+  entries), delivered exactly as DP's section.
+  - DP's lead and the sentences in codebook order.
+  - Up to two census asks beneath each sentence, by DP's mechanical rule (`examples_ap.json`): reader
+    A's census asks filed under the entry, on val1000 and outside_years PRs, in stage G's seeded order,
+    first two, none on a probe PR (asserted). 111 entries have two, 30 one, 1 none.
+  - `probes.CONVENTIONS_PRECEDENCE` after the list.
+  - `build_context.py ap <bodies>` builds it. The two context files carry census bodies and are not
+    committed; `context_ap.sha256` holds their digests, and `run_ds41.sh` refuses any other bytes.
+  - `prec`'s rebuild stays byte-identical (checked 2026-10-09).
+  - The section is 47k-66k characters a PR against DP's 6k-37k, so length is part of the design, as
+    for DP.
+- **The model and runs:** as DX, DE and DP: DeepSeek-V4.1-Flash, keepthink, reasoning high, contract
+  v2, the stage D configs. Three reps, `iter_ds41_conv_<val|post>_ap_rep<n>`.
+- **Preflight:** `cli plan` passes for both sets, with reviewed workspaces 6 of 6 and 4 of 4.
+- **The gate:** `run_stage_ap_gate.sh`, one Slurm job.
+
+**Matching.**
+- **One seal a set,** on these ten PRs, over X1, X2, DX1-3 and AP1-3: eight sessions a PR, as D23.
+  DX is matched again under the same seal as AP, so the comparison stays within one seal.
+- **The procedure:** two blind matchers a set as subagents, `cli probe audit`, `cli probe unblind`
+  into `match_AP_<set>/`.
+- **The reading:** per-session reach on the in-census asks, pooled over three reps, read with
+  `read_stage.py AP AP DX`.
+
+**Reading rule, fixed before any session.**
+
+| AP − DX, pooled in-census reach, both matchers | reading |
+|---|---|
+| **≥ +0.10** (10 cells of 99, about three asks a rep) | **the conventions, chosen without the asks and delivered with precedence, beat solo DeepSeek.** The first ask-free convention delivery to move a reviewer |
+| **≤ +0.05** | **they do not.** Stage F's result holds on DeepSeek with precedence: the gain needed the asks' own choice of conventions |
+| between, or the matchers disagree | inconclusive; read the reasoning at the asks that differ |
+
+- **Volume guard:** AP's findings a PR are at most DX's + 3.0, and asks reached a finding are no lower
+  than DX's. If AP fails either, it is a volume effect whatever its reach.
+
+**Also read:**
+- **AP_i ∪ DX_i against DX_i ∪ DX_j**, paired by rep, under the same seal. This is the round's
+  comparator: does AP add over solo run twice?
+- **AP against DP's cells** on these PRs (DP's own seals): how much of DP's gain survives choosing
+  without the asks. They are different seals, so this is not a reading.
+- **The split by whether the ask's entry is in AP's picks** (22 asks) or not (11).
+- **Findings a PR, and asks reached a finding.**
+- **Partial cells.**
+- **The out-of-census asks** on these PRs.
+
+One ask moving in every rep is 3 cells, 0.030.
+
+**Limits, stated before.**
+- One model, three reps, 33 in-census asks.
+- The picks were made by Opus, not by the reviewer's own model.
+- These PRs were chosen in stage C because Claude X missed asks there, and every stage since used
+  them, so they are in-sample.
+- A positive here is a direction, to be checked on a fresh set (the round's validation remainder)
+  before any claim.
+
+**Cost.**
+- **Generation:** GPU on `first` only. 30 sessions at once, about 1-1.5 hours plus 12 minutes to
+  serve. $0.
+- **Matching:** four matcher runs, about 0.4-0.6M tokens on the primary subscription. Its week reset
+  at 10:00 on 2026-10-09.

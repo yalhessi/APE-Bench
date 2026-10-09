@@ -13,7 +13,11 @@ outside_years PRs, in the order stage G's seed gives them. It needs the census b
 the asks by id. Bodies are never committed, so its two context files are not either; their digests
 are in `context_prec.sha256`, which the stage's gate checks before any run.
 
-usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <base|exact|common|all|prec> [bodies.json]
+`ap` (stage AP) is `prec` on stage F's blind picks (`briefs_applicable.json`) instead of the exact
+entries: the same examples rule and closing, its examples recorded in `examples_ap.json` and its digests in
+`context_ap.sha256`.
+
+usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <base|exact|common|all|prec|ap> [bodies.json]
 """
 import glob
 import hashlib
@@ -30,7 +34,7 @@ SETS = {"val": "configs/probe_sets/val_small12.yaml", "post": "configs/probe_set
 PER_ENTRY = 2
 
 
-def census_examples(bodies: Path, entries: set, probe_prs: set) -> dict:
+def census_examples(bodies: Path, entries: set, probe_prs: set, record_file: str = "examples_prec.json") -> dict:
     """Up to PER_ENTRY census asks a entry, as stage G's writers were shown them (body[:900], the
     hunk's last 800 characters), and the record of which they are."""
 
@@ -47,7 +51,7 @@ def census_examples(bodies: Path, entries: set, probe_prs: set) -> dict:
     assert not leaked, f"an example sits on a probe PR: {sorted(leaked)}"
     record = {i: [{"cid": c, "pr": body[c]["pr"], "event_id": body[c]["event_id"], "path": body[c]["path"]}
                   for c in cids] for i, cids in chosen.items()}
-    (HERE / "examples_prec.json").write_text(json.dumps(
+    (HERE / record_file).write_text(json.dumps(
         {"seed": seed, "per_entry": PER_ENTRY, "sets": ["val1000", "outside_years"], "entries": record}, indent=1) + "\n")
     return {i: [{"path": body[c]["path"], "comment": body[c]["body"][:900], "code": (body[c]["diff_hunk"] or "")[-800:]}
                 for c in cids] for i, cids in chosen.items()}
@@ -57,11 +61,12 @@ level = sys.argv[1]
 specs = {tag: probes.load_probe_set(Path(path)) for tag, path in SETS.items()}
 briefs, closing = None, ""
 if level != "base":
-    source = HERE / f"briefs_{'exact' if level == 'prec' else level}.json"
+    source = HERE / f"briefs_{ {'prec': 'exact', 'ap': 'applicable'}.get(level, level) }.json"
     examples = None
-    if level == "prec":
+    if level in ("prec", "ap"):
         entries = {i for ids in json.loads(source.read_text())["prs"].values() for i in ids}
-        examples = census_examples(Path(sys.argv[2]), entries, {pr for s in specs.values() for pr in s.pr_numbers})
+        examples = census_examples(Path(sys.argv[2]), entries, {pr for s in specs.values() for pr in s.pr_numbers},
+                                   f"examples_{level}.json")
         closing = probes.CONVENTIONS_PRECEDENCE
     briefs = probes.load_conventions(source, CODEBOOK, examples)
 digests = []
@@ -73,6 +78,6 @@ for tag, spec in specs.items():
     digests.append(f"{hashlib.sha256(out.read_bytes()).hexdigest()}  {out.resolve().relative_to(Path.cwd().resolve())}\n")
     held = "" if conventions is None else f", {sum(map(len, conventions.values()))} sentences"
     print(f"{out}: {len(prs)} PRs{held}")
-if level == "prec":
-    (HERE / "context_prec.sha256").write_text("".join(digests))
+if level in ("prec", "ap"):
+    (HERE / f"context_{level}.sha256").write_text("".join(digests))
     print("".join(digests), end="")

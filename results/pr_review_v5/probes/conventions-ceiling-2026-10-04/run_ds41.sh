@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # One stage-D run: DeepSeek-V4.1-Flash (keepthink, reasoning high) under contract v2 on a probe set, at
 # one level: base (the PR model alone, every PR of the set), exact (stage L's exact section), prec (the
-# exact section with census examples and the precedence paragraph). A briefed run reviews the PRs its
-# context file holds.
-# usage (any directory inside the tree): run_ds41.sh <val|post> <base|exact|prec> <rep> [plan]
+# exact section with census examples and the precedence paragraph), ap (stage AP: prec on stage F's blind
+# picks). A briefed run reviews the PRs its context file holds.
+# usage (any directory inside the tree): run_ds41.sh <val|post> <base|exact|prec|ap> <rep> [plan]
 #   with `plan`, the preflight of the same run (spends nothing); without, the run itself, which needs the
 #   server of serve_ds41.sbatch on 127.0.0.1:8012. A complete run is skipped; an interrupted one resumes.
 set -euo pipefail
@@ -13,13 +13,13 @@ export PYTHONPATH=$PWD/src ELAN_HOME=/research/projects/proofedit/ya475/.elan
 export PATH=$ELAN_HOME/bin:$PATH
 P=results/pr_review_v5/probes/conventions-ceiling-2026-10-04
 case $tag in val) cfg=val_small12 ;; post) cfg=probe_2026_07_08_v1 ;; *) echo "set: val or post" >&2; exit 2 ;; esac
-case $level in base|exact|prec) ;; *) echo "level: base, exact or prec" >&2; exit 2 ;; esac
+case $level in base|exact|prec|ap) ;; *) echo "level: base, exact, prec or ap" >&2; exit 2 ;; esac
 context=$P/context_${tag}_${level}.jsonl
 name=iter_ds41_conv_${tag}_${level}_rep${rep}
 # The prec context files hold census bodies, which are never committed; they are rebuilt by
 # build_context.py and must be the bytes this stage pre-registered.
-if [ "$level" = prec ]; then
-  grep -F "$context" $P/context_prec.sha256 | sha256sum -c --quiet - || { echo "$context is not the pre-registered file" >&2; exit 4; }
+if [ "$level" = prec ] || [ "$level" = ap ]; then
+  grep -F "$context" $P/context_${level}.sha256 | sha256sum -c --quiet - || { echo "$context is not the pre-registered file" >&2; exit 4; }
 fi
 prs=()
 if [ "$level" != base ]; then
