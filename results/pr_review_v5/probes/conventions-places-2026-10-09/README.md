@@ -166,3 +166,94 @@ pre-registered asked-against-decoy reading.
 **What it means for the reading.** The orchestrating session has not read any group's verdicts. The
 rule, its thresholds and the readings declared above were all fixed before the report arrived. The
 note is here so the reading can be judged knowing it.
+
+## Result (2026-10-09): by the rule as written, the detector band. The rule's key measure failed; the verdict discriminates moderately, at about 7% precision
+
+**How it ran.**
+- **Answers:** all 2,022, 07:44 to 11:16 (`e5d10631`). Four stopped at 65,536 tokens, and six are
+  unparsed.
+- **Readings:** `places.py read` gives the rule's readings. `read_more.py` gives the readings declared
+  during the run, plus two scores added after the reading, labelled as such.
+
+**The rule's measures.**
+
+| | asked (42) | unasked exact (549) | decoy (836 parsed) |
+|---|---|---|---|
+| `departs` rate | **0.70** | 0.30 | 0.28 |
+
+- **AUC of the stated CONFIDENCE:** asked against decoy **0.348**; asked against unasked 0.474.
+- **The capped engine:** a cap of 10 a PR by confidence keeps 2 of 42 asked pairs.
+- **Projected unscoped filings from stage F's 25:** median 67.5 a PR.
+
+**By the rule as written: the detector band** (AUC asked against decoy ≤ 0.60). Decoy `departs`
+(0.28) does not reach the band's other trigger, 0.40.
+
+**The rule's AUC measured the wrong thing.**
+- **The model gave its confidence in its own verdict, not the probability of a departure the prompt
+  asked for.**
+  - `departs` answers: mean confidence 90.5, median 95.
+  - `conforms` answers: mean 89.9, median 95.
+- **So a confident `conforms` ranks above a hesitant `departs`.** The stated number carries no
+  information about departure, and the AUC criterion and the capped reading rest on it.
+- **This is a failure of the elicitation, recorded as such.** The pre-registered verdict stands as
+  written. It is not re-read.
+
+**Readings declared before the reading** (`read_more.py`):
+
+| | stated confidence | `departs` rate as the score *(added after)* | signed confidence *(added after)* |
+|---|---|---|---|
+| pooled AUC, asked vs decoy | 0.348 | 0.729 | 0.775 |
+| pooled AUC, asked vs unasked | 0.474 | 0.732 | 0.777 |
+| within-PR AUC (10 PRs) | 0.351 | 0.678 | 0.716 |
+| leave-one-PR-out range | 0.333-0.376 | 0.687-0.752 | 0.744-0.801 |
+| sample 1 only, vs decoy | 0.394 | 0.729 | 0.771 |
+
+Signed confidence is CONFIDENCE for a `departs` answer and 100 − CONFIDENCE for a `conforms` one.
+
+- **Agreement as confidence.** For exact pairs with two samples, the asked share by the number of
+  samples saying `departs`:
+
+  | samples saying `departs` | pairs | asked | asked share |
+  |---|---|---|---|
+  | 2 of 2 | 149 | 26 | 0.174 |
+  | 1 of 2 | 93 | 7 | 0.075 |
+  | 0 of 2 | 349 | 9 | 0.026 |
+
+  It is monotone, about 7× from 0 of 2 to 2 of 2.
+- **Asked pairs on asks DX misses:** 35 of the 42, with a `departs` rate there of 0.70, the same as
+  over all asked pairs.
+- **Per-rule suppression, simulated leave-PR-out.** The share of asked departs kept, against filings
+  a PR over this test's pairs:
+
+  | cut | asked departs kept | filings a PR |
+  |---|---|---|
+  | none | 29.5 of 29.5 | 33.2 |
+  | 0.5 | 24.5 | 28.1 |
+  | 0.3 | 24.0 | 24.0 |
+  | 0.1 | 22.5 (0.76) | 18.7 |
+
+- **Precision:** 0.068 of all `departs` filings sit at an asked pair. The base rate is 42 of 1,431
+  pairs, 2.9%.
+
+**What it means, at this altitude** (one model, one turn, the exact entries plus five decoys a PR, in
+sample).
+- **The verdict at a place discriminates moderately.**
+  - It says `departs` at 0.70 of the places maintainers asked about, against 0.28-0.30 elsewhere.
+  - Verdict-based AUCs are 0.68-0.78, above stage H's deciders (0.56-0.64), though those answered a
+    different question.
+  - Within a PR it holds on 7 of the 10 PRs.
+- **It reaches what solo misses:** 35 of the 42 asked pairs are on asks DX misses, at the same 0.70.
+- **But uncapped it files at about a quarter to a third of all (place, convention) pairs, so about 7%
+  of its filings are asks.**
+  - That is the territory of stage H's finding that maintainers raise 1 in 20 to 1 in 400 of the
+    places a convention's situation occurs. Many of the unasked departures may be real, and nobody has
+    adjudicated whether they would be welcome.
+- **Two volume levers measure as real, in sample:** two-sample agreement, and per-rule suppression
+  left out by PR. Together they could halve volume while keeping about three quarters of the asked
+  departs. Both are selection under the 2026-09-22 ruling, so they are measured here as operating
+  points, not proposed.
+- **The decision this hands the user.**
+  - Read as written, the rule says drop this form, and go to DP with decoys (M4).
+  - Read with its failed measure set aside, the engine is a moderately discriminating, high-volume
+    generator whose value turns on whether its unasked departures are welcome. That is the open
+    adjudication (`docs/todo/adjudication-rubric.md`).
