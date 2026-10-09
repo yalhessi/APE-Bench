@@ -101,3 +101,13 @@ than site and kind (the exact ask recurred 6 times in 381, too few to read).
   obligation of each other in every rep (location 0.652/0.609/0.609 against issue
   0.304/0.217/0.261). Only the forced fanout — 179 candidates on 4 PRs, produced by refusing
   abstentions — shows location 1.0 against issue 0.5. Quote the regime with the framing, every time.
+
+**2026-10-09: a stated confidence measured nothing, because the model read the scale as confidence
+in its own verdict** (`results/pr_review_v5/probes/conventions-places-2026-10-09/`, Result).
+- **What happened.** The prompt asked for `CONFIDENCE: 0-100, how likely it is that the code departs`.
+  DeepSeek-V4.1 answered about 90-95 for `departs` and `conforms` alike. The pre-registered AUC on it
+  read 0.348, against 0.73-0.78 for the verdict itself.
+- **The lesson for any probe:**
+  - Score a verdict by its own departs rate over samples, or by a signed confidence.
+  - Check the scale's use (confidence by verdict) before any rule reads it.
+  - Never pre-register a threshold on a stated confidence alone.
