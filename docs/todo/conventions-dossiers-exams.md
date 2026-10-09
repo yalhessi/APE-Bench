@@ -148,6 +148,17 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-09, the ladder matched blind** (`results/pr_review_v5/probes/conventions-ladder-2026-10-08/`,
+Result).
+- **The place alone does not carry the asks:** told only that a maintainer asked, the model passes at
+  5-6 of 39.
+- **With the convention's sentence it passes at 25-29.**
+- **DP's gains were already within the bare sentence's reach at the place:** 5-6 of 7.
+- **DP's examples lower the judged verdicts:** UX against U is +1 / -5 and +0 / -4.
+- **DP's misses read as mixed:** u 4-6, s 3, f 3-5.
+- **The understanding hypothesis, as a lever for DeepSeek, finds no support.** What is measured is
+  the per-place question: at the place, the bare sentence passes 13 asks that DE's review missed.
+
 **2026-10-09, why the ceiling is not 100%** (`docs/research/ceiling-residual-2026-10.md`). The census
 holds the knowledge behind what is missed.
 - **What nothing reaches:** 6 of 46 asks, the union of every ceiling session over three models. Five
