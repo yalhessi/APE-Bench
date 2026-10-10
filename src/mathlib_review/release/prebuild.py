@@ -112,6 +112,7 @@ def prepare_sources_for(episode: Any, *, logger) -> Callable[[Path, Path], Await
 
 async def build_reviewed_workspaces(
     plan: Sequence[ReviewedBuild], *, manager, logger, force_rebuild: bool = False,
+    restore_base: Optional[Callable[[str], Awaitable[Any]]] = None,
 ) -> Dict[str, Any]:
     """Build the reviewed workspaces the plan says are missing; return `key -> BuildResult`.
 
@@ -119,6 +120,11 @@ async def build_reviewed_workspaces(
     up front with the base named, never attempted. A failed build is logged and recorded, and
     the next episode still builds: the operator wants the twelve that succeed and the one
     message about the thirteenth, not an exception after the first.
+
+    A base that is BUILT is a snapshot, not yet a directory under `workspaces/`, and the
+    builder reads the directory. `restore_base` (`RestoreManager.get_workspace`) restores it
+    first; it returns at once for a base already READY. Without it, 39 of the fresh set's 40
+    episodes (2026-10-10) failed in the same second on "base workspace ... is not built".
     """
 
     results: Dict[str, Any] = {}
@@ -136,6 +142,8 @@ async def build_reviewed_workspaces(
         logger.info("PR %s: building reviewed workspace %s (%d changed files)",
                     pr, item.key, len(item.episode.changed_files))
         try:
+            if restore_base is not None:
+                await restore_base(item.episode.base_sha)
             result = await manager.build_reviewed_workspace(
                 item.key, item.episode.base_sha,
                 prepare_sources=prepare_sources_for(item.episode, logger=logger),
@@ -174,6 +182,15 @@ def _build_manager(scaffold: Any, logger):
     return BuildManager(config, logger, repo_url=repo_url)
 
 
+def _base_restorer(manager, logger) -> Callable[[str], Awaitable[Any]]:
+    """`RestoreManager.get_workspace` on the builder's own config and repository, so a BUILT
+    base is restored into the same `workspaces/` the reviewed build reads."""
+
+    from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
+
+    return RestoreManager(manager.config, logger, repo_url=manager.repo_url).get_workspace
+
+
 def _print_plan(plan: Sequence[ReviewedBuild]) -> None:
     counts = {status: sum(1 for item in plan if item.status == status)
               for status in (READY, MISSING, BASE_MISSING)}
@@ -203,7 +220,8 @@ def _main_reviewed(args: argparse.Namespace, overrides: Dict[str, Any]) -> int:
     assert_toolchain(scaffold, logger)
     manager = _build_manager(scaffold, logger)
     results = asyncio.run(build_reviewed_workspaces(
-        plan, manager=manager, logger=logger, force_rebuild=args.force_rebuild))
+        plan, manager=manager, logger=logger, force_rebuild=args.force_rebuild,
+        restore_base=_base_restorer(manager, logger)))
     failed = [key for key, result in results.items() if not result.success]
     print(f"built {len(results) - len(failed)} of {len(results)} reviewed workspace(s)"
           + (f"; FAILED: {failed}" if failed else ""))
