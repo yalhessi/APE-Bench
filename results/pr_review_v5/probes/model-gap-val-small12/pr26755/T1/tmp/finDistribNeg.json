@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Ring/Pointwise/Finset.lean", "line_start": 29, "line_end": 29, "replacement": "protected def distribNeg [DecidableEq \u03b1] [Mul \u03b1] [HasDistribNeg \u03b1] :"}

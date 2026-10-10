@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean", "declaration_name": "Finset.commMonoid", "new_declaration": "@[to_additive \"`Finset \u03b1` is an `AddCommMonoid` under pointwise operations if `\u03b1` is. \"]\nprotected def commMonoid : CommMonoid (Finset \u03b1) :=\n  coe_injective.commMonoid _ coe_one coe_mul coe_pow"}

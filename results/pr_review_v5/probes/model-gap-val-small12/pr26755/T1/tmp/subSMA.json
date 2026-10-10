@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Module/Submodule/Pointwise.lean", "line_start": 506, "line_end": 506, "replacement": "protected def pointwiseSetMulAction [SMulCommClass R R M] :"}

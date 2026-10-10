@@ -1,0 +1,124 @@
+# Review notes: PR #43192 (`PresheafOfModulesOfCommRing` abbrevs)
+
+## What I did
+
+- I read `brief.md`, `pr.md`, `model.md` and `diff.patch`.
+- I checked the file as the PR leaves it with `lean_verify_edit` (no edit). It compiles, with no errors and no warnings.
+- I read the files it wraps through `file_read`: `Presheaf.lean`, `Presheaf/Pushforward.lean` and `Presheaf/Pullback.lean`.
+- I searched the base tree (`content_search`, `declaration_search`) for these:
+  - the existing comm-ring abbrev `pushforward₀OfCommRingCat`;
+  - places that spell `PresheafOfModules (R ⋙ forget₂ _ _)` by hand;
+  - `homMk`/`mkHom` counts;
+  - `Category*` usage;
+  - root-level name clashes.
+- `zulip_search` found no prior discussion of the name or the design. `precedent_search` gave nothing that applies beyond the general "add API" requests.
+- Every edit I propose was compiled with `lean_verify_edit` (outcome `compiled`) unless noted otherwise. Temporary argument files are in `tmp/`.
+
+## Object by object
+
+- **`Mathlib.lean` import:** the import is added in sorted position (diff line 8), so nothing to file.
+- **Module header, `@[expose] public section`:**
+  - The file is a `module` and has `@[expose] public section`. That is fine.
+  - The title has a typo ("presheaves commutative rings") and is imprecise. Filed.
+- **`universe` / `open`:**
+  - The universe line names six universes but only `v` and `u` are needed. Filed with the `Type*` finding.
+  - `Limits` is unused: removing it compiles cleanly. Filed.
+- **`PresheafOfModulesOfCommRing`:**
+  - It has no type ascription. Filed; `Type (max u₁ v₁ u (v + 1))` compiles.
+  - The name and design need Zulip consensus. Filed.
+  - It is placed too high in the import graph. Filed.
+  - The existing hand spellings should use it. Filed.
+  - Correctness check: an `example` with `M : PresheafOfModulesOfCommRing R` finds the `Module (R.obj X) (M.obj X)` instance through the abbrev.
+- **`mk`:**
+  - It is missing the `cat_disch` auto-params. Filed; compiles.
+  - `abbrev` vs `@[simps] def`. Filed; compiles.
+  - The docstring is a verb phrase. Filed.
+  - The binders match the structure fields.
+- **`obj`, `map`:**
+  - Both name the presheaf of modules `F`, which clashes with `F : C ⥤ D`. Filed for each; compiles.
+  - The body of `map` uses `_ _` where `..` would do. Filed; compiles.
+  - The `obj` docstring is a verb phrase. Filed.
+  - `F.obj` cannot replace `PresheafOfModules.obj F` in the bodies, because it would resolve to the new `obj`. So the qualified call is right.
+- **`mkHom`:**
+  - Filed:
+    - the rename to `homMk` (29 vs 10 files; sibling `isoMk`);
+    - the missing `cat_disch` auto-param;
+    - `{X Y}` should be `⦃X Y⦄` to match `isoMk`. This needs `naturality f := naturality f`; the plain field assignment fails.
+    - the docstring is a verb phrase.
+  - All of these compile.
+- **`isoMk`:**
+  - The docstring is a verb phrase. Filed.
+  - The binders and auto-param already match `PresheafOfModules.isoMk`. Nothing else to file.
+- **`unit`:**
+  - It rebinds the section variable `R`. Filed; `variable (R) in` compiles.
+  - The signature fits on one line (92 chars). Filed.
+  - The universe `.{u}` is right: `PresheafOfModules.unit` lives in the ring's universe.
+- **`restrictScalars`:**
+  - The local `{S}` is not a duplicate of a section variable. Fine.
+  - Its noun-phrase docstring ends with a full stop. That is covered by the file-level full-stop finding.
+- **`pushforward₀`:**
+  - It duplicates `PresheafOfModules.pushforward₀OfCommRingCat`; the two are reducibly equal (`with_reducible rfl` compiles). Filed as blocking.
+  - The deprecated alias compiles in `Pushforward.lean`.
+  - Its own binders duplicate the next `variable` line. Filed.
+  - Its conclusion is split although it fits on one line. Filed.
+- **`pushforward`, `pullback`:**
+  - Correctness check: for small categories, an example `PresheafOfModulesOfCommRing.pullback φ` with no instance argument elaborates. It failed only because the example was not marked `noncomputable`, so instance search sees through the abbrev `pushforward`.
+  - Nothing else to file.
+- **`pullbackPushforwardAdjunction`:** the header fits on one line. Filed. The body is fine.
+- **`variable {F ...} {R ...} {S ...} (φ ...)`:** it fits on one line (95 chars). Filed.
+
+## Conventions: where I filed each one and where I left it
+
+- **Reuse existing `variable`s.**
+  - Filed:
+    - `unit`, which rebinds `R`;
+    - `pushforward₀`, which rebinds `F` and `R`;
+    - the file, where `C` is declared three times.
+- **Module title states precisely what the file proves.** Filed at the file (title).
+- **`abbrev` only when unfolding is needed.**
+  - Filed: `mk` (and `mkHom`).
+  - Left:
+    - `PresheafOfModulesOfCommRing`: instance search must unfold it to find the `Category` instance. The `Module` `example` shows the abbrev being used.
+    - `pushforward`: `pullback`'s instance argument `[(pushforward.{v} φ).IsRightAdjoint]` resolves only through it (`example` checked).
+    - `obj`, `map`: simp lemmas about `PresheafOfModules.obj/map` must see through them.
+    - `pushforward₀`, `restrictScalars`, `pullback`, `unit`, `isoMk`, `pullbackPushforwardAdjunction`: wrappers whose stated purpose is to be defeq-transparent to the `PresheafOfModules` API.
+- **Break after the colon, so the conclusion starts its own line.**
+  - Nowhere to file:
+    - `mk`, `map`, `restrictScalars`, `pushforward`, `pullback` and `pushforward₀` each end the hypothesis line with `:`.
+    - `mkHom`/`isoMk` end with `... ) : M₁ ⟶ M₂ where`, with the whole conclusion on one line, never split mid-conclusion.
+  - The split inside `pushforward₀`'s conclusion is filed under line length.
+- **Binder kind follows inferability.** Nowhere to file:
+  - `unit (R)` and `pushforward₀ (F) (R)` are explicit and cannot be inferred.
+  - `pushforward`, `pullback` and `pullbackPushforwardAdjunction` take `φ` explicitly; `F`, `R`, `S` are implicit and inferable from `φ`.
+  - `obj (F) (X)`, `map (F) {X Y} (f)`, `mkHom {M₁ M₂}` and `isoMk {M₁ M₂}` match `PresheafOfModules.isoMk`.
+- **`protected` against root-name clashes.** Nowhere to file. `declaration_search` for `_root_.pullback`, `unit`, `map`, `obj`, `pushforward` and `restrictScalars` reports no such declarations, and `content_search` finds these short names only inside namespaces.
+- **Remove a redundant or unused `open`.** Filed: `Limits`.
+- **New file imported in `Mathlib.lean`.** Nothing to file: diff line 8 `public import Mathlib.Algebra.Category.ModuleCat.Presheaf.OfCommRing`.
+- **New file is a `module` with `@[expose] public section`.** Nothing to file: diff lines 21 `module` and 33 `@[expose] public section`.
+- **`@[expose]` on individual definitions.** Left:
+  - Every declaration in the file is an `abbrev` whose body downstream code must unfold; that is the PR's purpose.
+  - So putting `@[expose]` on each one would expose exactly what the section-level `@[expose]` exposes, and there is no def whose body should stay hidden.
+- **Lines broken only past 100 characters.** Filed:
+  - `unit` (92);
+  - `pushforward₀` conclusion (85);
+  - `pullbackPushforwardAdjunction` header (89);
+  - the `variable` line (95);
+  - the module-doc paragraph reflow (in the title finding).
+
+  `PresheafOfModulesOfCommRing`'s signature (97 if joined) is rewritten anyway by the type-ascription and single-`C` findings. The `pullbackPushforwardAdjunction` docstring is 107 if joined, so its break is correct.
+- **No new declaration when an existing one states it.** Filed: `pushforward₀` duplicates `PresheafOfModules.pushforward₀OfCommRingCat`.
+- **Variable letters follow the area.** Filed: `obj` and `map` use `F` for a presheaf of modules.
+- **Docstring of a definition is a noun phrase.** Filed: `mk`, `obj`, `mkHom`, `isoMk`. The other docstrings are already noun phrases.
+- **Explicit type on definitions.** Filed: `PresheafOfModulesOfCommRing`. Every other declaration states its type.
+- **Deprecate one of two duplicates.** Filed in the `pushforward₀` finding: deprecate `pushforward₀OfCommRingCat`. The alias compiles.
+- **`∀ ⦃x⦄` for a variable that a later hypothesis determines.** Filed: `mkHom`'s `naturality`. `isoMk` already uses `⦃X Y⦄`. `mk`'s `map`/`map_comp` bind data, not hypotheses, and mirror the structure fields.
+- **`noncomputable section` vs per-definition marking.** Nothing to file: only 5 of 12 declarations are noncomputable (`unit`, `restrictScalars`, `pushforward`, `pullback`, `pullbackPushforwardAdjunction`), so marking each one is the form the convention asks for.
+- **Auto-param for hypotheses a decision procedure discharges.** Filed: `mk` (`map_id`, `map_comp`) and `mkHom` (`naturality`). `isoMk` already has `:= by cat_disch`.
+- **`Type*` / `Category*` rather than fixed universes.** Filed at the file.
+- **Apply the new definition to existing hand-written places.** Filed at `PresheafOfModulesOfCommRing`: Monoidal.lean, Differentials/Presheaf.lean, Stalk.lean, Presheaf.lean:64 and StructureSheaf.lean:245. Each would need the abbrev placed lower in the import graph (the placement finding).
+- **No full stop on noun-phrase docstrings.** Filed once at the file, listing all eight docstrings.
+- **Zulip consensus for a new concept's name or design.** Filed at `PresheafOfModulesOfCommRing`.
+- **`..` for a run of trailing `_`.**
+  - Filed: the `map` body (`PresheafOfModules.map _ _`) and `forget₂ _ _` across the file.
+  - Left: the single `_` in `PresheafOfModules.pullbackPushforwardAdjunction _`, which is not a run.
+- **`@[expose]` placement.** See the `@[expose]` convention above.

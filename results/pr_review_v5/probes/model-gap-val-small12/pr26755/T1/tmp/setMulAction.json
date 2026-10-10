@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean", "line_start": 173, "line_end": 173, "replacement": "protected def mulAction [Monoid \u03b1] [MulAction \u03b1 \u03b2] : MulAction (Set \u03b1) (Set \u03b2) where"}

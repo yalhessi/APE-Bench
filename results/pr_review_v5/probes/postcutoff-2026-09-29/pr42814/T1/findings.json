@@ -1,0 +1,44 @@
+[
+  {
+    "target": "module_doc in Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+    "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but under `Int.IsFundamentalDiscr` as defined, `1` is a fundamental discriminant (1 % 4 = 1, the `D = 4 * x` clause is vacuous, no odd prime square divides 1), and `1` is not the discriminant of any quadratic field. The sentence is false as stated.",
+    "requested_change": "Correct the sentence to account for `1`, e.g. \"Apart from `1`, these are exactly the discriminants of quadratic fields\", or else add `D ≠ 1` to `IsFundamentalDiscr` if `1` is meant to be excluded.",
+    "severity": "blocking",
+    "evidence": "lean_verify_edit on Mathlib/NumberTheory/FundamentalDiscriminant.lean, inserting `theorem isFundamentalDiscr_one_probe : IsFundamentalDiscr 1 := by simp [isFundamentalDiscr_iff_squarefree]` before `end Int`: outcome `compiled`, no errors. So the PR's definition admits D = 1, which contradicts the module doc's 'exactly the discriminants of quadratic fields'."
+  },
+  {
+    "target": "Int.squarefree_iff_prime_sq_not_dvd",
+    "claim": "`Int.squarefree_iff_prime_sq_not_dvd` is proved by hand. It builds a local `bridge` iff, rewrites, and then uses an anonymous-constructor `exact` that shuffles the bridge in each direction. The same rewrite chain closes the goal directly with `simp_rw`.",
+    "requested_change": "Replace the proof by `simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_mul, Int.natCast_dvd]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Data/Nat/Squarefree.lean, declaration_name `Int.squarefree_iff_prime_sq_not_dvd`, with the body replaced by `simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_mul,\\n    Int.natCast_dvd]`: outcome `compiled`, no errors, no warnings."
+  },
+  {
+    "target": "Odd.isCoprime_two",
+    "claim": "`Odd.isCoprime_two` concludes `IsCoprime x 2`, with `2` on the right, but the name does not say which side. The sibling names all mark the side: `Int.isCoprime_two_left` and `Int.isCoprime_two_right` (Mathlib/RingTheory/Int/Basic.lean:119,123, `IsCoprime m 2 ↔ Odd m`), and `Nat.coprime_two_left`/`Nat.coprime_two_right` with aliases `Odd.coprime_two_left`/`Odd.coprime_two_right` (Mathlib/Data/Nat/Prime/Basic.lean:153-159). The `left` counterpart is also missing.",
+    "requested_change": "Rename `Odd.isCoprime_two` to `Odd.isCoprime_two_right`. Add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`. Update the use in `Int.isFundamentalDiscr_iff_squarefree` to `hp.isCoprime_two_right`.",
+    "severity": "advisory",
+    "evidence": "content_search `coprime_two` found the Nat `_left/_right` pair and the `Odd.coprime_two_left/right` aliases. content_search `IsCoprime [a-z] 2` found `Int.isCoprime_two_left/right`. lean_verify_edit on Mathlib/RingTheory/Coprime/Basic.lean, replacing `Odd.isCoprime_two` with `Odd.isCoprime_two_right` (same proof) plus `Odd.isCoprime_two_left := h.isCoprime_two_right.symm`: outcome `compiled`. The general lemma is still needed: replacing its use with `Int.isCoprime_two_right.2 hp` fails in FundamentalDiscriminant.lean with `Unknown constant`, so it is not imported there. That is why this is a rename and not a removal."
+  },
+  {
+    "target": "IsCoprime.dvd_mul_right_iff",
+    "claim": "`IsCoprime.dvd_mul_right_iff` and `IsCoprime.dvd_mul_left_iff` carry an `_iff` suffix that the identically shaped siblings do not. `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m` and `Nat.Coprime.dvd_mul_left` (Mathlib/Data/Nat/GCD/Basic.lean:101,104) have no suffix, and neither do `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` (Mathlib/Algebra/Divisibility/Units.lean). The names `IsCoprime.dvd_mul_right/left` are free.",
+    "requested_change": "Rename `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left`, matching `Nat.Coprime.dvd_mul_right/left`. Update the use in `Int.isFundamentalDiscr_iff_squarefree`.",
+    "severity": "advisory",
+    "evidence": "declaration_search: `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right` are not declared at base or in the PR. content_search showed the Nat.Coprime pair, and IsUnit.dvd_mul_right/left and Units.dvd_mul_right/left, as un-suffixed iff lemmas. lean_verify_edit on Mathlib/RingTheory/Coprime/Basic.lean, lines 110-114 replaced with the renamed pair (same proofs): outcome `compiled`."
+  },
+  {
+    "target": "Nat.forall_prime_iff_two_and_odd",
+    "claim": "The reverse direction of `Nat.forall_prime_iff_two_and_odd` re-derives the 2-or-odd split by hand (`obtain rfl | hne := eq_or_ne p 2` and `hp.odd_of_ne_two hne`). Mathlib already states that split as `Nat.Prime.eq_two_or_odd'`.",
+    "requested_change": "Use the term-mode proof `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+    "severity": "advisory",
+    "evidence": "declaration_search: `Nat.Prime.eq_two_or_odd'` exists at Mathlib/Data/Nat/Prime/Basic.lean:45. lean_verify_edit on Mathlib/Data/Nat/Prime/Basic.lean, declaration_name `Nat.forall_prime_iff_two_and_odd`, with that term proof: outcome `compiled`, no errors or warnings."
+  },
+  {
+    "target": "Int.isFundamentalDiscr_four_mul_add_one",
+    "claim": "`Int.isFundamentalDiscr_four_mul_add_one` applies only when the discriminant is literally of the form `4 * m + 1`. The reusable statement takes a hypothesis `D % 4 = 1`, which is also the form `isFundamentalDiscr_iff_squarefree` and `emod_four_eq_zero_or_one` use, so a user holding `hD : D % 4 = 1` cannot apply the lemma without first rewriting `D`.",
+    "requested_change": "Add `theorem isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one {D : ℤ} (hD : D % 4 = 1) : IsFundamentalDiscr D ↔ Squarefree D := by simp [isFundamentalDiscr_iff_squarefree, hD]`, and derive `isFundamentalDiscr_four_mul_add_one` from it (`isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one (by omega)`).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/NumberTheory/FundamentalDiscriminant.lean, declaration_name `Int.isFundamentalDiscr_four_mul_add_one`, replaced by the hypothesis-form lemma followed by `isFundamentalDiscr_four_mul_add_one` derived from it: outcome `compiled`, no errors."
+  }
+]

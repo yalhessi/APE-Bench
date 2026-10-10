@@ -1,0 +1,51 @@
+[
+  {
+    "target": "PresheafOfModulesOfCommRing.pushforward₀",
+    "claim": "`PresheafOfModulesOfCommRing.pushforward₀ F R` is the same term with the same type as the existing `PresheafOfModules.pushforward₀OfCommRingCat F R` (Pushforward.lean:71, both are `pushforward₀ F (R ⋙ forget₂ _ _)` into `PresheafOfModules ((F.op ⋙ R) ⋙ forget₂ _ _)`), so the PR leaves two library names for one functor; the PR description itself names `pushforward₀OfCommRingCat` as the declaration this namespace is meant to replace.",
+    "requested_change": "Keep a single name: remove `PresheafOfModules.pushforward₀OfCommRingCat` from Pushforward.lean, add `@[deprecated (since := \"2026-..\")] alias PresheafOfModules.pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀` next to the new abbrev, and state the `Monoidal` instance in `PushforwardZeroMonoidal.lean` on `PresheafOfModulesOfCommRing.pushforward₀ F R` (importing the file that defines it).",
+    "severity": "blocking",
+    "evidence": "lean_verify_edit with `example ... : pushforward₀.{v} F R = PresheafOfModules.pushforward₀OfCommRingCat.{v} F R := rfl` appended to the file: outcome `compiled`. With `PushforwardZeroMonoidal` added to the imports, `example ... : (pushforward₀.{u} F R).Monoidal := inferInstance` found the existing instance `PresheafOfModules.instMonoidal...Pushforward₀OfCommRingCat` (only error: example needs `noncomputable`), so moving the instance to the new name loses nothing. content_search: `pushforward₀OfCommRingCat` is used only in Pushforward.lean:71 (definition) and PushforwardZeroMonoidal.lean:33."
+  },
+  {
+    "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "claim": "The file imports `Presheaf.Pullback` (which pulls in Generator, Abelian, EpiMono, ShortComplex.Exact, PartialAdjoint), but `PresheafOfModulesOfCommRing` and the whole `Basic` section (`mk`, `obj`, `map`, `mkHom`, `isoMk`, `unit`, `restrictScalars`) need only `Presheaf.ChangeOfRings`; the files that currently spell `PresheafOfModules.{v} (R ⋙ forget₂ _ _)` (Presheaf/Monoidal.lean, Differentials/Presheaf.lean, Stalk.lean, PushforwardZeroMonoidal.lean) import only `Presheaf`/`Pushforward`, so they cannot adopt the new abbrev without a much heavier import.",
+    "requested_change": "Split the file: put `PresheafOfModulesOfCommRing` and the `Basic` section in a module importing only `Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings` (or into `Presheaf/ChangeOfRings.lean` itself), and keep only the `PushforwardPullback` section behind the `Presheaf.Pullback` import (or place `pushforward₀`/`pushforward` in `Pushforward.lean` and `pullback`/`pullbackPushforwardAdjunction` in `Pullback.lean`).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing lines 8-120 with the same file but import `Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings` and the `PushforwardPullback` section deleted: outcome `compiled`, no warnings. Imports read with content_search: Monoidal.lean imports Presheaf.Colimits + Monoidal.Closed; Differentials/Presheaf.lean and Stalk.lean import `ModuleCat.Presheaf`; Generator.lean (imported by Pullback) imports Abelian, EpiMono, Free, ShortComplex.Exact, Elements, Generator.Basic."
+  },
+  {
+    "target": "PresheafOfModulesOfCommRing.map",
+    "claim": "Because `M.map` on `M : PresheafOfModulesOfCommRing R` now elaborates to the new head symbol `PresheafOfModulesOfCommRing.map`, the existing `PresheafOfModules.map_comp`/`map_id` no longer rewrite with `rw`, and `simp only [PresheafOfModules.map_comp]` rewrites into the `(R ⋙ forget₂ _ _).map f` form the abbrevs are meant to avoid; the PR adds `obj`/`map` with none of the basic API stated in the `R.map` form.",
+    "requested_change": "Add `lemma map_id (F : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : F.map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _ := PresheafOfModules.map_id _ _` and `@[reassoc] lemma map_comp ... : F.map (f ≫ g) = F.map f ≫ (ModuleCat.restrictScalars _).map (F.map g) ≫ (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _ := PresheafOfModules.map_comp _ _ _` after `map`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with an example `M.map (f ≫ g) = M.map f ≫ ... := by rw [PresheafOfModules.map_comp]` for `M : PresheafOfModulesOfCommRing.{v} R`: error `Tactic rewrite failed: Did not find an occurrence of the pattern PresheafOfModules.map ?self (?f ≫ ?g)`. `simp only [PresheafOfModules.map_comp]` on the same goal left `... (RingCat.Hom.hom ((R ⋙ forget₂ CommRingCat RingCat).map f)) ...` against `CommRingCat.Hom.hom (R.map f)` unsolved. Inserting the two lemmas above after `map` (with `@[reassoc]`) and then `rw [map_comp]` on that goal: outcome `compiled`."
+  },
+  {
+    "target": "PresheafOfModulesOfCommRing.mk",
+    "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+    "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+    "severity": "advisory",
+    "evidence": "Base Presheaf.lean:48-55 (`map_id ... := by cat_disch`, `map_comp ... := by cat_disch`) and :98-100 (`naturality ... := by cat_disch`); OfCommRing.lean:73 `isoMk` has `:= by cat_disch`. lean_verify_edit replacing `PresheafOfModulesOfCommRing.mk` with the autoParam version: `compiled`; replacing `PresheafOfModulesOfCommRing.mkHom` with `naturality ... := by cat_disch`: `compiled`."
+  },
+  {
+    "target": "module_doc in Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "claim": "The module docstring title `# Modules over presheaves commutative rings` is missing \"of\", and the docstring never names the declaration the file introduces.",
+    "requested_change": "Change the title to `# Presheaves of modules over presheaves of commutative rings` and mention `PresheafOfModulesOfCommRing R` (an abbreviation for `PresheafOfModules (R ⋙ forget₂ _ _)`) in the body.",
+    "severity": "advisory",
+    "evidence": "OfCommRing.lean:11 reads `# Modules over presheaves commutative rings`; lines 13-15 describe \"short names\" without naming `PresheafOfModulesOfCommRing`."
+  },
+  {
+    "target": "open in Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "claim": "`open CategoryTheory Functor Limits` opens `Limits`, which nothing in the file uses.",
+    "requested_change": "Replace line 22 with `open CategoryTheory Functor`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing line 22 with `open CategoryTheory Functor`: outcome `compiled`, no errors, no warnings."
+  },
+  {
+    "target": "PresheafOfModulesOfCommRing.unit",
+    "claim": "`unit` rebinds `(R : Cᵒᵖ ⥤ CommRingCat.{u})` although `R` is already the section variable of `section Basic`, shadowing it instead of making it explicit.",
+    "requested_change": "Write `variable (R) in` before the docstring and drop the binder: `noncomputable abbrev unit : PresheafOfModulesOfCommRing.{u} R := PresheafOfModules.unit (R ⋙ forget₂ _ _)`.",
+    "severity": "advisory",
+    "evidence": "OfCommRing.lean:33 declares `{R : Cᵒᵖ ⥤ CommRingCat.{u}}`; line 77 rebinds `(R : ...)`. lean_verify_edit replacing lines 76-79 with the `variable (R) in` form plus `example : unit R = PresheafOfModules.unit (R ⋙ forget₂ _ _) := rfl`: outcome `compiled` (R stays explicit, as in base `PresheafOfModules.unit`)."
+  }
+]

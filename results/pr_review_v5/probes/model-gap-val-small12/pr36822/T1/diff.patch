@@ -1,0 +1,172 @@
+diff --git a/Mathlib/Order/Filter/AtTopBot/Disjoint.lean b/Mathlib/Order/Filter/AtTopBot/Disjoint.lean
+--- a/Mathlib/Order/Filter/AtTopBot/Disjoint.lean
++++ b/Mathlib/Order/Filter/AtTopBot/Disjoint.lean
+@@ -22,28 +22,22 @@ open Set
+ 
+ namespace Filter
+ 
++@[to_dual disjoint_atTop_principal_Iio]
+ theorem disjoint_atBot_principal_Ioi [Preorder α] (x : α) : Disjoint atBot (𝓟 (Ioi x)) :=
+   disjoint_of_disjoint_of_mem (Iic_disjoint_Ioi le_rfl) (Iic_mem_atBot x) (mem_principal_self _)
+ 
+-theorem disjoint_atTop_principal_Iio [Preorder α] (x : α) : Disjoint atTop (𝓟 (Iio x)) :=
+-  @disjoint_atBot_principal_Ioi αᵒᵈ _ _
+-
++@[to_dual disjoint_atBot_principal_Ici]
+ theorem disjoint_atTop_principal_Iic [Preorder α] [NoTopOrder α] (x : α) :
+     Disjoint atTop (𝓟 (Iic x)) :=
+   disjoint_of_disjoint_of_mem (Iic_disjoint_Ioi le_rfl).symm (Ioi_mem_atTop x)
+     (mem_principal_self _)
+ 
+-theorem disjoint_atBot_principal_Ici [Preorder α] [NoBotOrder α] (x : α) :
+-    Disjoint atBot (𝓟 (Ici x)) :=
+-  @disjoint_atTop_principal_Iic αᵒᵈ _ _ _
+-
++@[to_dual disjoint_pure_atBot]
+ theorem disjoint_pure_atTop [Preorder α] [NoTopOrder α] (x : α) : Disjoint (pure x) atTop :=
+   Disjoint.symm <| (disjoint_atTop_principal_Iic x).mono_right <| le_principal_iff.2 <|
+     mem_pure.2 self_mem_Iic
+ 
+-theorem disjoint_pure_atBot [Preorder α] [NoBotOrder α] (x : α) : Disjoint (pure x) atBot :=
+-  @disjoint_pure_atTop αᵒᵈ _ _ _
+-
++@[to_dual disjoint_atTop_atBot]
+ theorem disjoint_atBot_atTop [PartialOrder α] [Nontrivial α] :
+     Disjoint (atBot : Filter α) atTop := by
+   rcases exists_pair_ne α with ⟨x, y, hne⟩
+@@ -53,7 +47,4 @@ theorem disjoint_atBot_atTop [PartialOrder α] [Nontrivial α] :
+   · refine disjoint_of_disjoint_of_mem ?_ (Iic_mem_atBot y) (Ici_mem_atTop x)
+     exact Iic_disjoint_Ici.2 hle
+ 
+-theorem disjoint_atTop_atBot [PartialOrder α] [Nontrivial α] : Disjoint (atTop : Filter α) atBot :=
+-  disjoint_atBot_atTop.symm
+-
+ end Filter
+diff --git a/Mathlib/Order/Interval/Set/Disjoint.lean b/Mathlib/Order/Interval/Set/Disjoint.lean
+--- a/Mathlib/Order/Interval/Set/Disjoint.lean
++++ b/Mathlib/Order/Interval/Set/Disjoint.lean
+@@ -36,11 +36,11 @@ section Preorder
+ 
+ variable [Preorder α] {a b c : α}
+ 
+-@[simp]
++@[to_dual (attr := simp) Ici_disjoint_Iio]
+ theorem Iic_disjoint_Ioi (h : a ≤ b) : Disjoint (Iic a) (Ioi b) :=
+   disjoint_left.mpr fun _ ha hb => (h.trans_lt hb).not_ge ha
+ 
+-@[simp]
++@[to_dual (attr := simp) Ioi_disjoint_Iic]
+ theorem Iio_disjoint_Ici (h : a ≤ b) : Disjoint (Iio a) (Ici b) :=
+   disjoint_left.mpr fun _ ha hb => (h.trans_lt' ha).not_ge hb
+ 
+@@ -56,99 +56,59 @@ theorem Ioc_disjoint_Ioc_of_le {d : α} (h : b ≤ c) : Disjoint (Ioc a b) (Ioc
+ theorem Ico_disjoint_Ico_same : Disjoint (Ico a b) (Ico b c) :=
+   disjoint_left.mpr fun _ hab hbc => hab.2.not_ge hbc.1
+ 
+-@[simp]
++@[to_dual (attr := simp) Iic_disjoint_Ici]
+ theorem Ici_disjoint_Iic : Disjoint (Ici a) (Iic b) ↔ ¬a ≤ b := by
+   rw [Set.disjoint_iff_inter_eq_empty, Ici_inter_Iic, Icc_eq_empty_iff]
+ 
+-@[simp]
+-theorem Iic_disjoint_Ici : Disjoint (Iic a) (Ici b) ↔ ¬b ≤ a :=
+-  disjoint_comm.trans Ici_disjoint_Iic
+-
+ @[simp]
+ theorem Ioc_disjoint_Ioi (h : b ≤ c) : Disjoint (Ioc a b) (Ioi c) :=
+   disjoint_left.mpr (fun _ hx hy ↦ (hx.2.trans h).not_gt hy)
+ 
+ theorem Ioc_disjoint_Ioi_same : Disjoint (Ioc a b) (Ioi b) :=
+   Ioc_disjoint_Ioi le_rfl
+ 
++@[to_dual Iio_disjoint_Ioi_of_not_lt]
+ theorem Ioi_disjoint_Iio_of_not_lt (h : ¬a < b) : Disjoint (Ioi a) (Iio b) :=
+   disjoint_left.mpr fun _ hx hy ↦ h (hx.trans hy)
+ 
++@[to_dual Iio_disjoint_Ioi_of_le]
+ theorem Ioi_disjoint_Iio_of_le (h : a ≤ b) : Disjoint (Ioi b) (Iio a) :=
+   Ioi_disjoint_Iio_of_not_lt (not_lt_of_ge h)
+ 
+-@[simp]
++@[to_dual Iio_disjoint_Ioi_same]
+ theorem Ioi_disjoint_Iio_same : Disjoint (Ioi a) (Iio a) :=
+   Ioi_disjoint_Iio_of_le le_rfl
+ 
+-@[simp]
++@[to_dual Iio_disjoint_Ioi_iff]
+ theorem Ioi_disjoint_Iio_iff [DenselyOrdered α] : Disjoint (Ioi a) (Iio b) ↔ ¬a < b :=
+   ⟨fun h hab ↦ (exists_between hab).elim
+     fun _ hc ↦ h.notMem_of_mem_left hc.left hc.right,
+     Ioi_disjoint_Iio_of_not_lt⟩
+ 
+-theorem Iio_disjoint_Ioi_of_not_lt (h : ¬a < b) : Disjoint (Iio b) (Ioi a) :=
+-  disjoint_comm.mp (Ioi_disjoint_Iio_of_not_lt h)
+-
+-theorem Iio_disjoint_Ioi_of_le (h : a ≤ b) : Disjoint (Iio a) (Ioi b) :=
+-  disjoint_comm.mp (Ioi_disjoint_Iio_of_le h)
+-
+-@[simp]
+-theorem Iio_disjoint_Ioi_same : Disjoint (Iio a) (Ioi a) :=
+-  Iio_disjoint_Ioi_of_le le_rfl
+-
+-@[simp]
+-theorem Iio_disjoint_Ioi_iff [DenselyOrdered α] : Disjoint (Iio a) (Ioi b) ↔ ¬b < a :=
+-  disjoint_comm.trans Ioi_disjoint_Iio_iff
+-
+-@[simp]
++@[to_dual (attr := simp)]
+ theorem iUnion_Iic : ⋃ a : α, Iic a = univ :=
+   iUnion_eq_univ_iff.2 fun x => ⟨x, self_mem_Iic⟩
+ 
+-@[simp]
+-theorem iUnion_Ici : ⋃ a : α, Ici a = univ :=
+-  iUnion_eq_univ_iff.2 fun x => ⟨x, self_mem_Ici⟩
+-
+-@[simp]
++@[to_dual (attr := simp) iUnion_Icc_left]
+ theorem iUnion_Icc_right (a : α) : ⋃ b, Icc a b = Ici a := by
+   simp only [← Ici_inter_Iic, ← inter_iUnion, iUnion_Iic, inter_univ]
+ 
+-@[simp]
++@[to_dual (attr := simp) iUnion_Ico_left]
+ theorem iUnion_Ioc_right (a : α) : ⋃ b, Ioc a b = Ioi a := by
+   simp only [← Ioi_inter_Iic, ← inter_iUnion, iUnion_Iic, inter_univ]
+ 
+-@[simp]
+-theorem iUnion_Icc_left (b : α) : ⋃ a, Icc a b = Iic b := by
+-  simp only [← Ici_inter_Iic, ← iUnion_inter, iUnion_Ici, univ_inter]
+-
+-@[simp]
+-theorem iUnion_Ico_left (b : α) : ⋃ a, Ico a b = Iio b := by
+-  simp only [← Ici_inter_Iio, ← iUnion_inter, iUnion_Ici, univ_inter]
+-
+-@[simp]
++@[to_dual (attr := simp)]
+ theorem iUnion_Iio [NoMaxOrder α] : ⋃ a : α, Iio a = univ :=
+   iUnion_eq_univ_iff.2 exists_gt
+ 
+-@[simp]
+-theorem iUnion_Ioi [NoMinOrder α] : ⋃ a : α, Ioi a = univ :=
+-  iUnion_eq_univ_iff.2 exists_lt
+-
+-@[simp]
++@[to_dual (attr := simp) iUnion_Ioc_left]
+ theorem iUnion_Ico_right [NoMaxOrder α] (a : α) : ⋃ b, Ico a b = Ici a := by
+   simp only [← Ici_inter_Iio, ← inter_iUnion, iUnion_Iio, inter_univ]
+ 
+-@[simp]
++@[to_dual (attr := simp) iUnion_Ioo_left]
+ theorem iUnion_Ioo_right [NoMaxOrder α] (a : α) : ⋃ b, Ioo a b = Ioi a := by
+   simp only [← Ioi_inter_Iio, ← inter_iUnion, iUnion_Iio, inter_univ]
+ 
+-@[simp]
+-theorem iUnion_Ioc_left [NoMinOrder α] (b : α) : ⋃ a, Ioc a b = Iic b := by
+-  simp only [← Ioi_inter_Iic, ← iUnion_inter, iUnion_Ioi, univ_inter]
+-
+-@[simp]
+-theorem iUnion_Ioo_left [NoMinOrder α] (b : α) : ⋃ a, Ioo a b = Iio b := by
+-  simp only [← Ioi_inter_Iio, ← iUnion_inter, iUnion_Ioi, univ_inter]
+-
+ end Preorder
+ 
+ section LinearOrder

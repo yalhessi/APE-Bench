@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean","line_start":941,"line_end":941,"replacement":"\n/-- control -/\ndef controlNoncomputableCheck : Nat := Classical.choice ⟨0⟩\n"}

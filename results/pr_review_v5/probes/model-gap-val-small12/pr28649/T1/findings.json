@@ -1,0 +1,65 @@
+[
+ {
+  "target": "MeasureTheory.tendsto_of_uncrossing_lt_top (docstring, Mathlib/Probability/Martingale/Convergence.lean:133)",
+  "claim": "The PR replaces 'bounded liminfs' with 'bounded limit inferiors', which is not the standard plural: the plural of the postpositive 'limit inferior' is 'limits inferior'. The original 'liminfs' was not a typo either: Mathlib uses it in prose elsewhere (Order/LiminfLimsup.lean:11 '# liminfs and limsups of functions and filters', MeasureTheory/Constructions/BorelSpace/Order.lean:34 'Countable liminfs and limsups').",
+  "requested_change": "Write 'with bounded upcrossings and bounded limits inferior is convergent', or revert to the original 'bounded liminfs'.",
+  "severity": "advisory",
+  "evidence": "content_search over target/Mathlib for 'limits? inferiors?|liminfs|limsups' finds 'limit inferiors' only in this PR's line. 'liminfs' appears in LiminfLimsup.lean:11 and BorelSpace/Order.lean:34, and the singular 'limit inferior' in MeanValue.lean and Deriv/Slope.lean. zulip_search found no convention thread. Spliced docstring (with the rename of finding 5) checked with lean_verify_edit line mode 133-148: outcome compiled."
+ },
+ {
+  "target": "module docstring of Mathlib/Probability/Moments/Basic.lean (Main results)",
+  "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' on lines 25 and 27, but line 30 of the same list still says 'such that the cgf exists'. So the docstring now spells the abbreviation two ways. Elsewhere `Probability/Moments` writes it lowercase in prose: ComplexMGF.lean:18,20,21,32 'the mgf', MGFAnalytic.lean:20, SubGaussian.lean:32,107,110, and 'pdf' in Distributions/*. That lowercase spelling refers to the Lean definitions `mgf`/`cgf`.",
+  "requested_change": "Use one spelling throughout the list. Either revert lines 25 and 27 to the area's lowercase 'mgfs'/'cgfs' (or write `mgf`s/`cgf`s), or keep the capitals and change line 30 to 'such that the CGF exists'.",
+  "severity": "advisory",
+  "evidence": "file_read of Basic.lean lines 1-34. content_search '(the|their|an?) (mgf|cgf|MGF|CGF)s?' over target/Mathlib/Probability: the only capitalised hits are the two lines this PR changes, and every other hit is lowercase (4 files). On Zulip the area maintainer (Rémy Degenne) writes 'mgf' lowercase. The variant with line 30 capitalised (plus the line-15 spacing fix) was checked with lean_verify_edit lines 15-30: outcome compiled."
+ },
+ {
+  "target": "module docstring of Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (Main statements)",
+  "claim": "The PR fixes 'measurablity' in this module docstring, but leaves two factual errors in its Main statements entry for the composition. (1) It names `ProbabilityTheory.integral_comp`, which does not exist: the theorem is declared inside `namespace Kernel` at line 417, so it is `ProbabilityTheory.Kernel.integral_comp`. (2) Its displayed formula uses the Lebesgue integral `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`, although the file and that theorem are about the Bochner integral (`∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`). The title also says 'the composition-products' where the body says 'the composition-product'.",
+  "requested_change": "Change the bullet to: `* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.` In the title, replace 'the composition-products of two kernels' with 'the composition-product of two kernels'.",
+  "severity": "advisory",
+  "evidence": "declaration_search 'ProbabilityTheory.integral_comp' returned no declaration, base or PR. 'ProbabilityTheory.Kernel.integral_comp' is declared at IntegralCompProd.lean:417 with statement `∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a` (file_read 400-449). The corrected docstring was checked with lean_verify_edit line mode 10-31: outcome compiled, no new warnings."
+ },
+ {
+  "target": "'Variant of the upcrossing estimate' module docstring in Mathlib/Probability/Martingale/Upcrossing.lean (lines 685-708)",
+  "claim": "The PR edits this docstring ('left-hand side'), but its formulas misstate the code. (1) The measurability identity reads `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}`, which is circular. It then says $U_N(a,b)$ is measurable 'since $U_N(a, b)$ is a stopping time'. But `upcrossingsBefore_eq_sum` sums the indicators of `{n | upperCrossingTime a b f N n ω < N}`, i.e. of $\\{\\tau_i < N\\}$, and the stopping time used is `upperCrossingTime` (`Adapted.isStoppingTime_upperCrossingTime`). (2) The target inequality is written with RHS `\\sup_N \\mathbb{E}[f_N]`, whereas `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part` proves the bound by `⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺)`, i.e. $\\sup_N \\mathbb{E}[(f_N - a)^+]$.",
+  "requested_change": "In this docstring, replace `\\mathbf{1}_{\\{U_N(a, b) < N\\}}` with `\\mathbf{1}_{\\{\\tau_i < N\\}}`. Replace '$U_N(a, b)$ is measurable as $\\{U_N(a, b) < N\\}$ is a measurable set since $U_N(a, b)$ is a stopping time' with '$U_N(a, b)$ is measurable as $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a stopping time'. Change `\\sup_N \\mathbb{E}[f_N]` to `\\sup_N \\mathbb{E}[(f_N - a)^+]`.",
+  "severity": "advisory",
+  "evidence": "file_read of Upcrossing.lean 685-759 and 1-80, where τ is defined in the Proof outline as the upper crossing time. content_search found `upcrossingsBefore_eq_sum` (line 711: sum of `{n | upperCrossingTime a b f N n ω < N}.indicator 1 i`), `Adapted.isStoppingTime_upperCrossingTime` (line 325), and `mul_lintegral_upcrossings_le_lintegral_pos_part` (line 783, RHS `⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺) ∂μ`). The corrected docstring was checked with lean_verify_edit line mode 689-706: outcome compiled."
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_uncrossing_lt_top",
+  "claim": "The PR fixes the docstring of this theorem but not the typo in its name: 'uncrossing' should be 'upcrossings'. The hypothesis is `upcrossings a b f ω < ∞`, and the sibling names in the file are `not_frequently_of_upcrossings_lt_top` and `upcrossings_eq_top_of_frequently_lt`. The name is used once, in `Submartingale.exists_ae_tendsto_of_bdd`.",
+  "requested_change": "Rename to `tendsto_of_upcrossings_lt_top`. Add `@[deprecated (since := \"2025-08-19\")] alias tendsto_of_uncrossing_lt_top := tendsto_of_upcrossings_lt_top`, and update the call in `Submartingale.exists_ae_tendsto_of_bdd`. This can be done here or in a follow-up chore PR.",
+  "severity": "advisory",
+  "evidence": "declaration_search 'MeasureTheory.tendsto_of_upcrossings_lt_top' returned none, so there is no clash. content_search finds 'tendsto_of_uncrossing_lt_top' only at Convergence.lean:138 (declaration) and :191 (use). lean_verify_edit line mode 133-148 with the renamed theorem plus the deprecated alias: outcome compiled. The only new warning is the deprecation at the old call site, which the requested update removes."
+ },
+ {
+  "target": "module docstring of Mathlib/Probability/Martingale/Convergence.lean (Main results)",
+  "claim": "This typo-fix PR edits two other docstrings in this file but leaves three typos in its Main results list. Lines 32, 35 and 38 read 'part b the L¹ martingale convergence theorem' and 'part c the L¹ martingale convergence theorem', each missing 'of'; line 28 has the correct 'part a of the L¹ martingale convergence theorem'.",
+  "requested_change": "Change 'part b the' to 'part b of the' (line 32) and 'part c the' to 'part c of the' (lines 35 and 38), re-wrapping to the 100-character limit.",
+  "severity": "advisory",
+  "evidence": "file_read of Convergence.lean 1-42. lean_verify_edit line mode 32-40 with the corrected bullets: outcome compiled, no new warnings (line length fine)."
+ },
+ {
+  "target": "'L¹ martingale convergence theorem' section docstring in Mathlib/Probability/Martingale/Convergence.lean (lines 244-305)",
+  "claim": "The LaTeX in this docstring, in the file the PR is fixing, has typos. Line 267 `\\|\\|f_m - g\\|_1` has a doubled `\\|`. Lines 279 and 284 have `\\mathbb|g|` with `{E}` missing. Line 294 has `\\mathbb{E}[g \\mid \\mathcal{F}_n = ...` with the closing `]` missing. 'the usual literary definition' (line 261) should be 'the usual definition in the literature'.",
+  "requested_change": "Change `\\le \\|\\|f_m - g\\|_1` to `\\le \\|f_m - g\\|_1`. Change both `\\mathbb|g|` to `\\mathbb{E}|g|`. Change `\\mathbb{E}[g \\mid \\mathcal{F}_n = \\mathbb{E}[h \\mid \\mathcal{F}_n]` to `\\mathbb{E}[g \\mid \\mathcal{F}_n] = \\mathbb{E}[h \\mid \\mathcal{F}_n]`. Change 'usual literary definition' to 'usual definition in the literature'.",
+  "severity": "advisory",
+  "evidence": "file_read of Convergence.lean 244-305 shows each quoted fragment verbatim."
+ },
+ {
+  "target": "module docstring of Mathlib/Probability/Moments/Basic.lean (Main definitions, line 15)",
+  "claim": "The PR edits this module docstring, but line 15 still has no space after the colon ('`ProbabilityTheory.centralMoment X p μ`:`p`th central moment'). The neighbouring bullets all use ': '.",
+  "requested_change": "Change '`ProbabilityTheory.centralMoment X p μ`:`p`th' to '`ProbabilityTheory.centralMoment X p μ`: `p`th'.",
+  "severity": "advisory",
+  "evidence": "file_read of Basic.lean 1-34. The fix (lines 15-30 spliced) was checked with lean_verify_edit: outcome compiled, and line 15 stays within 100 characters."
+ },
+ {
+  "target": "module docstring of Mathlib/Probability/Moments/Variance.lean (Main results, line 34)",
+  "claim": "The PR fixes the Popoviciu docstring in this file but leaves the module docstring's matching bullet with a missing space: 'is at most`((b - a) / 2) ^ 2`'.",
+  "requested_change": "Change 'at most`((b - a) / 2) ^ 2`' to 'at most `((b - a) / 2) ^ 2`' on line 34.",
+  "severity": "advisory",
+  "evidence": "file_read of Variance.lean 1-60. lean_verify_edit line mode 34 with the space inserted: outcome compiled, no new warnings."
+ }
+]

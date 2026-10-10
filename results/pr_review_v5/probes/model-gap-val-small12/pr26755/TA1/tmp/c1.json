@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Ring/Pointwise/Set.lean","line_start":30,"line_end":30,"replacement":"protected def hasDistribNeg [Mul α] [HasDistribNeg α] : HasDistribNeg (Set α) where"}

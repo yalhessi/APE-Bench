@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Martingale/Convergence.lean", "line_start": 101, "line_end": 103, "replacement": "submartingale converges to its `limitProcess` almost everywhere.\n-/"}

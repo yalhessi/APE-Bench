@@ -1,0 +1,79 @@
+[
+ {
+  "target": "UniqueDiffWithinAt.mono",
+  "claim": "`UniqueDiffWithinAt.mono` (L441-443) sits after the PR's new `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (L433), so it now assumes both, but monotonicity in the set needs no continuity at all: the span of the tangent cone grows by `tangentConeAt_mono` (already TVS, no continuity) and `x ∈ closure s` grows by `closure_mono`. Routing it through `mono_nhds` makes a PR that generalizes these lemmas leave one of them stated more narrowly than it has to be.",
+  "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and prove it directly:\n```lean\ntheorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) :\n    UniqueDiffWithinAt 𝕜 t x :=\n  ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (line mode, L430-443 replaced by congr_pt, then `mono` with the proof above, then the `variable` line, then `mono_nhds`): outcome `compiled`, no errors, no warnings; the rest of the file (mono_closure, uniqueDiffWithinAt_Ici, ...) still compiles."
+ },
+ {
+  "target": "tangentConeAt.lim_zero",
+  "claim": "The PR's new proof of `tangentConeAt.lim_zero` names an auxiliary `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n` whose proof is a one-line term, and uses it only once, in the next line `apply Tendsto.congr' this`.",
+  "requested_change": "Inline the `have` at its only use:\n```lean\n  refine .congr' ((eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦\n    inv_smul_smul₀ hn (d n)) ?_\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with declaration_name=tangentConeAt.lim_zero and this body: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "tangentConeAt.lim_zero",
+  "claim": "The tail of `tangentConeAt.lim_zero`, `apply Tendsto.congr' this` / `rw [tendsto_norm_atTop_iff_cobounded] at hc` / `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`, is three tactic calls that one `simpa` performs: the `rw ... at hc` is a single-use conversion, and the `congr'` step is a rewrite `simpa` can do itself.",
+  "requested_change": "Merge the three calls into one `simpa`:\n```lean\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [← tendsto_congr' this, zero_smul] using\n    (tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.1 hc)).smul hd\n```\n(or, alternatively, `rw [tendsto_norm_atTop_iff_cobounded] at hc` first and get the eventual inequality from `hc.eventually_ne_cobounded 0`).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on tangentConeAt.lim_zero with this body: `compiled`, no errors or warnings. The variant `rw [...] at hc; have := (hc.eventually_ne_cobounded 0).mono ...; simpa only [← tendsto_congr' this, zero_smul] using (tendsto_inv₀_cobounded.comp hc).smul hd` also `compiled`. precedent_search: the same shape was suggested by ADedecker on this lemma in PR #21065."
+ },
+ {
+  "target": "tangentConeAt.lim_zero",
+  "claim": "The PR rewrites `tangentConeAt.lim_zero`, and its new proof uses `fun n hn ↦`, but its statement keeps `=>`: `(hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y))`, so the two arrow styles are mixed within one declaration.",
+  "requested_change": "Write the statement's lambdas with `↦`: `(hc : Tendsto (fun n ↦ ‖c n‖) l atTop) (hd : Tendsto (fun n ↦ c n • d n) l (𝓝 y))`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on tangentConeAt.lim_zero with the `↦` statement: outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "mem_tangentConeAt_of_openSegment_subset",
+  "claim": "`mem_tangentConeAt_of_openSegment_subset` (L242) and `mem_tangentConeAt_of_segment_subset` (L257) stay in the `Normed` section with `[NormedAddCommGroup G] [NormedSpace ℝ G]`, but the proof uses only the module structure: it applies `mem_tangentConeAt_of_pow_smul`, which already lives in the TVS section and has no continuity assumption, plus `openSegment_eq_image` and algebra. That is exactly the kind of lemma the PR sets out to move to TVS.",
+  "requested_change": "Move both lemmas (and their deprecated aliases) into the `TVS` section of `TangentCone`, stated for `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`, and drop the then-unused `variable [NormedAddCommGroup G] [NormedSpace ℝ G]` from `section Normed`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on mem_tangentConeAt_of_openSegment_subset restated with `{V : Type*} [AddCommGroup V] [Module ℝ V] [TopologicalSpace V] {s : Set V} {x y : V}`, proof unchanged: `compiled`, no errors. A line-mode edit (L240-615) generalizing both segment lemmas this way also `compiled`, and so did every use downstream in the file."
+ },
+ {
+  "target": "uniqueDiffWithinAt_convex",
+  "claim": "`uniqueDiffWithinAt_convex` and `uniqueDiffOn_convex` (section `RealNormed`, L595-613) assume a real normed space, but everything the proof uses holds in a real topological vector space: `Submodule.eq_top_of_nonempty_interior'`, `Convex.openSegment_closure_interior_subset_interior`, `isOpenMap_sub_right`, and the segment lemma, once that is generalized.",
+  "requested_change": "After generalizing `mem_tangentConeAt_of_openSegment_subset`, change `section RealNormed`'s variables to `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G] [IsTopologicalAddGroup G] [ContinuousSMul ℝ G]` (and rename the section accordingly, e.g. `RealTVS`).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit line mode L240-615: the two segment lemmas generalized to a `[TopologicalSpace V]` real module, and `variable [AddCommGroup G] [Module ℝ G] [TopologicalSpace G] [IsTopologicalAddGroup G] [ContinuousSMul ℝ G]` in `RealNormed`. Outcome `compiled`, no errors or warnings, and uniqueDiffOn_Ici/Icc/... below still compile. Generalizing the convex lemma alone, with the segment lemma left normed, hit a whnf heartbeat timeout, so the two must move together."
+ },
+ {
+  "target": "tangentConeAt_mono_field",
+  "claim": "`tangentConeAt_mono_field`, `UniqueDiffWithinAt.mono_field` and `UniqueDiffOn.mono_field` (L548-586) stay in the UniqueDiff `Normed` section, and the PR re-adds that section's `variable {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebra 𝕜 𝕜']` and `[NormedSpace 𝕜' E] [IsScalarTower 𝕜 𝕜' E]` lines just for them. Yet their proofs never use a norm on `E`, only the module structures, the scalar tower and `algebraMap_cobounded_le_cobounded` on the fields. Their docstrings are also inaccurate: they say \"`E` is a normed vector space\", `tangentConeAt_mono_field`'s says \"Given `x ∈ s`\" with no such hypothesis, and `UniqueDiffOn.mono_field`'s says \"the larger field `𝕜`\" where it means `𝕜'`.",
+  "requested_change": "Move the three `mono_field` lemmas to a TVS section with `[AddCommGroup E] [Module 𝕜 E] [Module 𝕜' E] [IsScalarTower 𝕜 𝕜' E] [TopologicalSpace E]` (no continuity needed). Remove `[NormedSpace 𝕜' E] [IsScalarTower 𝕜 𝕜' E]` from the Normed section's `variable`, and fix the docstrings: drop \"normed\" and \"Given `x ∈ s`\", and write `𝕜'` for the larger field.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit line mode L548-586, replaced by a section with `variable {V : Type*} [AddCommGroup V] [Module 𝕜 V] [Module 𝕜' V] [IsScalarTower 𝕜 𝕜' V] [TopologicalSpace V] {s : Set V} {x : V}` and the three proofs unchanged: outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "tangentConeAt_subset_zero",
+  "claim": "`tangentConeAt_subset_zero` (L298) and `UniqueDiffWithinAt.accPt` (L308) remain in the `Normed` section, although the proof uses only `tangentConeAt.lim_zero` (now TVS), `tendsto_const_nhds.add` (`ContinuousAdd`) and `tendsto_nhds_unique` (`T2Space`), so they hold in any Hausdorff TVS.",
+  "requested_change": "Move `tangentConeAt_subset_zero` and `UniqueDiffWithinAt.accPt` into the TVS section after `variable [ContinuousAdd E]`, adding `[T2Space E]` to them.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit line mode L298-312, both restated for `{V : Type*} [AddCommGroup V] [Module 𝕜 V] [TopologicalSpace V] [ContinuousAdd V] [ContinuousSMul 𝕜 V] [T2Space V]` with unchanged proofs: outcome `compiled`, no errors, and `uniqueDiffWithinAt_iff_accPt` downstream still compiles."
+ },
+ {
+  "target": "section Normed (TangentCone.lean L149, L479)",
+  "claim": "The two `section Normed` commands the PR adds (L149, after `end TVS` at L147, and L479, after `end TVS` at L477) are each followed directly by a `variable` line, with no blank line between the `section` command and the following command.",
+  "requested_change": "Insert a blank line after each `section Normed`, i.e. `section Normed`, then an empty line, then the `variable` block.",
+  "severity": "advisory",
+  "evidence": "Quoted L149-150: `section Normed` / `variable [NormedAddCommGroup E] [NormedSpace 𝕜 E]`, and L479-480: `section Normed` / `variable {𝕜' : Type*} ...`. lean_verify_edit line mode L147-153 with the blank line inserted: `compiled`."
+ },
+ {
+  "target": "variable {x y : E} {s t : Set E} (TangentCone.lean L85, L153, L414, L483)",
+  "claim": "Re-splitting the TVS and Normed sections, the PR re-declares `variable {x y : E} {s t : Set E}` in each new `section Normed` (L153, L483), on top of the copies in the TVS sections (L85, L414): four identical variable lines. They need only `E : Type*`, which is already a file-level variable at L76.",
+  "requested_change": "Declare `variable {x y : E} {s t : Set E}` once, right after `variable {E F G : Type*}` (L76), and delete the four per-section copies.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit line mode L76-483: added `variable {x y : E} {s t : Set E}` after L76 and removed the 4 copies. Outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "PR #29842 (title/description)",
+  "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+  "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+  "severity": "advisory",
+  "evidence": "pr.md: title as quoted, description `(not recoverable at review start)`; diff.patch shows the moved blocks."
+ }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "target": "isMulCommutative_mono",
+    "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` says that `IsMulCommutative` is antitone in the subobject (it passes DOWN to smaller subobjects), but the `_mono` suffix in Mathlib's naming convention means monotone. The PR's own title calls the lemma `isMulCommutative_anti`, so the code and the title disagree.",
+    "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (to_additive then generates `isAddCommutative_anti`), keeping the statement, docstrings and proof unchanged.",
+    "severity": "blocking",
+    "evidence": "Read the lemma at Mathlib/Algebra/Group/Subsemigroup/Defs.lean:350-356: hypothesis `h : s ≤ t` with `[IsMulCommutative t]` concludes `IsMulCommutative s`, i.e. the property moves from the larger to the smaller object. content_search for root-level `_anti` lemmas shows the convention for order-reversing statements, including Prop-valued ones of exactly this shape: `Nat.nth_mem_anti (hab : a ≤ b) (h : p (nth p b)) : p (nth p a)`, `nth_ne_zero_anti`, `dualAnnihilator_anti`, `einfsep_anti`, `closure_pow_anti`. declaration_search: neither `isMulCommutative_anti` nor any other monotonicity lemma for `IsMulCommutative` exists at the base, so the new name is free. naming_norm returned `subject_unresolved` (unmeasured), so the call rests on the mono/anti convention, not on a prefix census. lean_verify_edit replacing the declaration with `lemma isMulCommutative_anti ...` (same body) plus `example : @isAddCommutative_anti = @isAddCommutative_anti := rfl`: outcome `compiled`, no errors or warnings."
+  }
+]

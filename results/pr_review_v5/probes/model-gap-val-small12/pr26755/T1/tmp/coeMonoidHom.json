@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean", "declaration_name": "Finset.coeMonoidHom", "new_declaration": "@[to_additive \"The coercion from `Finset` to `set` as an `AddMonoidHom`.\"]\ndef coeMonoidHom : Finset \u03b1 \u2192* Set \u03b1 where\n  toFun := (\u2191)\n  map_one' := coe_one\n  map_mul' := coe_mul"}

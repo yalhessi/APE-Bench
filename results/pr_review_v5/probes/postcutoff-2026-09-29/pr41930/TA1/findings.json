@@ -1,0 +1,86 @@
+[
+ {
+  "target": "PR #41930 (title and description)",
+  "claim": "The description says the PR will \"name the minor premises according to their contents\", but the diff renames no minor premise: `one`, `inl_mul`, `inr_mul` (in `Monoid.Coprod.induction_on'`) and `inl`, `inr`, `mul` (in `Monoid.Coprod.induction_on`) are unchanged, and the only rename is the motive `C` -> `motive`. The title also calls these `theorem`s \"recursors\" (they are `elab_as_elim` induction principles), says \"name\" for a rename in two declarations, and uses the `fix` type for a bound-variable rename that fixes no bug.",
+  "requested_change": "Retitle to say exactly what changes, e.g. `chore(GroupTheory/Coprod): rename the motive of Coprod.induction_on and induction_on' to motive`, and replace the description with one accurate sentence, e.g. \"Rename the motive `C` of `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` (and their additive versions) to `motive`, as the naming convention for induction principles asks.\" Drop the clause about minor premises, or else actually rename some.",
+  "severity": "blocking",
+  "evidence": "diff.patch: the only lines changed replace `C` with `motive` in the two signatures (lines 196-199 and 209-211 of the PR's file). The minor-premise binders `(one : ...)`, `(inl_mul : ...)`, `(inr_mul : ...)`, `(inl : ...)`, `(inr : ...)` and `(mul : ...)` have the same names before and after. pr.md: the title is `fix(GroupTheory/Coprod): fix recursor argument name` and the description claims that the minor premises are renamed."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "`Monoid.Coprod.induction_on'` is a `theorem` (an induction principle) with no docstring, and its `@[to_additive (attr := elab_as_elim)]` passes no additive docstring. So neither it nor the generated `AddMonoid.Coprod.induction_on'` says what it proves, or how it differs from the unprimed `induction_on` (it is induction by left multiplication, starting from `1`).",
+  "requested_change": "Add a docstring and pass one to `to_additive`:\n```lean\n/-- Induction principle for `M ∗ N` by left multiplication: if `motive` holds for `1` and is\npreserved by left multiplication by `inl m` and by `inr n`, then it holds for every element. -/\n@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N` by left\naddition: if `motive` holds for `0` and is preserved by left addition of `inl m` and of `inr n`,\nthen it holds for every element. -/]\ntheorem induction_on' ...\n```",
+  "severity": "advisory",
+  "evidence": "Read via `file_read`: lines 195-196 are `@[to_additive (attr := elab_as_elim)]` / `theorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N)`, with no `/-- ... -/` before them. `lean_verify_edit`, line mode 195-206, with the docstrings above: outcome `compiled`, success true, no errors and no warnings."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "`Monoid.Coprod.induction_on` is a `theorem` (the main induction principle for `M ∗ N`, used by `PushoutI.induction_on` through `induction x using Coprod.induction_on with | inl | inr | mul`) with no docstring. Its `@[to_additive (attr := elab_as_elim)]` passes no additive docstring either, so `AddMonoid.Coprod.induction_on` is undocumented too.",
+  "requested_change": "Add a docstring and pass one to `to_additive`:\n```lean\n/-- Induction principle for `M ∗ N`: if `motive` holds for every `inl m` and every `inr n` and is\nclosed under multiplication, then it holds for every element. -/\n@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N`: if\n`motive` holds for every `inl m` and every `inr n` and is closed under addition, then it holds for\nevery element. -/]\ntheorem induction_on ...\n```",
+  "severity": "advisory",
+  "evidence": "Read via `file_read`: lines 208-209 are `@[to_additive (attr := elab_as_elim)]` / `theorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N)`, with no docstring. `content_search` finds its use at `PushoutI.lean:179`. `lean_verify_edit`, line mode 208-212, with the docstrings above: `compiled`, success true, no warnings."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "`Monoid.Coprod.induction_on'` is told apart from `Monoid.Coprod.induction_on` only by a prime, although it is a different principle: induction by left multiplication from `1`, with cases `one`, `inl_mul` and `inr_mul`. The indexed coproduct names the same principle descriptively: `Monoid.CoprodI.induction_left {motive : CoprodI M → Prop} (m : CoprodI M) (one : motive 1) (mul : ∀ {i} (m : M i) x, motive x → motive (of m * x))` (`CoprodI.lean:202`).",
+  "requested_change": "Rename `Monoid.Coprod.induction_on'` to `Monoid.Coprod.induction_left` (additive: `AddMonoid.Coprod.induction_left`), matching `Monoid.CoprodI.induction_left`. Keep `@[deprecated (since := ...)] alias induction_on' := induction_left` and `@[deprecated (since := ...)] alias _root_.AddMonoid.Coprod.induction_on' := AddMonoid.Coprod.induction_left`, and call `induction_left` in `induction_on`'s proof. This PR already rewrites the signature, so it can make the rename too, or leave it to a stated follow-up.",
+  "severity": "advisory",
+  "evidence": "`declaration_search Monoid.Coprod.induction_left`: no declaration at the base or in this PR. `content_search 'induction_on''` over GroupTheory: the only use of `Coprod.induction_on'` is `induction_on`'s own proof (`Coprod/Basic.lean:212`), so nothing downstream breaks. `file_read CoprodI.lean:201-214` shows the `induction_left` / `induction_on` pair. `lean_verify_edit`, line mode 195-212, with the rename, both deprecated aliases and the updated proof: `compiled`, success true, no warnings."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "The statement of `Monoid.Coprod.induction_on'` breaks its first line after `(m : M ∗ N)` (57 characters), although `(one : motive 1)` fits there: `theorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N) (one : motive 1)` is 74 characters. So the signature takes four lines where three suffice. This PR rewrites all four lines.",
+  "requested_change": "Join `(one : motive 1)` onto the first line:\n```lean\ntheorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N) (one : motive 1)\n    (inl_mul : ∀ m x, motive x → motive (inl m * x))\n    (inr_mul : ∀ n x, motive x → motive (inr n * x)) : motive m := by\n```\n(`inl_mul` and `inr_mul` together would be 101 characters, so they keep separate lines.)",
+  "severity": "advisory",
+  "evidence": "Line lengths computed from the PR's text: line 196 is 57 characters, and with `(one : motive 1)` joined it is 74. `lean_verify_edit`, line mode 195-212, with this layout (and the two-line `induction_on` below): `compiled`, success true, no warnings."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "The PR re-wraps `Monoid.Coprod.induction_on`'s statement onto three lines, breaking after `(m : M ∗ N)` at column 56 and after `(inr : ∀ n, motive (inr n))`. Neither break is forced by the 100-character limit: the statement fits on two lines of 84 and 97 characters.",
+  "requested_change": "Fill the lines and break only at the limit:\n```lean\ntheorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N) (inl : ∀ m, motive (inl m))\n    (inr : ∀ n, motive (inr n)) (mul : ∀ x y, motive x → motive y → motive (x * y)) : motive m :=\n```",
+  "severity": "advisory",
+  "evidence": "diff.patch hunk 2: the PR's new lines are `theorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N)` / `    (inl : ∀ m, motive (inl m)) (inr : ∀ n, motive (inr n))` / `    (mul : ∀ x y, motive x → motive y → motive (x * y)) : motive m :=`. The two-line form measures 84 and 97 characters (checked by script, none over 100). `lean_verify_edit`, line mode 195-212: `compiled`, success true, no warnings (line-length linter silent)."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "In `Monoid.Coprod.induction_on'` the bound variables of the minor premises `inl_mul : ∀ m x, ...` and `inr_mul : ∀ n x, ...` have no type ascriptions. That `m : M`, `n : N` and `x : M ∗ N` is left to elaboration from `inl m * x`, and the reader has to reconstruct it too. This matters more because `m` is also the name of the major premise, of type `M ∗ N`.",
+  "requested_change": "Ascribe the types:\n```lean\n    (inl_mul : ∀ (m : M) (x : M ∗ N), motive x → motive (inl m * x))\n    (inr_mul : ∀ (n : N) (x : M ∗ N), motive x → motive (inr n * x)) : motive m := by\n```",
+  "severity": "advisory",
+  "evidence": "diff.patch line `(inl_mul : ∀ m x, motive x → motive (inl m * x))` has no binder types. `lean_verify_edit`, line mode 195-212, with the ascriptions: `compiled`, success true, no warnings, and the proof (`simpa using inl_mul m _ ih`) is unchanged."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "In `Monoid.Coprod.induction_on` the bound variables of the minor premises `inl : ∀ m, ...`, `inr : ∀ n, ...` and `mul : ∀ x y, ...` have no type ascriptions, so their types (`M`, `N`, `M ∗ N`) must be inferred from `inl m`, `inr n` and `x * y`.",
+  "requested_change": "Ascribe the types:\n```lean\ntheorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N) (inl : ∀ m : M, motive (inl m))\n    (inr : ∀ n : N, motive (inr n)) (mul : ∀ x y : M ∗ N, motive x → motive y → motive (x * y)) :\n    motive m :=\n```",
+  "severity": "advisory",
+  "evidence": "diff.patch lines `(inl : ∀ m, motive (inl m)) (inr : ∀ n, motive (inr n))` and `(mul : ∀ x y, motive x → motive y → motive (x * y))` have no binder types. `lean_verify_edit`, line mode 195-212, with the ascriptions: `compiled`, success true, no warnings, and no line over 100 characters."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "`Monoid.Coprod.induction_on'` names its major premise `(m : M ∗ N)`, but in the same signature `m` is the letter for an element of `M` (`inl_mul : ∀ m x, motive x → motive (inl m * x)`, with `m` rebound at type `M`), and `x` is the letter for an element of `M ∗ N`. The conclusion `motive m` and the premise `inl m * x` use `m` with two different types.",
+  "requested_change": "Name the major premise with the signature's letter for `M ∗ N`: `(x : M ∗ N)`, conclusion `motive x`, and `rcases mk_surjective x with ⟨x, rfl⟩` in the proof.",
+  "severity": "advisory",
+  "evidence": "diff.patch: `theorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N)` beside `(inl_mul : ∀ m x, motive x → motive (inl m * x))`. `lean_verify_edit`, line mode 195-212, with the major premise renamed to `x` in both theorems: `compiled`, success true, no warnings. Callers apply it positionally or through `induction ... using`, so the explicit argument's name is not used by name anywhere (content_search)."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "`Monoid.Coprod.induction_on` names its major premise `(m : M ∗ N)`, while the same signature uses `m` for an element of `M` (`inl : ∀ m, motive (inl m)`) and `x`, `y` for elements of `M ∗ N` (`mul : ∀ x y, ...`). The conclusion `motive m` uses the letter with its other meaning.",
+  "requested_change": "Rename the major premise to `x`: `theorem induction_on {motive : M ∗ N → Prop} (x : M ∗ N) ... : motive x := induction_on' x ...`.",
+  "severity": "advisory",
+  "evidence": "diff.patch: `theorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N)` / `(inl : ∀ m, motive (inl m))` / `(mul : ∀ x y, ...) : motive m`. `lean_verify_edit`, line mode 195-212, with the rename: `compiled`, success true, no warnings. Its one external use, `PushoutI.lean:179` (`induction x using Coprod.induction_on with | inl g | inr h | mul x y ihx ihy`), does not refer to the major premise by name."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "`Monoid.Coprod.induction_on` repeats verbatim the leading binders `{motive : M ∗ N → Prop} (m : M ∗ N)` of the consecutive declaration `Monoid.Coprod.induction_on'`, rather than declaring them once.",
+  "requested_change": "Declare the shared binders once around the pair:\n```lean\nsection induction\n\nvariable {motive : M ∗ N → Prop} (m : M ∗ N)\n\n@[to_additive (attr := elab_as_elim)]\ntheorem induction_on' (one : motive 1) ... : motive m := by ...\n\n@[to_additive (attr := elab_as_elim)]\ntheorem induction_on (inl : ∀ m, motive (inl m)) (inr : ∀ n, motive (inr n))\n    (mul : ∀ x y, motive x → motive y → motive (x * y)) : motive m := ...\n\nend induction\n```\nThe argument order (`motive`, major premise, minor premises) is unchanged.",
+  "severity": "advisory",
+  "evidence": "diff.patch: line 196 `theorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N)` and line 209 `theorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N)`, adjacent declarations. `lean_verify_edit`, line mode 195-212, with the section/variable form above: `compiled`, success true, no warnings (elab_as_elim and to_additive accept the variable-bound motive)."
+ },
+ {
+  "target": "PR #41930 (scope: sibling eliminators)",
+  "claim": "The PR renames the motive `C` -> `motive` only for `Monoid.Coprod`. The eliminators of the neighbouring free constructions in GroupTheory still use `C`: `FreeGroup.induction_on {C : FreeGroup α → Prop} (z : FreeGroup α) (C1 : C 1) ...` (`FreeGroup/Basic.lean:626`), whose minor premise `C1` is exactly the kind the description promises to rename by content, and `PresentedGroup.induction_on {rels} {C : PresentedGroup rels → Prop}` (`PresentedGroup.lean:98`). Its indexed and pushout siblings `Monoid.CoprodI.induction_on`, `Monoid.PushoutI.induction_on` and `HNNExtension.induction_on` already use `motive`.",
+  "requested_change": "Apply the same rename (`C` -> `motive`, and `C1` -> `one`) to `FreeGroup.induction_on` and `PresentedGroup.induction_on`, or say in the description that these are left to a named follow-up PR.",
+  "severity": "advisory",
+  "evidence": "`content_search '→ Prop\\}'` over `target/Mathlib/GroupTheory`: `{C :` motives remain at `FreeGroup/Basic.lean:626`, `PresentedGroup.lean:98`, `Congruence/Defs.lean:262,268` and `Coset/Defs.lean:172`. `{motive :` is already used at `CoprodI.lean:202,211`, `PushoutI.lean:171` and `HNNExtension.lean:123`. `file_read` of `FreeGroup/Basic.lean:625-630` shows `(C1 : C 1)`. `precedent_search` on this code returned a maintainer (eric-wieser, PR #28096) asking on a motive-renaming PR: \"This one could be `motive`d too.\""
+ }
+]

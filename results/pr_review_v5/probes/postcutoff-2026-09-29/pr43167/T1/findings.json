@@ -1,0 +1,51 @@
+[
+ {
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+  "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses it. The file never mentions a commutator or `⁅`, and the moved lemma now sits in `Subgroup/Basic.lean`, which Pointwise already imports. So the line only adds a dependency edge from a low-level `Algebra/Group` file to `GroupTheory/Commutator/Basic`, and through it `QuotientGroup.Defs`.",
+  "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Subgroup/Pointwise.lean, deleting line 13 (the new import): outcome `compiled`, with no errors and no warnings. content_search for `commutator|⁅` in Pointwise.lean: 0 matches. The diff shows that the import is the only change to Pointwise's header and that Commutator/Basic.lean's imports are unchanged, so there is no cycle or re-export reason for it."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`commutator_sup_left` has no `@[to_additive]`, and neither has its private helper `commutator_sup_left'`, so no `AddSubgroup.commutator_sup_left` is generated. Almost every `Subgroup` commutator lemma in this file carries `@[to_additive]`, including the new `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` in this same PR.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, and also to `commutator_sup_left'` if the quotient-based helper is kept.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/GroupTheory/Commutator/Basic.lean, replacing lines 326-358 with the same three declarations, each prefixed by `@[to_additive]`: outcome `compiled`, no errors, no warnings. It also compiles with `@[to_additive]` when combined with the elementwise proof proposed in the proof-golf finding. In the file as the PR leaves it, `commutator_eq_bot_of_disjoint` is the only other untagged `Subgroup` lemma."
+ },
+ {
+  "target": "Subgroup.commutator_sup_right",
+  "claim": "`commutator_sup_right` has no `@[to_additive]`, unlike its siblings in the file. Its additive counterpart is therefore missing, even though the additive version of `commutator_comm` that its proof uses exists.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_right`. This needs `commutator_sup_left` to be tagged as well.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with `@[to_additive]` on `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right` (lines 326-358 replaced): outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "The proof of `commutator_sup_left` goes a long way round. It needs a private primed helper `commutator_sup_left'` that works in the quotient by `⁅H, N⁆ ⊔ ⁅K, N⁆`, and then moves everything into `M := H ⊔ K ⊔ N` through `subgroupOf`, two `map_subtype_inj` simp transfers and a `convert`. That is about 30 lines. A direct elementwise argument is shorter and needs no helper. The key facts are that `H ⊔ K` normalizes `L := ⁅H, N⁆ ⊔ ⁅K, N⁆` (which the PR already proves) and that `commutatorElement_mul_left_eq_conj_mul` and `commutatorElement_inv_left` already exist in this file.",
+  "requested_change": "Delete the private `commutator_sup_left'`, and prove the `≤` direction directly by `commutator_le` plus `closure_induction` on `H ⊔ K = closure (H ∪ K)`, using that `H ⊔ K ≤ normalizer L`:\n@[to_additive]\ntheorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n  refine le_antisymm (commutator_le.mpr fun g hg n hn ↦ ?_)\n    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n  set L := ⁅H, N⁆ ⊔ ⁅K, N⁆\n  have hL : L ≤ N := sup_le (commutator_le_right H N) (commutator_le_right K N)\n  have hHK : closure ((H : Set G) ∪ K) ≤ normalizer (L : Set G) := by\n    rw [← sup_eq_closure]\n    exact sup_le\n      (le_normalizer_iff_commutator_le_right.mpr <| (commutator_mono_right hL).trans le_sup_left)\n      (le_normalizer_iff_commutator_le_right.mpr <| (commutator_mono_right hL).trans le_sup_right)\n  rw [sup_eq_closure] at hg\n  induction hg using closure_induction with\n  | mem x hx =>\n    exact hx.elim (fun hx ↦ mem_sup_left (commutator_mem_commutator hx hn))\n      (fun hx ↦ mem_sup_right (commutator_mem_commutator hx hn))\n  | one => simp\n  | mul x y hx _ ihx ihy =>\n    rw [commutatorElement_mul_left_eq_conj_mul]\n    exact mul_mem ((mem_normalizer_iff.mp (hHK hx) _).mp ihy) ihx\n  | inv x hx ih =>\n    rw [commutatorElement_inv_left]\n    exact (mem_normalizer_iff''.mp (hHK hx) _).mp (by simpa using inv_mem ih)\n\n@[to_additive]\ntheorem commutator_sup_right (N H K : Subgroup G) [N.Normal] : ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆ := by\n  simp_rw [commutator_comm N, commutator_sup_left]\n",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/GroupTheory/Commutator/Basic.lean, replacing lines 326-358 (the helper, `commutator_sup_left` and `commutator_sup_right`) with the block shown: outcome `compiled`, no errors, no warnings. The same proof also compiled as a declaration-mode replacement of `Subgroup.commutator_sup_left` alone. It is 21 lines, against 29 for the helper plus the main proof, and it uses no `subgroupOf`, quotient, `convert` or `private` declaration. As a sanity check, the verifier rejected a deliberately wrong `rfl` proof of `commutator_sup_right` with `compile_errors`."
+ },
+ {
+  "target": "Subgroup.commutator_mono_left",
+  "claim": "The PR puts `gcongr` on the two one-sided lemmas `commutator_mono_left` and `commutator_mono_right`, but not on the two-argument `commutator_mono` they are derived from. The canonical `gcongr` lemma is the one in which both arguments vary, as with the Lie-ideal analogue: `LieSubmodule.mono_lie` is `@[gcongr]`, while `mono_lie_left` and `mono_lie_right` are untagged. Tagging `commutator_mono` already covers one-sided goals.",
+  "requested_change": "Change `commutator_mono`'s attribute to `@[to_additive (attr := gcongr)]`, and drop `(attr := gcongr)` from `commutator_mono_left` and `commutator_mono_right`, keeping them as plain `@[to_additive]` API lemmas.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Commutator/Basic.lean, replacing lines 150-160 with `@[to_additive (attr := gcongr)] commutator_mono` and untagged `commutator_mono_left` and `commutator_mono_right`: outcome `compiled`, no errors. That includes the PR's own one-sided `grw [le_normalizer_iff_commutator_le_right, hHKN, ...]` steps in `commutator_sup_left`, which rewrite only the second commutator argument. The precedent is content_search on Mathlib/Algebra/Lie/IdealOperations.lean: `@[gcongr] theorem mono_lie (h₁ : I ≤ J) (h₂ : N ≤ N')` at line 160-161, with `mono_lie_left` and `mono_lie_right` untagged at lines 168 and 172."
+ },
+ {
+  "target": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+  "claim": "The rename uses two hand-written deprecated aliases, one for `Subgroup` and one spelled `_root_.AddSubgroup....`, for a lemma that is `@[to_additive]`. A single `to_additive` deprecated alias generates both and keeps them in sync.",
+  "requested_change": "Replace the two aliases in `Mathlib/Algebra/Group/Subgroup/Basic.lean` with\n@[to_additive (attr := deprecated (since := \"2026-08-27\"))]\nalias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Basic.lean, replacing lines 530-535 with that single alias plus a test `example` using `AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup H K`: outcome `compiled`. The example produced the expected warning \"`AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup` has been deprecated: Use `AddSubgroup.inf_normalizer_le_normalizer_sup` instead\". The `@[to_additive (attr := deprecated (since := ...))] alias` form is used in recent Mathlib, for example in Topology/Algebra/Group/Basic.lean:231 and IsUniformGroup/Defs.lean:349 (2026-08-21). Older aliases in this directory use the two-alias form, so this is a nit."
+ },
+ {
+  "target": "Subgroup.iInf_normalizer_le_normalizer_iSup",
+  "claim": "The PR moves the binary `inf_normalizer_le_normalizer_sup` to `Subgroup/Basic.lean`, where it now sits beside `inf_normalizer_le_normalizer_inf` and `iInf_normalizer_le_normalizer_iInf`. Its indexed version `iInf_normalizer_le_normalizer_iSup` is left behind in `Pointwise.lean`, although it does not depend on anything pointwise. This splits the `sup`/`iSup` pair across two files.",
+  "requested_change": "Move `iInf_normalizer_le_normalizer_iSup` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` to `Mathlib/Algebra/Group/Subgroup/Basic.lean`, directly after `inf_normalizer_le_normalizer_sup`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Basic.lean, inserting `iInf_normalizer_le_normalizer_iSup` with its unchanged proof (`simp_rw [mem_iInf, mem_normalizer_iff_map_conj_eq, map_iSup, hg] at hg ⊢`) after line 528: outcome `compiled`, no errors. file_read of Pointwise.lean lines 334-338 shows that it now sits alone where the binary lemma used to be."
+ }
+]

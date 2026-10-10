@@ -1,0 +1,1 @@
+{"code": "theorem UniqueDiffWithinAt.congr_pt (h : UniqueDiffWithinAt 𝕜 s x) (hy : x = y) :\n    UniqueDiffWithinAt 𝕜 s y := hy ▸ h\n\nvariable [ContinuousAdd E] [ContinuousSMul 𝕜 E]\n\ntheorem UniqueDiffWithinAt.mono_nhds (h : UniqueDiffWithinAt 𝕜 s x) (st : 𝓝[s] x ≤ 𝓝[t] x) :\n    UniqueDiffWithinAt 𝕜 t x := by", "limit": 6}

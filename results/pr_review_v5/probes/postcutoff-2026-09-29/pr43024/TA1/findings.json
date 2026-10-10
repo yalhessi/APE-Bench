@@ -1,0 +1,44 @@
+[
+ {
+  "target": "isMulCommutative_mono",
+  "claim": "`isMulCommutative_mono` (Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352) states an antitone fact -- `s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, commutativity passes DOWN to smaller subobjects -- but is named `_mono`. Mathlib names this exact shape `anti` (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `Simple.anti`, `SimpleGraph.IsAcyclic.anti`, `CliqueFree.anti`, `Set.Subsingleton.anti`, `Filter.Subsingleton.anti`), and the PR's own title announces the lemma as `isMulCommutative_anti`.",
+  "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (the `to_additive` image becomes `isAddCommutative_anti`), so the name says the property is antitone in the subobject and matches the PR title.",
+  "severity": "blocking",
+  "evidence": "Read the statement at Defs.lean:352-356: hypothesis `h : s ≤ t`, instance `[IsMulCommutative t]`, conclusion `IsMulCommutative s`, i.e. antitone in the subobject. content_search for `(theorem|lemma) ...(.anti|_anti)` returned the analogues: Combinatorics/Graph/Simple.lean:61 `lemma Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, :84 `Simple.anti (hle : H ≤ G) : H.Simple`, SimpleGraph/Acyclic.lean:104 `IsAcyclic.anti`, SimpleGraph/Clique.lean:453 `CliqueFree.anti`, Data/Set/Subsingleton.lean:39 `Subsingleton.anti`, Order/Filter/Subsingleton.lean:33 `Subsingleton.anti`. declaration_search `isMulCommutative_anti`: declared nowhere (base or PR), so the title names a lemma the diff does not add. naming_norm on `isMulCommutative_mono`: subject_unresolved (unmeasured). lean_verify_edit (line mode, lines 350-356) with the lemma renamed to `isMulCommutative_anti`: outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "isMulCommutative_mono",
+  "claim": "`isMulCommutative_mono` is declared at the root although its conclusion is `IsMulCommutative s` and its sibling constructor already lives in that namespace (`IsMulCommutative.of_setLike_mul_comm`, Defs.lean:341; `IsMulCommutative.of_comm`, Semigroup.lean:185); the analogous antitonicity lemmas for class-valued predicates are namespaced (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`).",
+  "requested_change": "Declare the lemma as `IsMulCommutative.anti` (additive image `IsAddCommutative.anti`), keeping the statement, so it is found next to `IsMulCommutative.of_setLike_mul_comm` and can be called as `IsMulCommutative.anti h` / `.anti h` where the expected type is `IsMulCommutative s`.",
+  "severity": "advisory",
+  "evidence": "declaration_search `IsMulCommutative.anti`, `IsMulCommutative.mono`, `IsMulCommutative.of_le`: none declared, so no clash. lean_verify_edit (line mode, lines 350-356) declaring `IsMulCommutative.anti` plus an `example` using `IsAddCommutative.anti h` for an additive subobject: outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "isMulCommutative_mono",
+  "claim": "The `to_additive` docstring of `isMulCommutative_mono` closes with `-/ ]` (Defs.lean:351), a space before the closing bracket, while every other `to_additive` docstring in this file closes `-/]` (lines 286, 292, 299, 305, 310, 315) and the form is overwhelmingly `-/]` in the area.",
+  "requested_change": "Write the attribute as `@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/]`, dropping the space before `]`.",
+  "severity": "advisory",
+  "evidence": "content_search over Mathlib/Algebra/Group: `-/]` 730 matches in 94 files; `-/ ]` 9 matches in 4 files, two of them this PR's lemma and its neighbour `setLike_mul_comm`. Read Defs.lean:284-315 for the file's own `-/]` uses. lean_verify_edit (line mode, lines 350-356) with `-/]`: outcome `compiled`."
+ },
+ {
+  "target": "isMulCommutative_mono",
+  "claim": "`isMulCommutative_mono` repeats the binder block `{S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` that the two declarations directly before it (`isMulCommutative_iff_of_setLike`, Defs.lean:336, and `setLike_mul_comm`, Defs.lean:345) also spell out, so three consecutive declarations restate the same arguments (and shadow the file-level `variable {M : Type*}`).",
+  "requested_change": "Wrap the three lemmas in a `section` with `variable {S : Type*} [SetLike S M] [Mul M] [MulMemClass S M] {s t : S}` (reusing the file's `M`) and drop those binders from the signatures, leaving `isMulCommutative_mono` as `lemma isMulCommutative_mono [LE S] [IsConcreteLE S M] (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s`.",
+  "severity": "advisory",
+  "evidence": "Read Defs.lean:333-356: after `end MulMemClass` the three lemmas each declare `{S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]`; the file-level `variable {M : Type*} {N : Type*}` (line 55) is still in scope. lean_verify_edit (line mode, lines 335-356) replacing them with a `section SetLike` / `variable {S : Type*} [SetLike S M] [Mul M] [MulMemClass S M] {s t : S}` block: outcome `compiled`, no errors or warnings. content_search for `@setLike_mul_comm`, `@isMulCommutative_iff_of_setLike`, `@IsMulCommutative.of_setLike_mul_comm` over Mathlib: 0 matches, so the implicit-argument reordering affects no positional caller."
+ },
+ {
+  "target": "PR #43024 (title)",
+  "claim": "The PR title `feat: \\`isMulCommutative_anti\\` for subobjects` names a declaration the diff does not add: the only new lemma is `isMulCommutative_mono`, and `isMulCommutative_anti` is declared nowhere.",
+  "requested_change": "Make the title and the code agree: rename the lemma to `isMulCommutative_anti` (see the naming finding), or, if the `_mono` name is kept, retitle the PR to name `isMulCommutative_mono`.",
+  "severity": "advisory",
+  "evidence": "diff.patch adds only `isMulCommutative_mono` (Defs.lean:350-356). declaration_search `isMulCommutative_anti`: 0 declarations at base or in the PR's files; `isMulCommutative_mono`: declared only in this PR at Defs.lean:352."
+ },
+ {
+  "target": "PR #43024 (title)",
+  "claim": "The PR title `feat: \\`isMulCommutative_anti\\` for subobjects` omits the area scope required by the `type(Area): description` commit convention.",
+  "requested_change": "Retitle to `feat(Algebra/Group/Subsemigroup): \\`isMulCommutative_anti\\` for subobjects` (with the lemma name matching the code).",
+  "severity": "advisory",
+  "evidence": "pr.md title is `feat: \\`isMulCommutative_anti\\` for subobjects`; the only changed file is Mathlib/Algebra/Group/Subsemigroup/Defs.lean."
+ }
+]

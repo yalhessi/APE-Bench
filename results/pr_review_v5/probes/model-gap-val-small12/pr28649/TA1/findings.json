@@ -1,0 +1,107 @@
+[
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module docstring, Main statements)",
+  "claim": "The module docstring this PR edits misstates the second main statement. It names `ProbabilityTheory.integral_comp`, which does not exist: the lemma is declared inside `namespace Kernel`, so its name is `ProbabilityTheory.Kernel.integral_comp`. It also gives the formula with the Lebesgue integral `∫⁻`, but the lemma, like the whole file, is about the Bochner integral `∫`.",
+  "requested_change": "Replace lines 30-31 with:\n* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+  "severity": "advisory",
+  "evidence": "declaration_search `ProbabilityTheory.integral_comp`: 'No declaration ... exists at the base commit or in the files this PR changes'. declaration_search `ProbabilityTheory.Kernel.integral_comp`: declared at IntegralCompProd.lean:417. The file's `namespace Kernel` runs from line 359 to line 445. The lemma at 417-418 reads `theorem integral_comp : ∀ {f : γ → E} (_ : Integrable f ((η ∘ₖ κ) a)), ∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`, which is Bochner (`∫`) and not `∫⁻`. The `integral_compProd` item above it correctly uses `∫`. lean_verify_edit with the replacement at lines 30-31: outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Upcrossing.lean (section docstring 'Variant of the upcrossing estimate')",
+  "claim": "The displayed identity in the section docstring this PR edits is wrong. `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}` equals `N · 1{U_N < N}`, not `U_N`. The next sentence also says `U_N(a, b)` 'is a stopping time'. The code it describes (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) sums the indicators of `{upperCrossingTime a b f N i < N}`. Measurability comes from `upperCrossingTime` being a stopping time.",
+  "requested_change": "Replace lines 703-706 with:\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\n$$\nwhere $\\tau_i$ is the `i`-th upper crossing time `upperCrossingTime a b f N i`, $U_N(a, b)$ is\nmeasurable as each $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a stopping time\n(`Adapted.isStoppingTime_upperCrossingTime`).",
+  "severity": "advisory",
+  "evidence": "file_read Upcrossing.lean:711-712: `theorem upcrossingsBefore_eq_sum (hab : a < b) : upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`. At 743-744 measurability is proved by `ℱ.le N _ (hf.isStoppingTime_upperCrossingTime.measurableSet_lt_of_pred N)`. lean_verify_edit with the replacement at lines 703-706: outcome `compiled`, no errors or warnings. All new lines are 100 characters or fewer."
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_uncrossing_lt_top (docstring)",
+  "claim": "The docstring change from 'bounded liminfs' to 'bounded limit inferiors' fixes no typo. 'liminfs' is the library's own spelling (the title of `Mathlib/Order/LiminfLimsup.lean` is '# liminfs and limsups of functions and filters'), and it names the `liminf` in hypothesis `hf₁`. 'limit inferiors' is a nonstandard plural (traditionally 'limits inferior'). The hunk is a stylistic rewording of the original author's prose that reads worse, so it should be left out of a typo-fix PR.",
+  "requested_change": "Revert line 133 to `/-- A realization of a stochastic process with bounded upcrossings and bounded liminfs is`.",
+  "severity": "advisory",
+  "evidence": "content_search for 'limit inferiors|limits inferior|liminfs|...' over Mathlib found 'liminfs' in Order/LiminfLimsup.lean:11 and MeasureTheory/Constructions/BorelSpace/Order.lean:34. 'limit inferiors' occurs only in this PR's line. The hypothesis is `hf₁ : liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞` (Convergence.lean:138). lean_verify_edit with the reverted line 133: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module docstring, Main results)",
+  "claim": "This PR makes the module docstring inconsistent: 'MGFs' and 'CGFs' (lines 25 and 27) are capitalised, while line 30 of the same list still says 'the cgf exists'. The rest of `Probability/Moments` writes lowercase 'mgf' in prose. In all three places the docstring uses an identifier-style abbreviation where the full term should be written out.",
+  "requested_change": "Write the terms out consistently. Line 25 becomes 'and their moment generating functions are defined at `t`, then', line 27 becomes 'and their cumulant generating functions are defined at `t`, then', and line 30 becomes 'the cumulant generating function exists, ...'. Rewrap to stay within 100 columns. If the abbreviation is kept, at least make line 30 read 'the CGF exists', so that one spelling is used throughout the docstring.",
+  "severity": "advisory",
+  "evidence": "file_read Basic.lean:24-33 (as the PR leaves it): line 25 'and their MGFs are defined at `t`', line 27 'and their CGFs are defined at `t`', line 30 'the cgf exists'. content_search over Mathlib/Probability for '(the|an|a|its|their) (mgf|cgf|MGF|CGF)s?' found lowercase 'mgf' in ComplexMGF.lean:18,20,21,32, MGFAnalytic.lean:20 and SubGaussian.lean (8 lines). The only uppercase uses are the two this PR adds. lean_verify_edit replacing Basic.lean:13-33 with the rewritten docstring: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module docstring title)",
+  "claim": "The title of the module docstring this PR edits has a typo that the typo pass missed. It says 'the composition and the composition-products of two kernels'. The file treats a single composition-product, and the body says 'the composition and the composition-product of two kernels' (line 12).",
+  "requested_change": "Change line 10 to `# Bochner integral of a function against the composition and the composition-product of two kernels`.",
+  "severity": "advisory",
+  "evidence": "file_read IntegralCompProd.lean:10 '# Bochner integral of a function against the composition and the composition-products of two kernels'; line 12 'We prove properties of the composition and the composition-product of two kernels.' lean_verify_edit with the replaced line 10: outcome `compiled`. The new line is 99 characters."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Convergence.lean (module docstring, Main results)",
+  "claim": "The typo pass in this file missed three items in the Main results list. They read 'part b the L¹ martingale convergence theorem' (line 32) and 'part c the L¹ martingale convergence theorem' (lines 35 and 38), dropping the 'of' that line 28 has ('part a of the L¹ martingale convergence theorem').",
+  "requested_change": "Insert 'of' in lines 32, 35 and 38 ('part b of the', 'part c of the') and rewrap so that no line exceeds 100 columns. Line 38 is already 100 characters, so its item becomes '...tendsto_eLpNorm_condExp`: part c of the L¹ martingale convergence' followed by 'theorem: given a ...'.",
+  "severity": "advisory",
+  "evidence": "content_search 'part [abc] the' over Mathlib/Probability: hits only at Convergence.lean:32, 35 and 38. Line 28 reads 'part a of the L¹ martingale'. lean_verify_edit replacing lines 32-40 with the rewrapped text: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Variance.lean (module docstring, Main results)",
+  "claim": "The Main results entry for the lemma whose docstring this PR edits (`variance_le_sq_of_bounded`, Popoviciu's inequality) has a missing space, a typo the pass missed: 'is at most`((b - a) / 2) ^ 2`.'",
+  "requested_change": "Change line 34 to '  `a ≤ X ≤ b` almost everywhere is at most `((b - a) / 2) ^ 2`.'",
+  "severity": "advisory",
+  "evidence": "file_read Variance.lean:33-34: '* `ProbabilityTheory.variance_le_sq_of_bounded`: the variance of a random variable `X` satisfying' / '  `a ≤ X ≤ b` almost everywhere is at most`((b - a) / 2) ^ 2`.' lean_verify_edit with the replaced line 34: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module docstring, Main definitions and Chernoff item)",
+  "claim": "The formulas in the module docstring this PR edits lack the standard spacing. They read `μ[X^p]`, `μ[(X - μ[X])^p]`, `μ[exp(t*X)]` and `exp(- t*ε + cgf X ℙ t)`: no spaces around `^` and `*`, a space after the prefix `-`, and no space before the application argument. There is also no space after the colon in '`ProbabilityTheory.centralMoment X p μ`:`p`th'. The declaration docstrings in the same file use the spaced forms (`μ[X ^ p]` at line 47, `μ[(X - μ[X]) ^ p]` at line 51).",
+  "requested_change": "Write `μ[X ^ p]`, `μ[(X - μ[X]) ^ p]`, `μ[exp (t * X)]` and `exp (-t * ε + cgf X ℙ t)`, and add the space in '`ProbabilityTheory.centralMoment X p μ`: `p`th'.",
+  "severity": "advisory",
+  "evidence": "file_read Basic.lean:13-18 and 30 (module docstring), against 47 '/-- Moment of a real random variable, `μ[X ^ p]`. -/' and 51 '/-- Central moment of a real random variable, `μ[(X - μ[X]) ^ p]`. -/'. The statement of `measure_ge_le_exp_cgf` (line 428) is spelled `exp (-t * ε + cgf X μ t)`. lean_verify_edit replacing lines 13-33 (spacing included): outcome `compiled`. The longest new line is 99 characters."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module docstring list items)",
+  "claim": "None of the list items in the module docstring this PR edits ends with a period. That includes the two Main results items whose lines the PR changes (lines 25 and 27, which are complete 'if ... then ...' sentences) and the four Main definitions items.",
+  "requested_change": "End each list item with a period: lines 14, 16, 18, 20 and the item endings at lines 25 and 27 (for example '... then `mgf (X + Y) μ t = mgf X μ t * mgf Y μ t`.').",
+  "severity": "advisory",
+  "evidence": "file_read Basic.lean:13-27: every item ends without a period ('`μ[X^p]`', '`μ[(X - μ[X])^p]`', '`μ[exp(t*X)]`', 'function', '`... * mgf Y μ t`', '`... + cgf Y μ t`'). Only the last item ends with one ('of `cgf`.'). lean_verify_edit with the periods added (lines 13-33 replaced): outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module docstring heading)",
+  "claim": "The module docstring this PR edits, at the very paragraph the PR changes, uses the ad hoc heading '## Implementation details' instead of the style guide's '## Implementation notes'.",
+  "requested_change": "Rename the heading at line 33 to `## Implementation notes`.",
+  "severity": "advisory",
+  "evidence": "content_search '^## Implementation (details|notes|...)$': in Mathlib/Probability, 9 files use 'Implementation notes' and only this file uses 'Implementation details'. In Mathlib/MeasureTheory the count is 24 'Implementation notes', 3 'Implementation Notes' and 2 'Implementation details'. lean_verify_edit with line 33 replaced: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Convergence.lean (section docstring 'Almost everywhere martingale convergence theorem')",
+  "claim": "The section docstring this PR edits has a blank line between its last line of text and the closing `-/`.",
+  "requested_change": "Delete the blank line 102 so that `-/` directly follows 'submartingale converges to its `limitProcess` almost everywhere.'",
+  "severity": "advisory",
+  "evidence": "file_read Convergence.lean:101-103: 'submartingale converges to its `limitProcess` almost everywhere.' / '' / '-/'. lean_verify_edit replacing 101-103 with the two lines and no blank: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Upcrossing.lean (section docstring 'Variant of the upcrossing estimate')",
+  "claim": "The section docstring this PR edits has a blank line between its last line of text and the closing `-/`.",
+  "requested_change": "Delete the blank line 707 so that `-/` directly follows 'stopping time.'",
+  "severity": "advisory",
+  "evidence": "file_read Upcrossing.lean:706-708: 'stopping time.' / '' / '-/'. lean_verify_edit replacing 706-708 with 'stopping time.' / '-/': outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/CompNotation.lean (comment after the module docstring)",
+  "claim": "The comment attached to the module docstring this PR edits refers to another module as 'the `MeasureComp` file' instead of by its file path.",
+  "requested_change": "Write the reference as `Mathlib/Probability/Kernel/Composition/MeasureComp.lean`, for example '(for example `Mathlib/Probability/Kernel/Composition/MeasureComp.lean`)'.",
+  "severity": "advisory",
+  "evidence": "file_read CompNotation.lean:23-24: '/- This file is only for lemmas ... anything more involved should go elsewhere (for example the `MeasureComp` file). -/'. file_search shows `target/Mathlib/Probability/Kernel/Composition/MeasureComp.lean` exists. lean_verify_edit with lines 23-24 rewritten: outcome `compiled`."
+ },
+ {
+  "target": "Mathlib/Probability/Distributions/Gaussian/Real.lean (docstrings of gaussianPDFReal_pos, gaussianPDFReal_nonneg, measurable_gaussianPDFReal, stronglyMeasurable_gaussianPDFReal, lintegral_gaussianPDFReal_eq_one, integral_gaussianPDFReal_eq_one)",
+  "claim": "The six docstrings this PR edits in this file still use the identifier-style abbreviation 'pdf' ('The Gaussian pdf is nonnegative.', 'The Gaussian distribution pdf integrates to 1 ...') instead of the term it abbreviates. The definition's own docstring at line 43 spells it out ('Probability density function of the Gaussian distribution ...').",
+  "requested_change": "Write 'probability density function' in place of 'pdf'. For example: 'The Gaussian probability density function is positive when the variance is not zero.', and 'The probability density function of the Gaussian distribution integrates to 1 when the variance is not zero.' (lines 57, 62, 67, 72, 100 and 118).",
+  "severity": "advisory",
+  "evidence": "content_search 'pdf' in Real.lean: lines 57, 62, 67, 72, 100 and 118 (all changed by this PR) use 'pdf'. Line 43 says 'Probability density function'. lean_verify_edit with line 57 rewritten ('/-- The Gaussian probability density function is positive when the variance is not zero. -/', 91 characters): outcome `compiled`."
+ },
+ {
+  "target": "ProbabilityTheory.gaussianPDFReal (docstring)",
+  "claim": "The docstring this PR edits is a noun phrase ('Probability density function of the Gaussian distribution with mean `μ` and variance `v`.') but ends with a full stop.",
+  "requested_change": "Drop the final full stop: `/-- Probability density function of the Gaussian distribution with mean `μ` and variance `v` -/`.",
+  "severity": "advisory",
+  "evidence": "file_read Real.lean:43 '/-- Probability density function of the Gaussian distribution with mean `μ` and variance `v`. -/'. lean_verify_edit with the full stop removed: outcome `compiled`."
+ }
+]

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean", "line_start": 56, "line_end": 58, "replacement": "@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]\n@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]"}

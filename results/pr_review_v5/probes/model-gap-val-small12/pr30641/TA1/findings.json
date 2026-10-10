@@ -1,0 +1,114 @@
+[
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_sum_le` and `norm_nonneg`, which hold in any `SeminormedAddCommGroup`. The lemma is stated less generally than it could be.",
+  "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]`: `lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] {α : Type*} (s : Finset α) (f : α → E) : ...`. Make the same change to the existing sibling `posLog_norm_add_le`, so the two norm variants stay parallel.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `norm_sum_le` is declared at Mathlib/Analysis/Normed/Group/Basic.lean:1167 as `theorem norm_sum_le {E} [SeminormedAddCommGroup E] (s : Finset ι) (f : ι → E)`. lean_verify_edit replacing `Real.posLog_norm_sum_le` with the PR's own proof and only the instance changed to `[SeminormedAddCommGroup E]`: outcome `compiled`, no errors or warnings introduced. lean_verify_edit replacing lines 182-214 with the generalized `posLog_norm_sum_le` and `posLog_norm_add_le` (both on `SeminormedAddCommGroup E`): outcome `compiled`."
+ },
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "In `Real.posLog_norm_sum_le` the proof applies `monotoneOn_posLog (by simp) _ (norm_sum_le s f)` with a `_` hole and then closes that side goal on a separate line, passing an over-specified `simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]`. The whole `calc` is just a composition of two existing lemmas.",
+  "requested_change": "Discharge the side goal inline and write the proof as a term: `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s _)`. If you keep the `calc`, at least use `exact monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)` and not `apply ... _` followed by a separate line.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on `Real.posLog_norm_sum_le` with the body `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s _)`: outcome `compiled`, no errors or warnings introduced. This was tested with the `SeminormedAddCommGroup` header and again inside the combined 182-214 edit. The PR's line 191 is `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)` and line 192 is `simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]`. The existing `posLog_sum` (line 169) already closes the same kind of goal with `(by simp [Finset.sum_nonneg])`."
+ },
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "The monotonicity step `log⁺ ‖∑ t ∈ s, f t‖ ≤ log⁺ (∑ t ∈ s, ‖f t‖)` in `Real.posLog_norm_sum_le` (like those in `posLog_sum` and `posLog_norm_add_le`) applies the named lemma `monotoneOn_posLog` by hand, because `log⁺` has no `@[gcongr]` lemma. As it stands, `gcongr` cannot do this step.",
+  "requested_change": "Add `@[gcongr] theorem posLog_le_posLog {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : log⁺ x ≤ log⁺ y := monotoneOn_posLog hx (hx.trans hxy) hxy` next to `monotoneOn_posLog`, and discharge the step with `gcongr; exact norm_sum_le s f`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing the step's proof with `gcongr; exact norm_sum_le s f` on the file as the PR leaves it: compile_errors, `gcongr did not make progress`. declaration_search `Real.posLog_le_posLog`: no declaration at the base or in the PR. lean_verify_edit (line mode, lines 182-194) adding the `@[gcongr] posLog_le_posLog` lemma above `posLog_norm_sum_le` and proving the step with `by gcongr; exact norm_sum_le s f`: outcome `compiled`, no errors or warnings introduced."
+ },
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "The new docstring of `Real.posLog_norm_sum_le` puts its text on the line after `/--` and puts `-/` on a line of its own. It describes the lemma by contrast (\"Variant of `posLog_sum`\") and by its proof (\"using monotonicity of `log⁺` and the triangle inequality\"), not on its own terms. It cites `posLog_sum` without the `Real.` prefix that the file's other cross-references use. Its first line is broken at 76 characters.",
+  "requested_change": "Replace it with a standalone description in the file's usual form, for example: `/-- Estimate for `log⁺` of the norm of a sum. See `Real.posLog_norm_add_le` for a variant\\ninvolving just two summands. -/`.",
+  "severity": "advisory",
+  "evidence": "PR lines 182-185: `/--` / `Variant of `posLog_sum` for norms of elements in normed additive commutative` / `groups, using monotonicity of `log⁺` and the triangle inequality.` / `-/`. The file's other docstrings use the full name, e.g. line 116 `See `Real.posLog_prod``. lean_verify_edit (lines 182-214) with the suggested docstring: outcome `compiled`."
+ },
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "The header of `Real.posLog_norm_sum_le` is broken after `[NormedAddCommGroup E]`, at 59 characters, although the binders that follow would fit on the first line.",
+  "requested_change": "Fill the header lines up to the 100-character limit, e.g. (with the `SeminormedAddCommGroup` generalization) `lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] {α : Type*} (s : Finset α)` / `    (f : α → E) : log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=`.",
+  "severity": "advisory",
+  "evidence": "Measured line lengths: the PR's first header line is 59 characters. The whole binder list `lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E] {α : Type*} (s : Finset α) (f : α → E) :` is exactly 100 characters. The suggested two-line form compiled in the lean_verify_edit of lines 182-214."
+ },
+ {
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "`Real.posLog_norm_sum_le` only chains three existing lemmas (`monotoneOn_posLog`, `norm_sum_le`, `posLog_sum`). Its whole proof is the two-line term `(monotoneOn_posLog _ _ (norm_sum_le s f)).trans (posLog_sum s _)`, so it may be a combination lemma that callers could write directly.",
+  "requested_change": "Question to the author, under the convention that a lemma which merely combines existing ones is not added: state the downstream use that needs `posLog_norm_sum_le` as a named lemma (for example, matching the existing `posLog_norm_add_le`), or drop it and use `posLog_sum` with `monotoneOn_posLog` and `norm_sum_le` at the call site.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit: the full proof `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s _)` compiles (outcome `compiled`). declaration_search: `Real.posLog_norm_add_le` already exists at the base (PosLog.lean:170), so a two-summand precedent exists."
+ },
+ {
+  "target": "Real.posLog_pow",
+  "claim": "`Real.posLog_pow` is proved by two case splits: `by_cases hn : n = 0`, then `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, `posLog_eq_zero_iff` and `posLog_eq_log`. A one-line rewrite proves it from `Real.log_pow` and `mul_max_of_nonneg`.",
+  "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `Real.log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x` (Log/Basic.lean:267, @[simp]) and `mul_max_of_nonneg (b c : R) (ha : 0 ≤ a) : a * max b c = max (a * b) (a * c)` (Algebra/Order/Ring/Unbundled/Basic.lean:525). lean_verify_edit on `Real.posLog_pow` with `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x := by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`: outcome `compiled`, no errors or warnings introduced."
+ },
+ {
+  "target": "Real.posLog_pow",
+  "claim": "`Real.posLog_pow {n : ℕ} {a : ℝ}` makes both arguments implicit, but no hypothesis or other explicit argument determines them. The analogue `Real.log_pow (x : ℝ) (n : ℕ)` and the file's own `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` take them explicitly.",
+  "requested_change": "Make the arguments explicit, in `Real.log_pow`'s order: `lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+  "severity": "advisory",
+  "evidence": "PR line 102: `@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :`. File lines 64 and 67: `@[simp] theorem posLog_neg (x : ℝ)` and `@[simp] theorem posLog_abs (x : ℝ)`. Base `Real.log_pow (x : ℝ) (n : ℕ)` at Log/Basic.lean:267. `posLog_pow` is new and has no users in the file. The explicit-binder version compiled in the lean_verify_edit above (outcome `compiled`)."
+ },
+ {
+  "target": "Real.posLog_pow",
+  "claim": "The header of `Real.posLog_pow` is split over two lines (`@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :` / `    log⁺ (a ^ n) = n * log⁺ a := by`) although it fits on one line in 74 characters. With the split, the inline `@[simp]` sits in front of a multi-line header.",
+  "requested_change": "Join the header onto one line: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x := by`. If it stays multi-line, put `@[simp]` on its own line above `lemma`.",
+  "severity": "advisory",
+  "evidence": "Measured: `@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by` is 74 characters. The one-line header compiled in the lean_verify_edit of `Real.posLog_pow` (outcome `compiled`)."
+ },
+ {
+  "target": "Real.posLog_pow",
+  "claim": "The docstring of `Real.posLog_pow`, \"The function `log⁺` commutes with taking powers.\", is wrong: commuting with powers would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺ (a ^ n) = n * log⁺ a`.",
+  "requested_change": "Reword it to state what the lemma says, e.g. `/-- The function `log⁺` turns natural powers into multiples: `log⁺` of `a ^ n` is `n` times `log⁺ a`. -/`, or drop the docstring, as for `posLog_zero` and `posLog_one`.",
+  "severity": "advisory",
+  "evidence": "PR line 101: `/-- The function `log⁺` commutes with taking powers. -/`. Statement at lines 102-103: `log⁺ (a ^ n) = n * log⁺ a`."
+ },
+ {
+  "target": "module_doc in PosLog.lean",
+  "claim": "The new module-docstring sentence names the downstream module by its dotted name, `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`, not by its file path, and capitalises \"Circle Average\" mid-sentence.",
+  "requested_change": "Write `See `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` for the presentation of` / ``log⁺` as a circle average.`.",
+  "severity": "advisory",
+  "evidence": "PR lines 19-20: `See `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage` for the presentation of` / ``log⁺` as a Circle Average.`. file_search confirms `target/Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` exists. The suggested first line is exactly 100 characters."
+ },
+ {
+  "target": "module_doc in PosLog.lean",
+  "claim": "The module docstring's list of the standard estimates the file establishes (`posLog_prod`, `posLog_sum`) was not updated for the PR's new finite-sum estimate `posLog_norm_sum_le`, the norm version of `posLog_sum`.",
+  "requested_change": "Add a bullet such as `- `theorem posLog_norm_sum_le : log⁺ ‖∑ i, f i‖ ≤ log n + ∑ i, log⁺ ‖f i‖`` (for `f` valued in a (semi)normed group) to the list in the module docstring.",
+  "severity": "advisory",
+  "evidence": "PR lines 11-17: the module docstring lists only `posLog_prod` and `posLog_sum`. The PR adds `posLog_norm_sum_le` (line 186) in the `## Estimates for Sums` section."
+ },
+ {
+  "target": "Real.posLog_sum",
+  "claim": "The PR rewraps the unchanged docstring of `Real.posLog_sum` from the standard `/-- Estimate ... involving` / `just two summands. -/` into a `/--` / text / `-/` layout. The text no longer starts on the `/--` line, `-/` sits on a line of its own, and the edit changes no content.",
+  "requested_change": "Revert the docstring to its original form: `/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving` / `just two summands. -/`.",
+  "severity": "advisory",
+  "evidence": "diff hunk at @@ -130,8 +149,10 @@: removed `/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving` / `just two summands. -/`, added `/--` / `Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving just two summands.` / `-/`. The text is identical. Every other docstring in the file's first 180 lines (e.g. lines 116-117, 128-129, 135-136) starts on the `/--` line."
+ },
+ {
+  "target": "Real.posLog_add",
+  "claim": "The PR rewraps the unchanged docstring of `Real.posLog_add` into a `/--` / text / `-/` layout. The text no longer starts on the `/--` line, `-/` sits on a line of its own, and the edit changes no content.",
+  "requested_change": "Restore the original form: `/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving` / `multiple summands. -/`.",
+  "severity": "advisory",
+  "evidence": "diff hunk at @@ -158,8 +179,23 @@: the old `/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving` / `multiple summands. -/` is replaced by `/--` / `Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving multiple summands.` / `-/` (PR lines 196-198). The restored form compiled in the lean_verify_edit of lines 182-214."
+ },
+ {
+  "target": "Real.posLog_zero",
+  "claim": "`Real.posLog_zero` and `Real.posLog_one` are a parallel pair of one-line `@[simp]` lemmas, but a blank line separates them, which hides the parallel.",
+  "requested_change": "Put them on adjacent lines with no blank line: `@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]` / `@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]`.",
+  "severity": "advisory",
+  "evidence": "PR lines 56-58: `@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]`, blank, `@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]`. lean_verify_edit (lines 56-58 replaced by the two adjacent lines): outcome `compiled`."
+ },
+ {
+  "target": "module_doc in PosLog.lean",
+  "claim": "The PR adds a blank line after three of the file's section headers (`## Elementary Properties`, `## Estimates for Products`, `## Estimates for Sums`) but not after the first (`## Definition, Notation and Reformulations`). The file now spaces one construct two ways.",
+  "requested_change": "Also add the blank line between the first section header's `-/` (line 27) and `/-- Definition: the positive part of the logarithm. -/` (line 28), so all four section headers are spaced the same way.",
+  "severity": "advisory",
+  "evidence": "File as the PR leaves it: lines 25-28 `/-!` / `## Definition, Notation and Reformulations` / `-/` / `/-- Definition: ...` (no blank line). Lines 37-41, 112-116 and 149-153 each have `-/` followed by a blank line, which the PR inserted (diff `+` blank lines at hunks @@ -35,6 +37,7 @@, @@ -91,9 +98,21 @@, @@ -130,8 +149,10 @@)."
+ }
+]

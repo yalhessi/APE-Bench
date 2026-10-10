@@ -1,0 +1,30 @@
+[
+ {
+  "target": "tprod_nonneg",
+  "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the statement does not need: when `L` is not `NeBot`, `tprod_bot` turns `∏'[L] i, f i` into `∏ᶠ i, f i`, and that is nonnegative too. The sibling lemmas in this file, `one_le_tprod` (whose additive form is `tsum_nonneg`) and `tprod_le_one`, already handle the `¬ L.NeBot` case this way and carry no `NeBot` assumption. As written, the new lemma is strictly weaker than its siblings for an arbitrary summation filter.",
+  "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg`. Handle the degenerate filter the way `one_le_tprod` and `tprod_le_one` do: split on `L.NeBot`, and in the `¬ L.NeBot` branch use `rw [tprod_bot hL]; exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`. (`finprod_nonneg` itself needs `CommSemiring` and `IsOrderedRing`, so it is too strong for these typeclasses.) Verified replacement:\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf",
+  "severity": "advisory",
+  "evidence": "Read Order.lean. `one_le_tprod` (l.168) and `tprod_le_one` (l.176) have no `[L.NeBot]` and close the bot case with `tprod_bot hL` plus `one_le_finprod'` or `finprod_induction`. `tprod_bot (hL : ¬L.NeBot) (f) : ∏'[L] b, f b = ∏ᶠ b, f b` is in InfiniteSum/Defs.lean:184. `finprod_nonneg` (Finprod.lean:259) requires `[CommSemiring R] [PartialOrder R] [IsOrderedRing R]`, so `finprod_induction` is used directly. lean_verify_edit on the replacement above, with `[L.NeBot]` removed: outcome `compiled`, no errors, no warnings. A `simpa [tprod_bot hL] using finprod_induction ...` variant also compiled."
+ },
+ {
+  "target": "tprod_nonneg",
+  "claim": "In the multipliable branch, `tprod_nonneg` calls `ge_of_tendsto' h.hasProd ...` directly. This file already wraps exactly that call as `le_hasProd_of_le_prod` (l.36: `(hf : HasProd f a L) (h : ∀ s, c ≤ ∏ i ∈ s, f i) : c ≤ a := ge_of_tendsto' hf h`), under the same `[ClosedIciTopology α] [L.NeBot]` assumptions.",
+  "requested_change": "Replace `exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` with `exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i`, which goes through the file's own HasProd-order API rather than the raw filter lemma.",
+  "severity": "advisory",
+  "evidence": "`le_hasProd_of_le_prod` is at Order.lean:36 in the `Preorder` section (`[Preorder α] [CommMonoid α] [TopologicalSpace α]`, `[ClosedIciTopology α] [L.NeBot]`). `CommMonoidWithZero α` provides the `CommMonoid` it needs. lean_verify_edit with only this one-line change, keeping `[L.NeBot]`: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "tprod_nonneg",
+  "claim": "The statement binds the product variable as `x` (`0 ≤ ∏'[L] x, f x`). The surrounding `tprod` lemmas in this file write `∏'[L] i, f i` (`one_le_tprod`, `tprod_le_one`, `Multipliable.tprod_le_of_prod_le`, `tprod_le_of_prod_le'`), and the hypothesis of this same lemma already says `∀ i, 0 ≤ f i`.",
+  "requested_change": "Change the conclusion to `0 ≤ ∏'[L] i, f i`.",
+  "severity": "advisory",
+  "evidence": "Read Order.lean lines 120-183: every `∏'[L]` conclusion uses `i` as its bound variable. The verified replacement in the generalization finding already uses `∏'[L] i, f i` and compiles (lean_verify_edit: `compiled`)."
+ },
+ {
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "claim": "The new section is named `section WithZero` / `end WithZero`. `WithZero` is a Mathlib type constructor (`WithZero α`), and the section contains nothing about it. Its one lemma is about a `CommMonoidWithZero`. The neighbouring sections are named after the algebraic structure they assume (`OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`, `LinearOrderedCommRing`), so the name misleads.",
+  "requested_change": "Rename the section to `section CommMonoidWithZero` ... `end CommMonoidWithZero`. Optionally, hoist the shared assumptions into a section `variable` line, as the sibling sections do.",
+  "severity": "advisory",
+  "evidence": "Read the section names in Order.lean (Preorder, OrderedCommMonoid, OrderedCommGroup, WithZero (new), CanonicallyOrderedMul, LinearOrder, LinearOrderedCommRing). lean_verify_edit replacing lines 237-246 with the section renamed to `CommMonoidWithZero`: outcome `compiled`, no errors."
+ }
+]

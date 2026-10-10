@@ -1,0 +1,44 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/Combinatorics/Additive/ErdosGinzburgZiv.lean",
+   "matches": [
+    {
+     "line_number": 32,
+     "content": "    32|private noncomputable def f₁ (s : Finset ι) (a : ι → ZMod p) : MvPolynomial s (ZMod p) :="
+    },
+    {
+     "line_number": 36,
+     "content": "    36|private noncomputable def f₂ (s : Finset ι) (a : ι → ZMod p) : MvPolynomial s (ZMod p) :="
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Combinatorics/Additive/Corner/Roth.lean",
+   "matches": [
+    {
+     "line_number": 75,
+     "content": "    75|noncomputable def cornersTheoremBound (ε : ℝ) : ℕ := ⌊(triangleRemovalBound (ε / 9) * 27)⁻¹⌋₊ + 1"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Combinatorics/Additive/AP/Three/Behrend.lean",
+   "matches": [
+    {
+     "line_number": 334,
+     "content": "   334|noncomputable def nValue (N : ℕ) : ℕ :="
+    },
+    {
+     "line_number": 338,
+     "content": "   338|noncomputable def dValue (N : ℕ) : ℕ := ⌊(N : ℝ) ^ (nValue N : ℝ)⁻¹ / 2⌋₊"
+    }
+   ]
+  }
+ ],
+ "files_available": 18,
+ "files_scanned": 18,
+ "files_with_matches": 3,
+ "truncated": false
+}

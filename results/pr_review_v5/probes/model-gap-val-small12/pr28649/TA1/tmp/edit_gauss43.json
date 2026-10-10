@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Distributions/Gaussian/Real.lean", "line_start": 43, "line_end": 43, "replacement": "/-- Probability density function of the Gaussian distribution with mean `μ` and variance `v` -/"}

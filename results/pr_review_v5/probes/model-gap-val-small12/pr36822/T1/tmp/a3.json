@@ -1,0 +1,1 @@
+{"path":"Mathlib/Order/Interval/Set/Disjoint.lean","line_start":87,"line_end":87,"replacement":"\nexample : Disjoint (Iio a) (Ioi a) := by simp\nexample : Disjoint (Ioi a) (Iio a) := by simp\nexample [DenselyOrdered α] : Disjoint (Iio a) (Ioi b) ↔ ¬b < a := by simp\nexample [DenselyOrdered α] : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp\n"}

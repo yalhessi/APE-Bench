@@ -1,0 +1,266 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "to_dual: the generated translated name equals the original name 'Set.iUnion_Icc_right'.\nIf this is intentional, use the `@[to_dual self]` syntax.\nOtherwise, check that your declaration name is correct (if your declaration is an instance, try naming it)\nor provide a translated name using the `@[to_dual my_add_name]` syntax.",
+   "code_line": "@[to_dual (attr := simp)]",
+   "pos": {
+    "column": 2,
+    "line": 92
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`Set.iUnion_Ico_right` has already been declared",
+   "code_line": "theorem iUnion_Ico_right [NoMaxOrder α] (a : α) : ⋃ b, Ico a b = Ici a := by",
+   "pos": {
+    "column": 8,
+    "line": 105
+   }
+  },
+  {
+   "severity": "error",
+   "data": "to_dual: the generated translated name equals the original name 'Set.iUnion_Ioo_right'.\nIf this is intentional, use the `@[to_dual self]` syntax.\nOtherwise, check that your declaration name is correct (if your declaration is an instance, try naming it)\nor provide a translated name using the `@[to_dual my_add_name]` syntax.",
+   "code_line": "@[to_dual (attr := simp)]",
+   "pos": {
+    "column": 2,
+    "line": 108
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Ici_disjoint_Iio`",
+   "code_line": "example := @Ici_disjoint_Iio",
+   "pos": {
+    "column": 12,
+    "line": 112
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Ioi_disjoint_Iic`",
+   "code_line": "example := @Ioi_disjoint_Iic",
+   "pos": {
+    "column": 12,
+    "line": 113
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iic_disjoint_Ici`",
+   "code_line": "example := @Iic_disjoint_Ici",
+   "pos": {
+    "column": 12,
+    "line": 114
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_of_not_lt`",
+   "code_line": "example := @Iio_disjoint_Ioi_of_not_lt",
+   "pos": {
+    "column": 12,
+    "line": 115
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_of_le`",
+   "code_line": "example := @Iio_disjoint_Ioi_of_le",
+   "pos": {
+    "column": 12,
+    "line": 116
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_same`",
+   "code_line": "example := @Iio_disjoint_Ioi_same",
+   "pos": {
+    "column": 12,
+    "line": 117
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_iff`",
+   "code_line": "example := @Iio_disjoint_Ioi_iff",
+   "pos": {
+    "column": 12,
+    "line": 118
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Icc_left`",
+   "code_line": "example := @iUnion_Icc_left",
+   "pos": {
+    "column": 12,
+    "line": 120
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ico_left`",
+   "code_line": "example := @iUnion_Ico_left",
+   "pos": {
+    "column": 12,
+    "line": 121
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ioc_left`",
+   "code_line": "example := @iUnion_Ioc_left",
+   "pos": {
+    "column": 12,
+    "line": 123
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ioo_left`",
+   "code_line": "example := @iUnion_Ioo_left",
+   "pos": {
+    "column": 12,
+    "line": 124
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 14 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "to_dual: the generated translated name equals the original name 'Set.iUnion_Icc_right'.\nIf this is intentional, use the `@[to_dual self]` syntax.\nOtherwise, check that your declaration name is correct (if your declaration is an instance, try naming it)\nor provide a translated name using the `@[to_dual my_add_name]` syntax.",
+   "code_line": "@[to_dual (attr := simp)]",
+   "pos": {
+    "column": 2,
+    "line": 92
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`Set.iUnion_Ico_right` has already been declared",
+   "code_line": "theorem iUnion_Ico_right [NoMaxOrder α] (a : α) : ⋃ b, Ico a b = Ici a := by",
+   "pos": {
+    "column": 8,
+    "line": 105
+   }
+  },
+  {
+   "severity": "error",
+   "data": "to_dual: the generated translated name equals the original name 'Set.iUnion_Ioo_right'.\nIf this is intentional, use the `@[to_dual self]` syntax.\nOtherwise, check that your declaration name is correct (if your declaration is an instance, try naming it)\nor provide a translated name using the `@[to_dual my_add_name]` syntax.",
+   "code_line": "@[to_dual (attr := simp)]",
+   "pos": {
+    "column": 2,
+    "line": 108
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Ici_disjoint_Iio`",
+   "code_line": "example := @Ici_disjoint_Iio",
+   "pos": {
+    "column": 12,
+    "line": 112
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Ioi_disjoint_Iic`",
+   "code_line": "example := @Ioi_disjoint_Iic",
+   "pos": {
+    "column": 12,
+    "line": 113
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iic_disjoint_Ici`",
+   "code_line": "example := @Iic_disjoint_Ici",
+   "pos": {
+    "column": 12,
+    "line": 114
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_of_not_lt`",
+   "code_line": "example := @Iio_disjoint_Ioi_of_not_lt",
+   "pos": {
+    "column": 12,
+    "line": 115
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_of_le`",
+   "code_line": "example := @Iio_disjoint_Ioi_of_le",
+   "pos": {
+    "column": 12,
+    "line": 116
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_same`",
+   "code_line": "example := @Iio_disjoint_Ioi_same",
+   "pos": {
+    "column": 12,
+    "line": 117
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `Iio_disjoint_Ioi_iff`",
+   "code_line": "example := @Iio_disjoint_Ioi_iff",
+   "pos": {
+    "column": 12,
+    "line": 118
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Icc_left`",
+   "code_line": "example := @iUnion_Icc_left",
+   "pos": {
+    "column": 12,
+    "line": 120
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ico_left`",
+   "code_line": "example := @iUnion_Ico_left",
+   "pos": {
+    "column": 12,
+    "line": 121
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ioc_left`",
+   "code_line": "example := @iUnion_Ioc_left",
+   "pos": {
+    "column": 12,
+    "line": 123
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown identifier `iUnion_Ioo_left`",
+   "code_line": "example := @iUnion_Ioo_left",
+   "pos": {
+    "column": 12,
+    "line": 124
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

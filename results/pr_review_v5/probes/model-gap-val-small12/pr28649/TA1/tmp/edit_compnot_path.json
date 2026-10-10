@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Kernel/Composition/CompNotation.lean", "line_start": 23, "line_end": 24, "replacement": "/- This file is only for lemmas that are direct specializations of `Measure.bind` to kernels,\nanything more involved should go elsewhere (for example\n`Mathlib/Probability/Kernel/Composition/MeasureComp.lean`). -/"}
