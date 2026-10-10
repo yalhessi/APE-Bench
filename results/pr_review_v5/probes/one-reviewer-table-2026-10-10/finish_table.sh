@@ -29,9 +29,11 @@ until complete "${apt[@]}" && pair_done; do sleep 300; done
 echo "$(date -Is) P14 sessions all in"
 flag=0
 for f in $S/claude_logs/pair_T1_*.jsonl $S/claude_logs/pair_TA1_*.jsonl; do
-  python3 $P/audit_batch.py "$f" > "$f.audit" 2>&1 || { flag=1; echo "FLAG in $f (see $f.audit)"; }
+  python3 $P/audit_batch.py "$f" > "$f.audit" 2>&1 || { flag=1; echo "FLAG in $f (see $f.audit)"
+    [[ ",${FLAGS_READ:-}," == *",$(basename "$f" .jsonl),"* ]] && { echo "  read by hand and cleared (README)"; flag=$((flag - 1)); }; }
 done
-[ $flag = 0 ] || { echo "$(date -Is) STOP: a pair transcript is flagged; read it before matching"; exit 4; }
+# FLAGS_READ: the comma-separated batches whose flags were read by hand and recorded in the README.
+[ $flag -le 0 ] || { echo "$(date -Is) STOP: a pair transcript is flagged; read it before matching"; exit 4; }
 bash $HERE/run_matching.sh P14_val configs/probe_sets/val_small12.yaml blinding_P14_val_SEALED.json sources_P14_val.json 4 || exit 5
 bash $HERE/run_matching.sh P14_post configs/probe_sets/postcutoff_2026_07_08_v1.yaml blinding_P14_post_SEALED.json sources_P14_post.json 3 || exit 5
 python3 $HERE/read_table.py > $HERE/table.txt 2>&1

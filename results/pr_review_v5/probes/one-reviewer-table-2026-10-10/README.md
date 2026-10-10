@@ -25,6 +25,21 @@ The plan, the reading rule and every row's configuration are in
 - **Either way the fresh-set runs** drop these PRs or accept the overlay. Which one is decided before
   its pre-registration.
 
+## The Claude pair's transcript audit (read 2026-10-10, before any matching)
+
+`audit_batch.py` over the 14 pair streams: 12 batches clean, and 5 flags in two batches.
+- `pair_T1_1`: 30641 T1, 1 flag.
+- `pair_T1_4`: 42184 T1, 4 flags.
+
+All five are one benign pattern, the one stage F and the selectors recorded:
+- the session writes a file inside its own packet (`$D/tmp/v1.py`, `$D/tmp/write.py`, or
+  `findings.json` by heredoc);
+- it runs the file with the project's Python by absolute path;
+- it passes the resulting JSON to its own `$D/ptool lean_verify_edit`.
+
+The Python binary is the only path outside the packet, and nothing outside the packet is read. The
+finisher clears exactly these two (`FLAGS_READ=pair_T1_1,pair_T1_4`).
+
 ## Step 1, provisional: D12 issue recall for the rows on disk, all on `elm_gpt_5_mini`
 
 Read 2026-10-10 from `audits/<slug>(.elm)/semantic_report.json`. These are not the table's cells: the
