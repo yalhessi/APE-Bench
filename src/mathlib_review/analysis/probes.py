@@ -868,6 +868,18 @@ def _solo_runs(runs) -> Dict[int, tuple]:
     return out
 
 
+#: The target of a solo finding submitted with no anchor: a PR-level ask (the description, the
+#: title, the PR's scope), which the solo contract allows. Before 2026-10-10 such a finding rendered
+#: `None:None` and was refused; the refusal stays for a target that is missing or rendered broken.
+PR_LEVEL_TARGET = "PR level (no file or line)"
+
+
+def _solo_target(anchor) -> str:
+    if not anchor or not anchor.get("path"):
+        return PR_LEVEL_TARGET
+    return f"{anchor['path']}:{anchor.get('line_start')}" if anchor.get("line_start") is not None else anchor["path"]
+
+
 def _solo(run: str) -> Dict[int, tuple]:
     import asyncio
 
@@ -886,7 +898,7 @@ def _solo(run: str) -> Dict[int, tuple]:
                 if sample.successful_attempt is None or not result or not result.get("success"):
                     continue
                 pr = int(result["pr_number"])
-                found = [{"target": f"{(f.get('anchor') or {}).get('path')}:{(f.get('anchor') or {}).get('line_start')}",
+                found = [{"target": _solo_target(f.get("anchor")),
                           "claim": f.get("claim"), "requested_change": f.get("suggested_fix"),
                           "severity": f.get("severity")} for f in result.get("findings") or []]
                 split = compiles.get(pr, {"lean_verify_edit": -1, "lean_verify": -1})

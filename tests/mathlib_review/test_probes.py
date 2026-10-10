@@ -263,6 +263,16 @@ def test_a_solo_source_may_name_disjoint_runs_and_refuses_a_pr_in_two(monkeypatc
         probes._solo_runs(["a", "c"])
 
 
+def test_an_unanchored_solo_finding_reads_as_pr_level():
+    """A solo finding about the PR as a whole has no anchor (AP2 on 26755, 2026-10-10: "the PR has no
+    description"); it reaches the matcher as PR level, not as `None:None`."""
+
+    assert probes._solo_target(None) == probes.PR_LEVEL_TARGET
+    assert probes._solo_target({"path": None, "line_start": None}) == probes.PR_LEVEL_TARGET
+    assert probes._solo_target({"path": "Mathlib/X.lean", "line_start": 12}) == "Mathlib/X.lean:12"
+    assert probes._solo_target({"path": "Mathlib/X.lean", "line_start": None}) == "Mathlib/X.lean"
+
+
 def test_a_session_without_a_source_is_refused(tmp_path):
     seal = {"43192": {"R1": "Z1"}}
     with pytest.raises(ValueError, match="no source"):
