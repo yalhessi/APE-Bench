@@ -581,8 +581,13 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
                   brief: Path = BRIEF_X, root: Optional[Path] = None,
                   conventions: Optional[Dict[int, List[str]]] = None,
                   candidates: Optional[Dict[int, List[Dict[str, str]]]] = None,
-                  candidates_lead: str = "verify") -> List[Path]:
+                  candidates_lead: str = "verify",
+                  sections: Optional[Dict[int, str]] = None) -> List[Path]:
     """One packet per (PR, session): brief, PR text, diff, pass-0 model and the logging `ptool`.
+
+    `sections` (from `context_sections`) ends each brief with a conventions section already rendered
+    for a solo run's context file, byte for byte, so a Claude session reads what the solo session read
+    (the one reviewer table's Claude + AP, 2026-10-10). It takes the place of `conventions`.
 
     A packet that already holds findings is refused: it is a finished session, and rewriting its
     inputs would detach them from what it read. With `conventions`, each PR's brief ends with its
@@ -598,8 +603,10 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
 
     root = Path(root or Path.cwd())
     prs = list(prs or spec.pr_numbers)
-    if conventions is not None and candidates is not None:
-        raise ValueError("a packet's brief ends with conventions or with candidates, not both")
+    if sum(x is not None for x in (conventions, candidates, sections)) > 1:
+        raise ValueError("a packet's brief ends with one section (conventions, candidates or sections), not both")
+    if sections is not None and set(prs) - set(sections):
+        raise KeyError(f"no section for PRs {sorted(set(prs) - set(sections))}")
     if conventions is not None and set(prs) - set(conventions):
         raise KeyError(f"no conventions listed for PRs {sorted(set(prs) - set(conventions))}")
     if candidates is not None and set(prs) - set(candidates):
@@ -619,6 +626,8 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
             found = candidates[pr] if candidates else []
             section = (f"\n## {CONVENTIONS_TITLE}\n\n{conventions_section(held)}" if held else
                        f"\n## {CANDIDATES_TITLE}\n\n{candidates_section(found, lead)}" if found else "")
+            if sections is not None:
+                section = f"\n## {CONVENTIONS_TITLE}\n\n{sections[pr]}"
             (d / "brief.md").write_bytes(brief.read_bytes() + section.encode())
             (d / "model.md").write_text(models[pr])
             (d / "pr.md").write_text(pr_markdown(episodes[pr]))
@@ -626,6 +635,20 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
             _write_ptool(spec, d, pr, session, scratch, root)
             written.append(d)
     return written
+
+
+def context_sections(path: Path) -> Dict[int, str]:
+    """Each PR's conventions section text from a solo run's context file (`model_context`'s JSON
+    lines); a PR whose row holds no such section is left out."""
+
+    from src.mathlib_review.io import jsonl_rows
+
+    out = {}
+    for row in jsonl_rows(Path(path)):
+        texts = [s["text"] for s in row["sections"] if s["title"] == CONVENTIONS_TITLE]
+        if texts:
+            out[int(row["pr_number"])] = texts[0]
+    return out
 
 
 def _write_ptool(spec: ProbeSet, d: Path, pr: int, session: str, scratch: Path, root: Path) -> None:

@@ -220,6 +220,9 @@ def build_parser() -> argparse.ArgumentParser:
     parsers["packets"].add_argument("--candidates", type=Path, metavar="BRIEFS",
                                     help='end each brief with its PR\'s pinpointed candidates instead: a JSON '
                                          '{"prs": {pr: [items]}} (probes.load_candidates; needs --prs)')
+    parsers["packets"].add_argument("--conventions-from", type=Path,
+                                   help="end each brief with the conventions section of its PR's row in a "
+                                        "solo context file, byte for byte (probes.context_sections)")
     parsers["packets"].add_argument("--candidates-lead", default="verify",
                                     choices=["verify", "disposition", "ledger"],
                                     help="the candidates section's lead (probes.CANDIDATES_LEADS); "
@@ -711,7 +714,8 @@ def _probe(args, logger) -> int:
             spec, args.sessions, args.scratch.resolve(), prs=args.prs,
             conventions=probes.load_conventions(args.conventions, args.codebook) if args.conventions else None,
             candidates=probes.load_candidates(args.candidates) if args.candidates else None,
-            candidates_lead=args.candidates_lead)
+            candidates_lead=args.candidates_lead,
+            sections=probes.context_sections(args.conventions_from) if args.conventions_from else None)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "prompts":
         for pr in args.prs or spec.pr_numbers:

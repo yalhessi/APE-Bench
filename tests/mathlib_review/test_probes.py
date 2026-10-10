@@ -233,6 +233,24 @@ def test_harness_blind_inputs_read_claude_as_a_solo_submission(tmp_path):
     assert all("targets_unresolved" in st for pr in stats for s, st in stats[pr].items() if s in ("X1", "X2"))
 
 
+def test_a_packet_ends_with_the_solo_context_section_byte_for_byte(tmp_path):
+    """Claude + AP reads the section a DeepSeek AP session read: `--conventions-from` copies it."""
+
+    text = "These are conventions...\n\n- P001 a sentence\n  > an example\n\nThey outrank your judgement."
+    ctx = tmp_path / "context.jsonl"
+    ctx.write_text(json.dumps({"pr_number": "43192", "sections": [
+        {"title": "The PR model (pass 0)", "text": "model"},
+        {"title": probes.CONVENTIONS_TITLE, "text": text}]}) + "\n"
+        + json.dumps({"pr_number": "43167", "sections": [{"title": "The PR model (pass 0)", "text": "m"}]}) + "\n")
+    sections = probes.context_sections(ctx)
+    assert sections == {43192: text}, "a row without a conventions section is left out"
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe", "sessions_from": {}})
+    [d] = probes.write_packets(spec, ["TA1"], tmp_path / "scratch", prs=[43192], root=tmp_path, sections=sections)
+    assert (d / "brief.md").read_bytes() == probes.BRIEF_X.read_bytes() + f"\n## {probes.CONVENTIONS_TITLE}\n\n{text}".encode()
+    with pytest.raises(KeyError, match="no section"):
+        probes.write_packets(spec, ["TA1"], tmp_path / "scratch", prs=[43167], root=tmp_path, sections=sections)
+
+
 def test_a_session_without_a_source_is_refused(tmp_path):
     seal = {"43192": {"R1": "Z1"}}
     with pytest.raises(ValueError, match="no source"):
