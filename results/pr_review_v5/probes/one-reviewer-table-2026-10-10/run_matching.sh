@@ -4,10 +4,11 @@
 # matchers each (review finding 8), one headless batch on the primary token once the five-hour window
 # has room, the outputs checked and the transcripts audited, the batches' matches concatenated per
 # matcher, and the seal unblinded whole. A flag stops it before the unblinding.
-# usage: bash run_matching.sh <name> <set.yaml> <seal file> <sources file> <PRs a batch>
+# usage: bash run_matching.sh <name> <set.yaml> <seal file> <sources file> <PRs a batch> [merge]
+#   merge: the matchers have run and a flag was read by hand (README); check, merge and unblind only.
 #   e.g. bash run_matching.sh P14_val configs/probe_sets/val_small12.yaml blinding_P14_val_SEALED.json sources_P14_val.json 4
 set -euo pipefail
-name=$1; set_yaml=$2; seal=$3; sources=$4; size=$5
+name=$1; set_yaml=$2; seal=$3; sources=$4; size=$5; mode=${6:-run}
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$(git -C "$HERE" rev-parse --show-toplevel)"
 export PYTHONPATH=$PWD/src
@@ -17,6 +18,7 @@ TOKEN_VAR=CLAUDE_CODE_OAUTH_TOKEN
 source $P/token_window.sh
 probe() { ape/bin/python -m src.mathlib_review.review.cli probe "$@"; }
 work=$S/match_$name
+if [ "$mode" != merge ]; then
 rm -rf "$work"; mkdir -p "$work"
 ape/bin/python - "$T/$seal" "$size" "$work" <<'EOF'
 import json, sys
@@ -37,8 +39,9 @@ done
 echo "$(date -Is) $name: $(wc -l < "$work.prompts") matcher folders"
 wait_for_room 30 92 60 || { echo "no room for the matchers"; exit 3; }
 $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN m_$name $S/claude_logs - @"$work.prompts"
-python3 $P/check_matches.py "$work"/b*/m1 "$work"/b*/m2
 python3 $P/audit_batch.py $S/claude_logs/m_$name.jsonl || { echo "audit flagged; read by hand before unblinding"; exit 4; }
+fi
+python3 $P/check_matches.py "$work"/b*/m1 "$work"/b*/m2
 mkdir -p "$T/match_$name"
 ape/bin/python - "$work" "$T/match_$name" <<'EOF'
 import json, sys

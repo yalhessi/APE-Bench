@@ -36,8 +36,8 @@ done
 # FLAGS_READ: the comma-separated batches whose flags were read by hand and recorded in the README;
 # set it inside the wrapped command (sbatch --export splits on commas).
 [ $flag -eq 0 ] || { echo "$(date -Is) STOP: a pair transcript is flagged; read it before matching"; exit 4; }
-bash $HERE/run_matching.sh P14_val configs/probe_sets/val_small12.yaml blinding_P14_val_SEALED.json sources_P14_val.json 4 || exit 5
-bash $HERE/run_matching.sh P14_post configs/probe_sets/postcutoff_2026_07_08_v1.yaml blinding_P14_post_SEALED.json sources_P14_post.json 3 || exit 5
+[ -f $HERE/match_P14_val/unblinded.json ] || bash $HERE/run_matching.sh P14_val configs/probe_sets/val_small12.yaml blinding_P14_val_SEALED.json sources_P14_val.json 4 || exit 5
+[ -f $HERE/match_P14_post/unblinded.json ] || bash $HERE/run_matching.sh P14_post configs/probe_sets/postcutoff_2026_07_08_v1.yaml blinding_P14_post_SEALED.json sources_P14_post.json 3 || exit 5
 python3 $HERE/read_table.py > $HERE/table.txt 2>&1
 echo "$(date -Is) P14 matched; table.txt holds P14"
 
@@ -51,6 +51,6 @@ for r in "${dev[@]}"; do
   ape/bin/python -m src.mathlib_review.review.cli judge --config configs/pr_review_v5_medium_heldout_judge.yaml \
     --of "$r" --execute 2>&1 | tail -1
 done
-bash $HERE/run_matching.sh D12 configs/probe_sets/dev_medium_0_3_0.yaml blinding_D12_SEALED.json sources_D12.json 4 || exit 6
+[ -f $HERE/match_D12/unblinded.json ] || bash $HERE/run_matching.sh D12 configs/probe_sets/dev_medium_0_3_0.yaml blinding_D12_SEALED.json sources_D12.json 4 || exit 6
 python3 $HERE/read_table.py --judge > $HERE/table.txt 2>&1
 echo "$(date -Is) table finished: $HERE/table.txt"

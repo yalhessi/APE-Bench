@@ -40,6 +40,12 @@ All five are one benign pattern, the one stage F and the selectors recorded:
 The Python binary is the only path outside the packet, and nothing outside the packet is read. The
 finisher clears exactly these two (`FLAGS_READ=pair_T1_1,pair_T1_4`).
 
+**The P14 matchers' audit.** Four post-cutoff matcher folders ran. One flag, in `b1/m1`: it built
+its `matches.json` with its own `tmp/build.py`, run by the project's Python. That script opens only
+its own folder's `R*_pr*.json` and writes `matches.json`; the other three did the same with the
+system `python3`, which the audit does not flag. Read by hand, cleared, and unblinded with
+`run_matching.sh ... merge`.
+
 ## Step 1, provisional: D12 issue recall for the rows on disk, all on `elm_gpt_5_mini`
 
 Read 2026-10-10 from `audits/<slug>(.elm)/semantic_report.json`. These are not the table's cells: the
