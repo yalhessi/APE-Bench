@@ -20,7 +20,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import yaml
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -823,11 +823,13 @@ class Source(BaseModel):
 
     `claude`: a packet's `findings.json` (the label is the session directory's name);
     `solo`: a `cli run` solo run's task results; `lead`: a lead run's `findings.jsonl`, all channels.
+    A solo source may name several runs that hold disjoint PRs, one session a PR (the one reviewer
+    table's AP: stage AP's ten PRs and the apt run's four).
     """
 
     model_config = ConfigDict(extra="forbid")
     kind: Literal["claude", "solo", "lead"]
-    run: Optional[str] = None
+    run: Optional[Union[str, List[str]]] = None
 
 
 def _claude(spec: ProbeSet, pr: int, session: str):
@@ -851,6 +853,19 @@ def _solo_compiles(run: str) -> Dict[int, Dict[str, int]]:
             "lean_verify_edit": sum(v for k, v in counts.items() if k.endswith("lean_verify_edit")),
             "lean_verify": sum(v for k, v in counts.items() if k.endswith("lean_verify"))}
     return calls
+
+
+def _solo_runs(runs) -> Dict[int, tuple]:
+    """`_solo` over one run or several that hold disjoint PRs; a PR in two of them is refused."""
+
+    out: Dict[int, tuple] = {}
+    for run in ([runs] if isinstance(runs, str) else runs):
+        got = _solo(run)
+        twice = set(got) & set(out)
+        if twice:
+            raise ValueError(f"PRs {sorted(twice)} are in two of the runs {runs}")
+        out.update(got)
+    return out
 
 
 def _solo(run: str) -> Dict[int, tuple]:
@@ -977,7 +992,7 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
     missing = used - set(sources)
     if missing:
         raise ValueError(f"no source for sessions {sorted(missing)}")
-    loaded = {s: (_solo(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
+    loaded = {s: (_solo_runs(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
               for s in used if sources[s].kind != "claude"}
     stats: Dict[str, Dict[str, Any]] = {}
     graph_by_pr = _graphs(spec) if harness_blind and any(sources[s].kind == "claude" for s in used) else {}

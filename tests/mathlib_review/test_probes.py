@@ -251,6 +251,18 @@ def test_a_packet_ends_with_the_solo_context_section_byte_for_byte(tmp_path):
         probes.write_packets(spec, ["TA1"], tmp_path / "scratch", prs=[43167], root=tmp_path, sections=sections)
 
 
+def test_a_solo_source_may_name_disjoint_runs_and_refuses_a_pr_in_two(monkeypatch):
+    """AP in the one reviewer table is stage AP's ten-PR run and the apt run's four: one label, two runs."""
+
+    by_run = {"a": {1: ("f1", {}), 2: ("f2", {})}, "b": {3: ("f3", {})}, "c": {2: ("g2", {})}}
+    monkeypatch.setattr(probes, "_solo", lambda run: by_run[run])
+    assert set(probes._solo_runs(["a", "b"])) == {1, 2, 3}
+    assert probes._solo_runs("a") == by_run["a"]
+    assert probes.Source(kind="solo", run=["a", "b"]).run == ["a", "b"]
+    with pytest.raises(ValueError, match="in two of the runs"):
+        probes._solo_runs(["a", "c"])
+
+
 def test_a_session_without_a_source_is_refused(tmp_path):
     seal = {"43192": {"R1": "Z1"}}
     with pytest.raises(ValueError, match="no source"):
