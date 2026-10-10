@@ -1,0 +1,49 @@
+# The one reviewer table (2026-10-10)
+
+The plan, the reading rule and every row's configuration are in
+`docs/plans/2026-10-10-one-reviewer-table.md`, revised after the review round in
+`docs/research/one-reviewer-table-review-2026-10.md`. This folder holds the scripts and the record.
+
+## What runs where
+
+| cell | script | where | started |
+|---|---|---|---|
+| fresh set's reviewed workspaces | `prebuild --reviewed` | Slurm 449292 | 04:31; 37 of 39 built by 10:19 (26083 and 35571 failed) |
+| gpt-5.5 contract v2, P14 and D12, 3 reps | `run_gpt.sh` | Slurm 450109 | 10:45 |
+| D12 re-judges on `elm_gpt_5_mini` | `rejudge_dev.sh` | shell | 10:49; done 11:06 |
+| 19 blind selectors | `run_claude_batch.sh @selectors` | primary token | 10:50; done (audit: `audit_selectors.txt`) |
+| DeepSeek: apt on P14's 4 PRs; D12 solo and apt | `run_ds41_gate.sh` | Slurm 450144, server 450145 | 11:05; server up 11:18 |
+| Opus T1 and TA1 on P14 | `run_claude_pair.sh` | Slurm 450195 | 11:09 |
+
+## Step 1, provisional: D12 issue recall for the rows on disk, all on `elm_gpt_5_mini`
+
+Read 2026-10-10 from `audits/<slug>(.elm)/semantic_report.json`. These are not the table's cells: the
+new D12 runs replace the gpt and DeepSeek rows.
+
+| row | reps (of 23) | findings, 15 PRs |
+|---|---|---|
+| Opus 5.5, X route (2026-09-29) | 12, 11 | 119, 130 |
+| Opus 5.5, project harness (contract v2, `claude_sub`) | 8, 7 | 99, 97 |
+| Opus 5.5, hygiene (finding budget 40, write tools; not like-for-like) | 10, 9, 8 | 93, 103, 102 |
+| gpt-5.5, contract v2 (OpenAI endpoint, 2026-10-01) | 3 | 39 |
+| DeepSeek-V4.1-Flash, keepthink (plain server) | 8, 6, 9 | 60, 51, 54 |
+
+So "DeepSeek near Claude on dev" holds against Opus under the project harness. Against the X route,
+the Claude that P14 uses, Opus is ahead by 3 to 6 obligations, and files about twice as much.
+
+## The D12 census share, and AP's expected effect there (written before any D12 AP session is read)
+
+- **Census share.** Two blind readers labelled D12's 47 agreed asks against reader A's codebook,
+  assign-only (`build_reader_folders.py <dir> configs/probe_sets/dev_medium_0_3_0.yaml`). Both
+  transcripts audit clean, at 10 tool calls each.
+  - **40 of 47 are in census** (either reader); 38 by both; the same primary entry on 37.
+  - P14 has the same share: 39 of 46.
+  - Labels: `conventions-ceiling-2026-10-04/readers_dev/`; per ask: `asks_dev_census.json`.
+- **Retrieval.** The apt picks hold the entry of **29 of the 40** in-census asks (0.72). On the ten
+  stage F PRs it was 22 of 33 (0.67).
+- **Expectation, if the ten PRs' rates transfer.** On those PRs AP reached 0.50 of picked asks
+  against solo's 0.20, and 0.03 of unpicked ones against 0.09. Applied to dev's split:
+  0.72 × (+0.30) + 0.28 × (−0.06) ≈ **+0.20** of in-census reach on the matcher scorer.
+  - On the judge's 23 obligations that is about +2 to +4.
+  - It is inside D12's minimum detectable difference of about 5, so the judge alone cannot read it.
+  - The matcher seal over the 47 asks is the instrument that can.
