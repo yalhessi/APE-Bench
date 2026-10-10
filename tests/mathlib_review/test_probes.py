@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -207,6 +208,29 @@ def test_the_committed_readings_recompute(seal_name, match_dir, expected, publis
     in_scope = probes.unblind(asks, seal, matches, stats, scope=PASS34)
     if seal_name == "blinding_SEALED.json":
         assert in_scope["asks"] == 9 and in_scope["1"]["condition_reach"]["X"] == pytest.approx(4 / 9)
+
+
+def test_harness_blind_inputs_read_claude_as_a_solo_submission(tmp_path):
+    """The one reviewer table's seals hold Claude sessions beside solo runs: with `harness_blind` a
+    Claude finding's target reads `path:line` where it resolves, as a solo finding's does, no session
+    is longer than the solo budget, and no text says "convention" (a word; "conventional" is
+    prose); the default inputs are pinned above."""
+
+    feedback, asks = json.loads(POST.feedback_file.read_text()), json.loads(POST.asks_file.read_text())
+    seal = json.loads((G52_DIR / "blinding_SEALED.json").read_text())
+    stats = probes.match_inputs(POST, feedback, asks, seal, _sources(), tmp_path, harness_blind=True)
+    claude = {(pr, label) for pr, labels in seal.items() for label, s in labels.items() if s in ("X1", "X2")}
+    located = total = 0
+    for pr, label in claude:
+        rows = json.loads((tmp_path / f"{label}_pr{pr}.json").read_text())
+        assert len(rows) <= probes.SOLO_FINDING_BUDGET
+        total += len(rows)
+        located += sum(bool(re.fullmatch(r"Mathlib/\S+\.lean(:\d+)?", str(r["target"]))) for r in rows)
+    assert total and located / total > 0.5, "most Claude targets resolve to a path"
+    for f in tmp_path.glob("*_pr*.json"):
+        if not f.name.startswith("asks_"):
+            assert not re.search(r"\bconventions?\b", f.read_text(), re.I), f.name
+    assert all("targets_unresolved" in st for pr in stats for s, st in stats[pr].items() if s in ("X1", "X2"))
 
 
 def test_a_session_without_a_source_is_refused(tmp_path):

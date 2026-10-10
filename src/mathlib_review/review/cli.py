@@ -236,6 +236,9 @@ def build_parser() -> argparse.ArgumentParser:
         parsers[name].add_argument("--seal", required=True, type=Path)
     parsers["match-inputs"].add_argument("--sources", required=True, type=Path,
                                          help='JSON {session: {"kind": "claude|solo|lead", "run": ...}}')
+    parsers["match-inputs"].add_argument("--harness-blind", action="store_true",
+                                         help="cut Claude sessions to the solo budget, locate their targets "
+                                              "as path:line, and redact the conventions cues (probes.match_inputs)")
     parsers["unblind"].add_argument("--matches", required=True, type=Path,
                                     help="a directory with matches.1.json, matches.2.json, session_stats.json")
     parsers["unblind"].add_argument("--scope", nargs="+", help="families to restrict to")
@@ -751,7 +754,8 @@ def _probe(args, logger) -> int:
         inputs = args.out / "inputs"
         stats = probes.match_inputs(spec, json.loads(spec.feedback_file.read_text()),
                                     json.loads(spec.asks_file.read_text()),
-                                    json.loads(args.seal.read_text()), sources, inputs)
+                                    json.loads(args.seal.read_text()), sources, inputs,
+                                    harness_blind=args.harness_blind)
         files = sorted(p for p in inputs.iterdir() if p.name != "session_stats.json")
         seal = json.loads(args.seal.read_text())
         reviewers = {len(labels) for labels in seal.values()}

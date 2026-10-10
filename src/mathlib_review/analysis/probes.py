@@ -759,11 +759,20 @@ _REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"
 MATCHER_RUBRIC = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/matcher_rubric.md")
 
 
-def redact(text):
-    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text."""
+#: With `harness_blind`, also the cues a conventions condition leaves in its own words: a codebook
+#: id, and "convention" itself (7 of 25 AP findings against 2 of 28 solo ones on validation,
+#: 2026-10-10). Applied to every session alike, so it is not itself a cue.
+_REDACT_CONVENTIONS = [(re.compile(r"\bP\d{3}\b"), "a practice"), (re.compile(r"\bconventions\b"), "practices"),
+                       (re.compile(r"\bconvention\b"), "practice"), (re.compile(r"\bConventions\b"), "Practices"),
+                       (re.compile(r"\bConvention\b"), "Practice")]
+
+
+def redact(text, conventions: bool = False):
+    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text, and with
+    `conventions` the conventions conditions' (`_REDACT_CONVENTIONS`)."""
     if not isinstance(text, str):
         return text
-    for pattern, repl in _REDACT:
+    for pattern, repl in _REDACT + (_REDACT_CONVENTIONS if conventions else []):
         text = pattern.sub(repl, text)
     return text
 
@@ -925,12 +934,19 @@ def seal_labels(prs: List[int], sessions: List[str]) -> Dict[str, Dict[str, str]
 
 
 def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
-                 seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path) -> Dict[str, Any]:
+                 seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path,
+                 harness_blind: bool = False) -> Dict[str, Any]:
     """Blind inputs: per sealed PR, its asks and every session's findings under its shuffled label.
 
     Findings are stripped to `KEEP` with cues redacted. A finding without a target is refused, since
     a matcher would judge it without a location (test (b)'s solo findings reached the matchers as
     `None:None` until 2026-09-29).
+
+    `harness_blind` (the one reviewer table's seals, 2026-10-10) removes what still says which harness
+    wrote a finding when Claude sessions sit beside solo runs in one seal: a Claude session is cut to
+    the solo budget (its first 20, as `import_probe_session` cuts it), its prose target is located by
+    `resolve_target` and written `path:line` as a solo finding's is (an unresolved one keeps its text),
+    and every session's text loses the conventions cues. The counts go into `session_stats.json`.
     """
 
     out.mkdir(parents=True, exist_ok=True)
@@ -941,17 +957,20 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
     loaded = {s: (_solo(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
               for s in used if sources[s].kind != "claude"}
     stats: Dict[str, Dict[str, Any]] = {}
+    graph_by_pr = _graphs(spec) if harness_blind and any(sources[s].kind == "claude" for s in used) else {}
     for pr, labels in seal.items():
         write_json(out / f"asks_pr{pr}.json", ask_packet(feedback, asks["asks"][pr]))
         for label, session in labels.items():
             if sources[session].kind == "claude":
                 found, st = _claude(spec, int(pr), session)
+                if harness_blind:
+                    found, st = _claude_as_solo(found, st, graph_by_pr[int(pr)])
             else:
                 if int(pr) not in loaded[session]:
                     raise ValueError(f"{session} has no successful session for PR {pr}")
                 found, st = loaded[session][int(pr)]
             stats.setdefault(pr, {})[session] = st
-            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k))
+            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k), harness_blind)
                                     for k in KEEP}} for n, f in enumerate(found)]
             lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
             if lost:
@@ -959,6 +978,36 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
             write_json(out / f"{label}_pr{pr}.json", stripped)
     write_json(out / "session_stats.json", stats)
     return stats
+
+
+def _graphs(spec: ProbeSet) -> Dict[int, Any]:
+    """The set's round-1 change graphs by PR, as `import_probe_session` reads them."""
+
+    from src.mathlib_review.review.runner import load_release, load_run
+
+    dataset, _scaffold, _ = load_run(Path(spec.dataset_config),
+                                     overrides={"dataset": {"pr_numbers": list(spec.pr_numbers)}})
+    return {g.pr_number: g for g in load_release(dataset)["graphs"] if ":round1:" in g.episode_id}
+
+
+#: SoloReviewConfig.finding_budget, the cap a solo submission is cut to.
+SOLO_FINDING_BUDGET = 20
+
+
+def _claude_as_solo(found: List[Dict[str, Any]], st: Dict[str, Any], graph) -> tuple:
+    """A Claude session's findings as a solo submission reaches a matcher: its first
+    `SOLO_FINDING_BUDGET`, each prose target located as `path:line` where `resolve_target` can."""
+
+    kept, unresolved = [], 0
+    for f in found[:SOLO_FINDING_BUDGET]:
+        path, line, method = resolve_target(f.get("target"), graph)
+        if path:
+            f = {**f, "target": f"{path}:{line}" if line is not None else path}
+        else:
+            unresolved += 1
+        kept.append(f)
+    return kept, {**st, "findings": len(kept), "cut_to_budget": max(0, len(found) - SOLO_FINDING_BUDGET),
+                  "targets_unresolved": unresolved}
 
 
 def condition(session: str) -> str:
