@@ -34,7 +34,7 @@ n=0
 for ((i = 0; i < ${#queue[@]}; i += 2)); do
   batch=("${queue[@]:i:2}")
   t1=($(unfinished T1 "${batch[@]}")); ta=($(unfinished TA1 "${batch[@]}"))
-  need=$(( 10 * (${#t1[@]} + ${#ta[@]}) ))
+  need=$(( 4 * (${#t1[@]} + ${#ta[@]}) ))  # measured: a session is about 2.5 points (batches 1-4, 2026-10-10)
   [ "$need" -eq 0 ] && continue
   wait_for_room "$need" 92 60; rc=$?
   [ $rc -eq 2 ] && { echo "$(date -Is) STOP: the week is past 60%"; exit 2; }
