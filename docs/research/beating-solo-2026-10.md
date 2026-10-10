@@ -4,9 +4,77 @@
 solo reviewer to get a better deployable reviewer. I still believe sticking to the conventions is a
 good direction."*
 
-**Scope.** Every number below is DeepSeek-V4.1-Flash, self-hosted, on stage L/D's probe sets: 14
-Mathlib PRs, matched blind by two matchers. All of it is in-sample, and it is a direction, not a
-claim. "Deployable" means the reviewer never sees the maintainers' asks.
+*Revised 2026-10-10: the benchmark stated once, and every reviewer in one table, because the
+tables below it had mixed subsets and seals.*
+
+**Scope.** All of it is in-sample, and it is a direction, not a claim. "Deployable" means the
+reviewer never sees the maintainers' asks.
+
+## The benchmark, and why the numbers differ between tables
+
+**One benchmark throughout: the conventions probe sets** (`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/`).
+- **The set:** 14 Mathlib PRs (validation small12 and the post-cutoff probe), with 46 real
+  maintainer first-round asks. For 39 of them a census convention covers what the maintainer asked
+  for: the **in-census asks**, the measure's denominator.
+- **The measure:** per-session reach, the share of the in-census asks one review session's findings
+  reach, judged by two blind matchers. A condition ran one to three sessions; the table gives the
+  count.
+- **The ten PRs:** stage C ran only the ten PRs that hold an in-census ask neither unbriefed Claude
+  session reached. Of the other four, three hold 6 in-census asks that both Claude sessions reach,
+  and one holds none. Stages C, F, G and AP ran only these ten (AP because stage F's picks exist
+  only for them); L, M and D ran all 14. So the one comparison every condition shares is the **ten
+  PRs, 33 in-census asks**. They are the harder PRs, so every reviewer scores
+  lower there than on all 14.
+
+**Why the same reviewer shows different numbers:**
+- **The subset:** 14 PRs or 10. For example, solo DeepSeek reaches 0.22 on all 14 and 0.16 on the ten.
+- **The seal:** each round is matched afresh, by new matchers, with the two Claude solo sessions (X)
+  in every round as an anchor. The same two sessions read 0.27-0.39 on the ten PRs across seven
+  seals (0.36-0.49 on all 14). That ±0.06 is matching noise, so compare conditions within a seal
+  when one exists.
+- **Unions:** a union of reps is not a single session. Unions appear only in the AP table below,
+  marked "∪".
+
+## Every reviewer on the same ten PRs (33 in-census asks)
+
+Per-session reach, matcher 1 (matcher 2 where it differs). `read_common.py` in the probe folder
+prints every cell from the committed match tables.
+
+| reviewer | sees the asks? | ten PRs | all 14 PRs, where run | round, sessions |
+|---|---|---|---|---|
+| **solo** | | | | |
+| Qwen3.5-397B | no | 0.02 | 0.03 | L, 3 |
+| gpt-5.5 | no | 0.16 | 0.19 | M, 1 on validation and 2 on post-cutoff |
+| DeepSeek-V4.1-Flash | no | 0.16 (0.14-0.16) | 0.22 | AP and D, 3 |
+| Claude Opus 5.5 | no | **0.36** on AP's seal (0.27-0.39 over seven seals) | 0.38-0.49 | every round, 2 |
+| **conventions chosen from the diff alone (deployable)** | | | | |
+| Claude + 25 picks, as sentences (A) | no | 0.39 / 0.36 (X on the same seal: 0.36 / 0.33) | not run | F, 1 |
+| **DeepSeek + the same 25 picks, with examples and precedence (AP)** | **no** | **0.34** | not run | AP, 3 |
+| **the PR's own conventions (ceiling, not deployable)** | | | | |
+| Qwen + exact (LE) | yes | 0.04 | 0.09 | L, 3 |
+| gpt-5.5 + exact (GE) | yes | 0.30 | 0.41 | M, 1 |
+| gpt-5.5 + exact + disposition paragraph (GD) | yes | 0.55 on 31 of the 33 (GE on the same seal: 0.32) | 0.62 (13 PRs) | W (branch `generation-suppression`), 1 |
+| DeepSeek + exact (DE) | yes | 0.37 | 0.44 | D, 3 |
+| DeepSeek + exact + examples + precedence (DP) | yes | 0.62 / 0.61 | 0.64 | D, 3 |
+| Claude + exact (E) | yes | 0.70 | not run | C and F, 1 |
+
+**How to read it:**
+- Solo DeepSeek and solo gpt-5.5 are tied at 0.16, well below solo Claude at about 0.36.
+- AP, the ask-free conventions, roughly doubles DeepSeek to 0.34, close to solo Claude.
+- The same picks given to Claude as bare sentences moved it by only +0.03.
+- The ceiling rows show what the conventions carry once chosen right: 0.55-0.70 on the three stronger
+  models.
+
+**The other benchmark, the dev held-out 12,** is separate. It has 23 obligations on 12 other PRs,
+scored by the pipeline's judge v9, not by these matchers. Its solo readings:
+- DeepSeek: 8, 6, 9 of 23;
+- Opus 5.5: 11, 11 under brief X on the probe harness (the X sessions here), and 7, 7 under the
+  project harness;
+- gpt-5.5 under contract v2: 3 of 23;
+- Qwen: 2, 0, 2.
+
+No convention condition has run on dev. It counts as development material under the 2026-09-24
+ruling, which is why the deciding test below is the fresh set, not dev.
 
 ## In one paragraph
 
@@ -22,7 +90,7 @@ reviewer.
   reach more (about 0.55, simulated), but files about 25 times as much.
 - **Simply unioning solo runs** adds a little, at no design cost.
 
-## What was measured
+## AP and its combinations, on AP's seal (the same ten PRs)
 
 | reviewer | deployable? | in-census reach, 10 PRs (33 asks) | findings a PR | evidence |
 |---|---|---|---|---|
@@ -31,7 +99,7 @@ reviewer.
 | **AP: 25 ask-free conventions + examples + precedence** | **yes** (picks made by Opus from the diff) | **0.34** | 4.9 | stage AP, three reps, both matchers |
 | AP unioned with one solo rep | yes | 0.36 | ~7.6 | same seal |
 | per-place engine ∪ one solo rep (each picked convention asked at each changed place, one turn) | yes, but heavy | ~0.55 (simulated from measured parts) | ~68 (median) | places test + ladder, in-sample estimate |
-| *ceiling:* the conventions behind the PR's own asks, with examples and precedence (DP) | no | 0.61 | 3.5 | stage D |
+| *ceiling:* the conventions behind the PR's own asks, with examples and precedence (DP) | no | 0.62 | 3.5 | stage D |
 | *reference:* unbriefed Claude Opus | yes | 0.36 | 5.3 | same seal |
 
 ## What we learned
