@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P288",
+  "where": "Submodule.lean: three renamed theorems and their new deprecated aliases",
+  "why": "The PR renames three lemmas to improve their names and adds a deprecation for each old name."
+ },
+ {
+  "id": "P430",
+  "where": "Submodule.lean: aliases orthogonalProjection_eq_linear_proj, orthogonalProjection_coe_linearMap_eq_linearProj",
+  "why": "Existing 2025-07-11 deprecated aliases are retargeted to the new names while new aliases are added."
+ },
+ {
+  "id": "P019",
+  "where": "coe_starProjection_eq_isComplProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, orthogonalProjection_apply_eq_linearProjOfIsCompl",
+  "why": "New names spell statement declarations (IsCompl.projection as isComplProjection, toLinearMap as coe); tokenisation chosen."
+ },
+ {
+  "id": "P070",
+  "where": "coe_starProjection_eq_isComplProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl",
+  "why": "Rename moves coe from after the function name to before it, reordering name tokens."
+ },
+ {
+  "id": "P072",
+  "where": "Submodule.lean: old names starProjection_coe_eq_isCompl_projection and two others",
+  "why": "Renamed declarations are kept as deprecated aliases rather than deleted outright."
+ },
+ {
+  "id": "P073",
+  "where": "Submodule.lean: three new @[deprecated] aliases",
+  "why": "Each deprecation must name its replacement; aliases point at the renamed lemmas."
+ },
+ {
+  "id": "P434",
+  "where": "Submodule.lean: @[deprecated (since := \"2025-12-26\")] aliases",
+  "why": "New deprecations record their date in the since field."
+ },
+ {
+  "id": "P432",
+  "where": "all three renamed theorems (..._eq_linearProjOfIsCompl, ..._eq_isComplProjection)",
+  "why": "Equation lemmas named lhs_eq_rhs; renames change how both sides are spelled."
+ },
+ {
+  "id": "P254",
+  "where": "orthogonalProjection/starProjection sibling lemmas in Submodule.lean",
+  "why": "Renames align names across sibling lemmas about orthogonalProjection and starProjection."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Rename PR; title says only 'rename lemmas', description unrecoverable, should state old-to-new names."
+ },
+ {
+  "id": "P275",
+  "where": "Submodule.lean: three new deprecated aliases",
+  "why": "Old names deprecated in favour of replacements; must state the same result (aliases do)."
+ },
+ {
+  "id": "P082",
+  "where": "Submodule.lean: deprecated aliases replacing renamed theorems",
+  "why": "Deprecated declarations kept as one-line alias derivations from their replacements."
+ },
+ {
+  "id": "P113",
+  "where": "orthogonalProjection_apply_eq_linearProjOfIsCompl vs coe_orthogonalProjection_eq_linearProjOfIsCompl",
+  "why": "Pointwise and map-level variants distinguished by naming apply versus coe."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title chore(Analysis/InnerProductSpace/Projection/Submodule): rename lemmas; area omits Positive.lean also touched."
+ },
+ {
+  "id": "P121",
+  "where": "retargeted alias orthogonalProjection_eq_linear_proj and orthogonalProjection_coe_linearMap_eq_linearProj",
+  "why": "Older deprecations redirected to new names, not chained through newly deprecated intermediate names."
+ },
+ {
+  "id": "P122",
+  "where": "coe_starProjection_eq_isComplProjection statement",
+  "why": "Statement uses raw .toLinearMap projection while the name calls it coe."
+ },
+ {
+  "id": "P329",
+  "where": "Positive.lean: le_iff_range_le_range, starProjection_le_starProjection_iff",
+  "why": "Changes to existing proofs should be only the rename updates the PR's purpose needs."
+ },
+ {
+  "id": "P050",
+  "where": "Submodule.lean: open Submodule in before coe_starProjection_eq_isComplProjection",
+  "why": "open Submodule in sits inside namespace Submodule, above the renamed theorem."
+ },
+ {
+  "id": "P001",
+  "where": "Submodule.lean: Submodule.isCompl_orthogonal_of_hasOrthogonalProjection in renamed theorems",
+  "why": "Submodule. prefix written inside namespace Submodule in renamed declarations' statements."
+ },
+ {
+  "id": "P267",
+  "where": "Submodule.lean: stacked @[deprecated] alias pairs",
+  "why": "Runs of parallel deprecated aliases added adjacent to each other."
+ },
+ {
+  "id": "P130",
+  "where": "three renamed theorems",
+  "why": "Lemma names being chosen should state the conclusion of each equation."
+ },
+ {
+  "id": "P104",
+  "where": "coe_orthogonalProjection_eq_linearProjOfIsCompl, coe_starProjection_eq_isComplProjection",
+  "why": "Map-level equalities of bundled maps beside a pointwise apply version, renamed together."
+ },
+ {
+  "id": "P185",
+  "where": "whole PR (chore rename)",
+  "why": "A rename-only chore changes existing names, a stylistic change possibly by a third party."
+ },
+ {
+  "id": "P138",
+  "where": "whole PR (chore rename)",
+  "why": "Marginal-benefit rename whose deprecations and churn carry review and downstream cost."
+ },
+ {
+  "id": "P141",
+  "where": "three renamed theorems",
+  "why": "New theorem names must follow snake_case with lowerCamelCase declaration tokens."
+ }
+]

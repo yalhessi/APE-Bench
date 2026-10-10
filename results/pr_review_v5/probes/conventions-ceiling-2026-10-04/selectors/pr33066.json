@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P009",
+  "where": "ContinuousAlgEquiv.ofAlgEquiv (Topology/Algebra/Algebra/Equiv.lean); `use { toLinearEquiv := 0, ... }` in StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "why": "Structure instances built with `{ e with ... }` and `{ ... }` notation rather than `where` syntax."
+ },
+ {
+  "id": "P026",
+  "where": "auxContinuousLinearEquiv, auxIsometry (ContinuousAlgEquiv.lean)",
+  "why": "Two new auxiliary definitions declared `noncomputable abbrev`; whether unfolding is needed decides abbrev versus def."
+ },
+ {
+  "id": "P261",
+  "where": "auxContinuousLinearEquiv, auxIsometry, coe_auxIsometry, coe_symm_auxIsometry, coe_auxContinuousLinearEquiv",
+  "why": "Auxiliary declarations named with placeholder prefix `aux` instead of a descriptive name."
+ },
+ {
+  "id": "P391",
+  "where": "LinearIsometryEquiv.conjStarAlgEquiv_apply and conjStarAlgEquiv_apply_apply (Adjoint.lean)",
+  "why": "Map-level `_apply` and pointwise `_apply_apply` lemmas added; `@[simp]` placed only on the fully applied one."
+ },
+ {
+  "id": "P081",
+  "where": "conjStarAlgEquiv_refl/_trans, symm_conjStarAlgEquiv_apply_apply; ofAlgEquiv_trans_ofAlgEquiv among simp siblings",
+  "why": "`@[simp]` applied to some sibling lemmas of one family but not others, without a comment."
+ },
+ {
+  "id": "P048",
+  "where": "conjStarAlgEquiv lemmas `(e : H ≃ₗᵢ[𝕜] K)`; ofAlgEquiv lemmas `(e : A ≃ₐ[R] B) (he he')`; auxIsometry lemmas `(hαa : ...)`",
+  "why": "Same arguments repeated in each signature of consecutive declarations instead of one `variable`."
+ },
+ {
+  "id": "P411",
+  "where": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv proof; ContinuousAlgEquiv rewriting steps",
+  "why": "Many rewrites done with `▸` substitution (`thisα ▸ hα ▸ ...`, `adjoint_adjoint x ▸ this _`)."
+ },
+ {
+  "id": "P371",
+  "where": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv: this10, this1, this2, thisα, thisα', thisU, la, αa2",
+  "why": "Proof hypotheses named `this…`/`la` rather than after the variable they constrain (`α ≠ 0`)."
+ },
+ {
+  "id": "P127",
+  "where": "auxContinuousLinearEquiv left_inv/right_inv `have := by simpa ...`; main proof `have this10 :=`, `have this1 :=`",
+  "why": "Several `have`s leave non-evident statements to be inferred from their proof terms."
+ },
+ {
+  "id": "P339",
+  "where": "ContinuousAlgEquiv.coe_ofAlgEquiv, toAlgEquiv_ofAlgEquiv, symm_ofAlgEquiv, ofAlgEquiv_trans_ofAlgEquiv",
+  "why": "Signature binders `(he he')`, `(hf hf' hg hg')` given without explicit types."
+ },
+ {
+  "id": "P012",
+  "where": "`section linearIsometryEquiv`/`variable`, `end LinearIsometryEquiv`/`end linearIsometryEquiv` (Adjoint.lean); `section auxiliaryDefs`/`variable`",
+  "why": "New section, variable and end commands placed directly against neighbouring commands without blank lines."
+ },
+ {
+  "id": "P386",
+  "where": "`section linearIsometryEquiv` (Adjoint.lean), `section auxiliaryDefs` (ContinuousAlgEquiv.lean)",
+  "why": "New sections named; one spells `LinearIsometryEquiv` in lowerCamelCase, the other is generic."
+ },
+ {
+  "id": "P341",
+  "where": "symm_conjStarAlgEquiv_apply_apply, conjStarAlgEquiv_refl, conjStarAlgEquiv_trans, coe_auxContinuousLinearEquiv, coe_auxIsometry, ofAlgEquiv lemmas",
+  "why": "Undocumented routine lemmas declared with `theorem`, mixed with `lemma` in the same family."
+ },
+ {
+  "id": "P111",
+  "where": "docstrings of ContinuousAlgEquiv.ofAlgEquiv, auxIsometry, LinearIsometryEquiv.conjStarAlgEquiv",
+  "why": "Definition docstrings phrased as actions (`Interpret ...`, `Construct ...`, `induces`) rather than describing the value."
+ },
+ {
+  "id": "P029",
+  "where": "docstring of StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "why": "Docstring explains the theorem only as `the ⋆-algebra equivalence version of` another declaration."
+ },
+ {
+  "id": "P257",
+  "where": "docstring of auxContinuousLinearEquiv",
+  "why": "Docstring says `given certain properties are satisfied` instead of naming the hypotheses."
+ },
+ {
+  "id": "P404",
+  "where": "new OrderIsoClass instance at end of ContinuousAlgEquiv.lean",
+  "why": "New instance introduced with no docstring, only a preceding TODO comment."
+ },
+ {
+  "id": "P285",
+  "where": "`/- TODO: Remove instance ... -/` before the OrderIsoClass instance; TODO in theorem docstring",
+  "why": "TODO items placed in separate comment blocks below rather than in the module docstring's TODO list."
+ },
+ {
+  "id": "P074",
+  "where": "ContinuousAlgEquiv.lean imports InnerProductSpace.Adjoint, Positive, SpecialFunctions.Pow.Real",
+  "why": "Inner-product-space material added to a Normed/Operator file, pulling heavy imports into it."
+ },
+ {
+  "id": "P030",
+  "where": "import block of ContinuousAlgEquiv.lean",
+  "why": "New imports added, including Adjoint alongside Positive and Central.Basic; possibly redundant or unneeded."
+ },
+ {
+  "id": "P299",
+  "where": "import block of ContinuousAlgEquiv.lean",
+  "why": "Blank line separates the new `public import`s from the plain `import`s."
+ },
+ {
+  "id": "P422",
+  "where": "`open ComplexOrder` before StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "why": "Scoped-instance namespace `ComplexOrder` opened with plain `open`, not `open scoped`."
+ },
+ {
+  "id": "P059",
+  "where": "`conjContinuousAlgEquiv_apply,  adjoint_comp` in main proof; `### TODO:` module docstring heading",
+  "why": "A doubled space inside a rewrite list; heading-marker spacing in edited module docstring."
+ },
+ {
+  "id": "P084",
+  "where": "headers of auxContinuousLinearEquiv and auxIsometry",
+  "why": "Declaration headers broken after the colon though each would fit within 100 characters."
+ },
+ {
+  "id": "P165",
+  "where": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv proof",
+  "why": "Long proof establishes general facts inline (adjoint-conjugate central hence scalar, scalar real and positive)."
+ }
+]

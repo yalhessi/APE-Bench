@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P019",
+  "where": "card_minimalCover, card_maximalSeparatedSet, card_le_of_isSeparated",
+  "why": "Lemma names say `card` while their statements are about `Set.encard`."
+ },
+ {
+  "id": "P254",
+  "where": "card_minimalCover, card_maximalSeparatedSet, card_le_of_isSeparated",
+  "why": "New names must match sibling file names such as packingNumber_le_encard_self, which spell `encard`."
+ },
+ {
+  "id": "P130",
+  "where": "card_le_of_isSeparated",
+  "why": "Name carries hypothesis `of_isSeparated` but omits the conclusion's maximalSeparatedSet."
+ },
+ {
+  "id": "P385",
+  "where": "exists_set_encard_eq_coveringNumber/packingNumber, minimalCover, maximalSeparatedSet",
+  "why": "Existential lemmas come first; the witness definitions are then built by `.choose` from them."
+ },
+ {
+  "id": "P008",
+  "where": "minimalCover, maximalSeparatedSet and their _subset/finite_/isCover_/card_ lemmas",
+  "why": "Two new definitions, each with characterising lemmas so users need not unfold the dite."
+ },
+ {
+  "id": "P100",
+  "where": "finite_minimalCover vs maximalSeparatedSet family; card_le_of_isSeparated",
+  "why": "minimalCover has a finite_ lemma, maximalSeparatedSet does not; card_le_of_isSeparated has no cover analogue."
+ },
+ {
+  "id": "P341",
+  "where": "coveringNumber_le_packingNumber, coveringNumber_two_mul_le_externalCoveringNumber",
+  "why": "Declared with `theorem` but carry no docstring."
+ },
+ {
+  "id": "P050",
+  "where": "`open Classical in` before minimalCover",
+  "why": "The open is probably unused: maximalSeparatedSet has the same `if h : _ ≠ ⊤` and compiles without it."
+ },
+ {
+  "id": "P126",
+  "where": "MinimalCover vs MaximalSeparatedSet sections",
+  "why": "Sibling defs and lemmas differ: `open Classical` on only one; `simp [..]` versus `simp only [.., dite_false, ..]`."
+ },
+ {
+  "id": "P014",
+  "where": "maximalSeparatedSet_subset, isSeparated_maximalSeparatedSet (negative branches)",
+  "why": "Terminal `simp only [maximalSeparatedSet, h, dite_false, ...]` calls that close the goal."
+ },
+ {
+  "id": "P045",
+  "where": "module docstring, Main definitions and Main statements",
+  "why": "Module docstring updated to list the new definitions and comparison results."
+ },
+ {
+  "id": "P337",
+  "where": "module docstring: 'We define sets...:', 'We have the following inequalities...:'",
+  "why": "Bulleted lists follow their introducing paragraph with no blank line."
+ },
+ {
+  "id": "P119",
+  "where": "coveringNumber_two_mul_le_externalCoveringNumber",
+  "why": "Empty/nonempty case split precedes a chain of lemmas that holds for every A."
+ },
+ {
+  "id": "P171",
+  "where": "coveringNumber_two_mul_le_externalCoveringNumber",
+  "why": "`rcases ... with (h_empty | h_nonempty)` names h_nonempty, which is never used."
+ },
+ {
+  "id": "P216",
+  "where": "exists_set_encard_eq_packingNumber, isCover_maximalSeparatedSet",
+  "why": "`rcases eq_empty_or_nonempty with hA | hA` then simp [hA]; `by_cases hax : a = x` then `subst`."
+ },
+ {
+  "id": "P018",
+  "where": "isCover_maximalSeparatedSet, coveringNumber_le_packingNumber, coveringNumber_two_mul_le_externalCoveringNumber",
+  "why": "`by_contra` then `push_neg`; `simp only ... at h_top` then `simp`; `refine ... ?_` then `exact`."
+ },
+ {
+  "id": "P013",
+  "where": "exists_set_encard_eq_coveringNumber",
+  "why": "`let h := ENat.exists_eq_iInf ...` is used only by the immediately following `obtain`."
+ },
+ {
+  "id": "P084",
+  "where": "finite_minimalCover, isSeparated_maximalSeparatedSet, `noncomputable` lines",
+  "why": "Statements and the `noncomputable def` header are broken across lines though they fit within 100 characters."
+ },
+ {
+  "id": "P017",
+  "where": "isSeparated_maximalSeparatedSet",
+  "why": "Redundant ascription `(maximalSeparatedSet ε A : Set X)` on a term already of type Set X."
+ },
+ {
+  "id": "P057",
+  "where": "exists_set_encard_eq_packingNumber, coveringNumber_two_mul_le_externalCoveringNumber",
+  "why": "`Set.eq_empty_or_nonempty A` written fully qualified instead of `A.eq_empty_or_nonempty`."
+ },
+ {
+  "id": "P165",
+  "where": "isCover_maximalSeparatedSet (hC_separated)",
+  "why": "Proves inline that inserting a point far from a separated set keeps it separated, a general fact."
+ },
+ {
+  "id": "P437",
+  "where": "isCover_maximalSeparatedSet (hx_not_mem)",
+  "why": "`have hx_not_mem` is proved at the start but used only in the final rewrite."
+ },
+ {
+  "id": "P060",
+  "where": "coveringNumber_le_packingNumber",
+  "why": "`(iInf_le _ _).trans (le_of_eq ?_)` converts via le_of_eq instead of using `trans_eq` directly."
+ },
+ {
+  "id": "P001",
+  "where": "exists_set_encard_eq_* , maximalSeparatedSet_subset, isCover_maximalSeparatedSet",
+  "why": "`Set.` prefixes (encard_lt_top_iff, insert_subset, empty_subset) although `Set` names are used unqualified."
+ },
+ {
+  "id": "P041",
+  "where": "minimalCover and its lemmas; PR description",
+  "why": "New concept minimalCover; nothing in the PR uses it, and the description motivates only the separated set."
+ }
+]

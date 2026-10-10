@@ -1,0 +1,112 @@
+[
+ {
+  "id": "P230",
+  "where": "module docstrings of all seven files",
+  "why": "Every hunk rewrites a documentation cross-reference to another module, given as a file path."
+ },
+ {
+  "id": "P139",
+  "where": "module docstrings of all seven files; TODO items in ActionHom.lean and GroupExtension/Defs.lean",
+  "why": "PR updates stale docstring references so they hold for the code; touched TODOs must still apply."
+ },
+ {
+  "id": "P084",
+  "where": "Submonoid/Inverses.lean, GroupExtension/Defs.lean, FreeAbelianGroup.lean module docstrings",
+  "why": "Changed lines alter length: Inverses line now 101 chars, GroupExtension rewrapped, FreeAbelianGroup path line shortened."
+ },
+ {
+  "id": "P314",
+  "where": "GroupExtension/Defs.lean and Submonoid/Inverses.lean module docstrings",
+  "why": "Long backticked file paths placed in rewrapped docstring lines; breaks must fall between fragments."
+ },
+ {
+  "id": "P126",
+  "where": "GroupExtension/Defs.lean module docstring TODO",
+  "why": "Path spelling changed to `Mathlib/...` form, matching the file's other file reference."
+ },
+ {
+  "id": "P329",
+  "where": "GroupExtension/Defs.lean module docstring",
+  "why": "Beyond fixing the path, the hunk rewords the sentence (adds 'the planned file') and rewraps it."
+ },
+ {
+  "id": "P053",
+  "where": "GroupExtension/Defs.lean hunk",
+  "why": "Cleanup PR; this hunk lengthens and rewraps prose for a path-prefix fix."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title 'doc(GroupTheory): fix file refs' is subject to the type(Area): description convention."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Description 'Fix some stale documentation file refs' must say precisely what changes."
+ },
+ {
+  "id": "P138",
+  "where": "whole PR",
+  "why": "Documentation-only polish PR across seven files; review cost weighed against gain."
+ },
+ {
+  "id": "P185",
+  "where": "GroupExtension/Defs.lean module docstring",
+  "why": "Rewording of existing prose ('the planned file') beyond the reference fix, made by a third party."
+ },
+ {
+  "id": "P194",
+  "where": "GroupExtension/Defs.lean module docstring TODO list",
+  "why": "Changed text is a continuation line of a docstring bullet item, now split across two lines."
+ },
+ {
+  "id": "P313",
+  "where": "GroupExtension/Defs.lean module docstring TODO",
+  "why": "Modified TODO records work deferred to a later PR (planned Abelian.lean file)."
+ },
+ {
+  "id": "P125",
+  "where": "Perm/Sign.lean module docstring; other changed sentences",
+  "why": "Changed docstring sentences; the Sign.lean sentence ends with a path and no period."
+ },
+ {
+  "id": "P059",
+  "where": "changed docstring lines in all seven files",
+  "why": "Docstring text is edited; spacing, doubled or trailing spaces in changed lines are in scope."
+ },
+ {
+  "id": "P255",
+  "where": "changed docstring lines in all seven files",
+  "why": "File paths mentioned in docstrings are written as backticked code fragments."
+ },
+ {
+  "id": "P073",
+  "where": "Perm/Sign.lean module docstring",
+  "why": "Documentation note says lemmas have been moved and names their new file."
+ },
+ {
+  "id": "P209",
+  "where": "PR description",
+  "why": "The PR has a one-line description, subject to concision and template conventions."
+ },
+ {
+  "id": "P289",
+  "where": "ActionHom.lean and GroupExtension/Defs.lean TODO sections",
+  "why": "Changed lines sit in TODO sections flagging future work."
+ },
+ {
+  "id": "P285",
+  "where": "ActionHom.lean and GroupExtension/Defs.lean module docstrings",
+  "why": "Edited TODO lists live in the module docstrings."
+ },
+ {
+  "id": "P044",
+  "where": "Perm/Sign.lean module docstring",
+  "why": "Changed last text line is followed by a blank line before the closing `-/`."
+ },
+ {
+  "id": "P279",
+  "where": "whole PR",
+  "why": "Stale file-reference sweep is a change other open doc-fix PRs may already cover."
+ }
+]

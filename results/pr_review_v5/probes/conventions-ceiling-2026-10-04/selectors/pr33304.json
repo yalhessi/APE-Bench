@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P230",
+  "where": "every hunk: module docstrings, comments and deprecation messages in all 13 files",
+  "why": "The PR rewrites documentation cross-references to other modules, choosing file-path form for each."
+ },
+ {
+  "id": "P139",
+  "where": "all 13 files, e.g. Bundled.lean (HasForget/ paths), Over.lean, Mon_.lean, HasLimits.lean",
+  "why": "Stale file references in comments and docstrings are updated to match the current tree."
+ },
+ {
+  "id": "P314",
+  "where": "Localization/Equivalence.lean, StrictPseudofunctor.lean, Bundled.lean module docstrings",
+  "why": "Long backticked file paths force re-wrapping; line breaks placed around backticked fragments."
+ },
+ {
+  "id": "P084",
+  "where": "Localization/Equivalence.lean, StrictPseudofunctor.lean, Bundled.lean, Limits/FunctorCategory/*.lean docstrings",
+  "why": "Docstring paragraphs re-flowed after lengthening paths; lines near the 100-character limit."
+ },
+ {
+  "id": "P255",
+  "where": "all changed docstrings and comments",
+  "why": "File paths and declaration names mentioned in docs, written in backticks and in full form."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title 'doc(CategoryTheory): fix file refs' is subject to the type(Area) commit convention."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title 'fix file refs' must say precisely what changes; description unrecoverable."
+ },
+ {
+  "id": "P053",
+  "where": "Localization/Equivalence.lean reflow, Limits/Preserves/Limits.lean wording",
+  "why": "Cleanup PR with hunks that lengthen or reflow prose; each hunk's readability gain is weighed."
+ },
+ {
+  "id": "P329",
+  "where": "Localization/Equivalence.lean module docstring",
+  "why": "A whole paragraph is re-wrapped beyond the single reference the purpose needed."
+ },
+ {
+  "id": "P185",
+  "where": "Localization/Equivalence.lean, ConcreteCategory/*.lean, StrictPseudofunctor.lean",
+  "why": "Valid relative references rewritten to full paths: a stylistic change to others' prose."
+ },
+ {
+  "id": "P138",
+  "where": "the whole PR (13 files of docstring edits)",
+  "why": "Docstring polish across many files; review cost versus marginal benefit."
+ },
+ {
+  "id": "P382",
+  "where": "Groupoid/Subgroupoid.lean module docstring, Implementation details",
+  "why": "Edited line records the file was copied from/inspired by Subgroup/Basic and Subgraph."
+ },
+ {
+  "id": "P345",
+  "where": "Limits/HasLimits.lean docstring on colimit.ι_desc",
+  "why": "Edited docstring is overview text about reassoc lemmas, attached to one declaration."
+ },
+ {
+  "id": "P256",
+  "where": "Functor/Basic.lean `--` note before Functor.map_comp_assoc; HasLimits.lean `/--` note",
+  "why": "Edited comments: a run of `--` lines describing the next lemma, and an overview `/--`."
+ },
+ {
+  "id": "P073",
+  "where": "CategoryTheory.BundledHom, CategoryTheory.UnbundledHom deprecation messages",
+  "why": "Deprecation text naming the replacement approach is edited in both attributes."
+ },
+ {
+  "id": "P126",
+  "where": "ConcreteCategory/Bundled.lean, other files mixing relative and full paths",
+  "why": "File references in one docstring now spelled one way; consistency of reference form."
+ },
+ {
+  "id": "P078",
+  "where": "Functor/Basic.lean comment above Functor.map_comp_assoc",
+  "why": "Edited comment justifies a non-obvious manual lemma by an import of Reassoc.lean."
+ },
+ {
+  "id": "P201",
+  "where": "Functor/Basic.lean, Functor.map_comp_assoc",
+  "why": "Edited comment concerns a hand-written lemma that `reassoc` could generate."
+ },
+ {
+  "id": "P125",
+  "where": "Limits/Preserves/Over.lean ('See ...' line), Limits/Preserves/Limits.lean",
+  "why": "Edited docstring sentences; the Over.lean 'See' line has no closing period."
+ },
+ {
+  "id": "P209",
+  "where": "PR description",
+  "why": "PR description should state the change and motivation concisely; it is not recoverable."
+ },
+ {
+  "id": "P257",
+  "where": "Limits/Preserves/Limits.lean module docstring",
+  "why": "Reference rewritten as generic 'the files in the directory .../Shapes/'."
+ },
+ {
+  "id": "P203",
+  "where": "Limits/Preserves/Over.lean, Bundled.lean, Localization/Equivalence.lean module docstrings",
+  "why": "Docstrings point to related material by file; cross-references to related declarations."
+ },
+ {
+  "id": "P313",
+  "where": "Bicategory/Functor/StrictPseudofunctor.lean module docstring TODO",
+  "why": "Edited TODO records a deferred rename once the deprecated Strict.lean is removed."
+ },
+ {
+  "id": "P135",
+  "where": "StrictPseudofunctor.lean and Groupoid/Subgroupoid.lean module docstrings",
+  "why": "Edited module docstrings carry headings 'TODO' and 'Implementation details'."
+ },
+ {
+  "id": "P044",
+  "where": "StrictPseudofunctor.lean, Preserves/Over.lean, Localization/Equivalence.lean, Monoidal/Mon_.lean docstrings",
+  "why": "Edited docstrings close with `-/` on its own line after a blank line."
+ }
+]

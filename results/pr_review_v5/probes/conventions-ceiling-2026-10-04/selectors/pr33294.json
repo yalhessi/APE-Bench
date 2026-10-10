@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P072",
+  "where": "Cofinality.lean, Exponential.lean, Family.lean, FixedPoint.lean, Veblen.lean: IsNormal.cof_eq, IsNormal.nfp_fp, iSup_pow, iSup_add_nat, ...",
+  "why": "Many lemmas are renamed or moved out of the IsNormal namespace; old names are kept as deprecated aliases."
+ },
+ {
+  "id": "P121",
+  "where": "Arithmetic.lean and Family.lean: Ordinal.IsNormal.strictMono, lt_iff, le_iff, inj, id_le, map_iSup, map_sSup, refl, trans",
+  "why": "Ordinal.IsNormal lemmas superseded by general Order.IsNormal/StrictMono API are deprecated to those counterparts."
+ },
+ {
+  "id": "P275",
+  "where": "Arithmetic.lean: IsNormal.le_iff_eq -> StrictMono.le_apply, IsNormal.le_set -> map_isLUB, IsNormal.monotone -> Order.IsNormal.strictMono",
+  "why": "Several deprecations point to replacements that state a different result from the deprecated lemma."
+ },
+ {
+  "id": "P073",
+  "where": "Arithmetic.lean, Family.lean, FixedPoint.lean: @[deprecated X (since := ...)] on IsNormal.* lemmas and fp_iff_deriv",
+  "why": "Each deprecation names a replacement, many of which are not drop-in substitutes (different form or extra steps)."
+ },
+ {
+  "id": "P202",
+  "where": "Arithmetic.lean, Family.lean: deprecated IsNormal.limit_le, limit_lt, le_set, map_iSup_of_bddAbove, ...",
+  "why": "Deprecated declarations whose replacement statement differs keep their own statements and proofs rather than becoming aliases."
+ },
+ {
+  "id": "P082",
+  "where": "Arithmetic.lean: IsNormal.le_set (new 3-line proof), le_set', inj, le_iff; Family.lean deprecated map_* lemmas",
+  "why": "Deprecated lemmas keep or receive non-trivial proofs instead of one-line derivations from their replacements."
+ },
+ {
+  "id": "P183",
+  "where": "Arithmetic.lean, Family.lean: set_option linter.deprecated false in, before each deprecated IsNormal.* lemma",
+  "why": "The linter is switched off repeatedly to silence warnings from statements still mentioning the deprecated Ordinal.IsNormal."
+ },
+ {
+  "id": "P172",
+  "where": "Ordinal.IsNormal def and its lemmas versus Order.IsNormal and its lemmas",
+  "why": "Two parallel APIs state the same results; the Ordinal copy is deprecated in favour of Order's."
+ },
+ {
+  "id": "P108",
+  "where": "cof_eq_of_isNormal, cof_le_of_isNormal, isFundamentalSequence_of_isNormal, apply_omega0_of_isNormal, nfp_fp, deriv_fp, apply_lt_nfp, ...",
+  "why": "Lemmas whose main hypothesis is IsNormal f are moved out of the IsNormal namespace, losing dot notation."
+ },
+ {
+  "id": "P130",
+  "where": "cof_eq_of_isNormal, apply_omega0_of_isNormal, isFundamentalSequence_of_isNormal versus nfp_fp, deriv_fp, apply_lt_nfp",
+  "why": "Renamed lemmas include the hypothesis as _of_isNormal in some names and omit it in others."
+ },
+ {
+  "id": "P254",
+  "where": "Renamed lemmas across Cofinality.lean, Family.lean, FixedPoint.lean, Veblen.lean",
+  "why": "Sibling lemmas leaving the IsNormal namespace get inconsistent naming patterns (with/without _of_isNormal, _iff)."
+ },
+ {
+  "id": "P432",
+  "where": "Cofinality.lean: cof_eq_of_isNormal; Family.lean: apply_omega0_of_isNormal",
+  "why": "New equation lemma names: bare cof_eq naming no right side; apply_omega0 names the right-hand side."
+ },
+ {
+  "id": "P434",
+  "where": "All new @[deprecated (since := ...)] attributes; FixedPoint.lean uses 2025-10-25 where others use 2025-12-25",
+  "why": "Dozens of deprecations record dates in since, with inconsistent dates across the PR."
+ },
+ {
+  "id": "P329",
+  "where": "Exponential.lean: opow_add, opow_mul proof rewrites, module docstring reflow; iSup_*_nat renames",
+  "why": "Proof golfs, docstring reformatting and renames not required by the IsNormal deprecation are included."
+ },
+ {
+  "id": "P287",
+  "where": "Exponential.lean, FixedPoint.lean, Principal.lean call sites: .strictMono.le_apply.ge_iff_eq', .strictMono.injective.eq_iff",
+  "why": "Deprecating shortcuts like le_iff_eq, inj, le_apply lengthens many dependent proofs without replacement lemmas."
+ },
+ {
+  "id": "P045",
+  "where": "Arithmetic.lean and FixedPoint.lean module docstrings",
+  "why": "Module docstrings are edited to reflect Order.IsNormal and the changed forms of fixed-point statements."
+ },
+ {
+  "id": "P139",
+  "where": "Arithmetic.lean: docstring of Ordinal.IsNormal (Todo removed); removed section header",
+  "why": "A TODO 'deprecate this in favor of Order.IsNormal' is removed as the PR does it."
+ },
+ {
+  "id": "P037",
+  "where": "Arithmetic.lean: protected def IsNormal; Order/IsNormal.lean: protected theorem monotone",
+  "why": "Declarations made protected to avoid clashing with Order.IsNormal and root Monotone names when namespaces open."
+ },
+ {
+  "id": "P019",
+  "where": "Exponential.lean: iSup_pow_natCast; Family.lean: iSup_add_natCast, iSup_mul_natCast, apply_omega0_of_isNormal",
+  "why": "Lemmas renamed so names spell statement declarations (natCast for Nat.cast, isNormal)."
+ },
+ {
+  "id": "P430",
+  "where": "Family.lean: alias IsNormal.apply_of_isLimit retargeted to Order.IsNormal.apply_of_isSuccLimit",
+  "why": "An existing deprecated alias is retargeted when its target is itself deprecated."
+ },
+ {
+  "id": "P043",
+  "where": "Whole PR: IsNormal deprecation mixed with natCast renames, opow proof golfs, FixedPoint renames",
+  "why": "Separable changes are bundled into one large deprecation PR across eleven files."
+ },
+ {
+  "id": "P057",
+  "where": "Family.lean, Topology.lean: Order.IsNormal.map_iSup H ..., Order.IsNormal.map_sSup H ...; Cofinality call sites",
+  "why": "Call sites switch from dot notation to fully qualified names applied to IsNormal hypotheses."
+ },
+ {
+  "id": "P156",
+  "where": "PR description: 'See issue #17033. Moved from #28743.'",
+  "why": "Description does not state the many renames, moved lemmas or deprecation targets the PR makes."
+ },
+ {
+  "id": "P097",
+  "where": "Exponential.lean: opow_add, opow_mul (obtain ... ; · simp)",
+  "why": "New proof lines put two tactics on one line with ';'."
+ },
+ {
+  "id": "P119",
+  "where": "Exponential.lean: opow_add, have : b + c ≠ 0 then exact of the same term",
+  "why": "Rewritten proof introduces a have that the following steps do not use."
+ }
+]

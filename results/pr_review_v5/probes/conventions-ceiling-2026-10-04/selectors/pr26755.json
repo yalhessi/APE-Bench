@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P272",
+  "where": "Set/Basic.lean and Finset/Basic.lean: every def losing `noncomputable`",
+  "why": "The PR changes which definitions in the files are individually marked `noncomputable`."
+ },
+ {
+  "id": "P076",
+  "where": "Finset.monoid with its #adaptation_note; the Set pointwise defs",
+  "why": "A nightly-2025-04-07 workaround (`noncomputable` plus adaptation note) is re-checked and removed."
+ },
+ {
+  "id": "P139",
+  "where": "removed #adaptation_note above Finset.monoid",
+  "why": "A comment explaining a now-obsolete `noncomputable` requirement is deleted with the code change."
+ },
+ {
+  "id": "P081",
+  "where": "Set.one, Set.mulOneClass, Set.monoid, Set.commMonoid, Set.divisionMonoid, Set.divisionCommMonoid, Finset.monoid, singleton homs",
+  "why": "The `noncomputable` modifier is removed across a family of sibling declarations; others may keep it."
+ },
+ {
+  "id": "P084",
+  "where": "Set.divisionCommMonoid header; Set.monoid, Set.one, Set.singletonMonoidHom, Finset.monoid",
+  "why": "Dropping `noncomputable` shortens lines, so broken headers and bodies may now fit on one line."
+ },
+ {
+  "id": "P240",
+  "where": "Set.one, Set.monoid, Set.singletonMonoidHom, Finset.monoid",
+  "why": "Proof term sits on its own line after `:=`; with shorter headers it may now fit on one line."
+ },
+ {
+  "id": "P002",
+  "where": "Finset.monoid and the Set pointwise defs, now computable",
+  "why": "Definitions become computable, so whether their implementations are efficient becomes relevant."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and missing description",
+  "why": "Title says Monoid instances, but the PR also changes singleton homs, InvolutiveInv and DivisionMonoid; no description."
+ },
+ {
+  "id": "P100",
+  "where": "Set and Finset pointwise families (Finset.monoid vs other Finset structures)",
+  "why": "The computability improvement is applied to some members of the Set/Finset sibling families."
+ },
+ {
+  "id": "P298",
+  "where": "Set.involutiveInv and the scoped pointwise instance defs in Algebra/Group/Pointwise",
+  "why": "Changed instances in a low-level, widely imported file; compilation behaviour changes."
+ },
+ {
+  "id": "P041",
+  "where": "PR description (not recoverable)",
+  "why": "Design change reversing a Lean-nightly workaround needs a stated motivation, e.g. what upstream change allows it."
+ },
+ {
+  "id": "P372",
+  "where": "Set.one, Set.mulOneClass, Set.monoid, Set.commMonoid, Set.divisionMonoid, Finset.monoid",
+  "why": "Protected defs build typeclass instances but are not global instances; enabled via scoped attribute."
+ },
+ {
+  "id": "P021",
+  "where": "Set.monoid, Set.commMonoid, Set.divisionMonoid etc. vs instance Set.involutiveInv",
+  "why": "Pointwise structures on Set/Finset are defs, not instances, while involutiveInv is an instance."
+ },
+ {
+  "id": "P026",
+  "where": "the protected pointwise structure defs",
+  "why": "The declarations' kind (def, not abbrev) is touched; their unfolding matters for instance search."
+ },
+ {
+  "id": "P329",
+  "where": "whole diff, including singleton homs and involutiveInv",
+  "why": "Scope of edits beyond the titled Monoid instances; whether each is needed for the purpose."
+ },
+ {
+  "id": "P364",
+  "where": "Set.divisionCommMonoid: @[to_additive subtractionCommMonoid ...]",
+  "why": "to_additive is given an explicit target name that the generator might produce itself."
+ },
+ {
+  "id": "P408",
+  "where": "all changed declarations with @[to_additive \"...\"]",
+  "why": "Generated additive declarations get docstrings through the to_additive attribute."
+ },
+ {
+  "id": "P037",
+  "where": "Set.one, Set.monoid, Set.mulOneClass, Set.commMonoid, Set.divisionMonoid, Finset.monoid",
+  "why": "Changed headers carry `protected` to avoid clashes with root names like `monoid`."
+ },
+ {
+  "id": "P164",
+  "where": "Set.involutiveInv",
+  "why": "A changed instance carries an explicit name `involutiveInv`."
+ },
+ {
+  "id": "P396",
+  "where": "Set.singletonOneHom, Set.singletonMulHom, Set.singletonMonoidHom docstrings",
+  "why": "Noun-phrase docstrings ('The singleton operation as a `OneHom`.') end with a full stop."
+ },
+ {
+  "id": "P009",
+  "where": "Set.mulOneClass, Set.monoid, Set.commMonoid, Set.divisionMonoid, Set.divisionCommMonoid, Set.singletonMonoidHom",
+  "why": "Structure instances written with `{ ... with }` notation rather than `where`."
+ },
+ {
+  "id": "P167",
+  "where": "Set.monoid, Set.commMonoid, Set.divisionMonoid, Set.divisionCommMonoid, Set.singletonMonoidHom",
+  "why": "Structure instances inherit fields from existing bundled objects via `{ a, b with }`."
+ },
+ {
+  "id": "P425",
+  "where": "Set.divisionMonoid (@Set.ZPow α _ _ _), Set.monoid (@Set.NPow α _ _)",
+  "why": "Runs of trailing `_` placeholders in an application."
+ },
+ {
+  "id": "P059",
+  "where": "Finset.monoid to_additive docstring string",
+  "why": "The additive docstring string ends with a trailing space before the closing quote."
+ },
+ {
+  "id": "P128",
+  "where": "Set.singletonOneHom",
+  "why": "Two fields packed on one line with `;` in a `where` structure instance."
+ }
+]
