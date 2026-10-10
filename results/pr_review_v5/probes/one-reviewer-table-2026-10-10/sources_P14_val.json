@@ -1,0 +1,59 @@
+{
+ "X1": {
+  "kind": "claude"
+ },
+ "X2": {
+  "kind": "claude"
+ },
+ "T1": {
+  "kind": "claude"
+ },
+ "TA1": {
+  "kind": "claude"
+ },
+ "GPT1": {
+  "kind": "solo",
+  "run": "probe_val_small12_elmgpt55_contract2_rep1"
+ },
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep1"
+ },
+ "AP1": {
+  "kind": "solo",
+  "run": [
+   "iter_ds41_conv_val_ap_rep1",
+   "iter_ds41_conv_val_apt_rep1"
+  ]
+ },
+ "GPT2": {
+  "kind": "solo",
+  "run": "probe_val_small12_elmgpt55_contract2_rep2"
+ },
+ "DX2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep2"
+ },
+ "AP2": {
+  "kind": "solo",
+  "run": [
+   "iter_ds41_conv_val_ap_rep2",
+   "iter_ds41_conv_val_apt_rep2"
+  ]
+ },
+ "GPT3": {
+  "kind": "solo",
+  "run": "probe_val_small12_elmgpt55_contract2_rep3"
+ },
+ "DX3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep3"
+ },
+ "AP3": {
+  "kind": "solo",
+  "run": [
+   "iter_ds41_conv_val_ap_rep3",
+   "iter_ds41_conv_val_apt_rep3"
+  ]
+ }
+}

@@ -1,0 +1,52 @@
+{
+ "X1": {
+  "kind": "claude"
+ },
+ "X2": {
+  "kind": "claude"
+ },
+ "OP1": {
+  "kind": "solo",
+  "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+ },
+ "OP2": {
+  "kind": "solo",
+  "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+ },
+ "GPT1": {
+  "kind": "solo",
+  "run": "probe_dev_elmgpt55_contract2_rep1"
+ },
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_base_rep1"
+ },
+ "AP1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_apt_rep1"
+ },
+ "GPT2": {
+  "kind": "solo",
+  "run": "probe_dev_elmgpt55_contract2_rep2"
+ },
+ "DX2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_base_rep2"
+ },
+ "AP2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_apt_rep2"
+ },
+ "GPT3": {
+  "kind": "solo",
+  "run": "probe_dev_elmgpt55_contract2_rep3"
+ },
+ "DX3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_base_rep3"
+ },
+ "AP3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_apt_rep3"
+ }
+}
