@@ -30,7 +30,6 @@ for item in sys.argv[2:]:
         print(item)
 EOF
 }
-n=0
 for ((i = 0; i < ${#queue[@]}; i += 2)); do
   batch=("${queue[@]:i:2}")
   t1=($(unfinished T1 "${batch[@]}")); ta=($(unfinished TA1 "${batch[@]}"))
@@ -39,7 +38,7 @@ for ((i = 0; i < ${#queue[@]}; i += 2)); do
   wait_for_room "$need" 92 60; rc=$?
   [ $rc -eq 2 ] && { echo "$(date -Is) STOP: the week is past 60%"; exit 2; }
   [ $rc -ne 0 ] && { echo "$(date -Is) STOP: no room after twelve tries"; exit 1; }
-  n=$((n + 1))
+  n=$(( i / 2 + 1 ))  # the batch's place in the queue, so a restart never reuses a finished batch's log names
   echo "$(date -Is) batch $n: T1 ${t1[*]:-none} | TA1 ${ta[*]:-none}"
   [ ${#t1[@]} -gt 0 ] && { $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN pair_T1_$n $S/claude_logs T1 "${t1[@]}" & }
   [ ${#ta[@]} -gt 0 ] && { $P/run_claude_batch.sh CLAUDE_CODE_OAUTH_TOKEN pair_TA1_$n $S/claude_logs TA1 "${ta[@]}" & }
