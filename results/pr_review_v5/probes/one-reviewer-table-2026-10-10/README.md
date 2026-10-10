@@ -8,12 +8,22 @@ The plan, the reading rule and every row's configuration are in
 
 | cell | script | where | started |
 |---|---|---|---|
-| fresh set's reviewed workspaces | `prebuild --reviewed` | Slurm 449292 | 04:31; 37 of 39 built by 10:19 (26083 and 35571 failed) |
+| fresh set's reviewed workspaces | `prebuild --reviewed` | Slurm 449292 | 04:31; 37 of 39 built by 10:19 (26083 and 35571 failed, below) |
 | gpt-5.5 contract v2, P14 and D12, 3 reps | `run_gpt.sh` | Slurm 450109 | 10:45 |
 | D12 re-judges on `elm_gpt_5_mini` | `rejudge_dev.sh` | shell | 10:49; done 11:06 |
 | 19 blind selectors | `run_claude_batch.sh @selectors` | primary token | 10:50; done (audit: `audit_selectors.txt`) |
 | DeepSeek: apt on P14's 4 PRs; D12 solo and apt | `run_ds41_gate.sh` | Slurm 450144, server 450145 | 11:05; server up 11:18 |
 | Opus T1 and TA1 on P14 | `run_claude_pair.sh` | Slurm 450195 | 11:09 |
+
+**The fresh set's two failed builds, to settle before its test.**
+- **35571:** its round-1 reviewed state does not compile. `BrownianMotion.lean:22:13` reads
+  "unexpected token 'section'; expected 'lemma'", so like 33057 it has no reviewed workspace and never
+  will (`.claude/rules/mathlib-review.md`).
+- **26083:** a module the diff does not change, `Mathlib.LinearAlgebra.Pi`, fails on the path between
+  the changed modules. Before calling it a red state, compile the patched changed files against the
+  base, as that rule says.
+- **Either way the fresh-set runs** drop these PRs or accept the overlay. Which one is decided before
+  its pre-registration.
 
 ## Step 1, provisional: D12 issue recall for the rows on disk, all on `elm_gpt_5_mini`
 
