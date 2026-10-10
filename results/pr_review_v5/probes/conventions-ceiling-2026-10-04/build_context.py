@@ -17,7 +17,14 @@ are in `context_prec.sha256`, which the stage's gate checks before any run.
 entries: the same examples rule and closing, its examples recorded in `examples_ap.json` and its digests in
 `context_ap.sha256`.
 
-usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <base|exact|common|all|prec|ap> [bodies.json]
+`apt` (the one reviewer table, `docs/plans/2026-10-10-one-reviewer-table.md`) is `ap` on
+`briefs_applicable_t.json`: stage F's ten picks unchanged, and the same selector's picks for P14's
+other four PRs and the dev release's 15. It adds the dev set, puts the dev PRs in the leak
+assertion, and writes its own `examples_apt.json` and `context_apt.sha256`, so stage AP's files
+are never rewritten. An entry's examples do not depend on the other entries picked, so the ten
+PRs' rows are byte-equal to `ap`'s (checked by `check_apt.py`).
+
+usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <base|exact|common|all|prec|ap|apt> [bodies.json]
 """
 import glob
 import hashlib
@@ -31,6 +38,7 @@ HERE = Path(__file__).parent
 CENSUS = Path("results/pr_review_v5/adjudications/conventions-census-v1")
 CODEBOOK = CENSUS / "reader_A/codebook.json"
 SETS = {"val": "configs/probe_sets/val_small12.yaml", "post": "configs/probe_sets/postcutoff_2026_07_08_v1.yaml"}
+DEV = {"dev": "configs/probe_sets/dev_medium_0_3_0.yaml"}
 PER_ENTRY = 2
 
 
@@ -58,12 +66,12 @@ def census_examples(bodies: Path, entries: set, probe_prs: set, record_file: str
 
 
 level = sys.argv[1]
-specs = {tag: probes.load_probe_set(Path(path)) for tag, path in SETS.items()}
+specs = {tag: probes.load_probe_set(Path(path)) for tag, path in {**SETS, **(DEV if level == "apt" else {})}.items()}
 briefs, closing = None, ""
 if level != "base":
-    source = HERE / f"briefs_{ {'prec': 'exact', 'ap': 'applicable'}.get(level, level) }.json"
+    source = HERE / f"briefs_{ {'prec': 'exact', 'ap': 'applicable', 'apt': 'applicable_t'}.get(level, level) }.json"
     examples = None
-    if level in ("prec", "ap"):
+    if level in ("prec", "ap", "apt"):
         entries = {i for ids in json.loads(source.read_text())["prs"].values() for i in ids}
         examples = census_examples(Path(sys.argv[2]), entries, {pr for s in specs.values() for pr in s.pr_numbers},
                                    f"examples_{level}.json")
@@ -78,6 +86,6 @@ for tag, spec in specs.items():
     digests.append(f"{hashlib.sha256(out.read_bytes()).hexdigest()}  {out.resolve().relative_to(Path.cwd().resolve())}\n")
     held = "" if conventions is None else f", {sum(map(len, conventions.values()))} sentences"
     print(f"{out}: {len(prs)} PRs{held}")
-if level in ("prec", "ap"):
+if level in ("prec", "ap", "apt"):
     (HERE / f"context_{level}.sha256").write_text("".join(digests))
     print("".join(digests), end="")
