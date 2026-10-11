@@ -6,7 +6,10 @@
 window() {  # prints "<status> <five-hour % used> <five-hour reset epoch, or 0> <seven-day % used>"
   local var=${TOKEN_VAR:-CLAUDE_CODE_OAUTH_TOKEN_C}
   ( set +eu; source ~/.config/secrets/env.zsh; mkdir -p "$S/home_$var"; cd "$S/home_$var"
-    HOME=$S/home_$var CLAUDE_CODE_OAUTH_TOKEN="${!var}" timeout 120 claude -p "Reply with the single word: ok" \
+    # `claude` from PATH, or the pinned binary: a systemd user unit starts without the login PATH, and
+    # the check then read "unknown, 100%" and stopped the run (2026-10-11).
+    local bin; bin=$(command -v claude || echo /research/projects/proofedit/ya475/APE-Bench/data/resources/claude-2.1.285-linux-x64)
+    HOME=$S/home_$var CLAUDE_CODE_OAUTH_TOKEN="${!var}" timeout 120 "$bin" -p "Reply with the single word: ok" \
       --model claude-haiku-4-5-20251001 --output-format stream-json --verbose < /dev/null 2> /dev/null ) > "$S/limit_$var.jsonl" || true
   python3 - "$S/limit_$var.jsonl" <<'PY'
 import json, sys

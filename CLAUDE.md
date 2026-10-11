@@ -253,7 +253,7 @@ Claude Code background task dies with that process: stage 5's gpt-5.5 runs did a
 (`/proc/self/cgroup`), and tearing that scope down kills every process in it -- S2 died that way at 10
 of 16. Start it as a user unit, which lives outside the session:
 `systemd-run --user --collect --unit=<name> /bin/bash -c "exec <command> >> <log> 2>&1 < /dev/null"`
-(it survived the next restart; `systemctl --user status <name>` to watch it). Lingering is off, so it
+(it survived the next restart; `systemctl --user status <name>` to watch it). A unit starts without the login `PATH` and `HOME`: pass `--setenv=PATH="$PATH" --setenv=HOME="$HOME"`, or a tool resolved from `PATH` vanishes (2026-10-11: a window check read "unknown, 100%" and stopped a Claude batch). Lingering is off, so it
 lasts while any login session does; a Slurm job outlives even that. **A user unit is still in
 `/user.slice`, and systemd-oomd kills there under memory pressure** (60% for 20 s, `oomctl`): it picks
 the cgroup with the most reclaim, not the biggest, so a 272 MB unit reading files died `oom-kill` at
