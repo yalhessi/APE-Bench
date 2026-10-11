@@ -146,3 +146,68 @@ picks held the entry of 29 of 40 in-census asks, and DeepSeek's reach did not mo
    - It is one session a PR, on P14 only, and files 2.6 times as much (yield 0.29 → 0.15).
    - A second rep on P14 and a D12 run come before anything is built on it: about 29 sessions, about
      0.75 of a five-hour window at the measured 2.5 points a session.
+
+## Inspection (2026-10-11): before any further run, is the table valid, and how should it be read?
+
+The user, reading the Result:
+- every row scores higher on D12 than on P14 except DeepSeek + AP, which on D12 is below its own
+  solo;
+- the Opus picture misses two cells.
+
+These were checked by the main session and an independent auditor, and the numbers were reproduced.
+The scripts are `inspect_*.py` here and their outputs `inspect_*.txt`.
+
+1. **Delivery is sound.** Every AP session's record holds its own PR's conventions section, byte for
+   byte (39 of 39); no solo session holds one. One D12 PR, 33149, hits the 20-finding cap under AP
+   in two reps of three; no P14 run does.
+2. **Matching is stable** (`inspect_cross_seal`).
+   - The same sessions read under the older seals and the table's differ by 0 to 2 asks a session.
+   - The losses fall on every row alike (v0065 and v0066 on 30641), and no session gains.
+   - So harness-blind inputs and 13-session seals did not penalise AP.
+3. **"D12 is easier" is mostly ask weighting** (`inspect_weighting`).
+   - One reviewer wrote 29 of D12's 47 asks. D12 has 2.5 effective authors against P14's 9.3, and its
+     repeated suggestions are counted as separate asks.
+   - Weighting each (PR, author, family) group as one ask, P14 → D12 reads:
+
+     | row | P14 → D12 |
+     |---|---|
+     | DX | 0.35 → 0.30 |
+     | gpt | 0.28 → 0.21 |
+     | AP | 0.42 → 0.29 |
+     | X | 0.47 → 0.52 |
+     | OP | — → 0.40 |
+
+   - Under that weighting only Claude does better on D12, and AP is no longer the exception.
+   - This lens is post hoc. The plan headlines raw reach, and both are reported from here on.
+4. **AP's P14 gain is the discovery sample** (`inspect_per_ask`).
+   - On the ten stage F PRs the AP cell is stage AP's own sessions, the result that motivated the
+     table, scored again.
+   - Every AP session collected fresh reads null against DX: P14's other four PRs −0.04, D12 −0.01.
+   - Of AP's net +18 cells on P14, 9 are one suggestion repeated on three theorems of 34091 (v0106-108:
+     DX 0 of 9, AP 9 of 9).
+   - Group-weighted, pooled P14 AP − DX is +0.07 (matcher 1's interval spans 0); validation alone
+     stays at about +0.17.
+5. **The D12 expectation was miscalibrated.** On asks whose entry the selector picked, AP reaches
+   about 0.5 everywhere (0.50, 0.52, 0.56). DX's reach on the same asks is 0.20 on the ten PRs but
+   0.49 on D12, so there was little room to gain. Where room exists on D12 (14 picked asks DX never
+   reaches), AP converts 5 of 42 cells, against 18 of 48 on the ten.
+6. **Crowding out is small and the same on both benchmarks.** AP loses 4 cells on P14 and 6 on D12,
+   one rep each, mostly proof and documentation asks. Only one loss is on 33149, where the cap binds.
+7. **The D12 judge cannot read AP:** 8, 6, 4 are one-obligation flips, under a minimum detectable
+   difference of 5.
+8. **The Opus gaps are a design limit, not an artifact.**
+   - Stage C chose the ten PRs as those where X missed an in-census ask, so X reaches 0.94 on the other
+     four and there is no headroom there.
+   - All 7 asks TA reaches and no solo Opus session does are on the ten. TA's post-cutoff gain is
+     42184 and 42814, both among them.
+   - So TA's +0.20 is measured only where solo Claude has room to miss. It is one session.
+   - D12 is where Opus + AP can be tested off the ten: 15 sessions, with a same-day Opus solo beside
+     them, 30 in all.
+   - The Opus project harness on P14 bears only on harness against model, and that is already measured
+     on D12: +0.10, 4 obligations.
+
+**How the table reads after the inspection, provisionally:**
+- The orderings are honest about these sessions.
+- Claude is ahead of DeepSeek under every weighting.
+- AP on DeepSeek moved only the sessions that discovered it; every fresh cell is null.
+- Opus + AP is untested off the ten PRs.

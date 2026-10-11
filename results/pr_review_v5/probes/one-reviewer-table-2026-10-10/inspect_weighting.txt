@@ -1,0 +1,8 @@
+P14: 46 asks, 14 PRs (eff 11.1), 12 authors (eff 9.3); top authors [('grunweg', 8), ('ocfnash', 7)]; top PRs [(32875, 6), (34091, 6), (30641, 5)]; (pr,author,family) groups 28, of size>1: 13 holding 31 asks
+   raw/group-weighted/PR-macro: AP 0.41/0.42/0.46  DX 0.28/0.35/0.38  GPT 0.24/0.28/0.29  T 0.48/0.45/0.50  TA 0.67/0.66/0.68  X 0.47/0.47/0.47
+P14val: 30 asks, 8 PRs (eff 6.6), 7 authors (eff 5.6); top authors [('grunweg', 8), ('ocfnash', 6)]; top PRs [(32875, 6), (34091, 6), (30641, 5)]; (pr,author,family) groups 14, of size>1: 11 holding 27 asks
+   raw/group-weighted/PR-macro: AP 0.46/0.46/0.54  DX 0.26/0.31/0.37  GPT 0.19/0.23/0.31  T 0.50/0.47/0.53  TA 0.70/0.68/0.72  X 0.47/0.47/0.52
+P14post: 16 asks, 6 PRs (eff 4.7), 6 authors (eff 4.7); top authors [('riccardobrasca', 4), ('kim-em', 4)]; top PRs [(42814, 4), (43167, 4), (43192, 4)]; (pr,author,family) groups 14, of size>1: 2 holding 4 asks
+   raw/group-weighted/PR-macro: AP 0.33/0.37/0.35  DX 0.33/0.38/0.39  GPT 0.33/0.33/0.26  T 0.44/0.43/0.46  TA 0.62/0.64/0.62  X 0.47/0.46/0.42
+D12: 47 asks, 12 PRs (eff 7.1), 9 authors (eff 2.5); top authors [('j-loreaux', 29), ('grunweg', 5)]; top PRs [(33145, 11), (33098, 9), (33066, 7)]; (pr,author,family) groups 27, of size>1: 11 holding 31 asks
+   raw/group-weighted/PR-macro: AP 0.39/0.29/0.31  DX 0.40/0.30/0.30  GPT 0.28/0.21/0.18  OP 0.52/0.40/0.41  X 0.62/0.52/0.54
