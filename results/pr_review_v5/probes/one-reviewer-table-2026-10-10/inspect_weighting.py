@@ -20,7 +20,9 @@ def load(dirs, m):
     for d in dirs:
         tab.update(json.loads((T / d / "unblinded.json").read_text())[m]["table"])
     return tab
-for name, dirs in (("P14", ["match_P14_val", "match_P14_post"]), ("P14val", ["match_P14_val"]), ("P14post", ["match_P14_post"]), ("D12", ["match_D12"])):
+for name, dirs in (("P14", ["match_P14_val", "match_P14_post"]), ("P14val", ["match_P14_val"]), ("P14post", ["match_P14_post"]), ("D12", ["match_D12"]), ("D12b", ["match_D12b"])):
+    if not all((T / d / "unblinded.json").exists() for d in dirs):
+        continue
     tab = load(dirs, "1")
     cids = sorted(tab)
     auth = Counter(rows[c]["author"] for c in cids)

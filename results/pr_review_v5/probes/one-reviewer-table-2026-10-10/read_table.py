@@ -135,7 +135,8 @@ JUDGE_RUNS = {"X": ["probe-dev-claude-X1.elm", "probe-dev-claude-X2.elm"],
               "OP": ["probe-dev-opus55-contract2-claude-sub-rep1.elm", "probe-dev-opus55-contract2-claude-sub-rep2.elm"],
               "GPT": [f"probe-dev-elmgpt55-contract2-rep{n}" for n in (1, 2, 3)],
               "DX": [f"iter-ds41-conv-dev-base-rep{n}" for n in (1, 2, 3)],
-              "AP": [f"iter-ds41-conv-dev-apt-rep{n}" for n in (1, 2, 3)]}
+              "AP": [f"iter-ds41-conv-dev-apt-rep{n}" for n in (1, 2, 3)],
+              "T": ["probe-dev-claude-T1"], "TA": ["probe-dev-claude-TA1"]}
 
 
 def read_judge():
