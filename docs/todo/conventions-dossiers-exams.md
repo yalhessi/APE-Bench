@@ -155,9 +155,13 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
   It never beats two DeepSeek reps unioned.
 - **Opus + AP over same-day Opus solo:** +0.20 on both P14 sets. That is one rep, at 2.6 times the
   findings.
-- **Next, in order:**
-  1. A second Opus + AP rep on P14 and an Opus + AP run on D12 (about 29 sessions).
-  2. The fresh set, for whether DeepSeek's validation-only gain is fit to those PRs.
+- **The dev pair (2026-10-11) answered the Opus question:** Opus + AP over same-day Opus solo on dev
+  is +0.02 to +0.09, intervals spanning 0, at 1.7 times the findings. The P14 +0.20 is confined to
+  the ten PRs chosen for Claude's misses.
+- **No ask-free delivery has yet beaten solo** off the PRs it was developed or selected on. More reps
+  of the same delivery would not change that.
+- **What would reopen it:** a design change, for example among the untried ones in the table's
+  README. The fresh set (workspaces built) is the place to read it.
 - The 2026-10-09 entry below stands as recorded, read with this one.
 
 **2026-10-09, stage AP: the first ask-free convention delivery to move a reviewer**

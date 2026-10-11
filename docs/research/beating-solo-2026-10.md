@@ -30,7 +30,7 @@ The table gives per-session reach on all asks.
 | **DeepSeek + AP** [3] | **0.41** | **0.39** | 8, 6, 4 | 4.6 / 8.1 |
 | Opus, project harness [2] | | 0.52 | 8, 7 | — / 8.3 |
 | Opus, X route [2] (today's rep: 0.48 on P14) | 0.47 | 0.62 | 12, 11 | 4.9 / 10.5 |
-| **Opus + AP**, same day [1] | **0.67** | not run | | 14.3 / — |
+| **Opus + AP**, same day [1] | **0.67** | **0.60** (Opus solo same day: 0.53) | 12 (solo: 10) | 14.3 / 17.0 |
 
 **What the rule supports** (reps apart, and a PR-bootstrap interval excluding 0):
 - **Claude beats DeepSeek on both benchmarks.** "DeepSeek near Claude on dev" was DeepSeek near Opus
@@ -51,12 +51,21 @@ seals, and two things that change the reading:
   fresh reads null against DeepSeek solo (P14's other four PRs, and D12). Opus + AP is measured only
   on the ten PRs, chosen where solo Claude missed.
 
+**The dev pair (2026-10-11)** tested Opus + AP off the ten PRs: same-day Opus solo and Opus + AP on
+dev's 15 PRs, in one seal with every dev row.
+- Opus + AP comes out +0.02 to +0.09 over Opus solo by scoring, judge 12 against 10, with the PR
+  intervals spanning 0. It files 1.7 times the findings.
+- By the pre-registered rule, the P14 +0.20 is confined to the ten PRs chosen for solo Claude's
+  misses.
+
+So no ask-free convention delivery has yet beaten the solo reviewer off the PRs it was developed or
+selected on.
+
 **What this means for beating the solo reviewer, provisionally:**
 - The conventions lever has so far lifted the strongest reviewer (Opus), not the cheap one.
 - For DeepSeek, AP buys what a second solo run buys.
-- **Next:** a second Opus + AP rep on P14 and a D12 run, about 0.75 of a five-hour window, before
-  building on it. Then the fresh set, for whether the validation-only DeepSeek gain is fit to those
-  PRs.
+- **Next:** superseded by the dev pair. Opus + AP did not clear Opus solo on dev, and the AP line
+  now needs a design change rather than more reps of the same delivery.
 
 The detail, every comparison's interval and the untried designs:
 `one-reviewer-table-2026-10-10/README.md`, "Result".
