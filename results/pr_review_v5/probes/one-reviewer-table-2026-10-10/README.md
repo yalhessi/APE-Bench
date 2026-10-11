@@ -235,3 +235,8 @@ The inspection's deciding cell, run at the user's go-ahead (2026-10-11).
     reported beside it.
   - **Also read:** T − X (Claude across days on dev), and every table row again under the new seal, as
     a second check of seal stability.
+
+**The dev pair's audit (2026-10-11, before matching).** All 30 sessions finished by 09:18. There
+was one flag, in `pair_dev_T1_1` (33145 T1). The session wrote its own `findings.json` by heredoc,
+assigned the project's Python path to a variable it never used, and checked the file with the
+system `python3`. Nothing outside the packet was read. Cleared by name (`FLAGS_READ=pair_dev_T1_1`).
