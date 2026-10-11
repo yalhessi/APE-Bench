@@ -211,3 +211,27 @@ The scripts are `inspect_*.py` here and their outputs `inspect_*.txt`.
 - Claude is ahead of DeepSeek under every weighting.
 - AP on DeepSeek moved only the sessions that discovered it; every fresh cell is null.
 - Opus + AP is untested off the ten PRs.
+
+## The dev pair: Opus + AP off the ten PRs (pre-registered 2026-10-11, before any session)
+
+The inspection's deciding cell, run at the user's go-ahead (2026-10-11).
+- **Sessions.** On the dev release's 15 PRs: T1 (Opus 5.5 solo, brief X, the X route) and TA1 (the
+  same with `context_dev_apt.jsonl`'s section, byte for byte), one session each a PR, the same day.
+  Run with `run_claude_pair.sh dev`.
+  - T1's brief and model are byte-identical to the dev X1's.
+  - The 3 control PRs run because a judge import needs all 15.
+- **Scoring.**
+  - **Matcher:** a new D12 seal (`blinding_D12b_SEALED.json`) holding all 15 sessions a PR (the
+    table's 13 plus T1 and TA1), matched harness-blind in PR batches, so TA − T sits in one seal.
+  - **Judge v9:** T1 and TA1 imported as runs (`cli probe import`) and judged on `elm_gpt_5_mini`.
+- **Reading rule.**
+  - **The comparison:** TA − T, raw and group-weighted (`inspect_weighting`), with the PR bootstrap
+    and leave-one-PR-out range.
+  - **One session a row**, so the bootstrap interval decides.
+  - **Ordered on both matchers:** Opus + AP's gain holds off the ten PRs chosen for solo Claude's
+    misses.
+  - **Interval spans 0:** the P14 gain is read as confined to those ten.
+  - **On P14 the gain was +0.20,** at 2.6 times the findings. TA's findings a PR and yield are
+    reported beside it.
+  - **Also read:** T − X (Claude across days on dev), and every table row again under the new seal, as
+    a second check of seal stability.
