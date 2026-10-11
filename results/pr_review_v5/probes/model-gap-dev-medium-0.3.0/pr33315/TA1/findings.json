@@ -1,0 +1,86 @@
+[
+ {
+  "target": "Mathlib/Data/List/Lex.lean",
+  "claim": "The PR fixes the stale `Mathlib/Data/Finset/Colex.lean` and `Mathlib/Data/Pi/Lex.lean` entries in the `## See also` list of `Mathlib/Data/List/Lex.lean`, but the twin `Related files are:` lists in the same `Mathlib/Data` area still point at the moved files, written as dotted module names: `Mathlib/Data/PSigma/Order.lean` lines 24 and 26 (`Data.Finset.Colex`, `Data.Pi.Lex`), `Mathlib/Data/Sigma/Order.lean` lines 34 and 36 (`Data.Finset.CoLex`, `Data.Pi.Lex`), `Mathlib/Data/Prod/Lex.lean` lines 29 and 31 (`Data.Finset.CoLex`, `Data.Pi.Lex`). So a PR titled `doc(Data): fix file refs` leaves the same broken references three files away.",
+  "requested_change": "In this PR, update the `Related files are:` lists in `Mathlib/Data/PSigma/Order.lean`, `Mathlib/Data/Sigma/Order.lean` and `Mathlib/Data/Prod/Lex.lean`: replace `Data.Finset.Colex`/`Data.Finset.CoLex` with `Mathlib/Combinatorics/Colex.lean` and `Data.Pi.Lex` with `Mathlib/Order/PiLex.lean`, and write the remaining entries as file paths (`Mathlib/Data/List/Lex.lean`, `Mathlib/Data/Sigma/Order.lean`, ...) as `Mathlib/Data/List/Lex.lean` now does. (The same two stale entries also sit in `Mathlib/Order/PiLex.lean:28` and `Mathlib/Combinatorics/Colex.lean:44`, outside `Data`.)",
+  "severity": "advisory",
+  "evidence": "content_search for `Finset/Colex|Finset\\.Colex|Pi/Lex|Pi\\.Lex` over target/Mathlib: hits at Data/PSigma/Order.lean:24,26, Data/Sigma/Order.lean:36 (and :34 `Data.Finset.CoLex` read with file_read), Data/Prod/Lex.lean:31 (and :29), Order/PiLex.lean:28, Combinatorics/Colex.lean:44. file_search: `Mathlib/Data/Finset/Colex.lean` and `Mathlib/Data/Pi/Lex.lean` do not exist; `Mathlib/Combinatorics/Colex.lean` and `Mathlib/Order/PiLex.lean` do."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Finset/Defs.lean",
+  "claim": "The updated pointer `More information can be found in `Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean`` (line 34) follows a paragraph introducing the big-operator notation `∑ i ∈ s, f i` / `∏ i ∈ s, f i`, but that notation and `Finset.prod`/`Finset.sum` are defined and documented in `Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean`; `Basic.lean`'s module doc says only 'In this file we prove theorems about products and sums indexed by a `Finset`'.",
+  "requested_change": "Point the sentence at the defining file: `More information can be found in `Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean`.`",
+  "severity": "advisory",
+  "evidence": "declaration_search `Finset.prod` -> `Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:67`. file_read of Defs.lean lines 14-43: module doc '# Big operators ... In this file we define products and sums indexed by finite sets' with the `## Notation` table; Basic.lean lines 12-16: 'In this file we prove theorems about products and sums'. lean_verify_edit (line mode, lines 34-38 of Mathlib/Data/Finset/Defs.lean, together with the Fintype edit) -> outcome `compiled`, no errors or warnings."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Finset/Defs.lean",
+  "claim": "In the same module docstring the PR is fixing references in, line 38 still sends readers to `Mathlib/Data/Fintype/Basic.lean` for the `Fintype` class and `univ`, but `Fintype` (and `Finset.univ`) are now defined in `Mathlib/Data/Fintype/Defs.lean`; `Basic.lean` is 'a collection of basic `Fintype` instances'.",
+  "requested_change": "Change line 38 to `` `α`, called `univ`. See `Mathlib/Data/Fintype/Defs.lean`. ``",
+  "severity": "advisory",
+  "evidence": "declaration_search `Fintype` -> `Mathlib/Data/Fintype/Defs.lean:56`. file_read Data/Fintype/Basic.lean header: '# Instances for finite types'; Data/Fintype/Defs.lean header: '# Finite types ... defines a typeclass ... `Finset.univ`'. lean_verify_edit (lines 34-38 of Mathlib/Data/Finset/Defs.lean) -> `compiled`."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean",
+  "claim": "The rewritten implementation note still reads 'In the future, we could consider generalizing `Finset.Nat.antidiagonalTuple` further to support finitely-supported functions, as in `Finset.finsuppAntidiag`', but the generalization it proposes already exists: `Finset.finsuppAntidiag` (finitely supported functions) and `Finset.finAntidiagonal`/`Finset.piAntidiag` in `Mathlib/Algebra/Order/Antidiag/Pi.lean`, whose module doc says '`Finset.finAntidiagonal` is strictly more general than `Finset.Nat.antidiagonalTuple`. Deduplicate.' The note now describes as future work something done, and hides the actual open item (deduplication).",
+  "requested_change": "Replace lines 39-41 with a statement of what exists plus the remaining TODO, e.g.\n```\n`Finset.finAntidiagonal` and `Finset.piAntidiag` in `Mathlib/Algebra/Order/Antidiag/Pi.lean`\ngeneralize `Finset.Nat.antidiagonalTuple` to any commutative monoid with antidiagonals, and\n`Finset.finsuppAntidiag` in `Mathlib/Algebra/Order/Antidiag/Finsupp.lean` to finitely supported\nfunctions. TODO: deduplicate `Finset.Nat.antidiagonalTuple` with `Finset.finAntidiagonal`.\n```",
+  "severity": "advisory",
+  "evidence": "declaration_search: `Finset.finsuppAntidiag` at Algebra/Order/Antidiag/Finsupp.lean:45 ('The finset of functions `ι →₀ μ` with support contained in `s` and sum equal to `n`'), `Finset.piAntidiag` at Antidiag/Pi.lean:113. file_read Antidiag/Pi.lean lines 35-41 (TODO: 'Finset.finAntidiagonal is strictly more general than Finset.Nat.antidiagonalTuple. Deduplicate.') and line 64. The archive file of the old reference is gone (no Partition file under target/Archive). lean_verify_edit with the replacement above (lines 39-41) -> `compiled`, all lines <= 100 chars."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Finsupp/MonomialOrder.lean",
+  "claim": "The sentence the PR edits, 'For the graded lexicographic ordering, see `Mathlib/Data/Finsupp/MonomialOrder/DegLex.lean`' (line 37), has no closing period, so the docstring prose runs straight into the following bullet.",
+  "requested_change": "End the sentence with a period: `For the graded lexicographic ordering, see `Mathlib/Data/Finsupp/MonomialOrder/DegLex.lean`.` (92 characters, within the limit).",
+  "severity": "advisory",
+  "evidence": "content_search shows line 37 without a trailing period. lean_verify_edit (line 37 replaced with the period version) -> `compiled`."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Array/Defs.lean",
+  "claim": "The PR fixes the heading level and trims the stale sentence, but leaves a generic title and body: '# Definitions on Arrays' / 'This file contains various definitions on `Array`'. The file defines exactly two functions, `Array.cyclicPermute!` and `Array.permute!`, both about permuting an array, and the module doc names neither.",
+  "requested_change": "Retitle and name the definitions, e.g.\n```\n/-!\n# Permuting arrays\n\nThis file defines `Array.cyclicPermute!`, which permutes an array along a cycle of indices, and\n`Array.permute!`, which applies a list of such cycles in turn. It contains no proofs about them.\n-/\n```",
+  "severity": "advisory",
+  "evidence": "file_read of Mathlib/Data/Array/Defs.lean (39 lines): only `cyclicPermute!` (with `where cyclicPermuteAux`) and `permute!`. content_search `cyclicPermute|permute!` over target: no lemmas anywhere (only uses in Mathlib/Tactic/Translate/Core.lean and a nolints entry), so 'no proofs' is accurate. lean_verify_edit (lines 9-14 replaced) -> `compiled`."
+ },
+ {
+  "target": "Vector3.unexpandNil",
+  "claim": "The comment above `Vector3.unexpandNil` (line 55), '-- this is copied from `Init/NotationExtra.lean` (Lean core)', is a provenance note that a declaration was adapted from another library declaration; such notes are not kept in Mathlib. The hunk also only rewords a path that was not stale: `src/Init/NotationExtra.lean` is the file's path in the lean4 repository.",
+  "requested_change": "Delete the `-- this is copied from ...` line above `unexpandNil` instead of rewording it (if the provenance must stay, put it in the declaration's docstring, e.g. `/-- Unexpander for `Vector3.nil`, following the `List.nil` unexpander in core's `Init/NotationExtra.lean`. -/`).",
+  "severity": "advisory",
+  "evidence": "file_read Mathlib/Data/Vector3.lean lines 53-65. lean_verify_edit removing lines 55 and 60 (span 55-61 replaced without the two comment lines) -> `compiled`, no warnings. The Lean core source is not in the workspace (file_search `*NotationExtra*` empty), so the claim about the lean4 path is from the repository layout, not checked here."
+ },
+ {
+  "target": "Vector3.unexpandCons",
+  "claim": "The comment above `Vector3.unexpandCons` (line 60), '-- this is copied from `Init/NotationExtra.lean` (Lean core)', is the same kind of provenance note (adapted from core's `List.cons` unexpander), which Mathlib does not keep; the PR rewrites it rather than dropping it.",
+  "requested_change": "Delete the `-- this is copied from ...` line above `unexpandCons` (or fold the provenance into its docstring, `/-- Unexpander for `Vector3.cons`. ... -/`).",
+  "severity": "advisory",
+  "evidence": "file_read Mathlib/Data/Vector3.lean lines 60-65. lean_verify_edit with both comment lines removed -> `compiled`."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/Matrix/Mul.lean",
+  "claim": "The PR fixes 'See `Mathlib/Data/Matrix/ConjTranspose.lean` for' in `Mathlib/Data/Matrix/Mul.lean`, but the identical stale sentence remains in the twin module doc of `Mathlib/LinearAlgebra/Matrix/Defs.lean` (line 32), the file `Mul.lean`'s notation section was copied from.",
+  "requested_change": "Make the same replacement in `Mathlib/LinearAlgebra/Matrix/Defs.lean:32`: `See `Mathlib/LinearAlgebra/Matrix/ConjTranspose.lean` for`.",
+  "severity": "advisory",
+  "evidence": "content_search `Matrix/ConjTranspose` over target/Mathlib: Data/Matrix/Mul.lean:35 (fixed) and LinearAlgebra/Matrix/Defs.lean:32 (`Mathlib/Data/Matrix/ConjTranspose.lean`, stale). file_search: `Mathlib/Data/Matrix/ConjTranspose.lean` absent; declaration_search `Matrix.conjTranspose` -> LinearAlgebra/Matrix/ConjTranspose.lean:41, notation `ᴴ` at line 45."
+ },
+ {
+  "target": "module_doc in Mathlib/Data/List/Lex.lean",
+  "claim": "The `## See also` list the PR edits starts immediately after the paragraph line 'Related files are:' (line 22) with no blank line separating the bulleted list from the surrounding paragraph.",
+  "requested_change": "Insert a blank line between `Related files are:` and `* `Mathlib/Combinatorics/Colex.lean`: Colexicographic order on finite sets.`.",
+  "severity": "advisory",
+  "evidence": "model.md shows the list as the PR leaves it ('Related files are:' followed directly by '* `Mathlib/Combinatorics/Colex.lean`...'). lean_verify_edit (line 22 replaced by 'Related files are:' plus an empty line) -> `compiled`."
+ },
+ {
+  "target": "command in Mathlib/Data/Nat/Init.lean",
+  "claim": "In the `foundational algebra order theory` library note, the bullet list the PR edits (lines 47-56, three of them rewritten at lines 49, 50, 52, e.g. '* `Mathlib/Algebra/Group/Nat/Defs.lean` for the monoid instances on `ℕ`') consists of fragments with no closing period, and it starts directly after 'The relevant files are:' with no separating blank line.",
+  "requested_change": "End every bullet of the `The relevant files are:` list (lines 47-56) with a period, e.g. `* `Mathlib/Algebra/Group/Nat/Defs.lean` for the monoid instances on `ℕ`.`, and insert a blank line between `The relevant files are:` and the first bullet.",
+  "severity": "advisory",
+  "evidence": "file_read Mathlib/Data/Nat/Init.lean lines 46-57. lean_verify_edit (lines 46-56 replaced: blank line after 'The relevant files are:' and periods appended, all lines <= 100 chars) -> `compiled`, no errors or warnings."
+ },
+ {
+  "target": "PR #33315 description",
+  "claim": "The description 'Fix some stale documentation file refs.' does not say what changes beyond path updates: `Mathlib/Data/Array/Defs.lean` also has its title promoted from `##` to `#` and its stale reference deleted rather than updated, and `Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean` replaces the reference to `cut` in the removed archive file by a different library declaration, `Finset.finsuppAntidiag`.",
+  "requested_change": "Extend the description to list the non-mechanical changes: the `Array/Defs` heading-level fix and deleted sentence, and the `NatAntidiagonal` note now pointing to `Finset.finsuppAntidiag` instead of the archived `cut`.",
+  "severity": "advisory",
+  "evidence": "pr.md description vs diff.patch: Array/Defs hunk changes `## Definitions on Arrays` to `# Definitions on Arrays` and drops 'those are contained in other files in `Mathlib/Data/Array.lean`'; NatAntidiagonal hunk swaps `cut` in `archive/100-theorems-list/45_partition.lean` for `Finset.finsuppAntidiag`."
+ }
+]

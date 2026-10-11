@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "line_start": 113, "line_end": 114, "replacement": "  exact hi₁ hjk\n\n@[to_additive (attr := deprecated (since := \"2025-12-20\"))]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n"}

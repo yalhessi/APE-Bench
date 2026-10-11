@@ -1,0 +1,14 @@
+{
+ "findings_in": 126,
+ "anchored": 124,
+ "unanchored": 2,
+ "unanchored_rate": 0.0159,
+ "work_units_reached": 63,
+ "by_method": {
+  "review_line_entity": 109,
+  "review_line_range": 15
+ },
+ "by_failure": {
+  "no_location": 2
+ }
+}

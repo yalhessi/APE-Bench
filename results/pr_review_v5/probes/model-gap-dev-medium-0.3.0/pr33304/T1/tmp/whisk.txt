@@ -1,0 +1,2 @@
+-- The natural isomorphisms `Functor.leftUnitor` and `Functor.rightUnitor` are provided in
+-- `Mathlib/CategoryTheory/Functor/Category.lean`.

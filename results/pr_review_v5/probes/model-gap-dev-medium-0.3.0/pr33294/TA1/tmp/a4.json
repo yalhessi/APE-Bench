@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/Arithmetic.lean", "line_start": 410, "line_end": 413, "replacement": "set_option linter.deprecated false in\n@[deprecated StrictMono.le_apply \"use `hf.strictMono.le_apply.ge_iff_eq'`\" (since := \"2025-12-25\")]\ntheorem IsNormal.le_iff_eq {f} (H : Ordinal.IsNormal f) {a} : f a \u2264 a \u2194 f a = a :=\n  H.le_apply.ge_iff_eq'"}

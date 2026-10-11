@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/Topology.lean", "line_start": 186, "line_end": 186, "replacement": "    rw [h.map_iSup (bddAbove_of_small _)]"}

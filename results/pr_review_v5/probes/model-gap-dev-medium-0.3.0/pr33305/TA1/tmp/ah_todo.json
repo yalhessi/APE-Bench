@@ -1,0 +1,1 @@
+{"path": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean", "line_start": 19, "line_end": 20, "replacement": "The left actions of, e.g., `M` on `\u03b1 \u2192[N] \u03b2` are in `Mathlib/GroupTheory/GroupAction/Hom.lean`. Add\n`SMulCommClass` instances saying that they commute with the right actions defined here."}

@@ -1,0 +1,70 @@
+
+######## D12b: match_D12b
+
+== all asks: 47 asks on 12 PRs; per-session reach, matcher 1 / 2 ==
+  X      0.55 [0.53, 0.57] / 0.59 [0.57, 0.60] | union 28/29, stable 24/26 of 47 | 10.5 findings a PR, yield 0.21
+  T      0.53 [0.53] / 0.55 [0.55] | union 25/26, stable 25/26 of 47 | 9.8 findings a PR, yield 0.21
+  TA     0.60 [0.60] / 0.57 [0.57] | union 28/27, stable 28/27 of 47 | 17.0 findings a PR, yield 0.14
+  OP     0.43 [0.43, 0.43] / 0.46 [0.47, 0.45] | union 24/25, stable 16/18 of 47 | 8.3 findings a PR, yield 0.20
+  GPT    0.28 [0.28, 0.26, 0.30] / 0.29 [0.30, 0.26, 0.32] | union 17/18, stable 9/9 of 47 | 3.3 findings a PR, yield 0.33
+  DX     0.40 [0.38, 0.40, 0.40] / 0.42 [0.43, 0.40, 0.43] | union 21/22, stable 14/16 of 47 | 5.1 findings a PR, yield 0.30
+  AP     0.41 [0.40, 0.38, 0.45] / 0.39 [0.38, 0.36, 0.43] | union 24/23, stable 15/14 of 47 | 8.1 findings a PR, yield 0.20
+  DXuDX  0.45 [0.45, 0.45, 0.45] / 0.46 [0.45, 0.47, 0.47] | union 21/22, stable 21/21 of 47
+  APuDX  0.48 [0.45, 0.49, 0.49] / 0.45 [0.43, 0.47, 0.47] | union 25/24, stable 19/19 of 47
+-- comparisons (all asks): mean difference, 95% PR-bootstrap interval, leave-one-PR-out range; verdict --
+      DX - GPT    m1 +0.121 [+0.058, +0.197] loo +0.103..+0.148 | m2 +0.128 [+0.033, +0.261] loo +0.079..+0.167  -> ordered
+       X - DX     m1 +0.156 [+0.052, +0.308] loo +0.119..+0.182 | m2 +0.167 [+0.041, +0.327] loo +0.130..+0.210  -> ordered
+       T - DX     m1 +0.135 [+0.007, +0.306] loo +0.096..+0.175 | m2 +0.135 [-0.022, +0.318] loo +0.096..+0.198  -> indistinguishable (reps apart, interval spans 0)
+      OP - DX     m1 +0.028 [-0.063, +0.149] loo +0.007..+0.048 | m2 +0.039 [-0.058, +0.151] loo +0.018..+0.067  -> indistinguishable (reps apart, interval spans 0)
+       X - OP     m1 +0.128 [+0.074, +0.196] loo +0.111..+0.143 | m2 +0.128 [+0.073, +0.202] loo +0.111..+0.143  -> ordered
+       X - T      m1 +0.021 [-0.042, +0.082] loo +0.000..+0.033 | m2 +0.032 [-0.038, +0.100] loo +0.012..+0.044  -> indistinguishable
+      AP - DX     m1 +0.014 [-0.060, +0.120] loo -0.024..+0.044 | m2 -0.028 [-0.076, +0.018] loo -0.046..-0.009  -> indistinguishable
+      AP - DXuDX  m1 -0.035 [-0.109, +0.083] loo -0.079..-0.018 | m2 -0.071 [-0.111, -0.029] loo -0.080..-0.059  -> indistinguishable
+   APuDX - DXuDX  m1 +0.028 [-0.026, +0.122] loo -0.008..+0.046 | m2 -0.007 [-0.029, +0.022] loo -0.014..-0.000  -> indistinguishable
+      TA - T      m1 +0.064 [-0.087, +0.245] loo +0.000..+0.089 | m2 +0.021 [-0.097, +0.139] loo -0.024..+0.044  -> indistinguishable (reps apart, interval spans 0)
+       X - AP     m1 +0.142 [-0.025, +0.311] loo +0.104..+0.198 | m2 +0.195 [+0.075, +0.348] loo +0.159..+0.234  -> indistinguishable (reps apart, interval spans 0)
+       T - AP     m1 +0.121 [-0.078, +0.314] loo +0.081..+0.198 | m2 +0.163 [+0.016, +0.333] loo +0.126..+0.222  -> indistinguishable (reps apart, interval spans 0)
+
+== in-census asks: 40 asks on 12 PRs; per-session reach, matcher 1 / 2 ==
+  X      0.49 [0.47, 0.50] / 0.51 [0.50, 0.53] | union 21/22, stable 18/19 of 40
+  T      0.47 [0.47] / 0.50 [0.50] | union 19/20, stable 19/20 of 40
+  TA     0.55 [0.55] / 0.53 [0.53] | union 22/21, stable 22/21 of 40
+  OP     0.39 [0.38, 0.40] / 0.42 [0.42, 0.42] | union 18/19, stable 13/15 of 40
+  GPT    0.27 [0.28, 0.25, 0.28] / 0.28 [0.30, 0.25, 0.30] | union 14/15, stable 8/8 of 40
+  DX     0.38 [0.38, 0.38, 0.38] / 0.40 [0.42, 0.38, 0.40] | union 17/18, stable 11/13 of 40
+  AP     0.41 [0.42, 0.38, 0.42] / 0.38 [0.40, 0.35, 0.40] | union 20/19, stable 13/12 of 40
+  DXuDX  0.42 [0.42, 0.42, 0.42] / 0.44 [0.42, 0.45, 0.45] | union 17/18, stable 17/17 of 40
+  APuDX  0.47 [0.45, 0.47, 0.47] / 0.44 [0.42, 0.45, 0.45] | union 21/20, stable 16/16 of 40
+-- comparisons (in-census asks): mean difference, 95% PR-bootstrap interval, leave-one-PR-out range; verdict --
+      DX - GPT    m1 +0.108 [+0.035, +0.194] loo +0.093..+0.138 | m2 +0.117 [+0.010, +0.269] loo +0.065..+0.161  -> ordered
+       X - DX     m1 +0.113 [+0.000, +0.312] loo +0.066..+0.141 | m2 +0.113 [-0.015, +0.311] loo +0.066..+0.153  -> indistinguishable (reps apart, interval spans 0)
+       T - DX     m1 +0.100 [-0.040, +0.322] loo +0.053..+0.139 | m2 +0.100 [-0.074, +0.333] loo +0.053..+0.167  -> indistinguishable (reps apart, interval spans 0)
+      OP - DX     m1 +0.013 [-0.083, +0.155] loo -0.013..+0.032 | m2 +0.025 [-0.083, +0.160] loo -0.000..+0.056  -> indistinguishable
+       X - OP     m1 +0.100 [+0.045, +0.194] loo +0.079..+0.111 | m2 +0.087 [+0.028, +0.188] loo +0.066..+0.109  -> ordered
+       X - T      m1 +0.013 [-0.059, +0.086] loo -0.014..+0.026 | m2 +0.013 [-0.059, +0.086] loo -0.014..+0.026  -> indistinguishable
+      AP - DX     m1 +0.033 [-0.053, +0.167] loo -0.009..+0.073 | m2 -0.017 [-0.076, +0.042] loo -0.034..+0.010  -> indistinguishable
+      AP - DXuDX  m1 -0.017 [-0.105, +0.131] loo -0.065..+0.011 | m2 -0.058 [-0.111, +0.010] loo -0.074..-0.042  -> indistinguishable
+   APuDX - DXuDX  m1 +0.042 [-0.023, +0.160] loo +0.000..+0.069 | m2 -0.000 [-0.029, +0.043] loo -0.009..+0.011  -> indistinguishable
+      TA - T      m1 +0.075 [-0.103, +0.296] loo +0.000..+0.105 | m2 +0.025 [-0.111, +0.171] loo -0.028..+0.053  -> indistinguishable (reps apart, interval spans 0)
+       X - AP     m1 +0.079 [-0.089, +0.277] loo +0.031..+0.134 | m2 +0.129 [+0.014, +0.311] loo +0.083..+0.162  -> indistinguishable (reps apart, interval spans 0)
+       T - AP     m1 +0.067 [-0.150, +0.297] loo +0.018..+0.148 | m2 +0.117 [-0.042, +0.333] loo +0.070..+0.176  -> indistinguishable (reps apart, interval spans 0)
+
+######## D12 judge v9 (elm_gpt_5_mini): issue hits of 23 per run
+  X    [12, 11] of 23 (missing 0); union 13
+  OP   [8, 7] of 23 (missing 0); union 9
+  GPT  [2, 5, 5] of 23 (missing 0); union 7
+  DX   [7, 6, 7] of 23 (missing 0); union 10
+  AP   [8, 6, 4] of 23 (missing 0); union 10
+  T    [10] of 23 (missing 0); union 10
+  TA   [12] of 23 (missing 0); union 12
+-- comparisons (judge): mean difference in obligations, 95% PR-bootstrap interval, leave-one-PR-out --
+    DX - GPT  +2.67 [+0.00, +5.65] loo +1.92..+3.41  -> indistinguishable
+     X - DX   +4.83 [+0.74, +10.29] loo +3.10..+5.94  -> ordered
+     T - DX   +3.33 [-0.92, +9.37] loo +1.46..+4.38  -> indistinguishable
+    OP - DX   +0.83 [-3.07, +5.05] loo -0.18..+1.64  -> indistinguishable
+     X - OP   +4.00 [+1.19, +7.67] loo +2.88..+5.11  -> ordered
+     X - T    +1.50 [-0.77, +3.66] loo +0.58..+2.09  -> indistinguishable
+    AP - DX   -0.67 [-1.67, +0.81] loo -1.05..-0.37  -> indistinguishable
+    TA - T    +2.00 [-2.30, +4.76] loo +1.15..+3.29  -> indistinguishable
+     X - AP   +5.50 [+1.50, +10.47] loo +3.83..+6.71  -> ordered
+     T - AP   +4.00 [+0.00, +9.58] loo +2.19..+4.98  -> ordered

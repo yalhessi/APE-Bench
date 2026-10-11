@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Arctan.lean", "declaration_name": "Real.arctan_sqrt_three", "new_declaration": "@[simp]\ntheorem arctan_sqrt_three : arctan (√3) = π / 3 :=\n  arctan_eq_of_tan_eq tan_pi_div_three <| by constructor <;> linarith [pi_pos]"}

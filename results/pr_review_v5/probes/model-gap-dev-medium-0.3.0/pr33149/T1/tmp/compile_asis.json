@@ -1,0 +1,164 @@
+{
+ "mode": "as_is_compile_check",
+ "outcome": "compiled",
+ "compiles": true,
+ "errors_already_in_the_file": [],
+ "errors_introduced_by_your_edit": [],
+ "warnings": [
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 18,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 39,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 55,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `n`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 67,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `C`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 75,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ν`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 24,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 32,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 57,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 65,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 81,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `p`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def SolvesNavierStokes (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (p : T3 → ℝ → ℝ) : Prop :=",
+   "pos": {
+    "column": 57,
+    "line": 142
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "noncomputable def GalerkinProjection (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) : T3 → ℝ → Fin 3 → ℝ :=",
+   "pos": {
+    "column": 38,
+    "line": 150
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "  fun x t j => u₀ x j",
+   "pos": {
+    "column": 8,
+    "line": 151
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ht`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma galerkin_energy_bound (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) (t : ℝ) (ht : 0 ≤ t) :",
+   "pos": {
+    "column": 67,
+    "line": 306
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (h_divfree : DivergenceFree u₀) (T : ℝ) (hT : 0 < T) :",
+   "pos": {
+    "column": 5,
+    "line": 316
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (T : ℝ) (hT : 0 ≤ T) (τ_T : ℝ) (hτ : L.φ τ_T = T) :",
+   "pos": {
+    "column": 13,
+    "line": 355
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `Φ`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma bkm_finite_anyT (Φ : VorticityResponse) (u₀ : T3 → Fin 3 → ℝ)",
+   "pos": {
+    "column": 23,
+    "line": 407
+   }
+  }
+ ],
+ "environment": "Verified against the reviewed workspace: this PR's changed modules, and the modules between them on the import graph, are rebuilt, so imports resolve the declarations this PR adds or renames. Modules the PR did not touch are as they were compiled at the merge-base; only a changed file has a fully rebuilt import closure. A pre-existing error in a changed file is genuine -- most often a file that cannot be checked on its own.",
+ "warrants": "The current state of the file as the PR leaves it, and nothing else. This is NOT evidence for or against any change you are considering: no edit was applied, so nothing you are weighing has been tested. To test a change, call again with `declaration_name` + `new_declaration`."
+}

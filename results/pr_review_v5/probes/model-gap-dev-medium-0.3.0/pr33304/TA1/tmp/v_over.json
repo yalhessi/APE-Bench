@@ -1,0 +1,1 @@
+{"path": "Mathlib/CategoryTheory/Limits/Preserves/Over.lean", "line_start": 10, "line_end": 17, "replacement": "/-!\n\n# Forgetful functor from `Over X` preserves cofiltered limits\n\nNote that `Over.forget X : Over X ⥤ C` already creates all colimits, see\n`Over.createsColimitsOfSize` in `Mathlib/CategoryTheory/Limits/Over.lean`.\n-/"}

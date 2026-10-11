@@ -1,0 +1,30 @@
+{
+ "success": true,
+ "errors": [],
+ "infos": [
+  {
+   "severity": "information",
+   "data": "GalerkinLimit.smooth (ν : ℝ) (hν : 0 < ν) (u₀ : T3 → Fin 3 → ℝ) (h_smooth : SmoothInitial u₀)\n  (h_divfree : DivergenceFree u₀) : ∃ u p, SmoothSpacetime u ∧ SolvesNavierStokes ν u p ∧ ∀ (x : T3), u x 0 = u₀ x",
+   "code_line": "#check GalerkinLimit.smooth",
+   "pos": {
+    "column": 0,
+    "line": 473
+   }
+  },
+  {
+   "severity": "information",
+   "data": "'GalerkinLimit.smooth' depends on axioms: [bkm_implies_regularity,\n cGronwall,\n cSobolev,\n cSobolev_pos,\n hs_gronwall_bound,\n propext,\n sobolev_embedding,\n vorticity_hs_bound,\n vorticity_integrable,\n Classical.choice,\n Quot.sound]",
+   "code_line": "#print axioms GalerkinLimit.smooth",
+   "pos": {
+    "column": 0,
+    "line": 475
+   }
+  }
+ ],
+ "axioms": [],
+ "outcome": "compiled",
+ "message": "Lean ran: the code compiles with no errors.",
+ "warnings_introduced_by_your_edit": [],
+ "warnings_already_in_the_file": 17,
+ "mode": "verified_edit"
+}

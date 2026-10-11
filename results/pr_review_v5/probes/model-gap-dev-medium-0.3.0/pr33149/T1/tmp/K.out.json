@@ -1,0 +1,11 @@
+{
+ "success": true,
+ "errors": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compiled",
+ "message": "Lean ran: the code compiles with no errors.",
+ "warnings_introduced_by_your_edit": [],
+ "warnings_already_in_the_file": 17,
+ "mode": "verified_edit"
+}

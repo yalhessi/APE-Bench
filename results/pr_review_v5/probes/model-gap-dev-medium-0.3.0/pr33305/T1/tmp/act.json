@@ -1,0 +1,1 @@
+{"path":"Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean","line_start":19,"line_end":19,"replacement":"Add left actions of, e.g., `M` on `α →[N] β` to `Mathlib/GroupTheory/GroupAction/Hom.lean` and"}

@@ -1,0 +1,51 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Unknown constant `ContinuousMap.inner_toLp`",
+   "code_line": "  rw [ContinuousMap.inner_toLp] at h",
+   "pos": {
+    "column": 6,
+    "line": 507
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nn m : ℤ\nh : ⟪fourierLp 2 m, fourierLp 2 n⟫_ℂ = if m = n then 1 else 0\n⊢ ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) = if n = m then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 505
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 2 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "warnings_introduced_by_your_edit": [],
+ "warnings_already_in_the_file": 17,
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Unknown constant `ContinuousMap.inner_toLp`",
+   "code_line": "  rw [ContinuousMap.inner_toLp] at h",
+   "pos": {
+    "column": 6,
+    "line": 507
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nn m : ℤ\nh : ⟪fourierLp 2 m, fourierLp 2 n⟫_ℂ = if m = n then 1 else 0\n⊢ ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) = if n = m then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 505
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

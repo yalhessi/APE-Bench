@@ -1,0 +1,10 @@
+{
+ "mode": "as_is_compile_check",
+ "outcome": "compiled",
+ "compiles": true,
+ "errors_already_in_the_file": [],
+ "errors_introduced_by_your_edit": [],
+ "warnings": [],
+ "environment": "Verified against the reviewed workspace: this PR's changed modules, and the modules between them on the import graph, are rebuilt, so imports resolve the declarations this PR adds or renames. Modules the PR did not touch are as they were compiled at the merge-base; only a changed file has a fully rebuilt import closure. A pre-existing error in a changed file is genuine -- most often a file that cannot be checked on its own.",
+ "warrants": "The current state of the file as the PR leaves it, and nothing else. This is NOT evidence for or against any change you are considering: no edit was applied, so nothing you are weighing has been tested. To test a change, call again with `declaration_name` + `new_declaration`."
+}

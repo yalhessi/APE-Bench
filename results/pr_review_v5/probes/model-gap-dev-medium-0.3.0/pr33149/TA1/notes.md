@@ -1,0 +1,111 @@
+# Review notes: PR #33149 (Mathlib/Analysis/ODE/GalerkinRegularity.lean)
+
+## What I did
+- Read brief.md, pr.md, model.md (all 90-odd objects, the families and the relations) and diff.patch. I rebuilt the file text from the diff in `tmp/file.lean` so I could cite line numbers.
+- Compiled the file as the PR leaves it (`lean_verify_edit`, no edit). It compiles, with 17 unused-variable warnings (Mathlib CI treats warnings as errors).
+- Ran four verified-edit compiles, each of which appended or replaced code. Results are in `tmp/batch*_out.json`.
+  - batch1, appended examples, all compiled with no new warnings:
+    - `False` from `bkm_implies_regularity`;
+    - `BKMFinite`, `SmoothInitial` and `SolvesNavierStokes` are vacuous;
+    - `smoothInTime f ↔ ContDiff ℝ ω f` holds by `Iff.rfl`;
+    - `% 3` on `Fin 3` is a no-op;
+    - `fubini_torus3` is `integral_fintype_prod_volume_eq_prod`;
+    - the golfed `tau_interval_finite'` with `0 ≤ T`;
+    - the golfed `bkm_finite_anyT'` without `Φ`;
+    - `galerkin_energy_bound` holds by `le_rfl`;
+    - `GalerkinProjection` ignores `N` and `t`;
+    - the main statement holds with no hypotheses;
+    - `bkm_coordinate_invariance` for any C¹ φ via `integral_comp_mul_deriv`;
+    - `fourier3D = mFourier` by `rfl`;
+    - the anonymous `VorticityResponse` literal.
+  - batch2, deleting lines 37-38: 4 commandStart spacing warnings appear, and no error, so `open scoped InnerProductSpace` is unused.
+  - batch3: `import Mathlib` replaced by two targeted imports compiles.
+  - batch4: binder-style plus `↦` rewrites of the nine `:= fun` definitions, and the corrected `spectralCurl` (2π, no `% 3`), compile with the rest of the file.
+  - batch5/6: binder-style `fourier3D_orthogonal'` compiles; `uniform_vorticity_bound'` without `h_divfree` (gcongr) compiles; `fourier_ortho_integral` is derivable from `orthonormal_fourier` (the simpa variant compiled; a first `convert` variant failed and was discarded).
+- Used declaration_search to confirm the library already has:
+  - `UnitAddTorus`, `UnitAddTorus.mFourier`, `mFourierCoeff`, `orthonormal_mFourier`, `hasSum_sq_mFourierCoeff` and `hasSum_mFourier_series_apply_of_summable`;
+  - `MeasureTheory.integral_fintype_prod_eq_prod`, `mul_sub_le_image_sub_of_le_deriv`, `intervalIntegral.integral_comp_mul_deriv` and `orthonormal_fourier`;
+  - `T3Space`, `Real.iSup_of_not_bddAbove`, `MeasureTheory.eLpNorm`, `fourier_coe_apply` and `not_differentiableAt_abs_zero`.
+- Read `Mathlib/Analysis/Fourier/AddCircleMulti.lean` and the header of `Mathlib/Analysis/ODE/Gronwall.lean`. Both are modules with `@[expose] public section`.
+- Searched Zulip. Yury Kudryashov (maintainer): "we will definitely decline a PR with an `axiom` command."
+- naming_norm gave no measurement for the new names (`subject_unresolved` or `no_population`). precedent_search returned nothing relevant.
+
+## Overall judgement
+The PR is unrevised generated code that claims to settle the Navier-Stokes Millennium problem. Its 19 axioms include one that proves `False` (checked in Lean) and two more that are false. Its key definitions are placeholders. A maintainer would close it. All the other findings record what would also have to change, each checked where a check was possible.
+
+## Object by object
+- Module docstring: the title and summary claim a result the file does not prove, the implementation notes describe a route the proofs never use, and the only support is a self-citation. Filed.
+- `T3`: duplicates `UnitAddTorus (Fin 3)` and clashes with T₃ (`T3Space`). Filed.
+- `cMoser`, `cGronwall`, `cSobolev` and the `_pos` axioms: all axioms are filed together. `cMoser`, `cMoser_pos` and `cGronwall_pos` are also unused (filed under `moser_estimate`). `cSobolev`, `cSobolev_pos` and `cGronwall` are used, but only by axiom-based lemmas.
+- `fourier_ortho_integral`: provable from `orthonormal_fourier` (verified). Filed.
+- `fubini_torus3`: a library lemma (verified). Filed.
+- `VorticityResponse`: the name and docstring describe a functional the structure does not contain; fields `hmin_pos` and `hbounds` are badly named. Two findings.
+- `fourierDecay`: defined as `True`, so it is vacuous (verified); also misnamed (Prop in lowerCamelCase). Filed.
+- `SmoothInitial`: vacuous through `fourierDecay`; the fix is filed there. Its name is fine.
+- `smoothInTime`: `⊤` means analytic (verified); also misnamed. Filed.
+- `SmoothSpacetime`: inherits the two problems above, which are fixed at their source. Nothing separate.
+- `FourierCoeff`: a type abbreviation, correctly UpperCamelCase. It would go away with the move to `mFourierCoeff`. Not filed separately.
+- `fourier1D`: an alias of `fourier`. Filed.
+- `fourier3D`: equals `mFourier` by `rfl` (verified). Filed.
+- `fourierCoeff3D`: duplicates `mFourierCoeff`. Filed.
+- `fourierTransform`: binder and `↦` style (file-level findings); in the root namespace (filed). Its mathematics is fine once based on `mFourierCoeff`.
+- `DivergenceFree`: the definition is correct in Fourier space (homogeneous, so 2π does not matter); in the root namespace (filed). Nothing else.
+- `LerayProjection`: the formula is correct for `k ≠ 0` but it is never used. Covered by the `GalerkinProjection` finding and the naming finding.
+- `spectralNSResidual` and `SolvesNavierStokes`: the residual is constantly 0, so both are vacuous (verified); `p` is unused. Filed.
+- `fourierTruncate`: unused. Covered by the `GalerkinProjection` finding.
+- `GalerkinProjection` and `GalerkinAt`: constant in time and independent of `N` (verified); the naming case is wrong. Filed.
+- `spectralCurl`: missing the 2π factor, and `% 3` is a no-op (verified; the fix compiles). Filed.
+- `invFourier`: silently takes `.re`, and its `tsum` is 0 when the series does not converge. Not filed separately because it would be replaced by the library series API.
+- `Vorticity`: naming and binder style filed. Otherwise inherits from `spectralCurl`.
+- `l2Norm` and `linftyNorm`: `⨆` in ℝ gives a junk 0 for unbounded `f`; both should use `eLpNorm`. Filed under `linftyNorm`.
+- `BKMFinite`: vacuous (verified). Filed.
+- `fourier_inversion` and `parseval_orthonormal`: false as stated (mathematical argument, not compiled). Filed with the library replacements.
+- `bkm_implies_regularity`: proves `False` (verified). Filed.
+- `fourierCoeff_summable`: true (Bessel), but an axiom. It is covered by the all-axioms finding and goes away with `parseval3D`.
+- `integral_le_const_mul_length`: unused and derivable. Filed.
+- `vorticity_integrable`, `hs_gronwall_bound`, `sobolev_embedding` and `vorticity_hs_bound`: covered by the all-axioms finding (become hypotheses or proofs).
+- `moser_estimate` and `smooth_initial_hs_finite`: unused. Filed.
+- `hsNorm`: uses the sup norm of `k`, which is equivalent to the Euclidean norm, so I did not file it.
+- `TemporalLifting`: a misnamed field and an inaccurate docstring. Filed.
+- `fourier3D_orthogonal`: duplicates `orthonormal_mFourier`; the `have`/`intro` style and the golfed proof are verified. Filed.
+- `parseval3D`: duplicates `hasSum_sq_mFourierCoeff` and rests on false axioms. Filed.
+- `galerkin_energy_bound`: unused, has an unused `ht`, and holds by `le_rfl` (verified). Filed.
+- `uniform_vorticity_bound`: unused `h_divfree` (the gcongr version is verified). Filed.
+- `bkmPhysical` and `bkmLifted`: used only by `bkm_coordinate_invariance`. Covered there and in the module-doc finding.
+- `bkm_coordinate_invariance`: unused `hT`, and it is generalisable to any C¹ φ (verified). Filed.
+- `tau_interval_finite`: `0 ≤ T` suffices, and the proof golf is verified. Two findings.
+- `bkm_finite_anyT`: unused `Φ`, proof golf (verified), naming. Three findings.
+- `VorticityResponse.regularity`: holds with no hypotheses (verified). Filed.
+- `GalerkinLimit.smooth`: duplicates the previous theorem, in a made-up namespace. Filed.
+- `#check` and `#print axioms`: filed.
+
+## Conventions: places filed and places left
+- **Characterising lemmas for new definitions.** No separate finding. The definitions are placeholders to be deleted or replaced by library API (`mFourier` and `mFourierCoeff` come with their lemmas), so asking for simp lemmas about `fourierDecay := True` would be pointless. The hand-unfolding this convention targets does occur: `unfold fourier3D fourier1D` in `fourier3D_orthogonal`, `unfold GalerkinAt GalerkinProjection` in `galerkin_energy_bound`, `unfold bkmPhysical bkmLifted`. It is covered by the duplication findings (use the library API) and the `galerkin_energy_bound` finding.
+- **Drop or weaken unneeded hypotheses.** Filed at `uniform_vorticity_bound` (`h_divfree`), `bkm_finite_anyT` (`Φ`), `bkm_coordinate_invariance` (`hT` and the lifting structure), `tau_interval_finite` (`0 < T` to `0 ≤ T`), `galerkin_energy_bound` (`ht`) and `VorticityResponse.regularity` (all hypotheses).
+- **Derive from library results rather than reproving.** Filed at:
+  - `fubini_torus3`, `fourier_ortho_integral`, `fourier3D_orthogonal` and `parseval3D`;
+  - `bkm_coordinate_invariance`, which is `integral_comp_mul_deriv`;
+  - `tau_interval_finite`, which follows from `mul_sub_le_image_sub_of_le_deriv`;
+  - `integral_le_const_mul_length`.
+- **The module title states what the file proves.** Filed at the module docstring.
+- **No unneeded imports.** Filed: `import Mathlib` is replaced by two imports, verified to compile.
+- **AI disclosure.** Filed at the PR description.
+- **`fun … ↦`.** Filed once at file level, listing every declaration.
+- **The new file is imported in `Mathlib.lean`.** Filed.
+- **A new file is a `module` with `@[expose] public section`.** Filed.
+- **Justify non-obvious claims with a reference.** Filed within the module-docstring finding: the regularity claim cites only the author's DOI. The axioms are not justified either, and are filed for removal instead of for justification.
+- **No new definition the library already has.** Filed at `T3`, `fourier1D`, `fourier3D`, `fourierCoeff3D`, `linftyNorm`/`l2Norm` and `GalerkinLimit.smooth`.
+- **Remove commented-out code and scaffolding.** Filed: `#check`, `#print axioms`, and the "Axioms (after definitions they reference)" heading. There is no commented-out code.
+- **Docs kept in step with the code.** Filed at the module docstring (implementation notes for an unused route), `VorticityResponse` (docstring), `TemporalLifting` (docstring and field name) and `spectralCurl` (docstring updated in the requested change).
+- **Name case by kind.** Filed at `GalerkinProjection` (with `LerayProjection`, `Vorticity` and `GalerkinAt`), `smoothInTime` (with `fourierDecay`) and `bkm_finite_anyT`. Left: `SmoothInitial`, `SmoothSpacetime`, `DivergenceFree`, `SolvesNavierStokes`, `BKMFinite` (Prop-valued, already UpperCamelCase); `FourierCoeff`, `T3`, `VorticityResponse`, `TemporalLifting` (types, already UpperCamelCase); `hsNorm`, `l2Norm`, `linftyNorm`, `fourierTransform`, `invFourier`, `spectralCurl` (term-valued, already lowerCamelCase).
+- **No name with a different established meaning.** Filed at `T3` (clashes with T₃/`T3Space`).
+- **The PR title and description are accurate.** Filed.
+- **Binders after the name instead of `:= fun` or `have … := by intro`.** Filed at file level for the nine `:= fun` definitions (verified compile). The `have … ∀ … := by intro` forms are filed within `fourier3D_orthogonal` (`h1`), `bkm_finite_anyT` (`bound`) and `VorticityResponse.regularity` (`hNS`, `hInit`).
+- **No linter exemption.** Filed: `set_option linter.style.commandStart false` hides four fixable warnings (verified).
+- **Root namespace.** Filed at file level.
+- **The name describes the notion.** Filed at `VorticityResponse` (no functional in it) and `GalerkinLimit.smooth` (no Galerkin limit). `GalerkinProjection` is filed for its content.
+- **`noncomputable section`.** Filed: 16 of the 24 definitions are noncomputable.
+- **File name and directory.** Filed: `Analysis/ODE` holds a PDE claim, and the Fourier content belongs in `Analysis/Fourier/AddCircleMulti.lean`.
+- **Close LLM-generated PRs the submitter cannot revise.** Filed at the PR level as the primary finding.
+- **Remove unused lemmas.** Filed at `moser_estimate` (with `cMoser`, `cMoser_pos`, `cGronwall_pos`, `smooth_initial_hs_finite`), `integral_le_const_mul_length` and `galerkin_energy_bound`. Not filed separately: `tau_interval_finite`, `bkm_coordinate_invariance` and `TemporalLifting`, which are presented as main results in the docstring and so count as intended API. Their non-use by the main theorem is filed in the module-docstring finding.
+- **Clean up AI output.** Folded into the PR-level finding: placeholder definitions, the narrative heading, debugging commands.

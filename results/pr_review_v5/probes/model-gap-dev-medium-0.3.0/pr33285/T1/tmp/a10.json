@@ -1,0 +1,1 @@
+{"path": "Mathlib/RingTheory/Ideal/Cotangent.lean", "declaration_name": "Ideal.cotangentEquivIdeal_symm_apply", "new_declaration": "theorem cotangentEquivIdeal_symm_apply (x : R) (hx : x ∈ I) :\n    I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x, Submodule.mem_map_of_mem hx⟩ =\n      I.toCotangent ⟨x, hx⟩ :=\n  I.cotangentEquivIdeal.symm_apply_eq.2 rfl"}

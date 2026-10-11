@@ -6,3 +6,5 @@ P14post: 16 asks, 6 PRs (eff 4.7), 6 authors (eff 4.7); top authors [('riccardob
    raw/group-weighted/PR-macro: AP 0.33/0.37/0.35  DX 0.33/0.38/0.39  GPT 0.33/0.33/0.26  T 0.44/0.43/0.46  TA 0.62/0.64/0.62  X 0.47/0.46/0.42
 D12: 47 asks, 12 PRs (eff 7.1), 9 authors (eff 2.5); top authors [('j-loreaux', 29), ('grunweg', 5)]; top PRs [(33145, 11), (33098, 9), (33066, 7)]; (pr,author,family) groups 27, of size>1: 11 holding 31 asks
    raw/group-weighted/PR-macro: AP 0.39/0.29/0.31  DX 0.40/0.30/0.30  GPT 0.28/0.21/0.18  OP 0.52/0.40/0.41  X 0.62/0.52/0.54
+D12b: 47 asks, 12 PRs (eff 7.1), 9 authors (eff 2.5); top authors [('j-loreaux', 29), ('grunweg', 5)]; top PRs [(33145, 11), (33098, 9), (33066, 7)]; (pr,author,family) groups 27, of size>1: 11 holding 31 asks
+   raw/group-weighted/PR-macro: AP 0.41/0.33/0.34  DX 0.40/0.31/0.31  GPT 0.28/0.20/0.18  OP 0.43/0.37/0.37  T 0.53/0.50/0.54  TA 0.60/0.59/0.56  X 0.55/0.51/0.52

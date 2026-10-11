@@ -1,0 +1,1 @@
+{"code":"theorem Dense.continuous_sup {α : Type*} [TopologicalSpace α]\n    [ConditionallyCompleteLattice α] [ClosedIicTopology α] {f : γ → α} [TopologicalSpace γ]\n    {S : Set γ} (hS : Dense S) (hf : Continuous f) (h : BddAbove (range f)) :\n    ⨆ i, f i = ⨆ s : S, f s := by\n  rw [← sSup_range, ← sSup_range]","limit":6}

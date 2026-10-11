@@ -240,3 +240,36 @@ The inspection's deciding cell, run at the user's go-ahead (2026-10-11).
 was one flag, in `pair_dev_T1_1` (33145 T1). The session wrote its own `findings.json` by heredoc,
 assigned the project's Python path to a variable it never used, and checked the file with the
 system `python3`. Nothing outside the packet was read. Cleared by name (`FLAGS_READ=pair_dev_T1_1`).
+The D12b matchers' audit: one flag in eight folders, in `b4/m2`. It changed into its own folder and
+built `matches.json` from its own `R*_pr*.json` with `tmp/build.py` under the project's Python.
+Read by hand and cleared; checked, merged and unblinded with `run_matching.sh ... merge`.
+
+## Result, the dev pair (2026-10-11): Opus + AP does not clear same-day Opus solo on dev
+
+`table_D12b.txt`, the D12b seal of all 15 sessions a PR; matcher 1 / matcher 2.
+
+| | T1, Opus solo | TA1, Opus + AP | TA − T, 95% PR-bootstrap interval |
+|---|---|---|---|
+| reached, all 47 asks | 0.53 / 0.55 | 0.60 / 0.57 | +0.064 [−0.087, +0.245] / +0.021 [−0.097, +0.139] |
+| reached, in census (40) | 0.47 / 0.50 | 0.55 / 0.53 | +0.075 / +0.025, intervals span 0 |
+| reached or partial, all asks | 31 / 31 | 35 / 35 | +0.085 |
+| group-weighted (`inspect_weighting`) | 0.50 | 0.59 | +0.09 |
+| judge v9, of 23 | 10 | 12 | +2.0 [−2.3, +4.8] |
+| findings a PR | 9.8 | 17.0 | 1.7 times |
+
+**By the pre-registered rule:**
+- The intervals span 0 on both matchers, so Opus + AP's P14 gain (+0.20) is read as confined to the
+  ten PRs chosen for solo Claude's misses.
+- On dev the point estimate is small and positive (+0.02 to +0.09 by scoring), at 1.7 times the
+  findings, inside the noise.
+- T1 against X1/X2, Claude on two days, is indistinguishable here too (−0.02).
+
+**Seal stability, second check.**
+- D12 and D12b hold the same 13 sessions. The DeepSeek, AP and gpt rows move by at most one ask.
+- Every Opus row (X1, X2, OP1, OP2) drops 4 to 6 asks. All of the drop is four rename asks on 33145
+  (d0022, d0023, d0025, d0027: one reviewer's repeated suggestion). Both D12b matchers rule every Opus
+  session "partial" on them, where both D12 matchers ruled "reached".
+- These are borderline asks judged differently by two seals, not a load effect: AP files as much as
+  OP and does not move.
+- T1 and TA1 are both "partial" on the four, so TA − T is untouched. OP − DX shrinks from +0.12 to
+  +0.03: a cross-row gap that rests on one PR's four asks.

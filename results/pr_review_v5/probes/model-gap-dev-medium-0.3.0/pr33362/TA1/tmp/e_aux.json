@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Complex/Schwarz.lean", "line_start": 77, "line_end": 79, "replacement": "    rw [dslope_of_ne _ hz', slope_def_module, norm_smul, norm_inv, mem_sphere_iff_norm.mp hz, \u2190\n      div_eq_inv_mul, div_le_div_iff_of_pos_right hr\u2080, \u2190 mem_closedBall_iff_norm]\n    exact h_maps <| mem_ball.mpr <| (mem_sphere.mp hz).trans_lt hr.2"}

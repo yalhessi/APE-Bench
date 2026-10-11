@@ -1,0 +1,50 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (↑(LinearMap.iInfKerProjEquiv R φ hd hu)).toFun`\n\nIssues:\n  No theorems found for `LinearMap.comp` in order to prove `Continuous fun a => (LinearMap.proj ↑i ∘ₗ (⨅ i ∈ J, LinearMap.ker (LinearMap.proj i)).subtype) a`",
+   "code_line": "  continuous_toFun := by fun_prop",
+   "pos": {
+    "column": 25,
+    "line": 109
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unknown free variable `_fvar.8958`",
+   "code_line": "def iInfKerProjEquiv {I J : Set ι} [DecidablePred fun i => i ∈ I] (hd : Disjoint I J)",
+   "pos": {
+    "column": 4,
+    "line": 104
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 2 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (↑(LinearMap.iInfKerProjEquiv R φ hd hu)).toFun`\n\nIssues:\n  No theorems found for `LinearMap.comp` in order to prove `Continuous fun a => (LinearMap.proj ↑i ∘ₗ (⨅ i ∈ J, LinearMap.ker (LinearMap.proj i)).subtype) a`",
+   "code_line": "  continuous_toFun := by fun_prop",
+   "pos": {
+    "column": 25,
+    "line": 109
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unknown free variable `_fvar.8958`",
+   "code_line": "def iInfKerProjEquiv {I J : Set ι} [DecidablePred fun i => i ∈ I] (hd : Disjoint I J)",
+   "pos": {
+    "column": 4,
+    "line": 104
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

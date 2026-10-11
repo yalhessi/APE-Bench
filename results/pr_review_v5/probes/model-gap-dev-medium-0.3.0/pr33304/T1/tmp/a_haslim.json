@@ -1,0 +1,1 @@
+{"path": "Mathlib/CategoryTheory/Limits/HasLimits.lean", "line_start": 446, "line_end": 447, "replacement": "-- `Adjunction.hasLimit_comp_equivalence` and `Adjunction.hasLimit_of_comp_equivalence`\n-- are proved in `Mathlib/CategoryTheory/Adjunction/Limits.lean`."}

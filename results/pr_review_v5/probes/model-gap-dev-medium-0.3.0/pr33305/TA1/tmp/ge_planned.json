@@ -1,0 +1,1 @@
+{"path": "Mathlib/GroupTheory/GroupExtension/Defs.lean", "line_start": 49, "line_end": 50, "replacement": "  (which will be available in `Mathlib/GroupTheory/GroupExtension/Abelian.lean`, to be added in a\n  later PR)."}

@@ -1,0 +1,2 @@
+-- `Adjunction.hasLimit_comp_equivalence` and `Adjunction.hasLimit_of_comp_equivalence`
+-- are proved in `Mathlib/CategoryTheory/Adjunction/Limits.lean`.

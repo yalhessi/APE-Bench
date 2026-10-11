@@ -1,0 +1,1 @@
+{"line_start": 6, "line_end": 6, "replacement": "module\n\npublic import Mathlib.Analysis.CStarAlgebra.Classes\npublic import Mathlib.Analysis.Fourier.AddCircle"}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean", "line_start": 118, "line_end": 118, "replacement": "noncomputable def auxIsometry (h\u03b1a : starRingEnd \ud835\udd5c \u03b1' = \u03b1') :"}

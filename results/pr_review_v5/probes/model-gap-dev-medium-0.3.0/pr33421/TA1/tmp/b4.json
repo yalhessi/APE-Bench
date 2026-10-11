@@ -1,0 +1,1 @@
+{"path":"Mathlib/Topology/Algebra/Order/Floor.lean","line_start":127,"line_end":127,"replacement":"\nexample {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt (fun y : α => ⌈y⌉) x := by fun_prop (disch := exact hx)\n\nexample {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt (fun y : α => ⌊y⌋) x := by fun_prop (disch := exact hx)\n"}

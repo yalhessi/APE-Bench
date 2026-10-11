@@ -1,0 +1,32 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  add_mem h.left ?m.103\nhas type\n  x✝ + ?m.98 ∈ comap f₁ q\nbut is expected to have type\n  x✝ ∈ comap (f₁ + f₂) q",
+   "code_line": "  fun _ h ↦ add_mem h.1 h.2",
+   "pos": {
+    "column": 12,
+    "line": 598
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 1 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  add_mem h.left ?m.103\nhas type\n  x✝ + ?m.98 ∈ comap f₁ q\nbut is expected to have type\n  x✝ ∈ comap (f₁ + f₂) q",
+   "code_line": "  fun _ h ↦ add_mem h.1 h.2",
+   "pos": {
+    "column": 12,
+    "line": 598
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

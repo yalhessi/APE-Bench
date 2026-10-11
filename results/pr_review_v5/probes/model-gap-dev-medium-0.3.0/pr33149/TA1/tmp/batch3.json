@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/ODE/GalerkinRegularity.lean", "line_start": 6, "line_end": 6, "replacement": "import Mathlib.Analysis.Fourier.AddCircleMulti\nimport Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts", "max_messages": 30}

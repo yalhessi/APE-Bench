@@ -1,0 +1,10 @@
+{
+ "success": true,
+ "errors": [],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compiled",
+ "message": "Lean ran: the code compiles with no errors.",
+ "mode": "verified_edit"
+}

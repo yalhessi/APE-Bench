@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Array/Defs.lean", "line_start": 9, "line_end": 14, "replacement": "/-!\n# Permuting arrays\n\nThis file defines `Array.cyclicPermute!`, which permutes an array along a cycle of indices, and\n`Array.permute!`, which applies a list of such cycles in turn. It contains no proofs about them.\n-/"}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Meromorphic/Basic.lean", "line_start": 732, "line_end": 732, "replacement": "end Meromorphic\n\nopen Meromorphic in\nexample (f : \ud835\udd5c \u2192 \ud835\udd5c) : deriv f = _root_.deriv f := rfl\n\nexample {f : \ud835\udd5c \u2192 E} : MeromorphicOn f Set.univ \u2194 Meromorphic f := Iff.rfl\n"}

@@ -1,0 +1,1 @@
+{"path":"Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean","line_start":17,"line_end":20,"replacement":"## TODO\n\nAdd `SMulCommClass` instances saying that the left actions of, e.g., `M` on `α →[N] β` (defined in\n`Mathlib/GroupTheory/GroupAction/Hom.lean`) commute with the right actions defined here."}

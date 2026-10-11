@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Finsupp/MonomialOrder.lean", "line_start": 37, "line_end": 37, "replacement": "For the graded lexicographic ordering `MonomialOrder.degLex`, see\n`Mathlib/Data/Finsupp/MonomialOrder/DegLex.lean`."}

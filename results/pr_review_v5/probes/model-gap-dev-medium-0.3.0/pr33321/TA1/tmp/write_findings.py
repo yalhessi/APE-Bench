@@ -1,0 +1,238 @@
+import json
+D = "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr33321/TA1"
+IND = "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean"
+BE = "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean"
+F = []
+def add(target, claim, change, severity, evidence):
+    F.append({"target": target, "claim": claim, "requested_change": change, "severity": severity, "evidence": evidence})
+
+add("Submonoid.closure_image_isMulIndecomposable_baseOf",
+    "The PR renames the existing public lemma `Submonoid.closure_image_one_lt_and_isMulIndecomposable` (and its `to_additive` counterpart) to `Submonoid.closure_image_isMulIndecomposable_baseOf` and deletes the old name with no deprecated alias, so downstream code using the old name breaks without warning.",
+    "Directly after the renamed lemma add `@[to_additive (attr := deprecated (since := \"<merge date, e.g. 2025-12-26>\"))]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf`. That covers both the multiplicative and the additive old names.",
+    "blocking",
+    "declaration_search: `Submonoid.closure_image_one_lt_and_isMulIndecomposable` is declared at the base commit (Indecomposable.lean:46), and the PR's diff removes it with no alias. lean_verify_edit inserting that alias after the lemma (line mode, line 113): outcome `compiled`. The file already uses the pattern `@[to_additive (attr := deprecated ...)] alias` (content_search, Mathlib/Algebra/Group/Units/Defs.lean:124).")
+
+add("Subgroup.closure_image_isMulIndecomposable_baseOf",
+    "`Subgroup.closure_image_isMulIndecomposable_baseOf` is proved by a long route: it splits `univ` into the two half spaces and transports the negative half through `invMonoidHom` with the auxiliary lemma `IsMulIndecomposable.image_baseOf_inv_comp_eq`. But `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf`, which the PR also adds and which depends only on the `Submonoid` lemma, gives the result at once. So `image_baseOf_inv_comp_eq` (and the `invMonoidHom_comp_invMonoidHom`/`to_additive` additions it needs in `Hom/Basic.lean`) do not have to be in this PR.",
+    "Move `mem_or_inv_mem_closure_baseOf` above the `Subgroup` lemma and prove the lemma as\n```\n  refine le_antisymm (closure_mono (image_subset_range _ _)) ((closure_le _).mpr ?_)\n  rintro - ⟨i, rfl⟩\n  rcases IsMulIndecomposable.mem_or_inv_mem_closure_baseOf v hv_inv f hf i with h | h\n  · exact le_closure_toSubmonoid _ h\n  · exact inv_mem_iff.mp (le_closure_toSubmonoid _ h)\n```\nThen delete `IsMulIndecomposable.image_baseOf_inv_comp_eq`, which has no other user. With this proof the import `Mathlib.Algebra.Group.Subgroup.Pointwise` can become `Mathlib.Algebra.Group.Subgroup.Lattice`.",
+    "advisory",
+    "lean_verify_edit (line mode, lines 57-190 of Indecomposable.lean replaced by: the Submonoid lemma, the IsMulIndecomposable namespace block, then the Subgroup lemma with the 5-line proof above, and image_baseOf_inv_comp_eq removed): outcome `compiled`. A second run with that body and the imports `Irreducible.Defs, Subgroup.Lattice, Order.Group.Defs, Order.Preorder.Finite` (no Pointwise): `compiled`. In model.md, `image_baseOf_inv_comp_eq` is used only by the Subgroup lemma, and `invMonoidHom_comp_invMonoidHom` only by `image_baseOf_inv_comp_eq`.")
+
+add(IND,
+    "The PR adds imports that this file does not need, and leaves pre-existing ones that are now implied. `Mathlib.Algebra.Group.Subgroup.Lattice` is already provided by `Mathlib.Algebra.Group.Subgroup.Pointwise`, and `Mathlib.Algebra.Order.Group.Basic` is not needed at all. Once `Mathlib.Algebra.Order.Group.Defs` and `...Subgroup.Pointwise` are added, `Mathlib.Algebra.Order.Monoid.Defs` and `Mathlib.Algebra.Group.Submonoid.Basic` are implied too.",
+    "Reduce the import block to\n```\npublic import Mathlib.Algebra.Group.Irreducible.Defs\npublic import Mathlib.Algebra.Group.Subgroup.Pointwise\npublic import Mathlib.Algebra.Order.Group.Defs\npublic import Mathlib.Order.Preorder.Finite\n```\nIf the `Subgroup` lemma is reproved via `mem_or_inv_mem_closure_baseOf`, use `Mathlib.Algebra.Group.Subgroup.Lattice` in place of `...Pointwise`.",
+    "advisory",
+    "lean_verify_edit deleting single import lines: line 9 (Subgroup.Lattice) `compiled`; line 13 (Order.Group.Basic) `compiled`; line 14 (Order.Monoid.Defs) `compiled`. Line 10 (Pointwise) and line 12 (Order.Group.Defs) give `compile_errors`, so those two are needed. The 4-import block above (line mode, lines 8-15): `compiled`, no warnings.")
+
+add(IND,
+    "The import block is not sorted: `public import Mathlib.Algebra.Order.Group.Defs` comes before `public import Mathlib.Algebra.Order.Group.Basic`.",
+    "Sort the imports alphabetically (`...Order.Group.Basic` before `...Order.Group.Defs`). Dropping the unneeded `...Order.Group.Basic`, as in the import finding above, also fixes the order.",
+    "advisory",
+    "Lines 12-13 of the file as the PR leaves it (file_read): `public import Mathlib.Algebra.Order.Group.Defs` / `public import Mathlib.Algebra.Order.Group.Basic`.")
+
+add(BE,
+    "`Mathlib.Algebra.Module.Submodule.Union` is imported but not used. Its only connection to the file is `Module.exists_dual_forall_apply_ne_zero`, which appears only in the TODO text.",
+    "Delete `public import Mathlib.Algebra.Module.Submodule.Union`.",
+    "advisory",
+    "lean_verify_edit deleting BaseExists.lean line 9: outcome `compiled`. Deleting line 10 (OrzechProperty) or line 11 (QuadraticForm.Dual) gives `compile_errors`, so those are needed.")
+
+add(BE,
+    "The module docstring's title `# Existence of bases for crystallographic root systems` claims a result the file does not prove. Its own TODO says existence of a base is still to be done; the file proves that the roots in `baseOf` have non-positive pairwise pairings and are linearly independent.",
+    "Retitle the module docstring to say what is proved, e.g. `# Linear independence of the indecomposable roots of a crystallographic root system`. Add a one-paragraph summary saying these are steps towards the existence of bases.",
+    "advisory",
+    "Module docstring lines 14-40 (file_read): the title and TODO item 2 (\"Prove that every reduced crystallographic root system has a base ...\"). The file's declarations are `baseOf_pairwise_pairing_le_zero`, `linearIndepOn_root_baseOf'` and `linearIndepOn_root_baseOf` (model.md).")
+
+add(BE,
+    "The module docstring uses the non-standard heading `## Implementation details` and has no `## Main results` section. It also contains the garbled phrase \"even though the existence ultimate statement does not\".",
+    "Rename the heading to `## Implementation notes`. Add `## Main results` listing `RootPairing.baseOf_pairwise_pairing_le_zero` (under its new name), `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`. Reword the phrase to \"even though the ultimate existence statement does not\".",
+    "advisory",
+    "BaseExists.lean lines 17-19 (file_read): `## Implementation details` / `The proof needs a set of ordered coefficients, even though the existence ultimate statement does`.")
+
+add("IsMulIndecomposable.baseOf",
+    "The additive docstring of `IsMulIndecomposable.baseOf` misspells \"crystallogrphic\". The multiplicative docstring (\"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\") never says which indices the set contains. `v` is also a family, not a set.",
+    "Fix the typo to \"crystallographic\". Make both docstrings define the set, e.g. \"The set of indices `i` with `1 < f (v i)` such that `v i` cannot be written as a non-trivial product of two points `v j`, `v k` with `1 < f (v j)`, `1 < f (v k)`.\" (and the additive analogue).",
+    "advisory",
+    "Indecomposable.lean lines 44-48 (file_read): `/-- The \"base\" of a set of points of a monoid relative to a morphism `f`. -/` and `In the case that `v` is the set of roots of a crystallogrphic root system`.")
+
+add("IsMulIndecomposable.baseOf",
+    "`IsMulIndecomposable.baseOf` comes with no membership lemma, so its value is unfolded by hand where it is used. `pairwise_div_notMem_range'` states its hypothesis as `s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}`, which is the body of `baseOf`. The `Submonoid` lemma's proof re-creates it as `let t : Set ι := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`. `image_baseOf_inv_comp_eq` and `linearIndepOn_root_baseOf'` destructure membership by defeq (`⟨i, ⟨hi, hi'⟩, rfl⟩`, `obtain ⟨i, -, hi⟩ := i`).",
+    "Add, right after the definition,\n```\n@[to_additive]\nlemma mem_baseOf_iff [Monoid S] {v : ι → M} {f : M →* S} {i : ι} :\n    i ∈ baseOf v f ↔ IsMulIndecomposable v {j | 1 < f (v j)} i :=\n  Iff.rfl\n```\nUse it, or `baseOf v f` itself, in place of the hand-unfolded forms above.",
+    "advisory",
+    "lean_verify_edit inserting the lemma above (as `IsMulIndecomposable.mem_baseOf_iff`, line mode at line 51): outcome `compiled`. Use sites quoted from file_read of Indecomposable.lean lines 72, 98, 164 and BaseExists.lean line 88.")
+
+add("IsMulIndecomposable.baseOf",
+    "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` assigned to `Set ι`. This relies on the defeq `Set ι = ι → Prop`, which Mathlib avoids. `pairwise_div_notMem_range` does the same in `hst : s ⊆ IsMulIndecomposable v t`.",
+    "Define `baseOf v f : Set ι := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`. State `pairwise_div_notMem_range`'s hypothesis as `hst : s ⊆ {i | IsMulIndecomposable v t i}`.",
+    "advisory",
+    "lean_verify_edit replacing lines 44-50 by the setOf definition (docstrings unchanged): outcome `compiled` for Indecomposable.lean. I could not test cross-file whether BaseExists still compiles, but membership in `{i | p i}` unfolds to `p i` the same way.")
+
+add(IND,
+    "`IsMulIndecomposable.subset`, `IsMulIndecomposable.baseOf`, `IsMulIndecomposable.baseOf_subset_one_lt` and `IsMulIndecomposable.image_baseOf_inv_comp_eq` are each declared with the full `IsMulIndecomposable.` prefix outside any `namespace`, while the same file later opens `namespace IsMulIndecomposable` for its siblings. Inside these declarations the prefix is then repeated where the auto-opened namespace already supplies it, e.g. `IsMulIndecomposable.baseOf v f ⊆ ...` in `baseOf_subset_one_lt`; `image_baseOf_inv_comp_eq` already writes plain `baseOf v`.",
+    "After `isMulIndecomposable_id_univ`, open `namespace IsMulIndecomposable` and put `protected lemma subset`, `def baseOf`, `lemma baseOf_subset_one_lt` (with statement `baseOf v f ⊆ {i | 1 < f (v i)}`) and `image_baseOf_inv_comp_eq` inside it, without the prefix. Close it before the `Submonoid`/`Subgroup` lemmas.",
+    "advisory",
+    "lean_verify_edit (line mode, lines 34-77 replaced by isMulIndecomposable_id_univ followed by `namespace IsMulIndecomposable ... end IsMulIndecomposable` holding those four declarations unprefixed): outcome `compiled`.")
+
+add("IsMulIndecomposable.subset",
+    "`IsMulIndecomposable.subset` closes the goal `{i | IsMulIndecomposable v s i} ⊆ s` with `aesop`, but the goal is just the first projection of the definition.",
+    "Replace `by aesop` with the term `fun _ hi ↦ hi.1`. The statement then also fits on one line: `protected lemma IsMulIndecomposable.subset (v : ι → M) (s : Set ι) : {i | IsMulIndecomposable v s i} ⊆ s :=` (inside the namespace).",
+    "advisory",
+    "lean_verify_edit (declaration mode, with `@[to_additive]` kept) proof `fun _ hi ↦ hi.1`: outcome `compiled`, no warnings.")
+
+add("IsMulIndecomposable.image_baseOf_inv_comp_eq",
+    "If kept, `image_baseOf_inv_comp_eq` ends in a bare `_eq` that names no right-hand side, and it spells `invMonoidHom` as `inv`. The statement is `v '' baseOf v (invMonoidHom.comp f) = (invMonoidHom ∘ v) '' baseOf v f`.",
+    "Rename after the left-hand side as Mathlib spells it, e.g. `image_baseOf_invMonoidHom_comp`. Or remove the lemma entirely, as in the `Subgroup.closure_image_isMulIndecomposable_baseOf` proof finding.",
+    "advisory",
+    "Statement from model.md / file_read lines 57-62. naming_norm on this name: `insufficient_evidence` (no prefix census), so this rests on the `_eq` and spelling conventions only.")
+
+add("IsMulIndecomposable.pairwise_div_notMem_range",
+    "The goal `v i / v j ∉ range v` is a negation, but it is proved by `by_contra! ⟨k, hk⟩` instead of introducing the hypothesis.",
+    "Replace `intro i hi j hj hne` / `by_contra! ⟨k, hk⟩` with `rintro i hi j hj hne ⟨k, hk⟩`.",
+    "advisory",
+    "lean_verify_edit (declaration mode) with `rintro i hi j hj hne ⟨k, hk⟩` and the rest of the proof unchanged: outcome `compiled`.")
+
+add("IsMulIndecomposable.pairwise_div_notMem_range",
+    "Each branch of `pairwise_div_notMem_range` goes through `suffices ¬ IsMulIndecomposable ...`, an identical 8-lemma `simp only` that unfolds the definition, and an existential. It could instead apply the indecomposability hypothesis it already has.",
+    "Replace the body after `h_sub` with\n```\n  rintro i hi j hj - ⟨k, hk⟩\n  rcases hv_t k with hk' | hk'\n  · exact ((hst hi).2 k hk' j (h_sub hj) (by simp [hk])).elim (hv_one k) (hv_one j)\n  · exact ((hst hj).2 k⁻¹ hk' i (h_sub hi) (by simp [hv_inv, hk])).elim (hv_one _) (hv_one i)\n```",
+    "advisory",
+    "lean_verify_edit (declaration mode) with this body: outcome `compiled`.")
+
+add("IsMulIndecomposable.pairwise_div_notMem_range",
+    "The signature of `pairwise_div_notMem_range` puts each binder on its own line (`(v : ι → G)` / `(hv_one : ...)` / `(hv_inv : ...)` / `(s t : Set ι)` / `(hst : ...)` / `(hv_t : ...)`), even though they fit in far fewer lines under 100 characters.",
+    "Fill the lines up to 100 characters:\n```\nlemma pairwise_div_notMem_range [InvolutiveInv ι] (v : ι → G) (hv_one : ∀ i, v i ≠ 1)\n    (hv_inv : ∀ i, v i⁻¹ = (v i)⁻¹) (s t : Set ι) (hst : s ⊆ IsMulIndecomposable v t)\n    (hv_t : ∀ i, i ∈ t ∨ i⁻¹ ∈ t) :\n```",
+    "advisory",
+    "file_read lines 141-147 show the one-binder-per-line layout. lean_verify_edit with the 3-line signature above: outcome `compiled`.")
+
+add("IsMulIndecomposable.pairwise_div_notMem_range'",
+    "`pairwise_div_notMem_range'` is a primed variant that only instantiates `pairwise_div_notMem_range` at `t = {i | 1 < f (v i)}`, i.e. at `baseOf v f` unfolded. Its only use is `pairwise_baseOf_div_notMem`, which instantiates it again at `s = baseOf v f`. Any `s ⊆ baseOf v f` case follows from `pairwise_baseOf_div_notMem` by `Set.Pairwise.mono`.",
+    "Delete `pairwise_div_notMem_range'` and prove `pairwise_baseOf_div_notMem` directly:\n```\n  have hv_one : ∀ i, v i ≠ 1 := fun i ↦ by contrapose! hf; exact ⟨i, by simp [hf]⟩\n  refine pairwise_div_notMem_range v hv_one hv_inv _ {i | 1 < f (v i)} subset_rfl fun i ↦ ?_\n  simpa [hv_inv] using (hf i).symm\n```",
+    "advisory",
+    "lean_verify_edit (line mode, lines 160-175 replaced by `pairwise_baseOf_div_notMem` with this proof, the primed lemma removed): outcome `compiled`. model.md relations: the primed lemma is used only by `pairwise_baseOf_div_notMem`.")
+
+add("IsMulIndecomposable.pairwise_baseOf_div_notMem",
+    "The name `pairwise_baseOf_div_notMem` drops the `range` that its sibling `pairwise_div_notMem_range` names for the same conclusion `v i / v j ∉ range v`. The `RootPairing.Base` analogue is also spelled with it, `sub_notMem_range_root`.",
+    "Rename to `pairwise_baseOf_div_notMem_range` (additive: `pairwise_baseOf_sub_notMem_range`), and update the call in `RootPairing.baseOf_pairwise_pairing_le_zero`.",
+    "advisory",
+    "Statements from model.md. content_search in Base.lean:262-271 shows `sub_notMem_range_root` / `sub_notMem_range_coroot`. naming_norm: `subject_unresolved`, so the tool does not measure this name.")
+
+add("IsMulIndecomposable.mem_or_inv_mem_closure_baseOf",
+    "The statement of `mem_or_inv_mem_closure_baseOf` is aligned with extra spaces: `     v i    ∈ Submonoid.closure ...` has a five-space indent and four spaces after `v i`.",
+    "Use standard spacing, which fits in 99 characters:\n```\n    v i ∈ Submonoid.closure (v '' baseOf v f) ∨ (v i)⁻¹ ∈ Submonoid.closure (v '' baseOf v f) := by\n```",
+    "advisory",
+    "diff.patch added line `     v i    ∈ Submonoid.closure (v '' baseOf v f) ∨` (found by scanning added lines for doubled spaces). lean_verify_edit with the one-line statement: outcome `compiled`.")
+
+add(IND,
+    "`[InvolutiveInv ι]`, `(v : ι → G)`, `(hv_inv : ∀ i, v i⁻¹ = (v i)⁻¹)`, `[CommGroup S] [IsOrderedMonoid S]`, `(f : G →* S)` and `(hf : ∀ i, f (v i) ≠ 1)` are repeated in the signature of every lemma of the `namespace IsMulIndecomposable` block (`pairwise_div_notMem_range`, `pairwise_div_notMem_range'`, `pairwise_baseOf_div_notMem`, `mem_or_inv_mem_closure_baseOf`).",
+    "Declare them once in the block: `variable [InvolutiveInv ι] (v : ι → G) (hv_inv : ∀ i, v i⁻¹ = (v i)⁻¹)` with `include hv_inv`, then `variable [CommGroup S] [IsOrderedMonoid S] (f : G →* S) (hf : ∀ i, f (v i) ≠ 1)` with `include hf` before the lemmas that use `f`. Leave only the lemma-specific binders in each signature.",
+    "advisory",
+    "lean_verify_edit (line mode, lines 138-190 replaced by the block with these two variable/include lines, the primed lemma removed, `pairwise_div_notMem_range (hv_one) (s t) (hst) (hv_t)`, `pairwise_baseOf_div_notMem` and `mem_or_inv_mem_closure_baseOf [Finite ι] (i : ι)`): outcome `compiled`. The external call `pairwise_baseOf_sub_notMem P.root (by simp) f hf` keeps its argument order.")
+
+add(IND,
+    "Several new or changed signatures break lines before 100 characters: `image_baseOf_inv_comp_eq` (`[CommGroup S] [IsOrderedMonoid S]` alone, `(f : G →* S) :` alone), `Subgroup.closure_image_isMulIndecomposable_baseOf`, `Submonoid.closure_image_isMulIndecomposable_baseOf` (`[CommMonoid S] [IsOrderedCancelMonoid S]` / `(v : ι → M) (f : M →* S) :`), and `pairwise_div_notMem_range'`/`pairwise_baseOf_div_notMem`/`mem_or_inv_mem_closure_baseOf` (`(v ...) (hv_inv ...)` / `(f ...) (hf ...)`).",
+    "Fill each signature line up to the 100-character limit, e.g. `    (v : ι → G) (hv_inv : ∀ i, v i⁻¹ = (v i)⁻¹) (f : G →* S) (hf : ∀ i, f (v i) ≠ 1) :` and `    [CommMonoid S] [IsOrderedCancelMonoid S] (v : ι → M) (f : M →* S) :`.",
+    "advisory",
+    "file_read lines 57-62, 90-93, 115-120, 160-182. lean_verify_edit with joined signatures for image_baseOf_inv_comp_eq (inside the namespace-block run) and mem_or_inv_mem_closure_baseOf: outcome `compiled`.")
+
+add("invMonoidHom_comp_invMonoidHom",
+    "`invMonoidHom_comp_invMonoidHom` is proved by `by ext; simp`: two tactics joined with `;` on one line, for a fact that is exactly `inv_inv` pointwise.",
+    "Use the term proof `MonoidHom.ext inv_inv`.",
+    "advisory",
+    "lean_verify_edit (declaration mode, `@[to_additive (attr := simp)]` kept) with `:=\\n  MonoidHom.ext inv_inv`: outcome `compiled`.")
+
+add("RootPairing.algebraMap_pairingIn'",
+    "`algebraMap_pairingIn'` is told apart from the existing `algebraMap_pairingIn` only by a prime. The statements differ: the existing lemma maps `pairingIn S` into `R` and gets `pairing`, while the new one maps `pairingIn T` into `S` and gets `pairingIn S`.",
+    "Give it a name that says what differs, e.g. `algebraMap_pairingIn_eq_pairingIn` (lhs_eq_rhs), and update the two uses (`pairingIn_rat` and `linearIndepOn_root_baseOf'`).",
+    "advisory",
+    "IsValuedIn.lean lines 80-83 (existing `algebraMap_pairingIn`) and 140-146 (new primed lemma), file_read. naming_norm: `insufficient_evidence` (`algebraMap_` prefix is a plurality, 174/263), so the prefix itself is not at issue, only the prime.")
+
+add("RootPairing.baseOf_pairwise_pairing_le_zero",
+    "The name `baseOf_pairwise_pairing_le_zero` misspells the statement `(baseOf P.root f).Pairwise fun i j ↦ P.pairingIn ℤ i j ≤ 0`. It says `pairing` where the statement uses `pairingIn`, and puts `baseOf` before `pairwise`, unlike the head-first `pairwise_baseOf_div_notMem` it is built from. The `Base` analogue is `pairingIn_le_zero_of_ne`.",
+    "Rename to `pairwise_baseOf_pairingIn_le_zero` and update the call in `linearIndepOn_root_baseOf'`.",
+    "advisory",
+    "content_search in Mathlib/LinearAlgebra/RootSystem: `Base.lean:275 lemma pairingIn_le_zero_of_ne`, `Finite/CanonicalBilinear.lean:392 pairingIn_le_zero_iff`, `Finite/G2.lean:159 pairingIn_le_zero_of_root_add_mem`; no `pairing_le_zero` name for a `pairingIn` statement. lean_verify_edit with the rename (and the call updated, line mode lines 52-93): outcome `compiled`.")
+
+add("RootPairing.baseOf_pairwise_pairing_le_zero",
+    "The docstring of `baseOf_pairwise_pairing_le_zero` is only a citation (\"This is [serre1965](Ch. V, §9, Lemma 3).\"); it never says what the lemma states.",
+    "Begin the docstring with the statement, e.g. \"Given an additive map `f` that is nonzero on every root, distinct indices in `baseOf P.root f` have non-positive pairing `P.pairingIn ℤ i j`.\" and keep the citation as a second paragraph.",
+    "advisory",
+    "BaseExists.lean line 55 (file_read). The rewritten docstring was included in the compiled line-mode run over lines 52-93 (outcome `compiled`).")
+
+add(BE,
+    "The `section CommRing` variables `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` are used only by `baseOf_pairwise_pairing_le_zero`. `linearIndepOn_root_baseOf'` in the same section then re-binds its own `{S : Type*} [LinearOrder S] ...` and `(f : Dual S M)`, shadowing the section's `S` and `f`.",
+    "Remove `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` from the section `variable` and put them in the signature of `baseOf_pairwise_pairing_le_zero`, so the section variables are just `[CommRing R] [Module R M] [Module R N] (P : RootPairing ι R M N)`.",
+    "advisory",
+    "BaseExists.lean lines 52-53 and 72-76 (file_read). lean_verify_edit (line mode, lines 52-93) with that variable line and the binders moved into the lemma: outcome `compiled`.")
+
+add("RootPairing.linearIndepOn_root_baseOf'",
+    "`linearIndepOn_root_baseOf'` is told apart from `linearIndepOn_root_baseOf` only by a prime. The difference is real and nameable: independence over the ordered coefficient ring `S` (with `f : Dual S M`), against independence over the field `R`.",
+    "Rename the primed lemma to name the differing term, e.g. `linearIndepOn_root_baseOf_of_isValuedIn` or `linearIndepOn_baseOf_root_restrictScalars`-style. Or ask the author which name they prefer; anything that is not a bare prime will do.",
+    "advisory",
+    "Statements from model.md (lines 332-337 and 478-480). The docstring currently explains the prime by contrast with the unprimed lemma.")
+
+add("RootPairing.linearIndepOn_root_baseOf'",
+    "The docstring of `linearIndepOn_root_baseOf'` never says what the lemma proves. It discusses where the lemma is \"usually established\" and describes it by contrast with `RootPairing.linearIndepOn_root_baseOf` (\"a stepping stone ... except that this version does not make the field assumption\").",
+    "Start the docstring with a standalone statement, e.g. \"If `f : Dual S M` is nonzero on every root, then the roots indexed by `baseOf P.root f` are linearly independent over the ordered coefficient ring `S`.\" Keep at most a short note on the generality (e.g. `R = ℂ`, `S = ℚ`; `S = R = ℤ`), not a comparison with the other lemma.",
+    "advisory",
+    "BaseExists.lean lines 65-71 (file_read). The rewritten docstring was in the compiled line-mode run over lines 52-93.")
+
+add("RootPairing.linearIndepOn_root_baseOf'",
+    "`linearIndepOn_root_baseOf'` introduces the data-carrying instance `Fintype ι` with `have : Fintype ι := Fintype.ofFinite ι`, which forgets its value.",
+    "Use `letI : Fintype ι := Fintype.ofFinite ι`. The instance is needed: removing it breaks `P.posRootForm S`.",
+    "advisory",
+    "lean_verify_edit with `letI : Fintype ι := ...`: outcome `compiled`. With the line removed: `compile_errors` at `⟨P.posRootForm S, by simpa using P.posRootForm_rootFormIn_posDef S⟩`.")
+
+add("RootPairing.linearIndepOn_root_baseOf'",
+    "`have hp ... := by obtain ⟨i, -, hi⟩ := i; simpa` puts two tactics on one line with `;`.",
+    "Write it as\n```\n  have hp (i : baseOf P.root (f : M →+ S)) : 0 < f' (v i) := by\n    obtain ⟨i, -, hi⟩ := i\n    simpa\n```",
+    "advisory",
+    "BaseExists.lean line 88 (file_read). lean_verify_edit with the split form: outcome `compiled`.")
+
+add("RootPairing.linearIndepOn_root_baseOf'",
+    "In `hn`, `(by aesop : i ≠ j)` uses general automation to turn `hij : ⟨i, hi⟩ ≠ ⟨j, hj⟩` into `i ≠ j`, which is a one-step term.",
+    "Replace `(by aesop : i ≠ j)` with `(fun h ↦ hij (Subtype.ext h))`.",
+    "advisory",
+    "lean_verify_edit (declaration mode) with `(fun h ↦ hij (Subtype.ext h))`: outcome `compiled`.")
+
+add("RootPairing.linearIndepOn_root_baseOf",
+    "`linearIndepOn_root_baseOf`, the main result of the new file, has no docstring.",
+    "Add a docstring, e.g. \"For a reduced crystallographic root system over a field of characteristic zero and a `ℚ`-linear form `f` that is nonzero on every root, the roots indexed by `baseOf P.root f` are linearly independent over `R`.\"",
+    "advisory",
+    "BaseExists.lean line 102 (file_read): `lemma linearIndepOn_root_baseOf [Module ℚ M] [Module ℚ N]` with no preceding docstring.")
+
+add("RootPairing.linearIndepOn_root_baseOf",
+    "`linearIndepOn_root_baseOf` introduces the data-carrying instance `Fintype (baseOf P.root (f : M →+ ℚ))` with `have`, which forgets its value.",
+    "Use `letI : Fintype (baseOf P.root (f : M →+ ℚ)) := Fintype.ofFinite _`.",
+    "advisory",
+    "lean_verify_edit (declaration mode) with `letI`: outcome `compiled`.")
+
+add("RootPairing.linearIndepOn_root_baseOf",
+    "Inside `namespace RootPairing` and under `open Submodule`, the proof writes redundant prefixes: `← RootPairing.finrank_rootSpanIn ℚ P` and `← Submodule.coe_toAddSubgroup`.",
+    "Write `← finrank_rootSpanIn ℚ P` and `← coe_toAddSubgroup`. (`Set.finrank` must keep its prefix because `Module` is also open.)",
+    "advisory",
+    "lean_verify_edit (declaration mode) with both prefixes dropped: outcome `compiled`.")
+
+add("RootPairing.linearIndepOn_root_baseOf",
+    "`span_mono fun x i ↦ by aesop` proves `range v ⊆ range (P.rootSpanMem ℚ)` with general automation, and names a membership proof `i`.",
+    "Replace with `span_mono <| range_subset_iff.mpr fun _ ↦ mem_range_self _`.",
+    "advisory",
+    "lean_verify_edit (declaration mode) with that term: outcome `compiled`. Other spellings tried that did not compile: `fun _ ⟨i, hi⟩ ↦ ⟨i, hi⟩`, `range_comp_subset_range _ _`.")
+
+add("RootPairing.linearIndepOn_root_baseOf",
+    "In `h_card` the basis `b` (data) is built in tactic mode, with `replace this : LinearIndependent ℚ v := ...`. That silently overwrites the unrelated `this : Fintype ...` hypothesis inside the block.",
+    "Write\n```\n    have hli : LinearIndependent ℚ v :=\n      .of_comp (P.rootSpan ℚ).subtype <| P.linearIndepOn_root_baseOf' f hf\n    let b : Basis (baseOf P.root (f : M →+ ℚ)) ℚ (P.rootSpan ℚ) := Basis.mk hli (by rw [h_span])\n```",
+    "advisory",
+    "BaseExists.lean lines 125-128 (file_read). lean_verify_edit (declaration mode) with this form: outcome `compiled`.")
+
+add(BE,
+    "`open Function IsAddIndecomposable Module Set Submodule` opens `Function`, and nothing in the file uses it.",
+    "Change the line to `open IsAddIndecomposable Module Set Submodule`.",
+    "advisory",
+    "lean_verify_edit (line mode, line 44) without `Function`: outcome `compiled`.")
+
+add("PR #33321",
+    "The PR description says only \"Work toward #28717\". It does not mention that the PR renames `Submonoid.closure_image_one_lt_and_isMulIndecomposable` to `Submonoid.closure_image_isMulIndecomposable_baseOf`, adds the `IsMulIndecomposable.baseOf` API and the `Subgroup` closure result, or changes `invMonoidHom` lemmas in `Hom/Basic.lean`.",
+    "Expand the description to list the rename (old name -> new name), the new `baseOf` definition and lemmas, the new file `RootSystem/BaseExists.lean` with its two linear-independence results, and the auxiliary changes in `Hom/Basic.lean`, `IsValuedIn.lean` and `RootPositive.lean`.",
+    "advisory",
+    "pr.md (description is one line) against diff.patch (six files, including a renamed public lemma).")
+
+json.dump(F, open(D + "/findings.json", "w"), ensure_ascii=False, indent=1)
+print(len(F))

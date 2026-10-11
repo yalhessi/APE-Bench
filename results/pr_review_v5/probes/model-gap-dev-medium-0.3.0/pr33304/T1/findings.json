@@ -1,0 +1,23 @@
+[
+ {
+  "target": "module_doc in Mathlib/CategoryTheory/Localization/Equivalence.lean",
+  "claim": "The module docstring this PR rewraps still cites `Localization.of_equivalence_target`, `Localization.of_equivalence_source` and `Localization.of_equivalences`, none of which exist; the lemmas are `CategoryTheory.Functor.IsLocalization.of_equivalence_target` (Predicate.lean:393), `Functor.IsLocalization.of_equivalence_source` and `Functor.IsLocalization.of_equivalences` (this file, inside `namespace Functor` / `namespace IsLocalization`). So the fixed file reference sits next to three broken declaration references.",
+  "requested_change": "In lines 14-19 of the module docstring, replace `Localization.of_equivalence_target`, `Localization.of_equivalence_source` and `Localization.of_equivalences` with `Functor.IsLocalization.of_equivalence_target`, `Functor.IsLocalization.of_equivalence_source` and `Functor.IsLocalization.of_equivalences`, rewrapping to 100 columns. Leave `Localization.isEquivalence` as it is, because it is correct.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `CategoryTheory.Localization.of_equivalence_target` -> no declaration at base or in PR; `Localization.of_equivalence_source` -> none; `CategoryTheory.Functor.IsLocalization.of_equivalence_target` -> Mathlib/CategoryTheory/Localization/Predicate.lean:393; `Localization.isEquivalence` -> Equivalence.lean:61. file_read of Equivalence.lean shows `of_equivalence_source`/`of_equivalences` at lines 73/105 under `namespace Functor` / `namespace IsLocalization`. Other files call it `Functor.IsLocalization.of_equivalence_target` (Localization/Adjunction.lean:150, CalculusOfFractions/OfAdjunction.lean:80). lean_verify_edit (line mode, lines 14-22 replaced with the corrected paragraph, all lines <=93 chars): outcome compiled, no errors or warnings."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Functor/Basic.lean",
+  "claim": "This PR fixes the `Reassoc.lean` reference in this file but leaves the comment above `Functor.comp_id` (line 130), `-- Natural isomorphisms are also provided in `Whiskering.lean`.`. That reference is stale and ambiguous. It is a bare filename, against the full-path spelling the PR applies everywhere else. Three `Whiskering.lean` files exist under Mathlib/CategoryTheory. And the natural isomorphisms `F ⋙ 𝟭 D ≅ F` / `𝟭 C ⋙ F ≅ F` (`Functor.rightUnitor`, `Functor.leftUnitor`) are now declared in `Mathlib/CategoryTheory/Functor/Category.lean`, not in `Whiskering.lean`.",
+  "requested_change": "Replace line 130 with `-- The natural isomorphisms `Functor.leftUnitor` and `Functor.rightUnitor` are provided in` / `-- `Mathlib/CategoryTheory/Functor/Category.lean`.`",
+  "severity": "advisory",
+  "evidence": "content_search for path references in the touched file found line 130 `-- Natural isomorphisms are also provided in `Whiskering.lean`.`. file_search `Whiskering.lean` -> Mathlib/CategoryTheory/Whiskering.lean, Mathlib/CategoryTheory/Sites/Whiskering.lean, Mathlib/CategoryTheory/Adjunction/Whiskering.lean (plus a MathlibTest file). declaration_search `CategoryTheory.Functor.leftUnitor` -> Functor/Category.lean:158, `CategoryTheory.Functor.rightUnitor` -> Functor/Category.lean:166. In Whiskering.lean they are only used (lines 356-367), not defined. zulip_search 'Broken file references' (Wieser, Dillies, Testa, maintainers): the agreed convention is to spell module references in docs and comments as full paths. lean_verify_edit (line 130 replaced by the two comment lines): outcome compiled, no errors or warnings."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Limits/HasLimits.lean",
+  "claim": "In the same file as the `Reassoc.lean` fix, the comment before `section LimFunctor` (lines 446-447) still names the Lean 3 identifiers `hasLimitCompEquivalence` and `hasLimitOfCompEquivalence`. Neither exists. The lemmas in the referenced file are `CategoryTheory.Adjunction.hasLimit_comp_equivalence` and `CategoryTheory.Adjunction.hasLimit_of_comp_equivalence`.",
+  "requested_change": "Change the comment to `-- `Adjunction.hasLimit_comp_equivalence` and `Adjunction.hasLimit_of_comp_equivalence`` / `-- are proved in `Mathlib/CategoryTheory/Adjunction/Limits.lean`.`",
+  "severity": "advisory",
+  "evidence": "file_read HasLimits.lean:446-447. declaration_search: `CategoryTheory.Limits.hasLimitCompEquivalence`, `...hasLimitOfCompEquivalence`, `...Limits.hasLimit_comp_equivalence` -> none. `CategoryTheory.Adjunction.hasLimit_comp_equivalence` -> Adjunction/Limits.lean:242, `CategoryTheory.Adjunction.hasLimit_of_comp_equivalence` -> Adjunction/Limits.lean:247. The file path in the comment is correct (file exists). lean_verify_edit (lines 446-447 replaced): outcome compiled, no errors or warnings."
+ }
+]

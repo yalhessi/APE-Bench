@@ -1,0 +1,32 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Application type mismatch: The argument\n  ContinuousLinearMap.continuous f\nhas type\n  Continuous ⇑f\nbut is expected to have type\n  Continuous ⇑(LinearEquiv.ofBijective ?m.111 ⋯)\nin the application\n  (LinearEquiv.ofBijective ?m.111 ⋯).toContinuousLinearEquivOfContinuous ⋯",
+   "code_line": "    f.continuous",
+   "pos": {
+    "column": 4,
+    "line": 409
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 1 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Application type mismatch: The argument\n  ContinuousLinearMap.continuous f\nhas type\n  Continuous ⇑f\nbut is expected to have type\n  Continuous ⇑(LinearEquiv.ofBijective ?m.111 ⋯)\nin the application\n  (LinearEquiv.ofBijective ?m.111 ⋯).toContinuousLinearEquivOfContinuous ⋯",
+   "code_line": "    f.continuous",
+   "pos": {
+    "column": 4,
+    "line": 409
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

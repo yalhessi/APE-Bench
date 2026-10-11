@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# ptool <tool>|list|describe ['<json arguments>'] -- one call to the pipeline's own review tools for
+# this PR, as an arm makes it (`cli tool`). The wrapper, not the reviewer, logs every call.
+set -o pipefail
+PR=33149; OUT=/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr33149/T1; WORK=/research/projects/proofedit/ya475/table_scratch/claude_scratch/work/pr33149/T1; RAW=/research/projects/proofedit/ya475/table_scratch/claude_scratch/raw/pr33149/T1
+cd /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers && export PYTHONPATH="$PWD/src" PATH="$HOME/.elan/bin:$PATH"
+stamp=$(date +%s%N)-$$
+mkdir -p "$RAW"
+ape/bin/python -m src.mathlib_review.review.cli tool "$1" \
+  --episodes inputs/pr_review_v4/releases/dev-medium-0.3.0/input/episodes.jsonl --pr "$PR" \
+  --workdir "$WORK" --run-config configs/pr_review_v5_dev_medium_0_3_0.yaml \
+  --arguments "${2:-}" > "$RAW/$stamp.out" 2> "$RAW/$stamp.err"
+status=$?
+ape/bin/python -m src.mathlib_review.review.cli probe log-call "$OUT/calls.jsonl" "$stamp" "$1" "${2:-}" "$RAW/$stamp.out" "$status"
+cat "$RAW/$stamp.out"
+[ $status -eq 0 ] || tail -5 "$RAW/$stamp.err" >&2
+exit $status

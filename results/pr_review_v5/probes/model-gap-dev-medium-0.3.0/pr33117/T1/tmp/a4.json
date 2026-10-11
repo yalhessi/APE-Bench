@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Meromorphic/Basic.lean", "line_start": 639, "line_end": 641, "replacement": "/-- A function is meromorphic on `Set.univ` iff it is meromorphic. -/\n@[simp]\nlemma meromorphicOn_univ {f : \ud835\udd5c \u2192 E} : MeromorphicOn f Set.univ \u2194 Meromorphic f :=\n  \u27e8fun h x \u21a6 h x (mem_univ x), fun h x _ \u21a6 h x\u27e9"}
