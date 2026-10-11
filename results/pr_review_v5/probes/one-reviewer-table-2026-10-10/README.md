@@ -78,3 +78,71 @@ the Claude that P14 uses, Opus is ahead by 3 to 6 obligations, and files about t
   - On the judge's 23 obligations that is about +2 to +4.
   - It is inside D12's minimum detectable difference of about 5, so the judge alone cannot read it.
   - The matcher seal over the 47 asks is the instrument that can.
+
+## Result (2026-10-10): the one reviewer table
+
+Every cell read by the plan's rule (`read_table.py`; full output `table.txt`). P14 is one seal a set,
+and D12's matcher scorer is one seal over its 47 agreed asks. Reach is per session, matcher 1, with
+matcher 2 within 0.04 everywhere. Sessions a row are in brackets.
+
+| reviewer | P14 all asks (46) | P14 in census (39) | D12 all asks (47) | D12 in census (40) | D12 judge, of 23 | findings a PR, P14 / D12 |
+|---|---|---|---|---|---|---|
+| gpt-5.5, contract v2 [3] | 0.24 | 0.21 | 0.28 | 0.26 | 2, 5, 5 | 1.8 / 3.3 |
+| DeepSeek-V4.1-Flash, contract v2 [3] | 0.28 | 0.22 | 0.40 | 0.38 | 7, 6, 7 | 2.6 / 5.1 |
+| DeepSeek, two solo reps unioned [3 pairs] | 0.32 | 0.26 | 0.43 | 0.41 | | |
+| **DeepSeek + AP** [3] | **0.41** | **0.38** | **0.39** | **0.38** | 8, 6, 4 | 4.6 / 8.1 |
+| Opus 5.5, project harness [2] | | | 0.52 | 0.50 | 8, 7 | — / 8.3 |
+| Opus 5.5, X route, 2026-09-29 [2] | 0.47 | 0.46 | 0.62 | 0.56 | 12, 11 | 4.9 / 10.5 |
+| Opus 5.5, X route, today (T) [1] | 0.48 | 0.46 | | | | 5.4 / — |
+| **Opus 5.5 + AP, today (TA)** [1] | **0.67** | **0.69** | | | | 14.3 / — |
+
+**Orderings that pass the rule** (reps apart, and the PR-bootstrap interval excludes 0 on both
+matchers):
+- **Claude (X route) over DeepSeek, on both benchmarks:** +0.19 on P14, +0.22 on D12 (matcher), and
+  +4.8 obligations on the judge.
+- **Opus over itself, by harness:** the X route beats the project harness on D12, +0.10 (matcher)
+  and +4.0 (judge).
+- **DeepSeek over gpt-5.5 on D12** (+0.12).
+- **DeepSeek + AP over DeepSeek on P14's in-census asks** (+0.15, pooled).
+- **Opus + AP over same-day Opus solo,** on each P14 set: +0.20 pooled, +0.20 on validation and
+  +0.19 on post-cutoff.
+
+**Read as indistinguishable:**
+- DeepSeek against gpt-5.5 on P14 (+0.04), and on D12's judge (+2.7, interval [0.0, 5.7]).
+- DeepSeek against Opus under the project harness on D12 (+0.12, reps apart, interval spans 0).
+- Opus X route, 2026-09-29, against Opus X route today (−0.01).
+- DeepSeek + AP against two DeepSeek reps unioned, on every benchmark.
+
+**AP on DeepSeek, per set** (all asks, AP − DX):
+
+| P14 validation (8 PRs) | P14 post-cutoff (6 PRs) | D12 (12 PRs) |
+|---|---|---|
+| +0.20 (interval touches 0 on matcher 1) | 0.00 | −0.01 (judge −0.7) |
+
+The expectation written before D12 was read was about +0.20 of in-census reach. It was not met: the
+picks held the entry of 29 of 40 in-census asks, and DeepSeek's reach did not move.
+
+**Reading, provisional:**
+1. **The question behind the table resolves.**
+   - On P14 DeepSeek sits with gpt-5.5 (the same configuration now: +0.04).
+   - On D12 it sits above gpt and level with Opus under the project harness.
+   - Opus on the X route, the Claude of the probe tables, is ahead of DeepSeek on both benchmarks.
+   - The Opus harness gap (+0.10, +4 obligations) is as large as DeepSeek against gpt. Part of
+     "Claude against the rest" is the harness, not the model.
+2. **AP's DeepSeek gain is confined to validation small12.** Those are the 8 PRs that stages C to AP
+   were designed and read on. On the 6 post-cutoff PRs and the 12 dev PRs it is zero, at more volume
+   (yield 0.30 → 0.19 on dev).
+   - The likeliest readings are in-sample fit to those PRs, or chance on 8 PRs.
+   - The fresh set is validation-window and untouched, so it tells fit to the PRs from a window
+     effect.
+   - Untried for DeepSeek:
+     - the selector's `where` delivered with each sentence;
+     - fewer picks (top 10);
+     - the per-place engine;
+     - examples drawn from the PR's own family;
+     - a delivery without the precedence paragraph's licence wording.
+3. **Opus + AP is the one cell where ask-free conventions lifted the best solo reviewer,** on both
+   P14 sets.
+   - It is one session a PR, on P14 only, and files 2.6 times as much (yield 0.29 → 0.15).
+   - A second rep on P14 and a D12 run come before anything is built on it: about 29 sessions, about
+     0.75 of a five-hour window at the measured 2.5 points a session.
