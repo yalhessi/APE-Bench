@@ -4,13 +4,57 @@
 solo reviewer to get a better deployable reviewer. I still believe sticking to the conventions is a
 good direction."*
 
-*Revised 2026-10-10: the benchmark stated once, and every reviewer in one table, because the
-tables below it had mixed subsets and seals.*
+*Revised 2026-10-11, superseding the tables below:* the clean table comes first. Every reviewer
+was collected under one configuration, with 1-3 sessions a PR, and scored in one seal a benchmark
+(`results/pr_review_v5/probes/one-reviewer-table-2026-10-10/`). The sections after it were written
+on 2026-10-09 from the ten-PR seals. **Their AP conclusions hold on validation small12 only:** off
+those 8 PRs, AP did not move DeepSeek.
 
 **Scope.** All of it is in-sample, and it is a direction, not a claim. "Deployable" means the
 reviewer never sees the maintainers' asks.
 
-## The benchmark, and why the numbers differ between tables
+## The one reviewer table (2026-10-10)
+
+**Two benchmarks, each scored in a single seal by two blind matchers.**
+- **P14:** the probe sets, 14 PRs, 46 maintainer asks.
+- **D12:** the dev held-out 12, 47 agreed asks. Its pipeline judge (23 obligations) is reported
+  beside it.
+
+The table gives per-session reach on all asks.
+
+| reviewer | P14 | D12 | D12 judge, of 23 | findings a PR, P14 / D12 |
+|---|---|---|---|---|
+| gpt-5.5, solo [3 reps] | 0.24 | 0.28 | 2, 5, 5 | 1.8 / 3.3 |
+| DeepSeek, solo [3] | 0.28 | 0.40 | 7, 6, 7 | 2.6 / 5.1 |
+| DeepSeek, two solo reps unioned | 0.32 | 0.43 | | |
+| **DeepSeek + AP** [3] | **0.41** | **0.39** | 8, 6, 4 | 4.6 / 8.1 |
+| Opus, project harness [2] | | 0.52 | 8, 7 | — / 8.3 |
+| Opus, X route [2] (today's rep: 0.48 on P14) | 0.47 | 0.62 | 12, 11 | 4.9 / 10.5 |
+| **Opus + AP**, same day [1] | **0.67** | not run | | 14.3 / — |
+
+**What the rule supports** (reps apart, and a PR-bootstrap interval excluding 0):
+- **Claude beats DeepSeek on both benchmarks.** "DeepSeek near Claude on dev" was DeepSeek near Opus
+  under the project harness. The same Opus gains +0.10 (four obligations) on the X route.
+- **DeepSeek against gpt-5.5:** level on P14, ahead on D12.
+- **DeepSeek + AP gains only on validation small12** (+0.20). On post-cutoff the gain is 0.00 and on
+  dev −0.01, though the picks held the convention behind 29 of dev's 40 in-census asks. It never
+  beats two DeepSeek reps unioned.
+- **Opus + AP beats same-day Opus solo by +0.20,** on both P14 sets. It files 2.6 times as much, and
+  it is one rep on P14 only.
+
+**What this means for beating the solo reviewer, provisionally:**
+- The conventions lever has so far lifted the strongest reviewer (Opus), not the cheap one.
+- For DeepSeek, AP buys what a second solo run buys.
+- **Next:** a second Opus + AP rep on P14 and a D12 run, about 0.75 of a five-hour window, before
+  building on it. Then the fresh set, for whether the validation-only DeepSeek gain is fit to those
+  PRs.
+
+The detail, every comparison's interval and the untried designs:
+`one-reviewer-table-2026-10-10/README.md`, "Result".
+
+## Before the one reviewer table: the probe sets' earlier tables (superseded)
+
+### The benchmark, and why the numbers differ between tables
 
 **One benchmark throughout: the conventions probe sets** (`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/`).
 - **The set:** 14 Mathlib PRs (validation small12 and the post-cutoff probe), with 46 real
@@ -35,7 +79,7 @@ reviewer never sees the maintainers' asks.
 - **Unions:** a union of reps is not a single session. Unions appear only in the AP table below,
   marked "∪".
 
-## Every reviewer on the same ten PRs (33 in-census asks)
+### Every reviewer on the same ten PRs (33 in-census asks)
 
 Per-session reach, matcher 1 (matcher 2 where it differs). `read_common.py` in the probe folder
 prints every cell from the committed match tables.
