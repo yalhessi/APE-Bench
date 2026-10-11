@@ -42,6 +42,15 @@ The table gives per-session reach on all asks.
 - **Opus + AP beats same-day Opus solo by +0.20,** on both P14 sets. It files 2.6 times as much, and
   it is one rep on P14 only.
 
+**The inspection of 2026-10-11** (the table's README, "Inspection") found matching stable across
+seals, and two things that change the reading:
+- **D12's raw reach is weighted by one reviewer's repeated asks.** One reviewer wrote 29 of its 47.
+  Weighting each (PR, author, family) group as one ask, P14 → D12 reads DX 0.35 → 0.30,
+  AP 0.42 → 0.29 and X 0.47 → 0.52, so only Claude does better on D12.
+- **The P14 AP cell on the ten PRs is stage AP's own sessions re-scored.** Every AP session collected
+  fresh reads null against DeepSeek solo (P14's other four PRs, and D12). Opus + AP is measured only
+  on the ten PRs, chosen where solo Claude missed.
+
 **What this means for beating the solo reviewer, provisionally:**
 - The conventions lever has so far lifted the strongest reviewer (Opus), not the cheap one.
 - For DeepSeek, AP buys what a second solo run buys.
