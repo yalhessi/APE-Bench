@@ -148,6 +148,18 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-11, the one reviewer table qualifies stage AP**
+(`results/pr_review_v5/probes/one-reviewer-table-2026-10-10/README.md`, Result).
+- **AP on DeepSeek:** +0.20 on validation small12, the PRs stage AP was read on. It is 0.00 on the
+  post-cutoff 6 PRs and −0.01 on the dev 12, though the picks held 29 of dev's 40 in-census entries.
+  It never beats two DeepSeek reps unioned.
+- **Opus + AP over same-day Opus solo:** +0.20 on both P14 sets. That is one rep, at 2.6 times the
+  findings.
+- **Next, in order:**
+  1. A second Opus + AP rep on P14 and an Opus + AP run on D12 (about 29 sessions).
+  2. The fresh set, for whether DeepSeek's validation-only gain is fit to those PRs.
+- The 2026-10-09 entry below stands as recorded, read with this one.
+
 **2026-10-09, stage AP: the first ask-free convention delivery to move a reviewer**
 (`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`, Result AP; the picture is in
 `docs/research/beating-solo-2026-10.md`).
