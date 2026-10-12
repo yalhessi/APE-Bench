@@ -1,0 +1,1402 @@
+=== D12 33145 d0029 DX3 [D12a]  family F6  None:None
+ASK: I suggest turning the declarations involving `iSup` and `iInf` around so that they read: ```lean ⨆ s : S, f s = ⨆ i, f i := by ``` instead.
+MATCHER: m1 no (No finding asks to flip the equations to put the subtype supremum on the left.) | m2 no (Flip equations to iSup over S = iSup over all; no reviewer asks to flip the Dense statements.)
+READER: K l.34 ap=n/a/None know=demand
+  quote: should the equality be oriented `⨆ s : S, f s = ⨆ i, f i`? ... Orientation convention: Mathlib often states `sSup` over a smaller set = over a bigger... no convention. Skip.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.34 (+-1):
+[33] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[34] REASONING: All four edits compile:
+- `continuous_sup'` with `exact hS.continuous_sup hf h1` ✓
+- `continuous_inf'` with `exact hS.continuous_inf hf h1` ✓
+- `continuous_lowerBounds` golf ✓
+- `continuous_inf` with `h.mono (Set.image_subset_range f S)` ✓ (implied by the inf declaration compiling — yes it compiled)
+
+And earlier:
+- `continuous_upperBounds` golf ✓
+- `continuous_sup` `grind` → `Set.image_subset_range f S` ✓
+
+Also types confirmed: no stray section variables (only `[TopologicalSpace α] [Preorder α] [ClosedIicTopology α]` etc.). Good — no scope/variable-leak issue.
+
+Interesting: `BddAbove.mono Dense.continuous_sup._proof_1_1✝ h` — the `by grind` became a `_proof` term. Note the `#print` shows the elaborated proof, showing `by grind` produced an auxiliary proof. Fine.
+
+Now, `Subtype.range_coe : Set.range Subtype.val = s` exists! So the `h2` block could be:
+```lean
+    have h2 : ¬ BddAbove (f '' S) := fun h =>
+      h1 (BddAbove.mono (hf.range_subset_closure_image_dense hS) h.closure)
+    rw [← Subtype.range_coe (s := S), ← image_univ]  -- hmm
+```
+Hmm, we need to rewrite RHS `sSup (range fu
+[34] TEXT(assistant): Let me verify the combined rewrite of `continuous_sup'`, and check for any pre-existing duplicates of these bounds lemmas.
+
+
+[34] TOOL lean_verify_edit: {"declaration_name": "Dense.continuous_sup'", "new_declaration": "theorem Dense.continuous_sup' {\u03b1 : Type*} [TopologicalSpace \u03b1]\n    [ConditionallyCompleteLinearOrder \u03b1] [ClosedIicTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u03b3]\n    {S : Set \u03b3} (hS : Dense 
+[34] TOOL declaration_search: {"identifier": "Dense.continuous_upperBounds"}
+[34] TOOL declaration_search: {"identifier": "Continuous.range_subset_closure_image_dense"}
+[34] TOOL content_search: {"content_pattern": "range_subset_closure_image_dense", "path": "target/Mathlib", "max_matches_per_file": 8, "limit": 10}
+[35] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+
+GREP 'orient':
+--- line 34 REASONING (match 'orient')
+e.continuous_sup` itself could be stated more usefully, e.g. `BddAbove (range f)` hypothesis vs `BddAbove (f '' S)`? Since S is dense and closure... they're equivalent here. Not an ask.  One more: should the equality be oriented `⨆ s : S, f s = ⨆ i, f i`? The `rw [← sSup_range, ← sSup_range]`... Orientation convention: Mathlib often states `sSup` over a smaller set = over a bigger... no convention. Skip.  Another: `Dense.continuous_sup` uses 
+
+--- line 49 REASONING (match 'orient')
+d* notation `⨆ s ∈ S`, which is `iSup` over `S` with a proof — the subtype version is generally preferred in Mathlib for `ciSup`. I'll not file this.  OK, let me also double check the statement `⨆ i, f i = ⨆ s : S, f s` orientation: LHS = sup over all, RHS = sup over dense subset. Both fine.  Now let me reconsider one thing: since the maintainer thread mentioned "both sides should be equal to zero if `f` is unbounded" (in ℝ), which is exactly
+
+[2 matching blocks]
+
+=== P14_post 42814 p0005 DX2 [P14post]  family F7  Mathlib/Data/Nat/Squarefree.lean:395
+ASK: Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating this in any normalization monoid something.
+CODE AT COMMENT: @@ -387,6 +387,19 @@ theorem prod_primeFactors_sdiff_of_squarefree {n : ℕ} (hn : Squarefree n) {t : |   |  end Nat |   | +namespace Int | + | +/-- An integer is squarefree iff no prime square divides it. -/ | +theorem squarefree_iff_prime_sq_not_dvd {n : ℤ} :
+MATCHER: m1 no (No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.) | m2 no (No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof.)
+READER: K l.26 ap=n/a/None know=none
+  quote: So for ℤ the general lemma already applies ... a real maintainer might ask: state this in Algebra/Squarefree/Basic.lean as a general UFD-style lemma ... or keep in Data/Nat/Squarefree. Hmm.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.26 (+-1):
+[25] RESULT file_read: {"success": true, "content": "   297|theorem isCoprime_mul_units_right (hu : IsUnit u) (hv : IsUnit v) (y z : R) :\n   298|    IsCoprime (y * u) (z * v) ↔ IsCoprime y z :=/- ... omitted ... -/\n   302
+[26] REASONING: So there's `namespace IsCoprime` at line 313 with `section CommRing` [CommRing R]. So `Odd.isCoprime_two` is defined inside `namespace IsCoprime`, hence the `_root_.` prefix — correct and needed. Good.
+
+And indeed `Odd.isCoprime_two` generalizes `Int.isCoprime_two_right`. Hmm — could a maintainer say: this generalizes the existing `Int.isCoprime_two_right`/`isCoprime_two_left`, so the ℤ versions should be derived from it (or deprecated)? That's more of a follow-up; not necessarily in-scope.
+
+Wait, more importantly: `Odd.isCoprime_two` is stated as `IsCoprime x 2` from `Odd x` — but the natural Mathlib convention here is a `simp`-able iff or a `theorem` with a "two" name. Hmm; but the bigger question is whether the statement should be `IsCoprime x 2` (which direction?). Hmm.
+
+Now, potential issue: `Odd.isCoprime_two` name. In Mathlib conventions, for `Odd.isCoprime_two`, there's the analogous `Int.isCoprime_two_left`/`right`. Hmm, but `Odd.isCoprime_two` is fine.
+
+Hmm. Is `Odd.isCoprime_two` even needed? In FundamentalDiscriminant, `hp.isCoprime_two` for `hp : Odd p` with p : ℤ. There
+[26] TOOL content_search: {"path": "target/Mathlib", "content_pattern": "[Ff]undamental.{0,20}[Dd]iscr", "limit": 20}
+[26] TOOL declaration_search: {"identifier": "Int.IsFundamentalDiscr"}
+[27] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/AlgebraicTopology/FundamentalGroupoid/SimplyConnected.lean", "matches": [{"line_number": 41, "content": "    39|@[mk_iff]\n    40|class SimplyCon
+
+GREP 'UFD|squarefree_iff_irreducible':
+--- line 11 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|"}, {"line_number": 48, "content": "    46|\n    47|theorem squ
+
+--- line 15 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|"}, {"line_number": 148, "content": "   146|    (coprime_mul_if
+
+--- line 16 REASONING (match 'UFD|squarefree_iff_irreducible')
+ natural home is `Mathlib/Algebra/Squarefree/Basic.lean` (or `Mathlib/RingTheory/...`). Actually, there is also `Mathlib/Algebra/Squarefree/Basic.lean` which has general squarefree facts. Also there's the generic lemma `squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible` in RingTheory/UniqueFactorizationDomain probably, which gives: for a UFD with at least one irreducible... Actually maybe the ℤ statement can be derived from a general lemma about UFDs /
+
+--- line 16 TOOL_USE content_search (match 'UFD|squarefree_iff_irreducible')
+{"path": "target/Mathlib", "content_pattern": "squarefree_iff_irreducible_sq_not_dvd", "limit": 20}
+
+--- line 17 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|\n    50|theorem _root_.Squarefree.natFactorization_le_one {n :
+
+--- line 18 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+ne ⟨fun h ↦ ?_, ?_⟩"}, {"line_number": 147, "content": "   145|    exact hx.not_isUnit (h x t)\n   146|\n   147|theorem squarefree_iff_irreducible_sq_not_dvd_of_ne_zero {r : R} (hr : r ≠ 0) :\n   148|    Squarefree r ↔ ∀ x : R, Irreducible x → ¬x * x ∣ r := by\n   1
+
+--- line 19 REASONING (match 'UFD|squarefree_iff_irreducible')
+Interesting. So there's a generic lemma `squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible` for `CommMonoidWithZero` + `WfDvdMonoid`? Actually `irreducible_sq_not_dvd_iff_eq_zero_and_no_irreducibles_or_squarefree` requires `[CommMonoidWithZero R] [WfDvdMonoid R]`. For ℤ that h
+
+[stopped at --max 7 blocks]
+
+=== P14_val 32875 v0094 DX3 [P14val_a]  family F1  Mathlib/Probability/Kernel/Disintegration/Integral.lean:55
+ASK: ````suggestion simpa [this] using (Kernel.compProd_apply_prod hs ht).symm ````
+CODE AT COMMENT:  |    have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by |      congr; exact (κ.disintegrate _).symm | -  rw [this, Kernel.compProd_apply (hs.prod ht)] | -  classical | -  have : ∀ b, Kernel.condKernel κ (a, b) {c | (b, c) ∈ s ×ˢ t} | -      = s.indicator (fun b ↦ Kernel.condKernel κ (a, b) t) b := by | -    intro b | -    by_cases hb : b ∈ s <;> simp [hb] | -  simp_rw [Set.preimage, this] | -  rw [lintegral_indicator hs] | +  simp only [this] | +  exact (Kernel.compProd_apply_prod hs ht).symm
+MATCHER: m1 no (Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.) | m2 no (Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached.)
+READER: K l.11 ap=held/None know=none
+  quote: `simp only [this]` ... `rw [this]` would be more idiomatic. ... this is a real style point but minor.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.11 (+-1):
+[10] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Data/EReal/Basic.lean", "matches": [{"line_number": 435, "content": "   429|  · contrapose!\n   430|    intro h\n   431|    exact ⟨x.toReal, coe_
+[11] REASONING: So `exists_between'` is the to_dual of `exists_between`:
+
+```
+@[to_dual exists_between']
+theorem exists_between [LT α] [DenselyOrdered α] {a₁ a₂ : α} : a₁ < a₂ → ∃ a, a₁ < a ∧ a < a₂
+```
+
+So `exists_between' : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`. Wait, `to_dual` swaps the dual order. Hmm, `to_dual` on `exists_between`... The dual statement is: `a₂ < a₁ → ∃ a, a < a₂ ∧ a₁ < a`? Let me be careful.
+
+Actually `@[to_dual]` generates the dual version in the dual order type. The generated lemma `exists_between'` would have type something like `{a₁ a₂ : α} : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`. Hmm.
+
+Actually for `OrderDual`, `a₁ < a₂` in the dual means `a₂ < a₁` in original, and the witness `a` satisfies (in dual) `a₁ < a < a₂` meaning in original `a₂ < a < a₁`. So the dual statement is: from `a₂ < a₁` (original, i.e., `a₁ < a₂` in dual) get `∃ a, a₁ < a ∧ a < a₂` in dual, i.e., original `a₂ < a < a₁`.
+
+Anyway, `exists_between' h` where `h : dist x y < ε` gives `∃ ε', dist x y < ε' ∧ ε' < ε`? Hmm wait with `a₁ = dist x y`, `a₂ = ε`: `exists_between' : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`? Let's compute:
+[11] TOOL file_read: {"file_path": "target/Mathlib/Data/Finset/Image.lean", "line_start": 60, "line_end": 95, "omit_details": false}
+[11] TOOL file_read: {"file_path": "target/Mathlib/Data/Rat/Lemmas.lean", "line_start": 280, "line_end": 320, "omit_details": false}
+[12] RESULT file_read: {"success": true, "content": "    57|\n    58|@[simp]\n    59|theorem map_val (f : α ↪ β) (s : Finset α) : (map f s).1 = s.1.map f :=\n    60|  rfl\n    61|\n    62|@[simp]\n    63|theorem map_empty (
+
+GREP 'rw \\[this\\]|simp only \\[this\\]':
+--- line 3 TEXT[user] (match 'rw \\[this\\]|simp only \\[this\\]')
+mm   rw [this, compProd_apply (hs.prod ht)]   classical   have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t)       = s.indicator (fun b ↦ ρ.condKernel b t) b := by     intro b     by_cases hb : b ∈ s <;> simp [hb]   simp_rw [this]   rw [lintegral_indicator hs] ``` - as the PR leaves it: ```lean lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s) {t : Set Ω}     (ht : MeasurableSet t) :     ∫⁻ b in s, ρ.condKernel b t 
+
+--- line 4 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+ap_equiv` went from <10ms to 25ms, `Rat.inv_intCast_den_of_pos` from <10ms to 17ms. These are regressions. Note the PR description only lists declarations with ≥10ms before or after, and these show increases. 3. Global `simp only [this]` patterns — using `simp only [this]` where `this` is a hypothesis. Actually in `setLIntegral_condKernel_eq_measure_prod`, `simp only [this]` uses a local hypothesis; this works but may be considered fragile. Actually `r
+
+--- line 11 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+nd simp". The maintainer concern with `grind` is that it's a heavyweight tactic that can be slow and non-obvious; Mathlib policy: `grind` is allowed but... Let me search Zulip for guidance on `grind` in Mathlib.  (b) **`simp only [this]`** in the two `setLIntegral_condKernel_eq_measure_prod` lemmas: using a local hypothesis in `simp only` is non-idiomatic; `rw [this]` is the standard. Actually `simp only [this]` when `this` is a hypothesis... Hmm, this
+
+--- line 20 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+sk. The PR is a golf PR. Common maintainer asks on golf PRs in Mathlib:  1. Don't use `grind` when a direct `simp`/`rw` is available and faster. If `grind` makes it slower, prefer the original or a simp-based proof. 2. `simp only [this]` style: prefer `rw`.  Hmm, but let me look at the actual diff again for anomalies:  - `pi_map_piCongrLeft`: new last two lines `simp only [pi_pi, this]` then `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`. Note the *or
+
+--- line 22 TOOL_RESULT content_search (match 'rw \\[this\\]|simp only \\[this\\]')
+x xs : _ → ℕ) (Fin.castLE (Nat.succ_le_succ (Fin.is_lt _).le) j))\n   660|            fun j => rfl\n   661|        simp_rw [this]"}]}, {"path": "target/Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean", "matches": [{"line_number": 514, "content":
+
+--- line 23 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+sup_finset_sup'`: `simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢`. Then `exact fun i i_s ↦ eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)`. Fine.  6. Two `setLIntegral_condKernel_eq_measure_prod`: `simp only [this]` then `exact (...).symm`.  7. `exists_lt_mem_ball_of_mem_ball`: `exists_between' h`.  Hmm, now let me reconsider #7: `exists_between' h` — is `exists_between'` really the lemma a maintainer would want? The statement pro
+
+--- line 37 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+oves the eventually inside: `∀ᶠ a, ∀ i ∈ s, F i a < b ↔ ∀ i ∈ s, ∀ᶠ a, F i a < b`. Then `exact fun i i_s => eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)`. Yes. Reasonable and matches.  OK. Now let me reconsider the `simp only [this]` in the two disintegration lemmas. Using `simp only [this]` with a local hypothesis: Mathlib style. Actually many proofs do `simp only [this]`? Hmm, more common is `rw [this]`. But `simp only [this]` is used in Mathlib 
+
+[stopped at --max 7 blocks]
+
+=== P14_val 32875 v0095 AP1 [P14val_a]  family F1  Mathlib/Probability/Kernel/Disintegration/Integral.lean:147
+ASK: simpa
+CODE AT COMMENT: rableSet s |      ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by |    have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by |      congr; exact (ρ.disintegrate _).symm | -  rw [this, compProd_apply (hs.prod ht)] | -  classical | -  have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t) | -      = s.indicator (fun b ↦ ρ.condKernel b t) b := by | -    intro b | -    by_cases hb : b ∈ s <;> simp [hb] | -  simp_rw [this] | -  rw [lintegral_indicator hs] | +  simp only [this] | +  exact (compProd_apply_prod hs ht).symm
+MATCHER: m1 no (Measure twin of v0094; same rw one-liners reach it.) | m2 no (Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached.)
+READER: K l.40 ap=held/considered_dropped know=none
+  quote: `simpa only [this] using (compProd_apply_prod hs ht).symm` would be a single tactic. Is that better? Marginally. ... Marginal. I'd rather not file that.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.40 (+-1):
+[39] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[40] REASONING: Interesting results:
+
+1. For `Finset.mem_map_equiv`, `mem_map_of_injective` is a `Multiset` lemma and the goal state shows `f.symm (f (f.symm b)) ∈ s` — wait, the expected type shows LHS `f (f.symm b) ∈ map f.toEmbedding s` and RHS `f.symm (f (f.symm b)) ∈ s`. Hmm, so `rw [← f.apply_symm_apply b]` rewrote both occurrences of `b`. Need `simp` afterwards. So it needs `simpa using mem_map_of_injective ...`. Not clean.
+
+2. For `Rat.inv_intCast_den_of_pos`, my alternative `simp only [den_inv, num_intCast]; simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` compiles! Hmm, so there's a lighter route, but it's not obviously shorter/better than grind. Hmm. Wait — did the second `simp` need explicit args? It compiled. Hmm, interesting. But is that a *better* proof than `grind`? It's two `simp`s... Actually maybe simpler: `simp only [den_inv, num_intCast, ha0.ne', ite_false, Int.natAbs_of_nonneg ha0.le, Int.toNat_of_nonneg ha0.le, Int.cast_natCast]`? Let me test a single `simp only` without grind.
+
+Hmm, what would the maintainer want? For `Rat.inv_intCast_den_of_pos`, the neighbouring style is `simp 
+[40] TOOL file_read: {"file_path": "target/Mathlib/MeasureTheory/Constructions/Pi.lean", "line_start": 440, "line_end": 475, "omit_details": false}
+[40] TOOL file_read: {"file_path": "target/Mathlib/Order/LiminfLimsup.lean", "line_start": 1135, "line_end": 1165, "omit_details": false}
+[41] RESULT file_read: {"success": true, "content": "   437|theorem ae_le_set_pi {I : Set ι} {s t : ∀ i, Set (α i)} (h : ∀ i ∈ I, s i ≤ᵐ[μ i] t i) :\n   438|    Set.pi I s ≤ᵐ[Measure.pi μ] Set.pi I t :=\n   439|  ((eventual
+
+GREP 'Marginal|simpa only \\[this\\]':
+--- line 3 TEXT[user] (match 'Marginal|simpa only \\[this\\]')
+ · exact hl2 _ _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))   +    · exact .symm <| hl2 _ _ (Finset.mem_image_of_mem _ (by simp))   +  simp [-Finset.mem_union, Finset.forall_mem_union, O] at hl2   ``` - A change of marginal benefit (cosmetic spacing, docstring polish) is not made, or not merged, when its review cost exceeds the gain.    Example 1, asked on another PR on the PR as a whole. The maintainer's comment:    > I'm afraid I'm going
+
+--- line 28 REASONING (match 'Marginal|simpa only \\[this\\]')
+vention says correct/complete docstrings... but adding a docstring to a lemma whose proof changed isn't required. Hmm. But now that the proof is one line showing it's a corollary, maybe it should get a docstring. That's marginal.  Note: now `_real_le'` is a trivial consequence of `_le` (non-prime). And similarly, is there a `tendsto_of_forall_isClosed_limsup_real_le` (non-prime)? Let me grep. If the non-prime real version exists and is also pro
+
+--- line 37 REASONING (match 'Marginal|simpa only \\[this\\]')
+rging: "Consecutive tactic calls or calc steps that a single call can perform are merged into that one call." Here `simp only [this]` then `exact (...).symm` — could be merged: `rw [this]; exact ...` hmm same. Could be `simpa only [this] using (compProd_apply_prod hs ht).symm`. Hmm! Interesting: `simpa only [this] using (compProd_apply_prod hs ht).symm` would be a single tactic. Is that better? Marginally.  Hmm, mid-strength finding. Note the convention
+
+--- line 40 REASONING (match 'Marginal|simpa only \\[this\\]')
+ (both): `simp only [this]` — style: `rw [this]` would be more idiomatic for rewriting with a hypothesis, and then the two tactics could not merge anyway. Hmm. Actually could the whole proof be shortened to one tactic: `simpa only [this] using (compProd_apply_prod hs ht).symm`? Let's test. If that works, the convention on merging ("Consecutive tactic calls ... that a single call can perform are merged") might justify it... but that convention's examples
+
+--- line 43 REASONING (match 'Marginal|simpa only \\[this\\]')
+ype.prod_equiv`. The `congrFun rfl` is weird but works.  Let me test `Fintype.prod_equiv _ _ _ (fun _ ↦ rfl)` via lean_verify_edit. If it compiles, then suggest that (more readable). Hmm, is `fun _ ↦ rfl` more readable? Marginally. Perhaps the maintainer's ask is different: maybe `Finset.prod_bij`? Hmm.  Hmm, alternatively maybe the intended cleaner proof: `simpa only [pi_pi, this] using Fintype.prod_equiv e.symm _ _ (congrFun rfl)`? no.  Let's
+
+--- line 46 REASONING (match 'Marginal|simpa only \\[this\\]')
+onventions don't demand `rw` here. Hmm.  Hmm, let me check: does the `simp only [this]` need to be `simp only` rather than `rw`? If `rw [this]` works, the convention "Consecutive tactic calls ... merged" maybe suggests `simpa only [this] using (compProd_apply_prod hs ht).symm`. Hmm, would that work? Let's test on one of them. If it works, is it a request I'd make? It merges two tactics into one, which the conventions do call for ("Consecutive tactic cal
+
+--- line 49 REASONING (match 'Marginal|simpa only \\[this\\]')
+ons don't cover `simp only` vs `rw` for a hypothesis rewrite... except maybe "Consecutive tactic calls or calc steps that a single call can perform are merged into that one call": `simp only [this]; exact (...).symm` → `simpa only [this] using (...).symm` — a single call. Hmm! That convention's example is exactly about merging `rw [X]` + `exact h` into `rwa [X]`. Here the analogous merge is `simpa only [this] using ...`. Hmm, so under that convention, a
+
+[stopped at --max 7 blocks]
+
+=== P14_val 29842 v0053 DX2 [P14val_b]  family F12  None:None
+ASK: How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition. If you've changed your mind, could you explain why in the PR description?
+MATCHER: m1 no (No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.) | m2 no (Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial.)
+READER: K l.7 ap=n/a/None know=pr_context
+  quote: The PR description is empty. A maintainer might ask for a description? The brief says don't report general risks... no description isn't a finding per se.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.7 (+-1):
+[6] RESULT file_read: {"success": true, "content": "   398|\n   399|@[deprecated (since := \"2025-04-27\")] alias tangentCone_eq_univ := tangentConeAt_eq_univ\n   400|\n   401|end Normed\n   402|\n   403|end TangentCone\n 
+[7] REASONING: Now let me understand the change. The PR moves `tangentConeAt_closure` and `uniqueDiffWithinAt_closure` / `mono_closure` between sections, generalizing the section variables.
+
+Key things to check:
+1. Is `tangentConeAt_closure` actually generalizable to TVS? The PR keeps it in the `Normed` section — wait, no. Let me check: the PR moved it from section `Normed` into a new position... Actually, look at the diff: `tangentConeAt_closure` is moved from line 106ish (in Normed) to line 144ish (Normed section still). Hmm.
+
+Actually the diff indicates the section boundaries were changed: the old `section Normed` (with `NormedAddCommGroup E`... ) was replaced by `section TVS` extending with `ContinuousSMul 𝕜 E`. Then `tangentConeAt_closure` is moved *after* `end TVS` (line 147) into a new `section Normed` at line 149.
+
+So the net effect: homogenizes so that tangentConeAt_closure stays Normed (since it needs closure and metric) and uniqueDiffWithinAt_closure stays Normed (needs closure).
+
+Wait but `tangentConeAt_closure` requires `NormedAddCommGroup`... but the `Normed` section lacks `Continuous
+[7] TOOL file_read: {"file_path": "target/Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 100, "line_end": 150, "omit_details": false}
+[7] TOOL file_read: {"file_path": "target/Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 410, "line_end": 500, "omit_details": false}
+[8] RESULT file_read: {"success": true, "content": "    97|  eq_univ_of_forall fun _ ↦ mem_tangentConeAt_of_pow_smul (norm_pos_iff.1 hr₀) hr <|\n    98|    Eventually.of_forall fun _ ↦ mem_univ _\n    99|\n   100|@[depreca
+
+GREP 'description':
+--- line 3 TEXT[user] (match 'description')
+# Pull request #29842  **Title:** feat(TangentCone): generalize some lemmas to TVS  **Description:** (no description provided)  **Changed files:**   - `Mathlib/Analysis/Calculus/TangentCone.lean`  **Tools available:** read files, grep the repo (content_search), find files by name (file_search), compile a snippet aga
+
+--- line 7 REASONING (match 'description')
+oneAt_closure` is declared in the earlier Normed section (line 156) with `@[simp]`. Yes.  Hmm, but now consider: does `uniqueDiffWithinAt_closure` still work with the same proof? Yes, unchanged.  Now what else... The PR description is empty. A maintainer might ask for a description? The brief says don't report general risks... Documentation concern: no description isn't a finding per se.  Let's think about duplication: `variable [ContinuousAdd E] 
+
+--- line 40 TOOL_RESULT precedent_search (match 'description')
+_eq_primeage_image`, it's enough to study the subset\n+  `normAtAllPlaces '' (normLeOne K)` of `realSpace K`.\n+\n+2. A description of `normAtAllPlaces '' (normLeOne K)` is given by `normAtAllPlaces_normLeOne`, it\n+  is the set of `x : realSpace K`, 
+
+--- line 55 REASONING (match 'description')
+w I'm leaning towards: the actual review comments may be about things like "please add a `@[simp]`/`[gcongr]`-style attribute" or "docstring" on... hmm, no new declarations. OR the review comments might be about the *PR description* (empty!) — hmm! The PR has no description. A maintainer might ask for a description... but the brief says findings must be actionable code changes; "add a PR description" is a "documentation" ask, arguably. Hmm, that's
+
+--- line 61 REASONING (match 'description')
+ze `tangentConeAt_subset_zero` / `UniqueDiffWithinAt.accPt` / `zero_mem_tangentCone`..." — plausible.  3. "The `have` in `lim_zero`: use X." — unlikely (already implemented).  4. "Add a note to the module docstring / no description." — hmm.  5. "`tangentConeAt.lim_zero`'s statement: prefer `Tendsto c l (cobounded 𝕜)`" — hmm! Hmm, actually, hmm: this is interesting. The PR *rewrites* `hc` to the cobounded form inside the proof, which suggests the c
+
+--- line 67 REASONING (match 'description')
+ Hold on. Let me reconsider something! I've been assuming the PR's generalization *of the section structure* is the point. But let me re-read the PR title: "feat(TangentCone): generalize some lemmas to TVS". And the PR *description is empty*. Hmm.  Hmm, let me think about which lemmas the PR *failed* to generalize that are *closest* to the changed ones — because a maintainer reviewing the diff would see the pattern and immediately check the *adjac
+
+--- line 77 REASONING (match 'description')
+ings. Since CI linters passed (no warnings from my compile check) ✓ nothing to ask.  OK, so: given that everything checks out, maybe the ground truth comment is about **scope: "please split this PR"** or **"please add a description"**... Hmm! Hold on: "no description provided" — hmm, for a Mathlib PR, the description matters; a maintainer might comment "Please fill in the PR description" — but that's not a code finding.  Hmm, hmm, hmm. Let me try 
+
+[stopped at --max 7 blocks]
+
+=== D12 33145 d0027 DX2 [D12a]  family F8  Mathlib/Topology/Order/IsLUB.lean:243
+ASK: ```suggestion theorem Dense.ciInf' {α : Type*} [TopologicalSpace α] ```
+CODE AT COMMENT: range_coe_subtype, setOf_mem_eq] | +      have := h.closure.mono (image_closure_subset_closure_image hf) | +      simp only [hS.closure_eq, image_univ] at this | +      exact h1 this | +    simp [csSup_of_not_bddAbove h1, csSup_of_not_bddAbove h2] | + | +/-- This is an analogue of `Dense.continuous_inf` for functions taking values in a conditionally | +complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/ | +theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]
+MATCHER: m1 no (ciInf' names from four; R5, R13 want a descriptive name instead of the prime.) | m2 no (Rename to Dense.ciInf'; same findings as the other ciSup/ciInf renames.)
+READER: K l.46 ap=n/a/None know=none
+  quote: `continuous_sup` sounds like 'continuity of sup' which is misleading-ish ... for naming_norm, `Dense.continuous_sup` came back subject_unresolved, so unmeasured.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_upperBounds` proves `upperBounds (f '' S) ⊆ upperBounds (range f)` by hand: `mem_closure_iff_frequently` + `mem_of_closed isClosed_Iic` re-derives `upperBounds s ⊆ upperBounds (closure s)`, which is the
+  [1] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_sup'` opens with the `isEmpty_or_nonempty γ` split and then re-proves the bounded case by the verbatim body of `Dense.continuous_sup` (lines 199-204), so the two declarations carry the same argument twi
+  [2] Mathlib/Topology/Order/IsLUB.lean: The `have h2 : ¬ BddAbove (range (fun s : S => f (Subtype.val s)))` in `Dense.continuous_sup'` is proved with an eight-line `range_comp'` + `simp_all only [Subtype.range_coe_subtype, setOf_mem_eq]` detour, although `¬ Bd
+  [3] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_lowerBounds` (and likewise `Dense.continuous_inf`, line 208, and `Dense.continuous_inf'`, line 243) repeats the whole proof of its order-dual (`continuous_upperBounds`, `continuous_sup`, `continuous_sup
+  [4] Mathlib/Topology/Order/IsLUB.lean: The docstrings of the new `upperBounds`/`lowerBounds` lemmas misdescribe the statements: “the upper bounds of the range of the universe” — the right-hand side is `range f`, and there is no “range of the universe” — and “
+  [5] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_upperBounds` (and `Dense.continuous_lowerBounds`, line 183) lead with `continuous_`, whereas every base-snapshot declaration whose conclusion subject is `upperBounds` is named with that subject first —
+TRANSCRIPT around l.46 (+-1):
+[45] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Topology/Order/MonotoneConvergence.lean", "matches": [{"line_number": 37, "content": "    34|\n    35|variable {α β : Type*}\n    36|\n    37|/--
+[46] REASONING: `SupConvergenceClass` exists in `Mathlib/Topology/Order/MonotoneConvergence.lean` (my `#check` failed because it wasn't imported by IsLUB.lean — indeed `Mathlib.Topology.Order.IsLUB` doesn't import MonotoneConvergence, and `#check @SupConvergenceClass` needs the name to be in scope... the class is not imported).
+
+Aaron Liu's suggestion "Probably the assumption here is docs#SupConvergenceClass" was about what generalizes the "reaches its supremum" story? Hmm, actually the thread's topic title is "Continuous function reaches its supremum on a dense set" and the discussion was about `⨆ i, f i = ⨆ s : S, f s` generalized to *any* ordered codomain with order topology. Kevin's remark was about `⨆ s ∈ S`. Hmm, Aaron's "Probably the assumption here is SupConvergenceClass" might be about a different lemma (maybe another version of the statement where you want `sSup` over a directed set...). Hard to know.
+
+Hmm — maybe the Zulip context is about whether the assumption on α should be `OrderClosedTopology`... Let me not chase this further.
+
+Now, let me consider the "generalization" concern in our
+[46] TOOL lean_verify_edit: {"path": "Mathlib/Topology/Order/IsLUB.lean", "declaration_name": "Dense.continuous_sup", "new_declaration": "theorem Dense.continuous_sup {\u03b1 : Type*} [TopologicalSpace \u03b1]\n    [ConditionallyCompleteLattice \u03b1] [ClosedIicTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u0
+[46] TOOL lean_verify_edit: {"path": "Mathlib/Topology/Order/IsLUB.lean", "declaration_name": "Dense.continuous_lowerBounds", "new_declaration": "theorem Dense.continuous_lowerBounds {\u03b1 : Type*} [TopologicalSpace \u03b1] [Preorder \u03b1]\n    [ClosedIciTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u03b3]
+[47] RESULT lean_verify_edit: {"success": false, "errors": [{"severity": "error", "data": "failed to synthesize instance of type class\n  Nonempty γ\n\nHint: Type class instance resolution failures can be inspected with the `set_o
+
+GREP "continuous_inf'|subject_unresolved":
+--- line 3 TEXT[user] (match "continuous_inf'|subject_unresolved")
+.lean`; changed: value_or_body:added - as the PR leaves it: ```lean /-- The lower bounds of the image of a continuous function on a dense set is equal to the lower bounds of the range of the universe. -/ ```  ### `Dense.continuous_inf'` (theorem, added) [d060e494ca] - file: `Mathlib/Topology/Order/IsLUB.lean`; changed: name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean theorem Dense.continuous_inf' {α : Type*} [Topological
+
+--- line 5 TOOL_RESULT file_read (match "continuous_inf'|subject_unresolved")
+2|complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/\n   243|theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]\n   244|    [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] {f : γ → α} [To
+
+--- line 9 TOOL_RESULT file_read (match "continuous_inf'|subject_unresolved")
+2|complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/\n   243|theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]\n   244|    [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] {f : γ → α} [To
+
+--- line 15 TOOL_RESULT naming_norm (match "continuous_inf'|subject_unresolved")
+{"success": true, "verdict": "insufficient_evidence", "subject": null, "empty_because": "subject_unresolved", "results": "This tool could not work out what this declaration is ABOUT from its conclusion, so it never asked the co
+
+--- line 19 REASONING (match "continuous_inf'|subject_unresolved")
+ense.exists_lt ... := hs.orderDual.exists_gt x`. So the local file convention (OrderClosed.lean and IsLUB.lean) is to derive dual statements by `αᵒᵈ`/`orderDual`. This supports a finding: `Dense.continuous_inf` / `Dense.continuous_inf'` / `Dense.continuous_lowerBounds` duplicate the proof of their `sup` counterparts instead of being derived by order duality (as `Dense.isGLB_inter_iff`, `Dense.exists_lt`, `isGLB_iff_of_subset_of_subset_closure` do in t
+
+--- line 28 REASONING (match "continuous_inf'|subject_unresolved")
+uality derivations for sup/inf: ``` example [ConditionallyCompleteLattice α] [ClosedIciTopology α] ... (h : BddBelow (range f)) :     ⨅ i, f i = ⨅ s : S, f s :=   hS.continuous_sup (α := αᵒᵈ) hf h ``` and similarly for `continuous_inf'`: ``` example [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] :     ⨅ i, f i = ⨅ s : S, f s := hS.continuous_sup' (α := αᵒᵈ) hf ``` Let's test.  Also test whether `continuous_sup'` could be derived from `cont
+
+--- line 31 REASONING (match "continuous_inf'|subject_unresolved")
+k. So:  1. `Dense.continuous_lowerBounds` can be `:= hS.continuous_upperBounds (α := αᵒᵈ) hf` — duality (one line, no duplicated proof). 2. `Dense.continuous_inf` can be `:= hS.continuous_sup (α := αᵒᵈ) hf h`. 3. `Dense.continuous_inf'` can be `:= hS.continuous_sup' (α := αᵒᵈ) hf`.  That's a strong duplication finding: three declarations duplicate the proofs of their order-duals when the file's convention is to derive the dual (`Dense.isGLB_inter_iff`
+
+[stopped at --max 7 blocks]
+
+=== D12 33294 d0038 AP2 [D12b]  family F8  Mathlib/SetTheory/Cardinal/Cofinality.lean:535
+ASK: ```suggestion theorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f) ```
+CODE AT COMMENT: @@ -532,7 +532,7 @@ theorem cof_cof (a : Ordinal.{u}) : cof (cof a).ord = cof a := by |    obtain ⟨g, hg⟩ := exists_fundamental_sequence a.cof.ord |    exact ord_injective (hf.trans hg).cof_eq.symm |   | -protected theorem IsNormal.isFundamentalSequence {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f) | +theorem isFundamentalSequence_of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)
+MATCHER: m1 no (No reviewer proposes renaming isFundamentalSequence_of_isNormal to dotted IsFundamentalSequence.of_isNormal.) | m2 no (No reviewer questions the name isFundamentalSequence_of_isNormal.)
+READER: K l.35 ap=held/considered_dropped know=none
+  quote: 'Hmm — the opposite convention! The change moved `IsNormal.isFundamentalSequence` OUT of the `IsNormal` namespace ... Given `Ordinal.IsNormal` is deprecated, they can't put things in its namespace. Fine. So `isFundamentalSequence_of_isNormal` is consistent.' (l.35)
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.35 (+-1):
+[34] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/SetTheory/Ordinal/Arithmetic.lean", "matches": [{"line_number": 55, "content": "    53|noncomputable section\n    54|\n    55|open Function Cardi
+[35] REASONING: The file has `open Function ...`. So `Injective.eq_iff` resolves to `Function.Injective.eq_iff`. But wait, does the deprecation attribute in Arithmetic.lean use the resolution? It must, given my earlier standalone test needed `open Function`. Hmm, but actually maybe in my first test, the file `import Mathlib.SetTheory.Ordinal.Arithmetic` doesn't re-open. Right.
+
+OK so `@[deprecated Injective.eq_iff]` is fine (resolves to Function.Injective.eq_iff). Hmm but is the stored name the resolved one? Probably yes (Lean elaborates the ident). Actually hmm, I'm not 100% sure. Let me test what the deprecation message shows.
+
+Actually, this is a minor point. Let me not chase it. But note: Mathlib convention is deprecations should name the full name; using `Injective.eq_iff` relies on `open` and the printed name may be `Injective.eq_iff`. Hmm. Actually many Mathlib deprecations use short names that resolve via open. E.g. `@[deprecated IsNormal.ext (since := ...)]` — full name `Order.IsNormal.ext` but written as `IsNormal.ext` (relies on `open Order`). That's used in this PR too (Family.lean line 
+[35] TOOL file_read: {"file_path": "target/Mathlib/SetTheory/Ordinal/FixedPoint.lean", "line_start": 280, "line_end": 400, "omit_details": false}
+[36] RESULT file_read: {"success": true, "content": "   277|@[simp]\n   278|theorem nfp_id : nfp id = id := by\n   279|  ext\n   280|  simp_rw [← iSup_iterate_eq_nfp, iterate_id]\n   281|  exact ciSup_const\n   282|\n   283
+
+GREP 'IsFundamentalSequence\\.|of_isNormal':
+--- line 3 TEXT[user] (match 'IsFundamentalSequence\\.|of_isNormal')
+ga0 : preOmega ω = ω := by   simp_rw [← isNormal_preOmega.apply_omega0, preOmega_natCast, iSup_natCast] ``` - as the PR leaves it: ```lean @[simp] theorem preOmega_omega0 : preOmega ω = ω := by   simp_rw [← apply_omega0_of_isNormal isNormal_preOmega, preOmega_natCast, iSup_natCast] ```  ### `Ordinal.isFundamentalSequence_of_isNormal` (theorem, modified) [2642023d5d] - file: `Mathlib/SetTheory/Cardinal/Cofinality.lean`; changed: attributes:removed,
+
+--- line 9 TOOL_RESULT file_read (match 'IsFundamentalSequence\\.|of_isNormal')
+|@[simp]\n   862|theorem iSup_natCast : iSup Nat.cast = ω :=/- ... omitted ... -/\n   864|\n   865|theorem apply_omega0_of_isNormal {f : Ordinal.{u} → Ordinal.{v}} (hf : IsNormal f) :\n   866|    ⨆ n : ℕ, f n = f ω :=/- ... omitted ... -/\n   868|\n  
+
+--- line 35 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+:= H₁.comp H₂` → `comp (hg := H₁) (hf := H₂)`. So identical. Good.  Hmm wait, actually is `omega o = preOmega (o + ω)`? Let me check the definition. Whatever, it matches.  12. **Cofinality.lean**: `isFundamentalSequence_of_isNormal` name. It was `IsNormal.isFundamentalSequence`. Renamed to `isFundamentalSequence_of_isNormal`. The convention: "A declaration whose main argument is a term of type `T` or a hypothesis `P x` ... is placed in `T`'s or `P
+
+--- line 40 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+ `Order.IsNormal` lemma? `bsup` is Ordinal-specific (blsub/bsup). Hmm, so it's not superseded — it stays. But its name remains `IsNormal.bsup` in the (deprecated) `IsNormal` namespace. Hmm. Should it be renamed to `bsup_of_isNormal`? Hmm, that's a question of consistency. Actually maybe it should be `Ordinal.IsNormal.bsup` kept? Since `IsNormal` is deprecated, `IsNormal.bsup` resides in the `Ordinal.IsNormal` namespace which is deprecated-ish. Hmm
+
+--- line 41 TOOL_RESULT content_search (match 'IsFundamentalSequence\\.|of_isNormal')
+"content": "   868|\n   869|@[deprecated (since := \"2025-12-25\")]\n   870|alias IsNormal.apply_omega0 := apply_omega0_of_isNormal\n   871|\n   872|@[simp]"}]}, {"path": "target/Mathlib/SetTheory/Ordinal/Arithmetic.lean", "matches": [{"line_number": 
+
+--- line 42 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+esting. These are Ordinal-specific (blsub/bsup), so they aren't superseded by `Order.IsNormal` lemmas. But the naming convention question: since the PR is deprecating `Ordinal.IsNormal`, should these be renamed to `bsup_of_isNormal` etc.? Hmm. But wait, `IsNormal.blsub_eq` is *used* by `isFundamentalSequence_of_isNormal` in Cofinality and elsewhere. If they're not deprecated, they stay. Hmm, but their names live in the `Ordinal.IsNormal` namespace
+
+--- line 46 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+, with each convention applied. Let me enumerate conventions and check:  1. Lemma name built from names of declarations in its statement. → Check `iSup_pow_natCast`, `iSup_add_natCast`, `iSup_mul_natCast`, `apply_omega0_of_isNormal`, `cof_eq_of_isNormal`, `cof_le_of_isNormal`, `isFundamentalSequence_of_isNormal`, `isNormal_veblenWith_zero`, `mem_range_deriv`, `le_iff_deriv`, `nfp_fp`, `deriv_fp`, `fp_iff_deriv`, `apply_le_nfp`, `nfp_le_apply`, `ap
+
+[stopped at --max 7 blocks]
+
+=== P14_val 34091 v0107 DX1 [P14val_a]  family F2  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97
+ASK: ```suggestion theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ```
+CODE AT COMMENT: ` that requires codomain to be infinite. -/ | +theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) : | +    ∃ a : α, Infinite (f ⁻¹' {a}) := | +  exists_infinite_fiber f h (by | +    rw [Cardinal.infinite_iff] at hα ⊢ | +    exact hα.trans h.le) | + | +/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's | +has an uncountable fiber. -/ | +theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :
+MATCHER: m1 no ([Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.) | m2 no ([Uncountable beta] instance binder on exists_uncountable_fiber.)
+READER: K l.24 ap=held/None know=demand
+  quote: since `Uncountable` is a class, could be `[Uncountable β]`? But it's a hypothesis; using it as an explicit argument is fine. Similarly `Infinite β` is a class but used explicitly. Fine.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-c
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: This PR deletes the `have k` block from `Cardinal.le_range_of_union_finset_eq_univ`, and that block contained the only use in the file of `Set.union_finset_finite_of_range_finite`, the only declaration this file took fro
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: `Cardinal.exists_infinite_fiber'` is a strict special case of the declaration immediately above it, not an independent result: its hypotheses `#α < #β` and `Infinite α` imply `Infinite β` via `h.le`, so the general `exis
+TRANSCRIPT around l.24 (+-1):
+[23] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/SetTheory/Cardinal/Pigeonhole.lean", "matches": [{"line_number": 98, "content": "    96|has an uncountable fiber. -/\n    97|theorem exists_uncou
+[24] REASONING: So `exists_uncountable_fiber` is new and unique. `aleph0_lt_mk_iff : ℵ₀ < #α ↔ Uncountable α` — so an alternative statement form for the goal in the proof: goal `Uncountable (f ⁻¹' {a})` ↔ `ℵ₀ < #(fiber)`. The proof rewrote `Uncountable` to `ℵ₁ ≤ #·` via succ. Hmm, would it be simpler to use `aleph0_lt_mk_iff` in the forward direction on the goal, keeping `ℵ₀ < #fiber` as goal? Let's think: after `simp_rw [← aleph0_lt_mk_iff] at hβ ⊢`, hβ : `ℵ₀ < #β`, goal `∃ a, ℵ₀ < #(fiber)`.
+
+Branch 1 (`#α < ℵ₀`): use `infinite_pigeonhole_card f ℵ₀ hβ.le le_rfl (by rwa [isRegular_aleph0.cof_eq])` → gives `∃ a, ℵ₀ ≤ #(fiber)`, which yields `ℵ₀ < #(fiber)`? NO — `ℵ₀ ≤ #fiber` gives `fiber` infinite, not uncountable. Hmm right, in branch 1 of `exists_uncountable_fiber` they used θ = ℵ₁ to get an uncountable fiber. So they need θ = ℵ₁. With goal form `ℵ₀ < #fiber`, using θ=ℵ₁ gives `ℵ₁ ≤ #fiber`, and then `aleph0_lt_aleph_one.trans_le`? `ℵ₀ < ℵ₁ ≤ #fiber` → `ℵ₀ < #fiber` ✓. So it's possible, slightly more steps. The `succ`-form for Uncountable is arguably natural since `Uncountable` is `ℵ₀ < #·` and `
+[24] TOOL lean_verify_edit: {"path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean"}
+[24] TOOL file_read: {"file_path": "target/Mathlib/SetTheory/Cardinal/Regular.lean", "line_start": 1, "line_end": 105, "omit_details": false}
+[25] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+
+GREP '\\[Uncountable':
+--- line 10 TOOL_RESULT content_search (match '\\[Uncountable')
+not_iff_not, mk_le_aleph0_iff]\n   441|"}, {"line_number": 444, "content": "   442|@[simp]\n   443|theorem aleph0_lt_mk [Uncountable α] : ℵ₀ < #α :=\n   444|  aleph0_lt_mk_iff.mpr ‹_›\n   445|\n   446|instance canLiftCardinalNat : CanLift Cardinal ℕ (↑
+
+--- line 22 TOOL_RESULT content_search (match '\\[Uncountable')
+not_iff_not, mk_le_aleph0_iff]\n   441|"}, {"line_number": 444, "content": "   442|@[simp]\n   443|theorem aleph0_lt_mk [Uncountable α] : ℵ₀ < #α :=\n   444|  aleph0_lt_mk_iff.mpr ‹_›\n   445|\n   446|instance canLiftCardinalNat : CanLift Cardinal ℕ (↑
+
+--- line 24 REASONING (match '\\[Uncountable')
+#fiber` ✓. So it's possible, slightly more steps. The `succ`-form for Uncountable is arguably natural since `Uncountable` is `ℵ₀ < #·` and `succ ℵ₀ = ℵ₁`. Fine either way. Not a finding.  Now, is `Uncountable` a class? `[Uncountable ℝ]` is used as an instance in Analysis/Real/Cardinality.lean (`instance : Uncountable ℝ`), so `Uncountable` is a class (or at least used as an instance). Interesting: `aleph0_lt_mk [Uncountable α]` — yes it's a class.  
+
+--- line 55 REASONING (match '\\[Uncountable')
+ntable` of a set, to check for duplication: e.g. `Uncountable.preimage`? Hmm. Let's search `Uncountable` declarations.  Actually, here's another thought about `exists_uncountable_fiber`: since `Uncountable` is a class (`[Uncountable β]`), and `Cardinal.aleph0_lt_mk [Uncountable α] : ℵ₀ < #α`, the hypothesis could be given as an instance `[Uncountable β]`? Not necessary.  Hmm, what about the statement's *hypothesis on β*: `h : #α < #β` and `hβ : Unc
+
+[4 matching blocks]
+
+=== P14_val 34091 v0108 DX3 [P14val_a]  family F2  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89
+ASK: ```suggestion theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ```
+CODE AT COMMENT: ite_pigeonhole_card_lt f w w' | -  exact ⟨a, w'.trans ha.le⟩ | +  simp_rw [Cardinal.infinite_iff] at hβ ⊢ | +  rcases lt_or_ge #α ℵ₀ with hα | hα | +  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq]) | +  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ | +    exact ⟨a, hα.trans ha.le⟩ | + | +/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/ | +theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :
+MATCHER: m1 no ([Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.) | m2 no ([Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no.)
+READER: K l.43 ap=held/None know=demand
+  quote: make `[Infinite β]` an implicit instance argument to `exists_infinite_fiber` ... that's a real API question! ... `[Infinite β]` would be idiomatic. But then users who have `hβ : Infinite β` explicitly... Meh. Not a finding.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) says "A function whose domain's cardinality is infinite but strictly greater than its domain's has a fiber with cardinality strictly great t
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.exists_infinite_fiber` (lines 78-79) has the same defect: "A function whose domain's cardinality is infinite but strictly greater than its domain's has an infinite fiber." The hypothe
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The docstring of the newly added `Cardinal.exists_uncountable_fiber` (lines 95-96) says "A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber", again compar
+TRANSCRIPT around l.43 (+-1):
+[42] RESULT precedent_search: {"success": true, "count": 5, "as_of": "2026-01-18T04:16:55Z", "results": "1. PR #32975 · `Mathlib/Data/Set/Countable.lean` · 2025-12-18T05:26:59Z (similarity 0.646)\n   jcommelin wrote: \"Whoops, `Se
+[43] REASONING: Precedent search wasn't very informative. Precedent 5: "This version should be more general" — a maintainer asking for more general statements. Hmm.
+
+Now let me step back and consider: is there a real *generalization* defect in the PR? The PR generalizes `infinite_pigeonhole_card_lt` (ℵ₀ ≤ #α → ℵ₀ ≤ #β) and `exists_infinite_fiber` (Infinite α → Infinite β). Hmm, but hmm: in `infinite_pigeonhole_card_lt` with `ℵ₀ ≤ #β` — hmm, is there a subtlety: when `#α < ℵ₀` (α finite), the theorem says `∃ a, #α < #(f ⁻¹' {a})`. Fine.
+
+Hmm, wait. Now consider `exists_uncountable_fiber`: hypothesis `hβ : Uncountable β`. Hmm, `Uncountable β` = `¬ Countable β`. But hmm, `#α < #β` with β uncountable... but also we might want the statement with `ℵ₁ ≤ #β`. Fine.
+
+Hmm, now: is `exists_uncountable_fiber` motivated? It may be the "new feature" of the PR. Its proof uses `infinite_pigeonhole_card f ℵ₁` — using `isRegular_aleph_one.cof_eq`. OK.
+
+Now let me look for a possibly *wrong* aspect: `exists_uncountable_fiber` with `Uncountable β` — the conclusion `Uncountable (f ⁻¹' {a})`: In the branch where `ℵ₀ ≤ #α
+[43] TOOL content_search: {"content_pattern": "preimage_singleton|of_preimage_singleton", "path": "target/Mathlib", "limit": 10, "max_matches_per_file": 5}
+[43] TOOL content_search: {"content_pattern": "\u2203 a, .*#\\(f \u207b\u00b9'|\u2203 y, .*#\\(f \u207b\u00b9'|_fiber", "path": "target/Mathlib", "limit": 15, "max_matches_per_file": 5}
+[44] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Order/Filter/Cofinite.lean", "matches": [{"line_number": 255, "content": "   253|\n   254|/-- For a function with finite fibres, inverse images o
+
+GREP '\\[Infinite':
+--- line 3 TEXT[user] (match '\\[Infinite')
+heorem, modified) [8db5a596ac] - file: `Mathlib/LinearAlgebra/Basis/Cardinality.lean`; changed: proof:modified - before the PR: ```lean theorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]     {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :     Cardinal.lift.{w'} #ι ≤ Cardinal.lift.{w} #κ := by   let Φ := fun k : κ => (b.repr (v k)).support   have w₁ : #ι ≤ #(Set.range Φ) := by 
+
+--- line 5 TOOL_RESULT file_read (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) :=/- ... omitted ... -/\n   123
+
+--- line 6 TOOL_RESULT file_read (match '\\[Infinite')
+he basis `b` is infinite.\n   243|-/\n   244|theorem linearIndependent_le_infinite_basis {ι : Type w} (b : Basis ι R M) [Infinite ι] {κ : Type w}\n   245|    (v : κ → M) (i : LinearIndependent R v) : #κ ≤ #ι :=/- ... omitted ... -/\n   259|\n   260|
+
+--- line 8 TOOL_RESULT file_read (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n   112|  by_contra h\n  
+
+--- line 9 REASONING (match '\\[Infinite')
+nd `by infer_instance` for `Infinite α` = `Infinite ι`... Hmm, but wait: they need `Infinite ι` where α = ι (the codomain is Finset ι). Actually the context: `h : ¬ (#κ ≤ #ι)`, so `#ι < #κ`. They need `Infinite ι` from `[Infinite ι]`. Actually with `[Infinite ι]` and the new `exists_infinite_fiber` requiring `Infinite β` = `Infinite κ`, that's not directly available; κ infinite follows from #ι < #κ and ι infinite. So they use the prime version. 
+
+--- line 10 TOOL_RESULT content_search (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n   112|  by_contra h"}, 
+
+--- line 16 TOOL_RESULT file_read (match '\\[Infinite')
+dinality of `s`.\n   113|-/\n   114|theorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]\n   115|    {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :\n   116|    Cardinal.lift.{w'} #
+
+[stopped at --max 7 blocks]
+
+=== P14_val 34091 v0105 DX1 [P14val_a]  family F1  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:86
+ASK: Surely this is a one-liner using `infinite_pigeonhole_card_lt`?
+CODE AT COMMENT: infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) : |      ∃ a : α, Infinite (f ⁻¹' {a}) := by | -  simp_rw [Cardinal.infinite_iff] at w' ⊢ | -  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w' | -  exact ⟨a, w'.trans ha.le⟩ | +  simp_rw [Cardinal.infinite_iff] at hβ ⊢ | +  rcases lt_or_ge #α ℵ₀ with hα | hα | +  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq]) | +  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ | +    exact ⟨a, hα.trans ha.le⟩
+MATCHER: m1 no (One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.) | m2 no (One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof.)
+READER: K l.12 ap=held/None know=unclear
+  quote: Let me think about golf for `exists_infinite_fiber` ... Could use `infinite_pigeonhole_card f ℵ₀` — needs ... `#α < (ℵ₀).ord.cof`. So the case split is needed.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-c
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: This PR deletes the `have k` block from `Cardinal.le_range_of_union_finset_eq_univ`, and that block contained the only use in the file of `Set.union_finset_finite_of_range_finite`, the only declaration this file took fro
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: `Cardinal.exists_infinite_fiber'` is a strict special case of the declaration immediately above it, not an independent result: its hypotheses `#α < #β` and `Infinite α` imply `Infinite β` via `h.le`, so the general `exis
+TRANSCRIPT around l.12 (+-1):
+[11] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Order/KonigLemma.lean", "matches": [{"line_number": 143, "content": "   141|    exact ⟨⟨_, π hle b⟩, ⟨⟨by simp, by rw [π_trans, ← h2]⟩, by simp⟩,
+[12] REASONING: So `Uncountable α ↔ ℵ₀ < #α`. So `exists_uncountable_fiber`'s goal `Uncountable (f ⁻¹' {a})` is `ℵ₀ < #(fiber)`. The proof rewrote `Uncountable` to `ℵ₁ ≤ #·` via `aleph0_lt_mk_iff` and `succ_le_iff`, `succ_aleph0`.
+
+Hmm, is `exists_uncountable_fiber` needed for downstream? It's not used in this PR. And is it a duplicate of an existing lemma? Let's check whether the library has something like `Cardinal.exists_uncountable_fiber_of...`. Search.
+
+Also let me check `Cardinal.infinite_pigeonhole_card_lt` uses elsewhere; and check whether `exists_infinite_fiber` is used elsewhere in the library (the old signature) — grep showed only Pigeonhole and le_range_of... So no other users.
+
+Now important: is there an existing lemma in `Mathlib/SetTheory/Cardinal/` about uncountable fibers? Let's search "Uncountable (f ⁻¹' ".
+
+Let me now check the git history/docs: the `deprecated (since := "2026-01-17")`. Let me check the repo for how recent `since` dates look. Let's grep for `deprecated (since := "2026`.
+
+Also check `Mathlib/Deprecated/` conventions? Some renames put the alias in the same file; oth
+[12] TOOL file_read: {"file_path": "target/Mathlib/Combinatorics/Pigeonhole.lean", "limit": 80}
+[12] TOOL file_read: {"file_path": "target/Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean", "line_start": 225, "line_end": 270}
+[13] RESULT file_read: {"success": true, "content": "     1|/-\n     2|Copyright (c) 2020 Kyle Miller. All rights reserved.\n     3|Released under Apache 2.0 license as described in the file LICENSE.\n     4|Authors: Kyle M
+
+GREP 'exists_infinite_fiber':
+--- line 3 TEXT[user] (match 'exists_infinite_fiber')
+ LinearIndependent R v) : #κ ≤ #ι := by   classical   by_contra h   rw [not_le, ← Cardinal.mk_finset_of_infinite ι] at h   let Φ := fun k : κ => (b.repr (v k)).support   obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h (by infer_instance)   let v' := fun k : Φ ⁻¹' {s} => v k   have i' : LinearIndependent R v' := i.comp _ Subtype.val_injective   have w' : Finite (Φ ⁻¹' {s}) := by     apply i'.finite_of_le_span_finite v' (s.image b)
+
+--- line 5 TOOL_RESULT file_read (match 'exists_infinite_fiber')
+main's cardinality is infinite but strictly greater than its domain's\n    79|has an infinite fiber. -/\n    80|theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    81|    ∃ a : α, Infinite (f ⁻¹' {a}) :=/- ... omitted
+
+--- line 8 TOOL_RESULT file_read (match 'exists_infinite_fiber')
+main's cardinality is infinite but strictly greater than its domain's\n    79|has an infinite fiber. -/\n    80|theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    81|    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n    82|  
+
+--- line 9 REASONING (match 'exists_infinite_fiber')
+Now let me think about what's going on.  Key observations:  1. `exists_infinite_fiber` was changed: the third hypothesis changed from `Infinite α` to `Infinite β`. That's a *strengthening* of the statement — the hypothesis got weaker (more general), good. Wait: `h : #α < #β` together with `Infinite β`...
+
+--- line 9 TOOL_USE content_search (match 'exists_infinite_fiber')
+{"content_pattern": "exists_infinite_fiber|le_range_of_union_finset_eq", "path": "target/Mathlib", "max_matches_per_file": 10, "limit": 20}
+
+--- line 11 TOOL_RESULT content_search (match 'exists_infinite_fiber')
+  142|  obtain ⟨a₀, ha₀, ha₀inf⟩ : ∃ a₀ : αs, a₀.1 = 0 ∧ (Ici a₀).Infinite := by\n   143|    obtain ⟨a₀, ha₀⟩ := Finite.exists_infinite_fiber (fun (a : αs) ↦ π (zero_le a.1) a.2)\n   144|    refine ⟨⟨0, a₀⟩, rfl, (infinite_coe_iff.1 ha₀).mono ?_⟩\n   145|    si
+
+--- line 12 REASONING (match 'exists_infinite_fiber')
+te of an existing lemma? Let's check whether the library has something like `Cardinal.exists_uncountable_fiber_of...`. Search.  Also let me check `Cardinal.infinite_pigeonhole_card_lt` uses elsewhere; and check whether `exists_infinite_fiber` is used elsewhere in the library (the old signature) — grep showed only Pigeonhole and le_range_of... So no other users.  Now important: is there an existing lemma in `Mathlib/SetTheory/Cardinal/` about uncountable fib
+
+[stopped at --max 7 blocks]
+
+=== P14_post 42184 p0003 DX2 [P14post]  family F6  Mathlib/Topology/Algebra/InfiniteSum/Order.lean:243
+ASK: and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)
+CODE AT COMMENT: @@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip |   |  end OrderedCommGroup |   | +section WithZero | + | +theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] | +    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) : | +    0 ≤ ∏'[L] x, f x := by | +  by_cases h : Multipliable f L | +  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i
+MATCHER: m1 no (Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.) | m2 no (Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof.)
+READER: C l.10 ap=n/a/None know=none
+  quote: check ... for any existing `tprod_nonneg`-ish statements like `HasProd.tprod_nonneg` or `Multipliable.tprod_nonneg`
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Topology/Algebra/InfiniteSum/Order.lean: `tprod_nonneg` assumes `[L.NeBot]`, but the statement does not need it: for the trivial summation filter `tprod` is `1` (by `tprod_eq_one_of_not_multipliable`, and in fact `multipliable_bot` holds there) resp. `∏ᶠ x, f x
+  [1] Mathlib/Topology/Algebra/InfiniteSum/Order.lean: The new `section WithZero` is misleading: the hypotheses of its only lemma are `CommMonoidWithZero` plus order/topology instances, and this file names each section after its typeclass context (`Preorder`, `OrderedCommMon
+TRANSCRIPT around l.10 (+-1):
+[9] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "matches": [{"line_number": 239, "content": "   237|section WithZero\n   238|\n   239|theorem tprod_non
+[10] REASONING: Let's look at `one_le_tprod` and `tsum_nonneg` around line 167 to see the existing context. The new lemma `tprod_nonneg` is in a `WithZero` section using `CommMonoidWithZero`, whereas `one_le_tprod` is `[CommMonoid α] [PartialOrder α] [IsOrderedMonoid α]` presumably. Actually for multiplicative monoids with zero, the tprod notation `∏'[L] x, f x` is defined for `CommMonoidWithZero`? Let's check the definition of tprod.
+
+Also the new lemma isn't tagged `@[to_additive]` — the additive counterpart `tsum_nonneg` already exists (line 167 `@[to_additive tsum_nonneg]`). So no need.
+
+Check whether `tprod_nonneg` statement is correct: `[CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [ClosedIciTopology α] [L.NeBot]`. Proof: `by_cases h : Multipliable f L`; `ge_of_tendsto' h.hasProd ...`. Hmm — `ge_of_tendsto'` requires `ClosedIciTopology` and `∀ s, c ≤ u s`. `s.prod_nonneg` for `Finset` in a `CommMonoidWithZero` with `PosMulMono`... `Finset.prod_nonneg` requires `[CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α]`? Let me check.
+
+Wa
+[10] TOOL file_read: {"file_path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "line_start": 150, "line_end": 200, "omit_details": false}
+[10] TOOL declaration_search: {"identifier": "Finset.prod_nonneg"}
+[11] RESULT file_read: {"success": true, "content": "   147|omit [IsOrderedMonoid α] in\n   148|@[to_additive]\n   149|theorem tprod_le_of_prod_le' (ha₂ : 1 ≤ a₂) (h : ∀ s, ∏ i ∈ s, f i ≤ a₂) :\n   150|    ∏'[L] i, f i ≤ a₂
+
+GREP 'HasProd':
+--- line 3 TEXT[user] (match 'HasProd')
+ologicalSpace α] [Preorder α] [ZeroLEOneClass α]     [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :     0 ≤ ∏'[L] x, f x := by   by_cases h : Multipliable f L   · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i   · simp [tprod_eq_one_of_not_multipliable h] ```  ### `section in Order.lean` (command, added) [a1e044627e] - file: `Mathlib/Topology/Algebra/InfiniteSum/Order.lean`; changed: names
+
+--- line 5 TOOL_RESULT file_read (match 'HasProd')
+le [Preorder α] [CommMonoid α] [TopologicalSpace α] {a c : α} {f : ι → α}\n    29|\n    30|@[to_additive]\n    31|lemma hasProd_le_of_prod_le [ClosedIicTopology α] [L.NeBot]\n    32|    (hf : HasProd f a L) (h : ∀ s, ∏ i ∈ s, f i ≤ c) : a ≤ c :=/-
+
+--- line 6 TOOL_RESULT file_read (match 'HasProd')
+{"success": true, "content": "   183|\n   184|@[to_additive]\n   185|theorem hasProd_one_iff_of_one_le {ι α : Type*} {L : SummationFilter ι} [CommMonoid α]\n   186|  [PartialOrder α] [IsOrderedMonoid α] [
+
+--- line 7 REASONING (match 'HasProd')
+Let's check whether the file already had `tprod_nonneg` elsewhere. Also check the additive version existence: `tsum_nonneg`. Let's look for `tsum_nonneg` in the library.  Also check `HasProd` definitions, `ge_of_tendsto'`, and whether the section name / naming convention is right. Note the added declaration lacks `@[to_additive]`... The declaration is about multiplicative notation but in a `WithZero` sectio
+
+--- line 8 TOOL_RESULT content_search (match 'HasProd')
+"path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "matches": [{"line_number": 167, "content": "   165|  hasProd_le h ha hasProd_one\n   166|\n   167|@[to_additive tsum_nonneg]\n   168|theorem one_le_tprod (h : ∀ i, 1 ≤ g i) : 1 ≤ ∏
+
+--- line 10 REASONING (match 'HasProd')
+tprod_nonneg` statement is correct: `[CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [ClosedIciTopology α] [L.NeBot]`. Proof: `by_cases h : Multipliable f L`; `ge_of_tendsto' h.hasProd ...`. Hmm — `ge_of_tendsto'` requires `ClosedIciTopology` and `∀ s, c ≤ u s`. `s.prod_nonneg` for `Finset` in a `CommMonoidWithZero` with `PosMulMono`... `Finset.prod_nonneg` requires `[CommMonoidWithZero α] [Preorder α
+
+--- line 11 TOOL_RESULT file_read (match 'HasProd')
+h _\n   157|    · rwa [tprod_bot hL, finprod_of_infinite_mulSupport hf]\n   158|\n   159|@[to_additive]\n   160|theorem HasProd.one_le [L.NeBot] (h : ∀ i, 1 ≤ g i) (ha : HasProd g a L) : 1 ≤ a :=\n   161|  hasProd_le h hasProd_one ha\n   162|\n   
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0067 DX3 [P14val_b]  family F1  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:194
+ASK: Can `positivity` do this (untested)?
+CODE AT COMMENT: riant of `posLog_sum` for norms of elements in normed additive commutative | +groups, using monotonicity of `log⁺` and the triangle inequality. | +-/ | +lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E] | +    {α : Type*} (s : Finset α) (f : α → E) : | +    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by | +  calc log⁺ ‖∑ t ∈ s, f t‖ | +  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by | +    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) | +    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]
+MATCHER: m1 no (positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.) | m2 no (positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial.)
+READER: C l.38 ap=n/a/None know=demand
+  quote: A cleaner canonical way: monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun i _ ↦ norm_nonneg (f i)) (norm_sum_le s f)
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The proof of `Real.posLog_pow` is an unnecessary three-way case split (`by_cases hn`, `by_cases h₂a : |a| ≤ 1`, `rw [not_le]`, `pow_le_one₀`, `one_lt_pow₀`, and two calls to `posLog_eq_log`) for an identity that is immed
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` is stated under `[NormedAddCommGroup E]`, but neither its statement nor its proof uses completeness: the only group-level ingredient is `norm_sum_le`, which Mathlib states for `[SeminormedAddCom
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_zero` and its sibling `Real.posLog_one` are the only declarations in the file that carry no docstring, while every other declaration (including trivial ones such as `posLog_nonneg`, `posLog_neg`, `posLog_abs
+TRANSCRIPT around l.38 (+-1):
+[37] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[38] REASONING: Both edits compile. 
+
+Wait, the second edit: I dropped `[NormedAddCommGroup E]` and used `[SeminormedAddCommGroup E]` — but did the tool preserve the docstring? It reported compiled with no warnings, so fine.
+
+Hmm, but I should double check the second edit actually applied the seminormed change (it compiled, which means yes — if the binder had been dropped entirely, it wouldn't compile... well, actually if the binder were dropped, the statement `f : α → E` with no normed structure would fail. So it applied).
+
+Now, a caveat about the Seminormed generalization: maybe the maintainer would want consistency with `posLog_norm_add_le` (which uses Normed). Should I instead propose changing both? The finding should be about the new declaration. If the maintainer weakens the new one, the sibling becomes inconsistent — but that's OK; the direction of generalization is standard. Hmm, would a Mathlib reviewer actually ask for `SeminormedAddCommGroup`? Many post-2023 reviewers do push for weaker typeclass assumptions when possible. I'll file as advisory.
+
+Now let me think about whether there are m
+[38] TOOL lean_verify_edit: {"path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean"}
+[38] TOOL content_search: {"content_pattern": "See `Mathlib[A-Za-z0-9._]*\\.lean`", "path": "target/Mathlib", "limit": 10, "max_matches_per_file": 2}
+[39] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+
+GREP 'positivity|sum_nonneg':
+--- line 3 TEXT[user] (match 'positivity|sum_nonneg')
+t α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ```  ### `Real.posLog_pow` (lemma, added) [7bb89441d9] - file: `Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean`; chang
+
+--- line 7 REASONING (match 'positivity|sum_nonneg')
+`0 ∈ Set.Ici 0`. There may be a cleaner way: `posLog_mono`? Hmm, is there a lemma `posLog_le_posLog`? Let me search. Actually there might be a `MonotoneOn` usage. Alternatively `exact monotoneOn_posLog (by simp) (Finset.sum_nonneg ...) (norm_sum_le s f)` — the `apply` with `_` is fine.  Another thought: since `log⁺` is monotone... maybe the whole lemma follows from `posLog_sum s (‖f ·‖)` plus `posLog_le_posLog (norm_sum_le s f)`... whatever.  Now
+
+--- line 15 TOOL_RESULT file_read (match 'positivity|sum_nonneg')
+{"success": true, "content": "   192|    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]\n   193|  _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=\n   194|    posLog_sum s (‖f ·‖)\n   1
+
+--- line 16 REASONING (match 'positivity|sum_nonneg')
+ompared to `log⁺ (∑ t ∈ s, ‖f t‖)` — consistent.  Now note the new lemma's proof:   ```lean calc log⁺ ‖∑ t ∈ s, f t‖ _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by   apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)   simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))] _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=   posLog_sum s (‖f ·‖) ```  vs existing style: ```lean _ ≤ log⁺ (‖a‖ + ‖b‖) := by   apply monotoneOn_posLog _ _ (norm_add_le a b)   <;> simp [add_no
+
+--- line 26 REASONING (match 'positivity|sum_nonneg')
+  ```lean lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E]     {α : Type*} (s : Finset α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=   (monotoneOn_posLog (by simp) (Finset.sum_nonneg fun i _ ↦ norm_nonneg (f i))     (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖)) ``` Hmm, does `(posLog_sum s (‖f ·‖))` need beta reduction: `posLog_sum s (fun t ↦ ‖f t‖)` gives `log⁺ (∑ t ∈ s, ‖f t‖) ≤ log ↑s.card + ∑ 
+
+--- line 32 REASONING (match 'positivity|sum_nonneg')
+notoneOn_posLog` only, and both norm lemmas use it. Fine.  Wait — actually, let me reconsider the first calc step's use of `monotoneOn_posLog`:  ```lean apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))] ```  vs the sibling's: ```lean apply monotoneOn_posLog _ _ (norm_add_le a b) <;> simp [add_nonneg (norm_nonneg a) (norm_nonneg b)] ```  Hmm, in the new one, `(by simp)` is used to prove th
+
+--- line 32 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) :=\n    monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun i _ \u21a6 norm_nonneg (f i))\n      (norm_sum_le s f)\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)"}
+
+[stopped at --max 7 blocks]
+
+=== P14_post 43192 p0015 AP2 [P14post]  family F2  Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:43
+ASK: (This may apply to other definitions below.)
+CODE AT COMMENT:  (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y)) | +    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom | +      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _) | +    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z), | +      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫ | +        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom | +          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :
+MATCHER: m1 no (Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.) | m2 no (Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no.)
+READER: C l.49 ap=held/ignored know=none
+  quote: The constructor `PresheafOfModules.Hom.mk` takes `(app) (naturality)` — but the naturality proof shape: `naturality {X Y} (f) : ... := by cat_disch` — it's a field with a default proof.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: `PresheafOfModulesOfCommRing.pushforward₀` is a second public name for a declaration that already exists: it is `rfl`-equal to `PresheafOfModules.pushforward₀OfCommRingCat` (Pushforward.lean:71). Adding it and leaving th
+  [1] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The new abbreviation/namespace name `PresheafOfModulesOfCommRing` is a name for an already-existing concept (`PresheafOfModules.{v} (R ⋙ forget₂ _ _)`) that is chosen by the author alone and is about to carry a dozen abb
+  [2] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (a missing `of`), so it does not state precisely what the file provides, as the module-docstring convention requires.
+  [3] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The docstrings of the constructors describe the act of building the value rather than the value: line 35 `Construct a presheaf of modules over a presheaf of commutative rings.`, line 50 `Evaluate a presheaf of modules ov
+  [4] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The type and category variables are declared with hand-written universes (`universe v v₁ v₂ u₁ u₂ u`, `{C : Type u₁} [Category.{v₁} C]` here, `{C : Type u₁} … {D : Type u₂}` at line 33 and line 90), instead of with the b
+  [5] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: `unit` re-states the type of a variable the file already declares, `(R : Cᵒᵖ ⥤ CommRingCat.{u})` (line 33), instead of reusing it; its analogue `PresheafOfModules.unit` is written with `variable (R) in` and no type ascri
+  [6] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The body of `map` applies `PresheafOfModules.map` to a run of placeholder underscores, `PresheafOfModules.map _ _`, rather than naming the arguments or using `..`.
+  [7] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The object of `PresheafOfModulesOfCommRing` is bound as `F` in `obj` (line 51) and in `map` (line 55), although `F` is the letter this file (line 93: `(F : C ⥤ D)`) and the surrounding area use for a functor; the base fi
+  [8] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: `open CategoryTheory Functor Limits` opens `Limits`, which nothing in the file uses (nothing here mentions limits, colimits or a `Limits.` name), so the unused open should be removed.
+TRANSCRIPT around l.49 (+-1):
+[48] RESULT code_hover: {"success": true, "hover_content": "PresheafOfModules.map.{v, v₁, u₁, u} {C : Type u₁} [Category.{v₁, u₁} C] {R : Cᵒᵖ ⥤ RingCat}\n  (self : PresheafOfModules R) {X Y : Cᵒᵖ} (f : X ⟶ Y) :\n  self.obj X
+[49] REASONING: The projection is `PresheafOfModules.map {C} {R} (self) {X Y} (f)` — so `PresheafOfModules.map F f` is valid and compiles. Note `R` is implicit in the projection. So writing `PresheafOfModules.map F f` is clearer. This is a minor style point; the convention about `_ _` → `..` supports it.
+
+Hmm, is this worth filing? The convention is explicitly in the list with two examples of maintainers changing `hom_ext _ _` to `hom_ext ..`. Here `PresheafOfModules.map _ _` is the same pattern. I'll file it as advisory with suggestion `PresheafOfModules.map F f` (verified compiles) — mentioning `..` as also acceptable. Hmm... Actually the convention says write `..`. To be safest, I'll suggest `PresheafOfModules.map F f` (naming the actual arguments) since that's unambiguously better and I verified it compiles. Hmm, but the reviewer says the requested change must be what the convention calls for: `..`. I'll phrase: "replace the run of placeholders with the actual arguments `PresheafOfModules.map F f` (or `..`), as the convention prefers". Hmm, maybe simpler: file it as: "the run of trailing `_` pla
+[49] TOOL lean_verify: {"code": "import Mathlib.Algebra.Category.ModuleCat.Presheaf.OfCommRing\n\nopen CategoryTheory\n\nuniverse v v\u2081 v\u2082 u\u2081 u\u2082 u\n\nnamespace Test\n\nvariable {C : Type u\u2081} [Category.{v\u2081} C] {D : Type u\u2082} [Category.{v\u2082} D]\nvariable (F : C \u2964 D) (R : D\u1d52\u1d
+[49] TOOL lean_verify_edit: {"line_end": 22, "line_start": 22, "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean", "replacement": "open CategoryTheory"}
+[49] TOOL lean_verify_edit: {"declaration_name": "PresheafOfModulesOfCommRing", "new_declaration": "abbrev PresheafOfModulesOfCommRing {C : Type*} [Category* C]\n    (R : C\u1d52\u1d56 \u2964 CommRingCat.{u}) :=\n  PresheafOfModules.{v} (R \u22d9 forget\u2082 _ _)", "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRi
+[50] RESULT lean_verify: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors."}
+
+GREP 'mkHom|cat_disch':
+--- line 3 TEXT[user] (match 'mkHom|cat_disch')
+CommRing.{v} R}     (app : ∀ (X : Cᵒᵖ), M₁.obj X ≅ M₂.obj X)     (naturality : ∀ ⦃X Y : Cᵒᵖ⦄ (f : X ⟶ Y),       M₁.map f ≫ (ModuleCat.restrictScalars (R.map f).hom).map (app Y).hom =         (app X).hom ≫ M₂.map f := by cat_disch) : M₁ ≅ M₂ :=   PresheafOfModules.isoMk app naturality ```  ### `attribute in OfCommRing.lean` (command, added) [0b5e6407f0] - file: `Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean`; changed: unknown:added 
+
+--- line 5 TOOL_RESULT file_read (match 'mkHom|cat_disch')
+  58|\n    59|/-- Construct a morphism of presheaves of modules over a presheaf of commutative rings. -/\n    60|abbrev mkHom {M₁ M₂ : PresheafOfModulesOfCommRing.{v} R}\n    61|    (app : ∀ (X : Cᵒᵖ), M₁.obj X ⟶ M₂.obj X)\n    62|    (naturalit
+
+--- line 10 REASONING (match 'mkHom|cat_disch')
+fOfModules` have such a `mk`? Let's check `Mathlib/Algebra/Category/ModuleCat/Presheaf/Basic.lean` for the structure fields.  Also check whether `PresheafOfModules.isoMk` exists (used at line 74) and its signature; and `mkHom` — maybe there's already a `PresheafOfModules.homMk`? Let me search.  Also check `PresheafOfModules.obj` — is `PresheafOfModules.obj` a projection? `abbrev obj (F) (X) : ModuleCat (R.obj X) := PresheafOfModules.obj F X`
+
+--- line 29 TOOL_RESULT file_read (match 'mkHom|cat_disch')
+rictScalarsId' (R.map (𝟙 X)).hom\n    50|      (congrArg RingCat.Hom.hom (R.map_id X))).inv.app _ := by\n    51|        cat_disch\n    52|  map_comp {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z) :\n    53|    map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars
+
+--- line 30 REASONING (match 'mkHom|cat_disch')
+t? Let's test. Actually, it's possible the `unit` def is universe-polymorphic and `ModuleCat.of _ (R.obj X)` can be at `ModuleCat.{max u v}`?? no.  OK, this is a detail. Let's verify by lean_verify a few `#check`s.  2. `mkHom` in the new file: `abbrev mkHom ... : M₁ ⟶ M₂ where app := app; naturality := naturality`. But `M₁ ⟶ M₂` is `PresheafOfModules.Hom M₁ M₂` whose fields are app, naturality. Note there's already `PresheafOfModules.homMk` 
+
+--- line 35 REASONING (match 'mkHom|cat_disch')
+bbrev for the type. And the structure literal syntax `{ obj := ..., ... }` works when the expected type is already the comm-ring abbrev (metavariables would be resolved). So `mk` might be genuinely redundant! Similarly `mkHom`: `{ app := app, naturality := naturality }` with expected type `M₁ ⟶ M₂` works. Hmm.  But hold on: there's a subtlety. The naturality statement in `mkHom`/`isoMk` and the `map_id`/`map_comp` statements in `mk` are *sta
+
+--- line 41 REASONING (match 'mkHom|cat_disch')
+niverse). Fine.  Now, other checks: - Is `PresheafOfModulesOfCommRing.{v}` universe naming consistent? In the namespace's declarations, the pattern is: `abbrev mk ... : PresheafOfModulesOfCommRing.{v} R`, `obj`, `map`, `mkHom`, `isoMk`, `restrictScalars`, `pushforward`, `pullback`, `pullbackPushforwardAdjunction` all use `.{v}`; `unit` uses `.{u}` (forced). Good.  - Now let's check whether `pushforward₀`'s statement about universes is fine: 
+
+[stopped at --max 7 blocks]
+
+=== P14_post 43192 p0014 DX1 [P14post]  family F2  Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:43
+ASK: Could you add `by cat_disch` as default tactics?
+CODE AT COMMENT:  (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y)) | +    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom | +      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _) | +    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z), | +      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫ | +        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom | +          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :
+MATCHER: m1 no (cat_disch defaults for mk's map_id/map_comp.) | m2 no (cat_disch defaults for map_id/map_comp of mk.)
+READER: C l.None ap=n/a/None know=none
+  quote: (read the file and filed at :25, :93, :11; no reasoning mentions `cat_disch` or auto-params)
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: `PresheafOfModulesOfCommRing.pushforward₀` is a second declaration of a functor the library already has: it is literally the same term as the pre-existing `PresheafOfModules.pushforward₀OfCommRingCat` (`Mathlib/Algebra/C
+  [1] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: Naming of the new object is inconsistent with the local sibling convention: the abbreviation (and the file `OfCommRing.lean`) uses the suffix `OfCommRing`, while the abbreviation already in this directory for the same ki
+  [2] Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean: The module docstring is malformed: the heading reads `# Modules over presheaves commutative rings` (missing "of"), and the summary sentence "short names for categories and functors obtained from a presheaf of commutative
+TRANSCRIPT around l.None (+-1):
+GREP 'cat_disch|map_id|map_comp':
+--- line 3 TEXT[user] (match 'cat_disch|map_id|map_comp')
+CommRing.{v} R}     (app : ∀ (X : Cᵒᵖ), M₁.obj X ≅ M₂.obj X)     (naturality : ∀ ⦃X Y : Cᵒᵖ⦄ (f : X ⟶ Y),       M₁.map f ≫ (ModuleCat.restrictScalars (R.map f).hom).map (app Y).hom =         (app X).hom ≫ M₂.map f := by cat_disch) : M₁ ≅ M₂ :=   PresheafOfModules.isoMk app naturality ```  ### `attribute in OfCommRing.lean` (command, added) [0b5e6407f0] - file: `Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean`; changed: unknown:added 
+
+--- line 5 TOOL_RESULT file_read (match 'cat_disch|map_id|map_comp')
+ : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n    37|      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n    38|    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom\n    39|      (congrArg CommRingCat.Hom.hom 
+
+--- line 13 TOOL_RESULT file_read (match 'cat_disch|map_id|map_comp')
+) :=\n    43|  { obj X := ModuleCat.of _ (M.obj (F.op.obj X))\n    44|    map {X Y} f := M.map (F.op.map f)\n    45|    map_id X := by\n    46|      refine ModuleCat.hom_ext\n    47|        -- Work around an instance diamond for `restrictScalarsI
+
+--- line 15 TOOL_RESULT content_search (match 'cat_disch|map_id|map_comp')
+ : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n    37|      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n    38|    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom"}, {"line_number": 51, "content": "    49|\n
+
+--- line 18 TOOL_RESULT content_search (match 'cat_disch|map_id|map_comp')
+ : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n    37|      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n    38|    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom"}, {"line_number": 60, "content": "    58|\n
+
+--- line 20 TOOL_RESULT content_search (match 'cat_disch|map_id|map_comp')
+≫ S.hom, ?_⟩,\n   179|      ⟨MorphismProperty.CostructuredArrow.isoMk e trivial trivial ?_⟩⟩\n   180|    · simp [← Spec.map_comp_assoc, F]\n   181|    · exact (P.cancel_left_of_respectsIso _ _).mpr S.prop"}]}, {"path": "target/Mathlib/AlgebraicGeom
+
+--- line 21 TOOL_RESULT content_search (match 'cat_disch|map_id|map_comp')
+strictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom\n    43|          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :\n    44|    PresheafOfModulesOfCommRing.{v} R where\n    45|  obj := obj\n    46|  map := map"}, {"l
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0064 AP3 [P14val_b]  family F8  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:103
+ASK: I think `x` might be more conventional for a real number --- though this file uses a mix of different conventions (sometimes `x`, sometimes `a` and `b`, sometimes `r`). In other words, consider my suggestion optional. ```suggestion @[simp] lemma posLog_pow {n : ℕ} {x : ℝ} : log⁺ (x ^ n) = n * log⁺ x := by ```
+CODE AT COMMENT: @@ -91,9 +98,21 @@ theorem monotoneOn_posLog : MonotoneOn log⁺ (Set.Ici 0) := by |      simp only [this, and_true, ge_iff_le] |      linarith |   | +/-- The function `log⁺` commutes with taking powers. -/ | +@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : | +    log⁺ (a ^ n) = n * log⁺ a := by
+MATCHER: m1 no (Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.) | m2 no (Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no.)
+READER: C l.7 ap=absent/None know=none
+  quote: is {n : ℕ} {a : ℝ} the right binder form? Should n and a be implicit? Compare posLog_neg (x : ℝ) -- explicit. Existing file has mixed styles. Not worth.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` is stated with `[NormedAddCommGroup E]`, but neither its statement nor its proof needs the normed-group hypothesis: the only norm estimate used is `norm_sum_le`, which is stated for `[Seminormed
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_pow` has `@[simp]` written inline before the keyword, while its declaration header spans two lines (`lemma posLog_pow {n : ℕ} {a : ℝ} :` with the statement on the following line). The attribute should be on
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_zero` and `Real.posLog_one` are a parallel pair of one-line lemmas, but a blank line (line 57) is inserted between them, so the parallel is not visible.
+  [3] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The docstring of `Real.posLog_sum` was rewritten from the conforming form (text starting on the `/--` line, `-/` closing the last text line) into a three-line form with the text on the line after `/--` and `-/` on a line
+  [4] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The docstring of `Real.posLog_add` was likewise rewritten from the conforming form into `/--` / text / `-/` on its own line, a cosmetic rewrite with no bearing on the new lemmas.
+  [5] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The new docstring of `Real.posLog_norm_sum_le` puts its text on the line after `/--` and closes with `-/` on a line of its own; it also explains the lemma by contrast with another declaration ("Variant of `posLog_sum`…")
+  [6] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The module docstring still describes the file's standard estimates as being about a sequence "of reals" and lists only `posLog_prod` and `posLog_sum`; the new `Real.posLog_norm_sum_le`, which is the normed-group version
+  [7] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The new cross-reference in the module docstring gives a dotted module name (`Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`); a cross-reference to another module in documentation gives the file path.
+  [8] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The docstring of `Real.posLog_pow` only restates its statement and misdescribes it: `log⁺ (a ^ n) = n * log⁺ a` is not a commutation of `log⁺` with taking powers (the right-hand side is not `log⁺` of anything).
+TRANSCRIPT around l.7 (+-1):
+[6] RESULT file_read: {"success": true, "content": "     1|/-\n     2|Copyright (c) 2025 Stefan Kebekus. All rights reserved.\n     3|Released under Apache 2.0 license as described in the file LICENSE.\n     4|Authors: Ste
+[7] REASONING: Now let me examine each new declaration for issues.
+
+1. `posLog_zero`, `posLog_one`: `@[simp]` lemmas. `posLog 0 = 0` and `posLog 1 = 0`. Note: these are lemmas about `log⁺ 0 = 0`, which follows from `posLog_eq_zero_iff`. But fine. `simp` tags: `log 0 = 0`? In Lean, `Real.log 0 = 0` is true (log_zero). And `posLog 0 = max 0 (log 0) = max 0 0 = 0`. Ok.
+
+Are these placed reasonably? Next to each other, both one-liners - convention says a pair of parallel one-liners should be adjacent with no blank line between them. They currently have a blank line between them (lines 56, 57 blank, 58). Let's check the diff:
+
+```
++@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]
++
++@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]
++
+```
+
+Yes! There's a blank line between the two one-liners. The convention "A pair or run of parallel one-line declarations is kept adjacent with no blank line between them, so that the parallel is visible." Example 1 explicitly: `@[simp] lemma logEquiv_symm : ... ` `+` blank `@[simp] lemma expEquiv_symm : ...`. So this is a concrete finding: remove the bla
+[7] TEXT(assistant): I'll gather baseline facts: compile the PR file as-is, check the referenced module, and look at conventions in the tree.
+
+
+[7] TOOL lean_verify_edit: {"path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean", "max_messages": 30}
+[7] TOOL file_search: {"pattern": "PosLogEqCircleAverage*", "directory_path": "target"}
+[7] TOOL content_search: {"content_pattern": "^\\s*norm_sum_le", "path": "target/Mathlib/Analysis/Normed/Group/Basic.lean", "C": 4}
+[7] TOOL declaration_search: {"identifier": "posLog_pow"}
+[8] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+
+GREP 'a : ℝ|x : ℝ':
+--- line 3 TEXT[user] (match 'a : ℝ|x : ℝ')
+ded) [7bb89441d9] - file: `Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean`; changed: attributes:added, name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :     log⁺ (a ^ n) = n * log⁺ a := by   by_cases hn : n = 0   · simp_all   by_cases h₂a : |a| ≤ 1   · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]   rw [not_le] at h₂a   have : 1 < |a ^ n| := by simp [one_lt_pow₀ h
+
+--- line 5 TOOL_RESULT file_read (match 'a : ℝ|x : ℝ')
+... omitted ... -/\n    59|\n    60|/-- The positive part of `log` is never negative. -/\n    61|theorem posLog_nonneg {x : ℝ} : 0 ≤ log⁺ x :=/- ... omitted ... -/\n    62|\n    63|/-- The function `log⁺` is even. -/\n    64|@[simp] theorem posL
+
+--- line 6 TOOL_RESULT file_read (match 'a : ℝ|x : ℝ')
+= by simp [posLog]\n    59|\n    60|/-- The positive part of `log` is never negative. -/\n    61|theorem posLog_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [posLog]\n    62|\n    63|/-- The function `log⁺` is even. -/\n    64|@[simp] theorem posLog_n
+
+--- line 7 REASONING (match 'a : ℝ|x : ℝ')
+emma logEquiv_symm : ... ` `+` blank `@[simp] lemma expEquiv_symm : ...`. So this is a concrete finding: remove the blank line between `posLog_zero` and `posLog_one`.  2. `posLog_pow`: `@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a`. Hmm, is that true? For `a = 0`, `n = 0`: `log⁺ (0^0) = log⁺ 1 = 0`, RHS `0 * log⁺ 0 = 0`. Ok. For `a = 0, n > 0`: `log⁺ 0 = 0`, RHS `n * log⁺ 0 = 0`. Ok. For `n = 0`, `a^0 = 1`, `log⁺ 1 = 
+
+--- line 22 REASONING (match 'a : ℝ|x : ℝ')
+nsider: is there an existing lemma `Real.posLog_pow`? No (declaration_search found only this PR). Is `log⁺ (a^n)` simplification already handled? Not needed.  What about the `posLog_pow` statement's usability: `{n : ℕ} {a : ℝ}` — Mathlib convention for the analogous `Real.log_pow`? Let's check `log_pow`: `theorem log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x` — explicit args. Hmm. Let's check.  Also `posLog_pow` `@[simp]`: The simp-norma
+
+--- line 29 TOOL_RESULT content_search (match 'a : ℝ|x : ℝ')
+61|  · rintro (rfl | rfl | rfl) <;> simp only [log_one, log_zero, log_neg_eq_log]\n   262|\n   263|theorem log_ne_zero {x : ℝ} : log x ≠ 0 ↔ x ≠ 0 ∧ x ≠ 1 ∧ x ≠ -1 := by\n   264|  simpa only [not_or] using log_eq_zero.not\n   265|\n   266|@[simp
+
+--- line 31 REASONING (match 'a : ℝ|x : ℝ')
+ (no attribute shown at line 381). So `simp_all [pow_le_one₀, ...]` listing it is fine (it's not in the default simp set). Good — nothing to ask there.  Also interesting: `Real.log_pow` is `@[simp]` with explicit args `(x : ℝ) (n : ℕ)`. So a sibling exists: `log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x`. The PR's `posLog_pow {n : ℕ} {a : ℝ}` uses implicit binders while the direct analogue `log_pow` uses explicit. Convention: "An argumen
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0067 DX2 [P14val_b]  family F1  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:194
+ASK: Can `positivity` do this (untested)?
+CODE AT COMMENT: riant of `posLog_sum` for norms of elements in normed additive commutative | +groups, using monotonicity of `log⁺` and the triangle inequality. | +-/ | +lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E] | +    {α : Type*} (s : Finset α) (f : α → E) : | +    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by | +  calc log⁺ ‖∑ t ∈ s, f t‖ | +  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by | +    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) | +    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]
+MATCHER: m1 no (positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.) | m2 no (positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial.)
+READER: C l.56 ap=n/a/None know=demand
+  quote: monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f) -- let me test whether that compiles; if yes, it's a cleaner one-line
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` is stated for `[NormedAddCommGroup E]`, but its statement and proof only use the normed-group structure: the two ingredients are `norm_sum_le` (triangle inequality) and `norm_nonneg`, both of wh
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The docstring of `Real.posLog_norm_sum_le` describes how the lemma is proved ("using monotonicity of `log⁺` and the triangle inequality") rather than what it states, and — unlike the sum/product docstrings in the same se
+TRANSCRIPT around l.56 (+-1):
+[55] RESULT precedent_search: {"success": true, "count": 6, "as_of": "2025-10-18T05:27:06Z", "results": "1. PR #15104 · `Mathlib/Computability/AkraBazzi/AkraBazzi.lean` · 2024-07-24T15:07:58Z (similarity 0.519)\n   jcommelin wrote
+[56] REASONING: The precedents include examples of reviewers suggesting shorter proofs (`rw [log_ofReal, if_neg hx.not_le]` instead of a two-step) and `simpa [...]` instead of a longer proof. That supports my proof-golf finding style: reviewers do suggest one-liner rewrites using existing lemmas (`simpa [..., log_pow]`). Good.
+
+No precedent about blank lines. Hmm.
+
+Let me now make a decision and also double-check one more possible substantive issue: the `@[simp]` attribute placement in Mathlib style: `@[simp] lemma` on the same line vs `@[simp]` on its own line. In this file, `@[simp] theorem posLog_neg (x : ℝ) : ...` — on the same line. So the new `@[simp] lemma posLog_pow` follows. ✓ (`log_pow` in Basic.lean puts `@[simp]` on its own line, but file-local convention wins.)
+
+Now, let me take one more careful look for potential *correctness* issues in `posLog_norm_sum_le`'s statement: `log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖`. Note: `log s.card` — for `s.card = 0`, `log 0 = 0` (junk). Fine (matches posLog_sum).
+
+Hmm, `log s.card`: in `posLog_sum` the statement is `log (s.card)` and her
+[56] TOOL lean_verify: {"code": "import Mathlib.Analysis.SpecialFunctions.Log.PosLog\n\nopen Real\nexample {E : Type*} [SeminormedAddCommGroup E] {\u03b1 : Type*} (s : Finset \u03b1) (f : \u03b1 \u2192 E) :\n    Real.posLog \u2016\u2211 t \u2208 s, f t\u2016 \u2264 log s.card + \u2211 t \u2208 s, Real.posLog \u2016f t\u20
+[57] RESULT lean_verify: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors."}
+
+GREP 'positivity|sum_nonneg':
+--- line 3 TEXT[user] (match 'positivity|sum_nonneg')
+t α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ```  ### `Real.posLog_pow` (lemma, added) [7bb89441d9] - file: `Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean`; chang
+
+--- line 9 TOOL_RESULT file_read (match 'positivity|sum_nonneg')
+al.posLog_abs]\n   168|  _ ≤ log⁺ (∑ t ∈ s, |f t|) := by\n   169|    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n   170|    simp [Finset.abs_sum_le_sum_abs]\n   171|  _ ≤ log⁺ (∑ t ∈ s, |f t_max|) := by\n   172|    apply monotone
+
+--- line 10 REASONING (match 'positivity|sum_nonneg')
+t.Ici 0)` applied to `x y : ℝ` with `hx : x ∈ Set.Ici 0` etc. They use `(by simp)` for membership in Ici 0 for the first point `‖∑ t ∈ s, f t‖`; but in the existing code style they were `(by simp)` and `(by simp [Finset.sum_nonneg])`. In the new lemma, the notation `by simp` then `_`. Hmm, could use `gcongr`? Actually a nice proof-golf: use `Real.log_nonneg`? Hmm. Let's see: an alternative is `apply monotoneOn_posLog <;> simp ...`. Eh.  Actually 
+
+--- line 21 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+7a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) := by\n    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n    simp [Finset.sum_nonneg (fun i _ \u21a6 norm_nonneg (f i))]\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)\n"}
+
+--- line 24 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+7a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) := by\n    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n    simp [Finset.sum_nonneg (fun i _ \u21a6 norm_nonneg (f i))]\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)", "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean"}
+
+--- line 26 REASONING (match 'positivity|sum_nonneg')
+sLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by   rcases eq_or_ne n 0 with rfl | hn   · simp   rw [← posLog_abs a]   ... ```  Idea 2 using `Real.posLog_eq_log_max_one`: ```lean   rw [posLog_eq_log_max_one (by positivity), ← abs_pow, ...] ``` Hmm. `log⁺ (a^n) = log⁺ |a ^ n| = log⁺ (|a| ^ n)`, then `posLog_eq_log_max_one (pow_nonneg (abs_nonneg a) n)`: `= log (max 1 (|a|^n))`. Then need `log (max 1 (|a|^n)) = n * log (max 1 |a|)`. Is `ma
+
+--- line 51 REASONING (match 'positivity|sum_nonneg')
+et me reconsider the `posLog_norm_sum_le` proof-golf angle too. The proof:  ```lean   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ```  Compare the pre-existing sibling (line 208-211): ```lean   _ ≤ log⁺ (‖a‖ + ‖b‖) := by     apply monotoneOn_posLog _ 
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0067 DX1 [P14val_b]  family F1  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:194
+ASK: Can `positivity` do this (untested)?
+CODE AT COMMENT: riant of `posLog_sum` for norms of elements in normed additive commutative | +groups, using monotonicity of `log⁺` and the triangle inequality. | +-/ | +lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E] | +    {α : Type*} (s : Finset α) (f : α → E) : | +    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by | +  calc log⁺ ‖∑ t ∈ s, f t‖ | +  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by | +    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) | +    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]
+MATCHER: m1 no (positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.) | m2 no (positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial.)
+READER: C l.33 ap=n/a/None know=demand
+  quote: Is the proof of posLog_norm_sum_le golfable? ... The first step could be done with gcongr? Hmm
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_pow` is proved by a nine-line case bash (`by_cases hn`, `by_cases h₂a`, an auxiliary `have : 1 < |a ^ n|`) that is not needed: the statement is a direct consequence of `Real.log_pow` together with `mul_max_o
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` is stated for `[NormedAddCommGroup E]`, but nothing in its statement or proof uses completeness or separation: the only norm lemmas used are `norm_sum_le` and `norm_nonneg`, both of which are st
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The new module-doc “See” line refers to the other file by its dotted module name `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`, a spelling Mathlib no longer uses for file references: it is indisting
+TRANSCRIPT around l.33 (+-1):
+[32] RESULT file_read: {"success": true, "content": "     1|/-\n     2|Copyright (c) 2025 Damiano Testa. All rights reserved.\n     3|Released under Apache 2.0 license as described in the file LICENSE.\n     4|Authors: Mich
+[33] REASONING: The linter allows both starting with a single space or newline. So the docstring reformatting isn't a lint error. So Mathlib style explicitly accepts `\n` start. So no finding for that. Good — this saves me from a dubious finding. Actually there's a nuance: the linter's message says "doc-strings should start with a single space or newline" — both are acceptable. So reformatting is allowed. However, is the change gratuitous (noise in the diff)? Probably a maintainer wouldn't care. Skip.
+
+Now, is the docstring reformat a "scope" issue? It's within the file's stated intent ("Improve the docstrings a little"). Skip.
+
+Now let me check the header of the file: "For a finite length-`n` sequence `f i` of reals, it establishes the following standard estimates." — with the new lemmas, maybe the module doc should list the new results? The module doc lists `posLog_prod` and `posLog_sum`. The PR added a "See also". Hmm, the module doc bullet list mentions theorems with backticks but not full names (`theorem posLog_prod`, `theorem posLog_sum` — actually it's inside a code span). Fine, pre-existing.
+[33] TOOL content_search: {"content_pattern": "prefer `theorem`|use `theorem`|prefer `lemma`", "path": "target", "limit": 10}
+[33] TOOL content_search: {"content_pattern": "See `Mathlib\\.[A-Za-z.]*`|see `Mathlib\\.[A-Za-z.]*`", "path": "target/Mathlib", "limit": 15, "max_matches_per_file": 2}
+[34] RESULT content_search: {"success": true, "results": [], "files_available": 7545, "files_scanned": 7545, "files_with_matches": 0, "truncated": false}
+
+GREP 'positivity|sum_nonneg':
+--- line 3 TEXT[user] (match 'positivity|sum_nonneg')
+t α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ```  ### `Real.posLog_pow` (lemma, added) [7bb89441d9] - file: `Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean`; chang
+
+--- line 9 TOOL_RESULT content_search (match 'positivity|sum_nonneg')
+al.posLog_abs]\n   168|  _ ≤ log⁺ (∑ t ∈ s, |f t|) := by\n   169|    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])"}, {"line_number": 169, "content": "   167|    rw [Real.posLog_abs]\n   168|  _ ≤ log⁺ (∑ t ∈ s, |f t|) := by\n   169
+
+--- line 16 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+7a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) := by\n    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n    simp [Finset.sum_nonneg (fun i _ \u21a6 norm_nonneg (f i))]\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)\n", "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean"}
+
+--- line 33 REASONING (match 'positivity|sum_nonneg')
+th posLog_sum. Fine.  Is the proof of `posLog_norm_sum_le` golfable? Currently: ```   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ``` The first step could be done with `gcongr`? Hmm: `apply monotoneOn_posLog _ _ (norm_sum_le s f)` then the subgoal is 
+
+--- line 48 TOOL_USE precedent_search (match 'positivity|sum_nonneg')
+7a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) := by\n    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n    simp [Finset.sum_nonneg (fun i _ \u21a6 norm_nonneg (f i))]\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)"}
+
+--- line 50 TOOL_RESULT precedent_search (match 'positivity|sum_nonneg')
+ < log n := Real.log_pos <| by aesop\n             simp only [one_div]\n             rw [inv_sub_inv (by have := hn' i; positivity) (by aesop)]\n-      _ =ᶠ[atTop] (fun (n : ℕ) => (log n - log (b i) - log n) / ((log (b i) + log n) * log n))  := by\n+
+
+--- line 69 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+7a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) := by\n    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n    simp [Finset.sum_nonneg (fun i _ \u21a6 norm_nonneg (f i))]\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)\n", "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean"}
+
+[stopped at --max 7 blocks]
+
+=== P14_post 42814 p0007 DX1 [P14post]  family F2  Mathlib/NumberTheory/FundamentalDiscriminant.lean:43
+ASK: ```suggestion variable {D : ℤ} theorem isFundamentalDiscr_def : ``` then you can remove `{D : ℤ}` in various declarations.
+CODE AT COMMENT: criminant if and only if `m` is | +  squarefree and `m ≡ 2, 3 mod 4`. | +-/ | + | +@[expose] public section | + | +namespace Int | + | +/-- `D` is a fundamental discriminant: it is a discriminant (`D ≡ 0, 1 mod 4`) and primitive, | +i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`. -/ | +def IsFundamentalDiscr (D : ℤ) : Prop := | +  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧ | +    ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D | + | +theorem isFundamentalDiscr_def {D : ℤ} :
+MATCHER: m1 no (R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.) | m2 no (R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.)
+READER: C l.None ap=n/a/None know=none
+  quote: (read and filed on the file — #1 at :13, #2 at :48 — with no reasoning on the repeated `{D : ℤ}` binders)
+SUBMITTED FINDINGS at that file:
+  [1] Mathlib/NumberTheory/FundamentalDiscriminant.lean: The module doc's claim "These are exactly the discriminants of quadratic fields" is false for the definition as given: `Int.IsFundamentalDiscr 1` holds (1 % 4 = 1 and `Squarefree 1`; it is also an instance of the PR's ow
+  [2] Mathlib/NumberTheory/FundamentalDiscriminant.lean: `Int.IsFundamentalDiscr.ne_zero` is proved by `grind [isFundamentalDiscr_def]` although the goal is a two-step definitional argument (apply the `∀ x, D = 4 * x → ¬ 4 ∣ x` conjunct at `x = 0`). For a single-line fact, `ex
+TRANSCRIPT around l.None (+-1):
+GREP 'variable|D : ℤ':
+--- line 3 TEXT[user] (match 'variable|D : ℤ')
+entalDiscr` (def, added) [795e06c697] - file: `Mathlib/NumberTheory/FundamentalDiscriminant.lean`; changed: name:added, statement_or_type:added, value_or_body:added - as the PR leaves it: ```lean def IsFundamentalDiscr (D : ℤ) : Prop :=   (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧     ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D ```  ### `namespace in FundamentalDiscriminant.lean` (command, added) [7d45dab206] - file:
+
+--- line 5 TOOL_RESULT file_read (match 'variable|D : ℤ')
+n    38|i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`. -/\n    39|def IsFundamentalDiscr (D : ℤ) : Prop :=\n    40|  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧\n    41|    ∀ p : ℕ, p.Prime → 
+
+--- line 8 TOOL_RESULT content_search (match 'variable|D : ℤ')
+rue, "results": [{"path": "target/Mathlib/Data/Nat/Squarefree.lean", "matches": [{"line_number": 47, "content": "    45|variable {s : Finset ℕ} {m n p : ℕ}\n    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime
+
+--- line 13 REASONING (match 'variable|D : ℤ')
+, but new one is stated in a general `R`. Is there a general statement already? `Nat.coprime_two_right`. Hmm.  Actually is the new lemma in `R` where `R` is a general `CommSemiring` or `CommRing`? Let's check the file's variable declarations. Also the name: Mathlib convention for this generalization... The naming convention: `Odd.isCoprime_two` — with `_root_.` prefix since `Odd` is not in the namespace. That's plausible.  But is the naming ok?
+
+--- line 14 TOOL_RESULT file_read (match 'variable|D : ℤ')
+|@[expose] public section\n    33|\n    34|\n    35|universe u v\n    36|\n    37|section CommSemiring\n    38|\n    39|variable {R : Type u} [CommSemiring R] (x y z w : R)\n    40|\n    41|/-- The proposition that `x` and `y` are coprime, defined 
+
+--- line 17 TOOL_RESULT content_search (match 'variable|D : ℤ')
+actorizationMonoid.squarefree_iff_nodup_normalizedFactors h0, Nat.factors_eq]"}, {"line_number": 47, "content": "    45|variable {s : Finset ℕ} {m n p : ℕ}\n    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime
+
+--- line 18 TOOL_RESULT content_search (match 'variable|D : ℤ')
+esults": [{"path": "target/Mathlib/RingTheory/Coprime/Lemmas.lean", "matches": [{"line_number": 196, "content": "   194|variable {m n : ℕ}\n   195|\n   196|theorem IsCoprime.pow_left (H : IsCoprime x y) : IsCoprime (x ^ m) y := by\n   197|  rw [← F
+
+[stopped at --max 7 blocks]
+
+=== P14_val 28649 v0031 AP1 [P14val_b]  family F10  Mathlib/Probability/Moments/Variance.lean:452
+ASK: I'm not sure about this one
+CODE AT COMMENT: @@ -449,7 +449,7 @@ lemma variance_le_sub_mul_sub [IsProbabilityMeasure μ] {a b : ℝ} {X : Ω → |        linarith |      _ = (b - μ[X]) * (μ[X] - a) := by ring |   | -/-- **Popoviciu's inequality on variance** | +/-- **Popoviciu's inequality on variances**
+MATCHER: m1 no (Only R5 questions 'variances', offering to keep singular 'on variance'.) | m2 no (Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change).)
+READER: V l.28 ap=n/a/None know=none
+  quote: line 7: 'That's an inconsistency within the file' (Bhatia-Davis singular) -> 'The Zulip shows the author of that lemma (Kei Tsukamoto) called it "Popoviciu's inequality on variances". So plural is intentional; leave.'
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.28 (+-1):
+[27] RESULT precedent_search: {"success": true, "count": 6, "as_of": "2025-08-19T16:42:16Z", "results": "1. PR #20151 · `Mathlib/Probability/Moments/ComplexMGF.lean` · 2025-01-20T15:15:46Z (similarity 0.627)\n   EtienneC30 wrote: 
+[28] REASONING: Not decisive. The precedents show EtienneC30 reviewing Probability docstrings, but nothing about capitalization of mgf.
+
+Let me now make a decision and also double-check the two real candidate findings I might file beyond MGF:
+
+Consider the possibility that the ground-truth finding is about `Variance.lean`: "Popoviciu's inequality on variances" — plural is consistent with the sibling? No, sibling is singular "Bhatia-Davis inequality on variance". Hmm. And Zulip shows the author used plural. Hmm — but wait. That Zulip message was the *contributor's* off-hand phrasing in a chat, not necessarily the in-code docstring name. The in-code docstring (pre-PR) says "Popoviciu's inequality on variance". Hmm, and Zulip says "I added the formalization of Popoviciu's inequality on variances in the Probability.Variance.lean file". So the file reference says plural. Hmm, so the docstring was inconsistent with it. So the PR aligns with the literature name. Since it's a *named theorem* whose standard name is "Popoviciu's inequality on variances", I don't think a maintainer would ask to revert. I'll le
+[28] TOOL lean_verify_edit: {"path": "Mathlib/Probability/Moments/Basic.lean", "line_start": 24, "line_end": 27, "replacement": "* `ProbabilityTheory.IndepFun.mgf_add`: if two real random variables `X` and `Y` are independent\n  and their mgfs are defined at `t`, then `mgf (X + Y) \u03bc t = mgf X \u03bc t * mgf Y \u03bc t`\n*
+[29] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+
+GREP 'variances|Popoviciu':
+--- line 3 TEXT[user] (match 'variances|Popoviciu')
+g `mgf` instead   of `cgf`. -/ ```  ### `doc_comment in Variance.lean` (command, modified) [0fd73d45e0] - file: `Mathlib/Probability/Moments/Variance.lean`; changed: documentation:modified - before the PR: ```lean /-- **Popoviciu's inequality on variance**  The variance of a random variable `X` satisfying `a ≤ X ≤ b` almost everywhere is at most `((b - a) / 2) ^ 2`. -/ ``` - as the PR leaves it: ```lean /-- **Popoviciu's inequality on variances*
+
+--- line 4 REASONING (match 'variances|Popoviciu')
+elled out. So changing "mgfs" to "MGFs" introduces an abbreviation that is not otherwise used in the docstring; and it's inconsistent with "cgf" lowercased elsewhere? Let me actually read the file.  3. `Variance.lean`: "Popoviciu's inequality on variance" → "Popoviciu's inequality on variances". Hmm. Is "variances" correct? The inequality is about the variance of a single random variable. The canonical name is "Popoviciu's inequality on variance
+
+--- line 6 TOOL_RESULT file_read (match 'variances|Popoviciu')
+: AEMeasurable X μ) :\n   425|    variance X μ ≤ (b - μ[X]) * (μ[X] - a) :=/- ... omitted ... -/\n   451|\n   452|/-- **Popoviciu's inequality on variances**\n   453|\n   454|The variance of a random variable `X` satisfying `a ≤ X ≤ b` almost everyw
+
+--- line 7 REASONING (match 'variances|Popoviciu')
+ng in Variance.lean is for `variance_le_sq_of_bounded`, and the sibling just above is "**The Bhatia-Davis inequality on variance**". So after the change, we have "The Bhatia-Davis inequality on variance" (singular) and "Popoviciu's inequality on variances" (plural). That's an inconsistency within the file — the convention "The same construct or notation is spelled the same way throughout a file". The sibling convention is "on variance" singular.
+
+--- line 13 REASONING (match 'variances|Popoviciu')
+cy like MGFs/CGFs vs cgf is exactly that kind of thing.  Now let me consider the Variance.lean change more carefully. The sibling above is "**The Bhatia-Davis inequality on variance**" (singular). Literature: Wikipedia "Popoviciu's inequality on variances". Let me double check whether there's a Zulip discussion or Mathlib naming. Actually let me search for "Popoviciu" in the repo, and also whether the theorem was named `variance_le_sq_of_bounded
+
+--- line 16 REASONING (match 'variances|Popoviciu')
+enerating function" spelled out. And `Kernel.HasSubgaussianMGF` docstring? Let me read the docstring at line ~130 of SubGaussian.lean.  Let me search the whole library for MGFs / CGFs.  Also, I want to double-check the "Popoviciu" question with a Zulip search for context.  Let me also consider the "In terms of implementation" change: does the Convergence.lean file use "Implementation" elsewhere? The module doc is titled "Almost everywhere martin
+
+--- line 19 REASONING (match 'variances|Popoviciu')
+ide does not mandate is left to the original author's taste" and "A change of marginal benefit ... is not made". Those would apply to the "Implementationwise" rewrite, the "left hand side"→"left-hand side" rewrite, the "Popoviciu's inequality on variances" rewrite... Hmm, but then also to MGFs. Hmm.  Wait — but "left hand side" → "left-hand side": the file/style guide? Hmm. Mathlib has no mandate, but consistency with Posterior.lean's "left-hand
+
+[stopped at --max 7 blocks]
+
+=== D12 33066 d0002 DX1 [D12c]  family F5  Mathlib/Topology/Algebra/Algebra/Equiv.lean:307
+ASK: This is just the pre-existing constructor for `ContinuousAlgEquiv`: ``` ContinuousAlgEquiv.mk.{u_1, u_2, u_3} {R : Type u_1} {A : Type u_2} {B : Type u_3} [CommSemiring R] [Semiring A] [TopologicalSpace A] [Semiring B] [TopologicalSpace B] [Algebra R A] [Algebra R B] (toAlgEquiv : A ≃ₐ[R] B) (continuous_toFun : Continuous toAlgEquiv.toFun := by fun_prop) (continuous_invFun : Continuous toAlgEquiv.invFun := by fun_prop) : A ≃A[R] ``` (up to some defeqs involving `toAlgEquiv.invFun`, `AlgEquiv.sym
+CODE AT COMMENT: @@ -302,6 +302,25 @@ theorem _root_.AlgEquiv.isUniformEmbedding {E₁ E₂ : Type*} [UniformSpace E |      continuous_toFun := h₁ |      continuous_invFun := by dsimp; fun_prop } |   | +/-- Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous. -/ | +def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm) : A ≃A[R] B := | +  { e with continuous_toFun := he, continuous_invFun := he' }
+MATCHER: m1 no (No one says ofAlgEquiv duplicates ContinuousAlgEquiv.mk; some note inline duplication but want to keep ofAlgEquiv.) | m2 no (Maintainer: ofAlgEquiv is just mk, remove it. Some flag the same duplication but ask to use ofAlgEquiv more.)
+READER: V l.10 ap=n/a/None know=mechanism
+  quote: there might already be a way: `e.toAlgEquiv`... the structure is by extension. Let me check `AlgEquiv.isUniformEmbedding` above does the same inline. Fine.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean: The five support declarations `auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry` are declared in the *root* namespace (no surrounding namespace, they are
+  [1] Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean: The `OrderIsoClass F _ _` instance is not used by any declaration in this PR (nor anywhere in the library), and its hypothesis set cannot currently be satisfied by any Mathlib type: `#synth ContinuousMapClass ((V →L[𝕜] V
+  [2] Mathlib/Topology/Algebra/Algebra/Equiv.lean: `ContinuousAlgEquiv.ofAlgEquiv_trans_ofAlgEquiv` is the only lemma of the six new `ofAlgEquiv` lemmas that is not tagged `@[simp]` (`coe_ofAlgEquiv`, `toAlgEquiv_ofAlgEquiv`, `ofAlgEquiv_toAlgEquiv`, `symm_ofAlgEquiv` al
+TRANSCRIPT around l.10 (+-1):
+[9] RESULT file_read: {"success": true, "content": "   267|theorem refl_symm : (refl R A).symm = refl R A := rfl\n   268|\n   269|theorem symm_symm_apply (e : A ≃A[R] B) (a : A) : e.symm.symm a = e a := rfl\n   270|\n   27
+[10] REASONING: Now, let me examine details.
+
+Key things to check:
+
+1. `auxContinuousLinearEquiv` is an `abbrev` with `noncomputable`. Definition with `where` structure fields for `≃L[𝕜] W`, which needs `toFun`? Actually they gave `toLinearMap` and `invFun`, etc.
+
+2. `auxIsometry` and `auxContinuousLinearEquiv` are in `section auxiliaryDefs` inside `ContinuousAlgEquiv.lean` at root namespace? Let me check: the file starts... let me look at whether there's a `namespace` around them. The declaration names in the PR model are `auxIsometry`, `coe_auxIsometry`, so they are at root namespace, not in `ContinuousAlgEquiv`. That's a scope/naming issue: private-ish helper lemmas in the root namespace pollute the global namespace. The PR description says "The proof has private auxiliary lemmas and definitions" — but they are NOT private! They are `noncomputable abbrev` at root. Actually maybe the author intended them private but they're needed... they're only used inside this file. Hmm, wait — actually `LinearMap.isPositive_linearIsometryEquiv_conj_iff U` is used in the instance. Let me check where that is.
+
+L
+[10] TOOL content_search: {"content_pattern": "conjStarAlgEquiv", "path": "target/Mathlib", "limit": 20}
+[10] TOOL content_search: {"content_pattern": "auxIsometry|auxContinuousLinearEquiv", "path": "target/Mathlib", "limit": 20}
+[11] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean", "matches": [{"line_number": 150, "content": "   148|public theorem StarAlgEquiv.eq_linearIsome
+
+GREP 'ofAlgEquiv|toContinuousAlgEquiv':
+--- line 3 TEXT[user] (match 'ofAlgEquiv|toContinuousAlgEquiv')
+lib/Analysis/InnerProductSpace/Adjoint.lean`; changed: name:added, statement_or_type:added, value_or_body:added - as the PR leaves it: ```lean def conjStarAlgEquiv (e : H ≃ₗᵢ[𝕜] K) : (H →L[𝕜] H) ≃⋆ₐ[𝕜] (K →L[𝕜] K) :=   .ofAlgEquiv e.toContinuousLinearEquiv.conjContinuousAlgEquiv fun x ↦ by     simp [star_eq_adjoint, conjContinuousAlgEquiv_apply, ← toContinuousLinearEquiv_symm, comp_assoc] ```  ### `section in Adjoint.lean` (command, added) [fcbd8
+
+--- line 6 TOOL_RESULT file_read (match 'ofAlgEquiv|toContinuousAlgEquiv')
+of their endomorphisms. -/\n   691|def conjStarAlgEquiv (e : H ≃ₗᵢ[𝕜] K) : (H →L[𝕜] H) ≃⋆ₐ[𝕜] (K →L[𝕜] K) :=\n   692|  .ofAlgEquiv e.toContinuousLinearEquiv.conjContinuousAlgEquiv fun x ↦ by\n   693|    simp [star_eq_adjoint, conjContinuousAlgEquiv_a
+
+--- line 8 TOOL_RESULT file_read (match 'ofAlgEquiv|toContinuousAlgEquiv')
+on.allEq _ _\n   167|    simpa using congr(f $(Subsingleton.allEq 0 1))\n   168|  obtain ⟨y, hy⟩ := (ContinuousAlgEquiv.ofAlgEquiv f.toAlgEquiv hf\n   169|    (f.toAlgEquiv.toLinearEquiv.continuous_symm hf)).eq_continuousLinearEquivConjContinuousAlgE
+
+--- line 9 TOOL_RESULT file_read (match 'ofAlgEquiv|toContinuousAlgEquiv')
+\n   305|/-- Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous. -/\n   306|def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm) : A ≃A[R] B :=\n   307|  { e with continuous_toFun := he,
+
+--- line 10 REASONING (match 'ofAlgEquiv|toContinuousAlgEquiv')
+erfluous. Hmm, but Mathlib wouldn't necessarily complain. Actually it might: `section linearIsometryEquiv` containing a `namespace LinearIsometryEquiv` block — near-duplicate naming. Minor style.  G. `ContinuousAlgEquiv.ofAlgEquiv` in Equiv.lean: does `ContinuousLinearEquiv.ofLinearEquiv` exist for comparison? Actually there might already be a way: `e.toAlgEquiv`... but constructing `A ≃A[R] B` from `A ≃ₐ[R] B` — hmm, the structure is by extensio
+
+--- line 11 TOOL_RESULT content_search (match 'ofAlgEquiv|toContinuousAlgEquiv')
+of their endomorphisms. -/\n   691|def conjStarAlgEquiv (e : H ≃ₗᵢ[𝕜] K) : (H →L[𝕜] H) ≃⋆ₐ[𝕜] (K →L[𝕜] K) :=\n   692|  .ofAlgEquiv e.toContinuousLinearEquiv.conjContinuousAlgEquiv fun x ↦ by\n   693|    simp [star_eq_adjoint, conjContinuousAlgEquiv_a
+
+--- line 18 TOOL_RESULT content_search (match 'ofAlgEquiv|toContinuousAlgEquiv')
+   171|  rw [ContinuousAlgEquiv.ext_iff] at hy\n   172|  simp_rw [← StarAlgEquiv.coe_toAlgEquiv, ContinuousAlgEquiv.coe_ofAlgEquiv f.toAlgEquiv hf _ ▸ hy,\n   173|    conjContinuousAlgEquiv_apply,  adjoint_comp] at this\n   174|  replace this (x : V 
+
+[stopped at --max 7 blocks]
+
+=== D12 33337 d0045 AP1 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.31 ap=held/considered_dropped know=direction
+  quote: Yaël Dillies: '`coe` should be a prefix' ... So the PR rename to `coe_orthogonalProjection_...` and `coe_starProjection_...` is well-motivated. Good ... I shouldn't object to that.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` is not named after its own statement. Its LHS is `K.starProjection.toLinearMap`, i.e. the head of the conclusion is `toLinearMap`, so the leading token should be `toLin
+  [1] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: The change is not announced: the title is `chore(Analysis/InnerProductSpace/Projection/Submodule): rename lemmas`, whose Area names only `Projection/Submodule.lean` although `Positive.lean` is also changed, and neither t
+TRANSCRIPT around l.31 (+-1):
+[30] RESULT zulip_search: {"success": true, "count": 8, "as_of": "2025-12-27T13:43:05Z", "excluded_pr": 33337, "results": "#lean4 > overloaded names can slow down elaboration\n  Jovan Gerbscheid [maintainer] — 2025-04-21T05:19
+[31] REASONING: There's a Zulip thread "Naming convention" with Yaël Dillies: "`coe` should be a prefix" (2025-06-17). That supports the PR's rename direction: `coe_` should be a prefix. So the PR rename to `coe_orthogonalProjection_...` and `coe_starProjection_...` is well-motivated. Good — this confirms the rename direction is right, so I shouldn't object to that.
+
+Now, the `isComplProjection` spelling remains a question. Hmm.
+
+Let me look at the Zulip thread on "Naming convention: function application" to see if there's something about `_apply`.
+
+Actually, let me now try a different angle: are there other places in Mathlib where a "coe" lemma got renamed with `_apply`? e.g. `coe_X_apply`. Hmm.
+
+Also, let me reconsider: is `orthogonalProjection_apply_eq_linearProjOfIsCompl` the correct name for the pointwise version, given the sibling `coe_orthogonalProjection_apply` in Basic.lean? Hmm. In Basic.lean:
+- `starProjection_apply` : `U.starProjection v = U.orthogonalProjection v`
+- `coe_orthogonalProjection_apply` : `U.orthogonalProjection v = U.starProjection v`
+
+These are about the two projections be
+[31] TOOL lean_verify: {"code": "import Mathlib.Analysis.InnerProductSpace.Projection.Submodule\n\nnamespace Testing\ndef x : Nat := 3\nend Testing\n\ndef Testing.y : Nat := x\n\nexample : Testing.y = 3 := rfl\n\nexample : True := by\n  let _ := @coe_starProjection_eq_isComplProjection\n  trivial\n"}
+[32] RESULT lean_verify: {"success": false, "errors": [{"severity": "error", "data": "Unknown identifier `coe_starProjection_eq_isComplProjection`", "code_line": "  let _ := @coe_starProjection_eq_isComplProjection", "pos": {
+
+GREP 'should be a prefix|toLinearMap_':
+--- line 3 TEXT[user] (match 'should be a prefix|toLinearMap_')
+e `MulOpposite` namespace and be called `MulOpposite.opPositiveLinearMap` and the one below `MulOpposite.unopPositiveLinearMap`.   >   > But, also, some missing basic API like, `unop.comp op = id`, `op.comp unop = id`, `toLinearMap_op`, `toLinearMap_unop`, etc.    The code it was on:    ```   @@ -159,6 +182,28 @@ instance : AddCommMonoid (E₁ →ₚ[R] E₂) :=      toLinearMap_injective.addCommMonoid _ toLinearMap_zero toLinearMap_add        toLinearMap_
+
+--- line 12 TOOL_RESULT naming_norm (match 'should be a prefix|toLinearMap_')
+{"toLinearMap": 21, "coe": 7, "map": 5, "comp": 4, "det": 4, "ι": 4, "fst": 3, "minpoly": 3}, "candidates": ["Submodule.toLinearMap_starProjection_eq_isComplProjection", "Submodule.toLinearMap_starProjection"], "results": "Subject of the conclusion: `t
+
+--- line 13 REASONING (match 'should be a prefix|toLinearMap_')
+The naming_norm verdict says "emerging" with candidate `toLinearMap_starProjection_eq_isComplProjection`. Hmm. That's advisory. Hmm, but that's a machine census noting `toLinearMap_` prefix leads 21 to 7. But is that ratio a real convention? It says "emerging — one spelling leads clearly
+
+--- line 18 TOOL_RESULT content_search (match 'should be a prefix|toLinearMap_')
+   313|    0 ≤ ⟪x, T x⟫ := hT.toLinearMap.inner_nonneg_right x"}, {"line_number": 337, "content": "   335|  (isPositive_toLinearMap_iff _).mp (hT.toLinearMap.add hS.toLinearMap)\n   336|\n   337|open ComplexOrder in\n   338|@[aesop safe apply]\n   339|
+
+--- line 20 TOOL_RESULT file_read (match 'should be a prefix|toLinearMap_')
+{"success": true, "content": "   437|  simp [← isPositive_toLinearMap_iff, LinearMap.isPositive_iff_complex]\n   438|\n   439|end Complex\n   440|\n   441|section PartialOrder\n   442|\n   4
+
+--- line 25 TOOL_RESULT naming_norm (match 'should be a prefix|toLinearMap_')
+e conclusion: `→ₗ` (from coercion_ascription).\nOf 124 declarations in the base snapshot with that subject: `coe_` 48, `toLinearMap_` 9, `corootSpan_` 4, `rootSpan_` 4, `submodule_` 4, `id_` 3.\nThis declaration uses `coe_` (48).\nVerdict: **insufficie
+
+--- line 30 TOOL_RESULT zulip_search (match 'should be a prefix|toLinearMap_')
+ic/coe_add/near/554075189\n\n#mathlib4 > Naming convention\n  Yaël Dillies [maintainer] — 2025-06-17T13:58:18Z\n  `coe` should be a prefix\n  https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/Naming.20convention/near/524460242\n\n#mathli
+
+[stopped at --max 7 blocks]
+
+=== D12 33337 d0045 DX3 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.105 ap=n/a/None know=direction
+  quote: for `coe_orthogonalProjection_eq_linearProjOfIsCompl` the subject `→ₗ` (coercion_ascription) prefers `coe_` 48 of 124 ... So for the bundled lemma, `coe_` is the plurality ✓.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` bundles two changes: besides moving `coe` to the front, it also rewrites the suffix `isCompl_projection` into `isComplProjection`. The token `isComplProjection` appears
+TRANSCRIPT around l.105 (+-1):
+[104] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/InnerProductSpace/Basic.lean", "matches": [{"line_number": 155, "content": "   149|variable {F}\n   150|\n   151|@[simp] lemma innerₗ_ap
+[105] REASONING: VERY interesting!! Look at Adjoint.lean lines 733-741:
+
+```lean
+namespace unitary
+
+@[deprecated (since := "2025-10-29")] alias norm_map := Unitary.norm_map
+@[deprecated (since := "2025-10-29")] alias inner_map_map := Unitary.inner_map_map
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv := Unitary.linearIsometryEquiv
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv_coe_apply :=
+  Unitary.linearIsometryEquiv_coe_apply
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv_coe_symm_apply :=
+  Unitary.linearIsometryEquiv_coe_symm_apply
+```
+
+Note line 738-741: the deprecated `unitary.linearIsometryEquiv_coe_apply` alias points to `Unitary.linearIsometryEquiv_coe_apply` — which is ITSELF now a deprecated alias (at line 720, renamed to `coe_linearIsometryEquiv_apply`)!! So in this campaign, older aliases were NOT re-pointed to the newest name; they point to the intermediate (now-deprecated) name. Hmm! Interesting. Hmm, and moreover — a deprecated alias pointing to a deprecated declaration... does Lean allow that? It's an `alias` to a deprecated name; 
+[105] TOOL zulip_search: {"query": "starProjection_eq_isCompl_projection wrong name rename soon", "limit": 8}
+[105] TOOL zulip_search: {"query": "rename IsCompl.projection lemmas coe prefix linearProjOfIsCompl naming projections prefix", "maintainers_only": false, "limit": 8}
+[106] RESULT zulip_search: {"success": true, "count": 8, "as_of": "2025-12-27T13:43:05Z", "excluded_pr": 33337, "results": "#mathlib4 > Matrix.dotProduct rename?\n  Martin Dvořák — 2024-12-12T07:43:34Z\n  The consensus is clear
+
+GREP '48 of 124|plurality':
+--- line 91 TOOL_RESULT naming_norm (match '48 of 124|plurality')
+s `coe_` (48).\nVerdict: **insufficient_evidence**.\n`coe_`, this name's prefix, is the most common spelling but only a plurality (48 of 124, under the 80% bar), so the census does not settle the prefix either way.\nThis census counts only each name
+
+--- line 105 REASONING (match '48 of 124|plurality')
+ for subject `toLinearMap` prefers `toLinearMap_` (21) over `coe_` (7) — "emerging" verdict, advisory. Hmm, and for `coe_orthogonalProjection_eq_linearProjOfIsCompl` the subject `→ₗ` (coercion_ascription) prefers `coe_` 48 of 124 (plurality, insufficient evidence). Hmm, so for the bundled lemma, `coe_` is the plurality ✓. And for the `toLinearMap`-styled lemma, `toLinearMap_` leads. Hmm, that's an *asymmetry* between the two renamed bundled lemm
+
+[2 matching blocks]
+
+=== D12 33337 d0045 DX1 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.53 ap=n/a/None know=direction
+  quote: Candidate B (naming): ... should be `toLinearMap_starProjection_...` per corpus (naming_norm: `toLinearMap_` 21 vs `coe_` 7). Hmm, but I argued `coe_` is justified by the generic coercion.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` carries the coercion prefix `coe_`, but its statement names the coercion as a projection: `K.starProjection.toLinearMap = ...`. The library spells lemmas of that shape
+TRANSCRIPT around l.53 (+-1):
+[52] RESULT file_search: {"success": true, "results": [], "truncated": false}
+[53] REASONING: Hmm, file_search returned nothing — maybe the directory path convention differs. Let me search in `target/Mathlib` for linter files.
+
+Actually earlier content_search on target/docs returned "files_available: 7" with 0 matches, so docs exists with 7 files (maybe .lean?). And file_search with directory target found nothing for *Deprecat* — because it searched `target` recursively? It said truncated false, 0 results. Hmm, that's odd since Mathlib has `Mathlib/Tactic/Linter/Deprecated.lean`? Maybe file_search needs a different root. Let me try directory_path "target/Mathlib/Tactic/Linter".
+
+Not that important. Let me refocus.
+
+Decision time. I need to produce findings that are defensible. Let me weigh candidates:
+
+**Candidate A (naming/statement consistency):** `coe_starProjection_eq_isComplProjection` — the LHS `K.starProjection.toLinearMap` should be written as a coercion `(K.starProjection : E →ₗ[𝕜] E)` to match the name's `coe_` prefix and its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`. Advisory. Hmm, weak-ish but concrete and verifiable.
+
+**Candidate B (naming):** `co
+[53] TOOL content_search: {"limit": 30, "path": "target/Mathlib", "content_pattern": "isCompl_projection|isComplProjection|IsCompl.projection_range"}
+[53] TOOL content_search: {"limit": 30, "path": "target", "content_pattern": "linearProjOfIsCompl"}
+[54] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/InnerProductSpace/Positive.lean", "matches": [{"line_number": 245, "content": "   243|    hp.isIdempotentElem.mem_range_iff.mp ha, sub_n
+
+GREP 'Candidate B|toLinearMap_ 21':
+--- line 53 REASONING (match 'Candidate B|toLinearMap_ 21')
+ould be written as a coercion `(K.starProjection : E →ₗ[𝕜] E)` to match the name's `coe_` prefix and its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`. Advisory. Hmm, weak-ish but concrete and verifiable.  **Candidate B (naming):** `coe_starProjection_eq_isComplProjection` should be `toLinearMap_starProjection_eq_isComplProjection` per corpus (naming_norm: `toLinearMap_` 21 vs `coe_` 7, "emerging"). Hmm, but I argued `coe_` is justifie
+
+[1 matching blocks]
+
+=== D12 33285 d0035 AP2 [D12b]  family F1  Mathlib/Algebra/Module/Submodule/Map.lean:597
+ASK: here's an even better golf ```suggestion comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2 ```
+CODE AT COMMENT: @@ -597,9 +597,8 @@ theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) : |      comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by
+MATCHER: m1 no (Term one-liner fun _ h ↦ q.add_mem h.1 h.2 reaches; R2's rintro tactic golf is a different, longer proof.) | m2 no (Reached = term proof fun _ h ↦ q.add_mem h.1 h.2; R2 golfs to a shorter tactic proof instead.)
+READER: V l.34 ap=held/considered_dropped know=construction
+  quote: thought of 'the whole thing: `fun m h ↦ add_mem h.1 h.2`' (l.22), tested `intro m h; exact add_mem h.1 h.2` → failed ('`add_mem`'s implicit `?m` can't unify. So the `simp only` is needed. So the current proof form is close to minimal.' l.34); submitted 'verified `intro m h; exact add_mem h.1 h.2` fails' (l.78)
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.34 (+-1):
+[33] RESULT lean_verify_edit: {"success": false, "errors": [{"severity": "error", "data": "Application type mismatch: The argument\n  h.right\nhas type\n  m ∈ ↑(comap f₂ q)\nbut is expected to have type\n  ?m.101 ∈ comap f₁ q\nin 
+[34] REASONING: Interesting: `exact add_mem h.1 h.2` fails without the `simp only ... at h ⊢` because `add_mem` expects both args in the *same* submodule (q), and `h.1 : m ∈ comap f₁ q`, `h.2 : m ∈ comap f₂ q` are not syntactically equal; `add_mem`'s implicit `?m` can't unify. So the `simp only` is needed. So the current proof form is close to minimal. Could it be `by simp [SetLike.le_def, Submodule.mem_inf, Submodule.mem_comap, ...]`? Let's test whether a one-liner `simp` proof works:
+
+```lean
+theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :
+    comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by
+  intro m h
+  simpa [Submodule.mem_inf, Submodule.mem_comap, LinearMap.add_apply] using add_mem h.1 h.2
+```
+Hmm, that's about the same length. Or maybe:
+```lean
+  simp only [SetLike.mem_coe, mem_comap, mem_inf, LinearMap.add_apply] at h ⊢
+  exact add_mem h.1 h.2
+```
+There might be an even simpler: `by rw [SetLike.le_def]; rintro m ⟨h1, h2⟩; exact add_mem h1 h2`? That would fail for the same reason.
+
+Hmm, what about using `Submodule.mem_inf.mp` ... same issue.
+
+What about `grind`? Or `aesop`? Per the 
+[34] TOOL file_read: {"file_path": "target/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean", "line_start": 270, "line_end": 360}
+[35] RESULT file_read: {"success": true, "content": "   267|@[simp]\n   268|theorem isOrtho_self {U : Submodule 𝕜 E} : U ⟂ U ↔ U = ⊥ :=/- ... omitted ... -/\n   271|\n   272|@[simp]\n   273|theorem isOrtho_orthogonal_right 
+
+GREP 'add_mem h.1 h.2|mem_comap':
+--- line 3 TEXT[user] (match 'add_mem h.1 h.2|mem_comap')
+`lean theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by   rw [SetLike.le_def]   intro m h   change f₁ m + f₂ m ∈ q   change f₁ m ∈ q ∧ f₂ m ∈ q at h   apply q.add_mem h.1 h.2 ``` - as the PR leaves it: ```lean theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by   rw [SetLike.le_def]   intro m h   simp only [mem_comap, mem_inf, Linear
+
+--- line 4 REASONING (match 'add_mem h.1 h.2|mem_comap')
+et me look at the key changes:  1. `Submodule.inf_comap_le_comap_add` — golf. Fine, but maybe could be `by simp [SetLike.le_def, ...]`? Actually the new proof uses `rw [SetLike.le_def]` then `simp only ... at h ⊢; exact add_mem h.1 h.2`. Perhaps the whole thing could be `by simp [SetLike.le_def]; ...` Actually could the proof be `fun m h => add_mem h.1 h.2`? Hmm. Let me check whether it's shorter. Actually the convention "A goal that a standard finish
+
+--- line 22 REASONING (match 'add_mem h.1 h.2|mem_comap')
+in` in the target tree to see if there are two.  Let me check the Rank.lean file around line 270-300 and grep.  6. **`inf_comap_le_comap_add`** — new proof: `rw [SetLike.le_def]; intro m h; simp only [...] at h ⊢; exact add_mem h.1 h.2`. Could this be simply `by simp [SetLike.le_def, submodule...]`? Hmm. Let's test whether `by intro m h; simpa [Submodule.mem_comap, Submodule.mem_inf] using add_mem h.1 h.2`? Or the whole thing: `fun m h ↦ add_mem h.1 h
+
+--- line 31 TOOL_USE lean_verify_edit (match 'add_mem h.1 h.2|mem_comap')
+aration": "theorem inf_comap_le_comap_add (f\u2081 f\u2082 : M \u2192\u209b\u2097[\u03c4\u2081\u2082] M\u2082) :\n    comap f\u2081 q \u2293 comap f\u2082 q \u2264 comap (f\u2081 + f\u2082) q := by\n  intro m h\n  exact add_mem h.1 h.2"}
+
+--- line 33 TOOL_RESULT lean_verify_edit (match 'add_mem h.1 h.2|mem_comap')
+t is expected to have type\n  ?m.101 ∈ comap f₁ q\nin the application\n  add_mem h.left h.right", "code_line": "  exact add_mem h.1 h.2", "pos": {"column": 20, "line": 599}}], "warnings": [], "infos": [], "axioms": [], "outcome": "compile_errors", "messag
+
+--- line 34 REASONING (match 'add_mem h.1 h.2|mem_comap')
+Interesting: `exact add_mem h.1 h.2` fails without the `simp only ... at h ⊢` because `add_mem` expects both args in the *same* submodule (q), and `h.1 : m ∈ comap f₁ q`, `h.2 : m ∈ comap f₂ q` are not syntactically equal; `add_mem`'s implicit `?m` can't 
+
+--- line 37 TOOL_RESULT file_read (match 'add_mem h.1 h.2|mem_comap')
+ 𝕜 F} (h : U ⟂ V) :\n   338|    U.comap f ⟂ V.comap f := by\n   339|  rw [isOrtho_iff_inner_eq] at *\n   340|  simp_rw [mem_comap, ← f.inner_map_map]\n   341|  intro u hu v hv\n   342|  exact h _ hu _ hv\n   343|\n   344|@[simp]\n   345|theorem IsOr
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0065 AP1 [P14val_b]  family F8  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:106
+ASK: There's no `ha` in scope, so this could be `ha`, right?
+CODE AT COMMENT: @@ -91,9 +98,21 @@ theorem monotoneOn_posLog : MonotoneOn log⁺ (Set.Ici 0) := by |      simp only [this, and_true, ge_iff_le] |      linarith |   | +/-- The function `log⁺` commutes with taking powers. -/ | +@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : | +    log⁺ (a ^ n) = n * log⁺ a := by | +  by_cases hn : n = 0 | +  · simp_all | +  by_cases h₂a : |a| ≤ 1
+MATCHER: m1 no (Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.) | m2 no (Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite.)
+READER: O l.32 ap=n/a/None know=none
+  quote: filed the one-liner replacement (finding 3); line 17/32 read the case split against the held case-split bullet, not the name
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_sum`'s docstring was rewritten by this PR from the two-line compact form into a three-line form whose text starts on the line *after* `/--` and whose closing `-/` sits on a line of its own; `Real.posLog_add`
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The new docstring of `Real.posLog_norm_sum_le` begins its text on the line after `/--` and puts `-/` on its own line (same conventions as above), and it explains the declaration only by contrast with `posLog_sum` plus a
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but nothing in the statement or proof needs the norm to see `1` or to be a norm rather than a seminorm: the proof uses only `norm_sum_le` (a `SeminormedAddCommG
+  [3] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The proof of `Real.posLog_pow` is longer than the statement needs: it case-splits twice with `by_cases`/`simp_all` and then rewrites a hypothesis in place (`rw [not_le] at h₂a`), although `Real.log_pow` holds uncondition
+  [4] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_zero` and `Real.posLog_one` are a pair of parallel one-line `@[simp]` lemmas, but a blank line (line 57) separates them, hiding the parallel; the convention is to keep such a pair adjacent with no blank line
+  [5] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The module docstring added by this PR refers to another module by its dotted name, `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`; a cross-reference to another module in documentation gives the modul
+TRANSCRIPT around l.32 (+-1):
+[31] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean", "matches": [{"line_number": 24, "content": "    20|\n    21|variable {a c : ℂ} {
+[32] REASONING: Interesting! In `PosLogEqCircleAverage.lean` (same author, related file), section headers `/-!\n## ...\n-/\n\n` ARE followed by a blank line. So the author's style in the sibling file has a blank line after section headers. That means the PR's added blank lines bring PosLog.lean in line with the author's other file. Hmm! So a maintainer probably would NOT ask to remove them; if anything, they'd ask for consistency the other way. So the added blank lines are a style normalization toward the author's/neighbour file's convention. I'll NOT file this, and note that the sibling file `PosLogEqCircleAverage.lean` uses the blank line style (a check I ran). Good — this avoids a likely false positive. But the remaining inconsistency (first header at line 25-27 has no blank line) — hmm, the PR left that one alone. Could ask "add the blank line there too for consistency"? That's marginal-benefit cosmetic; the convention "A change of marginal benefit (cosmetic spacing...) is not made" argues against requesting it. Skip.
+
+Now, the docstring format issue (text on `/--` line): note that the author's 
+[32] TOOL zulip_search: {"query": "posLog log\u207a lemmas naming convention simp", "limit": 6}
+[32] TOOL declaration_search: {"identifier": "posLog_norm_sum_le"}
+[33] RESULT zulip_search: {"success": true, "count": 6, "as_of": "2025-10-18T05:27:06Z", "excluded_pr": 30641, "results": "#mathlib4 > Naming convention\n  Eric Wieser [maintainer] — 2024-03-17T22:41:35Z\n  In this case the fi
+
+GREP 'h₂a':
+--- line 3 TEXT[user] (match 'h₂a')
+ributes:added, name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :     log⁺ (a ^ n) = n * log⁺ a := by   by_cases hn : n = 0   · simp_all   by_cases h₂a : |a| ≤ 1   · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]   rw [not_le] at h₂a   have : 1 < |a ^ n| := by simp [one_lt_pow₀ h₂a hn]   simp [posLog_eq_log this.le, posLog_eq_log h₂a.le] ```  ### `doc_comment in PosL
+
+--- line 16 TOOL_RESULT file_read (match 'h₂a')
+ ℝ} :\n   103|    log⁺ (a ^ n) = n * log⁺ a := by\n   104|  by_cases hn : n = 0\n   105|  · simp_all\n   106|  by_cases h₂a : |a| ≤ 1\n   107|  · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]\n   108|  rw [not_le] at h₂a\n   109|  have : 1 
+
+--- line 17 REASONING (match 'h₂a')
+ result substitutes or simplifies directly (`obtain rfl | h := eq_zero_or_pos n`), so that no hypothesis needs rewriting afterwards." That's about case splits! The proof does: ``` by_cases hn : n = 0 · simp_all by_cases h₂a : |a| ≤ 1 · simp_all [...] rw [not_le] at h₂a ``` This uses `by_cases hn : n = 0` followed by `simp_all` (which rewrites `n = 0` in place) rather than `obtain rfl | hn := eq_zero_or_pos n` / `Nat.eq_zero_or_pos`. Hmm, t
+
+--- line 19 TOOL_RESULT content_search (match 'h₂a')
+log⁺ r - log⁺ r⁻¹ = log r := by"}, {"line_number": 113, "content": "   109|  have : 1 < |a ^ n| := by simp [one_lt_pow₀ h₂a hn]\n   110|  simp [posLog_eq_log this.le, posLog_eq_log h₂a.le]\n   111|\n   112|/-!\n   113|## Estimates for Products
+
+--- line 32 REASONING (match 'h₂a')
+m whose result substitutes or simplifies directly (`obtain rfl | h := eq_zero_or_pos n`), so that no hypothesis needs rewriting afterwards." — The new `posLog_pow` proof does: ``` by_cases hn : n = 0 · simp_all by_cases h₂a : |a| ≤ 1 · simp_all [...] rw [not_le] at h₂a ``` The convention's second example: "Nicer case split: `obtain rfl | hL := eq_zero_or_pos L`" instead of `by_cases hL : L = 0`. So the convention: use `obtain rfl | hn := N
+
+--- line 44 REASONING (match 'h₂a')
+CommGroup E]` (verified compiles). Mention the sibling `posLog_norm_add_le` could get the same weakening.  F4 (advisory) — line 102, `Real.posLog_pow`: the proof does two `by_cases` with `simp_all` and a `rw [not_le] at h₂a`; `Real.log_pow` (unconditional: `log (x^n) = n * log x`) plus `mul_max_of_nonneg` gives the one-line proof. Also then the declaration (attribute included) is a single line, as the convention for one-line declarations r
+
+[6 matching blocks]
+
+=== D12 33145 d0027 AP2 [D12a]  family F8  Mathlib/Topology/Order/IsLUB.lean:243
+ASK: ```suggestion theorem Dense.ciInf' {α : Type*} [TopologicalSpace α] ```
+CODE AT COMMENT: range_coe_subtype, setOf_mem_eq] | +      have := h.closure.mono (image_closure_subset_closure_image hf) | +      simp only [hS.closure_eq, image_univ] at this | +      exact h1 this | +    simp [csSup_of_not_bddAbove h1, csSup_of_not_bddAbove h2] | + | +/-- This is an analogue of `Dense.continuous_inf` for functions taking values in a conditionally | +complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/ | +theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]
+MATCHER: m1 no (ciInf' names from four; R5, R13 want a descriptive name instead of the prime.) | m2 no (Rename to Dense.ciInf'; same findings as the other ciSup/ciInf renames.)
+READER: O l.92 ap=held/ignored know=none
+  quote: (no reasoning on the sup/inf names; filed grind at 204, h2 at 232, docstring-by-contrast at 219; the bounds pair named at 171)
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_lowerBounds` repeats by hand the proof of its order dual; the same holds for `Dense.continuous_inf` (lines 211-217) and `Dense.continuous_inf'` (lines 246-261). Mathlib proves the dual of an order-theor
+  [1] Mathlib/Topology/Order/IsLUB.lean: The docstring of `Dense.continuous_upperBounds` says 'the upper bounds of the range of the universe', which names nothing — the range meant is the range of `f` — and pairs the plural subject 'bounds' with 'is equal'. The
+  [2] Mathlib/Topology/Order/IsLUB.lean: The docstrings of `Dense.continuous_sup'` (lines 219-220) and `Dense.continuous_inf'` (lines 241-242) explain the declarations by contrast with `Dense.continuous_sup`/`Dense.continuous_inf` ('This is an analogue of …') i
+  [3] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_sup` discharges its only side goal with `by grind`; the goal there is `⊢ BddAbove (f '' S)`, i.e. exactly `Set.image_subset_range f S`, so heavy automation is not needed. The identical `by grind` occurs
+  [4] Mathlib/Topology/Order/IsLUB.lean: The proof of `Dense.continuous_upperBounds` redoes the 'upper bounds do not see the closure' argument by hand (unfolding `mem_closure_iff_frequently` and applying `isClosed_Iic`), although the file already proves that st
+  [5] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_upperBounds` (and `Dense.continuous_lowerBounds`, line 183) states an equality whose head is `upperBounds`, but its name leads with `continuous_`; every declaration in Mathlib whose conclusion is about
+  [6] Mathlib/Topology/Order/IsLUB.lean: In `Dense.continuous_sup'` the side fact `¬ BddAbove (range fun s : S => f s)` is proved by unfolding `range_comp'` with `simp_all only` and re-running the closure argument (`image_closure_subset_closure_image`, `BddAbov
+  [7] Mathlib/Topology/Order/IsLUB.lean: The file's `Authors:` line still records only the original authors of `IsLUB.lean`, while this PR adds ~100 lines of new material that its own description attributes partly to other people ('Some of the codes in this PR
+  [8] Mathlib/Topology/Order/IsLUB.lean: The PR title `feat: supremum of a continuous function on a dense set is equal to the supremum on the univ` omits the area part of the `type(Area): description` commit convention and uses the Lean identifier `univ` in pro
+TRANSCRIPT around l.92 (+-1):
+[91] REASONING: Both the docstring rewrite and the golfed proof compile together in file context.
+
+Now let me write up the submission.
+
+Final findings list (9). Let me write them carefully.
+
+Finding 1 — dualization.
+path: Mathlib/Topology/Order/IsLUB.lean, line_start 181, line_end 191? I'll use 183 (the declaration line) to 191. Hmm, the guidance: "Give the line of the declaration your claim is about." I'll give line_start=183, line_end=191.
+
+claim: "`Dense.continuous_lowerBounds` (and, identically, `Dense.continuous_inf` and `Dense.continuous_inf'`) repeats by hand the proof of its order-dual: the order-theoretic dual of a lemma is proved by instantiating the original at `αᵒᵈ`, as this very file does at lines 157 and 167 (`isGLB_iff_of_subset_of_subset_closure (α := αᵒᵈ)`, `Dense.isGLB_inter_iff`)."
+suggested_fix: "Replace the three bodies by the dual instantiations: `lowerBounds … := hS.continuous_upperBounds (α := αᵒᵈ) hf`; `Dense.continuous_inf := hS.continuous_sup (α := αᵒᵈ) hf h`; `Dense.continuous_inf' := hS.continuous_sup' (α := αᵒᵈ) hf` (each verified to compile here)."
+evidence: "Verified 
+[91] TOOL submit_findings: {"findings": [{"path": "Mathlib/Topology/Order/IsLUB.lean", "line_start": 183, "line_end": 191, "severity": "advisory", "claim": "`Dense.continuous_lowerBounds` repeats by hand the proof of its order dual; the same holds for `Dense.continuous_inf` (lines 211-217) and `Dense.continuous_inf'` (lines 2
+[92] RESULT submit_findings: {"evaluation_result": {"success": true, "score": 1.0, "message": "Review recorded: 9 findings, merge_ready=False.", "metrics": null, "nested_token_usage": null}, "message": "Review submitted"}
+
+GREP "continuous_inf'|continuous_sup'":
+--- line 3 TEXT[user] (match "continuous_inf'|continuous_sup'")
+`γ`. Then the upper bounds of `f '' S` is equal to the upper bounds of `range f`. 2. `Dense.continuous_sup` : If`α` is a conditionally complete lattice and `f` is bounded above, then `⨆ i, f i = ⨆ s : S, f s`. 3. `Dense.continuous_sup'`: If `α` is a conditionally complete linear order, then `⨆ i, f i = ⨆ s : S, f s`.  Some of the codes in this PR are created by @plp127 and @j-loreaux . See also the zulip discussion: [#Is there code for X? > Continuous
+
+--- line 6 TOOL_RESULT file_read (match "continuous_inf'|continuous_sup'")
+0|complete linear order. The assumption of `BddAbove (range f)` is not needed in this theorem. -/\n   221|theorem Dense.continuous_sup' {α : Type*} [TopologicalSpace α]\n   222|    [ConditionallyCompleteLinearOrder α] [ClosedIicTopology α] {f : γ → α} [To
+
+--- line 8 TOOL_RESULT file_read (match "continuous_inf'|continuous_sup'")
+0|complete linear order. The assumption of `BddAbove (range f)` is not needed in this theorem. -/\n   221|theorem Dense.continuous_sup' {α : Type*} [TopologicalSpace α]\n   222|    [ConditionallyCompleteLinearOrder α] [ClosedIicTopology α] {f : γ → α} [To
+
+--- line 10 REASONING (match "continuous_inf'|continuous_sup'")
+f_of_subset_of_subset_closure (α := αᵒᵈ) hst hts`. So this is a strong finding: `Dense.continuous_lowerBounds` should be `Dense.continuous_upperBounds (α := αᵒᵈ) hS hf` or similar, and also `Dense.continuous_inf`/`Dense.continuous_inf'` should be derived by dualizing.  Let me check the file at lines 154-158 to confirm.  Also, is `upperBounds (f '' S) = upperBounds (range f)` provable more simply? Let me think: Actually `hf.range_subset_closure_image_d
+
+--- line 14 REASONING (match "continuous_inf'|continuous_sup'")
+verify_edit.  Candidate edits to test: 1. `Dense.continuous_lowerBounds := Dense.continuous_upperBounds (α := αᵒᵈ) hS hf` (needs instances). 2. `Dense.continuous_inf := Dense.continuous_sup (α := αᵒᵈ) hS hf h` 3. `Dense.continuous_inf' := Dense.continuous_sup' (α := αᵒᵈ) hS hf` 4. Shortened proofs with `upperBounds_closure`. 5. Replace `by grind` with direct.  Let's test these. start with the dualizations.  Actually wait — is `Dense.continuous_inf'` r
+
+--- line 17 REASONING (match "continuous_inf'|continuous_sup'")
+Both work. Now `Dense.continuous_inf'` from `Dense.continuous_sup'`.
+
+--- line 17 TOOL_USE lean_verify_edit (match "continuous_inf'|continuous_sup'")
+{"declaration_name": "Dense.continuous_inf'", "new_declaration": "theorem Dense.continuous_inf' {\u03b1 : Type*} [TopologicalSpace \u03b1]\n    [ConditionallyCompleteLinearOrder \u03b1] [ClosedIciTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u03b
+
+[stopped at --max 7 blocks]
+
+=== D12 33421 d0049 AP2 [D12c]  family F6  Mathlib/Topology/Algebra/Order/Floor.lean:211
+ASK: Is this not something very general that should exist as a lemma? Same in the next theorem
+CODE AT COMMENT: d_one _) | +  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <| | +    continuousAt_floor h | + | +theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α] | +    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by | +  rw [funext round_eq'] | +  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by | +    simp only [two_mul] | +    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_) | +    exact fun a ha ↦ add_le_add ha ha
+MATCHER: m1 no (No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.) | m2 no (No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma.)
+READER: O l.83 ap=held/ignored know=demand
+  quote: filed the `variable` block at :205 and the naming at :215; P165 cited once, elsewhere: 'is it of independent use? It's a natural statement about `fract`' (about `two_mul_fract_eq_one_iff_exists_int`, l.83)
+SUBMITTED FINDINGS at that file:
+  [1] Mathlib/Topology/Algebra/Order/Floor.lean: `continuousAt_ceil` is the exact mirror of `continuousAt_floor` (line 101), and the PR tags `continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` with `@[fun_prop]` but leaves `contin
+  [2] Mathlib/Topology/Algebra/Order/Floor.lean: `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` are four consecutive declarations that each repeat the identical binder list `[IsStrictOrderedRing α] [Ord
+  [3] Mathlib/Topology/Algebra/Order/Floor.lean: `tendsto_round_nhdsLT_pure_half_ceil` (and its partner `tendsto_round_nhdsGE_pure`) spell the neighbourhood filter as `nhdsLT`/`nhdsGE`, while every sibling of the same shape in this file spells it `left`/`right`: `tends
+  [5] Mathlib/Topology/Algebra/Order/Floor.lean: The module docstring still describes the file as "# Topological facts about `Int.floor`, `Int.ceil` and `Int.fract`" with the sentence "This file proves statements about limits and continuity of functions involving `floo
+TRANSCRIPT around l.83 (+-1):
+[82] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[83] REASONING: Hmm wait, I made a typo in `continuousAt_round`'s proof: I wrote `(tendsto_round_nhdsGE_pure x).mono_left ?_` — I wrote `(tendsto_round_nhdsGE_pure x)`? Let me check what I submitted: I wrote 
+
+```
+  refine ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right (pure_le_nhds_iff.mpr ?_),
+    (tendsto_round_nhdsGE_pure x).mono_left ?_ |>.mono_right (pure_le_nhds _)⟩
+```
+Hmm, in my replacement text above I wrote `(tendsto_round_nhdsGE_pure x)`? Looking at what I sent: I typed `(tendsto_round_nhdsGE_pure x).mono_left ?_`... Actually I typed:
+
+"    (tendsto_round_nhdsGE_pure x).mono_left ?_ |>.mono_right (pure_le_nhds _)⟩"
+
+Hmm no, I typed `(tendsto_round_nhdsGE_pure x)`. Let me re-read my submitted text: 
+
+```
+  refine ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right (pure_le_nhds_iff.mpr ?_),
+    (tendsto_round_nhdsGE_pure x).mono_left ?_ |>.mono_right (pure_le_nhds _)⟩
+```
+
+Hmm, actually in my message I wrote `(tendsto_round_nhdsGE_pure x)`? The text I see in my function call was:
+
+    (tendsto_round_nhdsGE_pure x).mono_left ?_ |>.mono_right (pure_le_nhds _)⟩
+
+Wait, no. I wrote `(tend
+[83] TOOL lean_verify_edit: {"line_start": 9, "line_end": 9, "path": "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean", "max_messages": 10}
+[83] TOOL lean_verify_edit: {"line_start": 16, "line_end": 16, "path": "Mathlib/Topology/Instances/AddCircle/Defs.lean", "max_messages": 10}
+[83] TOOL lean_verify_edit: {"line_start": 12, "line_end": 12, "path": "Mathlib/Algebra/AddConstMap/Basic.lean", "max_messages": 10}
+[84] RESULT lean_verify_edit: {"success": false, "errors": [{"severity": "error", "data": "Unknown constant `Set.neg_mem_Ioo_iff`", "code_line": "    simp_rw [arg_inv, z₂.1, ite_false, Set.neg_mem_Ioo_iff, neg_neg, sub_eq_add_neg]
+
+GREP 'Tendsto \\(2|P165|should exist|general lemma':
+--- line 3 TEXT[user] (match 'Tendsto \\(2|P165|should exist|general lemma')
+ the PR leaves it: ```lean theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]     (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by   rw [funext round_eq']   have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by     simp only [two_mul]     refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)     exact fun a ha ↦ add_le_add ha ha   exact (tendsto_pure_pure (fun n ↦ (n + 1) 
+
+--- line 29 REASONING (match 'Tendsto \\(2|P165|should exist|general lemma')
+ction` with `variable`.  Hmm, but wait — is `[ContinuousAdd α]` needed for all four? `tendsto_round_nhdsGE_pure`: uses `(tendsto_id.add tendsto_id)` needing ContinuousAdd on... hmm, the target filter `𝓝[≥] (2*x)` — the `Tendsto (2 * ·)` step uses `(tendsto_id.add tendsto_id)` so needs `ContinuousAdd α`? The result filter is `𝓝[≥] (2 * x)`, computed via inf of tendsto_id and principal — hmm, `tendsto_id.add tendsto_id : Tendsto (fun a ↦ a + a) (𝓝[
+
+--- line 80 TOOL_RESULT file_read (match 'Tendsto \\(2|P165|should exist|general lemma')
+α]\n   206|    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n   207|  rw [funext round_eq']\n   208|  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n   209|    simp only [two_mul]\n   210|    refine (tendsto_id.add tendsto_id).inf (
+
+--- line 81 TOOL_USE lean_verify_edit (match 'Tendsto \\(2|P165|should exist|general lemma')
+rderedRing \u03b1] [OrderClosedTopology \u03b1] [ContinuousAdd \u03b1]\n\ntheorem tendsto_round_nhdsGE_pure (x : \u03b1) : Tendsto round (\ud835\udcdd[\u2265] x) (pure (round x)) := by\n  rw [funext round_eq']\n  have : Tendsto (2 * \u00b7) (\ud835\udcdd[\u2265] x) (\ud835\udcdd[\u2265] (2 * x)) := by\n    simp only [two_mul]\n    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n    exact fun a ha \u21a6 add_le_add ha ha
+
+--- line 114 TOOL_USE submit_findings (match 'Tendsto \\(2|P165|should exist|general lemma')
+ given to one family member given to the others \u2014 filed (F5 `ceil_one_add`/`floor_one_add`).\n9. Names follow siblings'/analogues' pattern \u2014 filed (F4).\n10. `\u00b7` placeholder lambdas \u2014 left: both new `Tendsto (2 * \u00b7) ...` binders already use `\u00b7` (Floor.lean:208,218).\n11. `refine` introduces the hypotheses of its subgoals \u2014 left: `continuousOn_floor_compl_range`/`continuousOn_ceil_compl_range` inline into the `Co
+
+[5 matching blocks]
+
+=== D12 33117 d0018 AP1 [D12a]  family F4  Mathlib/Analysis/Meromorphic/Basic.lean:730
+ASK: There is some new metaprogramming that can help here: the `to_fun` attribute. To get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`). ```suggestion @[to_fun (attr := fun_prop)] lemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg @[to_fun (attr := fun_prop)] lemma add (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f + g) := fun x ↦ (hf x).add (hg x) @[to_fun (attr := fun_prop)] theorem sum (h : ∀ σ, Meromorphic (G σ)) : Me
+CODE AT COMMENT: phic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv | + | +@[fun_prop] | +lemma fun_deriv [CompleteSpace E] (hf : Meromorphic f) : | +    Meromorphic (fun x ↦ _root_.deriv f x) := hf.deriv | + | +@[fun_prop] | +lemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) : | +    Meromorphic (_root_.deriv^[n] f) := fun x ↦ (hf x).iterated_deriv | + | +@[fun_prop] | +lemma fun_iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) : | +    Meromorphic (fun x ↦ _root_.deriv^[n] f x) := hf.iterated_deriv
+MATCHER: m1 no (No finding suggests the to_fun attribute or removing the hand-written fun_ variants.) | m2 no (Use the to_fun attribute to generate fun_ variants; no reviewer mentions to_fun or auto-generating the fun_ lemmas.)
+READER: O l.25 ap=absent/None know=mechanism
+  quote: the PR does exactly that (`add`/`fun_add`), consistent with the file. Hmm, one thing: is `fun_deriv`'s `(fun x ↦ _root_.deriv f x)` vs `deriv` — fine.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/Meromorphic/Basic.lean: `Meromorphic.deriv` (line 718) is declared without `protected`, unlike the two same-named lemmas already in this file, `MeromorphicAt.deriv` (line 378) and `MeromorphicOn.deriv` (line 562), which are `protected theorem d
+  [1] Mathlib/Analysis/Meromorphic/Basic.lean: `Meromorphic.fun_neg` has a stray space before the closing parenthesis: `Meromorphic (fun x ↦ -f x )`.
+  [2] Mathlib/Analysis/Meromorphic/Basic.lean: `meromorphicOn_univ` has a doubled space before the assignment: `Meromorphic f := by tauto`.
+  [3] Mathlib/Analysis/Meromorphic/Basic.lean: The docstring of `meromorphicOn_univ` mentions the code fragment `Set.univ` without backticks, so it does not render as code/link.
+  [4] Mathlib/Analysis/Meromorphic/Basic.lean: `Meromorphic.prod` is a `theorem` with no docstring, and so are `Meromorphic.sum` (664), `Meromorphic.fun_prod` (693) and `Meromorphic.fun_sum` (668), while the same-named declarations for the sibling predicates are docu
+  [5] Mathlib/Analysis/Meromorphic/Basic.lean: The module docstring's “Main statements” list is not kept in step with the code: it still lists only `MeromorphicAt` items and does not mention the new predicate `Meromorphic` (nor the equivalence `meromorphicOn_univ`) t
+  [6] Mathlib/Analysis/Meromorphic/Basic.lean: The arithmetic API shipped for the new predicate `Meromorphic` omits the inverse: `Meromorphic.mul`, `div`, `pow`, `zpow` are provided (lines 681, 698, 706, 712), but there is no `Meromorphic.inv`/`fun_inv`, although bot
+TRANSCRIPT around l.25 (+-1):
+[24] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+[25] REASONING: The file compiles clean with no warnings.
+
+Now let's test candidate edits.
+
+Candidate A: fix `fun_neg` spacing (trivial, no need to compile, but let's include in a combined test).
+
+Candidate B: prove `meromorphicOn_univ` by `by simp [Meromorphic, MeromorphicOn]` — let me check whether that compiles; also whether `Iff.rfl` works (to know whether a term proof is possible).
+
+Candidate C: add `inv` and `fun_inv` lemmas. To test, I'd add them to the file. Using declaration_name `Meromorphic.fun_neg` replacement with `fun_neg` + `inv` + `fun_inv`. But the docstring/attribute placement — `inv` needs `{f : 𝕜 → 𝕜}`. Let me test the statement to confirm it compiles.
+
+Candidate D: rename scalar variables to `s t` and hoist them into `variable`. Test via span replacement of the namespace block.
+
+Let me be careful about how many findings to file. Let me think about which are most likely to match real maintainer comments and are well-supported.
+
+Findings shortlist:
+1. Style: `fun_neg` — `(fun x ↦ -f x )` stray space; also line 641 `Meromorphic f  :=` doubled space. These are two places of the same
+[25] TOOL declaration_search: {"identifier": "Meromorphic"}
+[25] TOOL content_search: {"content_pattern": "MeromorphicOn f (Set\\.)?univ \u2194|\u2194 MeromorphicOn f (Set\\.)?univ", "path": "target/Mathlib", "limit": 10}
+[25] TOOL naming_norm: {"declaration": "meromorphicOn_univ"}
+[25] TOOL precedent_search: {"code": "@[fun_prop]\nlemma fun_neg (hf : Meromorphic f) : Meromorphic (fun x \u21a6 -f x ) := hf.neg"}
+[26] RESULT declaration_search: {"success": true, "count": 1, "declared_before_this_pr": 0, "declared_in_this_pr": 1, "searched_terms": ["Meromorphic"], "results": "- `Meromorphic` is declared in `Mathlib/Analysis/Meromorphic/Basic.
+
+GREP 'fun_add|to_fun':
+--- line 3 TEXT[user] (match 'fun_add|to_fun')
+added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[fun_prop] theorem sum (h : ∀ σ, Meromorphic (G σ)) :     Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x) ```  ### `Meromorphic.fun_add` (lemma, added) [e1da91dccf] - file: `Mathlib/Analysis/Meromorphic/Basic.lean`; changed: attributes:added, name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[fun_prop] lemma fun_add (hf : 
+
+--- line 6 TOOL_RESULT file_read (match 'fun_add|to_fun')
+g : Meromorphic g) :\n   657|    Meromorphic (f + g) :=/- ... omitted ... -/\n   658|\n   659|@[fun_prop]\n   660|lemma fun_add (hf : Meromorphic f) (hg : Meromorphic g) :\n   661|    Meromorphic (fun x ↦ f x + g x) :=/- ... omitted ... -/\n   662
+
+--- line 8 TOOL_RESULT file_read (match 'fun_add|to_fun')
+morphicAt g x) :\n    74|    MeromorphicAt (f + g) x :=/- ... omitted ... -/\n    85|\n    86|@[fun_prop]\n    87|lemma fun_add {f g : 𝕜 → E} (hf : MeromorphicAt f x) (hg : MeromorphicAt g x) :\n    88|    MeromorphicAt (fun z ↦ f z + g z) x :=/- 
+
+--- line 9 TOOL_RESULT file_read (match 'fun_add|to_fun')
+morphicOn f V :=/- ... omitted ... -/\n   476|lemma add : MeromorphicOn (f + g) U :=/- ... omitted ... -/\n   479|lemma fun_add : MeromorphicOn (fun z ↦ f z + g z) U :=/- ... omitted ... -/\n   482|lemma sub : MeromorphicOn (f - g) U :=/- ... omit
+
+--- line 10 REASONING (match 'fun_add|to_fun')
+On]`? Not needed.  12. Attributes: `@[fun_prop]` on `Meromorphic` def itself plus on each lemma. The convention about fun_prop: fine. But do the `fun_*` variants need `@[fun_prop]`? In the existing file, both `add` and `fun_add` have `@[fun_prop]`. Consistent.  13. Should the `Meromorphic` def be `@[fun_prop]`? `MeromorphicAt` def is. Fine.  14. Missing: `Meromorphic.inv`? Let's double check `MeromorphicAt.inv` is in the file: yes line 258 `le
+
+--- line 22 TOOL_RESULT file_read (match 'fun_add|to_fun')
+eromorphic g) :\n   657|    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n   658|\n   659|@[fun_prop]\n   660|lemma fun_add (hf : Meromorphic f) (hg : Meromorphic g) :\n   661|    Meromorphic (fun x ↦ f x + g x) := hf.add hg\n   662|"}
+
+--- line 25 REASONING (match 'fun_add|to_fun')
+ file's existing pattern (unexpanded/expanded forms). The convention "A lemma about a function property is named by the naming guide's convention for the expanded and unexpanded forms" — the PR does exactly that (`add`/`fun_add`), consistent with the file.  Hmm, one thing: is `fun_deriv`'s `(fun x ↦ _root_.deriv f x)` vs `deriv` — fine.  Another: `Meromorphic.iterated_deriv` — `:= fun x ↦ (hf x).iterated_deriv`. MeromorphicAt.iterated_deriv ha
+
+[stopped at --max 7 blocks]
+
+=== P14_val 32875 v0091 AP1 [P14val_a]  family F3  Mathlib/Data/Rat/Lemmas.lean:303
+ASK: Same here.
+CODE AT COMMENT: @@ -300,10 +300,8 @@ theorem inv_natCast_num_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.num = 1 |    inv_intCast_num_of_pos (mod_cast ha0 : 0 < (a : ℤ)) |   |  theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by | -  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one] | -  apply den_div_eq_of_coprime ha0 | -  rw [Int.natAbs_one] | -  exact Nat.coprime_one_left _ | +  simp only [den_inv, num_intCast]
+MATCHER: m1 no (Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.) | m2 no (Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial.)
+READER: O l.40 ap=n/a/None know=direction
+  quote: there's a lighter route, but it's not obviously shorter/better than grind. (filed: revert, slower per the PR's profile)
+SUBMITTED FINDINGS at that file:
+  [1] Mathlib/Data/Rat/Lemmas.lean: `Rat.inv_intCast_den_of_pos` is now closed by `grind` (after `simp only [den_inv, num_intCast]`), again replacing a short explicit proof while the PR's own profiling shows the declaration got slower (`<10 ms before, 17 m
+TRANSCRIPT around l.40 (+-1):
+[39] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[40] REASONING: Interesting results:
+
+1. For `Finset.mem_map_equiv`, `mem_map_of_injective` is a `Multiset` lemma and the goal state shows `f.symm (f (f.symm b)) ∈ s` — wait, the expected type shows LHS `f (f.symm b) ∈ map f.toEmbedding s` and RHS `f.symm (f (f.symm b)) ∈ s`. Hmm, so `rw [← f.apply_symm_apply b]` rewrote both occurrences of `b`. Need `simp` afterwards. So it needs `simpa using mem_map_of_injective ...`. Not clean.
+
+2. For `Rat.inv_intCast_den_of_pos`, my alternative `simp only [den_inv, num_intCast]; simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` compiles! Hmm, so there's a lighter route, but it's not obviously shorter/better than grind. Hmm. Wait — did the second `simp` need explicit args? It compiled. Hmm, interesting. But is that a *better* proof than `grind`? It's two `simp`s... Actually maybe simpler: `simp only [den_inv, num_intCast, ha0.ne', ite_false, Int.natAbs_of_nonneg ha0.le, Int.toNat_of_nonneg ha0.le, Int.cast_natCast]`? Let me test a single `simp only` without grind.
+
+Hmm, what would the maintainer want? For `Rat.inv_intCast_den_of_pos`, the neighbouring style is `simp 
+[40] TOOL file_read: {"file_path": "target/Mathlib/MeasureTheory/Constructions/Pi.lean", "line_start": 440, "line_end": 475, "omit_details": false}
+[40] TOOL file_read: {"file_path": "target/Mathlib/Order/LiminfLimsup.lean", "line_start": 1135, "line_end": 1165, "omit_details": false}
+[41] RESULT file_read: {"success": true, "content": "   437|theorem ae_le_set_pi {I : Set ι} {s t : ∀ i, Set (α i)} (h : ∀ i ∈ I, s i ≤ᵐ[μ i] t i) :\n   438|    Set.pi I s ≤ᵐ[Measure.pi μ] Set.pi I t :=\n   439|  ((eventual
+
+GREP 'den_inv|grind =':
+--- line 3 TEXT[user] (match 'den_inv|grind =')
+  apply den_div_eq_of_coprime ha0   rw [Int.natAbs_one]   exact Nat.coprime_one_left _ ``` - as the PR leaves it: ```lean theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by   simp only [den_inv, num_intCast]   grind ```  ### `MeasureTheory.Measure.pi_map_piCongrLeft` (lemma, modified) [d11aac133e] - file: `Mathlib/MeasureTheory/Constructions/Pi.lean`; changed: proof:modified - before the PR: ```lean lemma pi_m
+
+--- line 6 TOOL_RESULT file_read (match 'den_inv|grind =')
+nset α).map f = ∅ :=/- ... omitted ... -/\n    65|\n    66|variable {f : α ↪ β} {s : Finset α}\n    67|\n    68|@[simp, grind =]\n    69|theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=/- ... omitted ... -/\n    73|@[simp 1100]\n    74|
+
+--- line 11 TOOL_RESULT file_read (match 'den_inv|grind =')
+(∅ : Finset α).map f = ∅ :=\n    64|  rfl\n    65|\n    66|variable {f : α ↪ β} {s : Finset α}\n    67|\n    68|@[simp, grind =]\n    69|theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=\n    70|  Multiset.mem_map\n    71|\n    72|-- Hig
+
+--- line 12 TOOL_RESULT file_read (match 'den_inv|grind =')
+ 301|\n   302|theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n   303|  simp only [den_inv, num_intCast]\n   304|  grind\n   305|\n   306|theorem inv_natCast_den_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.den = a
+
+--- line 13 REASONING (match 'den_inv|grind =')
+ult is consumed by another tactic is squeezed to `simp only [...]`" — in `Finset.mem_map_equiv`, `simp only [mem_map, Equiv.coe_toEmbedding]` then `grind`. Squeezed already.  In `Rat.inv_intCast_den_of_pos`: `simp only [den_inv, num_intCast]` then grind. Squeezed. Hmm but is `den_inv`/`num_intCast` needed? Whatever.  Portmanteau: new proof is ``` simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h exact tendsto_o
+
+--- line 16 REASONING (match 'den_inv|grind =')
+lication closes is not closed by heavy general automation (grind, aesop)". The old proof is a 4-line explicit `rw`+`exact ⟨...⟩`. Hmm. This is a legit advisory finding.  Actually wait. There's a subtlety: `mem_map` has `grind =` attribute, so `grind` can use it. And `simp only [mem_map, Equiv.coe_toEmbedding]` then `grind` — but could `simp` alone close it? Let's test: `simp [Finset.mem_map, Equiv.coe_toEmbedding]`? The goal after simp only is
+
+--- line 28 REASONING (match 'den_inv|grind =')
+ `by simpa using Multiset.mem_map_equiv ...`? Let me check if `Multiset` version exists.  Let me check `declaration_search` for `Multiset.mem_map_equiv` and `mem_map_equiv`.  2. `Rat.inv_intCast_den_of_pos`: `simp only [den_inv, num_intCast]; grind`. 17ms after vs <10ms before. Original short. Hmm. Note adjacent lemma `inv_intCast_num_of_pos` is `by simp [*]`. So the area uses `simp`. Could this be `by simp [*, den_inv, num_intCast]`? Let's te
+
+[stopped at --max 7 blocks]
+
+=== D12 33421 d0051 AP1 [D12c]  family F7  Mathlib/Algebra/Order/Floor/Ring.lean:277
+ASK: Better I think as ```suggestion theorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) : k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by rw [fract, mul_sub, sub_eq_iff_eq_add'] refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩ rintro ⟨n, hn⟩ convert hn have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn] simp [mul_add, hk] ```
+CODE AT COMMENT:  |  theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by |    simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a |   | +theorem two_mul_fract_eq_one_iff_exists_int {x : R} : | +    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by | +  rw [fract, mul_sub, sub_eq_iff_eq_add'] | +  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩ | +  rintro ⟨n, hn⟩ | +  convert hn | +  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn] | +  simp [mul_add]
+MATCHER: m1 no (No finding generalizes the lemma to k * fract x; several only move it to the fract section.) | m2 no (Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k.)
+READER: O l.19 ap=absent/None know=construction
+  quote: filed 'Move the lemma into the `#### Fractional part` section'; 'Its statement mentions `fract`. Hmm, the file is Floor/Ring … This is fine. Name check'
+SUBMITTED FINDINGS at that file:
+  [7] Mathlib/Algebra/Order/Floor/Ring.lean: `Int.two_mul_fract_eq_one_iff_exists_int` is a lemma about `Int.fract` placed in the `#### Floor` section, immediately after the floor-division lemmas `mul_cast_floor_div_cancel_of_pos`/`mul_natCast_floor_div_cancel`, wh
+TRANSCRIPT around l.19 (+-1):
+[18] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Algebra/Order/Floor/Ring.lean", "matches": [{"line_number": 8, "content": "     6|module\n     7|\n     8|public import Mathlib.Algebra.Order.Fie
+[19] REASONING: `add_mem_Ico_iff_left` is in `Interval.Set.Group`. The old proof of `round_eq_zero_iff` used it. The new proof uses `round_eq_iff` and `simp`. Does it still need the import? `round_eq_iff`'s proof uses `Ico` and `Set` membership, which may need `Interval.Set.Basic` (imported by Group). Hmm, `Set.Ico` is defined in `Mathlib.Order.Interval.Set.Defs` presumably. To use `x ∈ Ico a b` as a proposition you need the definition. The `Ico` notation is likely available via `Order.Interval.Set.Basic`? Round.lean had the import so it works. But is it necessary now?
+
+This is the "shake"-style question. Actually the pattern: they changed `public import` → `import` in Round.lean but kept the import. So Round.lean still imports it. If it's needed for `round_eq_iff`, the import must stay. Fine.
+
+Hmm, but wait: maybe the whole set of import changes is actually the reverse: perhaps the intent is `Round.lean` should now be importable without pulling in interval-set algebra, and the downstream files that need it now import it directly. `import` (private) vs `public import` — for the *file's own* use, `im
+[19] TOOL content_search: {"content_pattern": "floor_eq_on_Ico|ceil_eq_on_Ioc", "path": "target/Mathlib", "recursive": true, "limit": 20}
+[19] TOOL content_search: {"content_pattern": "cast_mul_floor_div_cancel_of_pos|mul_cast_floor_div_cancel_of_pos", "path": "target/Mathlib", "recursive": true, "limit": 20}
+[20] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Algebra/Order/Floor/Ring.lean", "matches": [{"line_number": 155, "content": "   153|theorem floor_eq_zero_iff : ⌊a⌋ = 0 ↔ a ∈ Ico (0 : R) 1 := by
+
+GREP 'two_mul_fract|generali':
+--- line 1 TEXT[system] (match 'two_mul_fract|generali')
+n the PR model (every changed object, its kind and what changed, with the families and relations the change graph finds), then the diff. Read all three.  Examine every target across all concern families: - proof-golf; - generalization; - duplication; - naming; - documentation; - style; - scope; - correctness.  There is no quota. Submit only actionable requests supported by the reviewed code, and submit none when no request is warranted.  Each f
+
+--- line 3 TEXT[user] (match 'two_mul_fract|generali')
+lean`; changed: attributes:added, name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[simp] theorem ceil_one_add (a : R) : ⌈1 + a⌉ = 1 + ⌈a⌉ :=   mod_cast ceil_natCast_add 1 a ```  ### `Int.two_mul_fract_eq_one_iff_exists_int` (theorem, added) [01e92e863a] - file: `Mathlib/Algebra/Order/Floor/Ring.lean`; changed: name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean theorem two_mul_fract_eq_one
+
+--- line 9 TOOL_RESULT file_read (match 'two_mul_fract|generali')
+round_intCast, ← two_mul, Int.mul_ediv_cancel_left _ two_ne_zero]\n    91|    · refine absurd ?_ hx\n    92|      exact two_mul_fract_eq_one_iff_exists_int.mpr ⟨m, mod_cast hm.symm⟩\n    93|  · rw [round_eq', (ceil_eq_floor_add_one_iff_notMem _).mpr hx'
+
+--- line 19 REASONING (match 'two_mul_fract|generali')
+l. Mathlib policy: type changes need to be reviewed and possibly noted in the PR description. Hmm.  Also `continuousOn_ceil` lost its `[IsStrictOrderedRing α]` requirement (now in the Ring section it's general) — that's generalization, good.  (c) `Int.two_mul_fract_eq_one_iff_exists_int` is placed in `Mathlib/Algebra/Order/Floor/Ring.lean` in the `LinearOrderedRing` section? Let me check placement: it's added right after `mul_natCast_floor_div_
+
+--- line 21 TOOL_RESULT content_search (match 'two_mul_fract|generali')
+ = ⌊a⌋ := by\n   268|  simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n   269|\n   270|theorem two_mul_fract_eq_one_iff_exists_int {x : R} :"}, {"line_number": 284, "content": "   282|variable {R : Type*} [CommRing R] [LinearOrd
+
+--- line 25 REASONING (match 'two_mul_fract|generali')
+inside `section round`, no namespace. So name is `round_eq'`. Let me call naming_norm with `round_eq'`. Hmm, the tool takes the full name of a declaration this PR adds or renames. `round_eq'` — maybe it resolves.  Also `two_mul_fract_eq_one_iff_exists_int`, `round_eq_half_ceil_two_mul`, `round_eq_iff`, `ceil_intCast_add`, etc.  Let's do a batch of tool calls: naming_norm for several names.
+
+--- line 25 TOOL_USE naming_norm (match 'two_mul_fract|generali')
+{"declaration": "Int.two_mul_fract_eq_one_iff_exists_int"}
+
+[stopped at --max 7 blocks]
+

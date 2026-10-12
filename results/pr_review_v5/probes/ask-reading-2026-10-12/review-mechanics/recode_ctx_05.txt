@@ -1,0 +1,174 @@
+=== D12 33337 d0045 AP1 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.31 ap=held/considered_dropped know=direction
+  quote: Yaël Dillies: '`coe` should be a prefix' ... So the PR rename to `coe_orthogonalProjection_...` and `coe_starProjection_...` is well-motivated. Good ... I shouldn't object to that.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` is not named after its own statement. Its LHS is `K.starProjection.toLinearMap`, i.e. the head of the conclusion is `toLinearMap`, so the leading token should be `toLin
+  [1] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: The change is not announced: the title is `chore(Analysis/InnerProductSpace/Projection/Submodule): rename lemmas`, whose Area names only `Projection/Submodule.lean` although `Positive.lean` is also changed, and neither t
+TRANSCRIPT around l.31 (+-1):
+[30] RESULT zulip_search: {"success": true, "count": 8, "as_of": "2025-12-27T13:43:05Z", "excluded_pr": 33337, "results": "#lean4 > overloaded names can slow down elaboration\n  Jovan Gerbscheid [maintainer] — 2025-04-21T05:19
+[31] REASONING: There's a Zulip thread "Naming convention" with Yaël Dillies: "`coe` should be a prefix" (2025-06-17). That supports the PR's rename direction: `coe_` should be a prefix. So the PR rename to `coe_orthogonalProjection_...` and `coe_starProjection_...` is well-motivated. Good — this confirms the rename direction is right, so I shouldn't object to that.
+
+Now, the `isComplProjection` spelling remains a question. Hmm.
+
+Let me look at the Zulip thread on "Naming convention: function application" to see if there's something about `_apply`.
+
+Actually, let me now try a different angle: are there other places in Mathlib where a "coe" lemma got renamed with `_apply`? e.g. `coe_X_apply`. Hmm.
+
+Also, let me reconsider: is `orthogonalProjection_apply_eq_linearProjOfIsCompl` the correct name for the pointwise version, given the sibling `coe_orthogonalProjection_apply` in Basic.lean? Hmm. In Basic.lean:
+- `starProjection_apply` : `U.starProjection v = U.orthogonalProjection v`
+- `coe_orthogonalProjection_apply` : `U.orthogonalProjection v = U.starProjection v`
+
+These are about the two projections be
+[31] TOOL lean_verify: {"code": "import Mathlib.Analysis.InnerProductSpace.Projection.Submodule\n\nnamespace Testing\ndef x : Nat := 3\nend Testing\n\ndef Testing.y : Nat := x\n\nexample : Testing.y = 3 := rfl\n\nexample : True := by\n  let _ := @coe_starProjection_eq_isComplProjection\n  trivial\n"}
+[32] RESULT lean_verify: {"success": false, "errors": [{"severity": "error", "data": "Unknown identifier `coe_starProjection_eq_isComplProjection`", "code_line": "  let _ := @coe_starProjection_eq_isComplProjection", "pos": {
+
+GREP 'should be a prefix|toLinearMap_':
+--- line 3 TEXT[user] (match 'should be a prefix|toLinearMap_')
+e `MulOpposite` namespace and be called `MulOpposite.opPositiveLinearMap` and the one below `MulOpposite.unopPositiveLinearMap`.   >   > But, also, some missing basic API like, `unop.comp op = id`, `op.comp unop = id`, `toLinearMap_op`, `toLinearMap_unop`, etc.    The code it was on:    ```   @@ -159,6 +182,28 @@ instance : AddCommMonoid (E₁ →ₚ[R] E₂) :=      toLinearMap_injective.addCommMonoid _ toLinearMap_zero toLinearMap_add        toLinearMap_
+
+--- line 12 TOOL_RESULT naming_norm (match 'should be a prefix|toLinearMap_')
+{"toLinearMap": 21, "coe": 7, "map": 5, "comp": 4, "det": 4, "ι": 4, "fst": 3, "minpoly": 3}, "candidates": ["Submodule.toLinearMap_starProjection_eq_isComplProjection", "Submodule.toLinearMap_starProjection"], "results": "Subject of the conclusion: `t
+
+--- line 13 REASONING (match 'should be a prefix|toLinearMap_')
+The naming_norm verdict says "emerging" with candidate `toLinearMap_starProjection_eq_isComplProjection`. Hmm. That's advisory. Hmm, but that's a machine census noting `toLinearMap_` prefix leads 21 to 7. But is that ratio a real convention? It says "emerging — one spelling leads clearly
+
+--- line 18 TOOL_RESULT content_search (match 'should be a prefix|toLinearMap_')
+   313|    0 ≤ ⟪x, T x⟫ := hT.toLinearMap.inner_nonneg_right x"}, {"line_number": 337, "content": "   335|  (isPositive_toLinearMap_iff _).mp (hT.toLinearMap.add hS.toLinearMap)\n   336|\n   337|open ComplexOrder in\n   338|@[aesop safe apply]\n   339|
+
+--- line 20 TOOL_RESULT file_read (match 'should be a prefix|toLinearMap_')
+{"success": true, "content": "   437|  simp [← isPositive_toLinearMap_iff, LinearMap.isPositive_iff_complex]\n   438|\n   439|end Complex\n   440|\n   441|section PartialOrder\n   442|\n   4
+
+--- line 25 TOOL_RESULT naming_norm (match 'should be a prefix|toLinearMap_')
+e conclusion: `→ₗ` (from coercion_ascription).\nOf 124 declarations in the base snapshot with that subject: `coe_` 48, `toLinearMap_` 9, `corootSpan_` 4, `rootSpan_` 4, `submodule_` 4, `id_` 3.\nThis declaration uses `coe_` (48).\nVerdict: **insufficie
+
+--- line 30 TOOL_RESULT zulip_search (match 'should be a prefix|toLinearMap_')
+ic/coe_add/near/554075189\n\n#mathlib4 > Naming convention\n  Yaël Dillies [maintainer] — 2025-06-17T13:58:18Z\n  `coe` should be a prefix\n  https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/Naming.20convention/near/524460242\n\n#mathli
+
+[stopped at --max 7 blocks]
+
+=== D12 33337 d0045 DX3 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.105 ap=n/a/None know=direction
+  quote: for `coe_orthogonalProjection_eq_linearProjOfIsCompl` the subject `→ₗ` (coercion_ascription) prefers `coe_` 48 of 124 ... So for the bundled lemma, `coe_` is the plurality ✓.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` bundles two changes: besides moving `coe` to the front, it also rewrites the suffix `isCompl_projection` into `isComplProjection`. The token `isComplProjection` appears
+TRANSCRIPT around l.105 (+-1):
+[104] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/InnerProductSpace/Basic.lean", "matches": [{"line_number": 155, "content": "   149|variable {F}\n   150|\n   151|@[simp] lemma innerₗ_ap
+[105] REASONING: VERY interesting!! Look at Adjoint.lean lines 733-741:
+
+```lean
+namespace unitary
+
+@[deprecated (since := "2025-10-29")] alias norm_map := Unitary.norm_map
+@[deprecated (since := "2025-10-29")] alias inner_map_map := Unitary.inner_map_map
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv := Unitary.linearIsometryEquiv
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv_coe_apply :=
+  Unitary.linearIsometryEquiv_coe_apply
+@[deprecated (since := "2025-10-29")] alias linearIsometryEquiv_coe_symm_apply :=
+  Unitary.linearIsometryEquiv_coe_symm_apply
+```
+
+Note line 738-741: the deprecated `unitary.linearIsometryEquiv_coe_apply` alias points to `Unitary.linearIsometryEquiv_coe_apply` — which is ITSELF now a deprecated alias (at line 720, renamed to `coe_linearIsometryEquiv_apply`)!! So in this campaign, older aliases were NOT re-pointed to the newest name; they point to the intermediate (now-deprecated) name. Hmm! Interesting. Hmm, and moreover — a deprecated alias pointing to a deprecated declaration... does Lean allow that? It's an `alias` to a deprecated name; 
+[105] TOOL zulip_search: {"query": "starProjection_eq_isCompl_projection wrong name rename soon", "limit": 8}
+[105] TOOL zulip_search: {"query": "rename IsCompl.projection lemmas coe prefix linearProjOfIsCompl naming projections prefix", "maintainers_only": false, "limit": 8}
+[106] RESULT zulip_search: {"success": true, "count": 8, "as_of": "2025-12-27T13:43:05Z", "excluded_pr": 33337, "results": "#mathlib4 > Matrix.dotProduct rename?\n  Martin Dvořák — 2024-12-12T07:43:34Z\n  The consensus is clear
+
+GREP '48 of 124|plurality':
+--- line 91 TOOL_RESULT naming_norm (match '48 of 124|plurality')
+s `coe_` (48).\nVerdict: **insufficient_evidence**.\n`coe_`, this name's prefix, is the most common spelling but only a plurality (48 of 124, under the 80% bar), so the census does not settle the prefix either way.\nThis census counts only each name
+
+--- line 105 REASONING (match '48 of 124|plurality')
+ for subject `toLinearMap` prefers `toLinearMap_` (21) over `coe_` (7) — "emerging" verdict, advisory. Hmm, and for `coe_orthogonalProjection_eq_linearProjOfIsCompl` the subject `→ₗ` (coercion_ascription) prefers `coe_` 48 of 124 (plurality, insufficient evidence). Hmm, so for the bundled lemma, `coe_` is the plurality ✓. And for the `toLinearMap`-styled lemma, `toLinearMap_` leads. Hmm, that's an *asymmetry* between the two renamed bundled lemm
+
+[2 matching blocks]
+
+=== D12 33337 d0045 DX1 [D12a]  family F8  Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198
+ASK: ```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+CODE AT COMMENT: eprecated (since := "2025-07-11")] alias orthogonalProjection_eq_linear_proj := | -  orthogonalProjection_eq_linearProjOfIsCompl | +  orthogonalProjection_apply_eq_linearProjOfIsCompl | +@[deprecated (since := "2025-12-26")] alias orthogonalProjection_eq_linearProjOfIsCompl := | +  orthogonalProjection_apply_eq_linearProjOfIsCompl |   | -theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : | +theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :
+MATCHER: m1 no (No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.) | m2 no (No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct.)
+READER: V l.53 ap=n/a/None know=direction
+  quote: Candidate B (naming): ... should be `toLinearMap_starProjection_...` per corpus (naming_norm: `toLinearMap_` 21 vs `coe_` 7). Hmm, but I argued `coe_` is justified by the generic coercion.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean: `Submodule.coe_starProjection_eq_isComplProjection` carries the coercion prefix `coe_`, but its statement names the coercion as a projection: `K.starProjection.toLinearMap = ...`. The library spells lemmas of that shape
+TRANSCRIPT around l.53 (+-1):
+[52] RESULT file_search: {"success": true, "results": [], "truncated": false}
+[53] REASONING: Hmm, file_search returned nothing — maybe the directory path convention differs. Let me search in `target/Mathlib` for linter files.
+
+Actually earlier content_search on target/docs returned "files_available: 7" with 0 matches, so docs exists with 7 files (maybe .lean?). And file_search with directory target found nothing for *Deprecat* — because it searched `target` recursively? It said truncated false, 0 results. Hmm, that's odd since Mathlib has `Mathlib/Tactic/Linter/Deprecated.lean`? Maybe file_search needs a different root. Let me try directory_path "target/Mathlib/Tactic/Linter".
+
+Not that important. Let me refocus.
+
+Decision time. I need to produce findings that are defensible. Let me weigh candidates:
+
+**Candidate A (naming/statement consistency):** `coe_starProjection_eq_isComplProjection` — the LHS `K.starProjection.toLinearMap` should be written as a coercion `(K.starProjection : E →ₗ[𝕜] E)` to match the name's `coe_` prefix and its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`. Advisory. Hmm, weak-ish but concrete and verifiable.
+
+**Candidate B (naming):** `co
+[53] TOOL content_search: {"limit": 30, "path": "target/Mathlib", "content_pattern": "isCompl_projection|isComplProjection|IsCompl.projection_range"}
+[53] TOOL content_search: {"limit": 30, "path": "target", "content_pattern": "linearProjOfIsCompl"}
+[54] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Analysis/InnerProductSpace/Positive.lean", "matches": [{"line_number": 245, "content": "   243|    hp.isIdempotentElem.mem_range_iff.mp ha, sub_n
+
+GREP 'Candidate B|toLinearMap_ 21':
+--- line 53 REASONING (match 'Candidate B|toLinearMap_ 21')
+ould be written as a coercion `(K.starProjection : E →ₗ[𝕜] E)` to match the name's `coe_` prefix and its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`. Advisory. Hmm, weak-ish but concrete and verifiable.  **Candidate B (naming):** `coe_starProjection_eq_isComplProjection` should be `toLinearMap_starProjection_eq_isComplProjection` per corpus (naming_norm: `toLinearMap_` 21 vs `coe_` 7, "emerging"). Hmm, but I argued `coe_` is justifie
+
+[1 matching blocks]
+
+=== D12 33285 d0035 AP2 [D12b]  family F1  Mathlib/Algebra/Module/Submodule/Map.lean:597
+ASK: here's an even better golf ```suggestion comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2 ```
+CODE AT COMMENT: @@ -597,9 +597,8 @@ theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) : |      comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by
+MATCHER: m1 no (Term one-liner fun _ h ↦ q.add_mem h.1 h.2 reaches; R2's rintro tactic golf is a different, longer proof.) | m2 no (Reached = term proof fun _ h ↦ q.add_mem h.1 h.2; R2 golfs to a shorter tactic proof instead.)
+READER: V l.34 ap=held/considered_dropped know=construction
+  quote: thought of 'the whole thing: `fun m h ↦ add_mem h.1 h.2`' (l.22), tested `intro m h; exact add_mem h.1 h.2` → failed ('`add_mem`'s implicit `?m` can't unify. So the `simp only` is needed. So the current proof form is close to minimal.' l.34); submitted 'verified `intro m h; exact add_mem h.1 h.2` fails' (l.78)
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.34 (+-1):
+[33] RESULT lean_verify_edit: {"success": false, "errors": [{"severity": "error", "data": "Application type mismatch: The argument\n  h.right\nhas type\n  m ∈ ↑(comap f₂ q)\nbut is expected to have type\n  ?m.101 ∈ comap f₁ q\nin 
+[34] REASONING: Interesting: `exact add_mem h.1 h.2` fails without the `simp only ... at h ⊢` because `add_mem` expects both args in the *same* submodule (q), and `h.1 : m ∈ comap f₁ q`, `h.2 : m ∈ comap f₂ q` are not syntactically equal; `add_mem`'s implicit `?m` can't unify. So the `simp only` is needed. So the current proof form is close to minimal. Could it be `by simp [SetLike.le_def, Submodule.mem_inf, Submodule.mem_comap, ...]`? Let's test whether a one-liner `simp` proof works:
+
+```lean
+theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :
+    comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by
+  intro m h
+  simpa [Submodule.mem_inf, Submodule.mem_comap, LinearMap.add_apply] using add_mem h.1 h.2
+```
+Hmm, that's about the same length. Or maybe:
+```lean
+  simp only [SetLike.mem_coe, mem_comap, mem_inf, LinearMap.add_apply] at h ⊢
+  exact add_mem h.1 h.2
+```
+There might be an even simpler: `by rw [SetLike.le_def]; rintro m ⟨h1, h2⟩; exact add_mem h1 h2`? That would fail for the same reason.
+
+Hmm, what about using `Submodule.mem_inf.mp` ... same issue.
+
+What about `grind`? Or `aesop`? Per the 
+[34] TOOL file_read: {"file_path": "target/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean", "line_start": 270, "line_end": 360}
+[35] RESULT file_read: {"success": true, "content": "   267|@[simp]\n   268|theorem isOrtho_self {U : Submodule 𝕜 E} : U ⟂ U ↔ U = ⊥ :=/- ... omitted ... -/\n   271|\n   272|@[simp]\n   273|theorem isOrtho_orthogonal_right 
+
+GREP 'add_mem h.1 h.2|mem_comap':
+--- line 3 TEXT[user] (match 'add_mem h.1 h.2|mem_comap')
+`lean theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by   rw [SetLike.le_def]   intro m h   change f₁ m + f₂ m ∈ q   change f₁ m ∈ q ∧ f₂ m ∈ q at h   apply q.add_mem h.1 h.2 ``` - as the PR leaves it: ```lean theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by   rw [SetLike.le_def]   intro m h   simp only [mem_comap, mem_inf, Linear
+
+--- line 4 REASONING (match 'add_mem h.1 h.2|mem_comap')
+et me look at the key changes:  1. `Submodule.inf_comap_le_comap_add` — golf. Fine, but maybe could be `by simp [SetLike.le_def, ...]`? Actually the new proof uses `rw [SetLike.le_def]` then `simp only ... at h ⊢; exact add_mem h.1 h.2`. Perhaps the whole thing could be `by simp [SetLike.le_def]; ...` Actually could the proof be `fun m h => add_mem h.1 h.2`? Hmm. Let me check whether it's shorter. Actually the convention "A goal that a standard finish
+
+--- line 22 REASONING (match 'add_mem h.1 h.2|mem_comap')
+in` in the target tree to see if there are two.  Let me check the Rank.lean file around line 270-300 and grep.  6. **`inf_comap_le_comap_add`** — new proof: `rw [SetLike.le_def]; intro m h; simp only [...] at h ⊢; exact add_mem h.1 h.2`. Could this be simply `by simp [SetLike.le_def, submodule...]`? Hmm. Let's test whether `by intro m h; simpa [Submodule.mem_comap, Submodule.mem_inf] using add_mem h.1 h.2`? Or the whole thing: `fun m h ↦ add_mem h.1 h
+
+--- line 31 TOOL_USE lean_verify_edit (match 'add_mem h.1 h.2|mem_comap')
+aration": "theorem inf_comap_le_comap_add (f\u2081 f\u2082 : M \u2192\u209b\u2097[\u03c4\u2081\u2082] M\u2082) :\n    comap f\u2081 q \u2293 comap f\u2082 q \u2264 comap (f\u2081 + f\u2082) q := by\n  intro m h\n  exact add_mem h.1 h.2"}
+
+--- line 33 TOOL_RESULT lean_verify_edit (match 'add_mem h.1 h.2|mem_comap')
+t is expected to have type\n  ?m.101 ∈ comap f₁ q\nin the application\n  add_mem h.left h.right", "code_line": "  exact add_mem h.1 h.2", "pos": {"column": 20, "line": 599}}], "warnings": [], "infos": [], "axioms": [], "outcome": "compile_errors", "messag
+
+--- line 34 REASONING (match 'add_mem h.1 h.2|mem_comap')
+Interesting: `exact add_mem h.1 h.2` fails without the `simp only ... at h ⊢` because `add_mem` expects both args in the *same* submodule (q), and `h.1 : m ∈ comap f₁ q`, `h.2 : m ∈ comap f₂ q` are not syntactically equal; `add_mem`'s implicit `?m` can't 
+
+--- line 37 TOOL_RESULT file_read (match 'add_mem h.1 h.2|mem_comap')
+ 𝕜 F} (h : U ⟂ V) :\n   338|    U.comap f ⟂ V.comap f := by\n   339|  rw [isOrtho_iff_inner_eq] at *\n   340|  simp_rw [mem_comap, ← f.inner_map_map]\n   341|  intro u hu v hv\n   342|  exact h _ hu _ hv\n   343|\n   344|@[simp]\n   345|theorem IsOr
+
+[stopped at --max 7 blocks]
+

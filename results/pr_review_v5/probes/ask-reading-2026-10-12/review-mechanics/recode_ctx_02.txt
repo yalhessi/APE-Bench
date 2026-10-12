@@ -1,0 +1,195 @@
+=== P14_val 34091 v0108 DX3 [P14val_a]  family F2  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89
+ASK: ```suggestion theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ```
+CODE AT COMMENT: ite_pigeonhole_card_lt f w w' | -  exact ⟨a, w'.trans ha.le⟩ | +  simp_rw [Cardinal.infinite_iff] at hβ ⊢ | +  rcases lt_or_ge #α ℵ₀ with hα | hα | +  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq]) | +  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ | +    exact ⟨a, hα.trans ha.le⟩ | + | +/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/ | +theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :
+MATCHER: m1 no ([Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.) | m2 no ([Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no.)
+READER: K l.43 ap=held/None know=demand
+  quote: make `[Infinite β]` an implicit instance argument to `exists_infinite_fiber` ... that's a real API question! ... `[Infinite β]` would be idiomatic. But then users who have `hβ : Infinite β` explicitly... Meh. Not a finding.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) says "A function whose domain's cardinality is infinite but strictly greater than its domain's has a fiber with cardinality strictly great t
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.exists_infinite_fiber` (lines 78-79) has the same defect: "A function whose domain's cardinality is infinite but strictly greater than its domain's has an infinite fiber." The hypothe
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The docstring of the newly added `Cardinal.exists_uncountable_fiber` (lines 95-96) says "A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber", again compar
+TRANSCRIPT around l.43 (+-1):
+[42] RESULT precedent_search: {"success": true, "count": 5, "as_of": "2026-01-18T04:16:55Z", "results": "1. PR #32975 · `Mathlib/Data/Set/Countable.lean` · 2025-12-18T05:26:59Z (similarity 0.646)\n   jcommelin wrote: \"Whoops, `Se
+[43] REASONING: Precedent search wasn't very informative. Precedent 5: "This version should be more general" — a maintainer asking for more general statements. Hmm.
+
+Now let me step back and consider: is there a real *generalization* defect in the PR? The PR generalizes `infinite_pigeonhole_card_lt` (ℵ₀ ≤ #α → ℵ₀ ≤ #β) and `exists_infinite_fiber` (Infinite α → Infinite β). Hmm, but hmm: in `infinite_pigeonhole_card_lt` with `ℵ₀ ≤ #β` — hmm, is there a subtlety: when `#α < ℵ₀` (α finite), the theorem says `∃ a, #α < #(f ⁻¹' {a})`. Fine.
+
+Hmm, wait. Now consider `exists_uncountable_fiber`: hypothesis `hβ : Uncountable β`. Hmm, `Uncountable β` = `¬ Countable β`. But hmm, `#α < #β` with β uncountable... but also we might want the statement with `ℵ₁ ≤ #β`. Fine.
+
+Hmm, now: is `exists_uncountable_fiber` motivated? It may be the "new feature" of the PR. Its proof uses `infinite_pigeonhole_card f ℵ₁` — using `isRegular_aleph_one.cof_eq`. OK.
+
+Now let me look for a possibly *wrong* aspect: `exists_uncountable_fiber` with `Uncountable β` — the conclusion `Uncountable (f ⁻¹' {a})`: In the branch where `ℵ₀ ≤ #α
+[43] TOOL content_search: {"content_pattern": "preimage_singleton|of_preimage_singleton", "path": "target/Mathlib", "limit": 10, "max_matches_per_file": 5}
+[43] TOOL content_search: {"content_pattern": "\u2203 a, .*#\\(f \u207b\u00b9'|\u2203 y, .*#\\(f \u207b\u00b9'|_fiber", "path": "target/Mathlib", "limit": 15, "max_matches_per_file": 5}
+[44] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Order/Filter/Cofinite.lean", "matches": [{"line_number": 255, "content": "   253|\n   254|/-- For a function with finite fibres, inverse images o
+
+GREP '\\[Infinite':
+--- line 3 TEXT[user] (match '\\[Infinite')
+heorem, modified) [8db5a596ac] - file: `Mathlib/LinearAlgebra/Basis/Cardinality.lean`; changed: proof:modified - before the PR: ```lean theorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]     {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :     Cardinal.lift.{w'} #ι ≤ Cardinal.lift.{w} #κ := by   let Φ := fun k : κ => (b.repr (v k)).support   have w₁ : #ι ≤ #(Set.range Φ) := by 
+
+--- line 5 TOOL_RESULT file_read (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) :=/- ... omitted ... -/\n   123
+
+--- line 6 TOOL_RESULT file_read (match '\\[Infinite')
+he basis `b` is infinite.\n   243|-/\n   244|theorem linearIndependent_le_infinite_basis {ι : Type w} (b : Basis ι R M) [Infinite ι] {κ : Type w}\n   245|    (v : κ → M) (i : LinearIndependent R v) : #κ ≤ #ι :=/- ... omitted ... -/\n   259|\n   260|
+
+--- line 8 TOOL_RESULT file_read (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n   112|  by_contra h\n  
+
+--- line 9 REASONING (match '\\[Infinite')
+nd `by infer_instance` for `Infinite α` = `Infinite ι`... Hmm, but wait: they need `Infinite ι` where α = ι (the codomain is Finset ι). Actually the context: `h : ¬ (#κ ≤ #ι)`, so `#ι < #κ`. They need `Infinite ι` from `[Infinite ι]`. Actually with `[Infinite ι]` and the new `exists_infinite_fiber` requiring `Infinite β` = `Infinite κ`, that's not directly available; κ infinite follows from #ι < #κ and ι infinite. So they use the prime version. 
+
+--- line 10 TOOL_RESULT content_search (match '\\[Infinite')
+sets\n   109|must be at least the cardinality of `β`. -/\n   110|theorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n   111|    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n   112|  by_contra h"}, 
+
+--- line 16 TOOL_RESULT file_read (match '\\[Infinite')
+dinality of `s`.\n   113|-/\n   114|theorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]\n   115|    {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :\n   116|    Cardinal.lift.{w'} #
+
+[stopped at --max 7 blocks]
+
+=== P14_val 34091 v0105 DX1 [P14val_a]  family F1  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:86
+ASK: Surely this is a one-liner using `infinite_pigeonhole_card_lt`?
+CODE AT COMMENT: infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) : |      ∃ a : α, Infinite (f ⁻¹' {a}) := by | -  simp_rw [Cardinal.infinite_iff] at w' ⊢ | -  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w' | -  exact ⟨a, w'.trans ha.le⟩ | +  simp_rw [Cardinal.infinite_iff] at hβ ⊢ | +  rcases lt_or_ge #α ℵ₀ with hα | hα | +  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq]) | +  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ | +    exact ⟨a, hα.trans ha.le⟩
+MATCHER: m1 no (One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.) | m2 no (One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof.)
+READER: K l.12 ap=held/None know=unclear
+  quote: Let me think about golf for `exists_infinite_fiber` ... Could use `infinite_pigeonhole_card f ℵ₀` — needs ... `#α < (ℵ₀).ord.cof`. So the case split is needed.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-c
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: This PR deletes the `have k` block from `Cardinal.le_range_of_union_finset_eq_univ`, and that block contained the only use in the file of `Set.union_finset_finite_of_range_finite`, the only declaration this file took fro
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: `Cardinal.exists_infinite_fiber'` is a strict special case of the declaration immediately above it, not an independent result: its hypotheses `#α < #β` and `Infinite α` imply `Infinite β` via `h.le`, so the general `exis
+TRANSCRIPT around l.12 (+-1):
+[11] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Order/KonigLemma.lean", "matches": [{"line_number": 143, "content": "   141|    exact ⟨⟨_, π hle b⟩, ⟨⟨by simp, by rw [π_trans, ← h2]⟩, by simp⟩,
+[12] REASONING: So `Uncountable α ↔ ℵ₀ < #α`. So `exists_uncountable_fiber`'s goal `Uncountable (f ⁻¹' {a})` is `ℵ₀ < #(fiber)`. The proof rewrote `Uncountable` to `ℵ₁ ≤ #·` via `aleph0_lt_mk_iff` and `succ_le_iff`, `succ_aleph0`.
+
+Hmm, is `exists_uncountable_fiber` needed for downstream? It's not used in this PR. And is it a duplicate of an existing lemma? Let's check whether the library has something like `Cardinal.exists_uncountable_fiber_of...`. Search.
+
+Also let me check `Cardinal.infinite_pigeonhole_card_lt` uses elsewhere; and check whether `exists_infinite_fiber` is used elsewhere in the library (the old signature) — grep showed only Pigeonhole and le_range_of... So no other users.
+
+Now important: is there an existing lemma in `Mathlib/SetTheory/Cardinal/` about uncountable fibers? Let's search "Uncountable (f ⁻¹' ".
+
+Let me now check the git history/docs: the `deprecated (since := "2026-01-17")`. Let me check the repo for how recent `since` dates look. Let's grep for `deprecated (since := "2026`.
+
+Also check `Mathlib/Deprecated/` conventions? Some renames put the alias in the same file; oth
+[12] TOOL file_read: {"file_path": "target/Mathlib/Combinatorics/Pigeonhole.lean", "limit": 80}
+[12] TOOL file_read: {"file_path": "target/Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean", "line_start": 225, "line_end": 270}
+[13] RESULT file_read: {"success": true, "content": "     1|/-\n     2|Copyright (c) 2020 Kyle Miller. All rights reserved.\n     3|Released under Apache 2.0 license as described in the file LICENSE.\n     4|Authors: Kyle M
+
+GREP 'exists_infinite_fiber':
+--- line 3 TEXT[user] (match 'exists_infinite_fiber')
+ LinearIndependent R v) : #κ ≤ #ι := by   classical   by_contra h   rw [not_le, ← Cardinal.mk_finset_of_infinite ι] at h   let Φ := fun k : κ => (b.repr (v k)).support   obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h (by infer_instance)   let v' := fun k : Φ ⁻¹' {s} => v k   have i' : LinearIndependent R v' := i.comp _ Subtype.val_injective   have w' : Finite (Φ ⁻¹' {s}) := by     apply i'.finite_of_le_span_finite v' (s.image b)
+
+--- line 5 TOOL_RESULT file_read (match 'exists_infinite_fiber')
+main's cardinality is infinite but strictly greater than its domain's\n    79|has an infinite fiber. -/\n    80|theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    81|    ∃ a : α, Infinite (f ⁻¹' {a}) :=/- ... omitted
+
+--- line 8 TOOL_RESULT file_read (match 'exists_infinite_fiber')
+main's cardinality is infinite but strictly greater than its domain's\n    79|has an infinite fiber. -/\n    80|theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    81|    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n    82|  
+
+--- line 9 REASONING (match 'exists_infinite_fiber')
+Now let me think about what's going on.  Key observations:  1. `exists_infinite_fiber` was changed: the third hypothesis changed from `Infinite α` to `Infinite β`. That's a *strengthening* of the statement — the hypothesis got weaker (more general), good. Wait: `h : #α < #β` together with `Infinite β`...
+
+--- line 9 TOOL_USE content_search (match 'exists_infinite_fiber')
+{"content_pattern": "exists_infinite_fiber|le_range_of_union_finset_eq", "path": "target/Mathlib", "max_matches_per_file": 10, "limit": 20}
+
+--- line 11 TOOL_RESULT content_search (match 'exists_infinite_fiber')
+  142|  obtain ⟨a₀, ha₀, ha₀inf⟩ : ∃ a₀ : αs, a₀.1 = 0 ∧ (Ici a₀).Infinite := by\n   143|    obtain ⟨a₀, ha₀⟩ := Finite.exists_infinite_fiber (fun (a : αs) ↦ π (zero_le a.1) a.2)\n   144|    refine ⟨⟨0, a₀⟩, rfl, (infinite_coe_iff.1 ha₀).mono ?_⟩\n   145|    si
+
+--- line 12 REASONING (match 'exists_infinite_fiber')
+te of an existing lemma? Let's check whether the library has something like `Cardinal.exists_uncountable_fiber_of...`. Search.  Also let me check `Cardinal.infinite_pigeonhole_card_lt` uses elsewhere; and check whether `exists_infinite_fiber` is used elsewhere in the library (the old signature) — grep showed only Pigeonhole and le_range_of... So no other users.  Now important: is there an existing lemma in `Mathlib/SetTheory/Cardinal/` about uncountable fib
+
+[stopped at --max 7 blocks]
+
+=== P14_post 42184 p0003 DX2 [P14post]  family F6  Mathlib/Topology/Algebra/InfiniteSum/Order.lean:243
+ASK: and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)
+CODE AT COMMENT: @@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip |   |  end OrderedCommGroup |   | +section WithZero | + | +theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] | +    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) : | +    0 ≤ ∏'[L] x, f x := by | +  by_cases h : Multipliable f L | +  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i
+MATCHER: m1 no (Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.) | m2 no (Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof.)
+READER: C l.10 ap=n/a/None know=none
+  quote: check ... for any existing `tprod_nonneg`-ish statements like `HasProd.tprod_nonneg` or `Multipliable.tprod_nonneg`
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Topology/Algebra/InfiniteSum/Order.lean: `tprod_nonneg` assumes `[L.NeBot]`, but the statement does not need it: for the trivial summation filter `tprod` is `1` (by `tprod_eq_one_of_not_multipliable`, and in fact `multipliable_bot` holds there) resp. `∏ᶠ x, f x
+  [1] Mathlib/Topology/Algebra/InfiniteSum/Order.lean: The new `section WithZero` is misleading: the hypotheses of its only lemma are `CommMonoidWithZero` plus order/topology instances, and this file names each section after its typeclass context (`Preorder`, `OrderedCommMon
+TRANSCRIPT around l.10 (+-1):
+[9] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "matches": [{"line_number": 239, "content": "   237|section WithZero\n   238|\n   239|theorem tprod_non
+[10] REASONING: Let's look at `one_le_tprod` and `tsum_nonneg` around line 167 to see the existing context. The new lemma `tprod_nonneg` is in a `WithZero` section using `CommMonoidWithZero`, whereas `one_le_tprod` is `[CommMonoid α] [PartialOrder α] [IsOrderedMonoid α]` presumably. Actually for multiplicative monoids with zero, the tprod notation `∏'[L] x, f x` is defined for `CommMonoidWithZero`? Let's check the definition of tprod.
+
+Also the new lemma isn't tagged `@[to_additive]` — the additive counterpart `tsum_nonneg` already exists (line 167 `@[to_additive tsum_nonneg]`). So no need.
+
+Check whether `tprod_nonneg` statement is correct: `[CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [ClosedIciTopology α] [L.NeBot]`. Proof: `by_cases h : Multipliable f L`; `ge_of_tendsto' h.hasProd ...`. Hmm — `ge_of_tendsto'` requires `ClosedIciTopology` and `∀ s, c ≤ u s`. `s.prod_nonneg` for `Finset` in a `CommMonoidWithZero` with `PosMulMono`... `Finset.prod_nonneg` requires `[CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α]`? Let me check.
+
+Wa
+[10] TOOL file_read: {"file_path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "line_start": 150, "line_end": 200, "omit_details": false}
+[10] TOOL declaration_search: {"identifier": "Finset.prod_nonneg"}
+[11] RESULT file_read: {"success": true, "content": "   147|omit [IsOrderedMonoid α] in\n   148|@[to_additive]\n   149|theorem tprod_le_of_prod_le' (ha₂ : 1 ≤ a₂) (h : ∀ s, ∏ i ∈ s, f i ≤ a₂) :\n   150|    ∏'[L] i, f i ≤ a₂
+
+GREP 'HasProd':
+--- line 3 TEXT[user] (match 'HasProd')
+ologicalSpace α] [Preorder α] [ZeroLEOneClass α]     [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :     0 ≤ ∏'[L] x, f x := by   by_cases h : Multipliable f L   · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i   · simp [tprod_eq_one_of_not_multipliable h] ```  ### `section in Order.lean` (command, added) [a1e044627e] - file: `Mathlib/Topology/Algebra/InfiniteSum/Order.lean`; changed: names
+
+--- line 5 TOOL_RESULT file_read (match 'HasProd')
+le [Preorder α] [CommMonoid α] [TopologicalSpace α] {a c : α} {f : ι → α}\n    29|\n    30|@[to_additive]\n    31|lemma hasProd_le_of_prod_le [ClosedIicTopology α] [L.NeBot]\n    32|    (hf : HasProd f a L) (h : ∀ s, ∏ i ∈ s, f i ≤ c) : a ≤ c :=/-
+
+--- line 6 TOOL_RESULT file_read (match 'HasProd')
+{"success": true, "content": "   183|\n   184|@[to_additive]\n   185|theorem hasProd_one_iff_of_one_le {ι α : Type*} {L : SummationFilter ι} [CommMonoid α]\n   186|  [PartialOrder α] [IsOrderedMonoid α] [
+
+--- line 7 REASONING (match 'HasProd')
+Let's check whether the file already had `tprod_nonneg` elsewhere. Also check the additive version existence: `tsum_nonneg`. Let's look for `tsum_nonneg` in the library.  Also check `HasProd` definitions, `ge_of_tendsto'`, and whether the section name / naming convention is right. Note the added declaration lacks `@[to_additive]`... The declaration is about multiplicative notation but in a `WithZero` sectio
+
+--- line 8 TOOL_RESULT content_search (match 'HasProd')
+"path": "target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean", "matches": [{"line_number": 167, "content": "   165|  hasProd_le h ha hasProd_one\n   166|\n   167|@[to_additive tsum_nonneg]\n   168|theorem one_le_tprod (h : ∀ i, 1 ≤ g i) : 1 ≤ ∏
+
+--- line 10 REASONING (match 'HasProd')
+tprod_nonneg` statement is correct: `[CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [ClosedIciTopology α] [L.NeBot]`. Proof: `by_cases h : Multipliable f L`; `ge_of_tendsto' h.hasProd ...`. Hmm — `ge_of_tendsto'` requires `ClosedIciTopology` and `∀ s, c ≤ u s`. `s.prod_nonneg` for `Finset` in a `CommMonoidWithZero` with `PosMulMono`... `Finset.prod_nonneg` requires `[CommMonoidWithZero α] [Preorder α
+
+--- line 11 TOOL_RESULT file_read (match 'HasProd')
+h _\n   157|    · rwa [tprod_bot hL, finprod_of_infinite_mulSupport hf]\n   158|\n   159|@[to_additive]\n   160|theorem HasProd.one_le [L.NeBot] (h : ∀ i, 1 ≤ g i) (ha : HasProd g a L) : 1 ≤ a :=\n   161|  hasProd_le h hasProd_one ha\n   162|\n   
+
+[stopped at --max 7 blocks]
+
+=== P14_val 30641 v0067 DX3 [P14val_b]  family F1  Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:194
+ASK: Can `positivity` do this (untested)?
+CODE AT COMMENT: riant of `posLog_sum` for norms of elements in normed additive commutative | +groups, using monotonicity of `log⁺` and the triangle inequality. | +-/ | +lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E] | +    {α : Type*} (s : Finset α) (f : α → E) : | +    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by | +  calc log⁺ ‖∑ t ∈ s, f t‖ | +  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by | +    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) | +    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]
+MATCHER: m1 no (positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.) | m2 no (positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial.)
+READER: C l.38 ap=n/a/None know=demand
+  quote: A cleaner canonical way: monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun i _ ↦ norm_nonneg (f i)) (norm_sum_le s f)
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: The proof of `Real.posLog_pow` is an unnecessary three-way case split (`by_cases hn`, `by_cases h₂a : |a| ≤ 1`, `rw [not_le]`, `pow_le_one₀`, `one_lt_pow₀`, and two calls to `posLog_eq_log`) for an identity that is immed
+  [1] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_norm_sum_le` is stated under `[NormedAddCommGroup E]`, but neither its statement nor its proof uses completeness: the only group-level ingredient is `norm_sum_le`, which Mathlib states for `[SeminormedAddCom
+  [2] Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean: `Real.posLog_zero` and its sibling `Real.posLog_one` are the only declarations in the file that carry no docstring, while every other declaration (including trivial ones such as `posLog_nonneg`, `posLog_neg`, `posLog_abs
+TRANSCRIPT around l.38 (+-1):
+[37] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[38] REASONING: Both edits compile. 
+
+Wait, the second edit: I dropped `[NormedAddCommGroup E]` and used `[SeminormedAddCommGroup E]` — but did the tool preserve the docstring? It reported compiled with no warnings, so fine.
+
+Hmm, but I should double check the second edit actually applied the seminormed change (it compiled, which means yes — if the binder had been dropped entirely, it wouldn't compile... well, actually if the binder were dropped, the statement `f : α → E` with no normed structure would fail. So it applied).
+
+Now, a caveat about the Seminormed generalization: maybe the maintainer would want consistency with `posLog_norm_add_le` (which uses Normed). Should I instead propose changing both? The finding should be about the new declaration. If the maintainer weakens the new one, the sibling becomes inconsistent — but that's OK; the direction of generalization is standard. Hmm, would a Mathlib reviewer actually ask for `SeminormedAddCommGroup`? Many post-2023 reviewers do push for weaker typeclass assumptions when possible. I'll file as advisory.
+
+Now let me think about whether there are m
+[38] TOOL lean_verify_edit: {"path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean"}
+[38] TOOL content_search: {"content_pattern": "See `Mathlib[A-Za-z0-9._]*\\.lean`", "path": "target/Mathlib", "limit": 10, "max_matches_per_file": 2}
+[39] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+
+GREP 'positivity|sum_nonneg':
+--- line 3 TEXT[user] (match 'positivity|sum_nonneg')
+t α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by   calc log⁺ ‖∑ t ∈ s, f t‖   _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by     apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)     simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]   _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=     posLog_sum s (‖f ·‖) ```  ### `Real.posLog_pow` (lemma, added) [7bb89441d9] - file: `Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean`; chang
+
+--- line 7 REASONING (match 'positivity|sum_nonneg')
+`0 ∈ Set.Ici 0`. There may be a cleaner way: `posLog_mono`? Hmm, is there a lemma `posLog_le_posLog`? Let me search. Actually there might be a `MonotoneOn` usage. Alternatively `exact monotoneOn_posLog (by simp) (Finset.sum_nonneg ...) (norm_sum_le s f)` — the `apply` with `_` is fine.  Another thought: since `log⁺` is monotone... maybe the whole lemma follows from `posLog_sum s (‖f ·‖)` plus `posLog_le_posLog (norm_sum_le s f)`... whatever.  Now
+
+--- line 15 TOOL_RESULT file_read (match 'positivity|sum_nonneg')
+{"success": true, "content": "   192|    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]\n   193|  _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=\n   194|    posLog_sum s (‖f ·‖)\n   1
+
+--- line 16 REASONING (match 'positivity|sum_nonneg')
+ompared to `log⁺ (∑ t ∈ s, ‖f t‖)` — consistent.  Now note the new lemma's proof:   ```lean calc log⁺ ‖∑ t ∈ s, f t‖ _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by   apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)   simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))] _ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=   posLog_sum s (‖f ·‖) ```  vs existing style: ```lean _ ≤ log⁺ (‖a‖ + ‖b‖) := by   apply monotoneOn_posLog _ _ (norm_add_le a b)   <;> simp [add_no
+
+--- line 26 REASONING (match 'positivity|sum_nonneg')
+  ```lean lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E]     {α : Type*} (s : Finset α) (f : α → E) :     log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=   (monotoneOn_posLog (by simp) (Finset.sum_nonneg fun i _ ↦ norm_nonneg (f i))     (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖)) ``` Hmm, does `(posLog_sum s (‖f ·‖))` need beta reduction: `posLog_sum s (fun t ↦ ‖f t‖)` gives `log⁺ (∑ t ∈ s, ‖f t‖) ≤ log ↑s.card + ∑ 
+
+--- line 32 REASONING (match 'positivity|sum_nonneg')
+notoneOn_posLog` only, and both norm lemmas use it. Fine.  Wait — actually, let me reconsider the first calc step's use of `monotoneOn_posLog`:  ```lean apply monotoneOn_posLog (by simp) _ (norm_sum_le s f) simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))] ```  vs the sibling's: ```lean apply monotoneOn_posLog _ _ (norm_add_le a b) <;> simp [add_nonneg (norm_nonneg a) (norm_nonneg b)] ```  Hmm, in the new one, `(by simp)` is used to prove th
+
+--- line 32 TOOL_USE lean_verify_edit (match 'positivity|sum_nonneg')
+card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 := by\n  calc log\u207a \u2016\u2211 t \u2208 s, f t\u2016\n  _ \u2264 log\u207a (\u2211 t \u2208 s, \u2016f t\u2016) :=\n    monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun i _ \u21a6 norm_nonneg (f i))\n      (norm_sum_le s f)\n  _ \u2264 log s.card + \u2211 t \u2208 s, log\u207a \u2016f t\u2016 :=\n    posLog_sum s (\u2016f \u00b7\u2016)"}
+
+[stopped at --max 7 blocks]
+
