@@ -121,3 +121,17 @@ Generation: $0, the self-hosted DeepSeek tier, three reps of 29 PRs, as the tabl
 minutes a 15-PR rep; G's cells make sessions longer). Matching: the primary Claude token (the user's
 account), five sessions a PR on 26 PRs; its token estimate is computed from the table's matcher logs and
 G's actual volume and reported to the user before the seal is launched.
+
+## Amendment 1 (2026-10-12, before any session runs)
+
+**The smoke adds 33294.** The preflight counts 17 to 551 cells a PR (33294: 86 declarations, 551 cells;
+33149: 341), and the main risk to the design on this model is that a session cannot finish a ledger
+that size inside the run's limits (160 turns, 16,080,000 tokens a PR, as the DX/AP runs had). None of
+33145, 30641, 42814 is large. Smoke PRs: dev 33145 and 33294, val 30641, post 42814.
+
+**The smoke's health checks, fixed now; the job proceeds to the reps only if all hold** (they are about
+the harness, not the bars, and nothing in them reads an ask):
+- every smoke session ends with a submitted result;
+- at most 10% of a session's cells are `unstated`;
+- no session stops on its turn or token limit.
+Otherwise the job stops, releases the node, and the smoke is read by hand before anything else runs.
