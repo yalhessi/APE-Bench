@@ -1,0 +1,1639 @@
+{
+ "asks": [
+  {
+   "id": "d0042",
+   "pr": 33321,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "```suggestion\nIn the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the\n```",
+   "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+   "line": 47,
+   "author": "jcommelin",
+   "at": "2025-12-30T08:24:25Z",
+   "matcher_text": {
+    "ask_id": "d0042",
+    "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+    "code_at_comment": "cted lemma IsMulIndecomposable.subset (v : ι → M) (s : Set ι) :\n+    {i | IsMulIndecomposable v s i} ⊆ s := by\n+  aesop\n+\n @[to_additive]\n lemma isMulIndecomposable_id_univ [Subsingleton Mˣ] {x : M} (hx : x ≠ 1) :\n     IsMulIndecomposable id univ x ↔ Irreducible x :=\n   ⟨fun h ↦ ⟨by simpa, by simpa using h⟩, fun h ↦ by simpa using h.isUnit_or_isUnit⟩\n \n+/-- The \"base\" of a set of points of a monoid relative to a morphism `f`. -/\n+@[to_additive /-- The \"base\" of `v` relative to a morphism `f`.\n+\n+In the case that `v` is the set of roots of a crystallogrphic root system, and `S = ℚ`, this is the",
+    "comment": "```suggestion\nIn the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The `to_additive` docstring has a typo, \"crystallogrphic\". The multiplicative docstring (\"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\") never says which set it is.",
+      "requested_change": "Fix the spelling to \"crystallographic\". Make the multiplicative docstring say what the set is, e.g. \"the set of `i` such that `v i` is indecomposable among the points of `v` lying in the half-space `1 < f (v i)`\", and do the same for the additive docstring.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The `to_additive` docstring has a typo, \"crystallogrphic\". The multiplicative docstring (\"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\") never says which set it is.",
+      "requested_change": "Fix the spelling to \"crystallographic\". Make the multiplicative docstring say what the set is, e.g. \"the set of `i` such that `v i` is indecomposable among the points of `v` lying in the half-space `1 < f (v i)`\", and do the same for the additive docstring.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The additive docstring has a typo (\"crystallogrphic\"), and neither docstring says what the set is. The multiplicative one is only 'The \"base\" of a set of points of a monoid relative to a morphism `f`', which does not mention the half-space `1 < f (v i)` or indecomposability.",
+      "requested_change": "Correct \"crystallogrphic\" to \"crystallographic\". State the definition in both docstrings, e.g. \"Given a family `v` of points of a monoid `M` and a morphism `f : M →* S` into an ordered monoid, `baseOf v f` is the set of indices `i` such that `v i` lies in the half-space `1 < f (v i)` and is indecomposable relative to the points of `v` in that half-space.\" (and the additive analogue with `0 < f (v i)`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The additive docstring has a typo (\"crystallogrphic\"), and neither docstring says what the set is. The multiplicative one is only 'The \"base\" of a set of points of a monoid relative to a morphism `f`', which does not mention the half-space `1 < f (v i)` or indecomposability.",
+      "requested_change": "Correct \"crystallogrphic\" to \"crystallographic\". State the definition in both docstrings, e.g. \"Given a family `v` of points of a monoid `M` and a morphism `f : M →* S` into an ordered monoid, `baseOf v f` is the set of indices `i` such that `v i` lies in the half-space `1 < f (v i)` and is indecomposable relative to the points of `v` in that half-space.\" (and the additive analogue with `0 < f (v i)`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "GPT2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The to-additive docstring for `IsMulIndecomposable.baseOf` contains the typo `crystallogrphic`.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in that docstring.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The to-additive docstring for `IsMulIndecomposable.baseOf` contains the typo `crystallogrphic`.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in that docstring.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf` (its `to_additive` version) misspells `crystallographic` as `crystallogrphic`. The two docstrings of this declaration are also inconsistent: the primary one says \"The \"base\" of a set of points of a monoid relative to a morphism `f`\" whereas the additive one says \"The \"base\" of `v` relative to a morphism `f`\", and the argument is a family `v : ι → M`, not a set of points.",
+      "requested_change": "Fix the spelling to `crystallographic`, and make the two docstrings describe the same thing (e.g. use the additive wording, \"The \"base\" of `v` relative to a morphism `f`\", for both).",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf` (its `to_additive` version) misspells `crystallographic` as `crystallogrphic`. The two docstrings of this declaration are also inconsistent: the primary one says \"The \"base\" of a set of points of a monoid relative to a morphism `f`\" whereas the additive one says \"The \"base\" of `v` relative to a morphism `f`\", and the argument is a family `v : ι → M`, not a set of points.",
+      "requested_change": "Fix the spelling to `crystallographic`, and make the two docstrings describe the same thing (e.g. use the additive wording, \"The \"base\" of `v` relative to a morphism `f`\", for both).",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "GPT3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "OP2": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+      "claim": "The docstrings of `IsMulIndecomposable.baseOf` have two problems. The additive docstring has a typo, \"crystallogrphic\". The multiplicative docstring does not say what the base is.",
+      "requested_change": "Fix the typo to \"crystallographic\". Expand the multiplicative docstring to state that `baseOf v f` is the set of indices `i` with `1 < f (v i)` such that `v i` is indecomposable relative to that half-space.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+      "claim": "The docstrings of `IsMulIndecomposable.baseOf` have two problems. The additive docstring has a typo, \"crystallogrphic\". The multiplicative docstring does not say what the base is.",
+      "requested_change": "Fix the typo to \"crystallographic\". Expand the multiplicative docstring to state that `baseOf v f` is the set of indices `i` with `1 < f (v i)` such that `v i` is indecomposable relative to that half-space.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "DX3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "`IsMulIndecomposable.baseOf`'s docstring (the `to_additive` docstring, which becomes the docstring of `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\" (\"the set of roots of a crystallogrphic root system\"). `content_search` over the whole tree finds this misspelling exactly once, in this new text.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring of `IsMulIndecomposable.baseOf`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "`IsMulIndecomposable.baseOf`'s docstring (the `to_additive` docstring, which becomes the docstring of `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\" (\"the set of roots of a crystallogrphic root system\"). `content_search` over the whole tree finds this misspelling exactly once, in this new text.",
+      "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring of `IsMulIndecomposable.baseOf`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "OP1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring of `IsMulIndecomposable.baseOf` (i.e. `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\".",
+      "requested_change": "Replace \"crystallogrphic\" with \"crystallographic\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The additive docstring of `IsMulIndecomposable.baseOf` (i.e. `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\".",
+      "requested_change": "Replace \"crystallogrphic\" with \"crystallographic\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "DX2": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+      "claim": "The `@[to_additive]` docstring of `IsMulIndecomposable.baseOf` contains the typo \"crystallogrphic\" (\"a crystallogrphic root system\"), and the two docstrings are asymmetric: the (primary) multiplicative docstring is only \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`.\" while the additive one carries the useful root-system context, so the declaration users actually see for the multiplicative version lacks that context.",
+      "requested_change": "Spell it \"crystallographic\" and put the same content in both docstrings, e.g. make the primary docstring `The \"base\" of `v` relative to a morphism `f`. In the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the base of the root system associated to `f`.` and give `to_additive` the additive restatement of exactly that.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+      "claim": "The `@[to_additive]` docstring of `IsMulIndecomposable.baseOf` contains the typo \"crystallogrphic\" (\"a crystallogrphic root system\"), and the two docstrings are asymmetric: the (primary) multiplicative docstring is only \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`.\" while the additive one carries the useful root-system context, so the declaration users actually see for the multiplicative version lacks that context.",
+      "requested_change": "Spell it \"crystallographic\" and put the same content in both docstrings, e.g. make the primary docstring `The \"base\" of `v` relative to a morphism `f`. In the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the base of the root system associated to `f`.` and give `to_additive` the additive restatement of exactly that.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The `to_additive` docstring of `IsMulIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\" (line 47), and the two docstrings of the definition do not describe the same thing: the multiplicative one is only `The \"base\" of a set of points of a monoid relative to a morphism f.` while the additive one adds the root-system motivation (and the typo).",
+      "requested_change": "Fix the spelling to \"crystallographic\" and give both docstrings the same content, e.g. describe the multiplicative base as the indecomposable points of `v` in the half space `1 < f (v ·)`, and mention in both that for the roots of a crystallographic root system with `S = ℚ` (additively: of a crystallographic root system with `S = ℚ`) this is the base of the root system associated to `f`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The `to_additive` docstring of `IsMulIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\" (line 47), and the two docstrings of the definition do not describe the same thing: the multiplicative one is only `The \"base\" of a set of points of a monoid relative to a morphism f.` while the additive one adds the root-system motivation (and the typo).",
+      "requested_change": "Fix the spelling to \"crystallographic\" and give both docstrings the same content, e.g. describe the multiplicative base as the indecomposable points of `v` in the half space `1 < f (v ·)`, and mention in both that for the roots of a crystallographic root system with `S = ℚ` (additively: of a crystallographic root system with `S = ℚ`) this is the base of the root system associated to `f`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf` (the `to_additive` docstring on lines 45–48) misspells “crystallographic” as “crystallogrphic”; this is the only occurrence of that misspelling anywhere in `Mathlib` (grep over the whole tree). The same docstring also describes the argument as “the set of roots” / the multiplicative one as “a set of points of a monoid”, while the definition takes a family (`v : ι → M`).",
+      "requested_change": "Correct the spelling to “crystallographic”, and align the two docstrings on the family wording, e.g. multiplicative: “The base of a family `v` of points of a monoid relative to a morphism `f`.” (keeping the sentence about the crystallographic root-system case).",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf` (the `to_additive` docstring on lines 45–48) misspells “crystallographic” as “crystallogrphic”; this is the only occurrence of that misspelling anywhere in `Mathlib` (grep over the whole tree). The same docstring also describes the argument as “the set of roots” / the multiplicative one as “a set of points of a monoid”, while the definition takes a family (`v : ι → M`).",
+      "requested_change": "Correct the spelling to “crystallographic”, and align the two docstrings on the family wording, e.g. multiplicative: “The base of a family `v` of points of a monoid relative to a morphism `f`.” (keeping the sentence about the crystallographic root-system case).",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 12,
+     "m1_finding_text": {
+      "i": 12,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf`/`IsAddIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\", and the two versions do not describe the same thing: the multiplicative one is \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\" while the additive one is only \"The \\\"base\\\" of `v` relative to a morphism `f`\".",
+      "requested_change": "Fix the spelling to \"crystallographic\" and make the additive docstring the additive counterpart of the multiplicative one (same first sentence translated for additive monoids, then the root-system sentence).",
+      "severity": "advisory"
+     },
+     "note_m1": "Typo 'crystallogrphic'; every reviewer flagged and fixed it.",
+     "m2": "reached",
+     "m2_finding": 12,
+     "m2_finding_text": {
+      "i": 12,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "The docstring of `IsMulIndecomposable.baseOf`/`IsAddIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\", and the two versions do not describe the same thing: the multiplicative one is \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\" while the additive one is only \"The \\\"base\\\" of `v` relative to a morphism `f`\".",
+      "requested_change": "Fix the spelling to \"crystallographic\" and make the additive docstring the additive counterpart of the multiplicative one (same first sentence translated for additive monoids, then the root-system sentence).",
+      "severity": "advisory"
+     },
+     "note_m2": "Typo 'crystallogrphic' in to_additive docstring; every reviewer flags it."
+    }
+   },
+   "entries_text": {}
+  },
+  {
+   "id": "d0043",
+   "pr": 33321,
+   "family": "F6",
+   "in_census": true,
+   "entries": [
+    "P199"
+   ],
+   "text": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsMulIndecomposable v {i | 1 < f (v i)} j}\n```",
+   "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+   "line": 50,
+   "author": "jcommelin",
+   "at": "2025-12-30T08:26:17Z",
+   "matcher_text": {
+    "ask_id": "d0043",
+    "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+    "code_at_comment": "iv [Subsingleton Mˣ] {x : M} (hx : x ≠ 1) :\n     IsMulIndecomposable id univ x ↔ Irreducible x :=\n   ⟨fun h ↦ ⟨by simpa, by simpa using h⟩, fun h ↦ by simpa using h.isUnit_or_isUnit⟩\n \n+/-- The \"base\" of a set of points of a monoid relative to a morphism `f`. -/\n+@[to_additive /-- The \"base\" of `v` relative to a morphism `f`.\n+\n+In the case that `v` is the set of roots of a crystallogrphic root system, and `S = ℚ`, this is the\n+base of the root system associated to `f`. -/]\n+def IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n+  IsMulIndecomposable v {i | 1 < f (v i)}",
+    "comment": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsMulIndecomposable v {i | 1 < f (v i)} j}\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι` through definitional unfolding. The binders `hst : s ⊆ IsMulIndecomposable v t` in `pairwise_div_notMem_range` and `hst : s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` in `pairwise_div_notMem_range'` do the same, while `IsMulIndecomposable.subset` in the same PR writes `{i | IsMulIndecomposable v s i}`. The abuse makes membership opaque to `simp`: after unfolding `baseOf`, `i ∈ baseOf v f` stays stuck as `i ∈ IsMulIndecomposable v {..}`.",
+      "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}` and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}`, or `s ⊆ baseOf v f` for the primed lemma, so that the Set/predicate conversion is explicit everywhere.",
+      "severity": "advisory"
+     },
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι` through definitional unfolding. The binders `hst : s ⊆ IsMulIndecomposable v t` in `pairwise_div_notMem_range` and `hst : s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` in `pairwise_div_notMem_range'` do the same, while `IsMulIndecomposable.subset` in the same PR writes `{i | IsMulIndecomposable v s i}`. The abuse makes membership opaque to `simp`: after unfolding `baseOf`, `i ∈ baseOf v f` stays stuck as `i ∈ IsMulIndecomposable v {..}`.",
+      "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}` and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}`, or `s ⊆ baseOf v f` for the primed lemma, so that the Set/predicate conversion is explicit everywhere.",
+      "severity": "advisory"
+     },
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι`, and `pairwise_div_notMem_range` / `pairwise_div_notMem_range'` state `hst : s ⊆ IsMulIndecomposable v t` the same way. This relies on the `Set ι = ι → Prop` defeq, which Mathlib now treats as an abuse. It is also inconsistent with the PR's own `IsMulIndecomposable.subset`, which writes `{i | IsMulIndecomposable v s i}`.",
+      "requested_change": "Define `IsMulIndecomposable.baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}` (or `s ⊆ baseOf v f` in the primed lemma).",
+      "severity": "advisory"
+     },
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+      "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι`, and `pairwise_div_notMem_range` / `pairwise_div_notMem_range'` state `hst : s ⊆ IsMulIndecomposable v t` the same way. This relies on the `Set ι = ι → Prop` defeq, which Mathlib now treats as an abuse. It is also inconsistent with the PR's own `IsMulIndecomposable.subset`, which writes `{i | IsMulIndecomposable v s i}`.",
+      "requested_change": "Define `IsMulIndecomposable.baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}` (or `s ⊆ baseOf v f` in the primed lemma).",
+      "severity": "advisory"
+     },
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "GPT2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "GPT3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "OP2": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+      "claim": "`IsMulIndecomposable.baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`. That is a predicate `ι → Prop` used as a `Set ι`, which relies on defeq abuse. It is also inconsistent with the set-builder form the file uses elsewhere: `IsMulIndecomposable.subset`, and the pre-PR statement of the Submonoid lemma. The same abuse appears in `pairwise_div_notMem_range` (`hst : s ⊆ IsMulIndecomposable v t`).",
+      "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and state the hypothesis of `pairwise_div_notMem_range` as `(hst : s ⊆ {i | IsMulIndecomposable v t i})`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+      "claim": "`IsMulIndecomposable.baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`. That is a predicate `ι → Prop` used as a `Set ι`, which relies on defeq abuse. It is also inconsistent with the set-builder form the file uses elsewhere: `IsMulIndecomposable.subset`, and the pre-PR statement of the Submonoid lemma. The same abuse appears in `pairwise_div_notMem_range` (`hst : s ⊆ IsMulIndecomposable v t`).",
+      "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and state the hypothesis of `pairwise_div_notMem_range` as `(hst : s ⊆ {i | IsMulIndecomposable v t i})`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "DX3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "OP1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "DX2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Set/predicate defeq abuse in baseOf; R1, R2, R7 propose the same set-builder definition. R8/R13 only respell hypotheses.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Define baseOf via set-builder to avoid predicate/set defeq abuse; R1, R2, R7 propose exactly that."
+    }
+   },
+   "entries_text": {
+    "P199": "A statement about a type synonym goes through the synonym's own instances and API, not by applying the underlying type's structure across the definitional equality."
+   }
+  },
+  {
+   "id": "d0044",
+   "pr": 33321,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```",
+   "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+   "line": 19,
+   "author": "jcommelin",
+   "at": "2025-12-30T08:28:44Z",
+   "matcher_text": {
+    "ask_id": "d0044",
+    "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+    "code_at_comment": "ghts reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Oliver Nash\n+-/\n+module\n+\n+public import Mathlib.Algebra.Group.Irreducible.Indecomposable\n+public import Mathlib.Algebra.Module.Submodule.Union\n+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty\n+public import Mathlib.LinearAlgebra.QuadraticForm.Dual\n+public import Mathlib.LinearAlgebra.RootSystem.Base\n+\n+/-!\n+# Existence of bases for crystallographic root systems\n+\n+## Implementation details\n+\n+The proof needs a set of ordered coefficients, even though the existence ultimate statement does",
+    "comment": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 10,
+     "m1_finding_text": {
+      "i": 10,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+      "claim": "The module docstring has a word-order slip, \"even though the existence ultimate statement does not\". It also has no summary of what the file proves: it goes straight to implementation details and a TODO.",
+      "requested_change": "Change it to \"even though the ultimate existence statement does not\", and add a short `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 10,
+     "m2_finding_text": {
+      "i": 10,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+      "claim": "The module docstring has a word-order slip, \"even though the existence ultimate statement does not\". It also has no summary of what the file proves: it goes straight to implementation details and a TODO.",
+      "requested_change": "Change it to \"even though the ultimate existence statement does not\", and add a short `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 8,
+     "m1_finding_text": {
+      "i": 8,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+      "claim": "The module docstring has garbled wording ('even though the existence ultimate statement does not'). It is titled 'Existence of bases for crystallographic root systems' but proves no existence result, and unlike its sibling `RootSystem/Base.lean` it has no main-results section naming what the file does prove.",
+      "requested_change": "Change the phrase to 'even though the ultimate existence statement does not'. Add a `## Main results` section listing `RootPairing.linearIndepOn_root_baseOf` (and `RootPairing.linearIndepOn_root_baseOf'`), noting that existence itself is still TODO.",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 8,
+     "m2_finding_text": {
+      "i": 8,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+      "claim": "The module docstring has garbled wording ('even though the existence ultimate statement does not'). It is titled 'Existence of bases for crystallographic root systems' but proves no existence result, and unlike its sibling `RootSystem/Base.lean` it has no main-results section naming what the file does prove.",
+      "requested_change": "Change the phrase to 'even though the ultimate existence statement does not'. Add a `## Main results` section listing `RootPairing.linearIndepOn_root_baseOf` (and `RootPairing.linearIndepOn_root_baseOf'`), noting that existence itself is still TODO.",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "GPT2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module docstring phrase `the existence ultimate statement` is ungrammatical.",
+      "requested_change": "Rewrite it as `the ultimate existence statement`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module docstring phrase `the existence ultimate statement` is ungrammatical.",
+      "requested_change": "Rewrite it as `the ultimate existence statement`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+      "claim": "The module docstring title `# Existence of bases for crystallographic root systems` advertises a result this file does not contain: the file proves Serre's linear-independence lemmas (`baseOf_pairwise_pairing_le_zero`, `linearIndepOn_root_baseOf`, `linearIndepOn_root_baseOf'`), and existence of a base is deferred to the `## TODO` section of the same docstring. Line 19 also reads ungrammatically: \"even though the existence ultimate statement does not\".",
+      "requested_change": "Retitle to what the file actually proves, e.g. `# Linear independence of the base of a crystallographic root system` (leaving \"prove that every reduced crystallographic root system has a base\" in the TODO), and reword line 19 to \"even though the ultimate existence statement does not\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+      "claim": "The module docstring title `# Existence of bases for crystallographic root systems` advertises a result this file does not contain: the file proves Serre's linear-independence lemmas (`baseOf_pairwise_pairing_le_zero`, `linearIndepOn_root_baseOf`, `linearIndepOn_root_baseOf'`), and existence of a base is deferred to the `## TODO` section of the same docstring. Line 19 also reads ungrammatically: \"even though the existence ultimate statement does not\".",
+      "requested_change": "Retitle to what the file actually proves, e.g. `# Linear independence of the base of a crystallographic root system` (leaving \"prove that every reduced crystallographic root system has a base\" in the TODO), and reword line 19 to \"even though the ultimate existence statement does not\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "GPT3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module doc sentence “the existence ultimate statement” is grammatically incorrect.",
+      "requested_change": "Rephrase it, for example to “even though the ultimate existence statement does not.”",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module doc sentence “the existence ultimate statement” is grammatically incorrect.",
+      "requested_change": "Rephrase it, for example to “even though the ultimate existence statement does not.”",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "OP2": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 7,
+     "m1_finding_text": {
+      "i": 7,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:14",
+      "claim": "The module docstring of `BaseExists.lean` has a garbled sentence: \"even though the existence ultimate statement does not\". It also never says what the file actually proves. The file contains no existence result yet, only `RootPairing.linearIndepOn_root_baseOf` and its supporting lemmas, which themselves have no docstring.",
+      "requested_change": "Change the sentence to \"even though the ultimate existence statement does not\". Add a `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`. Give `linearIndepOn_root_baseOf` a short docstring.",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 7,
+     "m2_finding_text": {
+      "i": 7,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:14",
+      "claim": "The module docstring of `BaseExists.lean` has a garbled sentence: \"even though the existence ultimate statement does not\". It also never says what the file actually proves. The file contains no existence result yet, only `RootPairing.linearIndepOn_root_baseOf` and its supporting lemmas, which themselves have no docstring.",
+      "requested_change": "Change the sentence to \"even though the ultimate existence statement does not\". Add a `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`. Give `linearIndepOn_root_baseOf` a short docstring.",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "DX3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The new module doc's second sentence is garbled: \"The proof needs a set of ordered coefficients, even though the existence ultimate statement does not.\" (\"existence ultimate\" should be \"ultimate existence\").",
+      "requested_change": "Reword to e.g. \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The new module doc's second sentence is garbled: \"The proof needs a set of ordered coefficients, even though the existence ultimate statement does not.\" (\"existence ultimate\" should be \"ultimate existence\").",
+      "requested_change": "Reword to e.g. \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "OP1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "In the module docstring of `BaseExists.lean`, the sentence \"even though the existence ultimate statement does not\" has its words in the wrong order.",
+      "requested_change": "Change it to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "In the module docstring of `BaseExists.lean`, the sentence \"even though the existence ultimate statement does not\" has its words in the wrong order.",
+      "requested_change": "Change it to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "DX2": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module docstring of the new file contains the word-order slip \"even though the existence ultimate statement does not\" (should be \"the ultimate existence statement\").",
+      "requested_change": "Change line 19 to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The module docstring of the new file contains the word-order slip \"even though the existence ultimate statement does not\" (should be \"the ultimate existence statement\").",
+      "requested_change": "Change line 19 to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The new module docstring sentence “The proof needs a set of ordered coefficients, even though the existence ultimate statement does not” is garbled — the intended object is the ultimate existence statement (existence of a base), not “the existence ultimate statement”.",
+      "requested_change": "Rewrite as “The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.”",
+      "severity": "advisory"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+      "claim": "The new module docstring sentence “The proof needs a set of ordered coefficients, even though the existence ultimate statement does not” is garbled — the intended object is the ultimate existence statement (existence of a base), not “the existence ultimate statement”.",
+      "requested_change": "Rewrite as “The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.”",
+      "severity": "advisory"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+      "claim": "The new file's module docstring is titled `# Existence of bases for crystallographic root systems`, but the file proves no such thing: its results are `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`, i.e. linear independence of `IsAddIndecomposable.baseOf`, and the existence theorem is listed as future work in the `## TODO` section (item 2: \"Prove that every reduced crystallographic root system has a base\"). The title therefore states a broader result than the file proves. The paragraph below it also contains a garbled phrase, \"even though the existence ultimate statement does not\".",
+      "requested_change": "Retitle the module docstring to what the file proves, e.g. `# Linear independence of a base of a crystallographic root system` (and correspondingly consider renaming the file), and repair the sentence to read \"even though the ultimate existence statement does not\".",
+      "severity": "blocking"
+     },
+     "note_m1": "Word order 'existence ultimate'; R6 silent, R11 only retitles the module doc.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+      "claim": "The new file's module docstring is titled `# Existence of bases for crystallographic root systems`, but the file proves no such thing: its results are `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`, i.e. linear independence of `IsAddIndecomposable.baseOf`, and the existence theorem is listed as future work in the `## TODO` section (item 2: \"Prove that every reduced crystallographic root system has a base\"). The title therefore states a broader result than the file proves. The paragraph below it also contains a garbled phrase, \"even though the existence ultimate statement does not\".",
+      "requested_change": "Retitle the module docstring to what the file proves, e.g. `# Linear independence of a base of a crystallographic root system` (and correspondingly consider renaming the file), and repair the sentence to read \"even though the ultimate existence statement does not\".",
+      "severity": "blocking"
+     },
+     "note_m2": "Word order 'existence ultimate' -> 'ultimate existence'; R6, R11 miss it (R11 only retitles)."
+    }
+   },
+   "entries_text": {}
+  }
+ ],
+ "pr": 33321,
+ "sessions": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:83",
+     "claim": "The PR renames the existing public lemma `Submonoid.closure_image_one_lt_and_isMulIndecomposable` (and its generated additive form `AddSubmonoid.closure_image_pos_and_isAddIndecomposable`) to `Submonoid.closure_image_isMulIndecomposable_baseOf` / `AddSubmonoid.closure_image_isAddIndecomposable_baseOf` without leaving deprecated aliases, so downstream uses of the old names break with no deprecation warning.",
+     "requested_change": "Directly after the lemma, add\n@[deprecated (since := \"2025-12-22\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n@[deprecated (since := \"2025-12-22\")]\nalias AddSubmonoid.closure_image_pos_and_isAddIndecomposable :=\n  AddSubmonoid.closure_image_isAddIndecomposable_baseOf\n(use the date of the PR).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+     "claim": "The additive docstring has a typo (\"crystallogrphic\"), and neither docstring says what the set is. The multiplicative one is only 'The \"base\" of a set of points of a monoid relative to a morphism `f`', which does not mention the half-space `1 < f (v i)` or indecomposability.",
+     "requested_change": "Correct \"crystallogrphic\" to \"crystallographic\". State the definition in both docstrings, e.g. \"Given a family `v` of points of a monoid `M` and a morphism `f : M →* S` into an ordered monoid, `baseOf v f` is the set of indices `i` such that `v i` lies in the half-space `1 < f (v i)` and is indecomposable relative to the points of `v` in that half-space.\" (and the additive analogue with `0 < f (v i)`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:160",
+     "claim": "`pairwise_div_notMem_range'` is redundant. Its hypothesis `hst : s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` just says `s ⊆ baseOf v f`, so it is `(pairwise_baseOf_div_notMem v hv_inv f hf).mono hst`. Its only use is to prove `pairwise_baseOf_div_notMem` with `s := baseOf v f`. The free `s` with `hst : s ⊆ IsMulIndecomposable v t` in `pairwise_div_notMem_range` is also unnecessary, because `Set.Pairwise.mono` recovers it.",
+     "requested_change": "Delete `IsMulIndecomposable.pairwise_div_notMem_range'` (and its additive twin) and prove `pairwise_baseOf_div_notMem` directly:\n  have hv_one : ∀ i, v i ≠ 1 := fun i ↦ by contrapose! hf; exact ⟨i, by simp [hf]⟩\n  refine pairwise_div_notMem_range v hv_one hv_inv _ fun i ↦ ?_\n  simpa [hv_inv] using (hf i).symm\nPreferably also drop the `s`/`hst` arguments from `pairwise_div_notMem_range` and state its conclusion as `{i | IsMulIndecomposable v t i}.Pairwise fun i j ↦ v i / v j ∉ range v`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+     "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι`, and `pairwise_div_notMem_range` / `pairwise_div_notMem_range'` state `hst : s ⊆ IsMulIndecomposable v t` the same way. This relies on the `Set ι = ι → Prop` defeq, which Mathlib now treats as an abuse. It is also inconsistent with the PR's own `IsMulIndecomposable.subset`, which writes `{i | IsMulIndecomposable v s i}`.",
+     "requested_change": "Define `IsMulIndecomposable.baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}` (or `s ⊆ baseOf v f` in the primed lemma).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:34",
+     "claim": "`IsMulIndecomposable.subset` is proved with `by aesop`, but the statement is the first projection of the definition.",
+     "requested_change": "Replace the proof with the term `fun _ h ↦ h.1`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:56",
+     "claim": "The name says `pairing`, but the statement is about `P.pairingIn ℤ i j`. The word order also differs from the companion `IsAddIndecomposable.pairwise_baseOf_sub_notMem` that this PR adds, and the existing `RootPairing.Base.pairingIn_le_zero_of_ne` names the same inequality with `pairingIn`.",
+     "requested_change": "Rename to `RootPairing.pairwise_baseOf_pairingIn_le_zero` and update its use in `linearIndepOn_root_baseOf'`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "Section `CommRing` declares `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` as section variables. Only `baseOf_pairwise_pairing_le_zero` uses them, and the next lemma, `linearIndepOn_root_baseOf'`, rebinds both `S` (as an ordered ring) and `f` (as `f : Dual S M`), shadowing them. This is confusing to read.",
+     "requested_change": "Reduce the section `variable` line to `[CommRing R] [Module R M] [Module R N] (P : RootPairing ι R M N)`, and move `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` into the signature of `baseOf_pairwise_pairing_le_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "The import `Mathlib.Algebra.Module.Submodule.Union` is not needed by any declaration in the new file. It seems to be there only because the TODO in the module docstring mentions `Module.exists_dual_forall_apply_ne_zero`.",
+     "requested_change": "Remove `public import Mathlib.Algebra.Module.Submodule.Union` from BaseExists.lean, and add it back in the follow-up PR that actually uses `Module.exists_dual_forall_apply_ne_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "The module docstring has garbled wording ('even though the existence ultimate statement does not'). It is titled 'Existence of bases for crystallographic root systems' but proves no existence result, and unlike its sibling `RootSystem/Base.lean` it has no main-results section naming what the file does prove.",
+     "requested_change": "Change the phrase to 'even though the ultimate existence statement does not'. Add a `## Main results` section listing `RootPairing.linearIndepOn_root_baseOf` (and `RootPairing.linearIndepOn_root_baseOf'`), noting that existence itself is still TODO.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102",
+     "claim": "`linearIndepOn_root_baseOf`, the headline result of the PR (linear independence of the indecomposable roots over `R`), has no docstring. Its stepping-stone `linearIndepOn_root_baseOf'` has a long one.",
+     "requested_change": "Add a docstring, e.g. \"For a crystallographic root system over a field of characteristic zero, the roots indexed by `baseOf P.root f` (the roots that are indecomposable within the half-space `0 < f`, for a rational functional `f` vanishing on no root) are linearly independent over `R`.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:57",
+     "claim": "The fact about inverting `f` is stated only after taking images under `v`, with the awkward right-hand side `(invMonoidHom ∘ v) '' baseOf v f`. The proof goes through a `suffices ∀ f` and a long chain of `image_comp` / `MonoidHom.comp_assoc` rewrites. The underlying fact is at the level of indices: `i ∈ baseOf v (invMonoidHom.comp f) ↔ i⁻¹ ∈ baseOf v f`.",
+     "requested_change": "Add the index-level lemma `IsMulIndecomposable.inv_mem_baseOf_iff (i : ι) : i⁻¹ ∈ baseOf v f ↔ i ∈ baseOf v (invMonoidHom.comp f)` (proved by unfolding and reindexing `j ↦ j⁻¹`, `k ↦ k⁻¹`). Derive `image_baseOf_inv_comp_eq` from it by `ext x; constructor; rintro ⟨i, hi, rfl⟩; exact ⟨i⁻¹, ..., by simp [hv_inv]⟩`, dropping the rewrite chain.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:83",
+     "claim": "This PR renames `Submonoid.closure_image_one_lt_and_isMulIndecomposable` (and, through `to_additive`, its additive counterpart) to `Submonoid.closure_image_isMulIndecomposable_baseOf` and leaves no deprecated alias. The old names are public declarations at the base commit, so removing them without deprecation breaks downstream code, which the deprecation policy forbids.",
+     "requested_change": "Directly after the lemma, add deprecated aliases for both old names, e.g.\n\n@[deprecated (since := \"2025-12-26\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n@[deprecated (since := \"2025-12-26\")]\nalias AddSubmonoid.closure_image_pos_and_isAddIndecomposable :=\n  AddSubmonoid.closure_image_isAddIndecomposable_baseOf\n\n(use the merge date and whatever additive name `to_additive` generated for the old lemma).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:115",
+     "claim": "The 15-line proof splits `univ` into the two half-spaces, introduces `f' := invMonoidHom.comp f`, and rewrites with `IsMulIndecomposable.image_baseOf_inv_comp_eq`, `coe_invMonoidHom`, `image_inv_eq_inv` and `closure_inv`. The PR's own `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` already says that each `v i` or `(v i)⁻¹` lies in `Submonoid.closure (v '' baseOf v f)`, and that settles the lemma at once. `image_baseOf_inv_comp_eq` (15 lines) is used only here, and the new `invMonoidHom_comp_invMonoidHom` is used only by that lemma.",
+     "requested_change": "Move the lemma below `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf`, which depends only on the Submonoid lemma, and prove it with\n\n  refine le_antisymm (closure_mono (image_subset_range _ _)) ((closure_le _).mpr ?_)\n  rintro - ⟨i, rfl⟩\n  rcases IsMulIndecomposable.mem_or_inv_mem_closure_baseOf v hv_inv f hf i with h | h\n  · exact le_closure_toSubmonoid _ h\n  · simpa using (closure _).inv_mem (le_closure_toSubmonoid _ h)\n\nThen delete `IsMulIndecomposable.image_baseOf_inv_comp_eq`, and with it the reason for `invMonoidHom_comp_invMonoidHom`. If the reflection lemma is wanted as API, state it on index sets (`i⁻¹ ∈ baseOf v f ↔ i ∈ baseOf v (invMonoidHom.comp f)`), where it has a 7-line proof, and not as an equation of images through `invMonoidHom ∘ v`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+     "claim": "`baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`, a predicate `ι → Prop` used as a `Set ι` through definitional unfolding. The binders `hst : s ⊆ IsMulIndecomposable v t` in `pairwise_div_notMem_range` and `hst : s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` in `pairwise_div_notMem_range'` do the same, while `IsMulIndecomposable.subset` in the same PR writes `{i | IsMulIndecomposable v s i}`. The abuse makes membership opaque to `simp`: after unfolding `baseOf`, `i ∈ baseOf v f` stays stuck as `i ∈ IsMulIndecomposable v {..}`.",
+     "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}` and write the `hst` hypotheses as `s ⊆ {i | IsMulIndecomposable v t i}`, or `s ⊆ baseOf v f` for the primed lemma, so that the Set/predicate conversion is explicit everywhere.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+     "claim": "The `to_additive` docstring has a typo, \"crystallogrphic\". The multiplicative docstring (\"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\") never says which set it is.",
+     "requested_change": "Fix the spelling to \"crystallographic\". Make the multiplicative docstring say what the set is, e.g. \"the set of `i` such that `v i` is indecomposable among the points of `v` lying in the half-space `1 < f (v i)`\", and do the same for the additive docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:160",
+     "claim": "`pairwise_div_notMem_range'` (any `s ⊆ baseOf`) is exactly `pairwise_baseOf_div_notMem` followed by `Set.Pairwise.mono`. Its only use is to prove `pairwise_baseOf_div_notMem` with `s := baseOf v f`, so the PR adds two lemmas where one would do.",
+     "requested_change": "Delete `pairwise_div_notMem_range'` (and its additive version) and prove `pairwise_baseOf_div_notMem` directly:\n\n  pairwise_div_notMem_range v (fun i h ↦ hf i (by simp [h])) hv_inv _ _ (.refl _)\n    fun i ↦ by simpa [hv_inv] using (hf i).symm",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:140",
+     "claim": "The `s` and `hst : s ⊆ IsMulIndecomposable v t` arguments add nothing that `Set.Pairwise.mono` does not already give. They also force a `h_sub` detour, and each case of the proof is a `suffices ¬ IsMulIndecomposable v t _` plus a 7-lemma `simp only` that unfolds the definition backwards.",
+     "requested_change": "State the lemma for the maximal set, `{i | IsMulIndecomposable v t i}.Pairwise fun i j ↦ v i / v j ∉ range v`, with arguments `(v) (hv_one) (hv_inv) (t) (hv_t)`, and use the direct proof\n\n  intro i hi j hj hne\n  by_contra! ⟨k, hk⟩\n  rcases hv_t k with hk' | hk'\n  · simpa [hv_one] using hi.2 k hk' j hj.1 (by simp [hk])\n  · simpa [hv_one] using hj.2 k⁻¹ hk' i hi.1 (by simp [hv_inv, hk])",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:9",
+     "claim": "The new variable line `variable {ι M G S : Type*} [Monoid M] [CommGroup G] [LinearOrder S]` makes every new `G`-lemma assume commutativity of `G`. Nothing in the statements needs it: the only uses are `invMonoidHom : G →* G` (which needs `DivisionCommMonoid`) in `image_baseOf_inv_comp_eq` and the Subgroup proof built on it.",
+     "requested_change": "Once `image_baseOf_inv_comp_eq` is gone (see the `Subgroup.closure_image_isMulIndecomposable_baseOf` finding), weaken `[CommGroup G]` to `[Group G]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:9",
+     "claim": "Two of the four imports this PR adds are not needed. `Mathlib.Algebra.Order.Group.Basic` is unused, and `Mathlib.Algebra.Group.Subgroup.Lattice` is redundant next to `Mathlib.Algebra.Group.Subgroup.Pointwise`. `Algebra/Group/Irreducible/Indecomposable.lean` is a low-level file, so its imports should be minimal.",
+     "requested_change": "Drop `public import Mathlib.Algebra.Order.Group.Basic` and `public import Mathlib.Algebra.Group.Subgroup.Lattice`. If the Subgroup lemma is reproved from `mem_or_inv_mem_closure_baseOf`, keep `Subgroup.Lattice` and drop `Subgroup.Pointwise` instead, since `image_inv_eq_inv` and `closure_inv` are then no longer used.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:34",
+     "claim": "`IsMulIndecomposable.subset` is the first projection of the definition, but it is proved by `by aesop`, a general search.",
+     "requested_change": "Replace the proof with the term `fun _ h ↦ h.1`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:177",
+     "claim": "The statement is laid out with manual alignment: the first conclusion line has five leading spaces and padding (`     v i    ∈ ...`) so that the two `∈` line up. Mathlib style indents continuation lines by a fixed four (or six) spaces and does not pad for alignment.",
+     "requested_change": "Reformat the conclusion as\n    v i ∈ Submonoid.closure (v '' baseOf v f) ∨\n      (v i)⁻¹ ∈ Submonoid.closure (v '' baseOf v f) := by",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "The module docstring has a word-order slip, \"even though the existence ultimate statement does not\". It also has no summary of what the file proves: it goes straight to implementation details and a TODO.",
+     "requested_change": "Change it to \"even though the ultimate existence statement does not\", and add a short `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102",
+     "claim": "The main result of the new file has no docstring, although the primed lemma's docstring defers to it as the target statement.",
+     "requested_change": "Add a docstring saying that, for a crystallographic root system over a characteristic-zero field, the roots indexed by `baseOf P.root f` (for `f` nonvanishing on the roots) are linearly independent over `R`, with a reference to the corresponding statement in [serre1965] Ch. V §9.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102",
+     "claim": "In the `h_card` block, `replace this : LinearIndependent ℚ v := ...` reuses the name `this`, which there refers to the `Fintype (baseOf ..)` instance introduced at the top of the proof. The block silently replaces an instance hypothesis with a linear-independence fact, which is hard to follow.",
+     "requested_change": "Use a named hypothesis instead:\n    have hli : LinearIndependent ℚ v :=\n      .of_comp (P.rootSpan ℚ).subtype <| P.linearIndepOn_root_baseOf' f hf\n    let b : Basis (baseOf P.root (f : M →+ ℚ)) ℚ (P.rootSpan ℚ) := Basis.mk hli (by rw [h_span])",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:72",
+     "claim": "The instance argument `[P.IsValuedIn S]` is redundant: it follows from `[P.IsCrystallographic]` through `IsValuedIn.trans` along `ℤ → S → R`, and `IsValuedIn` is a `Prop`. Requiring it makes callers supply an instance that only exists globally for `S = ℚ`.",
+     "requested_change": "Drop `[P.IsValuedIn S]` from the signature and add `have : P.IsValuedIn S := .trans P (S := S) ℤ` at the start of the proof.",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "The `CommRing` section declares `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` as variables. The next lemma, `linearIndepOn_root_baseOf'`, rebinds `{S : Type*}` with a different structure (`CommRing S`, `IsStrictOrderedRing S`) and `(f : Dual S M)`, shadowing both section variables. Only `baseOf_pairwise_pairing_le_zero` uses them.",
+     "requested_change": "Remove `S`, its instances and `f` from the section `variable` line and put them in the binders of `baseOf_pairwise_pairing_le_zero`, e.g. `lemma baseOf_pairwise_pairing_le_zero [CharZero R] [IsDomain R] [P.IsCrystallographic] {S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S) (hf : ...)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:56",
+     "claim": "The lemma is about `P.pairingIn ℤ i j`, but its name says `pairing`. The root-system library consistently separates `pairing` from `pairingIn` in names (`Base.pairingIn_le_zero_of_ne`, the direct `Base` analogue of this lemma; `pairingIn_le_zero_of_root_add_mem`; `pairingIn_le_zero_iff`). The word order also differs from the lemma it applies, `IsAddIndecomposable.pairwise_baseOf_sub_notMem`.",
+     "requested_change": "Rename it to use `pairingIn`, ordered like its sibling, e.g. `RootPairing.pairwise_baseOf_pairingIn_le_zero`, and update the call in `linearIndepOn_root_baseOf'`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:1",
+     "claim": "`public import Mathlib.Algebra.Module.Submodule.Union` is not needed. Its only connection to the file is that the TODO in the module docstring mentions `Module.exists_dual_forall_apply_ne_zero`, which lives there.",
+     "requested_change": "Drop the import; add it in the follow-up PR that actually uses `Module.exists_dual_forall_apply_ne_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:9",
+     "claim": "The module docstring is just the title `# Indecomposable elements of monoids`, but the file now also holds `IsMulIndecomposable.baseOf` and the Submonoid/Subgroup closure theorems that the root-system development builds on.",
+     "requested_change": "Extend the module docstring with a short description of the main definitions (`IsMulIndecomposable`, `IsMulIndecomposable.baseOf`) and results (`Submonoid.closure_image_isMulIndecomposable_baseOf`, `Subgroup.closure_image_isMulIndecomposable_baseOf`, `IsMulIndecomposable.pairwise_baseOf_div_notMem`).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` renames the existing public lemma `Submonoid.closure_image_one_lt_and_isMulIndecomposable`, and its additive counterpart, without leaving a deprecated alias. Mathlib's deprecation policy requires an alias for every renamed declaration so that downstream code keeps compiling. The new statement is defeq to the old one, so an alias typechecks.",
+     "requested_change": "After the lemma, add:\n```lean\n@[deprecated (since := \"2025-12-26\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n@[deprecated (since := \"2025-12-26\")]\nalias AddSubmonoid.closure_image_zero_lt_and_isAddIndecomposable :=\n  AddSubmonoid.closure_image_isAddIndecomposable_baseOf\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:116",
+     "claim": "`Subgroup.closure_image_isMulIndecomposable_baseOf` has a 20-line proof built on `image_baseOf_inv_comp_eq`, `coe_invMonoidHom` and `closure_inv`. The PR's own `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` depends only on the Submonoid lemma and already gives the result directly. Once the proof uses it, `image_baseOf_inv_comp_eq` and the new `invMonoidHom_comp_invMonoidHom` (only used by it) have no consumer in this PR.",
+     "requested_change": "Move `mem_or_inv_mem_closure_baseOf` above the Subgroup lemma and prove the Subgroup lemma as:\n```lean\n  refine le_antisymm (closure_mono <| image_subset_range _ _) ((closure_le _).mpr ?_)\n  rintro - ⟨i, rfl⟩\n  rcases IsMulIndecomposable.mem_or_inv_mem_closure_baseOf v hv_inv f hf i with h | h\n  · exact le_closure_toSubmonoid _ h\n  · have : (v i)⁻¹ ∈ closure (v '' IsMulIndecomposable.baseOf v f) := le_closure_toSubmonoid _ h\n    simpa using this\n```\nThen consider dropping `image_baseOf_inv_comp_eq` and the `invMonoidHom` additions, or splitting them into a separate PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:160",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` is redundant API with an uninformative primed name. Its arbitrary `s` with `s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` (i.e. `s ⊆ baseOf v f`) follows from `pairwise_baseOf_div_notMem` by `Set.Pairwise.mono`. Its only use is to prove `pairwise_baseOf_div_notMem` with `s = baseOf v f`.",
+     "requested_change": "Delete `pairwise_div_notMem_range'` and prove `pairwise_baseOf_div_notMem` directly:\n```lean\n  have hv_one : ∀ i, v i ≠ 1 := fun i ↦ by contrapose! hf; exact ⟨i, by simp [hf]⟩\n  refine pairwise_div_notMem_range v hv_one hv_inv _ _ subset_rfl fun i ↦ ?_\n  simpa [hv_inv] using (hf i).symm\n```\nFor the same reason, consider dropping the `s` argument of `pairwise_div_notMem_range` and stating it for `IsMulIndecomposable v t` itself.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:25",
+     "claim": "The PR adds `[LinearOrder S]` to the file-level `variable` line, so the new def `IsMulIndecomposable.baseOf` and `IsMulIndecomposable.baseOf_subset_one_lt` silently require a linear order on `S`. Both only use `1 < f (v i)`, so `[LT S]` is enough. A def that is stated too narrowly limits every later user.",
+     "requested_change": "Remove `[LinearOrder S]` from the `variable` line and state `baseOf` and `baseOf_subset_one_lt` with `[Monoid S] [LT S]`. Add `[LinearOrder S]` explicitly to the lemmas that need it: the Submonoid/Subgroup closure lemmas, `image_baseOf_inv_comp_eq`, `pairwise_*`, and `mem_or_inv_mem_closure_baseOf`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The additive docstring of `IsMulIndecomposable.baseOf` (i.e. `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\".",
+     "requested_change": "Replace \"crystallogrphic\" with \"crystallographic\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "In the module docstring of `BaseExists.lean`, the sentence \"even though the existence ultimate statement does not\" has its words in the wrong order.",
+     "requested_change": "Change it to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102",
+     "claim": "`RootPairing.linearIndepOn_root_baseOf` is the headline result of the PR and of the new file, and the module doc's TODO refers to it, yet it has no docstring. The module doc also has no \"Main results\" section listing it. The less important `linearIndepOn_root_baseOf'` and `baseOf_pairwise_pairing_le_zero` do have docstrings.",
+     "requested_change": "Add a docstring to `linearIndepOn_root_baseOf`, e.g. \"The indecomposable positive roots relative to `f` are linearly independent over `R`\" with the Serre reference. Add a `## Main results` section to the module doc listing `RootPairing.linearIndepOn_root_baseOf` and `RootPairing.baseOf_pairwise_pairing_le_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:56",
+     "claim": "`RootPairing.baseOf_pairwise_pairing_le_zero` concludes `P.pairingIn ℤ i j ≤ 0`, but its name says `pairing`. Sibling root-system lemmas about `pairingIn` use the `pairingIn` token, e.g. `root_sub_root_mem_of_pairingIn_pos`, `zero_lt_pairingIn_iff`, `pairingIn_pairingIn_mem_set_of_isCrystallographic`. With the current name the lemma looks like a statement about `P.pairing`.",
+     "requested_change": "Rename it to `baseOf_pairwise_pairingIn_le_zero`, or `pairwise_pairingIn_baseOf_le_zero` to match `IsAddIndecomposable.pairwise_baseOf_sub_notMem`, and update the call in `linearIndepOn_root_baseOf'`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:52",
+     "claim": "The `CommRing` section declares `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` as section variables, but only `baseOf_pairwise_pairing_le_zero` uses them. The next lemma, `linearIndepOn_root_baseOf'`, then re-binds `{S : Type*}` and `(f : Dual S M)`, shadowing both. This is confusing to read and fragile.",
+     "requested_change": "Remove `S` and `f` from the section `variable` and put `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` directly in the signature of `baseOf_pairwise_pairing_le_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:34",
+     "claim": "`IsMulIndecomposable.subset` calls `aesop` for what is just the first projection of the definition.",
+     "requested_change": "Replace `by aesop` with the term proof `fun _ ↦ And.left`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` renames the existing lemma `Submonoid.closure_image_one_lt_and_isMulIndecomposable` and its `to_additive` counterpart. The old name exists at the base commit, and the PR adds no deprecation alias for either name, so downstream code using the old names breaks silently.",
+     "requested_change": "After the lemma, add\n```lean\n@[deprecated (since := \"2025-12-23\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n@[deprecated (since := \"2025-12-23\")]\nalias AddSubmonoid.closure_image_pos_and_isAddIndecomposable :=\n  AddSubmonoid.closure_image_isAddIndecomposable_baseOf\n```\nThe additive old name should match whatever `to_additive` generated before the PR.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:116",
+     "claim": "The proof of `Subgroup.closure_image_isMulIndecomposable_baseOf` is long and roundabout: it goes through `invMonoidHom.comp f`, `IsMulIndecomposable.image_baseOf_inv_comp_eq` and image/closure rewriting. It follows in a few lines from `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf`, which does not depend on it. With that change, `image_baseOf_inv_comp_eq` (an 18-line lemma) has no remaining use in the PR, and `invMonoidHom_comp_invMonoidHom` is only used by it.",
+     "requested_change": "Move `IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` above this lemma and prove it as\n```lean\n  refine le_antisymm (closure_mono <| image_subset_range _ _) ((closure_le _).mpr ?_)\n  rintro - ⟨i, rfl⟩\n  rcases IsMulIndecomposable.mem_or_inv_mem_closure_baseOf v hv_inv f hf i with h | h\n  · exact le_closure_toSubmonoid _ h\n  · exact inv_inv (v i) ▸ inv_mem (le_closure_toSubmonoid _ h : (v i)⁻¹ ∈ closure _)\n```\nThen drop `IsMulIndecomposable.image_baseOf_inv_comp_eq`, and with it the now-unneeded `invMonoidHom_comp_invMonoidHom`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:160",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` is redundant. Its hypothesis `s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}` is just `s ⊆ baseOf v f`, so it is `(pairwise_baseOf_div_notMem v hv_inv f hf).mono hst`. Its only use in the PR is to prove `pairwise_baseOf_div_notMem`. The primed name also carries no meaning.",
+     "requested_change": "Delete `pairwise_div_notMem_range'` and prove `pairwise_baseOf_div_notMem` directly:\n```lean\n    (baseOf v f).Pairwise fun i j ↦ v i / v j ∉ range v := by\n  have hv_one (i : ι) : v i ≠ 1 := fun h ↦ hf i (by simp [h])\n  refine pairwise_div_notMem_range v hv_one hv_inv _ _ subset_rfl fun i ↦ ?_\n  simpa [hv_inv] using (hf i).symm\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+     "claim": "`IsMulIndecomposable.baseOf` is defined as `IsMulIndecomposable v {i | 1 < f (v i)}`. That is a predicate `ι → Prop` used as a `Set ι`, which relies on defeq abuse. It is also inconsistent with the set-builder form the file uses elsewhere: `IsMulIndecomposable.subset`, and the pre-PR statement of the Submonoid lemma. The same abuse appears in `pairwise_div_notMem_range` (`hst : s ⊆ IsMulIndecomposable v t`).",
+     "requested_change": "Define `baseOf v f := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}`, and state the hypothesis of `pairwise_div_notMem_range` as `(hst : s ⊆ {i | IsMulIndecomposable v t i})`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+     "claim": "The docstrings of `IsMulIndecomposable.baseOf` have two problems. The additive docstring has a typo, \"crystallogrphic\". The multiplicative docstring does not say what the base is.",
+     "requested_change": "Fix the typo to \"crystallographic\". Expand the multiplicative docstring to state that `baseOf v f` is the set of indices `i` with `1 < f (v i)` such that `v i` is indecomposable relative to that half-space.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:52",
+     "claim": "The section `variable {S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` is used only by `baseOf_pairwise_pairing_le_zero`. `RootPairing.linearIndepOn_root_baseOf'`, in the same section, then re-binds `{S : Type*}` with a different instance set and `(f : Dual S M)`, shadowing both section variables. This is confusing to read.",
+     "requested_change": "Drop `S` and `f` from the section `variable` line. Put `{S : Type*} [LinearOrder S] [AddCommGroup S] [IsOrderedAddMonoid S] (f : M →+ S)` directly in the signature of `baseOf_pairwise_pairing_le_zero`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:9",
+     "claim": "The new file imports `Mathlib.Algebra.Module.Submodule.Union`, but nothing in it uses that import. It only names `Module.exists_dual_forall_apply_ne_zero` in the TODO docstring.",
+     "requested_change": "Remove `public import Mathlib.Algebra.Module.Submodule.Union`, and add it in the PR that implements the TODO.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:14",
+     "claim": "The module docstring of `BaseExists.lean` has a garbled sentence: \"even though the existence ultimate statement does not\". It also never says what the file actually proves. The file contains no existence result yet, only `RootPairing.linearIndepOn_root_baseOf` and its supporting lemmas, which themselves have no docstring.",
+     "requested_change": "Change the sentence to \"even though the ultimate existence statement does not\". Add a `## Main results` section listing `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`. Give `linearIndepOn_root_baseOf` a short docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/LinearAlgebra/RootSystem/RootPositive.lean:208",
+     "claim": "`RootPairing.RootPositiveForm.posForm_apply_root_root_le_zero_iff` does not follow the naming of the sibling lemma it negates, `zero_lt_apply_root_root_iff`: it adds a `posForm_` prefix the sibling lacks. It also spells `≤ 0` as `le_zero` rather than the conventional `nonpos`.",
+     "requested_change": "Rename to `apply_root_root_nonpos_iff`, matching `zero_lt_apply_root_root_iff`, and update the use in `BaseExists.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:56",
+     "claim": "The name `RootPairing.baseOf_pairwise_pairing_le_zero` does not match its statement. The statement is about `P.pairingIn ℤ i j ≤ 0`, but the name says `pairing`, which is a different declaration (`RootPairing.pairing`, valued in `R`). It also uses `le_zero` for `≤ 0`.",
+     "requested_change": "Rename to `baseOf_pairwise_pairingIn_nonpos` and update the use in `linearIndepOn_root_baseOf'`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` renames the existing public theorem `Submonoid.closure_image_one_lt_and_isMulIndecomposable` without keeping a deprecated alias, so downstream users of the old name (and its generated additive name) get a hard break instead of a deprecation path.",
+     "requested_change": "After the new theorem, add deprecated aliases for the old multiplicative and additive names, e.g.\n```lean\n@[deprecated (since := \"2026-10-10\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n@[deprecated (since := \"2026-10-10\")]\nalias AddSubmonoid.closure_image_pos_and_isAddIndecomposable :=\n  AddSubmonoid.closure_image_isAddIndecomposable_baseOf\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+     "claim": "`IsMulIndecomposable.baseOf` and the immediate lemma `IsMulIndecomposable.baseOf_subset_one_lt` require the section's `[LinearOrder S]`, but the definition and subset lemma only use the relation `<`. This makes the basic API less reusable than necessary.",
+     "requested_change": "State these two declarations with a local `[LT S]` assumption and omit the section's `[LinearOrder S]`, for example:\n```lean\nomit [LinearOrder S] in\ndef IsMulIndecomposable.baseOf [Monoid S] [LT S] (v : ι → M) (f : M →* S) : Set ι :=\n  IsMulIndecomposable v {i | 1 < f (v i)}\n\nomit [LinearOrder S] in\nlemma IsMulIndecomposable.baseOf_subset_one_lt [Monoid S] [LT S] (v : ι → M) (f : M →* S) :\n    IsMulIndecomposable.baseOf v f ⊆ {i | 1 < f (v i)} :=\n  IsMulIndecomposable.subset _ _\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+     "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+     "claim": "`IsMulIndecomposable.baseOf` (and `IsMulIndecomposable.baseOf_subset_one_lt` on line 53) is stated with a spurious `[LinearOrder S]` hypothesis: the file-level `variable {ι M G S : Type*} [Monoid M] [CommGroup G] [LinearOrder S]` on line 25 is elaborated into the signature of every declaration that mentions `S` in its statement or body, so `baseOf : (ι → M) → (M →* S) → Set ι` demands a linear order on `S` although its body `IsMulIndecomposable v {i | 1 < f (v i)}` needs only `LT S`. Symmetrically, the declarations whose proofs really do need the order (`image_baseOf_inv_comp_eq`, `Submonoid.closure_image_isMulIndecomposable_baseOf`, `Subgroup.closure_image_isMulIndecomposable_baseOf`, `pairwise_div_notMem_range'`, `pairwise_baseOf_div_notMem`, `mem_or_inv_mem_closure_baseOf`) no longer mention it, so the requirement is invisible in the source — the pre-PR `Submonoid.closure_image_one_lt_and_isMulIndecomposable` had it explicitly in its binder list (`[CommMonoid S] [LinearOrder S] [IsOrderedCancelMonoid S]`).",
+     "requested_change": "Remove `[LinearOrder S]` from the `variable` command on line 25 and state the order hypothesis on the declarations that need it: give `IsMulIndecomposable.baseOf` and `IsMulIndecomposable.baseOf_subset_one_lt` the binders `[Monoid S] [LT S]`, and add `[LinearOrder S]` to the binder lists of `image_baseOf_inv_comp_eq`, `Submonoid.closure_image_isMulIndecomposable_baseOf`, `Subgroup.closure_image_isMulIndecomposable_baseOf`, `pairwise_div_notMem_range'`, `pairwise_baseOf_div_notMem` and `mem_or_inv_mem_closure_baseOf`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The docstring of `IsMulIndecomposable.baseOf` (the `to_additive` docstring on lines 45–48) misspells “crystallographic” as “crystallogrphic”; this is the only occurrence of that misspelling anywhere in `Mathlib` (grep over the whole tree). The same docstring also describes the argument as “the set of roots” / the multiplicative one as “a set of points of a monoid”, while the definition takes a family (`v : ι → M`).",
+     "requested_change": "Correct the spelling to “crystallographic”, and align the two docstrings on the family wording, e.g. multiplicative: “The base of a family `v` of points of a monoid relative to a morphism `f`.” (keeping the sentence about the crystallographic root-system case).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "The new module docstring sentence “The proof needs a set of ordered coefficients, even though the existence ultimate statement does not” is garbled — the intended object is the ultimate existence statement (existence of a base), not “the existence ultimate statement”.",
+     "requested_change": "Rewrite as “The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.”",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:171",
+     "claim": "`IsMulIndecomposable.pairwise_baseOf_div_notMem` (line 171) drops the `_range` that both of its siblings carry — `pairwise_div_notMem_range` (line 141) and `pairwise_div_notMem_range'` (line 161) — although all three have the same conclusion `s.Pairwise fun i j ↦ v i / v j ∉ range v`; the name family introduced by this PR is therefore inconsistent.",
+     "requested_change": "Rename it to `IsMulIndecomposable.pairwise_baseOf_div_notMem_range` for consistency with the two siblings; its additive counterpart is used once, in `Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:61`, which then has to read `IsAddIndecomposable.pairwise_baseOf_sub_notMem_range`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/8710b9b26c1f284e0d76d04c8152c9102c34f57eda79c137eb5b403d4d4fd0b5/samples/0/attempts/attempt_1_20261010113756/ape_agent_session_20261010_113756__c4f814e9-b291-444b-baf7-ca77f638c6e8.jsonl"
+  },
+  "AP1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` renames the public declaration `Submonoid.closure_image_one_lt_and_isMulIndecomposable` (which exists at the merge base, in this very file) and the PR deletes the old name outright: there is no deprecation, so every downstream user of the old name (and of its additive counterpart) breaks silently.",
+     "requested_change": "Add a deprecated alias next to the renamed lemma, e.g.\n```lean\n@[deprecated (since := \"2025-12-20\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n```\n(use the actual date of the change, and add the same for the additive name `AddSubmonoid.closure_image_zero_lt_and_isAddIndecomposable` if `to_additive` does not carry it over automatically).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:9",
+     "claim": "The newly added `public import Mathlib.Algebra.Group.Subgroup.Lattice` is unnecessary: some other import of this file already provides everything the file takes from it (`Subgroup.closure`, `Subgroup.closure_le`, …), so it is exactly the kind of import `shake`/`minImports` will ask to be dropped.",
+     "requested_change": "Delete the line `public import Mathlib.Algebra.Group.Subgroup.Lattice`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:37",
+     "claim": "`IsMulIndecomposable.subset` is proved by `by aesop`, although its goal `{i | IsMulIndecomposable v s i} ⊆ s` is closed by the direct term `fun _ hi ↦ hi.1`; a direct application should not be routed through heavy automation.",
+     "requested_change": "Replace the proof by\n```lean\nprotected lemma IsMulIndecomposable.subset (v : ι → M) (s : Set ι) :\n    {i | IsMulIndecomposable v s i} ⊆ s :=\n  fun _ hi ↦ hi.1\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:151",
+     "claim": "In `IsMulIndecomposable.pairwise_div_notMem_range` the goal `v i / v j ∉ range v` is a negated statement, but it is opened with `by_contra! ⟨k, hk⟩`; a `¬ p` goal should be proved by introducing the hypothesis directly.",
+     "requested_change": "Replace `by_contra! ⟨k, hk⟩` with `rintro ⟨k, hk⟩` (the rest of the proof is unchanged).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:161",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` is a variant of the sibling `IsMulIndecomposable.pairwise_div_notMem_range` (line 141) distinguished only by a trailing prime, and it carries no docstring explaining the prime; the term that differs is the half space: it fixes `t := {i | 1 < f (v i)}`, takes `f`/`hf` instead of `hv_one`/`hv_t`, and keeps `s`.",
+     "requested_change": "Name the differing term instead of appending a prime, e.g. `IsMulIndecomposable.pairwise_div_notMem_range_of_one_lt` (or `…_halfSpace`), or — if the prime is kept — add a docstring stating what the primed version specialises (`t` restricted to `{i | 1 < f (v i)}`, with `hv_one`/`hv_t` derived from `hf`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:167",
+     "claim": "The proof of `pairwise_div_notMem_range'` closes the remaining goal with `apply pairwise_div_notMem_range v hv_one hv_inv s {i | 1 < f (v i)} hst fun i ↦ ?_`, i.e. `apply` on a term that still has a `?_` hole; such a term should be applied with `refine`.",
+     "requested_change": "Use `refine pairwise_div_notMem_range v hv_one hv_inv s {i | 1 < f (v i)} hst fun i ↦ ?_` instead of `apply` (the following `simpa [hv_inv] using (hf i).symm` is unchanged).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The `to_additive` docstring of `IsMulIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\" (line 47), and the two docstrings of the definition do not describe the same thing: the multiplicative one is only `The \"base\" of a set of points of a monoid relative to a morphism f.` while the additive one adds the root-system motivation (and the typo).",
+     "requested_change": "Fix the spelling to \"crystallographic\" and give both docstrings the same content, e.g. describe the multiplicative base as the indecomposable points of `v` in the half space `1 < f (v ·)`, and mention in both that for the roots of a crystallographic root system with `S = ℚ` (additively: of a crystallographic root system with `S = ℚ`) this is the base of the root system associated to `f`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Group/Hom/Basic.lean:74",
+     "claim": "The new proof of `invMonoidHom_comp_invMonoidHom` is `ext; simp`, i.e. two tactics on one line; tactics are written one per line (`;` is not used to put several tactics on one line). The same is done in the new proofs of `pairwise_div_notMem_range` (Indecomposable.lean:123 `by ext i; simp [(hf i).symm]`), `pairwise_div_notMem_range'` (Indecomposable.lean:166 `by contrapose! hf; exact ⟨i, by simp [hf]⟩`) and `linearIndepOn_root_baseOf'` (BaseExists.lean:88 `by obtain ⟨i, -, hi⟩ := i; simpa`).",
+     "requested_change": "Write the proof as\n```lean\n  ext\n  simp\n```\nand split the three analogous one-liners in Indecomposable.lean (lines 123, 166) and BaseExists.lean (line 88) the same way.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:106",
+     "claim": "`RootPairing.linearIndepOn_root_baseOf` introduces the `Fintype` instance as data with `have : Fintype (baseOf P.root (f : M →+ ℚ)) := Fintype.ofFinite _` (line 106), and `RootPairing.linearIndepOn_root_baseOf'` does the same for `Fintype ι` (line 79) — data-carrying instances are introduced with `let`/`letI`, not `have`, which forgets the value (note the adjacent `letI := P.indexNeg` on line 105 already uses the right idiom).",
+     "requested_change": "Write `letI : Fintype (baseOf P.root (f : M →+ ℚ)) := Fintype.ofFinite _` (resp. `letI : Fintype ι := Fintype.ofFinite ι` in `linearIndepOn_root_baseOf'`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+     "claim": "The module docstring is titled `# Existence of bases for crystallographic root systems`, but the file proves no existence of bases: its only results are `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf` (linear independence of the base associated to a functional), and existence of a base appears only as item 2 of the file's `## TODO`. The title therefore suggests a broader result than the file proves.",
+     "requested_change": "Retitle the module docstring for what the file proves, e.g. `# Linear independence of the base associated to a functional` (or `# Towards existence of bases for crystallographic root systems`), and add a `## Main results` section listing `RootPairing.linearIndepOn_root_baseOf` and `RootPairing.baseOf_pairwise_pairing_le_zero`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/2e32946c1de869068770e07fcbffcc4cd80d6d9fa08ac82e7bb577946048f0d7/samples/0/attempts/attempt_1_20261010120728/ape_agent_session_20261010_120728__8b8b89fe-3818-42aa-b25f-0f47292d8f6a.jsonl"
+  },
+  "GPT2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` renames the existing public theorem `Submonoid.closure_image_one_lt_and_isMulIndecomposable` without leaving a deprecated alias, so downstream code using the old name (and the generated additive old name) breaks unnecessarily.",
+     "requested_change": "Add deprecated aliases after this theorem, e.g. `alias Submonoid.closure_image_one_lt_and_isMulIndecomposable := Submonoid.closure_image_isMulIndecomposable_baseOf` and the corresponding `AddSubmonoid.closure_image_zero_lt_and_isAddIndecomposable := AddSubmonoid.closure_image_isAddIndecomposable_baseOf`, both with `@[deprecated ... (since := ...)]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The to-additive docstring for `IsMulIndecomposable.baseOf` contains the typo `crystallogrphic`.",
+     "requested_change": "Change `crystallogrphic` to `crystallographic` in that docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "The module docstring phrase `the existence ultimate statement` is ungrammatical.",
+     "requested_change": "Rewrite it as `the ultimate existence statement`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "`Submonoid.closure_image_isMulIndecomposable_baseOf` is a rename of the public lemma `Submonoid.closure_image_one_lt_and_isMulIndecomposable`, but the old name was removed outright: `#check @Submonoid.closure_image_one_lt_and_isMulIndecomposable` now fails with `Unknown constant`, and no `alias` is present in the file (nor for the generated additive name `AddSubmonoid.closure_image_pos_and_isAddIndecomposable`). Mathlib policy is to keep a `@[deprecated]` alias for a renamed public declaration.",
+     "requested_change": "Immediately after the renamed lemma, add\n\n@[to_additive, deprecated (since := \"<date>\")]\nalias Submonoid.closure_image_one_lt_and_isMulIndecomposable :=\n  Submonoid.closure_image_isMulIndecomposable_baseOf\n\n(verified to compile; it restores both `Submonoid.closure_image_one_lt_and_isMulIndecomposable` and the additive `AddSubmonoid.closure_image_pos_and_isAddIndecomposable`, each firing a deprecation warning pointing at the new name).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:44",
+     "claim": "The `@[to_additive]` docstring of `IsMulIndecomposable.baseOf` contains the typo \"crystallogrphic\" (\"a crystallogrphic root system\"), and the two docstrings are asymmetric: the (primary) multiplicative docstring is only \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`.\" while the additive one carries the useful root-system context, so the declaration users actually see for the multiplicative version lacks that context.",
+     "requested_change": "Spell it \"crystallographic\" and put the same content in both docstrings, e.g. make the primary docstring `The \"base\" of `v` relative to a morphism `f`. In the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the base of the root system associated to `f`.` and give `to_additive` the additive restatement of exactly that.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+     "claim": "`IsMulIndecomposable.baseOf` demands `[LinearOrder S]` although its body only uses `<` (`{i | 1 < f (v i)}`): `#check @IsMulIndecomposable.baseOf` prints `... [inst : Monoid M] → [LinearOrder S] → [inst_2 : Monoid S] → (ι → M) → (M →* S) → Set ι`. The instance comes solely from the file-scope `variable {ι M G S : Type*} [Monoid M] [CommGroup G] [LinearOrder S]` added at line 25, which silently strengthens every declaration mentioning `S` (`baseOf`, `baseOf_subset_one_lt`, and the pairwise lemmas), none of which needs more than an order providing `<` (plus, for `mem_or_inv_mem_closure_baseOf`, trichotomy).",
+     "requested_change": "Drop `[LinearOrder S]` from the file-scope `variable` and state the order where it is needed: give `IsMulIndecomposable.baseOf` (and `baseOf_subset_one_lt`) at most `[Monoid S] [Preorder S]` (equivalently `[LT S]`), keep the order/`IsOrderedMonoid S` binders on the `pairwise_*` and closure lemmas, and add `[LinearOrder S]` only to `mem_or_inv_mem_closure_baseOf`, which uses `lt_or_gt_of_ne`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:102",
+     "claim": "`RootPairing.linearIndepOn_root_baseOf` — the result the PR is titled after and the one both the module doc (TODO 2) and `RootPairing.linearIndepOn_root_baseOf'`'s docstring point at — has no docstring at all, while the auxiliary `linearIndepOn_root_baseOf'` carries a long one that describes itself as \"mostly a stepping stone en route to `RootPairing.linearIndepOn_root_baseOf`\". The documentation for the headline theorem is therefore misplaced/absent.",
+     "requested_change": "Add a docstring to `linearIndepOn_root_baseOf` stating the result (the roots in `IsAddIndecomposable.baseOf P.root f` are linearly independent over `R` for a finite crystallographic root system with `P.IsRootSystem`), and trim the stepping-stone prose on `linearIndepOn_root_baseOf'` down to a pointer to it.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "The module docstring of the new file contains the word-order slip \"even though the existence ultimate statement does not\" (should be \"the ultimate existence statement\").",
+     "requested_change": "Change line 19 to \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/3f37efccdc7fea914d534e8b786b500b160e4bbad1ed1c22e670416bcdd44321/samples/0/attempts/attempt_1_20261010123347/ape_agent_session_20261010_123347__eb750f9b-3279-43fe-8b0b-925d658f6c2b.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+     "claim": "The new file's module docstring is titled `# Existence of bases for crystallographic root systems`, but the file proves no such thing: its results are `RootPairing.baseOf_pairwise_pairing_le_zero`, `RootPairing.linearIndepOn_root_baseOf'` and `RootPairing.linearIndepOn_root_baseOf`, i.e. linear independence of `IsAddIndecomposable.baseOf`, and the existence theorem is listed as future work in the `## TODO` section (item 2: \"Prove that every reduced crystallographic root system has a base\"). The title therefore states a broader result than the file proves. The paragraph below it also contains a garbled phrase, \"even though the existence ultimate statement does not\".",
+     "requested_change": "Retitle the module docstring to what the file proves, e.g. `# Linear independence of a base of a crystallographic root system` (and correspondingly consider renaming the file), and repair the sentence to read \"even though the ultimate existence statement does not\".",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:14",
+     "claim": "The newly added `public import Mathlib.Algebra.Order.Group.Basic` itself publicly imports `Mathlib.Algebra.Order.Monoid.Defs` (line 9 of that file), so the pre-existing `public import Mathlib.Algebra.Order.Monoid.Defs` on this line is now redundant.",
+     "requested_change": "Delete `public import Mathlib.Algebra.Order.Monoid.Defs`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:9",
+     "claim": "The new file imports `Mathlib.Algebra.Module.Submodule.Union`, but nothing used in the file comes from that module.",
+     "requested_change": "Remove the `public import Mathlib.Algebra.Module.Submodule.Union` line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:34",
+     "claim": "This PR renames the pre-existing public declaration `Submonoid.closure_image_one_lt_and_isMulIndecomposable` (and its `to_additive` counterpart) to `Submonoid.closure_image_isMulIndecomposable_baseOf` and deletes the old name outright, with no `@[deprecated]` alias anywhere in the diff, so downstream users of the old name will just break.",
+     "requested_change": "Add deprecation aliases, e.g. `@[deprecated (since := \"YYYY-MM-DD\")] alias Submonoid.closure_image_one_lt_and_isMulIndecomposable := Submonoid.closure_image_isMulIndecomposable_baseOf`, plus the corresponding additive alias.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:161",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` is distinguished from `IsMulIndecomposable.pairwise_div_notMem_range` only by a prime; the prime does not name the term that differs (its `hst`/`hv_t` are the specialisation of the general lemma to `t = {i | 1 < f (v i)}`).",
+     "requested_change": "Rename it after the term that differs, e.g. `IsMulIndecomposable.pairwise_div_notMem_range_of_subset_baseOf`, and state its hypothesis as `s ⊆ baseOf v f` to match `pairwise_baseOf_div_notMem`, which already uses `baseOf`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:171",
+     "claim": "`IsMulIndecomposable.pairwise_baseOf_div_notMem` has exactly the same conclusion as its two siblings (`s.Pairwise fun i j ↦ v i / v j ∉ range v`) but its name omits `_range`, while `pairwise_div_notMem_range` and `pairwise_div_notMem_range'` include it.",
+     "requested_change": "Rename it to `IsMulIndecomposable.pairwise_baseOf_div_notMem_range` so that the conclusion is spelled the same way in all three names.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:72",
+     "claim": "`RootPairing.linearIndepOn_root_baseOf'` differs from `RootPairing.linearIndepOn_root_baseOf` only by a trailing prime; the name does not say what distinguishes the two (this one is the version for pairings valued in an ordered coefficient ring `S`, with no field assumption). Its docstring also explains it by contrast with the other lemma (\"This lemma is mostly a stepping stone en route to `RootPairing.linearIndepOn_root_baseOf` ...\") rather than on its own terms.",
+     "requested_change": "Rename to a name that spells the differing term, e.g. `RootPairing.linearIndepOn_root_baseOf_of_isValuedIn`, and rewrite the docstring as a standalone description of the statement (coefficients in an ordered ring `S`, `R` a domain, no `ℚ`-structure needed).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/LinearAlgebra/RootSystem/IsValuedIn.lean:140",
+     "claim": "`RootPairing.algebraMap_pairingIn'` sits immediately below the existing `RootPairing.algebraMap_pairingIn` and differs from it only by a prime; the prime does not identify the difference (here the right-hand side is `P.pairingIn S i j`, there it is `P.pairing i j`).",
+     "requested_change": "Rename it to a name that names the differing term, e.g. `RootPairing.algebraMap_pairingIn_eq_pairingIn`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:35",
+     "claim": "`IsMulIndecomposable.subset` only restates `Set.sep_subset`: `IsMulIndecomposable v s i` is by definition `i ∈ s ∧ ...`, so `Set.sep_subset s (fun i ↦ ∀ᵉ (j ∈ s) (k ∈ s), v i = v j * v k → v j = 1 ∨ v k = 1)` has exactly this statement, and `IsMulIndecomposable.baseOf_subset_one_lt` is the same lemma instantiated at `{i | 1 < f (v i)}`. Both are proved by `aesop`, although the direct term `fun _ h ↦ h.1` closes the goal.",
+     "requested_change": "Drop `IsMulIndecomposable.subset` and `IsMulIndecomposable.baseOf_subset_one_lt` and use `Set.sep_subset` at their use sites (`closure_mono (image_mono <| Set.sep_subset {i | 1 < f (v i)} _)` and `hst.trans (Set.sep_subset t _)`); if you prefer to keep them, prove them with `fun _ h ↦ h.1` rather than `aesop`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:35",
+     "claim": "The new `IsMulIndecomposable.*` material is split between explicit prefixes written outside any namespace (`IsMulIndecomposable.subset` line 35, `.baseOf` 49, `.baseOf_subset_one_lt` 53, `.image_baseOf_inv_comp_eq` 58) and an added `namespace IsMulIndecomposable ... end` block (lines 138-190) whose members drop the prefix. The same namespace is therefore used in two ways in one file.",
+     "requested_change": "Put the four prefixed declarations inside the existing `namespace IsMulIndecomposable` block (their full names are unchanged), or drop the `namespace` block and use the prefix consistently throughout.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:141",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range` proves the negated goal `v i / v j ∉ range v` with `by_contra! ⟨k, hk⟩`, although the hypothesis can simply be introduced: `rintro ⟨k, hk⟩` leaves the same goals. The same pattern occurs in `pairwise_div_notMem_range'`, where `have hv_one : ∀ i, v i ≠ 1` is proved by `fun i ↦ by contrapose! hf; exact ⟨i, by simp [hf]⟩`.",
+     "requested_change": "Replace `by_contra! ⟨k, hk⟩` with `rintro ⟨k, hk⟩`, and prove `hv_one` directly, as in `have hv_one : ∀ i, v i ≠ 1 := fun i h ↦ hf i (by simp [h])`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/Algebra/Group/Hom/Basic.lean:73",
+     "claim": "The proof of `invMonoidHom_comp_invMonoidHom` is written as `:= by ext; simp`, putting two tactics on one line via `;`, which the style guide asks to split. The same one-liner pattern occurs at `Subgroup.closure_image_isMulIndecomposable_baseOf` (`have : univ = {i | 1 < f (v i)} ∪ {i | f (v i) < 1} := by ext i; simp [(hf i).symm]`, Mathlib/Algebra/Group/Irreducible/Indecomposable.lean line 123) and in the proof of `pairwise_div_notMem_range'` (`fun i ↦ by contrapose! hf; exact ⟨i, by simp [hf]⟩`, line 166).",
+     "requested_change": "Write `ext` and `simp` as two separate lines in these proofs (the `hv_one` occurrence is covered by the direct term suggested for `IsMulIndecomposable.pairwise_div_notMem_range'`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:45",
+     "claim": "The docstring of `IsMulIndecomposable.baseOf`/`IsAddIndecomposable.baseOf` misspells \"crystallographic\" as \"crystallogrphic\", and the two versions do not describe the same thing: the multiplicative one is \"The \\\"base\\\" of a set of points of a monoid relative to a morphism `f`\" while the additive one is only \"The \\\"base\\\" of `v` relative to a morphism `f`\".",
+     "requested_change": "Fix the spelling to \"crystallographic\" and make the additive docstring the additive counterpart of the multiplicative one (same first sentence translated for additive monoids, then the root-system sentence).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/c67be38cd2858aca805f688d434baad1a0e4f5e9296ed237a066f78f44d3c709/samples/0/attempts/attempt_1_20261010125818/ape_agent_session_20261010_125818__a0620364-2e2a-4530-9e68-58aa11f415ac.jsonl"
+  },
+  "GPT3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:49",
+     "claim": "`IsMulIndecomposable.baseOf` and `IsMulIndecomposable.baseOf_subset_one_lt` unnecessarily require `LinearOrder S` through the file-level variable, although these two declarations only use the relation `<` and the monoid structure on `S`.",
+     "requested_change": "Move `S` into the binders for these two declarations and weaken the assumptions, e.g. use `{S : Type*} [LT S] [Monoid S]` (or at most an order class weaker than `LinearOrder`) for both `baseOf` and `baseOf_subset_one_lt`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:141",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range` and its two base/halfspace wrappers inherit an unnecessary `[CommGroup G]` assumption; the proof only uses the group operations, not commutativity of `G`.",
+     "requested_change": "Locally quantify the source as `{G : Type*} [Group G]` in `pairwise_div_notMem_range`, `pairwise_div_notMem_range'`, and `pairwise_baseOf_div_notMem`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:178",
+     "claim": "`IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` also inherits an unnecessary `[CommGroup G]` assumption; this submonoid-closure statement only needs `G` to be a group.",
+     "requested_change": "State `mem_or_inv_mem_closure_baseOf` with a local `{G : Type*} [Group G]` instead of using the file-level `[CommGroup G]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The additive docstring for `IsMulIndecomposable.baseOf` misspells “crystallographic” as “crystallogrphic”.",
+     "requested_change": "Change `crystallogrphic` to `crystallographic`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "The module doc sentence “the existence ultimate statement” is grammatically incorrect.",
+     "requested_change": "Rephrase it, for example to “even though the ultimate existence statement does not.”",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "`IsMulIndecomposable.baseOf`'s docstring (the `to_additive` docstring, which becomes the docstring of `IsAddIndecomposable.baseOf`) misspells \"crystallographic\" as \"crystallogrphic\" (\"the set of roots of a crystallogrphic root system\"). `content_search` over the whole tree finds this misspelling exactly once, in this new text.",
+     "requested_change": "Change `crystallogrphic` to `crystallographic` in the docstring of `IsMulIndecomposable.baseOf`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:141",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range` picks up an `[S : Type*] [LinearOrder S]` argument although its statement mentions no `S` at all: `#check @IsMulIndecomposable.pairwise_div_notMem_range` prints `∀ {ι G S} [CommGroup G] [LinearOrder S] [InvolutiveInv ι] (v : ι → G), ...`. This comes from the broadened section variable on line 25 (`variable {ι M G S : Type*} [Monoid M] [CommGroup G] [LinearOrder S]`); the same spillover also puts an unused order assumption on `IsMulIndecomposable.baseOf` (which needs only `LT S` and `One S`) and on `Submonoid.closure_image_isMulIndecomposable_baseOf`.",
+     "requested_change": "Do not put `[LinearOrder S]` in the file-level `variable` line; supply the order assumption only where the statement or proof needs it, or add `omit [LinearOrder S] in` to the declarations that do not. I verified `omit [LinearOrder S] in @[to_additive] lemma pairwise_div_notMem_range ...` compiles, after which `S` disappears from the signature.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:161",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` spells out the hypothesis `hst : s ⊆ IsMulIndecomposable v {i | 1 < f (v i)}`, which is definitionally `s ⊆ baseOf v f` — the very set the PR introduces `IsMulIndecomposable.baseOf` to name, and which the neighbouring `pairwise_baseOf_div_notMem` uses. The same set is also re-spelled as `let t : Set ι := {i | IsMulIndecomposable v {j | 1 < f (v j)} i}` inside the proof of `Submonoid.closure_image_isMulIndecomposable_baseOf`.",
+     "requested_change": "State the hypothesis as `(hst : s ⊆ baseOf v f)` (the proof still passes `t := {i | 1 < f (v i)}` to `pairwise_div_notMem_range`); likewise replace the `let t` in `Submonoid.closure_image_isMulIndecomposable_baseOf` by `let t := IsMulIndecomposable.baseOf v f`. I verified the `pairwise_div_notMem_range'` change compiles and leaves `pairwise_baseOf_div_notMem` working.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+     "claim": "The new module doc's second sentence is garbled: \"The proof needs a set of ordered coefficients, even though the existence ultimate statement does not.\" (\"existence ultimate\" should be \"ultimate existence\").",
+     "requested_change": "Reword to e.g. \"The proof needs a set of ordered coefficients, even though the ultimate existence statement does not.\"",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/606260a069841f258660f103ce9f26e01829f3ee700e8b6118ba0b94eaf119e4/samples/0/attempts/attempt_1_20261010131344/ape_agent_session_20261010_131344__817f9c6a-47f4-4be9-876a-3a0cf8143a35.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:13",
+     "claim": "The import block is not sorted: `public import Mathlib.Algebra.Order.Group.Defs` (line 12) precedes `public import Mathlib.Algebra.Order.Group.Basic` (line 13), but `…Order.Group.Basic` sorts before `…Order.Group.Defs`. On top of that, `Mathlib.Algebra.Order.Group.Basic` is not needed by this file.",
+     "requested_change": "Delete the line `public import Mathlib.Algebra.Order.Group.Basic`; if it turns out to be needed by the downstream new file `Mathlib/LinearAlgebra/RootSystem/BaseExists.lean` (check with `shake`), then instead move it below `Mathlib.Algebra.Order.Group.Defs` so that the block is sorted.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:15",
+     "claim": "The module docstring title `# Existence of bases for crystallographic root systems` advertises a result this file does not contain: the file proves Serre's linear-independence lemmas (`baseOf_pairwise_pairing_le_zero`, `linearIndepOn_root_baseOf`, `linearIndepOn_root_baseOf'`), and existence of a base is deferred to the `## TODO` section of the same docstring. Line 19 also reads ungrammatically: \"even though the existence ultimate statement does not\".",
+     "requested_change": "Retitle to what the file actually proves, e.g. `# Linear independence of the base of a crystallographic root system` (leaving \"prove that every reduced crystallographic root system has a base\" in the TODO), and reword line 19 to \"even though the ultimate existence statement does not\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+     "claim": "The docstring of `IsMulIndecomposable.baseOf` (its `to_additive` version) misspells `crystallographic` as `crystallogrphic`. The two docstrings of this declaration are also inconsistent: the primary one says \"The \"base\" of a set of points of a monoid relative to a morphism `f`\" whereas the additive one says \"The \"base\" of `v` relative to a morphism `f`\", and the argument is a family `v : ι → M`, not a set of points.",
+     "requested_change": "Fix the spelling to `crystallographic`, and make the two docstrings describe the same thing (e.g. use the additive wording, \"The \"base\" of `v` relative to a morphism `f`\", for both).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:90",
+     "claim": "This PR renames the pre-existing declaration `Submonoid.closure_image_one_lt_and_isMulIndecomposable` to `Submonoid.closure_image_isMulIndecomposable_baseOf` and deletes the old name outright; nothing in the diff keeps the old name working, so it is removed without a deprecation.",
+     "requested_change": "Add a deprecated alias for the old name (and for its additive `to_additive` twin), e.g. `@[deprecated (since := \"2025-XX-XX\")] alias Submonoid.closure_image_one_lt_and_isMulIndecomposable := Submonoid.closure_image_isMulIndecomposable_baseOf` placed after the new declaration.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:35",
+     "claim": "`IsMulIndecomposable.subset` proves the set-inclusion `{i | IsMulIndecomposable v s i} ⊆ s` with `aesop`, although the goal is the first component of the defining conjunction and a direct term closes it.",
+     "requested_change": "Replace the proof body `aesop` by `fun _ ↦ And.left` (equivalently `by rintro i ⟨hi, -⟩` followed by `exact hi`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:161",
+     "claim": "`IsMulIndecomposable.pairwise_div_notMem_range'` is a variant of `IsMulIndecomposable.pairwise_div_notMem_range` (declared a few lines above) distinguished only by a prime, although the statements differ in their hypotheses: the primed one fixes `t` to the half space `{i | 1 < f (v i)}` of a homomorphism `f` and derives `hv_one` and `hv_t` from `hf`, instead of taking an arbitrary `t` with `hv_one` and `hv_t`.",
+     "requested_change": "Give it a name that spells the specialisation instead of a prime (the practice's precedent is `fourier_bilin_convolution_eq_integral` for `fourier_bilin_convolution_eq'`), e.g. `IsMulIndecomposable.pairwise_div_notMem_range_of_subset_baseOf`; alternatively, if the general lemma is not needed on its own, merge the two.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:72",
+     "claim": "`RootPairing.linearIndepOn_root_baseOf'` is named with a prime although its statement is substantially different from `RootPairing.linearIndepOn_root_baseOf`: linear independence is taken over the coefficient ring `S` (with `[Algebra S R]`, `[IsScalarTower S R _]`, `[P.IsValuedIn S]`) and with `f : Dual S M`, rather than over `R` with `[P.IsRootSystem]` and `f : Dual ℚ M`. The docstring explains the mathematics of the difference but never explains the prime.",
+     "requested_change": "Rename to name the distinguishing feature (e.g. state that the coefficients are `S`/that the pairing is valued in `S`, such as `linearIndepOn_root_baseOf_of_isValuedIn`); if the prime is kept, say in the docstring which term of the statement it stands for.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/LinearAlgebra/RootSystem/IsValuedIn.lean:140",
+     "claim": "`RootPairing.algebraMap_pairingIn'` is named by appending a prime to the existing `RootPairing.algebraMap_pairingIn`, but what differs is the statement: the new lemma relates the `T`-valued and `S`-valued pairings through `algebraMap T S` (`algebraMap T S (P.pairingIn T i j) = P.pairingIn S i j`) whereas `algebraMap_pairingIn` relates `P.pairingIn S i j` to `P.pairing i j`. Neither side of the difference appears in the name.",
+     "requested_change": "Rename the lemma so that the two coefficient rings and the two sides of the equation are visible, e.g. `algebraMap_pairingIn_eq_pairingIn` (naming both sides, as the library does for equation lemmas), instead of carrying a prime; or state in a docstring what the prime stands for.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:56",
+     "claim": "`RootPairing.baseOf_pairwise_pairing_le_zero` concludes with `P.pairingIn ℤ i j ≤ 0`, but its name says `pairing`: `pairingIn` is a different declaration from `pairing`, and the neighbouring lemmas all spell the function they use (`RootPairing.BilinForm.IsPos.exists_mem_support_pos_pairingIn`, `RootPairing.BilinForm.exists_mem_support_pos_pairingIn_ne_zero`, `RootPairing.pairingIn_le_zero_of_ne`, `RootPairing.root_sub_root_mem_of_pairingIn_pos`, `RootPairing.zero_lt_pairingIn_iff`).",
+     "requested_change": "Rename it to `RootPairing.baseOf_pairwise_pairingIn_le_zero` (updating the single use in `RootPairing.linearIndepOn_root_baseOf'`).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/c1c2d1de3e041a940212b568b91e7118ae19e3f2eedf130cd8174159e91f5ebe/samples/0/attempts/attempt_1_20261010134905/ape_agent_session_20261010_134905__1ce7183e-89b7-443f-94ed-7643cf0b8973.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/D12_33321.md"
+}

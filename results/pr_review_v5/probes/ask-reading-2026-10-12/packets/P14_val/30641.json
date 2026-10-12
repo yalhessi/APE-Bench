@@ -1,0 +1,1649 @@
+{
+ "asks": [
+  {
+   "id": "v0064",
+   "pr": 30641,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P105"
+   ],
+   "text": "I think `x` might be more conventional for a real number --- though this file uses a mix of different conventions (sometimes `x`, sometimes `a` and `b`, sometimes `r`). In other words, consider my suggestion optional.\r\n```suggestion\r\n@[simp]\r\nlemma posLog_pow {n : ℕ} {x : ℝ} : log⁺ (x ^ n) = n * log⁺ x := by\r\n```",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+   "line": 103,
+   "author": "grunweg",
+   "at": "2025-10-18T16:29:58Z",
+   "matcher_text": {
+    "ask_id": "v0064",
+    "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+    "code_at_comment": "@@ -91,9 +98,21 @@ theorem monotoneOn_posLog : MonotoneOn log⁺ (Set.Ici 0) := by\n     simp only [this, and_true, ge_iff_le]\n     linarith\n \n+/-- The function `log⁺` commutes with taking powers. -/\n+@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :\n+    log⁺ (a ^ n) = n * log⁺ a := by",
+    "comment": "I think `x` might be more conventional for a real number --- though this file uses a mix of different conventions (sometimes `x`, sometimes `a` and `b`, sometimes `r`). In other words, consider my suggestion optional.\r\n```suggestion\r\n@[simp]\r\nlemma posLog_pow {n : ℕ} {x : ℝ} : log⁺ (x ^ n) = n * log⁺ x := by\r\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` takes its variables as implicit binders `{n : ℕ} {a : ℝ}`, although they occur only in the conclusion of an unconditional rewrite lemma; the lemma it mirrors, `Real.log_pow (x : ℝ) (n : ℕ)`, and the file's own `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)` take them explicitly, so `rw [posLog_pow x n]` cannot be written.",
+      "requested_change": "Change the signature to match `Real.log_pow`: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` takes its variables as implicit binders `{n : ℕ} {a : ℝ}`, although they occur only in the conclusion of an unconditional rewrite lemma; the lemma it mirrors, `Real.log_pow (x : ℝ) (n : ℕ)`, and the file's own `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)` take them explicitly, so `rw [posLog_pow x n]` cannot be written.",
+      "requested_change": "Change the signature to match `Real.log_pow`: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 8,
+     "m1_finding_text": {
+      "i": 8,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The header of `Real.posLog_pow` is split over two lines (`@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :` / `    log⁺ (a ^ n) = n * log⁺ a := by`) although it fits on one line in 74 characters. With the split, the inline `@[simp]` sits in front of a multi-line header.",
+      "requested_change": "Join the header onto one line: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x := by`. If it stays multi-line, put `@[simp]` on its own line above `lemma`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "reached",
+     "m2_finding": 7,
+     "m2_finding_text": {
+      "i": 7,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow {n : ℕ} {a : ℝ}` makes both arguments implicit, but no hypothesis or other explicit argument determines them. The analogue `Real.log_pow (x : ℝ) (n : ℕ)` and the file's own `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` take them explicitly.",
+      "requested_change": "Make the arguments explicit, in `Real.log_pow`'s order: `lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    },
+    "T1": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is an unconditional equation lemma but takes its variables as implicit `{n : ℕ} {a : ℝ}`, unlike its model `Real.log_pow (x : ℝ) (n : ℕ)` and the file's other simp equations `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)`, so it cannot be instantiated as `posLog_pow n x` in `rw`/`simp` or term mode.",
+      "requested_change": "Make the variables explicit, e.g. `@[simp] lemma posLog_pow (n : ℕ) (x : ℝ) : log⁺ (x ^ n) = n * log⁺ x`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename a to x. Reached only where a suggested signature uses x (explicit-binder findings); @[simp] placement findings do not rename.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is an unconditional equation lemma but takes its variables as implicit `{n : ℕ} {a : ℝ}`, unlike its model `Real.log_pow (x : ℝ) (n : ℕ)` and the file's other simp equations `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)`, so it cannot be instantiated as `posLog_pow n x` in `rw`/`simp` or term mode.",
+      "requested_change": "Make the variables explicit, e.g. `@[simp] lemma posLog_pow (n : ℕ) (x : ℝ) : log⁺ (x ^ n) = n * log⁺ x`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename a->x. Only findings whose new signature uses x reach; @[simp]-placement-only findings judged no."
+    }
+   },
+   "entries_text": {
+    "P105": "A variable is named with the letter the file's area uses for its kind (`X`, `Y` for measurable spaces), not with a letter that has an established different meaning there (`ε` for a small real in analysis), or that is easily confused with another symbol (`O` with `0`)."
+   }
+  },
+  {
+   "id": "v0065",
+   "pr": 30641,
+   "family": "F8",
+   "in_census": false,
+   "entries": [],
+   "text": "There's no `ha` in scope, so this could be `ha`, right?",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+   "line": 106,
+   "author": "grunweg",
+   "at": "2025-10-18T16:30:23Z",
+   "matcher_text": {
+    "ask_id": "v0065",
+    "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+    "code_at_comment": "@@ -91,9 +98,21 @@ theorem monotoneOn_posLog : MonotoneOn log⁺ (Set.Ici 0) := by\n     simp only [this, and_true, ge_iff_le]\n     linarith\n \n+/-- The function `log⁺` commutes with taking powers. -/\n+@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :\n+    log⁺ (a ^ n) = n * log⁺ a := by\n+  by_cases hn : n = 0\n+  · simp_all\n+  by_cases h₂a : |a| ≤ 1",
+    "comment": "There's no `ha` in scope, so this could be `ha`, right?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 8,
+     "m1_finding_text": {
+      "i": 8,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:104",
+      "claim": "The case splits in `Real.posLog_pow` produce hypotheses that then have to be rewritten: `by_cases hn : n = 0` with `· simp_all` (n is not substituted), and `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, which is a hypothesis needing rewriting after the case split. A case split uses the form whose result substitutes or simplifies directly.",
+      "requested_change": "```\n  obtain rfl | hn := eq_or_ne n 0\n  · simp\n  rcases le_or_gt |a| 1 with ha | ha\n  · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]\n  have : 1 < |a ^ n| := by simp [one_lt_pow₀ ha hn]\n  simp [posLog_eq_log this.le, posLog_eq_log ha.le]\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "reached",
+     "m2_finding": 8,
+     "m2_finding_text": {
+      "i": 8,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:104",
+      "claim": "The case splits in `Real.posLog_pow` produce hypotheses that then have to be rewritten: `by_cases hn : n = 0` with `· simp_all` (n is not substituted), and `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, which is a hypothesis needing rewriting after the case split. A case split uses the form whose result substitutes or simplifies directly.",
+      "requested_change": "```\n  obtain rfl | hn := eq_or_ne n 0\n  · simp\n  rcases le_or_gt |a| 1 with ha | ha\n  · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]\n  have : 1 < |a ^ n| := by simp [one_lt_pow₀ ha hn]\n  simp [posLog_eq_log this.le, posLog_eq_log ha.le]\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the identity is exactly `Real.log_pow` together with the distributivity of multiplication by a nonnegative natural over `max` — there is nothing here that needs a case distinction on `|a| ≤ 1`.",
+      "requested_change": "Replace the proof body with the direct computation\n`rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`\n(the two `posLog_def`s expose `max 0 (log (a ^ n)) = n * max 0 (log a)`, `log_pow` turns the left side into `max 0 (↑n * log a)`, and `mul_max_of_nonneg`/`mul_zero` turn the right side into the same thing). This also removes the confusingly named `h₂a`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the identity is exactly `Real.log_pow` together with the distributivity of multiplication by a nonnegative natural over `max` — there is nothing here that needs a case distinction on `|a| ≤ 1`.",
+      "requested_change": "Replace the proof body with the direct computation\n`rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`\n(the two `posLog_def`s expose `max 0 (log (a ^ n)) = n * max 0 (log a)`, `log_pow` turns the left side into `max 0 (↑n * log a)`, and `mul_max_of_nonneg`/`mul_zero` turn the right side into the same thing). This also removes the confusingly named `h₂a`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    },
+    "T1": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename h₂a to ha. R4 rcases names it ha; R9 flags h₂a as confusing and removes it. Other proof rewrites ignore naming.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename h2a->ha. R4's rcases rewrite names it ha; R9 flags the name but removes it via proof rewrite."
+    }
+   },
+   "entries_text": {}
+  },
+  {
+   "id": "v0066",
+   "pr": 30641,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P060"
+   ],
+   "text": "Can you prove the \\leq version here directly?",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+   "line": 109,
+   "author": "grunweg",
+   "at": "2025-10-18T16:31:39Z",
+   "matcher_text": {
+    "ask_id": "v0066",
+    "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+    "code_at_comment": "@@ -91,9 +98,21 @@ theorem monotoneOn_posLog : MonotoneOn log⁺ (Set.Ici 0) := by\n     simp only [this, and_true, ge_iff_le]\n     linarith\n \n+/-- The function `log⁺` commutes with taking powers. -/\n+@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :\n+    log⁺ (a ^ n) = n * log⁺ a := by\n+  by_cases hn : n = 0\n+  · simp_all\n+  by_cases h₂a : |a| ≤ 1\n+  · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]\n+  rw [not_le] at h₂a\n+  have : 1 < |a ^ n| := by simp [one_lt_pow₀ h₂a hn]",
+    "comment": "Can you prove the \\leq version here directly?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` takes seven lines: two `by_cases` splits, an `|a| ≤ 1` case using `simp_all`, and an auxiliary `1 < |a ^ n|` fact. It is a direct consequence of `posLog_def`, `log_pow` and `mul_max_of_nonneg`, because `n ≥ 0` gives `max 0 (n * log a) = n * max 0 (log a)`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` takes seven lines: two `by_cases` splits, an `|a| ≤ 1` case using `simp_all`, and an auxiliary `1 < |a ^ n|` fact. It is a direct consequence of `posLog_def`, `log_pow` and `mul_max_of_nonneg`, because `n ≥ 0` gives `max 0 (n * log a) = n * max 0 (log a)`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is an unnecessary three-way case split (`by_cases hn`, `by_cases h₂a : |a| ≤ 1`, `rw [not_le]`, `pow_le_one₀`, `one_lt_pow₀`, and two calls to `posLog_eq_log`) for an identity that is immediate from `posLog_def`, the existing simp lemma `Real.log_pow` (`log (x ^ n) = n * log x`) and `mul_max_of_nonneg`. The case analysis, including the `a = 0`/`n = 0` junk-value handling, is all subsumed by those three lemmas.",
+      "requested_change": "Replace the whole body (lines 104-110) with a one-liner, e.g. `simp [posLog_def, log_pow, mul_max_of_nonneg]`, or the explicit `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg 0 (log a) (Nat.cast_nonneg n), mul_zero]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is an unnecessary three-way case split (`by_cases hn`, `by_cases h₂a : |a| ≤ 1`, `rw [not_le]`, `pow_le_one₀`, `one_lt_pow₀`, and two calls to `posLog_eq_log`) for an identity that is immediate from `posLog_def`, the existing simp lemma `Real.log_pow` (`log (x ^ n) = n * log x`) and `mul_max_of_nonneg`. The case analysis, including the `a = 0`/`n = 0` junk-value handling, is all subsumed by those three lemmas.",
+      "requested_change": "Replace the whole body (lines 104-110) with a one-liner, e.g. `simp [posLog_def, log_pow, mul_max_of_nonneg]`, or the explicit `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg 0 (log a) (Nat.cast_nonneg n), mul_zero]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` proves a direct consequence of `posLog` and `Real.log_pow` by a manual case split on `n` and `|a|`, making the proof longer than necessary.",
+      "requested_change": "Replace the case split proof with the direct calculation using `Real.log_pow` and `max_mul_of_nonneg`, for example:\n```lean\n  rw [posLog, Real.log_pow, posLog]\n  simpa [mul_comm] using (max_mul_of_nonneg 0 (log a) (Nat.cast_nonneg n)).symm\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` proves a direct consequence of `posLog` and `Real.log_pow` by a manual case split on `n` and `|a|`, making the proof longer than necessary.",
+      "requested_change": "Replace the case split proof with the direct calculation using `Real.log_pow` and `max_mul_of_nonneg`, for example:\n```lean\n  rw [posLog, Real.log_pow, posLog]\n  simpa [mul_comm] using (max_mul_of_nonneg 0 (log a) (Nat.cast_nonneg n)).symm\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a seven-line argument with two case splits (`n = 0`, `|a| ≤ 1`), `simp_all`, and an auxiliary `1 < |a ^ n|` fact, although the statement follows directly from the definition: `log⁺ (a ^ n) = max 0 (log (a ^ n)) = max 0 (n * log a) = n * max 0 (log a)`, since `Real.log_pow` holds for every real `a` and `n` is nonnegative.",
+      "requested_change": "Replace the proof of `Real.posLog_pow` with the one-liner `by simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]` (or, as a non-flexible alternative, `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a seven-line argument with two case splits (`n = 0`, `|a| ≤ 1`), `simp_all`, and an auxiliary `1 < |a ^ n|` fact, although the statement follows directly from the definition: `log⁺ (a ^ n) = max 0 (log (a ^ n)) = max 0 (n * log a) = n * max 0 (log a)`, since `Real.log_pow` holds for every real `a` and `n` is nonnegative.",
+      "requested_change": "Replace the proof of `Real.posLog_pow` with the one-liner `by simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]` (or, as a non-flexible alternative, `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` proves the power rule by a manual case split even though it is an immediate consequence of the existing `Real.log_pow` and `mul_max_of_nonneg`.",
+      "requested_change": "Replace the proof with the direct rewrite through `posLog_def`, `Real.log_pow`, and `mul_max_of_nonneg`, for example:\n```lean\n  rw [posLog_def, posLog_def, Real.log_pow]\n  rw [mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` proves the power rule by a manual case split even though it is an immediate consequence of the existing `Real.log_pow` and `mul_max_of_nonneg`.",
+      "requested_change": "Replace the proof with the direct rewrite through `posLog_def`, `Real.log_pow`, and `mul_max_of_nonneg`, for example:\n```lean\n  rw [posLog_def, posLog_def, Real.log_pow]\n  rw [mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the identity is exactly `Real.log_pow` together with the distributivity of multiplication by a nonnegative natural over `max` — there is nothing here that needs a case distinction on `|a| ≤ 1`.",
+      "requested_change": "Replace the proof body with the direct computation\n`rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`\n(the two `posLog_def`s expose `max 0 (log (a ^ n)) = n * max 0 (log a)`, `log_pow` turns the left side into `max 0 (↑n * log a)`, and `mul_max_of_nonneg`/`mul_zero` turn the right side into the same thing). This also removes the confusingly named `h₂a`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the identity is exactly `Real.log_pow` together with the distributivity of multiplication by a nonnegative natural over `max` — there is nothing here that needs a case distinction on `|a| ≤ 1`.",
+      "requested_change": "Replace the proof body with the direct computation\n`rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`\n(the two `posLog_def`s expose `max 0 (log (a ^ n)) = n * max 0 (log a)`, `log_pow` turns the left side into `max 0 (↑n * log a)`, and `mul_max_of_nonneg`/`mul_zero` turn the right side into the same thing). This also removes the confusingly named `h₂a`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is longer than the statement needs: it case-splits twice with `by_cases`/`simp_all` and then rewrites a hypothesis in place (`rw [not_le] at h₂a`), although `Real.log_pow` holds unconditionally (`log (x ^ n) = n * log x`, including `x = 0` and `x < 0`) so no case analysis is required. As written it also forces the declaration header onto two lines while `@[simp]` is written inline before `lemma`; the attribute-placement practice wants `@[simp]` on its own line for a header that spans several lines (whereas a one-line declaration keeps its attribute inline).",
+      "requested_change": "Replace the proof with the one-line argument via `log_pow`, `mul_max_of_nonneg` and the definition of `log⁺`, which also lets the whole declaration (attribute included) sit on one line:\n```lean\n@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by\n  rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is longer than the statement needs: it case-splits twice with `by_cases`/`simp_all` and then rewrites a hypothesis in place (`rw [not_le] at h₂a`), although `Real.log_pow` holds unconditionally (`log (x ^ n) = n * log x`, including `x = 0` and `x < 0`) so no case analysis is required. As written it also forces the declaration header onto two lines while `@[simp]` is written inline before `lemma`; the attribute-placement practice wants `@[simp]` on its own line for a header that spans several lines (whereas a one-line declaration keeps its attribute inline).",
+      "requested_change": "Replace the proof with the one-line argument via `log_pow`, `mul_max_of_nonneg` and the definition of `log⁺`, which also lets the whole declaration (attribute included) sit on one line:\n```lean\n@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by\n  rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by two case splits: `by_cases hn : n = 0`, then `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, `posLog_eq_zero_iff` and `posLog_eq_log`. A one-line rewrite proves it from `Real.log_pow` and `mul_max_of_nonneg`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by two case splits: `by_cases hn : n = 0`, then `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, `posLog_eq_zero_iff` and `posLog_eq_log`. A one-line rewrite proves it from `Real.log_pow` and `mul_max_of_nonneg`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a nine-line case bash (`by_cases hn`, `by_cases h₂a`, an auxiliary `have : 1 < |a ^ n|`) that is not needed: the statement is a direct consequence of `Real.log_pow` together with `mul_max_of_nonneg`, so the proof can be a one-liner.",
+      "requested_change": "Replace the proof body with `by simp [posLog_def, mul_max_of_nonneg]` (compiles in the reviewed file; `log_pow` fires from the simp set, and `Nat.cast_nonneg` is discharged automatically). Equivalently `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`, which also compiles.",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "`Real.posLog_pow` is proved by a nine-line case bash (`by_cases hn`, `by_cases h₂a`, an auxiliary `have : 1 < |a ^ n|`) that is not needed: the statement is a direct consequence of `Real.log_pow` together with `mul_max_of_nonneg`, so the proof can be a one-liner.",
+      "requested_change": "Replace the proof body with `by simp [posLog_def, mul_max_of_nonneg]` (compiles in the reviewed file; `log_pow` fires from the simp set, and `Nat.cast_nonneg` is discharged automatically). Equivalently `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`, which also compiles.",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    },
+    "T1": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is a six-line case split (`n = 0`, `|a| ≤ 1`, then `1 < |a ^ n|`) for what is a one-step consequence of `Real.log_pow` and `mul_max_of_nonneg`: `log⁺ (a ^ n) = max 0 (n * log a) = n * max 0 (log a)` because `0 ≤ (n : ℝ)`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Simplify the 1<|a^n| step. One-line posLog_def/log_pow/mul_max proof removes the step entirely, satisfying the ask.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+      "claim": "The proof of `Real.posLog_pow` is a six-line case split (`n = 0`, `|a| ≤ 1`, then `1 < |a ^ n|`) for what is a one-step consequence of `Real.log_pow` and `mul_max_of_nonneg`: `log⁺ (a ^ n) = max 0 (n * log a) = n * max 0 (log a)` because `0 ≤ (n : ℝ)`.",
+      "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Prove <= directly. Nobody flags it; whole-proof one-liner rewrites moot it: partial."
+    }
+   },
+   "entries_text": {
+    "P060": "The direct lemma for a goal is used rather than one obtained by converting another (`le_rfl`, not `rfl.le`)."
+   }
+  },
+  {
+   "id": "v0067",
+   "pr": 30641,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P005"
+   ],
+   "text": "Can `positivity` do this (untested)?",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+   "line": 194,
+   "author": "grunweg",
+   "at": "2025-10-18T16:34:27Z",
+   "matcher_text": {
+    "ask_id": "v0067",
+    "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+    "code_at_comment": "e for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving\n-multiple summands. -/\n+/--\n+Variant of `posLog_sum` for norms of elements in normed additive commutative\n+groups, using monotonicity of `log⁺` and the triangle inequality.\n+-/\n+lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E]\n+    {α : Type*} (s : Finset α) (f : α → E) :\n+    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by\n+  calc log⁺ ‖∑ t ∈ s, f t‖\n+  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n+    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)\n+    simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]",
+    "comment": "Can `positivity` do this (untested)?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The tactic `calc` proof of `Real.posLog_norm_sum_le` has two steps: monotonicity of `log⁺` applied to `norm_sum_le`, whose side goals are discharged by `simp`, followed by `posLog_sum`. The same argument fits in a short term, with the `Set.Ici 0` membership goals supplied directly by `norm_nonneg` and `Finset.sum_nonneg`.",
+      "requested_change": "Replace the proof with the term `(monotoneOn_posLog (norm_nonneg _) (s.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`.",
+      "severity": "advisory"
+     },
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The tactic `calc` proof of `Real.posLog_norm_sum_le` has two steps: monotonicity of `log⁺` applied to `norm_sum_le`, whose side goals are discharged by `simp`, followed by `posLog_sum`. The same argument fits in a short term, with the `Set.Ici 0` membership goals supplied directly by `norm_nonneg` and `Finset.sum_nonneg`.",
+      "requested_change": "Replace the proof with the term `(monotoneOn_posLog (norm_nonneg _) (s.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`.",
+      "severity": "advisory"
+     },
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:191",
+      "claim": "The monotonicity step in `Real.posLog_norm_sum_le` is discharged with `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`: `apply` is used with an explicit `_` hole, whereas a term applied with holes should be applied with `refine`, and, more importantly, the two sibling proofs of the same shape in this file (`posLog_sum`, line 169, and `posLog_norm_add_le`, line 210) supply both membership proofs and discharge the inequality last.",
+      "requested_change": "Write the step in the file's own pattern, e.g.\n```\n  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n    exact norm_sum_le s f\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:191",
+      "claim": "The monotonicity step in `Real.posLog_norm_sum_le` is discharged with `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`: `apply` is used with an explicit `_` hole, whereas a term applied with holes should be applied with `refine`, and, more importantly, the two sibling proofs of the same shape in this file (`posLog_sum`, line 169, and `posLog_norm_add_le`, line 210) supply both membership proofs and discharge the inequality last.",
+      "requested_change": "Write the step in the file's own pattern, e.g.\n```\n  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n    exact norm_sum_le s f\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+      "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+      "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The monotonicity step `log⁺ ‖∑ t ∈ s, f t‖ ≤ log⁺ (∑ t ∈ s, ‖f t‖)` in `Real.posLog_norm_sum_le` (like those in `posLog_sum` and `posLog_norm_add_le`) applies the named lemma `monotoneOn_posLog` by hand, because `log⁺` has no `@[gcongr]` lemma. As it stands, `gcongr` cannot do this step.",
+      "requested_change": "Add `@[gcongr] theorem posLog_le_posLog {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : log⁺ x ≤ log⁺ y := monotoneOn_posLog hx (hx.trans hxy) hxy` next to `monotoneOn_posLog`, and discharge the step with `gcongr; exact norm_sum_le s f`.",
+      "severity": "advisory"
+     },
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "In `Real.posLog_norm_sum_le` the proof applies `monotoneOn_posLog (by simp) _ (norm_sum_le s f)` with a `_` hole and then closes that side goal on a separate line, passing an over-specified `simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]`. The whole `calc` is just a composition of two existing lemmas.",
+      "requested_change": "Discharge the side goal inline and write the proof as a term: `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s _)`. If you keep the `calc`, at least use `exact monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)` and not `apply ... _` followed by a separate line.",
+      "severity": "advisory"
+     },
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    },
+    "T1": {
+     "R": "R13",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+      "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "positivity for the sum-nonneg side goal. Term/simp rewrites of it are partial; R11's gcongr lemma removes the side goal.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+      "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "positivity for sum-nonneg side goal. Findings discharge it differently (term or simp [Finset.sum_nonneg]): partial."
+    }
+   },
+   "entries_text": {
+    "P005": "A goal that a standard finishing tactic (`simp`, `rfl`, `trivial`, `omega`, `positivity`, `grind`, `grw`, ...) closes is closed by that tactic, not by a hand-written term or rewrite chain."
+   }
+  },
+  {
+   "id": "v0068",
+   "pr": 30641,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P094"
+   ],
+   "text": "Can `gcongr` do this (or do you need to provide the side condition manually)?",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+   "line": 193,
+   "author": "grunweg",
+   "at": "2025-10-18T16:34:43Z",
+   "matcher_text": {
+    "ask_id": "v0068",
+    "path": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+    "code_at_comment": "gle_le_sum (fun _ _ ↦ posLog_nonneg) ht_max.1\n \n-/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving\n-multiple summands. -/\n+/--\n+Variant of `posLog_sum` for norms of elements in normed additive commutative\n+groups, using monotonicity of `log⁺` and the triangle inequality.\n+-/\n+lemma posLog_norm_sum_le {E : Type*} [NormedAddCommGroup E]\n+    {α : Type*} (s : Finset α) (f : α → E) :\n+    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by\n+  calc log⁺ ‖∑ t ∈ s, f t‖\n+  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n+    apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)",
+    "comment": "Can `gcongr` do this (or do you need to provide the side condition manually)?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The tactic `calc` proof of `Real.posLog_norm_sum_le` has two steps: monotonicity of `log⁺` applied to `norm_sum_le`, whose side goals are discharged by `simp`, followed by `posLog_sum`. The same argument fits in a short term, with the `Set.Ici 0` membership goals supplied directly by `norm_nonneg` and `Finset.sum_nonneg`.",
+      "requested_change": "Replace the proof with the term `(monotoneOn_posLog (norm_nonneg _) (s.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`.",
+      "severity": "advisory"
+     },
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The tactic `calc` proof of `Real.posLog_norm_sum_le` has two steps: monotonicity of `log⁺` applied to `norm_sum_le`, whose side goals are discharged by `simp`, followed by `posLog_sum`. The same argument fits in a short term, with the `Set.Ici 0` membership goals supplied directly by `norm_nonneg` and `Finset.sum_nonneg`.",
+      "requested_change": "Replace the proof with the term `(monotoneOn_posLog (norm_nonneg _) (s.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`.",
+      "severity": "advisory"
+     },
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:191",
+      "claim": "The monotonicity step in `Real.posLog_norm_sum_le` is discharged with `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`: `apply` is used with an explicit `_` hole, whereas a term applied with holes should be applied with `refine`, and, more importantly, the two sibling proofs of the same shape in this file (`posLog_sum`, line 169, and `posLog_norm_add_le`, line 210) supply both membership proofs and discharge the inequality last.",
+      "requested_change": "Write the step in the file's own pattern, e.g.\n```\n  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n    exact norm_sum_le s f\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:191",
+      "claim": "The monotonicity step in `Real.posLog_norm_sum_le` is discharged with `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`: `apply` is used with an explicit `_` hole, whereas a term applied with holes should be applied with `refine`, and, more importantly, the two sibling proofs of the same shape in this file (`posLog_sum`, line 169, and `posLog_norm_add_le`, line 210) supply both membership proofs and discharge the inequality last.",
+      "requested_change": "Write the step in the file's own pattern, e.g.\n```\n  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n    exact norm_sum_le s f\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+      "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+      "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The monotonicity step `log⁺ ‖∑ t ∈ s, f t‖ ≤ log⁺ (∑ t ∈ s, ‖f t‖)` in `Real.posLog_norm_sum_le` (like those in `posLog_sum` and `posLog_norm_add_le`) applies the named lemma `monotoneOn_posLog` by hand, because `log⁺` has no `@[gcongr]` lemma. As it stands, `gcongr` cannot do this step.",
+      "requested_change": "Add `@[gcongr] theorem posLog_le_posLog {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : log⁺ x ≤ log⁺ y := monotoneOn_posLog hx (hx.trans hxy) hxy` next to `monotoneOn_posLog`, and discharge the step with `gcongr; exact norm_sum_le s f`.",
+      "severity": "advisory"
+     },
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The monotonicity step `log⁺ ‖∑ t ∈ s, f t‖ ≤ log⁺ (∑ t ∈ s, ‖f t‖)` in `Real.posLog_norm_sum_le` (like those in `posLog_sum` and `posLog_norm_add_le`) applies the named lemma `monotoneOn_posLog` by hand, because `log⁺` has no `@[gcongr]` lemma. As it stands, `gcongr` cannot do this step.",
+      "requested_change": "Add `@[gcongr] theorem posLog_le_posLog {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : log⁺ x ≤ log⁺ y := monotoneOn_posLog hx (hx.trans hxy) hxy` next to `monotoneOn_posLog`, and discharge the step with `gcongr; exact norm_sum_le s f`.",
+      "severity": "advisory"
+     },
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    },
+    "T1": {
+     "R": "R13",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+      "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "gcongr for monotonicity step. Only R11 proposes gcongr (with new @[gcongr] lemma); term-proof rewrites are partial.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+      "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+      "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "gcongr for monotonicity step. R11 adds @[gcongr] lemma and uses gcongr; term-proof rewrites partial."
+    }
+   },
+   "entries_text": {
+    "P094": "A monotonicity or congruence step in an inequality is discharged by `gcongr`, not by applying the specific named monotonicity lemma."
+   }
+  }
+ ],
+ "pr": 30641,
+ "sessions": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is proved by a seven-line argument with two case splits (`n = 0`, `|a| ≤ 1`), `simp_all`, and an auxiliary `1 < |a ^ n|` fact, although the statement follows directly from the definition: `log⁺ (a ^ n) = max 0 (log (a ^ n)) = max 0 (n * log a) = n * max 0 (log a)`, since `Real.log_pow` holds for every real `a` and `n` is nonnegative.",
+     "requested_change": "Replace the proof of `Real.posLog_pow` with the one-liner `by simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]` (or, as a non-flexible alternative, `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` takes its variables as implicit binders `{n : ℕ} {a : ℝ}`, although they occur only in the conclusion of an unconditional rewrite lemma; the lemma it mirrors, `Real.log_pow (x : ℝ) (n : ℕ)`, and the file's own `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)` take them explicitly, so `rw [posLog_pow x n]` cannot be written.",
+     "requested_change": "Change the signature to match `Real.log_pow`: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The docstring of `Real.posLog_pow`, \"The function `log⁺` commutes with taking powers.\", misdescribes the statement: commuting with powers would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺` turns an `n`-th power into multiplication by `n`.",
+     "requested_change": "Reword the docstring to state what is proved, e.g. \"The positive part of the logarithm of `x ^ n` is `n * log⁺ x`.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_sum_le` and `norm_nonneg`, which hold for seminormed groups; the lemma is stated with a stronger hypothesis than needed.",
+     "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]` in `Real.posLog_norm_sum_le` (and, for consistency, in its sibling `Real.posLog_norm_add_le`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+     "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The docstring of `Real.posLog_pow` says \"`log⁺` commutes with taking powers\", which would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`. The lemma actually proves `log⁺ (a ^ n) = n * log⁺ a`: powers become multiples, as for `Real.log_pow`.",
+     "requested_change": "Reword the docstring to state the actual identity, e.g. `/-- The function `log⁺` turns powers into multiples: `log⁺ (a ^ n) = n * log⁺ a`. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is a `@[simp]` rewrite lemma whose only variables `{n : ℕ} {a : ℝ}` are implicit, so a caller cannot write `rw [posLog_pow a n]` or pick the instance to rewrite. Its model `Real.log_pow (x : ℝ) (n : ℕ)` takes them explicitly, as do the simp lemmas `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` in this same file.",
+     "requested_change": "Make the binders explicit and order them like `Real.log_pow`: `@[simp] lemma posLog_pow (a : ℝ) (n : ℕ) : log⁺ (a ^ n) = n * log⁺ a`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The proof of `Real.posLog_pow` takes seven lines: two `by_cases` splits, an `|a| ≤ 1` case using `simp_all`, and an auxiliary `1 < |a ^ n|` fact. It is a direct consequence of `posLog_def`, `log_pow` and `mul_max_of_nonneg`, because `n ≥ 0` gives `max 0 (n * log a) = n * max 0 (log a)`.",
+     "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its only use of that structure is `norm_sum_le` and `norm_nonneg`. Both hold for `SeminormedAddCommGroup`, so the hypothesis is stronger than needed.",
+     "requested_change": "Weaken the instance to `{E : Type*} [SeminormedAddCommGroup E]`, and change the docstring's \"normed additive commutative groups\" to \"seminormed additive commutative groups\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The tactic `calc` proof of `Real.posLog_norm_sum_le` has two steps: monotonicity of `log⁺` applied to `norm_sum_le`, whose side goals are discharged by `simp`, followed by `posLog_sum`. The same argument fits in a short term, with the `Set.Ici 0` membership goals supplied directly by `norm_nonneg` and `Finset.sum_nonneg`.",
+     "requested_change": "Replace the proof with the term `(monotoneOn_posLog (norm_nonneg _) (s.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s (‖f ·‖))`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The proof of `Real.posLog_pow` is a six-line case split (`n = 0`, `|a| ≤ 1`, then `1 < |a ^ n|`) for what is a one-step consequence of `Real.log_pow` and `mul_max_of_nonneg`: `log⁺ (a ^ n) = max 0 (n * log a) = n * max 0 (log a)` because `0 ≤ (n : ℝ)`.",
+     "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is an unconditional equation lemma but takes its variables as implicit `{n : ℕ} {a : ℝ}`, unlike its model `Real.log_pow (x : ℝ) (n : ℕ)` and the file's other simp equations `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)`, so it cannot be instantiated as `posLog_pow n x` in `rw`/`simp` or term mode.",
+     "requested_change": "Make the variables explicit, e.g. `@[simp] lemma posLog_pow (n : ℕ) (x : ℝ) : log⁺ (x ^ n) = n * log⁺ x`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The docstring of `Real.posLog_pow` says \"`log⁺` commutes with taking powers\", which is false as stated: commuting would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺ (a ^ n) = n * log⁺ a`.",
+     "requested_change": "Reword the docstring to state what the lemma says, e.g. `/-- The positive part of the logarithm of a power: `log⁺ (x ^ n) = n * log⁺ x`. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_nonneg` and `norm_sum_le`, which hold in any seminormed additive commutative group.",
+     "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]` (and do the same for the neighbouring `posLog_norm_add_le` if touched).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+     "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_sum_le` and `norm_nonneg`, which hold in any `SeminormedAddCommGroup`. The lemma is stated less generally than it could be.",
+     "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]`: `lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] {α : Type*} (s : Finset α) (f : α → E) : ...`. Make the same change to the existing sibling `posLog_norm_add_le`, so the two norm variants stay parallel.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "In `Real.posLog_norm_sum_le` the proof applies `monotoneOn_posLog (by simp) _ (norm_sum_le s f)` with a `_` hole and then closes that side goal on a separate line, passing an over-specified `simp [Finset.sum_nonneg (fun i _ ↦ norm_nonneg (f i))]`. The whole `calc` is just a composition of two existing lemmas.",
+     "requested_change": "Discharge the side goal inline and write the proof as a term: `(monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)).trans (posLog_sum s _)`. If you keep the `calc`, at least use `exact monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg]) (norm_sum_le s f)` and not `apply ... _` followed by a separate line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The monotonicity step `log⁺ ‖∑ t ∈ s, f t‖ ≤ log⁺ (∑ t ∈ s, ‖f t‖)` in `Real.posLog_norm_sum_le` (like those in `posLog_sum` and `posLog_norm_add_le`) applies the named lemma `monotoneOn_posLog` by hand, because `log⁺` has no `@[gcongr]` lemma. As it stands, `gcongr` cannot do this step.",
+     "requested_change": "Add `@[gcongr] theorem posLog_le_posLog {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : log⁺ x ≤ log⁺ y := monotoneOn_posLog hx (hx.trans hxy) hxy` next to `monotoneOn_posLog`, and discharge the step with `gcongr; exact norm_sum_le s f`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The new docstring of `Real.posLog_norm_sum_le` puts its text on the line after `/--` and puts `-/` on a line of its own. It describes the lemma by contrast (\"Variant of `posLog_sum`\") and by its proof (\"using monotonicity of `log⁺` and the triangle inequality\"), not on its own terms. It cites `posLog_sum` without the `Real.` prefix that the file's other cross-references use. Its first line is broken at 76 characters.",
+     "requested_change": "Replace it with a standalone description in the file's usual form, for example: `/-- Estimate for `log⁺` of the norm of a sum. See `Real.posLog_norm_add_le` for a variant\\ninvolving just two summands. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "The header of `Real.posLog_norm_sum_le` is broken after `[NormedAddCommGroup E]`, at 59 characters, although the binders that follow would fit on the first line.",
+     "requested_change": "Fill the header lines up to the 100-character limit, e.g. (with the `SeminormedAddCommGroup` generalization) `lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] {α : Type*} (s : Finset α)` / `    (f : α → E) : log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ :=`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` only chains three existing lemmas (`monotoneOn_posLog`, `norm_sum_le`, `posLog_sum`). Its whole proof is the two-line term `(monotoneOn_posLog _ _ (norm_sum_le s f)).trans (posLog_sum s _)`, so it may be a combination lemma that callers could write directly.",
+     "requested_change": "Question to the author, under the practice that a lemma which merely combines existing ones is not added: state the downstream use that needs `posLog_norm_sum_le` as a named lemma (for example, matching the existing `posLog_norm_add_le`), or drop it and use `posLog_sum` with `monotoneOn_posLog` and `norm_sum_le` at the call site.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is proved by two case splits: `by_cases hn : n = 0`, then `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, `posLog_eq_zero_iff` and `posLog_eq_log`. A one-line rewrite proves it from `Real.log_pow` and `mul_max_of_nonneg`.",
+     "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow {n : ℕ} {a : ℝ}` makes both arguments implicit, but no hypothesis or other explicit argument determines them. The analogue `Real.log_pow (x : ℝ) (n : ℕ)` and the file's own `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` take them explicitly.",
+     "requested_change": "Make the arguments explicit, in `Real.log_pow`'s order: `lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The header of `Real.posLog_pow` is split over two lines (`@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :` / `    log⁺ (a ^ n) = n * log⁺ a := by`) although it fits on one line in 74 characters. With the split, the inline `@[simp]` sits in front of a multi-line header.",
+     "requested_change": "Join the header onto one line: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x := by`. If it stays multi-line, put `@[simp]` on its own line above `lemma`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The docstring of `Real.posLog_pow`, \"The function `log⁺` commutes with taking powers.\", is wrong: commuting with powers would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺ (a ^ n) = n * log⁺ a`.",
+     "requested_change": "Reword it to state what the lemma says, e.g. `/-- The function `log⁺` turns natural powers into multiples: `log⁺` of `a ^ n` is `n` times `log⁺ a`. -/`, or drop the docstring, as for `posLog_zero` and `posLog_one`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The new module-docstring sentence names the downstream module by its dotted name, `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`, not by its file path, and capitalises \"Circle Average\" mid-sentence.",
+     "requested_change": "Write `See `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` for the presentation of` / ``log⁺` as a circle average.`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The module docstring's list of the standard estimates the file establishes (`posLog_prod`, `posLog_sum`) was not updated for the PR's new finite-sum estimate `posLog_norm_sum_le`, the norm version of `posLog_sum`.",
+     "requested_change": "Add a bullet such as `- `theorem posLog_norm_sum_le : log⁺ ‖∑ i, f i‖ ≤ log n + ∑ i, log⁺ ‖f i‖`` (for `f` valued in a (semi)normed group) to the list in the module docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:156",
+     "claim": "The PR rewraps the unchanged docstring of `Real.posLog_sum` from the standard `/-- Estimate ... involving` / `just two summands. -/` into a `/--` / text / `-/` layout. The text no longer starts on the `/--` line, `-/` sits on a line of its own, and the edit changes no content.",
+     "requested_change": "Revert the docstring to its original form: `/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving` / `just two summands. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:199",
+     "claim": "The PR rewraps the unchanged docstring of `Real.posLog_add` into a `/--` / text / `-/` layout. The text no longer starts on the `/--` line, `-/` sits on a line of its own, and the edit changes no content.",
+     "requested_change": "Restore the original form: `/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving` / `multiple summands. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "`Real.posLog_zero` and `Real.posLog_one` are a parallel pair of one-line `@[simp]` lemmas, but a blank line separates them, which hides the parallel.",
+     "requested_change": "Put them on adjacent lines with no blank line: `@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]` / `@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The PR adds a blank line after three of the file's section headers (`## Elementary Properties`, `## Estimates for Products`, `## Estimates for Sums`) but not after the first (`## Definition, Notation and Reformulations`). The file now spaces one construct two ways.",
+     "requested_change": "Also add the blank line between the first section header's `-/` (line 27) and `/-- Definition: the positive part of the logarithm. -/` (line 28), so all four section headers are spaced the same way.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` proves a direct consequence of `posLog` and `Real.log_pow` by a manual case split on `n` and `|a|`, making the proof longer than necessary.",
+     "requested_change": "Replace the case split proof with the direct calculation using `Real.log_pow` and `max_mul_of_nonneg`, for example:\n```lean\n  rw [posLog, Real.log_pow, posLog]\n  simpa [mul_comm] using (max_mul_of_nonneg 0 (log a) (Nat.cast_nonneg n)).symm\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but the proof only uses the seminorm triangle inequality available under `[SeminormedAddCommGroup E]`.",
+     "requested_change": "Weaken the typeclass assumption to `[SeminormedAddCommGroup E]` and update the docstring from “normed additive commutative groups” to “seminormed additive commutative groups”.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is proved by a nine-line case bash (`by_cases hn`, `by_cases h₂a`, an auxiliary `have : 1 < |a ^ n|`) that is not needed: the statement is a direct consequence of `Real.log_pow` together with `mul_max_of_nonneg`, so the proof can be a one-liner.",
+     "requested_change": "Replace the proof body with `by simp [posLog_def, mul_max_of_nonneg]` (compiles in the reviewed file; `log_pow` fires from the simp set, and `Nat.cast_nonneg` is discharged automatically). Equivalently `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`, which also compiles.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` is stated for `[NormedAddCommGroup E]`, but nothing in its statement or proof uses completeness or separation: the only norm lemmas used are `norm_sum_le` and `norm_nonneg`, both of which are stated for seminormed spaces, so the lemma is stated at a stronger typeclass level than Mathlib asks for.",
+     "requested_change": "Weaken the instance to `SeminormedAddCommGroup E` (and put `{α : Type*}` before `{E : Type*} [SeminormedAddCommGroup E]` so the explicit arguments come first): `lemma posLog_norm_sum_le {α : Type*} {E : Type*} [SeminormedAddCommGroup E] (s : Finset α) (f : α → E) : ...`. The proof is unchanged; adjust the docstring's “normed additive commutative groups” to “seminormed additive commutative groups”.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The new module-doc “See” line refers to the other file by its dotted module name `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`, a spelling Mathlib no longer uses for file references: it is indistinguishable from a declaration name (there is no such declaration), so doc-gen resolves it against the environment instead of the module, and no other Mathlib file uses this spelling.",
+     "requested_change": "Write the reference as a `.lean` file path, the spelling adopted library-wide after #24764: “See `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` for the presentation of `log⁺` as a Circle Average.” (Alternatively point at the declaration `circleAverage_log_norm_sub_const_eq_posLog`.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/8027bfaffff4697f4a737ecf48549bd4824e379fe9767108cd58c1d2364e45b2/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__493d2f1e-c3a9-4e7e-8b99-b63be32d7141.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:153",
+     "claim": "`Real.posLog_sum`'s docstring was rewritten by this PR from the two-line compact form into a three-line form whose text starts on the line *after* `/--` and whose closing `-/` sits on a line of its own; `Real.posLog_add` (lines 196-198) was reformatted identically. This contradicts the two docstring practices (text begins on the `/--` line; `-/` follows the last line of text) and is inconsistent with every other docstring in the file, which use the compact form (`posLog_mul`, line 116; `posLog_nat_mul`, line 128; `posLog_prod`, line 135). The rewording changed nothing but the wrapping.",
+     "requested_change": "Restore the previous wrapping for both declarations:\n```lean\n/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving\njust two summands. -/\ntheorem posLog_sum ...\n```\nand for `Real.posLog_add` (line 196):\n```lean\n/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving\nmultiple summands. -/\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:182",
+     "claim": "The new docstring of `Real.posLog_norm_sum_le` begins its text on the line after `/--` and puts `-/` on its own line (same practices as above), and it explains the declaration only by contrast with `posLog_sum` plus a description of the proof technique (\"using monotonicity of `log⁺` and the triangle inequality\") rather than stating what the estimate says. It also says \"normed\" although the lemma only needs a seminormed group (see the separate finding).",
+     "requested_change": "Replace it with a single compact, self-contained line, e.g.\n```lean\n/-- `log⁺` of the norm of a sum is bounded by `log s.card` plus the sum of `log⁺` of the norms. -/\nlemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] ...\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but nothing in the statement or proof needs the norm to see `1` or to be a norm rather than a seminorm: the proof uses only `norm_sum_le` (a `SeminormedAddCommGroup` lemma) and the order properties of `log⁺`, and the conclusion is the ℝ-valued inequality `posLog_sum` applied to `‖f ·‖`. The hypothesis is stronger than required.",
+     "requested_change": "Weaken the hypothesis to `[SeminormedAddCommGroup E]` (and adjust the docstring wording from \"normed\" to \"seminormed\"). The pre-existing sibling `posLog_norm_add_le` (line 206) admits the same weakening, for coherence.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The proof of `Real.posLog_pow` is longer than the statement needs: it case-splits twice with `by_cases`/`simp_all` and then rewrites a hypothesis in place (`rw [not_le] at h₂a`), although `Real.log_pow` holds unconditionally (`log (x ^ n) = n * log x`, including `x = 0` and `x < 0`) so no case analysis is required. As written it also forces the declaration header onto two lines while `@[simp]` is written inline before `lemma`; the attribute-placement practice wants `@[simp]` on its own line for a header that spans several lines (whereas a one-line declaration keeps its attribute inline).",
+     "requested_change": "Replace the proof with the one-line argument via `log_pow`, `mul_max_of_nonneg` and the definition of `log⁺`, which also lets the whole declaration (attribute included) sit on one line:\n```lean\n@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by\n  rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "`Real.posLog_zero` and `Real.posLog_one` are a pair of parallel one-line `@[simp]` lemmas, but a blank line (line 57) separates them, hiding the parallel; the practice is to keep such a pair adjacent with no blank line between them.",
+     "requested_change": "Delete the blank line at line 57 so the two one-liners are adjacent:\n```lean\n@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]\n@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The module docstring added by this PR refers to another module by its dotted name, `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`; a cross-reference to another module in documentation gives the module's file path instead.",
+     "requested_change": "Write the reference as `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` (and lower-case `Circle Average` if the phrase is kept).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/3e2c5b4de620cbecece0657a5306831c4171db1e6ae4f8abc1e40605623cf24a/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__cdd2d0cb-6d38-4d31-9ce2-b946bdb4854b.jsonl"
+  },
+  "GPT2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` proves the power rule by a manual case split even though it is an immediate consequence of the existing `Real.log_pow` and `mul_max_of_nonneg`.",
+     "requested_change": "Replace the proof with the direct rewrite through `posLog_def`, `Real.log_pow`, and `mul_max_of_nonneg`, for example:\n```lean\n  rw [posLog_def, posLog_def, Real.log_pow]\n  rw [mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` unnecessarily assumes `[NormedAddCommGroup E]`; its proof only uses `norm_sum_le` and nonnegativity of the norm, which are available for seminormed additive commutative groups.",
+     "requested_change": "Weaken the binder to `[SeminormedAddCommGroup E]` and update the docstring wording accordingly, leaving the proof otherwise unchanged.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` is proved by a manual two-way case split (`by_cases n = 0`, `by_cases |a| ≤ 1`, `simp_all`, `pow_le_one₀`, `one_lt_pow₀`, `posLog_eq_log`, plus the leftover-looking hypothesis name `h₂a`), although the identity is exactly `Real.log_pow` together with the distributivity of multiplication by a nonnegative natural over `max` — there is nothing here that needs a case distinction on `|a| ≤ 1`.",
+     "requested_change": "Replace the proof body with the direct computation\n`rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ (Nat.cast_nonneg n), mul_zero]`\n(the two `posLog_def`s expose `max 0 (log (a ^ n)) = n * max 0 (log a)`, `log_pow` turns the left side into `max 0 (↑n * log a)`, and `mul_max_of_nonneg`/`mul_zero` turn the right side into the same thing). This also removes the confusingly named `h₂a`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` is stated for `[NormedAddCommGroup E]`, but its statement and proof only use the normed-group structure: the two ingredients are `norm_sum_le` (triangle inequality) and `norm_nonneg`, both of which hold in a `SeminormedAddCommGroup`, and `log⁺ ‖·‖` makes sense there. The hypothesis is therefore stronger than the result needs.",
+     "requested_change": "Weaken the assumption to `[SeminormedAddCommGroup E]` (and adjust the docstring wording from \"normed\" to \"seminormed\" additive commutative groups accordingly).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:182",
+     "claim": "The docstring of `Real.posLog_norm_sum_le` describes how the lemma is proved (\"using monotonicity of `log⁺` and the triangle inequality\") rather than what it states, and — unlike the sum/product docstrings in the same sections — it does not point to the two-summand variant `Real.posLog_norm_add_le`.",
+     "requested_change": "Reword so that the docstring states the estimate and cross-references its sibling, e.g.\n`/--` `Estimate for `log⁺` of a sum, for elements of a normed additive commutative group. See `Real.posLog_norm_add_le` for a variant involving just two summands.` `-/`\n(dropping the proof recipe).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/e260eff11c1a75fad24d0e2cb0e961b0cb6f9bf81538764479820afbae465808/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__76cfa9ef-0fff-45ba-b61d-aec233c3c26b.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:153",
+     "claim": "The PR moved the text of `Real.posLog_sum`'s docstring onto the line after `/--` (it was `/-- Estimate for `log⁺` of a sum. See ...` before the PR). A docstring's text begins on the `/--` line, not on the line after it. `Real.posLog_add` (lines 196-198) was reformatted the same way by this PR.",
+     "requested_change": "Restore the text to the `/--` line, reflowing inside the 100-character limit, e.g.\n```\n/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving just\ntwo summands. -/\n```\nand likewise for `posLog_add` (line 196).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:182",
+     "claim": "The new docstring of `Real.posLog_norm_sum_le` starts its text on the line after `/--`, which is not the form a docstring takes (text begins on the `/--` line).",
+     "requested_change": "```\n/-- Variant of `posLog_sum` for norms of elements in normed additive commutative groups, using\nmonotonicity of `log⁺` and the triangle inequality. -/\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The module docstring added by this PR cross-references another module by its dotted module name, `Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`; a cross-reference to another module in documentation gives its file path, so that it renders as a link.",
+     "requested_change": "Refer to the file path instead, e.g. ``See `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` for the presentation of `log⁺` as a Circle Average.`` (reflowing so no line exceeds 100 characters).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but neither its statement nor its proof uses completeness/normedness: the only normed input, `norm_sum_le`, holds for `[SeminormedAddCommGroup E]`. The hypothesis should be weakened to what the proof actually needs.",
+     "requested_change": "State it as\n```\nlemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E]\n    {α : Type*} (s : Finset α) (f : α → E) :\n    log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖ := by\n```\nand update the docstring's \"normed additive commutative groups\" to \"seminormed\"; the same weakening applies to its sibling `posLog_norm_add_le` (line 206), which is a `NormedAddCommGroup` statement for the same reasons.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:191",
+     "claim": "The monotonicity step in `Real.posLog_norm_sum_le` is discharged with `apply monotoneOn_posLog (by simp) _ (norm_sum_le s f)`: `apply` is used with an explicit `_` hole, whereas a term applied with holes should be applied with `refine`, and, more importantly, the two sibling proofs of the same shape in this file (`posLog_sum`, line 169, and `posLog_norm_add_le`, line 210) supply both membership proofs and discharge the inequality last.",
+     "requested_change": "Write the step in the file's own pattern, e.g.\n```\n  _ ≤ log⁺ (∑ t ∈ s, ‖f t‖) := by\n    apply monotoneOn_posLog (by simp) (by simp [Finset.sum_nonneg])\n    exact norm_sum_le s f\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` has an attribute written inline before the keyword while its header spans two lines (`@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} :` / `log⁺ (a ^ n) = n * log⁺ a := by`). An attribute goes on its own line above a declaration whose header spans several lines. (The declaration fits on a single 72-character line, so the break itself is also not required by the 100-character limit.)",
+     "requested_change": "Either put the whole declaration on one line, `@[simp] lemma posLog_pow {n : ℕ} {a : ℝ} : log⁺ (a ^ n) = n * log⁺ a := by`, or keep the two-line header and move the attribute to its own line:\n```\n@[simp]\nlemma posLog_pow {n : ℕ} {a : ℝ} :\n    log⁺ (a ^ n) = n * log⁺ a := by\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "`Real.posLog_zero` and `Real.posLog_one` are a parallel pair of one-line `@[simp]` lemmas of identical shape, but they are separated by a blank line; a pair (or run) of parallel one-liners is kept adjacent with no blank line between them so the parallel is visible.",
+     "requested_change": "Delete the blank line (currently line 57) so that the two lemmas are adjacent:\n```\n@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]\n@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "The four new declarations `Real.posLog_zero` (56), `Real.posLog_one` (58), `Real.posLog_pow` (102) and `Real.posLog_norm_sum_le` (186) are all `lemma`s, whereas every other declaration in this file (17 of them, including the sibling `posLog_norm_add_le`) is a `theorem`; the same construct is spelled the same way throughout a file.",
+     "requested_change": "Change the four new `lemma`s to `theorem`s, matching the rest of `PosLog.lean` (including the parallel `posLog_norm_add_le`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:104",
+     "claim": "The case splits in `Real.posLog_pow` produce hypotheses that then have to be rewritten: `by_cases hn : n = 0` with `· simp_all` (n is not substituted), and `by_cases h₂a : |a| ≤ 1` followed by `rw [not_le] at h₂a`, which is a hypothesis needing rewriting after the case split. A case split uses the form whose result substitutes or simplifies directly.",
+     "requested_change": "```\n  obtain rfl | hn := eq_or_ne n 0\n  · simp\n  rcases le_or_gt |a| 1 with ha | ha\n  · simp_all [pow_le_one₀, (posLog_eq_zero_iff _).2]\n  have : 1 < |a ^ n| := by simp [one_lt_pow₀ ha hn]\n  simp [posLog_eq_log this.le, posLog_eq_log ha.le]\n```",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/3e6b3d5dd178d8c854af3ff69d293d707d808f8fd7ad294d8a69a06ed0ff1fa9/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__a1e18c21-842d-4573-99af-d9d6edcde6b4.jsonl"
+  },
+  "GPT3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` unnecessarily assumes `[NormedAddCommGroup E]`; the estimate only uses the seminorm triangle inequality and norm nonnegativity, so separatedness of the norm is not needed.",
+     "requested_change": "Weaken the typeclass assumption to `[SeminormedAddCommGroup E]` and update the docstring to say “seminormed additive commutative groups”.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "The proof of `Real.posLog_pow` is an unnecessary three-way case split (`by_cases hn`, `by_cases h₂a : |a| ≤ 1`, `rw [not_le]`, `pow_le_one₀`, `one_lt_pow₀`, and two calls to `posLog_eq_log`) for an identity that is immediate from `posLog_def`, the existing simp lemma `Real.log_pow` (`log (x ^ n) = n * log x`) and `mul_max_of_nonneg`. The case analysis, including the `a = 0`/`n = 0` junk-value handling, is all subsumed by those three lemmas.",
+     "requested_change": "Replace the whole body (lines 104-110) with a one-liner, e.g. `simp [posLog_def, log_pow, mul_max_of_nonneg]`, or the explicit `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg 0 (log a) (Nat.cast_nonneg n), mul_zero]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` is stated under `[NormedAddCommGroup E]`, but neither its statement nor its proof uses completeness: the only group-level ingredient is `norm_sum_le`, which Mathlib states for `[SeminormedAddCommGroup E]`, and all remaining steps (`monotoneOn_posLog`, `norm_nonneg`, `Finset.sum_nonneg`, `posLog_sum`) are available at the seminormed level. The hypothesis is therefore stronger than the reusable level requires.",
+     "requested_change": "Weaken the binder to `[SeminormedAddCommGroup E]` (binder `{E : Type*} [SeminormedAddCommGroup E]`) and adjust the docstring wording accordingly (\"seminormed additive commutative groups\").",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "`Real.posLog_zero` and its sibling `Real.posLog_one` are the only declarations in the file that carry no docstring, while every other declaration (including trivial ones such as `posLog_nonneg`, `posLog_neg`, `posLog_abs`) is documented, and the PR states that it improves the docstrings of this file.",
+     "requested_change": "Add docstrings before both lemmas, e.g. `/-- The positive part of `log` vanishes at `0`. -/` for `posLog_zero` and `/-- The positive part of `log` vanishes at `1`. -/` for `posLog_one`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/487c802d32375864356a0ce80717f7984537aa8514ab1e49bd8bef3e543481e2/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__8a541dab-3452-4ed5-9d4c-9cb22974669d.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:186",
+     "claim": "`Real.posLog_norm_sum_le` is stated with `[NormedAddCommGroup E]`, but neither its statement nor its proof needs the normed-group hypothesis: the only norm estimate used is `norm_sum_le`, which is stated for `[SeminormedAddCommGroup E]` (Mathlib/Analysis/Normed/Group/Basic.lean:1167). The hypothesis should be weakened so the result holds in the greater generality.",
+     "requested_change": "Change `[NormedAddCommGroup E]` to `[SeminormedAddCommGroup E]`. Verified: replacing the declaration with `lemma posLog_norm_sum_le {E : Type*} [SeminormedAddCommGroup E] {α : Type*} (s : Finset α) (f : α → E) : log⁺ ‖∑ t ∈ s, f t‖ ≤ log s.card + ∑ t ∈ s, log⁺ ‖f t‖` (same proof) compiles with no errors. For consistency, weaken the sibling `Real.posLog_norm_add_le` (line 206) the same way; that also compiles with `[SeminormedAddCommGroup E]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:102",
+     "claim": "`Real.posLog_pow` has `@[simp]` written inline before the keyword, while its declaration header spans two lines (`lemma posLog_pow {n : ℕ} {a : ℝ} :` with the statement on the following line). The attribute should be on its own line above the declaration.",
+     "requested_change": "Write\n```\n@[simp]\nlemma posLog_pow {n : ℕ} {a : ℝ} :\n    log⁺ (a ^ n) = n * log⁺ a := by\n```\n(verified: the file compiles with this change and no warnings).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:56",
+     "claim": "`Real.posLog_zero` and `Real.posLog_one` are a parallel pair of one-line lemmas, but a blank line (line 57) is inserted between them, so the parallel is not visible.",
+     "requested_change": "Delete the blank line so the two lemmas are adjacent:\n```\n@[simp] lemma posLog_zero : log⁺ 0 = 0 := by simp [posLog]\n@[simp] lemma posLog_one : log⁺ 1 = 0 := by simp [posLog]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:153",
+     "claim": "The docstring of `Real.posLog_sum` was rewritten from the conforming form (text starting on the `/--` line, `-/` closing the last text line) into a three-line form with the text on the line after `/--` and `-/` on a line of its own. This is a cosmetic rewrite of already-conforming documentation, orthogonal to the added lemmas.",
+     "requested_change": "Revert to the previous docstring:\n```\n/-- Estimate for `log⁺` of a sum. See `Real.posLog_add` for a variant involving just two\nsummands. -/\n```\n(This must stay on two lines: the single-line form is 104 characters.) Verified: this exact text compiles in the file with no errors.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:196",
+     "claim": "The docstring of `Real.posLog_add` was likewise rewritten from the conforming form into `/--` / text / `-/` on its own line, a cosmetic rewrite with no bearing on the new lemmas.",
+     "requested_change": "Revert to the previous docstring:\n```\n/-- Estimate for `log⁺` of a sum. See `Real.posLog_sum` for a variant involving\nmultiple summands. -/\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:182",
+     "claim": "The new docstring of `Real.posLog_norm_sum_le` puts its text on the line after `/--` and closes with `-/` on a line of its own; it also explains the lemma by contrast with another declaration (\"Variant of `posLog_sum`…\") rather than on its own terms.",
+     "requested_change": "Start the text on the `/--` line, close with `-/` on the last text line, and describe the result itself, e.g.\n```\n/-- Estimate for `log⁺` of the norm of a sum in a normed additive commutative group, obtained\nfrom monotonicity of `log⁺` and the triangle inequality: a variant of `posLog_sum`. -/\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:12",
+     "claim": "The module docstring still describes the file's standard estimates as being about a sequence \"of reals\" and lists only `posLog_prod` and `posLog_sum`; the new `Real.posLog_norm_sum_le`, which is the normed-group version of that headline estimate, is missing from the list, so the module documentation is no longer in step with the file.",
+     "requested_change": "Extend the sentence and the list, e.g. add\n```\n- `theorem posLog_norm_sum_le : log⁺ ‖∑ i, f i‖ ≤ log n + ∑ i, log⁺ ‖f i‖` (for `f : α → E` in a\n  normed additive commutative group `E`)\n```\nand adjust \"of reals\" in line 12 accordingly.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:19",
+     "claim": "The new cross-reference in the module docstring gives a dotted module name (`Mathlib.Analysis.SpecialFunctions.Integrals.PosLogEqCircleAverage`); a cross-reference to another module in documentation gives the file path.",
+     "requested_change": "Write the reference as a file path:\n```\nSee `Mathlib/Analysis/SpecialFunctions/Integrals/PosLogEqCircleAverage.lean` for the presentation of\n`log⁺` as a Circle Average.\n```\nVerified: this text compiles in the file with no errors.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean:101",
+     "claim": "The docstring of `Real.posLog_pow` only restates its statement and misdescribes it: `log⁺ (a ^ n) = n * log⁺ a` is not a commutation of `log⁺` with taking powers (the right-hand side is not `log⁺` of anything).",
+     "requested_change": "Either delete the docstring — the direct analogue `Real.log_pow` (Mathlib/Analysis/SpecialFunctions/Log/Basic.lean:267) has none — or state what the lemma gives, e.g. `/-- The positive part of the logarithm of a power is the exponent times the positive part: `log⁺ (a ^ n) = n * log⁺ a`. -/`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/795653a67d22c9b261a2399b3e20a107a8c1d608056fc0f6f270681774541a1e/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__6b4e850f-7caf-4410-aa6f-9a8dcf61a709.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_30641.md"
+}

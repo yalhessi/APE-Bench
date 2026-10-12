@@ -1,0 +1,1239 @@
+{
+ "asks": [
+  {
+   "id": "p0004",
+   "pr": 42814,
+   "family": "F6",
+   "in_census": true,
+   "entries": [
+    "P153"
+   ],
+   "text": "Can you add an alias for the right to left implication? Or maybe even removing the other one (I don't see any reasonable application).",
+   "path": "Mathlib/Data/Nat/Prime/Basic.lean",
+   "line": 110,
+   "author": "riccardobrasca",
+   "at": "2026-08-24T15:17:26Z",
+   "matcher_text": {
+    "ask_id": "p0004",
+    "path": "Mathlib/Data/Nat/Prime/Basic.lean",
+    "code_at_comment": "@@ -106,6 +106,14 @@ theorem Prime.odd_of_ne_two {p : ℕ} (hp : p.Prime) (h_two : p ≠ 2) : Odd p :\n theorem Prime.even_sub_one {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) : Even (p - 1) :=\n   let ⟨n, hn⟩ := hp.odd_of_ne_two h2; ⟨n, by rw [hn, Nat.add_sub_cancel, two_mul]⟩\n \n+/-- To prove a property of all primes, it is enough to prove it for `2` and for the odd primes. -/\n+theorem forall_prime_iff_two_and_odd {P : ℕ → Prop} :",
+    "comment": "Can you add an alias for the right to left implication? Or maybe even removing the other one (I don't see any reasonable application).",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT3": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "GPT1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "X1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "AP1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "X2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "T1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "GPT2": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for an alias of the reverse implication or dropping the iff; only proof golfs and binder changes.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks for a one-direction alias or removal; only proof golf and binder style."
+    }
+   },
+   "entries_text": {
+    "P153": "An iff lemma whose directions are used separately comes with `alias ⟨_, _⟩` names for each direction, so both are usable with dot notation."
+   }
+  },
+  {
+   "id": "p0005",
+   "pr": 42814,
+   "family": "F7",
+   "in_census": true,
+   "entries": [
+    "P063",
+    "P086"
+   ],
+   "text": "Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating this in any normalization monoid something.",
+   "path": "Mathlib/Data/Nat/Squarefree.lean",
+   "line": 395,
+   "author": "riccardobrasca",
+   "at": "2026-08-24T15:19:14Z",
+   "matcher_text": {
+    "ask_id": "p0005",
+    "path": "Mathlib/Data/Nat/Squarefree.lean",
+    "code_at_comment": "@@ -387,6 +387,19 @@ theorem prod_primeFactors_sdiff_of_squarefree {n : ℕ} (hn : Squarefree n) {t :\n \n end Nat\n \n+namespace Int\n+\n+/-- An integer is squarefree iff no prime square divides it. -/\n+theorem squarefree_iff_prime_sq_not_dvd {n : ℤ} :",
+    "comment": "Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating this in any normalization monoid something.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT3": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "GPT1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "X1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "AP1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "X2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "T1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "GPT2": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof."
+    }
+   },
+   "entries_text": {
+    "P063": "A result stated for a concrete type, object or value (a specific filter, a default element) but using only an abstract property of it, or none, is stated for every type, object or value with that property.",
+    "P086": "A new predicate, definition or lemma is not introduced when an existing library declaration already expresses or states it."
+   }
+  },
+  {
+   "id": "p0006",
+   "pr": 42814,
+   "family": "F4",
+   "in_census": true,
+   "entries": [
+    "P201"
+   ],
+   "text": "Can this be generated by `mk_iff`?",
+   "path": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+   "line": 43,
+   "author": "riccardobrasca",
+   "at": "2026-08-24T15:21:19Z",
+   "matcher_text": {
+    "ask_id": "p0006",
+    "path": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+    "code_at_comment": " if and only if\n+  it is squarefree.\n+* `Int.isFundamentalDiscr_four_mul`: `4m` is a fundamental discriminant if and only if `m` is\n+  squarefree and `m ≡ 2, 3 mod 4`.\n+-/\n+\n+@[expose] public section\n+\n+namespace Int\n+\n+/-- `D` is a fundamental discriminant: it is a discriminant (`D ≡ 0, 1 mod 4`) and primitive,\n+i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`. -/\n+def IsFundamentalDiscr (D : ℤ) : Prop :=\n+  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧\n+    ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D\n+\n+theorem isFundamentalDiscr_def {D : ℤ} :",
+    "comment": "Can this be generated by `mk_iff`?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT3": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "GPT1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "X1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "AP1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "X2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "T1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "GPT2": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding suggests a structure with mk_iff; several tag isFundamentalDiscr_def @[grind =] instead, a different kind of change.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding suggests mk_iff/generated characterisation; findings tag it grind or make it lemma."
+    }
+   },
+   "entries_text": {
+    "P201": "A dual, additive twin, projection or characterisation lemma that a generator (`to_dual`, `to_additive`, `simps`, `mk_iff`) can produce is generated, not written by hand; the declaration is placed after the lemmas the generator needs."
+   }
+  },
+  {
+   "id": "p0007",
+   "pr": 42814,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P048"
+   ],
+   "text": "```suggestion\nvariable {D : ℤ}\n\ntheorem isFundamentalDiscr_def :\n```\nthen you can remove `{D : ℤ}` in various declarations.",
+   "path": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+   "line": 43,
+   "author": "riccardobrasca",
+   "at": "2026-08-24T15:21:55Z",
+   "matcher_text": {
+    "ask_id": "p0007",
+    "path": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+    "code_at_comment": " if and only if\n+  it is squarefree.\n+* `Int.isFundamentalDiscr_four_mul`: `4m` is a fundamental discriminant if and only if `m` is\n+  squarefree and `m ≡ 2, 3 mod 4`.\n+-/\n+\n+@[expose] public section\n+\n+namespace Int\n+\n+/-- `D` is a fundamental discriminant: it is a discriminant (`D ≡ 0, 1 mod 4`) and primitive,\n+i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`. -/\n+def IsFundamentalDiscr (D : ℤ) : Prop :=\n+  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧\n+    ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D\n+\n+theorem isFundamentalDiscr_def {D : ℤ} :",
+    "comment": "```suggestion\nvariable {D : ℤ}\n\ntheorem isFundamentalDiscr_def :\n```\nthen you can remove `{D : ℤ}` in various declarations.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT3": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "DX3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "GPT1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "X1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "AP1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 7,
+     "m1_finding_text": {
+      "i": 7,
+      "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+      "claim": "`{D : ℤ}` is repeated in each of the four consecutive signatures `isFundamentalDiscr_def` (line 43), `IsFundamentalDiscr.ne_zero` (48), `IsFundamentalDiscr.emod_four_eq_zero_or_one` (51) and `isFundamentalDiscr_iff_squarefree` (56), instead of being declared once with `variable`.",
+      "requested_change": "Add `variable {D m : ℤ}` (right after `namespace Int`) and delete the `{D : ℤ}` / `{m : ℤ}` binders from those signatures; the unused `D` in the `m`-lemmas is not added automatically, so `isFundamentalDiscr_four_mul{,_add_one}` are unaffected.",
+      "severity": "advisory"
+     },
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "reached",
+     "m2_finding": 7,
+     "m2_finding_text": {
+      "i": 7,
+      "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+      "claim": "`{D : ℤ}` is repeated in each of the four consecutive signatures `isFundamentalDiscr_def` (line 43), `IsFundamentalDiscr.ne_zero` (48), `IsFundamentalDiscr.emod_four_eq_zero_or_one` (51) and `isFundamentalDiscr_iff_squarefree` (56), instead of being declared once with `variable`.",
+      "requested_change": "Add `variable {D m : ℤ}` (right after `namespace Int`) and delete the `{D : ℤ}` / `{m : ℤ}` binders from those signatures; the unused `D` in the `m`-lemmas is not added automatically, so `isFundamentalDiscr_four_mul{,_add_one}` are unaffected.",
+      "severity": "advisory"
+     },
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "X2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "T1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "TA1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+      "claim": "The binder `{D : ℤ}` is repeated in `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero`, `IsFundamentalDiscr.emod_four_eq_zero_or_one` and `isFundamentalDiscr_iff_squarefree`, and `{m : ℤ}` in `isFundamentalDiscr_four_mul_add_one` and `isFundamentalDiscr_four_mul`.",
+      "requested_change": "Add `variable {D m : ℤ}` after `namespace Int` and drop the repeated `{D : ℤ}` / `{m : ℤ}` binders from these six signatures.",
+      "severity": "advisory"
+     },
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+      "claim": "The binder `{D : ℤ}` is repeated in `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero`, `IsFundamentalDiscr.emod_four_eq_zero_or_one` and `isFundamentalDiscr_iff_squarefree`, and `{m : ℤ}` in `isFundamentalDiscr_four_mul_add_one` and `isFundamentalDiscr_four_mul`.",
+      "requested_change": "Add `variable {D m : ℤ}` after `namespace Int` and drop the repeated `{D : ℤ}` / `{m : ℤ}` binders from these six signatures.",
+      "severity": "advisory"
+     },
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "GPT2": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    },
+    "AP2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R7 and R11 ask for variable {D m : ℤ} and dropping repeated binders."
+    }
+   },
+   "entries_text": {
+    "P048": "Arguments shared by consecutive declarations are declared once with `variable`, not repeated in each signature."
+   }
+  }
+ ],
+ "pr": 42814,
+ "sessions": {
+  "X1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but `Int.IsFundamentalDiscr 1` holds (1 % 4 = 1, 1 is not 4 * x, and no odd prime square divides 1). 1 is not the discriminant of any quadratic field, so the sentence is false for the definition as written.",
+     "requested_change": "Fix the sentence to match the definition, e.g. \"These are exactly `1` and the discriminants of quadratic fields.\" Also say in the `IsFundamentalDiscr` docstring that `D = 1` is included. If the intended practice excludes 1, add `D ≠ 1` to the definition and adjust `isFundamentalDiscr_iff_squarefree` and `isFundamentalDiscr_four_mul_add_one` to match.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two : Odd x → IsCoprime x 2` breaks the left/right naming used by its exact siblings. In Mathlib/Data/Nat/Prime/Basic.lean, `Odd.coprime_two_right : n.Coprime 2` and `Odd.coprime_two_left : Coprime 2 n` are aliases. In Mathlib/RingTheory/Int/Basic.lean, `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` and `Int.isCoprime_two_left` are the pair. The PR's name leaves out the side, and it adds no `IsCoprime 2 x` counterpart.",
+     "requested_change": "Rename to `Odd.isCoprime_two_right`, add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`, and update the use in `Int.isFundamentalDiscr_iff_squarefree` to `hp.isCoprime_two_right`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:113",
+     "claim": "`IsCoprime.dvd_mul_left_iff` and `IsCoprime.dvd_mul_right_iff` carry an `_iff` suffix that the established lemmas of the same shape do not. `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m` and `Nat.Coprime.dvd_mul_left`, `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` are all iff statements named without `_iff`. `IsCoprime.dvd_mul_left/right` do not exist yet, so the suffix does not avoid a clash either.",
+     "requested_change": "Rename the pair to `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right`, matching `Nat.Coprime.dvd_mul_left/right`, and update the call in `Int.isFundamentalDiscr_iff_squarefree`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The proof builds a local `bridge` lemma with a `show … by push_cast; ring` cast rewrite and then transports both directions of the iff by hand. The cast bookkeeping is a direct simp rewrite through `Int.natCast_dvd` and `Nat.cast_pow`.",
+     "requested_change": "Replace the proof with `rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree]` followed by `simp_rw [← sq, ← Int.natCast_dvd, Nat.cast_pow]`. The one-liner `simp [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, ← sq, ← Int.natCast_dvd]` also works.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "The reverse direction does a manual `obtain rfl | hne := eq_or_ne p 2` split and then rebuilds oddness with `hp.odd_of_ne_two hne`. The existing `Nat.Prime.eq_two_or_odd' : p = 2 ∨ Odd p` gives that disjunction directly.",
+     "requested_change": "Golf to a term proof: `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "The proof introduces two anonymous `have {m} : …` facts. The second shadows the first `this`, and `grind` only finds them because they happen to sit in the local context, which the proof has to explain in a comment. Named hypotheses would make the dependency explicit and the comment unnecessary.",
+     "requested_change": "Name the two facts, e.g. `have hsq {m} : Squarefree m ↔ ¬ 4 ∣ m ∧ …` and `have hdvd {m p : ℤ} (hp : Odd p) : p ^ 2 ∣ 4 * m ↔ p ^ 2 ∣ m`, and delete the comment that explains the anonymous `have`s.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "`simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` performs a single closed rewrite of `4 * d / 4`. Neither `+contextual` nor `simp` is needed for that.",
+     "requested_change": "Replace `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` with `rw [Int.mul_ediv_cancel_left d four_ne_zero]`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The module docstring asserts that fundamental discriminants \"are exactly the discriminants of quadratic fields\", but under `Int.IsFundamentalDiscr` as defined, `D = 1` is a fundamental discriminant (1 ≡ 1 mod 4, no `x` with `1 = 4 * x`, no odd prime square divides 1), and 1 is not the discriminant of any quadratic field. The documented characterization is therefore false for the definition in the file.",
+     "requested_change": "Correct the sentence to match the definition, e.g. \"These are exactly `1` and the discriminants of quadratic fields\" (and state the `D = 1` practice in the `IsFundamentalDiscr` docstring as well); alternatively, if `1` is meant to be excluded, add `D ≠ 1` to `IsFundamentalDiscr` and update `isFundamentalDiscr_iff_squarefree` / `isFundamentalDiscr_four_mul_add_one` accordingly.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two : Odd x → IsCoprime x 2` breaks the established left/right naming for coprimality with 2: the library already has `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` / `Int.isCoprime_two_left` (Mathlib/RingTheory/Int/Basic.lean) and the ℕ aliases `Odd.coprime_two_right : Odd n → n.Coprime 2` / `Odd.coprime_two_left` (Mathlib/Data/Nat/Prime/Basic.lean). The new name omits the side, and there is no `IsCoprime 2 x` counterpart.",
+     "requested_change": "Rename to `Odd.isCoprime_two_right` (updating the use `hp.isCoprime_two` in `Int.isFundamentalDiscr_iff_squarefree`) and add the companion `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:110",
+     "claim": "The new iff lemmas `IsCoprime.dvd_mul_right_iff (H : IsCoprime x z) : x ∣ y * z ↔ x ∣ y` and `IsCoprime.dvd_mul_left_iff (H : IsCoprime x y) : x ∣ y * z ↔ x ∣ z` carry an `_iff` suffix that the library's exact analogues do not: `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m`, `Nat.Coprime.dvd_mul_left`, `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` are all iff statements without `_iff`, and the names `IsCoprime.dvd_mul_right/left` are free.",
+     "requested_change": "Rename the pair to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left` (same statements and proofs), and update the use `(IsCoprime.pow hp.isCoprime_two).dvd_mul_left_iff` in `Int.isFundamentalDiscr_iff_squarefree`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The proof builds a named `bridge` lemma with a `show ... by push_cast; ring` cast rewrite and then a hand-written two-way `exact ⟨fun ... => ..., fun ... => ...⟩` (with `=>` rather than `↦`), where a single rewrite chain through existing cast lemmas closes the goal.",
+     "requested_change": "Replace the proof by `simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_mul, Int.natCast_dvd]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "The reverse direction re-derives the case split `p = 2 ∨ Odd p` by hand (`obtain rfl | hne := eq_or_ne p 2` followed by `hp.odd_of_ne_two hne`), although `Nat.Prime.eq_two_or_odd'` in the same file states exactly that split.",
+     "requested_change": "Write the proof as the term `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "The proof introduces two anonymous `have`s, so the second shadows the first as `this` (the first becomes inaccessible) and a comment is needed to explain that `grind` picks them up; in addition `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` uses `+contextual` although it is not needed.",
+     "requested_change": "Name the two auxiliary facts (e.g. `have hsq {m} : Squarefree m ↔ ...` and `have hdvd {m p : ℤ} (hp : Odd p) : ...`), drop the explanatory comment, and replace `simp +contextual only [...]` by `simp only [Int.mul_ediv_cancel_left d four_ne_zero]`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but under `Int.IsFundamentalDiscr` as defined, `1` is a fundamental discriminant (1 % 4 = 1, the `D = 4 * x` clause is vacuous, no odd prime square divides 1), and `1` is not the discriminant of any quadratic field. The sentence is false as stated.",
+     "requested_change": "Correct the sentence to account for `1`, e.g. \"Apart from `1`, these are exactly the discriminants of quadratic fields\", or else add `D ≠ 1` to `IsFundamentalDiscr` if `1` is meant to be excluded.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "`Int.squarefree_iff_prime_sq_not_dvd` is proved by hand. It builds a local `bridge` iff, rewrites, and then uses an anonymous-constructor `exact` that shuffles the bridge in each direction. The same rewrite chain closes the goal directly with `simp_rw`.",
+     "requested_change": "Replace the proof by `simp_rw [← Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Int.natCast_mul, Int.natCast_dvd]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two` concludes `IsCoprime x 2`, with `2` on the right, but the name does not say which side. The sibling names all mark the side: `Int.isCoprime_two_left` and `Int.isCoprime_two_right` (Mathlib/RingTheory/Int/Basic.lean:119,123, `IsCoprime m 2 ↔ Odd m`), and `Nat.coprime_two_left`/`Nat.coprime_two_right` with aliases `Odd.coprime_two_left`/`Odd.coprime_two_right` (Mathlib/Data/Nat/Prime/Basic.lean:153-159). The `left` counterpart is also missing.",
+     "requested_change": "Rename `Odd.isCoprime_two` to `Odd.isCoprime_two_right`. Add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`. Update the use in `Int.isFundamentalDiscr_iff_squarefree` to `hp.isCoprime_two_right`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:110",
+     "claim": "`IsCoprime.dvd_mul_right_iff` and `IsCoprime.dvd_mul_left_iff` carry an `_iff` suffix that the identically shaped siblings do not. `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m` and `Nat.Coprime.dvd_mul_left` (Mathlib/Data/Nat/GCD/Basic.lean:101,104) have no suffix, and neither do `IsUnit.dvd_mul_right/left` and `Units.dvd_mul_right/left` (Mathlib/Algebra/Divisibility/Units.lean). The names `IsCoprime.dvd_mul_right/left` are free.",
+     "requested_change": "Rename `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left`, matching `Nat.Coprime.dvd_mul_right/left`. Update the use in `Int.isFundamentalDiscr_iff_squarefree`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "The reverse direction of `Nat.forall_prime_iff_two_and_odd` re-derives the 2-or-odd split by hand (`obtain rfl | hne := eq_or_ne p 2` and `hp.odd_of_ne_two hne`). Mathlib already states that split as `Nat.Prime.eq_two_or_odd'`.",
+     "requested_change": "Use the term-mode proof `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:73",
+     "claim": "`Int.isFundamentalDiscr_four_mul_add_one` applies only when the discriminant is literally of the form `4 * m + 1`. The reusable statement takes a hypothesis `D % 4 = 1`, which is also the form `isFundamentalDiscr_iff_squarefree` and `emod_four_eq_zero_or_one` use, so a user holding `hD : D % 4 = 1` cannot apply the lemma without first rewriting `D`.",
+     "requested_change": "Add `theorem isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one {D : ℤ} (hD : D % 4 = 1) : IsFundamentalDiscr D ↔ Squarefree D := by simp [isFundamentalDiscr_iff_squarefree, hD]`, and derive `isFundamentalDiscr_four_mul_add_one` from it (`isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one (by omega)`).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but `Int.IsFundamentalDiscr 1` holds and 1 is not the discriminant of any quadratic field, so the sentence is false for the definition as stated.",
+     "requested_change": "Correct the sentence to \"These are exactly `1` and the discriminants of quadratic fields.\" (or, if 1 is meant to be excluded, add `D ≠ 1` to `Int.IsFundamentalDiscr` and adjust the characterisation lemmas).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:39",
+     "claim": "`Int.IsFundamentalDiscr` formalises a named notion (fundamental discriminant) but neither its docstring nor the module docstring points to any background reading.",
+     "requested_change": "Add a reference to the docstring of `IsFundamentalDiscr` (e.g. `See <https://en.wikipedia.org/wiki/Fundamental_discriminant>.`) and/or a `## References` section in the module docstring (e.g. Cohen, *A Course in Computational Algebraic Number Theory*, §5.1).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:39",
+     "claim": "The definition is an ad hoc mixture (`D % 4 ∈ {0,1}`, `∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1`, no odd prime square divides `D`) that matches neither the textbook definition nor the form users work with; every downstream lemma in the file (`isFundamentalDiscr_four_mul`, `_four_mul_add_one`) goes through `isFundamentalDiscr_iff_squarefree` instead of the definition.",
+     "requested_change": "Make the squarefree characterisation the definition — `(D % 4 = 1 ∧ Squarefree D) ∨ (D % 4 = 0 ∧ Squarefree (D / 4) ∧ (D / 4 % 4 = 2 ∨ D / 4 % 4 = 3))` — and turn the current three-clause form into a characterisation lemma, or explain in the docstring why the present form is the one to unfold.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:39",
+     "claim": "In the definition (and its restatement `isFundamentalDiscr_def`), the bound variables of `∀ x, D = 4 * x → …` and `∀ p : ℕ, p.Prime → …` are explicit although the following hypothesis determines them.",
+     "requested_change": "Bind them strict-implicitly: `(∀ ⦃x⦄, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧ ∀ ⦃p : ℕ⦄, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D`, in both `IsFundamentalDiscr` and `isFundamentalDiscr_def`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The file opens `@[expose] public section`, exposing every body in the file, although the only definition is `IsFundamentalDiscr` and the file already provides `isFundamentalDiscr_def` for unfolding it.",
+     "requested_change": "Replace `@[expose] public section` with `public section` (and, if downstream files must unfold `IsFundamentalDiscr` definitionally, put `@[expose]` on that one definition instead).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:1",
+     "claim": "The binder `{D : ℤ}` is repeated in `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero`, `IsFundamentalDiscr.emod_four_eq_zero_or_one` and `isFundamentalDiscr_iff_squarefree`, and `{m : ℤ}` in `isFundamentalDiscr_four_mul_add_one` and `isFundamentalDiscr_four_mul`.",
+     "requested_change": "Add `variable {D m : ℤ}` after `namespace Int` and drop the repeated `{D : ℤ}` / `{m : ℤ}` binders from these six signatures.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:48",
+     "claim": "`IsFundamentalDiscr.ne_zero` is proved by `grind [isFundamentalDiscr_def]` although a two-line explicit proof is immediate: for `D = 0`, the second clause at `x = 0` gives `¬ 4 ∣ 0`.",
+     "requested_change": "Replace the proof with `by\n  rintro rfl\n  exact (h.2.1 0 rfl).1 (dvd_zero 4)` (or `(h.2.1 rfl).1 (dvd_zero 4)` if the binder becomes strict-implicit).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:77",
+     "claim": "`isFundamentalDiscr_four_mul : IsFundamentalDiscr (4 * m) ↔ …` and its sibling `isFundamentalDiscr_four_mul_add_one : IsFundamentalDiscr (4 * m + 1) ↔ …` are iff lemmas whose names read as the bare proposition `IsFundamentalDiscr (4 * m)` / `IsFundamentalDiscr (4 * m + 1)`.",
+     "requested_change": "Rename them `isFundamentalDiscr_four_mul_iff` and `isFundamentalDiscr_four_mul_add_one_iff` (and update the module docstring's Main results list).",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:77",
+     "claim": "`isFundamentalDiscr_four_mul` and `isFundamentalDiscr_four_mul_add_one` are stated with `theorem` and are listed under \"Main results\" in the module docstring, but carry no docstring.",
+     "requested_change": "Add docstrings, e.g. `/-- `4 * m` is a fundamental discriminant if and only if `m` is squarefree and `m ≡ 2, 3 mod 4`. -/` and `/-- `4 * m + 1` is a fundamental discriminant if and only if it is squarefree. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:77",
+     "claim": "The characterisations `isFundamentalDiscr_four_mul` and `isFundamentalDiscr_four_mul_add_one` are usable as grind rewrite rules but carry no `grind` attribute.",
+     "requested_change": "Tag both with `@[grind =]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:43",
+     "claim": "`isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero` and `IsFundamentalDiscr.emod_four_eq_zero_or_one` are undocumented auxiliary results stated with `theorem`.",
+     "requested_change": "Change `theorem` to `lemma` for these three declarations.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "`simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` only feeds the flexible `grind` that follows; the single-lemma `simp only` (with an unneeded `+contextual`) is a disguised rewrite.",
+     "requested_change": "Replace it with `rw [Int.mul_ediv_cancel_left d four_ne_zero]` (an unsqueezed `simp +contextual [Int.mul_ediv_cancel_left d four_ne_zero]` also works if a simp call is preferred).",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "`(IsCoprime.pow hp.isCoprime_two).dvd_mul_left_iff` applies the namespaced `IsCoprime.pow` to a term of type `IsCoprime _ _` with its full name.",
+     "requested_change": "Write it with dot notation: `exact hp.isCoprime_two.pow.dvd_mul_left_iff`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "The proof establishes two general facts as anonymous `have`s that are not about `D` — `Squarefree m ↔ ¬ 4 ∣ m ∧ ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ m` and `Odd p → (p ^ 2 ∣ 4 * m ↔ p ^ 2 ∣ m)` — and relies (per its own comment) on `grind` picking the anonymous `this`s up from the context.",
+     "requested_change": "Extract them as lemmas — the first as a public `Int` lemma next to `Int.squarefree_iff_prime_sq_not_dvd` (e.g. `Int.squarefree_iff_not_four_dvd_and_odd_prime_sq_not_dvd`), the second as a `private` lemma — and pass them to the `grind` calls explicitly, removing the comment.",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The proof builds a `bridge` lemma with `show … by push_cast; ring` and then a manual two-direction term, where a single rewrite chain suffices.",
+     "requested_change": "Replace the proof with `by\n  simp_rw [← squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, ← sq, ← Int.natCast_dvd,\n    Nat.cast_pow]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The proof writes its lambdas as `fun p => by …`, `fun h p hp hdvd => …` and `fun h x hx hdvd => …`.",
+     "requested_change": "Use `↦`: `fun p ↦ by …`, `fun h p hp hdvd ↦ …`, `fun h x hx hdvd ↦ …` (moot if the proof is replaced by the `simp_rw` one-liner).",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The statement `∀ p : ℕ, p.Prime → ¬ (p : ℤ) ^ 2 ∣ n` binds `p` explicitly although the following hypothesis `p.Prime` determines it.",
+     "requested_change": "State it as `Squarefree n ↔ ∀ ⦃p : ℕ⦄, p.Prime → ¬ (p : ℤ) ^ 2 ∣ n`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "In the reverse direction the hypothesis `h : P 2 ∧ ∀ p, p.Prime → Odd p → P p` is only ever used through `h.1` and `h.2`.",
+     "requested_change": "Destructure it when introduced: `fun ⟨h2, hodd⟩ p hp ↦ ?_`, then `exact h2` / `exact hodd p hp …`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 18,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "The case split `obtain rfl | hne := eq_or_ne p 2` leaves `hne : p ≠ 2`, which then has to be converted with `hp.odd_of_ne_two hne`, although `Nat.Prime.eq_two_or_odd'` yields `p = 2 ∨ Odd p` directly.",
+     "requested_change": "Split with `obtain rfl | hp' := hp.eq_two_or_odd'` and close with `exacts [h2, hodd p hp hp']`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 19,
+     "target": "Mathlib/Data/Nat/Prime/Basic.lean:110",
+     "claim": "Both sides quantify `∀ p, p.Prime → …` with `p` explicit although `p.Prime` determines it.",
+     "requested_change": "Use strict-implicit binders: `(∀ ⦃p⦄, p.Prime → P p) ↔ P 2 ∧ ∀ ⦃p⦄, p.Prime → Odd p → P p`, consistently with the other new prime-quantified statements.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+     "claim": "The module doc says fundamental discriminants are exactly the discriminants of quadratic fields, but the API (correctly, for the standard arithmetic practice) includes the exceptional value `1` as a fundamental discriminant, and `1` is not the discriminant of a quadratic field.",
+     "requested_change": "Qualify the sentence, for example by saying that apart from the conventional value `D = 1`, the fundamental discriminants are exactly the discriminants of quadratic fields.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:110",
+     "claim": "`IsCoprime.dvd_mul_right_iff`/`IsCoprime.dvd_mul_left_iff` use an `_iff` suffix where the matching divisibility-cancellation API is named without it (`Nat.Coprime.dvd_mul_right`, `Nat.Coprime.dvd_mul_left`, and the `IsUnit.dvd_mul_right`/`dvd_mul_left` simp lemmas).",
+     "requested_change": "Rename these two theorems to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left`, and update the use in `Int.isFundamentalDiscr_iff_squarefree` to the renamed `.dvd_mul_left`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:113",
+     "claim": "`IsCoprime.dvd_mul_left_iff` (and its sibling `IsCoprime.dvd_mul_right_iff` at line 110) deviate from how Mathlib names this statement. The `_iff` suffix here implies a same-base-name non-iff lemma `IsCoprime.dvd_mul_left`/`dvd_mul_right` that does not exist: in this very file every `_iff` lemma is paired with an un-suffixed counterpart (`neg_left`/`neg_left_iff`, `mul_left`/`mul_left_iff`, `add_mul_left_left`/`add_mul_left_left_iff`), and the corresponding implication here is named `IsCoprime.dvd_of_dvd_mul_left`/`dvd_of_dvd_mul_right`, not `dvd_mul_left`. Moreover the identical statements elsewhere carry the un-suffixed name: `Nat.Coprime.dvd_mul_left`, `Nat.Coprime.dvd_mul_right` (Data/Nat/GCD/Basic.lean:101,104) and `IsUnit.dvd_mul_left`, `IsUnit.dvd_mul_right` (Algebra/Divisibility/Units.lean:82,104), so the two new names are the only `..._dvd_mul_left_iff`/`..._dvd_mul_right_iff` in the library.",
+     "requested_change": "Rename `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right`, matching `Nat.Coprime.dvd_mul_left`/`dvd_mul_right` and `IsUnit.dvd_mul_left`/`dvd_mul_right`, and update the use in Mathlib/NumberTheory/FundamentalDiscriminant.lean:66 accordingly (`.dvd_mul_left`); dot notation still works since the hypothesis stays the first argument. `declaration_search` confirms no `IsCoprime.dvd_mul_left` exists, so there is no clash.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+     "claim": "The module doc's claim \"These are exactly the discriminants of quadratic fields\" is false for the definition as given: `Int.IsFundamentalDiscr 1` holds (1 % 4 = 1 and `Squarefree 1`; it is also an instance of the PR's own `Int.isFundamentalDiscr_four_mul_add_one` with `m = 0`, which I verified compiles), while `1` is not the discriminant of any quadratic field — for a quadratic field `ℚ(√d)`, `disc = d` with `d` squarefree and `d ≠ 1`, or `disc = 4d`. The sentence is also inconsistent with the definition's own docstring, which describes `1` as a legitimate (primitive) discriminant, and the file proves nothing about quadratic fields (it is deliberately independent of that theory), so the claim cannot be checked inside the file.",
+     "requested_change": "Either qualify the sentence, e.g. \"these are the discriminants of quadratic fields, together with the degenerate case `D = 1` (the discriminant of `ℚ`)\", and say in the same paragraph that the correspondence with quadratic fields is not proved here; or, if the intent is to exclude `1`, add that exclusion to `IsFundamentalDiscr` (and then `isFundamentalDiscr_four_mul_add_one` would need the hypothesis `m ≠ 0`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:48",
+     "claim": "`Int.IsFundamentalDiscr.ne_zero` is proved by `grind [isFundamentalDiscr_def]` although the goal is a two-step definitional argument (apply the `∀ x, D = 4 * x → ¬ 4 ∣ x` conjunct at `x = 0`). For a single-line fact, `exact`/an explicit term is preferred over an automated tactic: it documents which conjunct is used and survives refactors of the definition, and reviewers explicitly ask for `exact` rather than automation on one-liners (\"where aesop is discouraged\", Eric Wieser, 2026-02-09: \"For a single line proof, it is often much better to use `exact` as that make it clearer what refactors are possible.\").",
+     "requested_change": "Replace the proof with the direct term:\n\n  theorem IsFundamentalDiscr.ne_zero {D : ℤ} (h : IsFundamentalDiscr D) : D ≠ 0 := by\n    rintro rfl\n    exact (h.2.1 0 (by norm_num)).1 (dvd_zero 4)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/adc2986d5b821e86205d5779313fef0d05233c7c3df037a168d5ecbaefc221ca/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__569e7732-6bca-4147-b270-11cd74b06f4e.jsonl"
+  },
+  "AP1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:33",
+     "claim": "The new `module` file exposes everything with `@[expose] public section`. In a module file `@[expose]` belongs on the individual definition whose body downstream files must unfold, not on the whole public section; the only definition here is `Int.IsFundamentalDiscr` (the theorems need no exposure).",
+     "requested_change": "Replace `@[expose] public section` with `public section` and put the attribute on the definition: `@[expose]` directly above `def IsFundamentalDiscr (D : ℤ) : Prop` (drop `@[expose]` entirely if no downstream file needs to unfold the body).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:43",
+     "claim": "`Int.isFundamentalDiscr_def` is exactly the kind of characterisation lemma (`IsFundamentalDiscr D ↔ <conjunction>`, proved by `Iff.rfl`) that `grind` can use as a rewrite rule, but it carries no `@[grind =]` tag; consequently the file has to spell the lemma out in three `grind [isFundamentalDiscr_def]` calls.",
+     "requested_change": "Add `@[grind =]` to `isFundamentalDiscr_def` and delete the now-redundant `[isFundamentalDiscr_def]` arguments, writing plain `grind` in `IsFundamentalDiscr.ne_zero` and in the two branches of `isFundamentalDiscr_iff_squarefree`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:37",
+     "claim": "The docstring of `Int.IsFundamentalDiscr` — a definition of a named mathematical notion — gives no pointer to background reading, and neither does the module docstring.",
+     "requested_change": "Add a reference to the definition's docstring, e.g. `See https://en.wikipedia.org/wiki/Fundamental_discriminant.` (or a textbook reference), and optionally repeat it in the module docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:39",
+     "claim": "`Int.IsFundamentalDiscr` is defined by the awkard \"primitive discriminant\" spelling (`∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1` plus a prime-square clause), while the standard squarefree spelling is the theorem `isFundamentalDiscr_iff_squarefree` — and all three of the file's advertised main results are proved from that theorem, so the formulation in the definition is not the one easiest to use in practice.",
+     "requested_change": "Make the squarefree spelling the definition, `def IsFundamentalDiscr (D : ℤ) : Prop := (D % 4 = 1 ∧ Squarefree D) ∨ (D % 4 = 0 ∧ Squarefree (D / 4) ∧ (D / 4 % 4 = 2 ∨ D / 4 % 4 = 3))`, and keep the present primitive spelling as a characterisation lemma; then `isFundamentalDiscr_iff_squarefree` is `Iff.rfl` and `isFundamentalDiscr_four_mul`/`isFundamentalDiscr_four_mul_add_one` are immediate. If the primitive spelling is deliberate, say so in a comment in the file.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:51",
+     "claim": "`IsFundamentalDiscr.emod_four_eq_zero_or_one` is just the projection `h.1` of the definition, which `isFundamentalDiscr_def` already yields; it is used nowhere in the PR and is not registered with any attribute, and it is the only one of the definition's three conjuncts that gets a projection lemma (no counterpart for the `¬ 4 ∣ x ∧ x % 4 ≠ 1` or prime-square components).",
+     "requested_change": "Drop `IsFundamentalDiscr.emod_four_eq_zero_or_one` (users obtain the component from `Int.isFundamentalDiscr_def`); if it is meant as part of the API, list it in the module docstring's main results and state it as a `lemma` with a docstring rather than an undocumented `theorem`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:48",
+     "claim": "`IsFundamentalDiscr.ne_zero` is an auxiliary fact stated as an undocumented `theorem`, and its proof hands the goal to `grind [isFundamentalDiscr_def]` even though a two-line explicit proof is available (the practices reserve `theorem` for documented, more interesting statements and avoid automation when the explicit proof is short and readable).",
+     "requested_change": "State the auxiliary results of this file as `lemma`s — `IsFundamentalDiscr.ne_zero`, `Int.isFundamentalDiscr_def`, `IsFundamentalDiscr.emod_four_eq_zero_or_one` — keep `theorem` for the two main results and give those docstrings, and prove `ne_zero` directly: `rintro rfl; exact (h.2.1 0 (by ring)).1 (dvd_zero 4)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:69",
+     "claim": "In `isFundamentalDiscr_iff_squarefree` the `simp` is squeezed to `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]`, although its output feeds only the flexible `grind` on the following line.",
+     "requested_change": "Leave the call unsqueezed: use `simp +contextual` (the following `grind` is flexible, so the explicit lemma list buys nothing).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:56",
+     "claim": "`{D : ℤ}` is repeated in each of the four consecutive signatures `isFundamentalDiscr_def` (line 43), `IsFundamentalDiscr.ne_zero` (48), `IsFundamentalDiscr.emod_four_eq_zero_or_one` (51) and `isFundamentalDiscr_iff_squarefree` (56), instead of being declared once with `variable`.",
+     "requested_change": "Add `variable {D m : ℤ}` (right after `namespace Int`) and delete the `{D : ℤ}` / `{m : ℤ}` binders from those signatures; the unused `D` in the `m`-lemmas is not added automatically, so `isFundamentalDiscr_four_mul{,_add_one}` are unaffected.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "`Int.squarefree_iff_prime_sq_not_dvd` is `Int`-namespaced material placed in `Mathlib/Data/Nat/Squarefree.lean`, whose module docstring describes the file as \"Lemmas about squarefreeness of natural numbers\", whereas the library's `Int` squarefree results (`Int.squarefree_natAbs`, `Int.squarefree_natCast`) live in the `Int` section of `Mathlib/Algebra/Squarefree/Basic.lean`.",
+     "requested_change": "Move the lemma to that `Int` section, next to `Int.squarefree_natAbs` and `Int.squarefree_natCast`; if the proof cannot be ported because it uses `Nat.squarefree_iff_prime_squarefree`, record in this file's module docstring that it also holds `Int` results and mention the new lemma there.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:110",
+     "claim": "The two new parallel one-line dual lemmas `IsCoprime.dvd_mul_right_iff` and `IsCoprime.dvd_mul_left_iff` are separated by a blank line, so the parallel is not visible.",
+     "requested_change": "Keep the pair adjacent with no blank line between them (as the right/left pair `IsCoprime.dvd_of_dvd_mul_right`/`dvd_of_dvd_mul_left` is), matching the practice that a run of parallel one-liners is lined up.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/9e7d86b356e0680fbf4f9cc1a05e986a55978f4502a7ef0b7e0fc35e7335b3d2/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__ff1e1979-5202-42e9-9ba1-c759086bb224.jsonl"
+  },
+  "GPT2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+     "claim": "The module documentation says fundamental discriminants are exactly the discriminants of quadratic fields, but this API includes the conventional fundamental discriminant `D = 1`; `Int.IsFundamentalDiscr 1` is provable, while `1` is not the discriminant of a quadratic field in the usual degree-two sense.",
+     "requested_change": "Replace that sentence with a version that mentions the exceptional conventional case, for example: “Apart from the conventional case `D = 1`, these are exactly the discriminants of quadratic fields.”",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:110",
+     "claim": "`IsCoprime.dvd_mul_right_iff` and `IsCoprime.dvd_mul_left_iff` are the `IsCoprime` counterparts of the existing `Coprime.dvd_mul_right`/`Coprime.dvd_mul_left` (Mathlib/Data/Nat/GCD/Basic.lean:101,104), which state exactly the same thing with the same argument practice (`(H : Coprime k n) : k ∣ m * n ↔ k ∣ m`) and sit next to `Coprime.dvd_of_dvd_mul_right`/`dvd_of_dvd_mul_left` exactly as these do, but they drop the `_iff`-free naming: no lemma of shape `x ∣ y * z ↔ x ∣ y` elsewhere in the library carries an `_iff` suffix (`IsUnit.dvd_mul_right`/`left` in Algebra/Divisibility/Units.lean:82,104, `Units.dvd_mul_right`/`left`:38,55, `Coprime.dvd_mul_right`/`left`), so the new names are the only ones spelled this way.",
+     "requested_change": "Rename them to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left` (both names are currently free; only `IsCoprime.dvd_of_dvd_mul_right`/`dvd_of_dvd_mul_left` exist), and update the single use in FundamentalDiscriminant.lean:66.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two` is the only name in the library for `Odd x → IsCoprime x 2` that does not record which side `2` is on, although the library's names for this fact do: `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` and `Int.isCoprime_two_left : IsCoprime 2 m ↔ Odd m` (Mathlib/RingTheory/Int/Basic.lean:119,123, both `@[simp]`), and the corresponding `Odd.`-namespaced aliases `Odd.coprime_two_right`/`Odd.coprime_two_left` for `Nat.Coprime` (Mathlib/Data/Nat/Prime/Basic.lean:158,159). The new lemma's conclusion `IsCoprime x 2` is the `_two_right` shape, so a reader of the name cannot tell it from the `_two_left` statement without unfolding it.",
+     "requested_change": "Rename it to `Odd.isCoprime_two_right` so the family `Odd.coprime_two_right` / `Int.isCoprime_two_right` / `Odd.isCoprime_two_right` is uniform, and update the use at FundamentalDiscriminant.lean:66.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:48",
+     "claim": "`IsFundamentalDiscr.ne_zero` is closed by `grind [isFundamentalDiscr_def]`, which makes the whole definition — including the third conjunct about odd primes — available to the solver for a statement that is one step from the second conjunct of the definition: `0 % 4 = 0`, so only the clause `∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1` is needed, at `x = 0`. The proof is opaque, slow, and would break silently if the definition or `isFundamentalDiscr_def` changes shape.",
+     "requested_change": "Replace the proof with the direct projection:\n```lean\ntheorem IsFundamentalDiscr.ne_zero {D : ℤ} (h : IsFundamentalDiscr D) : D ≠ 0 := by\n  rintro rfl\n  exact (h.2.1 0 rfl).1 (dvd_zero 4)\n```\n(I compiled this replacement against the PR's file with `lean_verify_edit`; the file compiles with no errors and no new warnings.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/3372a4a2942f56b1d67b5f121bd3c46d06d5909121ed4e45511eb155803ef0e5/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__efaf813f-ba76-41ea-8397-035a38a87c83.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:33",
+     "claim": "`Mathlib/NumberTheory/FundamentalDiscriminant.lean` is a `module` file, and `@[expose]` is attached to the whole `public section` rather than to the definition, so every declaration added to this section (now or later) has its body exposed to importers. Mathlib's practice for `module` files is to expose the individual definitions whose bodies downstream files must unfold, not the section.",
+     "requested_change": "Change line 33 to `public section` and put `@[expose]` on `def IsFundamentalDiscr` (the only definition in the section); if nothing downstream needs to unfold the definition, drop the attribute entirely.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:43",
+     "claim": "`Int.isFundamentalDiscr_def` is a characterisation lemma that is used purely as a `grind` rewrite rule — it is passed explicitly in the three `grind` calls at lines 49, 70 and 71 — but it is not tagged `@[grind =]`, so those hint lists are needed and downstream `grind` invocations cannot use it.",
+     "requested_change": "Tag the lemma `@[grind =]` and delete the redundant `[isFundamentalDiscr_def]` argument from the `grind` calls at lines 49, 70 and 71.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:37",
+     "claim": "The docstring of `Int.IsFundamentalDiscr`, a definition of a named mathematical notion, gives no pointer to background reading, which Mathlib asks of definitions of named notions (compare `IsCoprime` in the file this PR touches, which carries `@[wikidata Q104752]`).",
+     "requested_change": "Add a reference or encyclopedia link to the docstring (e.g. a Wikipedia link on fundamental discriminants, and/or an `@[wikidata]` annotation on the definition).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:73",
+     "claim": "`Int.isFundamentalDiscr_four_mul_add_one` and `Int.isFundamentalDiscr_four_mul` (line 77) are `↔` characterisations, but their names spell only their left-hand sides (`IsFundamentalDiscr (4 * m + 1)`, `IsFundamentalDiscr (4 * m)`), which read as bare propositions; a lemma whose name would otherwise read as the bare proposition of its left-hand side carries an `_iff` suffix so that the name signals a characterisation (as `Int.isFundamentalDiscr_iff_squarefree` already does).",
+     "requested_change": "Rename them to `Int.isFundamentalDiscr_four_mul_add_one_iff` and `Int.isFundamentalDiscr_four_mul_iff` (or `..._iff_squarefree`), and update the module-doc references at lines 27-30.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:77",
+     "claim": "`Int.isFundamentalDiscr_four_mul` is one of the two results advertised in the module doc under `## Main results` but is stated as a `theorem` with no docstring; Mathlib's practice is that a declaration stated with `theorem` rather than `lemma` is important enough to carry a docstring. The same holds for `Int.isFundamentalDiscr_four_mul_add_one` at line 73.",
+     "requested_change": "Add a one-line docstring to each (e.g. for this one: ``/-- `4 * m` is a fundamental discriminant if and only if `m` is squarefree and `m ≡ 2, 3 mod 4`. -/``), or demote them to `lemma` if they are not meant as main results.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two` states `IsCoprime x 2`, i.e. `2` in the right slot, but the library's statements of this same fact carry the `_right` suffix marking that position — `Int.isCoprime_two_right` (`Mathlib/RingTheory/Int/Basic.lean:123`, `IsCoprime m 2 ↔ Odd m`) and `_root_.Odd.coprime_two_right` (`Mathlib/Data/Nat/Prime/Basic.lean:159` `n.Coprime 2`) — so the new name does not follow the pattern of its analogues.",
+     "requested_change": "Rename `Odd.isCoprime_two` to `Odd.isCoprime_two_right`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Data/Nat/Squarefree.lean:393",
+     "claim": "The proof of `Int.squarefree_iff_prime_sq_not_dvd` writes its lambda abstractions with `=>` — `fun p => by` in `bridge` (line 395) and `fun h p hp hdvd => …` / `fun h x hx hdvd => …` (lines 398-399) — whereas Mathlib writes lambda abstractions with `fun … ↦ …`.",
+     "requested_change": "Replace `=>` with `↦` in those three lambdas (and re-indent the continuation lines of the `exact ⟨…, …⟩` by two spaces rather than aligning them under the bracket).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/3aa5cf338d73a7f60c0590a1e66f24cdff73c486a54e339ca5755a72f7107dcf/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__820a103c-918e-4fc6-9a6b-f80c864260fb.jsonl"
+  },
+  "GPT3": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:13",
+     "claim": "The module documentation says fundamental discriminants are exactly the discriminants of quadratic fields, but the API defines `1` to be a fundamental discriminant (`Int.IsFundamentalDiscr 1`), and `1` is only the conventional exceptional/degenerate fundamental discriminant, not the discriminant of a quadratic field.",
+     "requested_change": "Revise this sentence to mention the exceptional value, for example: “With the usual practice, `1` is also fundamental; apart from `D = 1`, these are exactly the discriminants of quadratic fields.”",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:113",
+     "claim": "`IsCoprime.dvd_mul_left_iff` (and its sibling `IsCoprime.dvd_mul_right_iff` at line 110) carry an `_iff` suffix that this family does not use for iff statements about divisibility: the library's established analogue `Nat.Coprime.dvd_mul_left` / `Nat.Coprime.dvd_mul_right` states exactly the same iffs (`(H : Coprime k m) : k ∣ m * n ↔ k ∣ n`) with the bare name, as does `Prime.dvd_mul`. In this very file `_iff` is reserved for the cases where the undecorated name is already taken (`IsCoprime.mul_left_iff` next to `IsCoprime.mul_left`); `IsCoprime.dvd_mul_left`/`dvd_mul_right` are free.",
+     "requested_change": "Rename `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left` and `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right`, and update the single use site in `Int.isFundamentalDiscr_iff_squarefree` (line 66, `.dvd_mul_left_iff`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`Odd.isCoprime_two` states `Odd x → IsCoprime x 2`, but in this API family the library names such lemmas after the position of `2`: `Int.isCoprime_two_left` (`IsCoprime 2 m`) and `Int.isCoprime_two_right` (`IsCoprime m 2`), and in ℕ the `Odd.coprime_two_left`/`Odd.coprime_two_right` aliases. The conclusion here has `2` on the right, so the bare name is inconsistent with both siblings and ambiguous about which side is `2`.",
+     "requested_change": "Rename the lemma to `Odd.isCoprime_two_right` (and use `IsCoprime x 2`, as now), matching `Int.isCoprime_two_right`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:39",
+     "claim": "The second conjunct of `Int.IsFundamentalDiscr` is written as a quantification over representations, `∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1`. The binder is vacuous unless `4 ∣ D`, and `4 * x = D` pins down a single `x` (= `D / 4`), so this is an indirect way of writing the condition that the definition's own docstring (\"`D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`\") and the derived characterization (`D / 4 % 4 = 2 ∨ D / 4 % 4 = 3` in `isFundamentalDiscr_iff_squarefree`) state directly.",
+     "requested_change": "State the conjunct directly on the quotient: `(D % 4 = 0 ∨ D % 4 = 1) ∧ (4 ∣ D → ¬ 4 ∣ D / 4 ∧ D / 4 % 4 ≠ 1) ∧ ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D`, and restate `isFundamentalDiscr_def` to match. `lean_verify_edit` shows the file compiles unchanged otherwise (the `grind` proofs of `ne_zero` and `isFundamentalDiscr_iff_squarefree` still go through), so the restatement is available at no cost to the rest of the development.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/c2f03a60a38b175ee4e9eb6bc90daa4e61384fd44a724915785fe048f77e04bc/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064014__323e9a7f-c2be-4b5c-9956-fbd9ad1a01d8.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:33",
+     "claim": "This `module` file opens with `@[expose] public section`, which exposes the body of every definition in the file, but the file contains exactly one definition (`IsFundamentalDiscr`) and it already ships the unfolding lemma `isFundamentalDiscr_def`. `@[expose]` belongs on the individual definition whose body downstream files must unfold, not on the whole public section.",
+     "requested_change": "Replace line 33 by `public section` and put `@[expose]` on `def IsFundamentalDiscr` (line 39); drop `@[expose]` altogether if no downstream file needs to unfold the definition rather than use `isFundamentalDiscr_def`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:37",
+     "claim": "The docstring of `Int.IsFundamentalDiscr` formalises a named mathematical notion (fundamental discriminant) but points to no background reading (no reference, no encyclopedia link, no `@[wikidata …]`), unlike the surrounding library.  The same holds for the unknown attribution in the module doc.",
+     "requested_change": "Add a pointer to background reading to the docstring of `Int.IsFundamentalDiscr` (e.g. a `[Wikipedia](https://en.wikipedia.org/wiki/Fundamental_discriminant)` link, or the corresponding `@[wikidata Q…]` cross-reference attribute next to the definition).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:43",
+     "claim": "`Int.isFundamentalDiscr_def` is the characterisation lemma the file's `grind` calls rely on (it is passed explicitly to `grind` at lines 49, 71 and 72), but it is not tagged `@[grind =]`, so every call site has to list it by hand and `grind` cannot use it on its own.",
+     "requested_change": "Tag it: `@[grind =] theorem isFundamentalDiscr_def …` and drop the now-redundant explicit arguments, i.e. `grind [isFundamentalDiscr_def]` becomes `grind` in `IsFundamentalDiscr.ne_zero` (line 49) and in both branches of `isFundamentalDiscr_iff_squarefree` (lines 71-72).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:48",
+     "claim": "`IsFundamentalDiscr.ne_zero` is proved by `grind [isFundamentalDiscr_def]` although a short, readable explicit proof exists, which is the case in which the automation is not supposed to replace the explicit proof.",
+     "requested_change": "Replace the proof by the explicit argument, e.g.\n```\ntheorem IsFundamentalDiscr.ne_zero {D : ℤ} (h : IsFundamentalDiscr D) : D ≠ 0 := by\n  rintro rfl\n  exact (h.2.1 0 (by ring)).1 (dvd_zero 4)\n```\n(if the `grind` proof is kept for style, it should at least be plain `grind` once `isFundamentalDiscr_def` is tagged `@[grind =]`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:73",
+     "claim": "`Int.isFundamentalDiscr_four_mul_add_one` and `Int.isFundamentalDiscr_four_mul` are `theorem`s advertised in the module doc's `## Main results` but carry no docstring, while only `isFundamentalDiscr_iff_squarefree` is documented.",
+     "requested_change": "Add a docstring to each of `Int.isFundamentalDiscr_four_mul_add_one` (line 73) and `Int.isFundamentalDiscr_four_mul` (line 77), e.g. \"`4 * m + 1` is a fundamental discriminant if and only if it is squarefree.\" / \"`4 * m` is a fundamental discriminant if and only if `m` is squarefree and `m ≡ 2, 3 mod 4`.\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean:51",
+     "claim": "`Int.IsFundamentalDiscr.emod_four_eq_zero_or_one` (and likewise `Int.IsFundamentalDiscr.ne_zero`, line 48) is an undocumented auxiliary result of the file (`:= h.1`, used nowhere), but is stated with `theorem`, which the library reserves for important, documented statements.",
+     "requested_change": "State both auxiliary projection lemmas with `lemma` instead of `theorem` (or give them docstrings if they are meant as documented API).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/RingTheory/Coprime/Basic.lean:436",
+     "claim": "`_root_.Odd.isCoprime_two` is declared with `theorem` but has no docstring: it is an auxiliary result, and its immediate neighbours (`add_one_left_of_dvd`, `add_one_sub_one_of_two_dvd`, …) are all undocumented `lemma`s.",
+     "requested_change": "Change `theorem _root_.Odd.isCoprime_two` to `lemma _root_.Odd.isCoprime_two` (or, if it is meant to be a named result, keep `theorem` and add a docstring such as \"An odd element is coprime to `2`.\").",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/eb8e99aadfac2ff6495d1ed3dcf77380675a62078d438ead9023dacbb8b760ff/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__deb9b81f-1326-4793-8997-e0b276002826.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_42814.md"
+}

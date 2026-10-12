@@ -1,0 +1,1669 @@
+{
+ "asks": [
+  {
+   "id": "p0013",
+   "pr": 43192,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "```suggestion\n# Modules over presheaves of commutative rings\n```",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+   "line": 11,
+   "author": "joelriou",
+   "at": "2026-08-28T22:01:49Z",
+   "matcher_text": {
+    "ask_id": "p0013",
+    "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "code_at_comment": "@@ -0,0 +1,120 @@\n+/-\n+Copyright (c) 2026 Brian Nugent. All rights reserved.\n+Released under Apache 2.0 license as described in the file LICENSE.\n+Authors: Brian Nugent\n+-/\n+module\n+\n+public import Mathlib.Algebra.Category.ModuleCat.Presheaf.Pullback\n+\n+/-!\n+# Modules over presheaves commutative rings",
+    "comment": "```suggestion\n# Modules over presheaves of commutative rings\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module documentation title is grammatically malformed: `# Modules over presheaves commutative rings` is missing `of`.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module documentation title is grammatically malformed: `# Modules over presheaves commutative rings` is missing `of`.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title reads “Modules over presheaves commutative rings”, which is missing a word and misstates the subject of the file.",
+      "requested_change": "Write `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title reads “Modules over presheaves commutative rings”, which is missing a word and misstates the subject of the file.",
+      "requested_change": "Write `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "DX3": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing \"of\"); the rest of the docstring says \"a presheaf of commutative rings\".",
+      "requested_change": "Change the heading to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing \"of\"); the rest of the docstring says \"a presheaf of commutative rings\".",
+      "requested_change": "Change the heading to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title is missing a word: it reads \"# Modules over presheaves commutative rings\".",
+      "requested_change": "Change the title line to \"# Modules over presheaves of commutative rings\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title is missing a word: it reads \"# Modules over presheaves commutative rings\".",
+      "requested_change": "Change the title line to \"# Modules over presheaves of commutative rings\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "DX1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring is malformed: the heading reads `# Modules over presheaves commutative rings` (missing \"of\"), and the summary sentence \"short names for categories and functors obtained from a presheaf of commutative rings by forgetting to rings\" does not say what the abbreviations stand for — the reader cannot tell from the docstring that everything here is `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)` and its associated functors.",
+      "requested_change": "Rewrite the module docstring, e.g. `# Modules over presheaves of commutative rings` followed by \"This file provides abbreviations for `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)`, the category of presheaves of modules over a presheaf of commutative rings `R : Cᵒᵖ ⥤ CommRingCat`, and for the associated constructions (pushforward, pullback, …), so that `R ⋙ forget₂ _ _` does not have to be written out at each use.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring is malformed: the heading reads `# Modules over presheaves commutative rings` (missing \"of\"), and the summary sentence \"short names for categories and functors obtained from a presheaf of commutative rings by forgetting to rings\" does not say what the abbreviations stand for — the reader cannot tell from the docstring that everything here is `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)` and its associated functors.",
+      "requested_change": "Rewrite the module docstring, e.g. `# Modules over presheaves of commutative rings` followed by \"This file provides abbreviations for `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)`, the category of presheaves of modules over a presheaf of commutative rings `R : Cᵒᵖ ⥤ CommRingCat`, and for the associated constructions (pushforward, pullback, …), so that `R ⋙ forget₂ _ _` does not have to be written out at each use.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (a missing `of`), so it does not state precisely what the file provides, as the module-docstring practice requires.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings` (and, while editing, keep the following sentence describing that the file provides short names for the categories and functors obtained from a presheaf of commutative rings by forgetting to rings).",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (a missing `of`), so it does not state precisely what the file provides, as the module-docstring practice requires.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings` (and, while editing, keep the following sentence describing that the file provides short names for the categories and functors obtained from a presheaf of commutative rings by forgetting to rings).",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title 'Modules over presheaves commutative rings' is missing the word 'of'.",
+      "requested_change": "Change line 11 to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title 'Modules over presheaves commutative rings' is missing the word 'of'.",
+      "requested_change": "Change line 11 to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "DX2": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring of the new file is defective: its title `# Modules over presheaves commutative rings` is missing a word (should read \"over presheaves of commutative rings\"), and the docstring never names the file's main declaration `PresheafOfModulesOfCommRing` nor records the fact that makes the whole file work -- that it is definitionally `PresheafOfModules.{v} (R ⋙ forget₂ _ _)`, so that the entire `PresheafOfModules` API applies unchanged (this is exactly the design used at `AlgebraicGeometry/Modules/Presheaf.lean`, where `Scheme.PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.obj`).",
+      "requested_change": "Fix the title to `# Modules over presheaves of commutative rings`, and extend the docstring: mention `PresheafOfModulesOfCommRing` explicitly and add a short \"## Main definitions\" list for the abbreviations, with one sentence stating that `PresheafOfModulesOfCommRing R` is `PresheafOfModules (R ⋙ forget₂ _ _)` and hence the general API applies as is.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring of the new file is defective: its title `# Modules over presheaves commutative rings` is missing a word (should read \"over presheaves of commutative rings\"), and the docstring never names the file's main declaration `PresheafOfModulesOfCommRing` nor records the fact that makes the whole file work -- that it is definitionally `PresheafOfModules.{v} (R ⋙ forget₂ _ _)`, so that the entire `PresheafOfModules` API applies unchanged (this is exactly the design used at `AlgebraicGeometry/Modules/Presheaf.lean`, where `Scheme.PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.obj`).",
+      "requested_change": "Fix the title to `# Modules over presheaves of commutative rings`, and extend the docstring: mention `PresheafOfModulesOfCommRing` explicitly and add a short \"## Main definitions\" list for the abbreviations, with one sentence stating that `PresheafOfModulesOfCommRing R` is `PresheafOfModules (R ⋙ forget₂ _ _)` and hence the general API applies as is.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 15,
+     "m1_finding_text": {
+      "i": 15,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring's title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file provides (presheaves of modules, and short names for them); the paragraph below also breaks a line early (`...reduce the need for` / `repeatedly writing ...`).",
+      "requested_change": "Retitle to `# Presheaves of modules over a presheaf of commutative rings` and reflow the paragraph to the 100-column limit.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 15,
+     "m2_finding_text": {
+      "i": 15,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring's title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file provides (presheaves of modules, and short names for them); the paragraph below also breaks a line early (`...reduce the need for` / `repeatedly writing ...`).",
+      "requested_change": "Retitle to `# Presheaves of modules over a presheaf of commutative rings` and reflow the paragraph to the 100-column limit.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file is for; read on its own it suggests the file proves something about modules over presheaves of rings, whereas the file is nothing but short names for the commutative-ring case.",
+      "requested_change": "Retitle, e.g. `# Presheaves of modules over presheaves of commutative rings`, or (matching the body, which says the file only provides short names) `# Short names for modules over presheaves of commutative rings`, and keep the existing sentence explaining that the file introduces names for constructions obtained from a presheaf of commutative rings.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file is for; read on its own it suggests the file proves something about modules over presheaves of rings, whereas the file is nothing but short names for the commutative-ring case.",
+      "requested_change": "Retitle, e.g. `# Presheaves of modules over presheaves of commutative rings`, or (matching the body, which says the file only provides short names) `# Short names for modules over presheaves of commutative rings`, and keep the existing sentence explaining that the file introduces names for constructions obtained from a presheaf of commutative rings.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "GPT3": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module doc title is ungrammatical: it says `Modules over presheaves commutative rings`, missing `of`.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module doc title is ungrammatical: it says `Modules over presheaves commutative rings`, missing `of`.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is missing \"of\", and the docstring never names the declaration the file introduces.",
+      "requested_change": "Change the title to `# Presheaves of modules over presheaves of commutative rings` and mention `PresheafOfModulesOfCommRing R` (an abbreviation for `PresheafOfModules (R ⋙ forget₂ _ _)`) in the body.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+      "claim": "The module docstring title `# Modules over presheaves commutative rings` is missing \"of\", and the docstring never names the declaration the file introduces.",
+      "requested_change": "Change the title to `# Presheaves of modules over presheaves of commutative rings` and mention `PresheafOfModulesOfCommRing R` (an abbreviation for `PresheafOfModules (R ⋙ forget₂ _ _)`) in the body.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module doc title says `Modules over presheaves commutative rings`, which is ungrammatical and omits the `of` needed to describe the subject of the file.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Missing 'of' in title; R9, R10, R12 propose other grammatical titles but name the missing 'of'.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+      "claim": "The module doc title says `Modules over presheaves commutative rings`, which is ungrammatical and omits the `of` needed to describe the subject of the file.",
+      "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Missing 'of' in title; all flag it (R9, R10, R12 propose differently worded but grammatical titles)."
+    }
+   },
+   "entries_text": {}
+  },
+  {
+   "id": "p0014",
+   "pr": 43192,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P276"
+   ],
+   "text": "Could you add `by cat_disch` as default tactics?",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+   "line": 43,
+   "author": "joelriou",
+   "at": "2026-08-28T22:03:26Z",
+   "matcher_text": {
+    "ask_id": "p0014",
+    "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "code_at_comment": "rev mk (obj : ∀ (X : Cᵒᵖ), ModuleCat.{v} (R.obj X)) (map : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n+      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n+    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom\n+      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _)\n+    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z),\n+      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫\n+        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom\n+          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :",
+    "comment": "Could you add `by cat_disch` as default tactics?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "DX3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` drops the `:= by cat_disch` defaults that the `PresheafOfModules` structure fields `map_id` and `map_comp` have, so this constructor is less convenient than the anonymous-constructor form it wraps.",
+      "requested_change": "Add `:= by cat_disch` as the default for both the `map_id` and the `map_comp` arguments of `mk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` drops the `:= by cat_disch` defaults that the `PresheafOfModules` structure fields `map_id` and `map_comp` have, so this constructor is less convenient than the anonymous-constructor form it wraps.",
+      "requested_change": "Add `:= by cat_disch` as the default for both the `map_id` and the `map_comp` arguments of `mk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "DX1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` makes `map_id` and `map_comp` mandatory explicit arguments. In the `PresheafOfModules` structure it wraps, both fields default to `by cat_disch`. So `PresheafOfModulesOfCommRing.mk obj map` cannot be written even where the anonymous constructor would discharge the obligations automatically.",
+      "requested_change": "Add the defaults `:= by cat_disch` to the `map_id` and `map_comp` binders of `mk`, matching the fields of `PresheafOfModules`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` makes `map_id` and `map_comp` mandatory explicit arguments. In the `PresheafOfModules` structure it wraps, both fields default to `by cat_disch`. So `PresheafOfModulesOfCommRing.mk obj map` cannot be written even where the anonymous constructor would discharge the obligations automatically.",
+      "requested_change": "Add the defaults `:= by cat_disch` to the `map_id` and `map_comp` binders of `mk`, matching the fields of `PresheafOfModules`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "DX2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` drops the `:= by cat_disch` auto-params that `PresheafOfModules.map_id` and `PresheafOfModules.map_comp` carry, so callers must always supply both proofs even where `cat_disch` closes them, unlike the structure it wraps.",
+      "requested_change": "Give the two hypotheses the same auto-params: `(map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = ... .inv.app _ := by cat_disch)` and `(map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z), map (f ≫ g) = ... .inv.app _ := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk` drops the `:= by cat_disch` auto-params that `PresheafOfModules.map_id` and `PresheafOfModules.map_comp` carry, so callers must always supply both proofs even where `cat_disch` closes them, unlike the structure it wraps.",
+      "requested_change": "Give the two hypotheses the same auto-params: `(map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = ... .inv.app _ := by cat_disch)` and `(map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z), map (f ≫ g) = ... .inv.app _ := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` restates the structure's fields but drops the auto-params that the fields of `PresheafOfModules` carry (`map_id`/`map_comp` have `:= by cat_disch`, Presheaf.lean:48-55), so the abbreviation is *less* usable than the constructor it abbreviates: `PresheafOfModules.mk (R := R ⋙ forget₂ _ _) M.obj M.map` is a presheaf, while `PresheafOfModulesOfCommRing.mk M.obj M.map` is a function expecting the two coherence proofs.",
+      "requested_change": "Give both arguments the same default as the structure fields: `(map_id : ∀ (X : Cᵒᵖ), ... := by cat_disch)` and `(map_comp : ... := by cat_disch)`, so that `PresheafOfModulesOfCommRing.mk obj map` elaborates as a presheaf of modules and callers only supply the coherence proofs when `cat_disch` cannot.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` restates the structure's fields but drops the auto-params that the fields of `PresheafOfModules` carry (`map_id`/`map_comp` have `:= by cat_disch`, Presheaf.lean:48-55), so the abbreviation is *less* usable than the constructor it abbreviates: `PresheafOfModules.mk (R := R ⋙ forget₂ _ _) M.obj M.map` is a presheaf, while `PresheafOfModulesOfCommRing.mk M.obj M.map` is a function expecting the two coherence proofs.",
+      "requested_change": "Give both arguments the same default as the structure fields: `(map_id : ∀ (X : Cᵒᵖ), ... := by cat_disch)` and `(map_comp : ... := by cat_disch)`, so that `PresheafOfModulesOfCommRing.mk obj map` elaborates as a presheaf of modules and callers only supply the coherence proofs when `cat_disch` cannot.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "GPT3": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` is meant to be the commutative-ring wrapper for `PresheafOfModules.mk`, but it drops the underlying constructor's default `by cat_disch` proofs for `map_id` and `map_comp`, making the new wrapper less convenient than the constructor it wraps.",
+      "requested_change": "Add `:= by cat_disch` default values to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` is meant to be the commutative-ring wrapper for `PresheafOfModules.mk`, but it drops the underlying constructor's default `by cat_disch` proofs for `map_id` and `map_comp`, making the new wrapper less convenient than the constructor it wraps.",
+      "requested_change": "Add `:= by cat_disch` default values to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+      "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+      "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` does not preserve the default `by cat_disch` proof hooks of the underlying `PresheafOfModules.mk` constructor, so users of the new wrapper must supply `map_id` and `map_comp` even in cases where the base constructor would try the standard default tactic.",
+      "requested_change": "Add defaults `:= by cat_disch` to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "cat_disch defaults for mk's map_id/map_comp.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`PresheafOfModulesOfCommRing.mk` does not preserve the default `by cat_disch` proof hooks of the underlying `PresheafOfModules.mk` constructor, so users of the new wrapper must supply `map_id` and `map_comp` even in cases where the base constructor would try the standard default tactic.",
+      "requested_change": "Add defaults `:= by cat_disch` to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "cat_disch defaults for map_id/map_comp of mk."
+    }
+   },
+   "entries_text": {
+    "P276": "A hypothesis that a decision procedure discharges in typical uses is given as an auto-param (`:= by lia`, `:= by simp`), so that callers need not supply it."
+   }
+  },
+  {
+   "id": "p0015",
+   "pr": 43192,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P100",
+    "P276"
+   ],
+   "text": "(This may apply to other definitions below.)",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+   "line": 43,
+   "author": "joelriou",
+   "at": "2026-08-28T22:05:55Z",
+   "matcher_text": {
+    "ask_id": "p0015",
+    "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "code_at_comment": "rev mk (obj : ∀ (X : Cᵒᵖ), ModuleCat.{v} (R.obj X)) (map : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y),\n+      obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (obj Y))\n+    (map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom\n+      (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _)\n+    (map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z),\n+      map (f ≫ g) = map f ≫ (ModuleCat.restrictScalars _).map (map g) ≫\n+        (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom\n+          (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _) :",
+    "comment": "(This may apply to other definitions below.)",
+    "replies_to": "Could you add `by cat_disch` as default tactics?"
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "DX3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "The `naturality` argument of `mkHom` has no `:= by cat_disch` default. The field it fills, `PresheafOfModules.Hom.naturality`, has that autoParam, and so does the sibling `isoMk` in this file, so callers must always prove naturality by hand.",
+      "requested_change": "Give `naturality` the default `:= by cat_disch`, i.e. `(naturality : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y), M₁.map f ≫ (ModuleCat.restrictScalars (R.map f).hom).map (app Y) = app X ≫ M₂.map f := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "The `naturality` argument of `mkHom` has no `:= by cat_disch` default. The field it fills, `PresheafOfModules.Hom.naturality`, has that autoParam, and so does the sibling `isoMk` in this file, so callers must always prove naturality by hand.",
+      "requested_change": "Give `naturality` the default `:= by cat_disch`, i.e. `(naturality : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y), M₁.map f ≫ (ModuleCat.restrictScalars (R.map f).hom).map (app Y) = app X ≫ M₂.map f := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "DX1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "The `naturality` argument of `mkHom` has no default proof. In `PresheafOfModules.Hom.naturality`, and in the sibling `isoMk` in this file, it is an auto-param `:= by cat_disch`. The wrapper is therefore strictly less convenient than the structure it wraps.",
+      "requested_change": "Give `naturality` the default `:= by cat_disch` in `mkHom`, as `isoMk` and `PresheafOfModules.Hom` do.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "The `naturality` argument of `mkHom` has no default proof. In `PresheafOfModules.Hom.naturality`, and in the sibling `isoMk` in this file, it is an auto-param `:= by cat_disch`. The wrapper is therefore strictly less convenient than the structure it wraps.",
+      "requested_change": "Give `naturality` the default `:= by cat_disch` in `mkHom`, as `isoMk` and `PresheafOfModules.Hom` do.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "DX2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom`'s `naturality` hypothesis has no `:= by cat_disch` auto-param, although `PresheafOfModules.Hom.naturality` has one and the sibling `isoMk` in this file keeps it.",
+      "requested_change": "Write `(naturality : ∀ ... , M₁.map f ≫ ... = app X ≫ M₂.map f := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom`'s `naturality` hypothesis has no `:= by cat_disch` auto-param, although `PresheafOfModules.Hom.naturality` has one and the sibling `isoMk` in this file keeps it.",
+      "requested_change": "Write `(naturality : ∀ ... , M₁.map f ≫ ... = app X ≫ M₂.map f := by cat_disch)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "GPT3": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` wraps `PresheafOfModules.Hom.mk`, but unlike the underlying constructor it requires the naturality proof explicitly instead of keeping the `naturality := by cat_disch` default.",
+      "requested_change": "Give the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom` the default value `:= by cat_disch`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` wraps `PresheafOfModules.Hom.mk`, but unlike the underlying constructor it requires the naturality proof explicitly instead of keeping the `naturality := by cat_disch` default.",
+      "requested_change": "Give the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom` the default value `:= by cat_disch`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+      "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+      "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+      "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` drops the default `by cat_disch` naturality proof available on the underlying `PresheafOfModules.Hom.mk` constructor.",
+      "requested_change": "Add `:= by cat_disch` as the default for the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Extends cat_disch default to later definitions: mkHom naturality. R10 covers only mk.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` drops the default `by cat_disch` naturality proof available on the underlying `PresheafOfModules.Hom.mk` constructor.",
+      "requested_change": "Add `:= by cat_disch` as the default for the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Extend cat_disch defaults to later defs (mkHom naturality). R10 covers only mk: no."
+    }
+   },
+   "entries_text": {
+    "P100": "A variant or improvement introduced for one member of a family of siblings (left/right or primed lemma variants, analogous tactics or attributes, parallel code paths in meta-code) is also provided for the other members.",
+    "P276": "A hypothesis that a decision procedure discharges in typical uses is given as an auto-param (`:= by lia`, `:= by simp`), so that callers need not supply it."
+   }
+  },
+  {
+   "id": "p0016",
+   "pr": 43192,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P254"
+   ],
+   "text": "I would prefer the name `homMk` (overall, there is an hesitation in mathlib about `mkHom` or `homMk`). In the `PresheafOfModules` namespace, there is a `homMk` (with different parameters though).",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+   "line": 60,
+   "author": "joelriou",
+   "at": "2026-08-28T22:07:33Z",
+   "matcher_text": {
+    "ask_id": "p0016",
+    "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+    "code_at_comment": " over a presheaf of commutative rings at an object. -/\n+abbrev obj (F : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : ModuleCat.{v} (R.obj X) :=\n+  PresheafOfModules.obj F X\n+\n+/-- The restriction map of a presheaf of modules over a presheaf of commutative rings. -/\n+abbrev map (F : PresheafOfModulesOfCommRing.{v} R) {X Y : Cᵒᵖ} (f : X ⟶ Y) :\n+    F.obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (F.obj Y) :=\n+  PresheafOfModules.map _ _\n+\n+/-- Construct a morphism of presheaves of modules over a presheaf of commutative rings. -/\n+abbrev mkHom {M₁ M₂ : PresheafOfModulesOfCommRing.{v} R}",
+    "comment": "I would prefer the name `homMk` (overall, there is an hesitation in mathlib about `mkHom` or `homMk`). In the `PresheafOfModules` namespace, there is a `homMk` (with different parameters though).",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "DX3": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` inverts the library's name for a morphism constructor: this area already has `PresheafOfModules.homMk` (Presheaf.lean:220) and `isoMk` (used immediately below in the same file), and `homMk` is the standard paired-with-`isoMk` constructor name throughout CategoryTheory (`Over.homMk`, `Comma.homMk`, `InducedCategory.homMk`, `ObjectProperty.homMk`, `ModuleCat.homMk`, ...).",
+      "requested_change": "Rename `mkHom` to `homMk` (the statement and body are unchanged); I verified the renamed declaration compiles in place.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`PresheafOfModulesOfCommRing.mkHom` inverts the library's name for a morphism constructor: this area already has `PresheafOfModules.homMk` (Presheaf.lean:220) and `isoMk` (used immediately below in the same file), and `homMk` is the standard paired-with-`isoMk` constructor name throughout CategoryTheory (`Over.homMk`, `Comma.homMk`, `InducedCategory.homMk`, `ObjectProperty.homMk`, `ModuleCat.homMk`, ...).",
+      "requested_change": "Rename `mkHom` to `homMk` (the statement and body are unchanged); I verified the renamed declaration compiles in place.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` does not follow the CategoryTheory name for a morphism constructor built from components, which is `homMk` (e.g. `ComposableArrows.homMk (app) (w)`, `Over.homMk`, `Arrow.homMk`, `ObjectProperty.FullSubcategory.homMk`).",
+      "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` does not follow the CategoryTheory name for a morphism constructor built from components, which is `homMk` (e.g. `ComposableArrows.homMk (app) (w)`, `Over.homMk`, `Arrow.homMk`, `ObjectProperty.FullSubcategory.homMk`).",
+      "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "DX1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` departs from the library's naming practice for morphism constructors, which is `homMk` (paired with `isoMk`: `Over.homMk`/`Over.isoMk`, `Arrow.homMk`/`Arrow.isoMk`, `PresheafOfModules.homMk`/`PresheafOfModules.isoMk`). It also sits next to `isoMk` in this same file, so the two sibling constructors are named inconsistently.",
+      "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` departs from the library's naming practice for morphism constructors, which is `homMk` (paired with `isoMk`: `Over.homMk`/`Over.isoMk`, `Arrow.homMk`/`Arrow.isoMk`, `PresheafOfModules.homMk`/`PresheafOfModules.isoMk`). It also sits next to `isoMk` in this same file, so the two sibling constructors are named inconsistently.",
+      "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "DX2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 7,
+     "m1_finding_text": {
+      "i": 7,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` orders its name parts opposite to its sibling `isoMk` in the same file and to the library's `homMk`/`isoMk` pairs (`PresheafOfModules.homMk`/`isoMk`, `Over.homMk`, ...).",
+      "requested_change": "Rename `mkHom` to `homMk`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "reached",
+     "m2_finding": 7,
+     "m2_finding_text": {
+      "i": 7,
+      "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+      "claim": "`mkHom` orders its name parts opposite to its sibling `isoMk` in the same file and to the library's `homMk`/`isoMk` pairs (`PresheafOfModules.homMk`/`isoMk`, `Over.homMk`, ...).",
+      "requested_change": "Rename `mkHom` to `homMk`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "GPT3": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename mkHom to homMk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename mkHom to homMk."
+    }
+   },
+   "entries_text": {
+    "P254": "A declaration's name and namespace follow the pattern of its siblings' and analogues' names (the same abbreviation of a hypothesis, the same ordering of parts, the same namespace for the same kind of construction), not a fuller or different spelling."
+   }
+  }
+ ],
+ "pr": 43192,
+ "sessions": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:55",
+     "claim": "`PresheafOfModulesOfCommRing.map` (and likewise `PresheafOfModulesOfCommRing.obj`) shadows the structure projection under dot notation: for `M : PresheafOfModulesOfCommRing R`, `M.map f` now elaborates to the new constant `PresheafOfModulesOfCommRing.map`, and `rw` with the existing API about `PresheafOfModules.map` (`PresheafOfModules.map_id`, `PresheafOfModules.map_comp`, ...) no longer finds its pattern. The abbrev therefore makes the new spelling worse to work with than the one it replaces.",
+     "requested_change": "Delete the `obj` and `map` abbrevs (lines 50-57), so that `M.obj X` and `M.map f` resolve to `PresheafOfModules.obj`/`PresheafOfModules.map` and every existing lemma about them applies; the `Module (R.obj X) (M.obj X)` instance already provided in `Mathlib/Algebra/Category/ModuleCat/Presheaf.lean` covers the scalar action. (If the specialised types are really wanted, restate `map_id` and `map_comp` for the new `map`, with `@[simp]`/`@[reassoc]` to match the originals.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` duplicates the existing `PresheafOfModules.pushforward₀OfCommRingCat` (Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean:71), which the PR description itself names as the motivating example. After this PR the library has two names for the same functor, and the `Monoidal` instance in PushforwardZeroMonoidal.lean is stated only on the old one.",
+     "requested_change": "Make `PresheafOfModulesOfCommRing.pushforward₀` the single name: remove `PresheafOfModules.pushforward₀OfCommRingCat` from Pushforward.lean, replace it with `@[deprecated (since := \"2026-09-29\")] alias PresheafOfModules.pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀` (this needs the new abbrev to live no lower than Pushforward.lean, see the file-level finding), and state the `Monoidal` instance in PushforwardZeroMonoidal.lean as `(PresheafOfModulesOfCommRing.pushforward₀ F R).Monoidal`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The new file imports `Mathlib.Algebra.Category.ModuleCat.Presheaf.Pullback` for all its content. The core abbrev `PresheafOfModulesOfCommRing` and the whole `Basic` section need only `Presheaf.ChangeOfRings`, and the pushforward abbrevs need only `Presheaf.Pushforward`. The files that already work over `PresheafOfModules (R ⋙ forget₂ _ _)` (Presheaf/Monoidal.lean, Presheaf/PushforwardZeroMonoidal.lean, Differentials/Presheaf.lean, Stalk.lean, and `pushforward₀OfCommRingCat` in Pushforward.lean) import only `Presheaf` or `Pushforward`. None of them can adopt the new namespace without pulling in Pullback, and with it Generator, Abelian, Free, ShortComplex.Exact and the partial-adjoint machinery. That defeats the stated goal of a namespace in which to put all of these.",
+     "requested_change": "Split the file by import level. Define `PresheafOfModulesOfCommRing` and the `Basic` section (`mk`, `mkHom`, `isoMk`, `unit`, `restrictScalars`) in a file importing only `Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings`. Put `pushforward₀` and `pushforward` in or next to `Presheaf/Pushforward.lean`, and `pullback` and `pullbackPushforwardAdjunction` in or next to `Presheaf/Pullback.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`mkHom` departs from the library's naming practice for morphism constructors, which is `homMk` (paired with `isoMk`: `Over.homMk`/`Over.isoMk`, `Arrow.homMk`/`Arrow.isoMk`, `PresheafOfModules.homMk`/`PresheafOfModules.isoMk`). It also sits next to `isoMk` in this same file, so the two sibling constructors are named inconsistently.",
+     "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "The `naturality` argument of `mkHom` has no default proof. In `PresheafOfModules.Hom.naturality`, and in the sibling `isoMk` in this file, it is an auto-param `:= by cat_disch`. The wrapper is therefore strictly less convenient than the structure it wraps.",
+     "requested_change": "Give `naturality` the default `:= by cat_disch` in `mkHom`, as `isoMk` and `PresheafOfModules.Hom` do.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`mk` makes `map_id` and `map_comp` mandatory explicit arguments. In the `PresheafOfModules` structure it wraps, both fields default to `by cat_disch`. So `PresheafOfModulesOfCommRing.mk obj map` cannot be written even where the anonymous constructor would discharge the obligations automatically.",
+     "requested_change": "Add the defaults `:= by cat_disch` to the `map_id` and `map_comp` binders of `mk`, matching the fields of `PresheafOfModules`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The module docstring title 'Modules over presheaves commutative rings' is missing the word 'of'.",
+     "requested_change": "Change line 11 to `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, which nothing in the file uses.",
+     "requested_change": "Change line 22 to `open CategoryTheory Functor`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The module docstring title is missing a word: it reads \"# Modules over presheaves commutative rings\".",
+     "requested_change": "Change the title line to \"# Modules over presheaves of commutative rings\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` duplicates the existing `PresheafOfModules.pushforward₀OfCommRingCat`, which the PR description itself cites as the precedent. Both have body `PresheafOfModules.pushforward₀ F (R ⋙ forget₂ _ _)`, so the library ends up with two names for one functor.",
+     "requested_change": "Keep one name. Deprecate `PresheafOfModules.pushforward₀OfCommRingCat` in favour of `PresheafOfModulesOfCommRing.pushforward₀` with `@[deprecated (since := \"2026-..\")] alias`, and move its only use, `instance : (pushforward₀OfCommRingCat F R).Monoidal` in `PushforwardZeroMonoidal.lean`, to the new name.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`mkHom` does not follow the CategoryTheory name for a morphism constructor built from components, which is `homMk` (e.g. `ComposableArrows.homMk (app) (w)`, `Over.homMk`, `Arrow.homMk`, `ObjectProperty.FullSubcategory.homMk`).",
+     "requested_change": "Rename `PresheafOfModulesOfCommRing.mkHom` to `PresheafOfModulesOfCommRing.homMk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "The `naturality` argument of `mkHom` has no `:= by cat_disch` default. The field it fills, `PresheafOfModules.Hom.naturality`, has that autoParam, and so does the sibling `isoMk` in this file, so callers must always prove naturality by hand.",
+     "requested_change": "Give `naturality` the default `:= by cat_disch`, i.e. `(naturality : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y), M₁.map f ≫ (ModuleCat.restrictScalars (R.map f).hom).map (app Y) = app X ≫ M₂.map f := by cat_disch)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`mk` drops the `:= by cat_disch` defaults that the `PresheafOfModules` structure fields `map_id` and `map_comp` have, so this constructor is less convenient than the anonymous-constructor form it wraps.",
+     "requested_change": "Add `:= by cat_disch` as the default for both the `map_id` and the `map_comp` arguments of `mk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The file imports `Mathlib.Algebra.Category.ModuleCat.Presheaf.Pullback`, but the base abbrev `PresheafOfModulesOfCommRing` and the whole `Basic` section (mk/obj/map/mkHom/isoMk/unit/restrictScalars) need only `Presheaf.ChangeOfRings`. Because of this, the files that should adopt the abbrev cannot use it: `Pushforward.lean` (which `Pullback` imports, so using it there would be an import cycle), `Monoidal.lean`, `PushforwardZeroMonoidal.lean`, `Differentials/Presheaf.lean` and `Stalk.lean` all spell out `PresheafOfModules (R ⋙ forget₂ _ _)`. The PR's stated goal is a namespace that the dozen comm-ring abbrevs in open PRs can move into.",
+     "requested_change": "Split the file. Define `PresheafOfModulesOfCommRing` and the `Basic` section in a low file that imports only `Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings` (or in `Presheaf/ChangeOfRings.lean` itself). Put `pushforward₀`/`pushforward` next to `PresheafOfModules.pushforward` in `Pushforward.lean`, and `pullback`/`pullbackPushforwardAdjunction` in `Pullback.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, but nothing in the file uses it.",
+     "requested_change": "Change the line to `open CategoryTheory Functor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:77",
+     "claim": "`unit` rebinds `(R : Cᵒᵖ ⥤ CommRingCat.{u})` explicitly, shadowing the section variable `{R : Cᵒᵖ ⥤ CommRingCat.{u}}` declared in the same `Basic` section. Mathlib's idiom for making a section variable explicit in one declaration is `variable (R) in`, as `PresheafOfModules.unit` itself does (Presheaf.lean:282-303).",
+     "requested_change": "Delete the binder and precede the declaration with `variable (R) in`: `variable (R) in /-- ... -/ noncomputable abbrev unit : PresheafOfModulesOfCommRing.{u} R := PresheafOfModules.unit (R ⋙ forget₂ _ _)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:55",
+     "claim": "For `M : PresheafOfModulesOfCommRing R`, `M.map f` now elaborates to the new head `PresheafOfModulesOfCommRing.map`, so `rw` with the existing API (`PresheafOfModules.map_id`, `PresheafOfModules.map_comp`, and likewise `Hom.naturality`) no longer finds its pattern. `simp` and term-mode still work. The abbrev adds `map` without the basic rewrite lemmas that go with it.",
+     "requested_change": "Next to `map`, add `lemma map_id (M) (X) : M.map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _ := PresheafOfModules.map_id M X` and a `@[reassoc] lemma map_comp`, stated with the new `map` and proved by `PresheafOfModules.map_comp M f g`, so that `rw [map_id]`/`rw [map_comp]` work on the new spelling.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀ F R` is the same term with the same type as the existing `PresheafOfModules.pushforward₀OfCommRingCat F R` (Pushforward.lean:71, both are `pushforward₀ F (R ⋙ forget₂ _ _)` into `PresheafOfModules ((F.op ⋙ R) ⋙ forget₂ _ _)`), so the PR leaves two library names for one functor; the PR description itself names `pushforward₀OfCommRingCat` as the declaration this namespace is meant to replace.",
+     "requested_change": "Keep a single name: remove `PresheafOfModules.pushforward₀OfCommRingCat` from Pushforward.lean, add `@[deprecated (since := \"2026-..\")] alias PresheafOfModules.pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀` next to the new abbrev, and state the `Monoidal` instance in `PushforwardZeroMonoidal.lean` on `PresheafOfModulesOfCommRing.pushforward₀ F R` (importing the file that defines it).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The file imports `Presheaf.Pullback` (which pulls in Generator, Abelian, EpiMono, ShortComplex.Exact, PartialAdjoint), but `PresheafOfModulesOfCommRing` and the whole `Basic` section (`mk`, `obj`, `map`, `mkHom`, `isoMk`, `unit`, `restrictScalars`) need only `Presheaf.ChangeOfRings`; the files that currently spell `PresheafOfModules.{v} (R ⋙ forget₂ _ _)` (Presheaf/Monoidal.lean, Differentials/Presheaf.lean, Stalk.lean, PushforwardZeroMonoidal.lean) import only `Presheaf`/`Pushforward`, so they cannot adopt the new abbrev without a much heavier import.",
+     "requested_change": "Split the file: put `PresheafOfModulesOfCommRing` and the `Basic` section in a module importing only `Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings` (or into `Presheaf/ChangeOfRings.lean` itself), and keep only the `PushforwardPullback` section behind the `Presheaf.Pullback` import (or place `pushforward₀`/`pushforward` in `Pushforward.lean` and `pullback`/`pullbackPushforwardAdjunction` in `Pullback.lean`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:55",
+     "claim": "Because `M.map` on `M : PresheafOfModulesOfCommRing R` now elaborates to the new head symbol `PresheafOfModulesOfCommRing.map`, the existing `PresheafOfModules.map_comp`/`map_id` no longer rewrite with `rw`, and `simp only [PresheafOfModules.map_comp]` rewrites into the `(R ⋙ forget₂ _ _).map f` form the abbrevs are meant to avoid; the PR adds `obj`/`map` with none of the basic API stated in the `R.map` form.",
+     "requested_change": "Add `lemma map_id (F : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : F.map (𝟙 X) = (ModuleCat.restrictScalarsId' (R.map (𝟙 X)).hom (congrArg CommRingCat.Hom.hom (R.map_id X))).inv.app _ := PresheafOfModules.map_id _ _` and `@[reassoc] lemma map_comp ... : F.map (f ≫ g) = F.map f ≫ (ModuleCat.restrictScalars _).map (F.map g) ≫ (ModuleCat.restrictScalarsComp' (R.map f).hom (R.map g).hom (R.map (f ≫ g)).hom (congrArg CommRingCat.Hom.hom <| R.map_comp f g)).inv.app _ := PresheafOfModules.map_comp _ _ _` after `map`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`mk`'s `map_id`/`map_comp` and `mkHom`'s `naturality` are required arguments, whereas the `PresheafOfModules` structure fields and `Hom.naturality` they wrap default to `by cat_disch`, as does the file's own `isoMk`; the wrappers are therefore less convenient than the constructors they replace and inconsistent within the file.",
+     "requested_change": "Add `:= by cat_disch` defaults to `map_id` and `map_comp` in `PresheafOfModulesOfCommRing.mk` and to `naturality` in `PresheafOfModulesOfCommRing.mkHom`, matching `PresheafOfModules` and `isoMk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The module docstring title `# Modules over presheaves commutative rings` is missing \"of\", and the docstring never names the declaration the file introduces.",
+     "requested_change": "Change the title to `# Presheaves of modules over presheaves of commutative rings` and mention `PresheafOfModulesOfCommRing R` (an abbreviation for `PresheafOfModules (R ⋙ forget₂ _ _)`) in the body.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, which nothing in the file uses.",
+     "requested_change": "Replace line 22 with `open CategoryTheory Functor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:77",
+     "claim": "`unit` rebinds `(R : Cᵒᵖ ⥤ CommRingCat.{u})` although `R` is already the section variable of `section Basic`, shadowing it instead of making it explicit.",
+     "requested_change": "Write `variable (R) in` before the docstring and drop the binder: `noncomputable abbrev unit : PresheafOfModulesOfCommRing.{u} R := PresheafOfModules.unit (R ⋙ forget₂ _ _)`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀ F R` restates the existing `PresheafOfModules.pushforward₀OfCommRingCat F R` (Pushforward.lean:71, same body `pushforward₀ F (R ⋙ forget₂ _ _)`, same docstring meaning). The PR leaves two names for one functor, and the PR description says the old one is exactly what this namespace replaces.",
+     "requested_change": "Keep one name: make `PresheafOfModules.pushforward₀OfCommRingCat` a `@[deprecated (since := ...)] alias` of `PresheafOfModulesOfCommRing.pushforward₀` (the definition then has to sit at or below Pushforward.lean, see the placement finding), and switch its user `PushforwardZeroMonoidal.lean` (`instance : (pushforward₀OfCommRingCat F R).Monoidal`) to the new name.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The type abbrev `PresheafOfModulesOfCommRing` and the `Basic` section (`mk`, `obj`, `map`, `mkHom`, `isoMk`, `unit`, `restrictScalars`) need only `Presheaf.lean` and `Presheaf/ChangeOfRings.lean`, but they are placed in a file that imports `Presheaf.Pullback`. The files that today spell `PresheafOfModules (R ⋙ forget₂ _ _)` by hand (`Presheaf/Monoidal.lean`, `Differentials/Presheaf.lean`, `Stalk.lean`, the `Module` instance in `Presheaf.lean`) do not import `Pullback`, so they cannot use the new names.",
+     "requested_change": "Move `PresheafOfModulesOfCommRing` and the `Basic` declarations to a file low in the hierarchy (e.g. into `Presheaf.lean`, with `restrictScalars` next to `PresheafOfModules.restrictScalars` in `Presheaf/ChangeOfRings.lean`), put `pushforward₀`/`pushforward` next to their `PresheafOfModules` counterparts in `Presheaf/Pushforward.lean`, and keep only the pullback abbrevs in a file importing `Pullback`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The new abbrev is introduced but the existing places that spell it by hand are left as they are: `PresheafOfModules.{u} (R ⋙ forget₂ _ _)` in Presheaf/Monoidal.lean (lines 41, 63, 105, 125, 144), Differentials/Presheaf.lean (51, 97-108), Stalk.lean:187, the `Module` instance in Presheaf.lean:64, and `moduleStructurePresheaf` in AlgebraicGeometry/StructureSheaf.lean:245.",
+     "requested_change": "Replace those spellings with `PresheafOfModulesOfCommRing R` (and `pushforward₀OfCommRingCat` uses with the new `pushforward₀`), in this PR or in a stated follow-up, once the abbrev sits where those files can import it.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The PR introduces a new top-level name and namespace, `PresheafOfModulesOfCommRing`, meant to host 'around a dozen' comm-ring abbrevs from other open PRs; the name and the design (a parallel namespace of abbrevs rather than, say, `PresheafOfModules.OfCommRing` or changing `PresheafOfModules` itself) are the author's choice, with no prior community discussion found.",
+     "requested_change": "Ask on Zulip (e.g. #mathlib4 or #algebraic geometry) for consensus on the name `PresheafOfModulesOfCommRing` and on the abbrev-namespace design before this is merged, and link the thread in the PR description.",
+     "severity": "blocking"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "`abbrev PresheafOfModulesOfCommRing ... (R : Cᵒᵖ ⥤ CommRingCat.{u}) :=` has no stated type; its type is left to be inferred from the body.",
+     "requested_change": "State the type: `abbrev PresheafOfModulesOfCommRing (R : Cᵒᵖ ⥤ CommRingCat.{u}) : Type (max u₁ v₁ u (v + 1)) :=` (or `: Type _`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`mk` drops the `:= by cat_disch` auto-params that `PresheafOfModules.map_id` and `PresheafOfModules.map_comp` carry, so callers must always supply both proofs even where `cat_disch` closes them, unlike the structure it wraps.",
+     "requested_change": "Give the two hypotheses the same auto-params: `(map_id : ∀ (X : Cᵒᵖ), map (𝟙 X) = ... .inv.app _ := by cat_disch)` and `(map_comp : ∀ {X Y Z : Cᵒᵖ} (f : X ⟶ Y) (g : Y ⟶ Z), map (f ≫ g) = ... .inv.app _ := by cat_disch)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`mkHom`'s `naturality` hypothesis has no `:= by cat_disch` auto-param, although `PresheafOfModules.Hom.naturality` has one and the sibling `isoMk` in this file keeps it.",
+     "requested_change": "Write `(naturality : ∀ ... , M₁.map f ≫ ... = app X ≫ M₂.map f := by cat_disch)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`mkHom` orders its name parts opposite to its sibling `isoMk` in the same file and to the library's `homMk`/`isoMk` pairs (`PresheafOfModules.homMk`/`isoMk`, `Over.homMk`, ...).",
+     "requested_change": "Rename `mkHom` to `homMk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "In `mkHom`, `naturality : ∀ {X Y : Cᵒᵖ} (f : X ⟶ Y), ...` binds `X Y`, which `f` determines, as ordinary implicits, while the sibling `isoMk` binds them strict-implicitly (`∀ ⦃X Y : Cᵒᵖ⦄`).",
+     "requested_change": "Write `(naturality : ∀ ⦃X Y : Cᵒᵖ⦄ (f : X ⟶ Y), ...)` and the field as `naturality f := naturality f`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`mk` (and likewise `mkHom`) is an `abbrev` built with `where`, though nothing in the file needs it to unfold for elaboration or instance search; the upstream constructor it mirrors, `PresheafOfModules.isoMk`, is a `@[simps!] def`.",
+     "requested_change": "Make `mk` (and `mkHom`) a `def` with `@[simps]`, or state in the docstring which downstream use needs it reducible.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "The docstring of `mk`, `Construct a presheaf of modules over a presheaf of commutative rings.`, describes an action rather than the value defined.",
+     "requested_change": "Use a noun phrase, e.g. `/-- The presheaf of modules over a presheaf of commutative rings with the given modules and restriction maps -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:51",
+     "claim": "The docstring of `obj`, `Evaluate a presheaf of modules over a presheaf of commutative rings at an object.`, is an imperative, not a description of the module defined.",
+     "requested_change": "Use a noun phrase, e.g. `/-- The module of sections at `X` of a presheaf of modules over a presheaf of commutative rings -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "The docstring of `mkHom`, `Construct a morphism of presheaves of modules over a presheaf of commutative rings.`, describes the act of constructing rather than the morphism.",
+     "requested_change": "Use a noun phrase, e.g. `/-- The morphism of presheaves of modules over a presheaf of commutative rings given by a natural family of linear maps -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:69",
+     "claim": "The docstring of `isoMk`, `Construct an isomorphism of presheaves of modules over a presheaf of commutative rings.`, describes an action rather than the isomorphism.",
+     "requested_change": "Use a noun phrase, e.g. `/-- The isomorphism of presheaves of modules over a presheaf of commutative rings given by a natural family of linear isomorphisms -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "Docstrings that are noun phrases, not sentences, end with a full stop: `PresheafOfModulesOfCommRing` (`The category of ... rings.`), `map`, `unit`, `restrictScalars`, `pushforward₀`, `pushforward`, `pullback`, `pullbackPushforwardAdjunction`.",
+     "requested_change": "Drop the final full stop from these noun-phrase docstrings (e.g. `/-- The category of presheaves of modules over a presheaf of commutative rings -/`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "The module docstring's title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file provides (presheaves of modules, and short names for them); the paragraph below also breaks a line early (`...reduce the need for` / `repeatedly writing ...`).",
+     "requested_change": "Retitle to `# Presheaves of modules over a presheaf of commutative rings` and reflow the paragraph to the 100-column limit.",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:51",
+     "claim": "`obj` names its presheaf-of-modules argument `F`, a letter that in this file (`pushforward₀ (F : C ⥤ D)`, `variable {F : C ⥤ D}`) and in the area (`Pushforward.lean`, `Pullback.lean`) denotes a functor; presheaves of modules are `M`, `M₁`, `M₂` there and in this file's `mkHom`/`isoMk`.",
+     "requested_change": "Rename the argument to `M`: `abbrev obj (M : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : ModuleCat.{v} (R.obj X) := PresheafOfModules.obj M X`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:55",
+     "claim": "`map` names its presheaf-of-modules argument `F` (`map (F : PresheafOfModulesOfCommRing.{v} R) ... : F.obj X ⟶ ...`), the letter the file uses for the functor `F : C ⥤ D`.",
+     "requested_change": "Rename the argument to `M` (`M.obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (M.obj Y)`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 18,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:55",
+     "claim": "The body of `map` is `PresheafOfModules.map _ _`, a run of trailing `_` placeholders.",
+     "requested_change": "Write `PresheafOfModules.map ..`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 19,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:1",
+     "claim": "`forget₂ _ _` is written with a run of trailing `_` placeholders throughout the file (diff lines 42, 94, 99, 111, 119, 124).",
+     "requested_change": "Write `forget₂ ..` (e.g. `PresheafOfModules.{v} (R ⋙ forget₂ ..)`).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module documentation title is grammatically malformed: `# Modules over presheaves commutative rings` is missing `of`.",
+     "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` is a second declaration of a functor the library already has: it is literally the same term as the pre-existing `PresheafOfModules.pushforward₀OfCommRingCat` (`Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean:71`), which was introduced for exactly this purpose and whose only use is `PushforwardZeroMonoidal.lean:33`. Adding the new abbreviation from scratch leaves two names for one functor in the very area this PR is supposed to consolidate, so downstream PRs can pick either spelling.",
+     "requested_change": "Declare this functor once. Either drop `PresheafOfModulesOfCommRing.pushforward₀` and use `PresheafOfModules.pushforward₀OfCommRingCat` at the call sites, or (better, given this PR's aim of giving the commutative-ring abbreviations one home) make the old spelling a deprecated alias of the new one, i.e. replace `PresheafOfModules.pushforward₀OfCommRingCat` in `Pushforward.lean` by `@[deprecated (since := \"2026-…\")] alias pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀` (or delegate the new body to the old declaration, `:= PresheafOfModules.pushforward₀OfCommRingCat F R`) and update the use in `PushforwardZeroMonoidal.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "Naming of the new object is inconsistent with the local sibling practice: the abbreviation (and the file `OfCommRing.lean`) uses the suffix `OfCommRing`, while the abbreviation already in this directory for the same kind of object (a presheaf `R : Cᵒᵖ ⥤ CommRingCat`) is spelled `…OfCommRingCat` (`PresheafOfModules.pushforward₀OfCommRingCat`, `Pushforward.lean:71`). With the current names, `PresheafOfModulesOfCommRing` and `…OfCommRingCat` coexist for one notion.",
+     "requested_change": "Settle on one spelling for this area and use it in both places: rename the new abbreviation and namespace (and the file, e.g. `OfCommRingCat.lean`) to `PresheafOfModulesOfCommRingCat`, or, if `OfCommRing` is preferred, rename/deprecate `PresheafOfModules.pushforward₀OfCommRingCat` accordingly in this PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring is malformed: the heading reads `# Modules over presheaves commutative rings` (missing \"of\"), and the summary sentence \"short names for categories and functors obtained from a presheaf of commutative rings by forgetting to rings\" does not say what the abbreviations stand for — the reader cannot tell from the docstring that everything here is `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)` and its associated functors.",
+     "requested_change": "Rewrite the module docstring, e.g. `# Modules over presheaves of commutative rings` followed by \"This file provides abbreviations for `PresheafOfModules (R ⋙ forget₂ CommRingCat RingCat)`, the category of presheaves of modules over a presheaf of commutative rings `R : Cᵒᵖ ⥤ CommRingCat`, and for the associated constructions (pushforward, pullback, …), so that `R ⋙ forget₂ _ _` does not have to be written out at each use.\"",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/aa36b6b25d7ae4c369f33f73924bbbe5f8f07b33d49d85c871a07e073923118a/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__4401e690-21d8-4738-b797-ea8f2c8e0e81.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing `of`) and does not say what the file is for; read on its own it suggests the file proves something about modules over presheaves of rings, whereas the file is nothing but short names for the commutative-ring case.",
+     "requested_change": "Retitle, e.g. `# Presheaves of modules over presheaves of commutative rings`, or (matching the body, which says the file only provides short names) `# Short names for modules over presheaves of commutative rings`, and keep the existing sentence explaining that the file introduces names for constructions obtained from a presheaf of commutative rings.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:35",
+     "claim": "The docstrings of the three constructor abbreviations describe the act of constructing (`mk`: \"Construct a presheaf of modules over a presheaf of commutative rings.\", line 35; `mkHom`: \"Construct a morphism of ...\", line 59; `isoMk`: \"Construct an isomorphism of ...\", line 68), while the declarations they abbreviate use the noun-phrase form: `PresheafOfModules.isoMk` is documented \"Constructor for isomorphisms in the category of presheaves of modules.\" (Mathlib/Algebra/Category/ModuleCat/Presheaf.lean:128) and `PresheafOfModules.pushforward₀`'s helper \"Implementation of `pushforward₀`.\" (Pushforward.lean:39).",
+     "requested_change": "Reword along the lines of the originals, e.g. \"Constructor for presheaves of modules over a presheaf of commutative rings.\", \"Constructor for morphisms of presheaves of modules over a presheaf of commutative rings.\", \"Constructor for isomorphisms of presheaves of modules over a presheaf of commutative rings.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`PresheafOfModulesOfCommRing.mk` restates the structure's fields but drops the auto-params that the fields of `PresheafOfModules` carry (`map_id`/`map_comp` have `:= by cat_disch`, Presheaf.lean:48-55), so the abbreviation is *less* usable than the constructor it abbreviates: `PresheafOfModules.mk (R := R ⋙ forget₂ _ _) M.obj M.map` is a presheaf, while `PresheafOfModulesOfCommRing.mk M.obj M.map` is a function expecting the two coherence proofs.",
+     "requested_change": "Give both arguments the same default as the structure fields: `(map_id : ∀ (X : Cᵒᵖ), ... := by cat_disch)` and `(map_comp : ... := by cat_disch)`, so that `PresheafOfModulesOfCommRing.mk obj map` elaborates as a presheaf of modules and callers only supply the coherence proofs when `cat_disch` cannot.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:22",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, but nothing in this file comes from `CategoryTheory.Limits`: the file only mentions `forget₂`, `whiskerRight`, `IsRightAdjoint`, `CommRingCat`, `ModuleCat.restrictScalars` and the `PresheafOfModules` API, all reachable from the `CategoryTheory`/`Functor` namespaces that are also opened.",
+     "requested_change": "Reduce the line to `open CategoryTheory Functor` (as `Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean:28` does).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:77",
+     "claim": "`PresheafOfModulesOfCommRing.unit` repeats the binder `(R : Cᵒᵖ ⥤ CommRingCat.{u})`, although `R` is already declared for this section at line 33 (`variable {C : Type u₁} [Category.{v₁} C] {R : Cᵒᵖ ⥤ CommRingCat.{u}}`); the other declarations of the file (`restrictScalars`, `pushforward`, `pullback`) avoid this by reusing the section variables.",
+     "requested_change": "Use the existing variable, i.e. write `variable (R) in` immediately before the abbrev and drop the binder from its signature:\n```\nvariable (R) in\n/-- The free presheaf of modules of rank one over a presheaf of commutative rings. -/\nnoncomputable abbrev unit : PresheafOfModulesOfCommRing.{u} R :=\n  PresheafOfModules.unit (R ⋙ forget₂ _ _)\n```\n(compare `Mathlib/Algebra/Category/ModuleCat/Presheaf.lean:282`, where `variable (R)` makes `R` explicit for `unit`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` duplicates the existing `PresheafOfModules.pushforward₀OfCommRingCat` (Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean:71): the two declarations are the same functor, so after this PR the library carries two names for `pushforward₀ F (R ⋙ forget₂ _ _)`, in two namespaces, and it is not determined which one user code should call.",
+     "requested_change": "Decide the relationship and record it in the PR: either deprecate `PresheafOfModules.pushforward₀OfCommRingCat` in favour of the new `PresheafOfModulesOfCommRing.pushforward₀` (updating `PushforwardZeroMonoidal.lean:33`), or keep the old one as the single name and drop the new alias here.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep1/tasks/9229d562c0892dc7c82da33ffcacb3585bd16bed1efd0165f0b1756e6a08dc40/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__e2272e50-778f-4bb7-8fd5-2f35507db6b6.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module doc title says `Modules over presheaves commutative rings`, which is ungrammatical and omits the `of` needed to describe the subject of the file.",
+     "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`PresheafOfModulesOfCommRing.mk` does not preserve the default `by cat_disch` proof hooks of the underlying `PresheafOfModules.mk` constructor, so users of the new wrapper must supply `map_id` and `map_comp` even in cases where the base constructor would try the standard default tactic.",
+     "requested_change": "Add defaults `:= by cat_disch` to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`PresheafOfModulesOfCommRing.mkHom` drops the default `by cat_disch` naturality proof available on the underlying `PresheafOfModules.Hom.mk` constructor.",
+     "requested_change": "Add `:= by cat_disch` as the default for the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring of the new file is defective: its title `# Modules over presheaves commutative rings` is missing a word (should read \"over presheaves of commutative rings\"), and the docstring never names the file's main declaration `PresheafOfModulesOfCommRing` nor records the fact that makes the whole file work -- that it is definitionally `PresheafOfModules.{v} (R ⋙ forget₂ _ _)`, so that the entire `PresheafOfModules` API applies unchanged (this is exactly the design used at `AlgebraicGeometry/Modules/Presheaf.lean`, where `Scheme.PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.obj`).",
+     "requested_change": "Fix the title to `# Modules over presheaves of commutative rings`, and extend the docstring: mention `PresheafOfModulesOfCommRing` explicitly and add a short \"## Main definitions\" list for the abbreviations, with one sentence stating that `PresheafOfModulesOfCommRing R` is `PresheafOfModules (R ⋙ forget₂ _ _)` and hence the general API applies as is.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` is not a new abbreviation: it is the pre-existing `PresheafOfModules.pushforward₀OfCommRingCat` (Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean:71) under a second name. Both have the same body (`PresheafOfModules.pushforward₀ F (R ⋙ forget₂ _ _)`) and the same type up to unfolding the alias -- `PresheafOfModulesOfCommRing.pushforward₀ F R = PresheafOfModules.pushforward₀OfCommRingCat F R` is `rfl`, verified by compiling it -- yet the library now carries two independent names for one abbreviation, which is the situation this PR explicitly sets out to clean up.",
+     "requested_change": "Leave a single canonical name: re-export the old spelling as a deprecated alias of the new abbreviation (`@[deprecated (since := \"...\")]`/`alias PresheafOfModules.pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀`, placed where the import direction allows, i.e. not in `Pushforward.lean` itself) and update the single use at `Mathlib/Algebra/Category/ModuleCat/Presheaf/PushforwardZeroMonoidal.lean:33`; alternatively drop the new `pushforward₀` and keep using `PresheafOfModules.pushforward₀OfCommRingCat`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The new names use the suffix `OfCommRing`, but the only pre-existing sibling abbreviation for this situation spells it `OfCommRingCat` (`PresheafOfModules.pushforward₀OfCommRingCat`), and the PR states that its purpose is to be the home of the roughly dozen in-flight comm-ring abbreviations; two spellings of the same suffix in one family will be inconsistent.",
+     "requested_change": "Settle on one suffix for the family and apply it here: rename the alias and namespace (and the abbreviations in it) to the `...OfCommRingCat` spelling used by `PresheafOfModules.pushforward₀OfCommRingCat` -- `PresheafOfModulesOfCommRingCat`, `PresheafOfModulesOfCommRingCat.pushforward₀`, ... -- or rename the existing sibling instead, but do not ship both spellings.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/726f4f68669c3ad84b6ccabbd5fe5404bb8605263210f129c378d62bf6038222/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__9c0222ba-1361-4144-b1d8-98f4ceae70d0.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` is a second public name for a declaration that already exists: it is `rfl`-equal to `PresheafOfModules.pushforward₀OfCommRingCat` (Pushforward.lean:71). Adding it and leaving the old name in place gives the library two names for one functor, which the deprecation practice forbids.",
+     "requested_change": "Replace the old name rather than adding to it: delete `pushforward₀OfCommRingCat` from `Pushforward.lean`, add `namespace PresheafOfModules` + `@[deprecated (since := \"2026-05-01\")] alias pushforward₀OfCommRingCat := PresheafOfModulesOfCommRing.pushforward₀` + `end PresheafOfModules` at the end of this file (the alias must live here: `Pushforward.lean` cannot import this module), and switch `PushforwardZeroMonoidal.lean:33` to `PresheafOfModulesOfCommRing.pushforward₀ F R`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The new abbreviation/namespace name `PresheafOfModulesOfCommRing` is a name for an already-existing concept (`PresheafOfModules.{v} (R ⋙ forget₂ _ _)`) that is chosen by the author alone and is about to carry a dozen abbreviations; the naming practice requires such a name/design to be settled by community consensus first, and no prior Zulip discussion of it exists (the only existing comm-ring-specific spelling in the library is the suffix `…OfCommRingCat`, e.g. `pushforward₀OfCommRingCat`).",
+     "requested_change": "Raise the name/namespace (and the general `…OfCommRing`/`…OfCommRingCat` scheme for the planned abbreviations) on Zulip and rename the abbreviation and the namespace to the agreed spelling before merging, so the dozen follow-up abbreviations do not have to be renamed later.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (a missing `of`), so it does not state precisely what the file provides, as the module-docstring practice requires.",
+     "requested_change": "Change the title to `# Modules over presheaves of commutative rings` (and, while editing, keep the following sentence describing that the file provides short names for the categories and functors obtained from a presheaf of commutative rings by forgetting to rings).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:35",
+     "claim": "The docstrings of the constructors describe the act of building the value rather than the value: line 35 `Construct a presheaf of modules over a presheaf of commutative rings.`, line 50 `Evaluate a presheaf of modules over a presheaf of commutative rings at an object.`, line 59 `Construct a morphism of presheaves of modules …`, line 68 `Construct an isomorphism of presheaves of modules …`. The defining-docstring practice (and the local siblings, e.g. `PresheafOfModules.isoMk`'s \"Constructor for isomorphisms in the category of presheaves of modules.\") wants a noun phrase.",
+     "requested_change": "Reword to noun phrases naming the value, e.g. `Constructor for presheaves of modules over a presheaf of commutative rings.`, `The module over `R.obj X` attached to a presheaf of modules over a presheaf of commutative rings.`, `Constructor for morphisms of presheaves of modules over a presheaf of commutative rings.`, `Constructor for isomorphisms of presheaves of modules over a presheaf of commutative rings.`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The type and category variables are declared with hand-written universes (`universe v v₁ v₂ u₁ u₂ u`, `{C : Type u₁} [Category.{v₁} C]` here, `{C : Type u₁} … {D : Type u₂}` at line 33 and line 90), instead of with the binders that introduce fresh universe levels (`Type*`, `Category*`), which the practice prefers and which the neighbouring file `PushforwardZeroMonoidal.lean` (lines 29–30) uses.",
+     "requested_change": "Write `abbrev PresheafOfModulesOfCommRing {C : Type*} [Category* C] (R : Cᵒᵖ ⥤ CommRingCat.{u})`, `variable {C : Type*} [Category* C] {R : Cᵒᵖ ⥤ CommRingCat.{u}}` and `variable {C : Type*} [Category* C] {D : Type*} [Category* D]`, and reduce the universe line to `universe v u` (the only levels that appear in the statements); `C` need then be declared only once.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:77",
+     "claim": "`unit` re-states the type of a variable the file already declares, `(R : Cᵒᵖ ⥤ CommRingCat.{u})` (line 33), instead of reusing it; its analogue `PresheafOfModules.unit` is written with `variable (R) in` and no type ascription.",
+     "requested_change": "Replace the explicit binder with the existing variable, as the base declaration does:\n```lean\nvariable (R) in\n/-- The free presheaf of modules of rank one over a presheaf of commutative rings. -/\nnoncomputable abbrev unit : PresheafOfModulesOfCommRing.{u} R :=\n  PresheafOfModules.unit (R ⋙ forget₂ _ _)\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:57",
+     "claim": "The body of `map` applies `PresheafOfModules.map` to a run of placeholder underscores, `PresheafOfModules.map _ _`, rather than naming the arguments or using `..`.",
+     "requested_change": "Write `PresheafOfModules.map F f` (or `PresheafOfModules.map ..`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:51",
+     "claim": "The object of `PresheafOfModulesOfCommRing` is bound as `F` in `obj` (line 51) and in `map` (line 55), although `F` is the letter this file (line 93: `(F : C ⥤ D)`) and the surrounding area use for a functor; the base file names presheaves of modules `M` (`M.map f`, `M.obj X`, `variable (M M₁ M₂ : PresheafOfModules.{v} R)`).",
+     "requested_change": "Rename the argument to `M`: `abbrev obj (M : PresheafOfModulesOfCommRing.{v} R) (X : Cᵒᵖ) : ModuleCat.{v} (R.obj X) := PresheafOfModules.obj M X` and `abbrev map (M : PresheafOfModulesOfCommRing.{v} R) {X Y : Cᵒᵖ} (f : X ⟶ Y) : M.obj X ⟶ (ModuleCat.restrictScalars (R.map f).hom).obj (M.obj Y) := PresheafOfModules.map M f`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:22",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, which nothing in the file uses (nothing here mentions limits, colimits or a `Limits.` name), so the unused open should be removed.",
+     "requested_change": "Change the line to `open CategoryTheory Functor`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep2/tasks/2f677481ebed4ee433246929ccbcd9739ce0e7fd5bdb397572eb353607d06899/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__9c453008-1de4-4223-80b9-88ae74eba222.jsonl"
+  },
+  "GPT3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module doc title is ungrammatical: it says `Modules over presheaves commutative rings`, missing `of`.",
+     "requested_change": "Change the title to `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:36",
+     "claim": "`PresheafOfModulesOfCommRing.mk` is meant to be the commutative-ring wrapper for `PresheafOfModules.mk`, but it drops the underlying constructor's default `by cat_disch` proofs for `map_id` and `map_comp`, making the new wrapper less convenient than the constructor it wraps.",
+     "requested_change": "Add `:= by cat_disch` default values to the `map_id` and `map_comp` parameters of `PresheafOfModulesOfCommRing.mk`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`PresheafOfModulesOfCommRing.mkHom` wraps `PresheafOfModules.Hom.mk`, but unlike the underlying constructor it requires the naturality proof explicitly instead of keeping the `naturality := by cat_disch` default.",
+     "requested_change": "Give the `naturality` parameter of `PresheafOfModulesOfCommRing.mkHom` the default value `:= by cat_disch`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` is definitionally the same functor as the pre-existing public abbreviation `PresheafOfModules.pushforward₀OfCommRingCat` (Pushforward.lean:71), so this PR leaves two public names for one functor — exactly the duplication the namespace was introduced to remove. I verified the two are equal by `rfl`: `(PresheafOfModulesOfCommRing.pushforward₀ F R : _ ⥤ _) = (PresheafOfModules.pushforward₀OfCommRingCat F R : _ ⥤ _)`.",
+     "requested_change": "Add `@[deprecated PresheafOfModulesOfCommRing.pushforward₀ (since := \"...\")]` (or an `alias`/deprecation) to `PresheafOfModules.pushforward₀OfCommRingCat` in `Mathlib/Algebra/Category/ModuleCat/Presheaf/Pushforward.lean`, and update the single use in `Mathlib/Algebra/Category/ModuleCat/Presheaf/PushforwardZeroMonoidal.lean` (`(pushforward₀OfCommRingCat F R).Monoidal`) to the new name, so that only `PresheafOfModulesOfCommRing.pushforward₀` remains canonical.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring title `# Modules over presheaves commutative rings` is ungrammatical (missing \"of\"); the rest of the docstring says \"a presheaf of commutative rings\".",
+     "requested_change": "Change the heading to `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:60",
+     "claim": "`PresheafOfModulesOfCommRing.mkHom` inverts the library's name for a morphism constructor: this area already has `PresheafOfModules.homMk` (Presheaf.lean:220) and `isoMk` (used immediately below in the same file), and `homMk` is the standard paired-with-`isoMk` constructor name throughout CategoryTheory (`Over.homMk`, `Comma.homMk`, `InducedCategory.homMk`, `ObjectProperty.homMk`, `ModuleCat.homMk`, ...).",
+     "requested_change": "Rename `mkHom` to `homMk` (the statement and body are unchanged); I verified the renamed declaration compiles in place.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The new type synonym (and hence the whole namespace) is named `PresheafOfModulesOfCommRing`, whereas the only precedent in the library for this construction — the abbreviation this PR is designed to replace — spells the ring category out in full as `PresheafOfModules.pushforward₀OfCommRingCat` (Pushforward.lean:71). The `CommRingCat` name is also what every binder in this file uses (`R : Cᵒᵖ ⥤ CommRingCat.{u}`), so the shortened `OfCommRing` suffix is inconsistent.",
+     "requested_change": "Rename `PresheafOfModulesOfCommRing` to `PresheafOfModulesOfCommRingCat` (and the file `OfCommRing.lean` to `OfCommRingCat.lean`, the namespace, and the `Mathlib.lean` import name accordingly) so it matches `PresheafOfModules.pushforward₀OfCommRingCat`; if instead the intent is to retire the `...OfCommRingCat` spelling, say so in the PR description.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/e73909293fa7d22584385897c6495862e6923d0e66d4c009beb436cd81555827/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__bf57efe1-67f0-4887-a410-b34f1dd62c43.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:22",
+     "claim": "`open CategoryTheory Functor Limits` opens `Limits`, but nothing in this file uses anything from that namespace (the only limit-theoretic name anywhere in the file is `IsRightAdjoint`, which lives in `CategoryTheory`/`Functor`).",
+     "requested_change": "Change the line to `open CategoryTheory Functor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:93",
+     "claim": "`PresheafOfModulesOfCommRing.pushforward₀` is a second name for a declaration that already exists: it unfolds to exactly `PresheafOfModules.pushforward₀OfCommRingCat F R` (`Pushforward.lean:71`), including its type, so the library now carries two abbreviations for the same functor and the old one is still the one used in `PushforwardZeroMonoidal.lean:33`.",
+     "requested_change": "Define the body as `PresheafOfModules.pushforward₀OfCommRingCat F R`, and settle the duplicate in the same PR: either deprecate `PresheafOfModules.pushforward₀OfCommRingCat` in favour of this new spelling (updating its use in `PushforwardZeroMonoidal.lean`) or drop the new abbreviation and use the existing one.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:11",
+     "claim": "The module docstring title reads “Modules over presheaves commutative rings”, which is missing a word and misstates the subject of the file.",
+     "requested_change": "Write `# Modules over presheaves of commutative rings`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:50",
+     "claim": "The docstring of `PresheafOfModulesOfCommRing.obj` describes the act of evaluating (“Evaluate a presheaf of modules … at an object”) instead of the value defined; the same is done by `mk` (line 35), `mkHom` (line 59) and `isoMk` (line 68), all of which are verb phrases, while the sibling `PresheafOfModules.isoMk` is documented as “Constructor for isomorphisms in the category of presheaves of modules”.",
+     "requested_change": "Use noun phrases: `obj` → “The evaluation of a presheaf of modules over a presheaf of commutative rings at an object.”, `mk` → “Constructor for a presheaf of modules over a presheaf of commutative rings.”, `mkHom` → “Constructor for morphisms of presheaves of modules over a presheaf of commutative rings.”, `isoMk` → “Constructor for isomorphisms of presheaves of modules over a presheaf of commutative rings.”",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:57",
+     "claim": "The body of `PresheafOfModulesOfCommRing.map` is `PresheafOfModules.map _ _`, a run of trailing `_` placeholders where `..` is the Mathlib spelling.",
+     "requested_change": "Write `PresheafOfModules.map ..`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean:25",
+     "claim": "The new category abbreviation (and the namespace opened from it at line 29) is named `PresheafOfModulesOfCommRing`, although its argument is a presheaf of `CommRingCat`, not of `CommRing`: the only sibling abbreviation for this same hypothesis shape is `PresheafOfModules.pushforward₀OfCommRingCat` (`Pushforward.lean:71`), so this name spells the hypothesis differently from the rest of the area.",
+     "requested_change": "Rename the abbreviation and its namespace to `PresheafOfModulesOfCommRingCat` (`PresheafOfModulesOfCommRingCat.…`), or state in the docstring why the shorter spelling is preferred here.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep3/tasks/f2f2f873e96de63c3ec996477c68ee293beff7f264a4cbe0534adfe848df4dc4/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__4e3d737d-34a5-444a-b90e-c3ed016cc075.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_43192.md"
+}

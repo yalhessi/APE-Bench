@@ -1,0 +1,7 @@
+{
+ "F1": "proof", "F2": "interface", "F3": "registration (attributes)", "F4": "derive, don't restate",
+ "F5": "redundancy", "F6": "statement and API design", "F7": "generality", "F8": "naming",
+ "F9": "formatting", "F10": "documentation", "F11": "meta-code correctness", "F12": "PR level",
+ "CORR": "correctness",
+ "_source": "docs/research/pipeline-overfit-2026-09-replication.md, the arm-coverage reader families"
+}

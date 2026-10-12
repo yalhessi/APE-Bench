@@ -1,0 +1,2152 @@
+{
+ "asks": [
+  {
+   "id": "v0105",
+   "pr": 34091,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P011"
+   ],
+   "text": "Surely this is a one-liner using `infinite_pigeonhole_card_lt`?",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 86,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:24:42Z",
+   "matcher_text": {
+    "ask_id": "v0105",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": " exists_infinite_fiber {β α : Type u} (f : β → α) (w : #α < #β) (w' : Infinite α) :\n+theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n     ∃ a : α, Infinite (f ⁻¹' {a}) := by\n-  simp_rw [Cardinal.infinite_iff] at w' ⊢\n-  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w'\n-  exact ⟨a, w'.trans ha.le⟩\n+  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n+  rcases lt_or_ge #α ℵ₀ with hα | hα\n+  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n+  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩",
+    "comment": "Surely this is a one-liner using `infinite_pigeonhole_card_lt`?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "One-liner proof of exists_infinite_fiber via infinite_pigeonhole_card_lt; no reviewer simplified this proof.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "One-liner for exists_infinite_fiber via infinite_pigeonhole_card_lt; no finding targets that proof."
+    }
+   },
+   "entries_text": {
+    "P011": "A result or construction that existing library lemmas or API yield directly (a composition of library equivalences) is derived from them, not reproved or rebuilt from first principles."
+   }
+  },
+  {
+   "id": "v0106",
+   "pr": 34091,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P392"
+   ],
+   "text": "```suggestion\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] :\n```",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 80,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:25:18Z",
+   "matcher_text": {
+    "ask_id": "v0106",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": "cof_eq])\n+    exact ⟨a, ha.trans' (succ_le_of_lt hα)⟩\n+  · exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h) (hα.trans (le_succ _))\n+      ((lt_succ _).trans_le (isRegular_succ hα).2.ge)\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\n has an infinite fiber. -/\n-theorem exists_infinite_fiber {β α : Type u} (f : β → α) (w : #α < #β) (w' : Infinite α) :\n+theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :",
+    "comment": "```suggestion\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] :\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "This PR changes the signature of `exists_infinite_fiber` anyway, but it still takes the class hypothesis `Infinite β` as an explicit argument `(hβ : Infinite β)`. Its call site in this PR has to pass `(by infer_instance)` (`le_range_of_union_finset_eq_univ`). Mathlib takes `Infinite` as an instance argument `[Infinite β]`.",
+      "requested_change": "Make the binder instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ∃ a : α, Infinite (f ⁻¹' {a}) := by` followed by `have hβ := aleph0_le_mk β` and `simp_rw [Cardinal.infinite_iff]` (the goal only), with the rest of the proof unchanged. Replace `exists_infinite_fiber u' h (by infer_instance)` in `le_range_of_union_finset_eq_univ` with `exists_infinite_fiber u' h`.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "This PR changes the signature of `exists_infinite_fiber` anyway, but it still takes the class hypothesis `Infinite β` as an explicit argument `(hβ : Infinite β)`. Its call site in this PR has to pass `(by infer_instance)` (`le_range_of_union_finset_eq_univ`). Mathlib takes `Infinite` as an instance argument `[Infinite β]`.",
+      "requested_change": "Make the binder instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ∃ a : α, Infinite (f ⁻¹' {a}) := by` followed by `have hβ := aleph0_le_mk β` and `simp_rw [Cardinal.infinite_iff]` (the goal only), with the rest of the proof unchanged. Replace `exists_infinite_fiber u' h (by infer_instance)` in `le_range_of_union_finset_eq_univ` with `exists_infinite_fiber u' h`.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` takes the class hypothesis `Infinite β` as an explicit named argument `(hβ : Infinite β)`; its in-PR caller `le_range_of_union_finset_eq_univ` has to pass `(by infer_instance)` for it.",
+      "requested_change": "Make it instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ...`, start the proof with `have hβ := infinite_iff.mp ‹Infinite β›` and `simp_rw [infinite_iff]`, and drop the `(by infer_instance)` argument at line 121 (`exists_infinite_fiber u' h`) and the explicit argument in `exists_infinite_fiber'`.",
+      "severity": "blocking"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` takes the class hypothesis `Infinite β` as an explicit named argument `(hβ : Infinite β)`; its in-PR caller `le_range_of_union_finset_eq_univ` has to pass `(by infer_instance)` for it.",
+      "requested_change": "Make it instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ...`, start the proof with `have hβ := infinite_iff.mp ‹Infinite β›` and `simp_rw [infinite_iff]`, and drop the `(by infer_instance)` argument at line 121 (`exists_infinite_fiber u' h`) and the explicit argument in `exists_infinite_fiber'`.",
+      "severity": "blocking"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite β] instance binder on exists_infinite_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite beta] instance binder on exists_infinite_fiber."
+    }
+   },
+   "entries_text": {
+    "P392": "A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `[C x]`, not as a named explicit hypothesis."
+   }
+  },
+  {
+   "id": "v0107",
+   "pr": 34091,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P392"
+   ],
+   "text": "```suggestion\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] :\n```",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 97,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:29:59Z",
+   "matcher_text": {
+    "ask_id": "v0107",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": "hole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩\n+\n+/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\n+theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n+    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n+  exists_infinite_fiber f h (by\n+    rw [Cardinal.infinite_iff] at hα ⊢\n+    exact hα.trans h.le)\n+\n+/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\n+has an uncountable fiber. -/\n+theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :",
+    "comment": "```suggestion\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] :\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+      "claim": "The new lemma `exists_uncountable_fiber` takes the class `Uncountable β` as an explicit argument `(hβ : Uncountable β)`. Mathlib binds `Uncountable` as an instance argument, as in `[Uncountable β]` and `aleph0_lt_mk [Uncountable α]`.",
+      "requested_change": "Use `[Uncountable β]` and derive the cardinal bound inside the proof: `theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  have hβ : ℵ₁ ≤ #β := succ_aleph0 ▸ succ_le_of_lt aleph0_lt_mk\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hβ.trans' aleph0_lt_aleph_one.le)\n    rw [← succ_le_succ_iff, succ_aleph0] at hα\n    exact ⟨a, hα.trans (succ_le_of_lt ha)⟩`",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+      "claim": "The new lemma `exists_uncountable_fiber` takes the class `Uncountable β` as an explicit argument `(hβ : Uncountable β)`. Mathlib binds `Uncountable` as an instance argument, as in `[Uncountable β]` and `aleph0_lt_mk [Uncountable α]`.",
+      "requested_change": "Use `[Uncountable β]` and derive the cardinal bound inside the proof: `theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  have hβ : ℵ₁ ≤ #β := succ_aleph0 ▸ succ_le_of_lt aleph0_lt_mk\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hβ.trans' aleph0_lt_aleph_one.le)\n    rw [← succ_le_succ_iff, succ_aleph0] at hα\n    exact ⟨a, hα.trans (succ_le_of_lt ha)⟩`",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+      "claim": "The new `exists_uncountable_fiber` takes the class hypothesis `Uncountable β` as an explicit named argument `(hβ : Uncountable β)`.",
+      "requested_change": "Take it as `[Uncountable β]` and derive the cardinal bound inside the proof: `have hβ : ℵ₁ ≤ #β := by\\n    rw [← succ_aleph0, succ_le_iff, aleph0_lt_mk_iff]\\n    infer_instance` followed by `simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+      "claim": "The new `exists_uncountable_fiber` takes the class hypothesis `Uncountable β` as an explicit named argument `(hβ : Uncountable β)`.",
+      "requested_change": "Take it as `[Uncountable β]` and derive the cardinal bound inside the proof: `have hβ : ℵ₁ ≤ #β := by\\n    rw [← succ_aleph0, succ_le_iff, aleph0_lt_mk_iff]\\n    infer_instance` followed by `simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Uncountable beta] instance binder on exists_uncountable_fiber."
+    }
+   },
+   "entries_text": {
+    "P392": "A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `[C x]`, not as a named explicit hypothesis."
+   }
+  },
+  {
+   "id": "v0108",
+   "pr": 34091,
+   "family": "F2",
+   "in_census": true,
+   "entries": [
+    "P392"
+   ],
+   "text": "```suggestion\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] :\n```",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 89,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:30:24Z",
+   "matcher_text": {
+    "ask_id": "v0108",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": " α, Infinite (f ⁻¹' {a}) := by\n-  simp_rw [Cardinal.infinite_iff] at w' ⊢\n-  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w'\n-  exact ⟨a, w'.trans ha.le⟩\n+  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n+  rcases lt_or_ge #α ℵ₀ with hα | hα\n+  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n+  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩\n+\n+/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\n+theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :",
+    "comment": "```suggestion\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] :\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+      "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+      "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+      "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+      "claim": "The new lemma `exists_infinite_fiber'` takes the class `Infinite α` as an explicit hypothesis `(hα : Infinite α)`. Its only caller, `linearIndependent_le_infinite_basis`, passes `(by infer_instance)`.",
+      "requested_change": "State it as `theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  have : Infinite β := infinite_iff.mpr ((aleph0_le_mk α).trans h.le)\n  exists_infinite_fiber f h`. In `linearIndependent_le_infinite_basis` (StrongRankCondition.lean) write `Cardinal.exists_infinite_fiber' Φ h` without `(by infer_instance)`.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+      "claim": "The new lemma `exists_infinite_fiber'` takes the class `Infinite α` as an explicit hypothesis `(hα : Infinite α)`. Its only caller, `linearIndependent_le_infinite_basis`, passes `(by infer_instance)`.",
+      "requested_change": "State it as `theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  have : Infinite β := infinite_iff.mpr ((aleph0_le_mk α).trans h.le)\n  exists_infinite_fiber f h`. In `linearIndependent_le_infinite_basis` (StrongRankCondition.lean) write `Cardinal.exists_infinite_fiber' Φ h` without `(by infer_instance)`.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+      "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 8,
+     "m1_finding_text": {
+      "i": 8,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+      "claim": "`exists_infinite_fiber'` takes the class hypothesis `Infinite α` as an explicit named argument `(hα : Infinite α)`, and its only caller passes `(by infer_instance)` for it.",
+      "requested_change": "If the lemma is kept, make the hypothesis `[Infinite α]` and drop `(by infer_instance)` at StrongRankCondition.lean:250 (`exists_infinite_fiber' Φ h`).",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 8,
+     "m2_finding_text": {
+      "i": 8,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+      "claim": "`exists_infinite_fiber'` takes the class hypothesis `Infinite α` as an explicit named argument `(hα : Infinite α)`, and its only caller passes `(by infer_instance)` for it.",
+      "requested_change": "If the lemma is kept, make the hypothesis `[Infinite α]` and drop `(by infer_instance)` at StrongRankCondition.lean:250 (`exists_infinite_fiber' Φ h`).",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+      "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+      "severity": "advisory"
+     },
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "[Infinite α] on exists_infinite_fiber'; instance-implicit findings reach. Deleting the lemma does not.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "[Infinite alpha] on exists_infinite_fiber'. Deleting the lemma (R10) judged no."
+    }
+   },
+   "entries_text": {
+    "P392": "A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `[C x]`, not as a named explicit hypothesis."
+   }
+  },
+  {
+   "id": "v0109",
+   "pr": 34091,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "```suggestion\n/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's\n```",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 67,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:33:12Z",
+   "matcher_text": {
+    "ask_id": "v0109",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": "@@ -64,33 +64,51 @@ theorem infinite_pigeonhole_set {β α : Type u} {s : Set β} (f : s → α) (θ\n     rfl\n   rintro x ⟨_, hx'⟩; exact hx'\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's",
+    "comment": "```suggestion\n/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` as the PR leaves it says the domain's cardinality is \"strictly greater than its domain's\", which is vacuous and does not match the hypothesis `h : #α < #β`. The PR changed both occurrences of \"codomain's\" to \"domain's\", but only the first should have changed (to match the new `hβ : ℵ₀ ≤ #β`). The existing typo \"strictly great than\" is still there.",
+      "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's.\"",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` as the PR leaves it says the domain's cardinality is \"strictly greater than its domain's\", which is vacuous and does not match the hypothesis `h : #α < #β`. The PR changed both occurrences of \"codomain's\" to \"domain's\", but only the first should have changed (to match the new `hβ : ℵ₀ ≤ #β`). The existing typo \"strictly great than\" is still there.",
+      "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` as edited by this PR misstates the theorem: it says the domain's cardinality is \"strictly greater than its domain's\" (it should be the codomain's, matching `h : #α < #β`), keeps \"but\" where the two conditions are now conjoined, and keeps the typo \"strictly great than\" on the line below.",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` as edited by this PR misstates the theorem: it says the domain's cardinality is \"strictly greater than its domain's\" (it should be the codomain's, matching `h : #α < #β`), keeps \"but\" where the two conditions are now conjoined, and keeps the typo \"strictly great than\" on the line below.",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` compares the domain with itself: \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the statement is `(h : #α < #β)`, so the second term is the codomain, and this PR produced the error by flipping \"strictly smaller than its domain's\" to \"strictly greater\" while only rewriting the first clause. The same botched flip was made in `exists_infinite_fiber`'s docstring, lines 78–79 (also \"... infinite but strictly greater than its domain's ...\"). The second sentence additionally still reads \"cardinality strictly great than the codomain\".",
+      "requested_change": "Rewrite both docstrings as, respectively: \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain.\" and \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber.\"",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` compares the domain with itself: \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the statement is `(h : #α < #β)`, so the second term is the codomain, and this PR produced the error by flipping \"strictly smaller than its domain's\" to \"strictly greater\" while only rewriting the first clause. The same botched flip was made in `exists_infinite_fiber`'s docstring, lines 78–79 (also \"... infinite but strictly greater than its domain's ...\"). The second sentence additionally still reads \"cardinality strictly great than the codomain\".",
+      "requested_change": "Rewrite both docstrings as, respectively: \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain.\" and \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` describes the domain as “strictly greater than its domain's”, which is self-contradictory and no longer describes the hypothesis `#α < #β`. It also retains the grammatical typo “strictly great”.",
+      "requested_change": "Change this docstring to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than that of the codomain.",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` describes the domain as “strictly greater than its domain's”, which is self-contradictory and no longer describes the hypothesis `#α < #β`. It also retains the grammatical typo “strictly great”.",
+      "requested_change": "Change this docstring to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than that of the codomain.",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` that this PR rewrote now says the domain's cardinality is \"strictly greater than its domain's\", which is impossible. The second \"domain's\" should be \"codomain's\" (the hypothesis is `#α < #β` for `f : β → α`). The line also keeps the old typo \"strictly great than\".",
+      "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas a fiber with cardinality strictly greater than the codomain. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` that this PR rewrote now says the domain's cardinality is \"strictly greater than its domain's\", which is impossible. The second \"domain's\" should be \"codomain's\" (the hypothesis is `#α < #β` for `f : β → α`). The line also keeps the old typo \"strictly great than\".",
+      "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas a fiber with cardinality strictly greater than the codomain. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", which compares the domain's cardinality with itself; the statement's hypotheses are `hβ : ℵ₀ ≤ #β` (domain infinite) and `h : #α < #β` (codomain strictly smaller), so the second occurrence must be \"its codomain's\". The identical wording error is in the docstrings of `Cardinal.exists_infinite_fiber` (line 78) and `Cardinal.exists_uncountable_fiber` (line 95), which this PR also rewrote. There is also a leftover typo \"strictly great than\" in all three.",
+      "requested_change": "In all three docstrings replace the trailing \"than its domain's\" by \"than its codomain's\" and \"strictly great than the codomain\" by \"strictly greater than the codomain\", so that they read e.g. `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain. -/`, `/-- ... has an infinite fiber. -/` and `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", which compares the domain's cardinality with itself; the statement's hypotheses are `hβ : ℵ₀ ≤ #β` (domain infinite) and `h : #α < #β` (codomain strictly smaller), so the second occurrence must be \"its codomain's\". The identical wording error is in the docstrings of `Cardinal.exists_infinite_fiber` (line 78) and `Cardinal.exists_uncountable_fiber` (line 95), which this PR also rewrote. There is also a leftover typo \"strictly great than\" in all three.",
+      "requested_change": "In all three docstrings replace the trailing \"than its domain's\" by \"than its codomain's\" and \"strictly great than the codomain\" by \"strictly greater than the codomain\", so that they read e.g. `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain. -/`, `/-- ... has an infinite fiber. -/` and `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` (Pigeonhole.lean lines 67-68) is wrong: it says the domain's cardinality is \"strictly greater than its domain's\" (it must be the codomain's), and the second line still reads \"strictly great than the codomain\".",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain's. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` (Pigeonhole.lean lines 67-68) is wrong: it says the domain's cardinality is \"strictly greater than its domain's\" (it must be the codomain's), and the second line still reads \"strictly great than the codomain\".",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain's. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, instead of the codomain's, and it also says `strictly great`.",
+      "requested_change": "Rewrite the docstring to say that the domain has infinite cardinality strictly greater than the codomain's cardinality and that the fiber has cardinality strictly greater than the codomain's.",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, instead of the codomain's, and it also says `strictly great`.",
+      "requested_change": "Rewrite the docstring to say that the domain has infinite cardinality strictly greater than the codomain's cardinality and that the fiber has cardinality strictly greater than the codomain's.",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` misstates the hypothesis: it says the domain's cardinality is strictly greater than the domain's, and also says \"strictly great\" instead of \"strictly greater\" for the conclusion.",
+      "requested_change": "Rewrite it to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than the codomain.",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` misstates the hypothesis: it says the domain's cardinality is strictly greater than the domain's, and also says \"strictly great\" instead of \"strictly greater\" for the conclusion.",
+      "requested_change": "Rewrite it to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than the codomain.",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-contradictory: it reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\". In these statements the type is `f : β → α`, so β is the domain and α the codomain, and the hypothesis `#α < #β` compares domain against codomain; the pre-PR wording (\"whose codomain's cardinality is infinite but strictly smaller than its domain's\") was correct, and moving the clause to \"domain's\" without changing the comparison produced an impossible statement (it now asserts #β > #β). The same three docstrings also carry the typo \"strictly great than\".",
+      "requested_change": "Replace the second clause in all three docstrings with \"codomain's\" and fix the typo. For `infinite_pigeonhole_card_lt` (lines 67-68): \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\". For `exists_infinite_fiber` (78-79): \"...strictly greater than its codomain's / has an infinite fiber.\". For `exists_uncountable_fiber` (95-96): \"...strictly greater than its codomain's / has an uncountable fiber.\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-contradictory: it reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\". In these statements the type is `f : β → α`, so β is the domain and α the codomain, and the hypothesis `#α < #β` compares domain against codomain; the pre-PR wording (\"whose codomain's cardinality is infinite but strictly smaller than its domain's\") was correct, and moving the clause to \"domain's\" without changing the comparison produced an impossible statement (it now asserts #β > #β). The same three docstrings also carry the typo \"strictly great than\".",
+      "requested_change": "Replace the second clause in all three docstrings with \"codomain's\" and fix the typo. For `infinite_pigeonhole_card_lt` (lines 67-68): \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\". For `exists_infinite_fiber` (78-79): \"...strictly greater than its codomain's / has an infinite fiber.\". For `exists_uncountable_fiber` (95-96): \"...strictly greater than its codomain's / has an uncountable fiber.\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstrings rewritten for `Cardinal.infinite_pigeonhole_card_lt` (line 67) and `Cardinal.exists_infinite_fiber` (line 78) are self-contradictory: both now read \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", comparing the domain's cardinality with the domain's again, whereas the hypothesis `h : #α < #β` compares it with the *codomain's* (α is the codomain of `f : β → α`). This is exactly the mistake the rewrite introduced — the previous wording correctly said \"codomain's cardinality ... smaller than its domain's\". The same sentence also still has the typo \"strictly great than the codomain\".",
+      "requested_change": "Restore the domain/codomain distinction in both docstrings and fix the typo, e.g.\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/` for `infinite_pigeonhole_card_lt`, and\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber. -/` for `exists_infinite_fiber`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstrings rewritten for `Cardinal.infinite_pigeonhole_card_lt` (line 67) and `Cardinal.exists_infinite_fiber` (line 78) are self-contradictory: both now read \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", comparing the domain's cardinality with the domain's again, whereas the hypothesis `h : #α < #β` compares it with the *codomain's* (α is the codomain of `f : β → α`). This is exactly the mistake the rewrite introduced — the previous wording correctly said \"codomain's cardinality ... smaller than its domain's\". The same sentence also still has the typo \"strictly great than the codomain\".",
+      "requested_change": "Restore the domain/codomain distinction in both docstrings and fix the typo, e.g.\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/` for `infinite_pigeonhole_card_lt`, and\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber. -/` for `exists_infinite_fiber`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring this PR writes for `Cardinal.infinite_pigeonhole_card_lt` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` is wrong (the comparison is with the codomain), so the docstring contradicts the declaration's own statement `(h : #α < #β) (hβ : ℵ₀ ≤ #β)`; the same sentence also keeps the typo \"strictly great than the codomain\".",
+      "requested_change": "Replace the docstring with wording that matches the statement, e.g. \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has a fiber with cardinality strictly greater than the codomain.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring this PR writes for `Cardinal.infinite_pigeonhole_card_lt` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` is wrong (the comparison is with the codomain), so the docstring contradicts the declaration's own statement `(h : #α < #β) (hβ : ℵ₀ ≤ #β)`; the same sentence also keeps the typo \"strictly great than the codomain\".",
+      "requested_change": "Replace the docstring with wording that matches the statement, e.g. \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has a fiber with cardinality strictly greater than the codomain.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) says \"A function whose domain's cardinality is infinite but strictly greater than its domain's has a fiber with cardinality strictly great than the codomain\", i.e. it compares the domain's cardinality with itself. In `(f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β)` the domain is β and the codomain is α, so `h` says the domain's cardinality is strictly greater than the *codomain's*; the docstring is the only place in the declaration that now contradicts the statement (the first clause, 'domain's cardinality is infinite', is right, and was presumably what tempted the edit from the old 'codomain's cardinality is infinite' wording). The same line also carries the pre-existing typo 'strictly great than'.",
+      "requested_change": "Change the second occurrence of \"its domain's\" to \"its codomain's\" and 'great' to 'greater', e.g. \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\" (or rephrase as \"A function whose domain is infinite and whose codomain's cardinality is strictly smaller has a fiber with cardinality strictly greater than the codomain.\"). I applied the minimal rewording to lines 67-68 and the file still compiles.",
+      "severity": "advisory"
+     },
+     "note_m1": "Docstring of infinite_pigeonhole_card_lt: domain's -> codomain's. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) says \"A function whose domain's cardinality is infinite but strictly greater than its domain's has a fiber with cardinality strictly great than the codomain\", i.e. it compares the domain's cardinality with itself. In `(f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β)` the domain is β and the codomain is α, so `h` says the domain's cardinality is strictly greater than the *codomain's*; the docstring is the only place in the declaration that now contradicts the statement (the first clause, 'domain's cardinality is infinite', is right, and was presumably what tempted the edit from the old 'codomain's cardinality is infinite' wording). The same line also carries the pre-existing typo 'strictly great than'.",
+      "requested_change": "Change the second occurrence of \"its domain's\" to \"its codomain's\" and 'great' to 'greater', e.g. \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\" (or rephrase as \"A function whose domain is infinite and whose codomain's cardinality is strictly smaller has a fiber with cardinality strictly greater than the codomain.\"). I applied the minimal rewording to lines 67-68 and the file still compiles.",
+      "severity": "advisory"
+     },
+     "note_m2": "Docstring: codomain's not domain's. All reviewers fix it; some keep 'but' (minor)."
+    }
+   },
+   "entries_text": {}
+  },
+  {
+   "id": "v0110",
+   "pr": 34091,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "Similarly in comments below",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "line": 67,
+   "author": "ocfnash",
+   "at": "2026-02-17T15:34:13Z",
+   "matcher_text": {
+    "ask_id": "v0110",
+    "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "code_at_comment": "@@ -64,33 +64,51 @@ theorem infinite_pigeonhole_set {β α : Type u} {s : Set β} (f : s → α) (θ\n     rfl\n   rintro x ⟨_, hx'⟩; exact hx'\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's",
+    "comment": "Similarly in comments below",
+    "replies_to": "```suggestion\n/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's\n```"
+   },
+   "outcomes": {
+    "X2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `exists_infinite_fiber` has the same error: \"infinite but strictly greater than its domain's\" should compare against the codomain, since the hypothesis is `h : #α < #β` with `f : β → α`.",
+      "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.\"",
+      "severity": "blocking"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `exists_infinite_fiber` has the same error: \"infinite but strictly greater than its domain's\" should compare against the codomain, since the hypothesis is `h : #α < #β` with `f : β → α`.",
+      "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `Cardinal.exists_infinite_fiber` as edited by this PR says the domain's cardinality is \"strictly greater than its domain's\", which is meaningless; the hypothesis is `#α < #β`, i.e. greater than the codomain's.",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `Cardinal.exists_infinite_fiber` as edited by this PR says the domain's cardinality is \"strictly greater than its domain's\", which is meaningless; the hypothesis is `#α < #β`, i.e. greater than the codomain's.",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "AP2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+      "claim": "The docstring added for `exists_uncountable_fiber` repeats the same self-comparison: \"A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber\", which is false of the declaration, whose hypothesis `(h : #α < #β)` puts the strictly smaller cardinality on the codomain `α`.",
+      "requested_change": "Write \"A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `infinite_pigeonhole_card_lt` compares the domain with itself: \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the statement is `(h : #α < #β)`, so the second term is the codomain, and this PR produced the error by flipping \"strictly smaller than its domain's\" to \"strictly greater\" while only rewriting the first clause. The same botched flip was made in `exists_infinite_fiber`'s docstring, lines 78–79 (also \"... infinite but strictly greater than its domain's ...\"). The second sentence additionally still reads \"cardinality strictly great than the codomain\".",
+      "requested_change": "Rewrite both docstrings as, respectively: \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain.\" and \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "GPT1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` says the domain's cardinality is “strictly greater than its domain's”, but the theorem's comparison is between the codomain and domain cardinalities (`#α < #β`).",
+      "requested_change": "Change the first line to: `A function whose domain's cardinality is infinite and strictly greater than its codomain's` (leaving the second line as “has an infinite fiber.”).",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` says the domain's cardinality is “strictly greater than its domain's”, but the theorem's comparison is between the codomain and domain cardinalities (`#α < #β`).",
+      "requested_change": "Change the first line to: `A function whose domain's cardinality is infinite and strictly greater than its codomain's` (leaving the second line as “has an infinite fiber.”).",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "T1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The new docstring of `exists_infinite_fiber` says \"domain's cardinality is infinite but strictly greater than its domain's\". It should compare with the codomain, since the hypothesis is `h : #α < #β` for `f : β → α`.",
+      "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The new docstring of `exists_infinite_fiber` says \"domain's cardinality is infinite but strictly greater than its domain's\". It should compare with the codomain, since the hypothesis is `h : #α < #β` for `f : β → α`.",
+      "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", which compares the domain's cardinality with itself; the statement's hypotheses are `hβ : ℵ₀ ≤ #β` (domain infinite) and `h : #α < #β` (codomain strictly smaller), so the second occurrence must be \"its codomain's\". The identical wording error is in the docstrings of `Cardinal.exists_infinite_fiber` (line 78) and `Cardinal.exists_uncountable_fiber` (line 95), which this PR also rewrote. There is also a leftover typo \"strictly great than\" in all three.",
+      "requested_change": "In all three docstrings replace the trailing \"than its domain's\" by \"than its codomain's\" and \"strictly great than the codomain\" by \"strictly greater than the codomain\", so that they read e.g. `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain. -/`, `/-- ... has an infinite fiber. -/` and `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", which compares the domain's cardinality with itself; the statement's hypotheses are `hβ : ℵ₀ ≤ #β` (domain infinite) and `h : #α < #β` (codomain strictly smaller), so the second occurrence must be \"its codomain's\". The identical wording error is in the docstrings of `Cardinal.exists_infinite_fiber` (line 78) and `Cardinal.exists_uncountable_fiber` (line 95), which this PR also rewrote. There is also a leftover typo \"strictly great than\" in all three.",
+      "requested_change": "In all three docstrings replace the trailing \"than its domain's\" by \"than its codomain's\" and \"strictly great than the codomain\" by \"strictly greater than the codomain\", so that they read e.g. `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain. -/`, `/-- ... has an infinite fiber. -/` and `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "TA1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `exists_infinite_fiber` (lines 78-79) says the domain's cardinality is \"strictly greater than its domain's\", which is false of the statement (`#α < #β` compares with the codomain α).",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The docstring of `exists_infinite_fiber` (lines 78-79) says the domain's cardinality is \"strictly greater than its domain's\", which is false of the statement (`#α < #β` compares with the codomain α).",
+      "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas an infinite fiber. -/`",
+      "severity": "blocking"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, but the theorem assumes `#α < #β`, i.e. the domain is larger than the codomain.",
+      "requested_change": "Rewrite the docstring to say that a function whose domain has infinite cardinality strictly greater than its codomain's cardinality has an infinite fiber.",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, but the theorem assumes `#α < #β`, i.e. the domain is larger than the codomain.",
+      "requested_change": "Rewrite the docstring to say that a function whose domain has infinite cardinality strictly greater than its codomain's cardinality has an infinite fiber.",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` misstates the hypothesis by saying the domain's cardinality is strictly greater than the domain's; the theorem assumes it is strictly greater than the codomain's.",
+      "requested_change": "Rewrite it to say that a function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring for `Cardinal.exists_infinite_fiber` misstates the hypothesis by saying the domain's cardinality is strictly greater than the domain's; the theorem assumes it is strictly greater than the codomain's.",
+      "requested_change": "Rewrite it to say that a function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "DX1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-contradictory: it reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\". In these statements the type is `f : β → α`, so β is the domain and α the codomain, and the hypothesis `#α < #β` compares domain against codomain; the pre-PR wording (\"whose codomain's cardinality is infinite but strictly smaller than its domain's\") was correct, and moving the clause to \"domain's\" without changing the comparison produced an impossible statement (it now asserts #β > #β). The same three docstrings also carry the typo \"strictly great than\".",
+      "requested_change": "Replace the second clause in all three docstrings with \"codomain's\" and fix the typo. For `infinite_pigeonhole_card_lt` (lines 67-68): \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\". For `exists_infinite_fiber` (78-79): \"...strictly greater than its codomain's / has an infinite fiber.\". For `exists_uncountable_fiber` (95-96): \"...strictly greater than its codomain's / has an uncountable fiber.\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-contradictory: it reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\". In these statements the type is `f : β → α`, so β is the domain and α the codomain, and the hypothesis `#α < #β` compares domain against codomain; the pre-PR wording (\"whose codomain's cardinality is infinite but strictly smaller than its domain's\") was correct, and moving the clause to \"domain's\" without changing the comparison produced an impossible statement (it now asserts #β > #β). The same three docstrings also carry the typo \"strictly great than\".",
+      "requested_change": "Replace the second clause in all three docstrings with \"codomain's\" and fix the typo. For `infinite_pigeonhole_card_lt` (lines 67-68): \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\". For `exists_infinite_fiber` (78-79): \"...strictly greater than its codomain's / has an infinite fiber.\". For `exists_uncountable_fiber` (95-96): \"...strictly greater than its codomain's / has an uncountable fiber.\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+      "claim": "The docstring added for the new `Cardinal.exists_uncountable_fiber` repeats the same error as the modified docstrings above: \"A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber\" compares the domain's cardinality to the domain's, but the hypothesis `h : #α < #β` compares it to the codomain's.",
+      "requested_change": "Write `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+      "claim": "The docstrings rewritten for `Cardinal.infinite_pigeonhole_card_lt` (line 67) and `Cardinal.exists_infinite_fiber` (line 78) are self-contradictory: both now read \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", comparing the domain's cardinality with the domain's again, whereas the hypothesis `h : #α < #β` compares it with the *codomain's* (α is the codomain of `f : β → α`). This is exactly the mistake the rewrite introduced — the previous wording correctly said \"codomain's cardinality ... smaller than its domain's\". The same sentence also still has the typo \"strictly great than the codomain\".",
+      "requested_change": "Restore the domain/codomain distinction in both docstrings and fix the typo, e.g.\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/` for `infinite_pigeonhole_card_lt`, and\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber. -/` for `exists_infinite_fiber`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "AP1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring this PR writes for the generalized `Cardinal.exists_infinite_fiber` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` must be the codomain, otherwise the sentence describes nothing that the declaration `(h : #α < #β) (hβ : Infinite β)` states.",
+      "requested_change": "Rewrite as \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has an infinite fiber.\"",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+      "claim": "The docstring this PR writes for the generalized `Cardinal.exists_infinite_fiber` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` must be the codomain, otherwise the sentence describes nothing that the declaration `(h : #α < #β) (hβ : Infinite β)` states.",
+      "requested_change": "Rewrite as \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has an infinite fiber.\"",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The rewritten docstring of `Cardinal.exists_infinite_fiber` (lines 78-79) has the same defect: \"A function whose domain's cardinality is infinite but strictly greater than its domain's has an infinite fiber.\" The hypothesis `h : #α < #β` compares the domain β with the codomain α, so the sentence as written is meaningless for its own statement.",
+      "requested_change": "Replace the second \"its domain's\" with \"its codomain's\": \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas an infinite fiber. -/\".",
+      "severity": "advisory"
+     },
+     "note_m1": "Same domain/codomain docstring fix in exists_infinite_fiber and exists_uncountable_fiber. All reviewers fix it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+      "claim": "The rewritten docstring of `Cardinal.exists_infinite_fiber` (lines 78-79) has the same defect: \"A function whose domain's cardinality is infinite but strictly greater than its domain's has an infinite fiber.\" The hypothesis `h : #α < #β` compares the domain β with the codomain α, so the sentence as written is meaningless for its own statement.",
+      "requested_change": "Replace the second \"its domain's\" with \"its codomain's\": \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas an infinite fiber. -/\".",
+      "severity": "advisory"
+     },
+     "note_m2": "Same docstring fix in exists_infinite_fiber / exists_uncountable_fiber; all reviewers."
+    }
+   },
+   "entries_text": {}
+  }
+ ],
+ "pr": 34091,
+ "sessions": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` as edited by this PR misstates the theorem: it says the domain's cardinality is \"strictly greater than its domain's\" (it should be the codomain's, matching `h : #α < #β`), keeps \"but\" where the two conditions are now conjoined, and keeps the typo \"strictly great than\" on the line below.",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The docstring of `Cardinal.exists_infinite_fiber` as edited by this PR says the domain's cardinality is \"strictly greater than its domain's\", which is meaningless; the hypothesis is `#α < #β`, i.e. greater than the codomain's.",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring of the new `Cardinal.exists_uncountable_fiber` repeats the same error: \"uncountable but strictly greater than its domain's\" where the hypothesis `h : #α < #β` compares with the codomain.",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain's cardinality is uncountable and strictly greater than its codomain's has an uncountable fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The new proof of `Cardinal.infinite_pigeonhole_card_lt` case-splits on `#α < ℵ₀` and calls `infinite_pigeonhole_card` twice with separate regularity arguments (`isRegular_aleph0`, `isRegular_succ`), but under the generalized hypothesis `ℵ₀ ≤ #β` the statement follows directly from the existing fiber bound `Cardinal.mk_le_mk_mul_of_mk_preimage_le` and `Cardinal.mul_lt_of_lt`, with no case split and no cofinality.",
+     "requested_change": "Replace the proof body with:\n```lean\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ h h)\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The proof of the new `Cardinal.exists_uncountable_fiber` rewrites through `succ_le_iff`/`succ_aleph0` to `ℵ₁`, case-splits on `#α < ℵ₀`, and uses `isRegular_aleph_one` plus `Order.succ_le_succ_iff`; the statement is a direct consequence of `mk_le_mk_mul_of_mk_preimage_le` with bound `ℵ₀`, since `#α * ℵ₀ < #β` once `ℵ₀ < #β`.",
+     "requested_change": "Replace the proof body with:\n```lean\n  simp_rw [← Cardinal.aleph0_lt_mk_iff] at hβ ⊢\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ.le h hβ)\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "`Cardinal.exists_infinite_fiber` takes the Prop-valued class `Infinite β` as an explicit hypothesis `(hβ : Infinite β)`, and the PR's new siblings copy the pattern (`(hα : Infinite α)` in `exists_infinite_fiber'`, `(hβ : Uncountable β)` in `exists_uncountable_fiber`); every call site discharges it with `(by infer_instance)`, and the finite sibling `Finite.exists_infinite_fiber [Infinite α] [Finite β]` uses instance binders. Since the PR changes this signature anyway, this is the moment to fix it.",
+     "requested_change": "Make the class hypotheses instance-implicit: `exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` (proved by `have : Infinite β := Cardinal.infinite_iff.2 ((Cardinal.infinite_iff.1 ‹_›).trans h.le); exists_infinite_fiber f h`), and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)` (starting with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`). Drop the `(by infer_instance)` arguments in `le_range_of_union_finset_eq_univ` and in `linearIndependent_le_infinite_basis` (StrongRankCondition.lean).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The docstring of `infinite_pigeonhole_card_lt` as the PR leaves it says the domain's cardinality is \"strictly greater than its domain's\", which is vacuous and does not match the hypothesis `h : #α < #β`. The PR changed both occurrences of \"codomain's\" to \"domain's\", but only the first should have changed (to match the new `hβ : ℵ₀ ≤ #β`). The existing typo \"strictly great than\" is still there.",
+     "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The docstring of `exists_infinite_fiber` has the same error: \"infinite but strictly greater than its domain's\" should compare against the codomain, since the hypothesis is `h : #α < #β` with `f : β → α`.",
+     "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring of the new `exists_uncountable_fiber` copies the same error: \"uncountable but strictly greater than its domain's\". It should compare against the codomain (`h : #α < #β`, `f : β → α`).",
+     "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is uncountable and strictly greater than its codomain's has an uncountable fiber.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The new proof of `infinite_pigeonhole_card_lt` splits on `#α < ℵ₀` and goes through `infinite_pigeonhole_card` and regularity (`isRegular_aleph0`, `isRegular_succ`) in both branches. With the generalized hypothesis `ℵ₀ ≤ #β`, the statement follows directly from the existing lemmas `mk_le_mk_mul_of_mk_preimage_le` and `mul_lt_of_lt`: if every fiber has cardinality at most `#α`, then `#β ≤ #α * #α < #β`.",
+     "requested_change": "Replace the proof with:\n```\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ h h)\n```\n(This also removes the `simp_rw [← succ_le_iff]` and the case split.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The proof of the new `exists_uncountable_fiber` goes through `succ_aleph0`/`ℵ₁`, a case split, `isRegular_aleph_one` and a `succ_le_succ_iff` rewrite. The statement is one application of `mk_le_mk_mul_of_mk_preimage_le` plus `mul_lt_of_lt`: if every fiber has cardinality at most `ℵ₀`, then `#β ≤ #α * ℵ₀ < #β`. The proof also writes `Cardinal.aleph0_lt_mk_iff`, `Order.succ_le_iff` and `Order.succ_le_succ_iff`, but the file is inside `namespace Cardinal` with `open Order`, so the prefixes are redundant.",
+     "requested_change": "Replace the proof with:\n```\n  simp_rw [← aleph0_lt_mk_iff] at hβ ⊢\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ.le h hβ)\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+     "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:110",
+     "claim": "The PR renames the lemma (with a deprecation) to carry out the old TODO, but the new name still says `union` for the indexed union `⋃ a, (f a : Set β) = Set.univ`. Mathlib names that hypothesis shape `iUnion ... eq_univ` (e.g. `MeasureTheory.Measure.ext_iff_of_iUnion_eq_univ`, `Set.injective_iff_injective_of_iUnion_eq_univ`, `Subspace.exists_eq_top_of_iUnion_eq_univ`). Because the rename is paid for now, it should land on the conventional name.",
+     "requested_change": "Rename `le_range_of_union_finset_eq_univ` to `le_range_of_iUnion_finset_eq_univ`. Point the deprecated alias `le_range_of_union_finset_eq_top` at the new name, and update the use in `infinite_basis_le_maximal_linearIndependent'` (LinearAlgebra/Basis/Cardinality.lean:119).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "The docstring of the new `exists_infinite_fiber'` reads \"that requires codomain to be infinite\" and is missing the article.",
+     "requested_change": "Change the docstring to \"A weaker version of `exists_infinite_fiber` that requires the codomain to be infinite.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The PR deletes the only use of `Set.union_finset_finite_of_range_finite` (and of `infinite_coe_iff`/`infinite_univ`) from this file. The file compiles without its `public import Mathlib.Data.Set.Finite.Lattice`, and that module is where `union_finset_finite_of_range_finite` is declared. `Pigeonhole.lean` was that lemma's only user in Mathlib.",
+     "requested_change": "Remove the now-unneeded `public import Mathlib.Data.Set.Finite.Lattice` from `Mathlib/SetTheory/Cardinal/Pigeonhole.lean`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The docstring of `infinite_pigeonhole_card_lt` that this PR rewrote now says the domain's cardinality is \"strictly greater than its domain's\", which is impossible. The second \"domain's\" should be \"codomain's\" (the hypothesis is `#α < #β` for `f : β → α`). The line also keeps the old typo \"strictly great than\".",
+     "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas a fiber with cardinality strictly greater than the codomain. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The new docstring of `exists_infinite_fiber` says \"domain's cardinality is infinite but strictly greater than its domain's\". It should compare with the codomain, since the hypothesis is `h : #α < #β` for `f : β → α`.",
+     "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\nhas an infinite fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring of the new lemma `exists_uncountable_fiber` says \"domain's cardinality is uncountable but strictly greater than its domain's\". It should say codomain's, since the hypothesis is `h : #α < #β` for `f : β → α`.",
+     "requested_change": "Change the docstring to: `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's\nhas an uncountable fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "This PR changes the signature of `exists_infinite_fiber` anyway, but it still takes the class hypothesis `Infinite β` as an explicit argument `(hβ : Infinite β)`. Its call site in this PR has to pass `(by infer_instance)` (`le_range_of_union_finset_eq_univ`). Mathlib takes `Infinite` as an instance argument `[Infinite β]`.",
+     "requested_change": "Make the binder instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ∃ a : α, Infinite (f ⁻¹' {a}) := by` followed by `have hβ := aleph0_le_mk β` and `simp_rw [Cardinal.infinite_iff]` (the goal only), with the rest of the proof unchanged. Replace `exists_infinite_fiber u' h (by infer_instance)` in `le_range_of_union_finset_eq_univ` with `exists_infinite_fiber u' h`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "The new lemma `exists_infinite_fiber'` takes the class `Infinite α` as an explicit hypothesis `(hα : Infinite α)`. Its only caller, `linearIndependent_le_infinite_basis`, passes `(by infer_instance)`.",
+     "requested_change": "State it as `theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  have : Infinite β := infinite_iff.mpr ((aleph0_le_mk α).trans h.le)\n  exists_infinite_fiber f h`. In `linearIndependent_le_infinite_basis` (StrongRankCondition.lean) write `Cardinal.exists_infinite_fiber' Φ h` without `(by infer_instance)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The new lemma `exists_uncountable_fiber` takes the class `Uncountable β` as an explicit argument `(hβ : Uncountable β)`. Mathlib binds `Uncountable` as an instance argument, as in `[Uncountable β]` and `aleph0_lt_mk [Uncountable α]`.",
+     "requested_change": "Use `[Uncountable β]` and derive the cardinal bound inside the proof: `theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  have hβ : ℵ₁ ≤ #β := succ_aleph0 ▸ succ_le_of_lt aleph0_lt_mk\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hβ.trans' aleph0_lt_aleph_one.le)\n    rw [← succ_le_succ_iff, succ_aleph0] at hα\n    exact ⟨a, hα.trans (succ_le_of_lt ha)⟩`",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The docstring of `infinite_pigeonhole_card_lt` (Pigeonhole.lean lines 67-68) is wrong: it says the domain's cardinality is \"strictly greater than its domain's\" (it must be the codomain's), and the second line still reads \"strictly great than the codomain\".",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain's. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The docstring of `exists_infinite_fiber` (lines 78-79) says the domain's cardinality is \"strictly greater than its domain's\", which is false of the statement (`#α < #β` compares with the codomain α).",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain is infinite and has cardinality strictly greater than its codomain's\\nhas an infinite fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring of the new `exists_uncountable_fiber` (lines 95-96) says the domain's cardinality is \"strictly greater than its domain's\"; it must be the codomain's.",
+     "requested_change": "Replace the docstring with: `/-- A function whose domain is uncountable and has cardinality strictly greater than its\\ncodomain's has an uncountable fiber. -/`",
+     "severity": "blocking"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "`exists_infinite_fiber` takes the class hypothesis `Infinite β` as an explicit named argument `(hβ : Infinite β)`; its in-PR caller `le_range_of_union_finset_eq_univ` has to pass `(by infer_instance)` for it.",
+     "requested_change": "Make it instance-implicit: `theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ...`, start the proof with `have hβ := infinite_iff.mp ‹Infinite β›` and `simp_rw [infinite_iff]`, and drop the `(by infer_instance)` argument at line 121 (`exists_infinite_fiber u' h`) and the explicit argument in `exists_infinite_fiber'`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The new `exists_uncountable_fiber` takes the class hypothesis `Uncountable β` as an explicit named argument `(hβ : Uncountable β)`.",
+     "requested_change": "Take it as `[Uncountable β]` and derive the cardinal bound inside the proof: `have hβ : ℵ₁ ≤ #β := by\\n    rw [← succ_aleph0, succ_le_iff, aleph0_lt_mk_iff]\\n    infer_instance` followed by `simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "`exists_infinite_fiber'` only restates `exists_infinite_fiber` under the stronger hypothesis `Infinite α` (combined with `infinite_iff` and `h.le`), without simplifying the statement, and it has a single use (`linearIndependent_le_infinite_basis`).",
+     "requested_change": "Remove `exists_infinite_fiber'` and at its single use call `exists_infinite_fiber` directly: `obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ :=\\n    exists_infinite_fiber Φ h (Cardinal.infinite_iff.2 ((aleph0_le_mk _).trans h.le))` in `linearIndependent_le_infinite_basis`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "`exists_infinite_fiber'` is told apart from `exists_infinite_fiber` only by a prime, though it is the special case (it assumes the codomain `α` infinite instead of the domain `β`).",
+     "requested_change": "If the lemma is kept, rename it with a suffix that names the differing hypothesis, e.g. `exists_infinite_fiber_of_infinite_codomain`, and update the use in `linearIndependent_le_infinite_basis`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "The docstring of `exists_infinite_fiber'` describes it only by contrast with another declaration (\"A weaker version of `exists_infinite_fiber` that requires codomain to be infinite\") and does not state what it proves.",
+     "requested_change": "If the lemma is kept, give a standalone docstring: `/-- A function whose codomain is infinite and has cardinality strictly smaller than its domain's\\nhas an infinite fiber. -/`",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "`exists_infinite_fiber'` takes the class hypothesis `Infinite α` as an explicit named argument `(hα : Infinite α)`, and its only caller passes `(by infer_instance)` for it.",
+     "requested_change": "If the lemma is kept, make the hypothesis `[Infinite α]` and drop `(by infer_instance)` at StrongRankCondition.lean:250 (`exists_infinite_fiber' Φ h`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "The proof of `exists_infinite_fiber'` embeds a multi-line tactic block `(by rw [Cardinal.infinite_iff] at hα ⊢ / exact hα.trans h.le)` as an argument inside a term application.",
+     "requested_change": "Replace the embedded `by` block with a one-line term: `exists_infinite_fiber f h (infinite_iff.2 ((aleph0_le_mk α).trans h.le))`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The proof of `exists_uncountable_fiber` puts two tactics on one line with `;`: `(by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)`.",
+     "requested_change": "Replace the `by ...; ...` argument with the term `((hα.trans aleph0_lt_aleph_one).trans_eq isRegular_aleph_one.cof_eq.symm)`, or else put the two tactics on separate lines.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "Inside `namespace Cardinal` with `open Order`, the proof of `exists_uncountable_fiber` writes namespace prefixes those already supply: `Cardinal.aleph0_lt_mk_iff`, `Order.succ_le_iff` (line 99) and `Order.succ_le_succ_iff` (line 104). The same file uses `succ_le_iff` unqualified at line 71.",
+     "requested_change": "Write `aleph0_lt_mk_iff`, `succ_le_iff` and `succ_le_succ_iff` without the `Cardinal.`/`Order.` prefixes.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "Inside `namespace Cardinal`, the proof of `exists_infinite_fiber` writes `Cardinal.infinite_iff` (line 82), with a prefix the enclosing namespace already supplies. `exists_infinite_fiber'` does the same at line 92.",
+     "requested_change": "Write `infinite_iff` without the `Cardinal.` prefix at lines 82 and 92.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:244",
+     "claim": "The line the PR changes in `linearIndependent_le_infinite_basis` writes `Cardinal.exists_infinite_fiber'`, but StrongRankCondition.lean has `open Cardinal ...` (line 58), so the prefix is redundant.",
+     "requested_change": "Write `exists_infinite_fiber' Φ h ...` without the `Cardinal.` prefix (or `exists_infinite_fiber ...` if the primed lemma is removed).",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/LinearAlgebra/Basis/Cardinality.lean:114",
+     "claim": "The line the PR changes in `infinite_basis_le_maximal_linearIndependent'` writes `Cardinal.le_range_of_union_finset_eq_univ`, but Basis/Cardinality.lean has `open Module Basis Cardinal ...` (line 21), so the prefix is redundant.",
+     "requested_change": "Write `apply le_range_of_union_finset_eq_univ` (under its final name) without the `Cardinal.` prefix.",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:110",
+     "claim": "The new name `le_range_of_union_finset_eq_univ` spells the indexed union `⋃ a, ...` in its hypothesis as `union`; the library names that operation `iUnion`.",
+     "requested_change": "Rename it to `le_range_of_iUnion_finset_eq_univ`, point the deprecated alias `le_range_of_union_finset_eq_top` at the new name, and update the call in `infinite_basis_le_maximal_linearIndependent'`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The four pigeonhole lemmas the PR changes or adds (`infinite_pigeonhole_card_lt`, `exists_infinite_fiber`, `exists_infinite_fiber'`, `exists_uncountable_fiber`) each repeat the same binders `{β α : Type u} (f : β → α)`.",
+     "requested_change": "Wrap these four lemmas in a `section` with `variable {β α : Type u} (f : β → α)` and remove those binders from each signature.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "`exists_uncountable_fiber` makes every caller supply the cardinal inequality `#α < #β`. In its common use, a countable codomain, that inequality follows from the classes, but no lemma states that simpler case.",
+     "requested_change": "Add the corollary `theorem exists_uncountable_fiber_of_countable {β α : Type u} (f : β → α) [Countable α] [Uncountable β] : ∃ a : α, Uncountable (f ⁻¹' {a}) := exists_uncountable_fiber f ((mk_le_aleph0_iff.2 ‹_›).trans_lt (aleph0_lt_mk_iff.2 ‹_›)) ‹_›` (adjusted to the instance-implicit `[Uncountable β]` if that change is made), with a docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 18,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The second branch of `exists_uncountable_fiber` rewrites `hα` with `Order.succ_le_succ_iff` and `succ_aleph0` only so it can chain with `succ_le_of_lt`. A one-line term does the same.",
+     "requested_change": "Replace lines 104-105 (`rw [← Order.succ_le_succ_iff, succ_aleph0] at hα` / `exact ⟨a, hα.trans (succ_le_of_lt ha)⟩`) with `exact ⟨a, succ_aleph0 ▸ succ_le_of_lt (hα.trans_lt ha)⟩`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 19,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:110",
+     "claim": "Renaming `le_range_of_union_finset_eq_top` to `le_range_of_union_finset_eq_univ` (with its deprecation alias and the call-site change in LinearAlgebra/Basis/Cardinality.lean) is not needed to generalize the pigeonhole lemmas, which is this PR's stated purpose. Only the proof change (dropping `k` now that `exists_infinite_fiber` takes `Infinite β`) is.",
+     "requested_change": "Keep the proof change in this PR, and move the `⊤`→`Set.univ` rename, the removal of its TODO, the deprecated alias and the Basis/Cardinality.lean edit to a separate PR (or state the rename in the PR description as an intended part of it).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` describes the domain as “strictly greater than its domain's”, which is self-contradictory and no longer describes the hypothesis `#α < #β`. It also retains the grammatical typo “strictly great”.",
+     "requested_change": "Change this docstring to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than that of the codomain.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The docstring for `Cardinal.exists_infinite_fiber` says the domain's cardinality is “strictly greater than its domain's”, but the theorem's comparison is between the codomain and domain cardinalities (`#α < #β`).",
+     "requested_change": "Change the first line to: `A function whose domain's cardinality is infinite and strictly greater than its codomain's` (leaving the second line as “has an infinite fiber.”).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring for `Cardinal.exists_uncountable_fiber` says the uncountable domain is “strictly greater than its domain's”, but the theorem assumes the domain cardinality is strictly greater than the codomain's (`#α < #β`).",
+     "requested_change": "Change the first line to: `A function whose domain's cardinality is uncountable and strictly greater than its codomain's` (leaving the second line as “has an uncountable fiber.”).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-contradictory: it reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\". In these statements the type is `f : β → α`, so β is the domain and α the codomain, and the hypothesis `#α < #β` compares domain against codomain; the pre-PR wording (\"whose codomain's cardinality is infinite but strictly smaller than its domain's\") was correct, and moving the clause to \"domain's\" without changing the comparison produced an impossible statement (it now asserts #β > #β). The same three docstrings also carry the typo \"strictly great than\".",
+     "requested_change": "Replace the second clause in all three docstrings with \"codomain's\" and fix the typo. For `infinite_pigeonhole_card_lt` (lines 67-68): \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\". For `exists_infinite_fiber` (78-79): \"...strictly greater than its codomain's / has an infinite fiber.\". For `exists_uncountable_fiber` (95-96): \"...strictly greater than its codomain's / has an uncountable fiber.\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:8",
+     "claim": "This PR deletes the `have k` block from `Cardinal.le_range_of_union_finset_eq_univ`, and that block contained the only use in the file of `Set.union_finset_finite_of_range_finite`, the only declaration this file took from `Mathlib.Data.Set.Finite.Lattice` (the block's other two lemmas, `Set.infinite_univ` and `Set.infinite_coe_iff`, are declared in `Mathlib.Data.Set.Finite.Basic` and `Mathlib.Data.Finite.Defs`). No declaration defined in `Mathlib.Data.Set.Finite/Lattice.lean` (including `Finite.iUnion`, `Finite.biUnion`, `Infinite.biUnion`, `Finite.bddAbove`, `finite_subset_iUnion`, ...) occurs anywhere in Pigeonhole.lean afterwards, so `import Mathlib.Data.Set.Finite.Lattice` is now dead and should not be left behind by the simplification.",
+     "requested_change": "Delete line 8 (`public import Mathlib.Data.Set.Finite.Lattice`), leaving `public import Mathlib.SetTheory.Cardinal.Regular`. Verified: the file compiles unchanged otherwise. If the module is deliberately re-exported for downstream users, keep it with an explicit `-- shake: keep` comment instead.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:88",
+     "claim": "`Cardinal.exists_infinite_fiber'` is a strict special case of the declaration immediately above it, not an independent result: its hypotheses `#α < #β` and `Infinite α` imply `Infinite β` via `h.le`, so the general `exists_infinite_fiber` subsumes it, and the lemma is added only so that the single call site `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` does not have to derive `Infinite κ` from `#(Finset ι) < #κ`. Adding a weaker restatement of a just-generalized lemma to the public API for one internal call site is not something we should carry permanently (the `'` suffix in this PR's other file, `infinite_basis_le_maximal_linearIndependent'`, denotes the *more* general statement, and this lemma makes the same suffix mean the opposite in the same PR).",
+     "requested_change": "Delete `exists_infinite_fiber'` (lines 88-93) and generalize at the use site: in `linearIndependent_le_infinite_basis` replace line 250 with\n`  have hκ : Infinite κ := by`\n`    rw [Cardinal.infinite_iff] at ⊢`\n`    exact (Cardinal.infinite_iff.mp (inferInstance : Infinite (Finset ι))).trans h.le`\n`  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h hκ`",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/ea8a8ae63afc27cd3d4a462ec59350987883277a0138d2781493850fe38ac2e2/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__ad0db53c-b933-4e39-adda-f7938485e9a1.jsonl"
+  },
+  "AP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstring this PR writes for `Cardinal.infinite_pigeonhole_card_lt` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` is wrong (the comparison is with the codomain), so the docstring contradicts the declaration's own statement `(h : #α < #β) (hβ : ℵ₀ ≤ #β)`; the same sentence also keeps the typo \"strictly great than the codomain\".",
+     "requested_change": "Replace the docstring with wording that matches the statement, e.g. \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has a fiber with cardinality strictly greater than the codomain.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+     "claim": "The docstring this PR writes for the generalized `Cardinal.exists_infinite_fiber` says \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the second `domain's` must be the codomain, otherwise the sentence describes nothing that the declaration `(h : #α < #β) (hβ : Infinite β)` states.",
+     "requested_change": "Rewrite as \"A function whose domain's cardinality is infinite and strictly greater than the codomain's has an infinite fiber.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+     "claim": "The docstring of the newly added `Cardinal.exists_uncountable_fiber` says \"A function whose domain's cardinality is uncountable but strictly greater than its domain's\" — the second `domain's` is wrong, it is the codomain whose cardinality is compared.",
+     "requested_change": "Rewrite as \"A function whose domain's cardinality is uncountable and strictly greater than the codomain's has an uncountable fiber.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:88",
+     "claim": "The docstring of the new `Cardinal.exists_infinite_fiber'` — \"A weaker version of `exists_infinite_fiber` that requires codomain to be infinite.\" — explains the declaration by contrast with its sibling instead of on its own terms (and is ungrammatical: \"requires codomain\").",
+     "requested_change": "Give it a standalone description of what it states, e.g. re-use the wording the PR deleted from `exists_infinite_fiber`: \"A function whose codomain's cardinality is infinite but strictly smaller than its domain's has an infinite fiber.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "`Cardinal.exists_infinite_fiber'` is a variant of the new general `exists_infinite_fiber` distinguished only by its hypothesis (`Infinite α` instead of `Infinite β`), yet it is named by appending a prime rather than by naming the term that differs; the prime carries no information about which type must be infinite.",
+     "requested_change": "Rename it to a name that states the differing hypothesis, e.g. `exists_infinite_fiber_of_infinite_codomain`, and update the call in `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean` (line 250).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "`Cardinal.exists_infinite_fiber` (and the same PR's `Cardinal.exists_infinite_fiber'`, line 89, and `Cardinal.exists_uncountable_fiber`, line 97) take a class-typed hypothesis as a named explicit argument (`hβ : Infinite β`, `hα : Infinite α`, `hβ : Uncountable β`), whereas such hypotheses are taken as instance-implicit arguments; no other declaration in Mathlib takes an explicit `Infinite`/`Uncountable` hypothesis, and both call sites in this PR already have the instance in scope and pass `(by infer_instance)` by hand.",
+     "requested_change": "Take them as instance-implicit: `[Infinite β]` for `exists_infinite_fiber`, `[Infinite α]` for `exists_infinite_fiber'`, `[Uncountable β]` for `exists_uncountable_fiber` (writing `have hβ : ... := inferInstance` where the proofs want to rewrite the hypothesis), and drop the now-redundant `(by infer_instance)` arguments at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250` and `Mathlib/SetTheory/Cardinal/Pigeonhole.lean:121`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:101",
+     "claim": "The new proof of `Cardinal.exists_uncountable_fiber` sequences two tactics on one line with `;` — `(by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)` — instead of writing one tactic per line.",
+     "requested_change": "Split it over lines: `(by` / `  rw [isRegular_aleph_one.cof_eq]` / `  exact hα.trans aleph0_lt_aleph_one)`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/026bdc45fee4db697aab80dbf0545e0273302cfa6f0eae95b6fdf937523779e2/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__2c30cfb2-09fc-41b7-b948-d14410a541c1.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` misstates the hypothesis: it says the domain's cardinality is strictly greater than the domain's, and also says \"strictly great\" instead of \"strictly greater\" for the conclusion.",
+     "requested_change": "Rewrite it to say that the domain's cardinality is infinite and strictly greater than the codomain's, and that the fiber has cardinality strictly greater than the codomain.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+     "claim": "The docstring for `Cardinal.exists_infinite_fiber` misstates the hypothesis by saying the domain's cardinality is strictly greater than the domain's; the theorem assumes it is strictly greater than the codomain's.",
+     "requested_change": "Rewrite it to say that a function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+     "claim": "The docstring for `Cardinal.exists_uncountable_fiber` misstates the hypothesis by saying the domain's cardinality is strictly greater than the domain's; the theorem assumes it is strictly greater than the codomain's.",
+     "requested_change": "Rewrite it to say that a function whose domain's cardinality is uncountable and strictly greater than its codomain's has an uncountable fiber.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstrings rewritten for `Cardinal.infinite_pigeonhole_card_lt` (line 67) and `Cardinal.exists_infinite_fiber` (line 78) are self-contradictory: both now read \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", comparing the domain's cardinality with the domain's again, whereas the hypothesis `h : #α < #β` compares it with the *codomain's* (α is the codomain of `f : β → α`). This is exactly the mistake the rewrite introduced — the previous wording correctly said \"codomain's cardinality ... smaller than its domain's\". The same sentence also still has the typo \"strictly great than the codomain\".",
+     "requested_change": "Restore the domain/codomain distinction in both docstrings and fix the typo, e.g.\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's. -/` for `infinite_pigeonhole_card_lt`, and\n`/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber. -/` for `exists_infinite_fiber`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+     "claim": "The docstring added for the new `Cardinal.exists_uncountable_fiber` repeats the same error as the modified docstrings above: \"A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber\" compares the domain's cardinality to the domain's, but the hypothesis `h : #α < #β` compares it to the codomain's.",
+     "requested_change": "Write `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/8402e8ab3dfeffa97c8dee73921600ca400dad5b5937de98657947e179665c32/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__e1da9026-d166-421a-99d0-8bf20c511d2f.jsonl"
+  },
+  "AP2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstring of `infinite_pigeonhole_card_lt` compares the domain with itself: \"A function whose domain's cardinality is infinite but strictly greater than its domain's\" — the statement is `(h : #α < #β)`, so the second term is the codomain, and this PR produced the error by flipping \"strictly smaller than its domain's\" to \"strictly greater\" while only rewriting the first clause. The same botched flip was made in `exists_infinite_fiber`'s docstring, lines 78–79 (also \"... infinite but strictly greater than its domain's ...\"). The second sentence additionally still reads \"cardinality strictly great than the codomain\".",
+     "requested_change": "Rewrite both docstrings as, respectively: \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain.\" and \"A function whose domain's cardinality is infinite but strictly greater than its codomain's has an infinite fiber.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+     "claim": "The docstring added for `exists_uncountable_fiber` repeats the same self-comparison: \"A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber\", which is false of the declaration, whose hypothesis `(h : #α < #β)` puts the strictly smaller cardinality on the codomain `α`.",
+     "requested_change": "Write \"A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:88",
+     "claim": "The docstring of `exists_infinite_fiber'` describes the declaration only by contrast with another declaration (\"A weaker version of `exists_infinite_fiber` that requires codomain to be infinite\"), whereas a docstring is expected to explain the declaration on its own terms; a reader of the docs page sees no statement of what the lemma says.",
+     "requested_change": "Replace it by a standalone description of the statement, e.g. \"A function whose codomain's cardinality is infinite but strictly smaller than its domain's has an infinite fiber.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:89",
+     "claim": "`exists_infinite_fiber'` carries a prime although the variant it names differs from `exists_infinite_fiber` in a term that can be named: the hypothesis is on the codomain `α` (`Infinite α`) where the sibling's is on the domain `β`. The practices ask for the differing term of the statement to be named rather than for a prime to be appended (see the `_of_infinite` spellings already used in the library, e.g. `MaximalSpectrum.toPiLocalization_not_surjective_of_infinite`), and the prime here gives the reader no way to tell the two lemmas apart.",
+     "requested_change": "Rename it to a name that says which side is infinite, e.g. `exists_infinite_fiber_of_infinite_codomain`, and update the call in `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250`. No deprecation is needed for `exists_infinite_fiber'` since it is introduced by this PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "`exists_infinite_fiber` (line 80) states its class-typed hypothesis as a named explicit argument `(hβ : Infinite β)`; `exists_infinite_fiber'` (line 89) and the new `exists_uncountable_fiber` (line 97) do the same with `(hα : Infinite α)` and `(hβ : Uncountable β)`. `Infinite` and `Uncountable` are Prop classes, and the practices take a hypothesis whose type is a class as an instance-implicit argument. These three lines are in fact the only explicit `: Infinite`/`: Uncountable` hypotheses in the whole library, against `[Infinite α]`/`[Uncountable α]` everywhere else, including in the same file (`le_range_of_union_finset_eq_univ [Infinite β]`).",
+     "requested_change": "Use `[hβ : Infinite β]`, `[hα : Infinite α]` and `[hβ : Uncountable β]`, dropping the now-redundant explicit instance arguments: line 121 becomes `exists_infinite_fiber u' h` and `StrongRankCondition.lean:250` becomes `Cardinal.exists_infinite_fiber' Φ h` (the same instance search that `infer_instance` performs today succeeds in both places, and the proof of `exists_uncountable_fiber` can start by deriving `ℵ₁ ≤ #β` from the instance, e.g. `obtain hβ' : ℵ₁ ≤ #β := by rw [← Cardinal.aleph0_lt_mk_iff] at hβ; simpa [← Order.succ_le_iff, succ_aleph0] using hβ`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:102",
+     "claim": "The new proof of `exists_uncountable_fiber` puts two tactics on one line joined by `;`, inside a `by` block passed as an argument: `(by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)`. Tactics (and `cases`/`induction` alternatives) are to be written one per line, without `;`.",
+     "requested_change": "Expand to one tactic per line:\n```\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by\n        rw [isRegular_aleph_one.cof_eq]\n        exact hα.trans aleph0_lt_aleph_one)\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "`exists_uncountable_fiber` is added by this PR but is used nowhere in it and registered with no attribute or simp set; a fresh lemma that is neither used nor part of a declared API is dead code.",
+     "requested_change": "Either use it in the PR (it is the natural companion of `exists_infinite_fiber`), or state in the PR description that it is intended public API for a follow-up; otherwise drop it.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/869fa560705d500971518e6cf1c29e64e5d38d376142bb88af796192c19f3139/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__ec8cec84-57a3-49af-90e9-78526fea2f7d.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstring for `Cardinal.infinite_pigeonhole_card_lt` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, instead of the codomain's, and it also says `strictly great`.",
+     "requested_change": "Rewrite the docstring to say that the domain has infinite cardinality strictly greater than the codomain's cardinality and that the fiber has cardinality strictly greater than the codomain's.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:78",
+     "claim": "The docstring for `Cardinal.exists_infinite_fiber` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, but the theorem assumes `#α < #β`, i.e. the domain is larger than the codomain.",
+     "requested_change": "Rewrite the docstring to say that a function whose domain has infinite cardinality strictly greater than its codomain's cardinality has an infinite fiber.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:95",
+     "claim": "The docstring for `Cardinal.exists_uncountable_fiber` is inaccurate: it says the domain's cardinality is strictly greater than the domain's, but the theorem assumes the domain is strictly larger than the codomain.",
+     "requested_change": "Rewrite the docstring to say that a function whose domain has uncountable cardinality strictly greater than its codomain's cardinality has an uncountable fiber.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:69",
+     "claim": "The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) says \"A function whose domain's cardinality is infinite but strictly greater than its domain's has a fiber with cardinality strictly great than the codomain\", i.e. it compares the domain's cardinality with itself. In `(f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β)` the domain is β and the codomain is α, so `h` says the domain's cardinality is strictly greater than the *codomain's*; the docstring is the only place in the declaration that now contradicts the statement (the first clause, 'domain's cardinality is infinite', is right, and was presumably what tempted the edit from the old 'codomain's cardinality is infinite' wording). The same line also carries the pre-existing typo 'strictly great than'.",
+     "requested_change": "Change the second occurrence of \"its domain's\" to \"its codomain's\" and 'great' to 'greater', e.g. \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas a fiber with cardinality strictly greater than the codomain. -/\" (or rephrase as \"A function whose domain is infinite and whose codomain's cardinality is strictly smaller has a fiber with cardinality strictly greater than the codomain.\"). I applied the minimal rewording to lines 67-68 and the file still compiles.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "The rewritten docstring of `Cardinal.exists_infinite_fiber` (lines 78-79) has the same defect: \"A function whose domain's cardinality is infinite but strictly greater than its domain's has an infinite fiber.\" The hypothesis `h : #α < #β` compares the domain β with the codomain α, so the sentence as written is meaningless for its own statement.",
+     "requested_change": "Replace the second \"its domain's\" with \"its codomain's\": \"/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's\\nhas an infinite fiber. -/\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97",
+     "claim": "The docstring of the newly added `Cardinal.exists_uncountable_fiber` (lines 95-96) says \"A function whose domain's cardinality is uncountable but strictly greater than its domain's has an uncountable fiber\", again comparing the domain's cardinality with itself rather than with the codomain's, so it does not describe the statement of the lemma it documents.",
+     "requested_change": "Replace the second \"its domain's\" with \"its codomain's\": \"/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's\\nhas an uncountable fiber. -/\". I applied this rewording to lines 95-96 and the file still compiles.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/549730dd0942c4e2c5d5524a1bd2959f38aee40deb52ea544307af4cd88d4e47/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__cd88bbfc-b7c3-491f-8efb-55d4e3c38b59.jsonl"
+  },
+  "AP3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:67",
+     "claim": "The docstring of `Cardinal.infinite_pigeonhole_card_lt` (lines 67-68) reads \"A function whose domain's cardinality is infinite but strictly greater than its domain's\", which compares the domain's cardinality with itself; the statement's hypotheses are `hβ : ℵ₀ ≤ #β` (domain infinite) and `h : #α < #β` (codomain strictly smaller), so the second occurrence must be \"its codomain's\". The identical wording error is in the docstrings of `Cardinal.exists_infinite_fiber` (line 78) and `Cardinal.exists_uncountable_fiber` (line 95), which this PR also rewrote. There is also a leftover typo \"strictly great than\" in all three.",
+     "requested_change": "In all three docstrings replace the trailing \"than its domain's\" by \"than its codomain's\" and \"strictly great than the codomain\" by \"strictly greater than the codomain\", so that they read e.g. `/-- A function whose domain's cardinality is infinite but strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain. -/`, `/-- ... has an infinite fiber. -/` and `/-- A function whose domain's cardinality is uncountable but strictly greater than its codomain's has an uncountable fiber. -/`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:88",
+     "claim": "`Cardinal.exists_infinite_fiber'` is a variant of `Cardinal.exists_infinite_fiber` whose only difference is which of the two types is assumed infinite (`[Infinite α]` versus `[Infinite β]`), but the prime carries none of that information, and its docstring defines it purely by contrast with its sibling (\"A weaker version of `exists_infinite_fiber` that requires codomain to be infinite\"), whereas a docstring should explain the declaration on its own terms.",
+     "requested_change": "Rename it to a name that states its specialisation, e.g. `Cardinal.exists_infinite_fiber_of_infinite_codomain` (no deprecation is needed since the name is introduced by this PR), give it a standalone docstring such as `/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's has an infinite fiber. -/`, and update the one call site at `Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:80",
+     "claim": "`Cardinal.exists_infinite_fiber` takes its class-typed hypothesis `Infinite` as a named explicit hypothesis `(hβ : Infinite β)`, and the two declarations this PR adds do the same: `(hα : Infinite α)` at line 89 and `(hβ : Uncountable β)` at line 97. Mathlib's practice is that a hypothesis whose type is a class is an instance-implicit argument; the PR itself feels the cost, since both call sites must now pass the hypothesis by hand (`exists_infinite_fiber u' h (by infer_instance)` at line 121 and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` at StrongRankCondition.lean:250).",
+     "requested_change": "State them as `[Infinite β]`, `[Infinite α]` and `[Uncountable β]`, recover the cardinal inequalities inside the proofs (`have hβ : ℵ₀ ≤ #β := infinite_iff.mp inferInstance` and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)`), and drop the explicit `(by infer_instance)` at both call sites. I verified this exact rewrite (plus the two call-site changes) compiles.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:82",
+     "claim": "Inside `namespace Cardinal` (line 27), three lemma names on new or rewritten lines are written with a `Cardinal.` prefix that the enclosing namespace already supplies: `Cardinal.infinite_iff` at line 82, `Cardinal.infinite_iff` at line 92, and `Cardinal.aleph0_lt_mk_iff` at line 99.",
+     "requested_change": "Drop the redundant prefixes: `simp_rw [infinite_iff] at hβ ⊢` (or `at ⊢`), `haveI : Infinite β := infinite_iff.mpr ((infinite_iff.mp inferInstance).trans h.le)`, and `have h := aleph0_lt_mk_iff.mpr (inferInstance : Uncountable β)` together with `simp_rw [← aleph0_lt_mk_iff, ← Order.succ_le_iff, succ_aleph0] at ⊢`. I verified this compiles.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean:102",
+     "claim": "In the proof of `Cardinal.exists_uncountable_fiber` the argument at line 102 is `(by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)`, which puts two tactics on one line separated by `;`; Mathlib style is one tactic per line and does not use `;` to join several tactics, even inside a nested `by`.",
+     "requested_change": "Write the argument as\n```\n      (by\n        rw [isRegular_aleph_one.cof_eq]\n        exact hα.trans aleph0_lt_aleph_one)\n```\n(or as a one-tactic term, e.g. `(by simpa [isRegular_aleph_one.cof_eq] using hα.trans aleph0_lt_aleph_one)`). I verified the nested-block form compiles.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/1ca893e2f4560f45e28f603846ad57a44fa0033cf858fc7350a5e56949f795a9/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__663a142f-e552-4a60-8855-ffe6630b72b8.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_34091.md"
+}

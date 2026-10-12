@@ -1,0 +1,1021 @@
+{
+ "asks": [
+  {
+   "id": "v0131",
+   "pr": 36822,
+   "family": "F3",
+   "in_census": true,
+   "entries": [
+    "P098"
+   ],
+   "text": "simp?",
+   "path": "Mathlib/Order/Interval/Set/Disjoint.lean",
+   "line": 78,
+   "author": "vihdzp",
+   "at": "2026-03-18T18:09:20Z",
+   "matcher_text": {
+    "ask_id": "v0131",
+    "path": "Mathlib/Order/Interval/Set/Disjoint.lean",
+    "code_at_comment": "p]\n theorem Ioc_disjoint_Ioi (h : b ≤ c) : Disjoint (Ioc a b) (Ioi c) :=\n   disjoint_left.mpr (fun _ hx hy ↦ (hx.2.trans h).not_gt hy)\n \n theorem Ioc_disjoint_Ioi_same : Disjoint (Ioc a b) (Ioi b) :=\n   Ioc_disjoint_Ioi le_rfl\n \n+@[to_dual Iio_disjoint_Ioi_of_not_lt]\n theorem Ioi_disjoint_Iio_of_not_lt (h : ¬a < b) : Disjoint (Ioi a) (Iio b) :=\n   disjoint_left.mpr fun _ hx hy ↦ h (hx.trans hy)\n \n+@[to_dual Iio_disjoint_Ioi_of_le]\n theorem Ioi_disjoint_Iio_of_le (h : a ≤ b) : Disjoint (Ioi b) (Iio a) :=\n   Ioi_disjoint_Iio_of_not_lt (not_lt_of_ge h)\n \n-@[simp]\n+@[to_dual Iio_disjoint_Ioi_same]",
+    "comment": "simp?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_same`) because the new `to_dual` annotation does not pass `attr := simp`; consequently goals that used to close by `simp` no longer do.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_same`) because the new `to_dual` annotation does not pass `attr := simp`; consequently goals that used to close by `simp` no longer do.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the base file had `@[simp] theorem Ioi_disjoint_Iio_same` and `@[simp] theorem Iio_disjoint_Ioi_same`, but the tag was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, so neither the original nor its generated dual is in the simp set any more. Every other declaration dualised in this PR keeps its attribute with the `(attr := …)` form (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, all four `iUnion_…_right`), so this is an unintended regression of a public lemma's simp behaviour rather than a deliberate API change.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which applies `@[simp]` to both the original and the generated dual, or — if the tag is deliberately being dropped — say so in the PR description (which is currently empty).",
+      "severity": "advisory"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the base file had `@[simp] theorem Ioi_disjoint_Iio_same` and `@[simp] theorem Iio_disjoint_Ioi_same`, but the tag was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, so neither the original nor its generated dual is in the simp set any more. Every other declaration dualised in this PR keeps its attribute with the `(attr := …)` form (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, all four `iUnion_…_right`), so this is an unintended regression of a public lemma's simp behaviour rather than a deliberate API change.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which applies `@[simp]` to both the original and the generated dual, or — if the tag is deliberately being dropped — say so in the PR description (which is currently empty).",
+      "severity": "advisory"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute, and its generated dual `Iio_disjoint_Ioi_same` never gets one: the PR replaced `@[simp]` with a bare `@[to_dual Iio_disjoint_Ioi_same]`, but attributes are only applied to both declarations via the `(attr := …)` option, so neither is a simp lemma any more. Verified against the PR workspace: `example {α : Type*} [LinearOrder α] (a : α) : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for the `Iio`/`Ioi` direction, whereas both were `@[simp]` before this PR. Every other source lemma in this file that was `@[simp]` (e.g. `Iic_disjoint_Ioi`, `Ici_disjoint_Iic`, `iUnion_Iic`) correctly uses `(attr := simp)`, so this is an inconsistency, not a deliberate removal.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Ioi_disjoint_Iio_same` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same`).",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute, and its generated dual `Iio_disjoint_Ioi_same` never gets one: the PR replaced `@[simp]` with a bare `@[to_dual Iio_disjoint_Ioi_same]`, but attributes are only applied to both declarations via the `(attr := …)` option, so neither is a simp lemma any more. Verified against the PR workspace: `example {α : Type*} [LinearOrder α] (a : α) : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for the `Iio`/`Ioi` direction, whereas both were `@[simp]` before this PR. Every other source lemma in this file that was `@[simp]` (e.g. `Iic_disjoint_Ioi`, `Ici_disjoint_Iic`, `iUnion_Iic`) correctly uses `(attr := simp)`, so this is an inconsistency, not a deliberate removal.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Ioi_disjoint_Iio_same` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same`).",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "T1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. Both `Ioi_disjoint_Iio_same` and the removed `Iio_disjoint_Ioi_same` were `@[simp]` before. Now neither is a simp lemma, so a refactor that should change nothing silently drops two simp lemmas.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, so both `Ioi_disjoint_Iio_same` and its generated dual `Iio_disjoint_Ioi_same` stay simp lemmas.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. Both `Ioi_disjoint_Iio_same` and the removed `Iio_disjoint_Ioi_same` were `@[simp]` before. Now neither is a simp lemma, so a refactor that should change nothing silently drops two simp lemmas.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, so both `Ioi_disjoint_Iio_same` and its generated dual `Iio_disjoint_Ioi_same` stay simp lemmas.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_same]`, and a bare tag applies no attribute to the source, nor to the generated dual `Set.Iio_disjoint_Ioi_same` (only `(attr := …)` does). Both lemmas were `@[simp]` before the PR, so `simp` no longer closes goals it used to close, e.g. `Disjoint (Ioi (1:ℤ)) (Iio 1)` now fails with \"simp made no progress\" although the pre-PR lemma was a simp lemma; all sibling tags in the file use the `(attr := simp)` spelling, so this looks unintended.",
+      "requested_change": "Change line 78 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which re-tags both the source and the generated dual with `simp`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_same]`, and a bare tag applies no attribute to the source, nor to the generated dual `Set.Iio_disjoint_Ioi_same` (only `(attr := …)` does). Both lemmas were `@[simp]` before the PR, so `simp` no longer closes goals it used to close, e.g. `Disjoint (Ioi (1:ℤ)) (Iio 1)` now fails with \"simp made no progress\" although the pre-PR lemma was a simp lemma; all sibling tags in the file use the `(attr := simp)` spelling, so this looks unintended.",
+      "requested_change": "Change line 78 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which re-tags both the source and the generated dual with `simp`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the header went from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`, and `(attr := ...)` is what applies an attribute to both the source and the generated dual (`to_dual` copies no attributes by itself), so neither `Ioi_disjoint_Iio_same` nor the newly generated `Iio_disjoint_Ioi_same` is a simp lemma any more, although both were `@[simp]` at the base commit. The PR uses `@[to_dual (attr := simp) ...]` for every other pair of simp-tagged siblings it re-attributes (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, `iUnion_Icc_right`, `iUnion_Ioc_right`, `iUnion_Ico_right`, `iUnion_Ioo_right`), so this pair is the odd one out. Concretely, `simp` no longer closes `Disjoint (Ioi a) (Iio a)` (verified: `example {α : Type*} [Preorder α] (a : α) : Disjoint (Set.Ioi a) (Set.Iio a) := by simp` fails with \"`simp` made no progress\"), which it did before this PR.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which restores `@[simp]` on both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` (verified: compiles with no errors and no linter warnings), or state in a comment why the tag is intentionally dropped.",
+      "severity": "advisory"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the header went from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`, and `(attr := ...)` is what applies an attribute to both the source and the generated dual (`to_dual` copies no attributes by itself), so neither `Ioi_disjoint_Iio_same` nor the newly generated `Iio_disjoint_Ioi_same` is a simp lemma any more, although both were `@[simp]` at the base commit. The PR uses `@[to_dual (attr := simp) ...]` for every other pair of simp-tagged siblings it re-attributes (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, `iUnion_Icc_right`, `iUnion_Ioc_right`, `iUnion_Ico_right`, `iUnion_Ioo_right`), so this pair is the odd one out. Concretely, `simp` no longer closes `Disjoint (Ioi a) (Iio a)` (verified: `example {α : Type*} [Preorder α] (a : α) : Disjoint (Set.Ioi a) (Set.Iio a) := by simp` fails with \"`simp` made no progress\"), which it did before this PR.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which restores `@[simp]` on both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` (verified: compiles with no errors and no linter warnings), or state in a comment why the tag is intentionally dropped.",
+      "severity": "advisory"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` was `@[simp]` before this PR, and so was its hand-written dual `Set.Iio_disjoint_Ioi_same`. The PR replaces the attribute with `@[to_dual Iio_disjoint_Ioi_same]` without `(attr := simp)`, so both lemmas silently leave the simp set. Nothing in the PR explains the change, and every other converted lemma in the file keeps its simp attribute through `(attr := simp)`.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so that `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` are simp lemmas again.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` was `@[simp]` before this PR, and so was its hand-written dual `Set.Iio_disjoint_Ioi_same`. The PR replaces the attribute with `@[to_dual Iio_disjoint_Ioi_same]` without `(attr := simp)`, so both lemmas silently leave the simp set. Nothing in the PR explains the change, and every other converted lemma in the file keeps its simp attribute through `(attr := simp)`.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so that `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` are simp lemmas again.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "GPT1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` used to be a `simp` lemma (as did its `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_same]` drops the `simp` attribute on both declarations.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so the source theorem and generated dual keep their previous `simp` behavior.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` used to be a `simp` lemma (as did its `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_same]` drops the `simp` attribute on both declarations.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so the source theorem and generated dual keep their previous `simp` behavior.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "AP1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute: the old `@[simp]` line was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, and `to_dual` only transfers attributes to the generated dual when they are passed as `(attr := ...)` (per the `to_dual` docstring: \"Use the `(attr := ...)` syntax to apply attributes to both the original and the dual version\"). So as the PR leaves it neither `Ioi_disjoint_Iio_same` nor its generated dual `Iio_disjoint_Ioi_same` is a simp lemma, although both were `@[simp]` before the change — a regression in the public simp set, and inconsistent with the sibling `Ico_disjoint_Ico_same`, which is still `@[simp]`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, as is already done for `Iic_disjoint_Ioi`/`Iio_disjoint_Ici`/`Ici_disjoint_Iic` a few lines above, so that both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same` are tagged `[simp]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute: the old `@[simp]` line was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, and `to_dual` only transfers attributes to the generated dual when they are passed as `(attr := ...)` (per the `to_dual` docstring: \"Use the `(attr := ...)` syntax to apply attributes to both the original and the dual version\"). So as the PR leaves it neither `Ioi_disjoint_Iio_same` nor its generated dual `Iio_disjoint_Ioi_same` is a simp lemma, although both were `@[simp]` before the change — a regression in the public simp set, and inconsistent with the sibling `Ico_disjoint_Ico_same`, which is still `@[simp]`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, as is already done for `Iic_disjoint_Ioi`/`Iio_disjoint_Ici`/`Ici_disjoint_Iic` a few lines above, so that both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same` are tagged `[simp]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "GPT3": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`; the generated dual `Set.Iio_disjoint_Ioi_same` likewise is no longer a simp lemma, so existing `simp` proofs of these disjointness goals regress.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`; the generated dual `Set.Iio_disjoint_Ioi_same` likewise is no longer a simp lemma, so existing `simp` proofs of these disjointness goals regress.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "DX1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently loses its `@[simp]` attribute: the diff replaces its `@[simp]` with `@[to_dual Iio_disjoint_Ioi_same]` and does not use `(attr := simp)`. Since `(attr := ...)` is the syntax that applies an attribute to *both* the source and the generated dual (see the `attrOption` docstring in `Mathlib/Tactic/Translate/Core.lean`), the regenerated `Set.Iio_disjoint_Ioi_same` — also `@[simp]` before this PR — is not a `simp` lemma either. Verified: `example {α} [Preorder α] {a : α} : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for `Disjoint (Iio a) (Ioi a)`; both were closed by the base simp set. Every other declaration in this PR that had `@[simp]` got `(attr := simp)`, so this is an oversight, not a deliberate removal.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` for `Set.Ioi_disjoint_Iio_same` (matching lines 39/43/59 of the same file). With that edit the file compiles and `by simp` proves both `Disjoint (Ioi a) (Iio a)` and `Disjoint (Iio a) (Ioi a)` again.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "`Set.Ioi_disjoint_Iio_same` silently loses its `@[simp]` attribute: the diff replaces its `@[simp]` with `@[to_dual Iio_disjoint_Ioi_same]` and does not use `(attr := simp)`. Since `(attr := ...)` is the syntax that applies an attribute to *both* the source and the generated dual (see the `attrOption` docstring in `Mathlib/Tactic/Translate/Core.lean`), the regenerated `Set.Iio_disjoint_Ioi_same` — also `@[simp]` before this PR — is not a `simp` lemma either. Verified: `example {α} [Preorder α] {a : α} : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for `Disjoint (Iio a) (Ioi a)`; both were closed by the base simp set. Every other declaration in this PR that had `@[simp]` got `(attr := simp)`, so this is an oversight, not a deliberate removal.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` for `Set.Ioi_disjoint_Iio_same` (matching lines 39/43/59 of the same file). With that edit the file compiles and `by simp` proves both `Disjoint (Ioi a) (Iio a)` and `Disjoint (Iio a) (Ioi a)` again.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "TA1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_same` was `@[simp]` before the PR and is now generated without it. A refactor to `to_dual` should carry the original attributes over to the replacement, and here it silently changes the simp set.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`. Then both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` stay `@[simp]`, as they were before the PR.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_same` was `@[simp]` before the PR and is now generated without it. A refactor to `to_dual` should carry the original attributes over to the replacement, and here it silently changes the simp set.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`. Then both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` stay `@[simp]`, as they were before the PR.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    },
+    "X1": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_same`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_same` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_same]` with no `(attr := simp)`, so after the PR neither lemma is a simp lemma. Every other lemma this PR converts from a `@[simp]` pair uses `to_dual (attr := simp)`. So this looks like an accidental regression in simp behaviour, not a deliberate change.",
+      "requested_change": "Restore the simp attribute through `to_dual`: replace `@[to_dual Iio_disjoint_Ioi_same]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Set.Ioi_disjoint_Iio_same`, so that both it and the generated `Set.Iio_disjoint_Ioi_same` are `@[simp]` again.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+      "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_same`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_same` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_same]` with no `(attr := simp)`, so after the PR neither lemma is a simp lemma. Every other lemma this PR converts from a `@[simp]` pair uses `to_dual (attr := simp)`. So this looks like an accidental regression in simp behaviour, not a deliberate change.",
+      "requested_change": "Restore the simp attribute through `to_dual`: replace `@[to_dual Iio_disjoint_Ioi_same]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Set.Ioi_disjoint_Iio_same`, so that both it and the generated `Set.Iio_disjoint_Ioi_same` are `@[simp]` again.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_same; all reviewers."
+    }
+   },
+   "entries_text": {
+    "P098": "A declaration that is moved, generalised or deduplicated keeps exactly the attributes of the original, transferred to its replacement; attributes are not added or dropped in the process."
+   }
+  },
+  {
+   "id": "v0132",
+   "pr": 36822,
+   "family": "F3",
+   "in_census": true,
+   "entries": [
+    "P098"
+   ],
+   "text": "simp?",
+   "path": "Mathlib/Order/Interval/Set/Disjoint.lean",
+   "line": 82,
+   "author": "vihdzp",
+   "at": "2026-03-18T18:09:24Z",
+   "matcher_text": {
+    "ask_id": "v0132",
+    "path": "Mathlib/Order/Interval/Set/Disjoint.lean",
+    "code_at_comment": "theorem Ioc_disjoint_Ioi_same : Disjoint (Ioc a b) (Ioi b) :=\n   Ioc_disjoint_Ioi le_rfl\n \n+@[to_dual Iio_disjoint_Ioi_of_not_lt]\n theorem Ioi_disjoint_Iio_of_not_lt (h : ¬a < b) : Disjoint (Ioi a) (Iio b) :=\n   disjoint_left.mpr fun _ hx hy ↦ h (hx.trans hy)\n \n+@[to_dual Iio_disjoint_Ioi_of_le]\n theorem Ioi_disjoint_Iio_of_le (h : a ≤ b) : Disjoint (Ioi b) (Iio a) :=\n   Ioi_disjoint_Iio_of_not_lt (not_lt_of_ge h)\n \n-@[simp]\n+@[to_dual Iio_disjoint_Ioi_same]\n theorem Ioi_disjoint_Iio_same : Disjoint (Ioi a) (Iio a) :=\n   Ioi_disjoint_Iio_of_le le_rfl\n \n-@[simp]\n+@[to_dual Iio_disjoint_Ioi_iff]",
+    "comment": "simp?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_iff`) because the new `to_dual` annotation does not pass `attr := simp`; this removes the previous simplification rule for disjoint open rays in densely ordered preorders.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_iff`) because the new `to_dual` annotation does not pass `attr := simp`; this removes the previous simplification rule for disjoint open rays in densely ordered preorders.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "AP3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag for the same reason as `Set.Ioi_disjoint_Iio_same`: the base file had `@[simp]` on `Ioi_disjoint_Iio_iff` and on the hand-written `Iio_disjoint_Ioi_iff`, whereas the PR writes `@[to_dual Iio_disjoint_Ioi_iff]`, so neither the lemma nor its generated dual is a simp lemma any more — inconsistent with the `(attr := simp)` transfers used for the rest of the file.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Disjoint (Ioi a) (Iio b) ↔ ¬a < b` and its dual, or explain the removal in the PR description.",
+      "severity": "advisory"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag for the same reason as `Set.Ioi_disjoint_Iio_same`: the base file had `@[simp]` on `Ioi_disjoint_Iio_iff` and on the hand-written `Iio_disjoint_Ioi_iff`, whereas the PR writes `@[to_dual Iio_disjoint_Ioi_iff]`, so neither the lemma nor its generated dual is a simp lemma any more — inconsistent with the `(attr := simp)` transfers used for the rest of the file.",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Disjoint (Ioi a) (Iio b) ↔ ¬a < b` and its dual, or explain the removal in the PR description.",
+      "severity": "advisory"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute and its generated dual `Iio_disjoint_Ioi_iff` was never tagged, because the `@[simp]` was replaced by a bare `@[to_dual Iio_disjoint_Ioi_iff]` (attributes reach the dual only through `(attr := …)`). Verified against the PR workspace: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] (a b : α) : Disjoint (Ioi a) (Iio b) ↔ ¬ a < b := by simp` now fails with unsolved goal `Disjoint (Ioi a) (Iio b) ↔ b ≤ a` — `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬ a < b`, i.e. the canonical simp normal form for these `Ioi`/`Iio` disjointness goals was removed from the simp set (same for the `Iio`/`Ioi` direction). The base file had both lemmas as `@[simp]`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Ioi_disjoint_Iio_iff` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff`).",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute and its generated dual `Iio_disjoint_Ioi_iff` was never tagged, because the `@[simp]` was replaced by a bare `@[to_dual Iio_disjoint_Ioi_iff]` (attributes reach the dual only through `(attr := …)`). Verified against the PR workspace: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] (a b : α) : Disjoint (Ioi a) (Iio b) ↔ ¬ a < b := by simp` now fails with unsolved goal `Disjoint (Ioi a) (Iio b) ↔ b ≤ a` — `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬ a < b`, i.e. the canonical simp normal form for these `Ioi`/`Iio` disjointness goals was removed from the simp set (same for the `Iio`/`Ioi` direction). The base file had both lemmas as `@[simp]`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Ioi_disjoint_Iio_iff` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff`).",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "T1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. Both `Ioi_disjoint_Iio_iff` and the removed `Iio_disjoint_Ioi_iff` were `@[simp]` before. Now neither is a simp lemma, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` in densely ordered types.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. Both `Ioi_disjoint_Iio_iff` and the removed `Iio_disjoint_Ioi_iff` were `@[simp]` before. Now neither is a simp lemma, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` in densely ordered types.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_iff]`, which attaches no attribute to the source or to the generated dual `Set.Iio_disjoint_Ioi_iff`. Both were `@[simp]` before the PR, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬a < b` in densely ordered types (verified: `Disjoint (Ioi (2:ℚ)) (Iio 1)` is no longer closed by `simp`, although `DenselyOrdered ℚ` is found).",
+      "requested_change": "Change line 82 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, which re-tags both the source and the generated dual with `simp`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_iff]`, which attaches no attribute to the source or to the generated dual `Set.Iio_disjoint_Ioi_iff`. Both were `@[simp]` before the PR, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬a < b` in densely ordered types (verified: `Disjoint (Ioi (2:ℚ)) (Iio 1)` is no longer closed by `simp`, although `DenselyOrdered ℚ` is found).",
+      "requested_change": "Change line 82 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, which re-tags both the source and the generated dual with `simp`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "AP2": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag: the header became `@[to_dual Iio_disjoint_Ioi_iff]`, without `(attr := simp)`, so neither `Ioi_disjoint_Iio_iff` nor the generated `Iio_disjoint_Ioi_iff` is a simp lemma any more, whereas both were `@[simp]` at the base commit. `simp` can therefore no longer rewrite `Disjoint (Ioi a) (Iio b)` (verified: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] {a b : α} (h : ¬a < b) : Disjoint (Set.Ioi a) (Set.Iio b) := by simpa using h` fails, since the goal is no longer simplified to `¬a < b`).",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the source and the generated dual keep the `@[simp]` tag (verified: compiles with no errors and no linter warnings), or record why the tag is dropped.",
+      "severity": "advisory"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag: the header became `@[to_dual Iio_disjoint_Ioi_iff]`, without `(attr := simp)`, so neither `Ioi_disjoint_Iio_iff` nor the generated `Iio_disjoint_Ioi_iff` is a simp lemma any more, whereas both were `@[simp]` at the base commit. `simp` can therefore no longer rewrite `Disjoint (Ioi a) (Iio b)` (verified: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] {a b : α} (h : ¬a < b) : Disjoint (Set.Ioi a) (Set.Iio b) := by simpa using h` fails, since the goal is no longer simplified to `¬a < b`).",
+      "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the source and the generated dual keep the `@[simp]` tag (verified: compiles with no errors and no linter warnings), or record why the tag is dropped.",
+      "severity": "advisory"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` and its hand-written dual `Set.Iio_disjoint_Ioi_iff` were both `@[simp]` before this PR. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` without `(attr := simp)`, which drops both iff lemmas from the simp set: an unexplained API regression in a PR that is meant only to change how the duals are generated.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the lemma and its generated dual stay simp lemmas.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` and its hand-written dual `Set.Iio_disjoint_Ioi_iff` were both `@[simp]` before this PR. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` without `(attr := simp)`, which drops both iff lemmas from the simp set: an unexplained API regression in a PR that is meant only to change how the duals are generated.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the lemma and its generated dual stay simp lemmas.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "GPT1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` used to be a `simp` lemma (as did its generated `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_iff]` drops the `simp` attribute on both declarations.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so both the source theorem and generated dual are registered as `simp` lemmas.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` used to be a `simp` lemma (as did its generated `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_iff]` drops the `simp` attribute on both declarations.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so both the source theorem and generated dual are registered as `simp` lemmas.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "AP1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute in the same way as `Ioi_disjoint_Iio_same`: `@[simp]` was replaced by `@[to_dual Iio_disjoint_Ioi_iff]`, and since no `(attr := ...)` is passed, neither the source nor the regenerated `Iio_disjoint_Ioi_iff` is a simp lemma any more, although both were `@[simp]` before the change.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff` keep the `[simp]` attribute they had before.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute in the same way as `Ioi_disjoint_Iio_same`: `@[simp]` was replaced by `@[to_dual Iio_disjoint_Ioi_iff]`, and since no `(attr := ...)` is passed, neither the source nor the regenerated `Iio_disjoint_Ioi_iff` is a simp lemma any more, although both were `@[simp]` before the change.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff` keep the `[simp]` attribute they had before.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "GPT3": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_iff]`; the generated dual `Set.Iio_disjoint_Ioi_iff` likewise is no longer a simp lemma, removing the previous simplification rule for these disjointness propositions.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_iff]`; the generated dual `Set.Iio_disjoint_Ioi_iff` likewise is no longer a simp lemma, removing the previous simplification rule for these disjointness propositions.",
+      "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "DX1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` also loses its `@[simp]` attribute, and its regenerated dual `Set.Iio_disjoint_Ioi_iff` is left untagged, so `simp` no longer reduces either `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` to an order comparison, as it did before this PR. Verified: `example {α} [LinearOrder α] [DenselyOrdered α] {a b : α} : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp` now leaves the goal `⊢ Disjoint (Ioi a) (Iio b) ↔ b ≤ a`, and the `Iio`/`Ioi` version behaves the same, whereas `Disjoint (Iic a) (Ici b) ↔ ¬b ≤ a` (a sibling that did receive `(attr := simp)`) is still closed by `simp`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` for `Set.Ioi_disjoint_Iio_iff`, restoring `@[simp]` on both it and the generated `Set.Iio_disjoint_Ioi_iff`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "`Set.Ioi_disjoint_Iio_iff` also loses its `@[simp]` attribute, and its regenerated dual `Set.Iio_disjoint_Ioi_iff` is left untagged, so `simp` no longer reduces either `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` to an order comparison, as it did before this PR. Verified: `example {α} [LinearOrder α] [DenselyOrdered α] {a b : α} : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp` now leaves the goal `⊢ Disjoint (Ioi a) (Iio b) ↔ b ≤ a`, and the `Iio`/`Ioi` version behaves the same, whereas `Disjoint (Iic a) (Ici b) ↔ ¬b ≤ a` (a sibling that did receive `(attr := simp)`) is still closed by `simp`.",
+      "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` for `Set.Ioi_disjoint_Iio_iff`, restoring `@[simp]` on both it and the generated `Set.Iio_disjoint_Ioi_iff`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "TA1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_iff` was `@[simp]` before the PR and is now generated without it. Every other formerly-simp lemma in the file keeps it through `(attr := simp)`, so this looks like an accidental change to the simp set.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, so that `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff` both stay `@[simp]`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_iff` was `@[simp]` before the PR and is now generated without it. Every other formerly-simp lemma in the file keeps it through `(attr := simp)`, so this looks like an accidental change to the simp set.",
+      "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, so that `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff` both stay `@[simp]`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    },
+    "X1": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_iff`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_iff` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` with no `(attr := simp)`, so after the PR neither iff lemma is used by simp.",
+      "requested_change": "Replace `@[to_dual Iio_disjoint_Ioi_iff]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Set.Ioi_disjoint_Iio_iff`, so that both it and the generated `Set.Iio_disjoint_Ioi_iff` stay `@[simp]` as they were before the PR.",
+      "severity": "blocking"
+     },
+     "note_m1": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+      "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_iff`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_iff` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` with no `(attr := simp)`, so after the PR neither iff lemma is used by simp.",
+      "requested_change": "Replace `@[to_dual Iio_disjoint_Ioi_iff]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Set.Ioi_disjoint_Iio_iff`, so that both it and the generated `Set.Iio_disjoint_Ioi_iff` stay `@[simp]` as they were before the PR.",
+      "severity": "blocking"
+     },
+     "note_m2": "Restore simp via to_dual (attr := simp) on Ioi_disjoint_Iio_iff; all reviewers."
+    }
+   },
+   "entries_text": {
+    "P098": "A declaration that is moved, generalised or deduplicated keeps exactly the attributes of the original, transferred to its replacement; attributes are not added or dropped in the process."
+   }
+  }
+ ],
+ "pr": 36822,
+ "sessions": {
+  "X1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_same`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_same` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_same]` with no `(attr := simp)`, so after the PR neither lemma is a simp lemma. Every other lemma this PR converts from a `@[simp]` pair uses `to_dual (attr := simp)`. So this looks like an accidental regression in simp behaviour, not a deliberate change.",
+     "requested_change": "Restore the simp attribute through `to_dual`: replace `@[to_dual Iio_disjoint_Ioi_same]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Set.Ioi_disjoint_Iio_same`, so that both it and the generated `Set.Iio_disjoint_Ioi_same` are `@[simp]` again.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "The conversion to `to_dual` drops `@[simp]` from `Set.Ioi_disjoint_Iio_iff`. Before the PR both it and its dual `Set.Iio_disjoint_Ioi_iff` were `@[simp]`. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` with no `(attr := simp)`, so after the PR neither iff lemma is used by simp.",
+     "requested_change": "Replace `@[to_dual Iio_disjoint_Ioi_iff]` with `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Set.Ioi_disjoint_Iio_iff`, so that both it and the generated `Set.Iio_disjoint_Ioi_iff` stay `@[simp]` as they were before the PR.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` was `@[simp]` before this PR, and so was its hand-written dual `Set.Iio_disjoint_Ioi_same`. The PR replaces the attribute with `@[to_dual Iio_disjoint_Ioi_same]` without `(attr := simp)`, so both lemmas silently leave the simp set. Nothing in the PR explains the change, and every other converted lemma in the file keeps its simp attribute through `(attr := simp)`.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so that `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` are simp lemmas again.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` and its hand-written dual `Set.Iio_disjoint_Ioi_iff` were both `@[simp]` before this PR. The PR writes `@[to_dual Iio_disjoint_Ioi_iff]` without `(attr := simp)`, which drops both iff lemmas from the simp set: an unexplained API regression in a PR that is meant only to change how the duals are generated.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the lemma and its generated dual stay simp lemmas.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean",
+     "claim": "The PR converts only the `Preorder` section to `to_dual`. The same file still states six dual pairs by hand, although bare `@[to_dual]` generates each of them with the same name and statement: `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic` (each proved via `.dual` from its `IsGLB` twin), plus `iUnion_Ioc_eq_Ioi_self_iff` and `biUnion_Ioc_eq_Ioi_self_iff` (each a copy of its `Ico` twin's simp proof).",
+     "requested_change": "Finish the conversion in this file. Tag `IsGLB.biUnion_Ioi_eq`, `IsGLB.iUnion_Ioi_eq`, `IsGLB.biUnion_Ici_eq_Ioi` and `IsGLB.biUnion_Ici_eq_Ici` with `@[to_dual]`. Tag `iUnion_Ico_eq_Iio_self_iff` and `biUnion_Ico_eq_Iio_self_iff` with `@[to_dual (attr := simp)]`. Then delete the six hand-written duals. Leave `Ico_disjoint_Ico`/`Ioc_disjoint_Ioc` and the `iInf`/`iSup` pair as they are, because they do not translate yet.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Order/Filter/AtTopBot/Disjoint.lean:29",
+     "claim": "The proof builds `Disjoint (Ioi x) (Iic x)` as `(Iic_disjoint_Ioi le_rfl).symm`. This PR now generates `Set.Ioi_disjoint_Iic` (the dual of `Iio_disjoint_Ici`), which states that fact directly, so the `.symm` detour and the three-line layout are no longer needed.",
+     "requested_change": "Replace the proof with `disjoint_of_disjoint_of_mem (Ioi_disjoint_Iic le_rfl) (Ioi_mem_atTop x) (mem_principal_self _)`. It fits on one line, 96 characters long.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. Both `Ioi_disjoint_Iio_same` and the removed `Iio_disjoint_Ioi_same` were `@[simp]` before. Now neither is a simp lemma, so a refactor that should change nothing silently drops two simp lemmas.",
+     "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, so both `Ioi_disjoint_Iio_same` and its generated dual `Iio_disjoint_Ioi_same` stay simp lemmas.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. Both `Ioi_disjoint_Iio_iff` and the removed `Iio_disjoint_Ioi_iff` were `@[simp]` before. Now neither is a simp lemma, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` in densely ordered types.",
+     "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean",
+     "claim": "The PR uses `to_dual` only in the `Preorder` section of `Mathlib/Order/Interval/Set/Disjoint.lean`. Further down, the same file still states six order-dual lemmas by hand: `Set.iUnion_Ioc_eq_Ioi_self_iff` and `Set.biUnion_Ioc_eq_Ioi_self_iff` restate their `Ico`/`Iio` twins, and `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic` are proved through `h.dual`. `to_dual` can generate all six with their existing names.",
+     "requested_change": "Tag `Set.iUnion_Ico_eq_Iio_self_iff` and `Set.biUnion_Ico_eq_Iio_self_iff` with `@[to_dual (attr := simp)]`, and tag `IsGLB.biUnion_Ioi_eq`, `IsGLB.iUnion_Ioi_eq`, `IsGLB.biUnion_Ici_eq_Ioi` and `IsGLB.biUnion_Ici_eq_Ici` with `@[to_dual]`. Then delete the hand-written duals `Set.iUnion_Ioc_eq_Ioi_self_iff`, `Set.biUnion_Ioc_eq_Ioi_self_iff`, `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic`. The generated names match the deleted ones, so no deprecations are needed.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_same` was `@[simp]` before the PR and is now generated without it. A refactor to `to_dual` should carry the original attributes over to the replacement, and here it silently changes the simp set.",
+     "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`. Then both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` stay `@[simp]`, as they were before the PR.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. That drops `simp` from both this lemma and its dual: `Iio_disjoint_Ioi_iff` was `@[simp]` before the PR and is now generated without it. Every other formerly-simp lemma in the file keeps it through `(attr := simp)`, so this looks like an accidental change to the simp set.",
+     "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, so that `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff` both stay `@[simp]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Set.iUnion_Ico_eq_Iio_self_iff",
+     "claim": "The PR's stated purpose is to use `to_dual` in `Order/Interval/Set/Disjoint`, yet the file still contains hand-written duals that `to_dual` generates with identical statements. `iUnion_Ioc_eq_Ioi_self_iff` is the order dual of `iUnion_Ico_eq_Iio_self_iff`, and `biUnion_Ioc_eq_Ioi_self_iff` is the dual of `biUnion_Ico_eq_Iio_self_iff`; each of the four is still written and proved by hand.",
+     "requested_change": "Tag `iUnion_Ico_eq_Iio_self_iff` and `biUnion_Ico_eq_Iio_self_iff` with `@[to_dual (attr := simp)]`, with no explicit name since the generated names are already correct. Delete the hand-written `iUnion_Ioc_eq_Ioi_self_iff` and `biUnion_Ioc_eq_Ioi_self_iff`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "IsGLB.biUnion_Ioi_eq",
+     "claim": "In section `UnionIxx` of the converted file, `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic` are still proved by hand through `h.dual`. `to_dual` generates all four from `IsGLB.biUnion_Ioi_eq`, `IsGLB.iUnion_Ioi_eq`, `IsGLB.biUnion_Ici_eq_Ioi` and `IsGLB.biUnion_Ici_eq_Ici`, with the same statements and names.",
+     "requested_change": "Add `@[to_dual]` to `IsGLB.biUnion_Ioi_eq`, `IsGLB.iUnion_Ioi_eq`, `IsGLB.biUnion_Ici_eq_Ioi` and `IsGLB.biUnion_Ici_eq_Ici`, and delete the four hand-written `IsLUB.*` lemmas. Leave `iUnion_Iic_eq_Iio_iSup`, `iUnion_Iic_eq_Iic_iSup`, `Ioc_disjoint_Ioc` and the other remaining hand-written duals as they are, but add a short comment on why they are not `to_dual`: `isGLB_iInf` and `Ico_inter_Ico` are not yet tagged with `to_dual`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:47",
+     "claim": "The PR adds duals for some lemmas in the `Preorder` section, but not for three that sit between them: `Iic_disjoint_Ioc`, `Ioc_disjoint_Ioi` and `Ioc_disjoint_Ioi_same`. Their order duals (`Ici_disjoint_Ico`, `Ico_disjoint_Iio`, `Ico_disjoint_Iio_same`) exist nowhere in Mathlib, and `to_dual` produces them at no cost.",
+     "requested_change": "Change `@[simp]` on `Iic_disjoint_Ioc` to `@[to_dual (attr := simp) Ici_disjoint_Ico]`, change `@[simp]` on `Ioc_disjoint_Ioi` to `@[to_dual (attr := simp) Ico_disjoint_Iio]`, and add `@[to_dual Ico_disjoint_Iio_same]` to `Ioc_disjoint_Ioi_same`. The explicit names are needed because the generated names would say `codisjoint`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:39",
+     "claim": "`@[to_dual (attr := simp) Ici_disjoint_Iio]` on `Iic_disjoint_Ioi`, and likewise `@[to_dual (attr := simp) Ioi_disjoint_Iic]` on `Iio_disjoint_Ici`, adds two new conditional simp lemmas, `Set.Ici_disjoint_Iio (h : b ≤ a)` and `Set.Ioi_disjoint_Iic (h : b ≤ a)`. Neither existed before the PR, and the PR states no reason for adding them as simp lemmas with a side hypothesis.",
+     "requested_change": "In the PR description, or in a comment above the two attributes, state that the new simp lemmas `Ici_disjoint_Iio` and `Ioi_disjoint_Iic` are added deliberately. They mirror the existing conditional simp lemmas `Iic_disjoint_Ioi` and `Iio_disjoint_Ici`, whose `≤` hypothesis `simp` discharges with `le_refl` or from the context. Otherwise, add them with `@[simp, to_dual ...]` so that only the existing lemma stays simp.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "PR #36822 (title)",
+     "claim": "The title `feat(Order/Interval/Set/Disjoint): use \\`to_dual\\`` names only one of the two files the PR rewrites; it also converts `Mathlib/Order/Filter/AtTopBot/Disjoint.lean`. The title also does not say that the PR adds new lemmas (`Set.Ici_disjoint_Iio`, `Set.Ioi_disjoint_Iic`) besides regenerating existing ones.",
+     "requested_change": "Retitle to something like `feat(Order): use \\`to_dual\\` in Interval/Set/Disjoint and Filter/AtTopBot/Disjoint`. In the description, list the newly generated lemmas `Set.Ici_disjoint_Iio` and `Set.Ioi_disjoint_Iic`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` used to be a `simp` lemma (as did its `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_same]` drops the `simp` attribute on both declarations.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` so the source theorem and generated dual keep their previous `simp` behavior.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` used to be a `simp` lemma (as did its generated `Iio`/`Ioi` counterpart), but the replacement `@[to_dual Iio_disjoint_Ioi_iff]` drops the `simp` attribute on both declarations.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so both the source theorem and generated dual are registered as `simp` lemmas.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` silently loses its `@[simp]` attribute: the diff replaces its `@[simp]` with `@[to_dual Iio_disjoint_Ioi_same]` and does not use `(attr := simp)`. Since `(attr := ...)` is the syntax that applies an attribute to *both* the source and the generated dual (see the `attrOption` docstring in `Mathlib/Tactic/Translate/Core.lean`), the regenerated `Set.Iio_disjoint_Ioi_same` — also `@[simp]` before this PR — is not a `simp` lemma either. Verified: `example {α} [Preorder α] {a : α} : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for `Disjoint (Iio a) (Ioi a)`; both were closed by the base simp set. Every other declaration in this PR that had `@[simp]` got `(attr := simp)`, so this is an oversight, not a deliberate removal.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` for `Set.Ioi_disjoint_Iio_same` (matching lines 39/43/59 of the same file). With that edit the file compiles and `by simp` proves both `Disjoint (Ioi a) (Iio a)` and `Disjoint (Iio a) (Ioi a)` again.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` also loses its `@[simp]` attribute, and its regenerated dual `Set.Iio_disjoint_Ioi_iff` is left untagged, so `simp` no longer reduces either `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` to an order comparison, as it did before this PR. Verified: `example {α} [LinearOrder α] [DenselyOrdered α] {a b : α} : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp` now leaves the goal `⊢ Disjoint (Ioi a) (Iio b) ↔ b ≤ a`, and the `Iio`/`Ioi` version behaves the same, whereas `Disjoint (Iic a) (Ici b) ↔ ¬b ≤ a` (a sibling that did receive `(attr := simp)`) is still closed by `simp`.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` for `Set.Ioi_disjoint_Iio_iff`, restoring `@[simp]` on both it and the generated `Set.Iio_disjoint_Ioi_iff`.",
+     "severity": "blocking"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/a2c880a003a68730d7cbf24fc70307069b9ec94a7ce4be8908a5f6aa8f787ea0/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__a782c696-06fe-49b0-a0d0-bd35d928dc5c.jsonl"
+  },
+  "AP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute: the old `@[simp]` line was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, and `to_dual` only transfers attributes to the generated dual when they are passed as `(attr := ...)` (per the `to_dual` docstring: \"Use the `(attr := ...)` syntax to apply attributes to both the original and the dual version\"). So as the PR leaves it neither `Ioi_disjoint_Iio_same` nor its generated dual `Iio_disjoint_Ioi_same` is a simp lemma, although both were `@[simp]` before the change — a regression in the public simp set, and inconsistent with the sibling `Ico_disjoint_Ico_same`, which is still `@[simp]`.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, as is already done for `Iic_disjoint_Ioi`/`Iio_disjoint_Ici`/`Ici_disjoint_Iic` a few lines above, so that both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same` are tagged `[simp]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute in the same way as `Ioi_disjoint_Iio_same`: `@[simp]` was replaced by `@[to_dual Iio_disjoint_Ioi_iff]`, and since no `(attr := ...)` is passed, neither the source nor the regenerated `Iio_disjoint_Ioi_iff` is a simp lemma any more, although both were `@[simp]` before the change.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff` keep the `[simp]` attribute they had before.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Order/Filter/AtTopBot/Disjoint.lean:25",
+     "claim": "The PR metadata does not describe the change: the title is `feat(Order/Interval/Set/Disjoint): use to_dual`, but the PR also rewrites `Mathlib/Order/Filter/AtTopBot/Disjoint.lean` (all four hand-written `αᵒᵈ` duals there are deleted and regenerated by `to_dual`), and there is no description at all, so nothing in the title or description records that twelve declarations are deleted and regenerated under their existing names.",
+     "requested_change": "Retitle to cover both modules (e.g. `feat(Order): use to_dual in Filter.AtTopBot.Disjoint and Order.Interval.Set.Disjoint`) and add a description stating that the hand-written duals in these two files are now produced by `to_dual`, keeping the same declaration names.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep1/tasks/4668e0daab967156a5b37f6d4f16eeba58587df8c8e404de8d962adcce674dc3/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__d7ef3ab2-6798-414d-b8c3-6d8d02f15d5e.jsonl"
+  },
+  "GPT2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_same`) because the new `to_dual` annotation does not pass `attr := simp`; consequently goals that used to close by `simp` no longer do.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` lost its existing `[simp]` attribute (and so did the generated dual `Set.Iio_disjoint_Ioi_iff`) because the new `to_dual` annotation does not pass `attr := simp`; this removes the previous simplification rule for disjoint open rays in densely ordered preorders.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` lost its `@[simp]` attribute, and its generated dual `Iio_disjoint_Ioi_same` never gets one: the PR replaced `@[simp]` with a bare `@[to_dual Iio_disjoint_Ioi_same]`, but attributes are only applied to both declarations via the `(attr := …)` option, so neither is a simp lemma any more. Verified against the PR workspace: `example {α : Type*} [LinearOrder α] (a : α) : Disjoint (Ioi a) (Iio a) := by simp` now fails with \"`simp` made no progress\", and likewise for the `Iio`/`Ioi` direction, whereas both were `@[simp]` before this PR. Every other source lemma in this file that was `@[simp]` (e.g. `Iic_disjoint_Ioi`, `Ici_disjoint_Iic`, `iUnion_Iic`) correctly uses `(attr := simp)`, so this is an inconsistency, not a deliberate removal.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]` on `Ioi_disjoint_Iio_same` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_same` and `Iio_disjoint_Ioi_same`).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `@[simp]` attribute and its generated dual `Iio_disjoint_Ioi_iff` was never tagged, because the `@[simp]` was replaced by a bare `@[to_dual Iio_disjoint_Ioi_iff]` (attributes reach the dual only through `(attr := …)`). Verified against the PR workspace: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] (a b : α) : Disjoint (Ioi a) (Iio b) ↔ ¬ a < b := by simp` now fails with unsolved goal `Disjoint (Ioi a) (Iio b) ↔ b ≤ a` — `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬ a < b`, i.e. the canonical simp normal form for these `Ioi`/`Iio` disjointness goals was removed from the simp set (same for the `Iio`/`Ioi` direction). The base file had both lemmas as `@[simp]`.",
+     "requested_change": "Write `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` on `Ioi_disjoint_Iio_iff` (compiles cleanly and restores `simp` on both `Ioi_disjoint_Iio_iff` and `Iio_disjoint_Ioi_iff`).",
+     "severity": "blocking"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/81df877b1e27075b172f7a23f60d83793887d817cc74b414484dfcf996e7b113/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__adad2d04-8215-497c-8094-c652532b3347.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the header went from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`, and `(attr := ...)` is what applies an attribute to both the source and the generated dual (`to_dual` copies no attributes by itself), so neither `Ioi_disjoint_Iio_same` nor the newly generated `Iio_disjoint_Ioi_same` is a simp lemma any more, although both were `@[simp]` at the base commit. The PR uses `@[to_dual (attr := simp) ...]` for every other pair of simp-tagged siblings it re-attributes (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, `iUnion_Icc_right`, `iUnion_Ioc_right`, `iUnion_Ico_right`, `iUnion_Ioo_right`), so this pair is the odd one out. Concretely, `simp` no longer closes `Disjoint (Ioi a) (Iio a)` (verified: `example {α : Type*} [Preorder α] (a : α) : Disjoint (Set.Ioi a) (Set.Iio a) := by simp` fails with \"`simp` made no progress\"), which it did before this PR.",
+     "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which restores `@[simp]` on both `Ioi_disjoint_Iio_same` and the generated `Iio_disjoint_Ioi_same` (verified: compiles with no errors and no linter warnings), or state in a comment why the tag is intentionally dropped.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag: the header became `@[to_dual Iio_disjoint_Ioi_iff]`, without `(attr := simp)`, so neither `Ioi_disjoint_Iio_iff` nor the generated `Iio_disjoint_Ioi_iff` is a simp lemma any more, whereas both were `@[simp]` at the base commit. `simp` can therefore no longer rewrite `Disjoint (Ioi a) (Iio b)` (verified: `example {α : Type*} [LinearOrder α] [DenselyOrdered α] {a b : α} (h : ¬a < b) : Disjoint (Set.Ioi a) (Set.Iio b) := by simpa using h` fails, since the goal is no longer simplified to `¬a < b`).",
+     "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` so that both the source and the generated dual keep the `@[simp]` tag (verified: compiles with no errors and no linter warnings), or record why the tag is dropped.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:145",
+     "claim": "`Set.iUnion_Ioc_eq_Ioi_self_iff` is the dual of `Set.iUnion_Ico_eq_Iio_self_iff` and is still written out by hand (a proof of its own at line 148), even though this PR's stated purpose is precisely to have such duals generated by `to_dual`; the same holds for the `biUnion` twin `Set.biUnion_Ioc_eq_Ioi_self_iff` (line 156) with respect to `Set.biUnion_Ico_eq_Iio_self_iff` (line 150). These are the only pairs of dual order-theoretic lemmas left hand-written in this file after the PR (the two `iUnion`/`biUnion` `Ico`/`Ioc` pairs in the `LinearOrder` section), while the `Preorder`-section `Ico`/`Ioc` and `Iio`/`Ioi` pairs next to them were converted.",
+     "requested_change": "Tag `iUnion_Ico_eq_Iio_self_iff` with `@[to_dual (attr := simp)]` and delete the hand-written `iUnion_Ioc_eq_Ioi_self_iff`, and likewise `biUnion_Ico_eq_Iio_self_iff` / `biUnion_Ioc_eq_Ioi_self_iff`; or say in a comment why the `LinearOrder` section is out of scope for this PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "PR level (no file or line)",
+     "claim": "The PR title and description do not say what the change is: the title `feat(Order/Interval/Set/Disjoint): use to_dual` names only one of the two changed files (`Mathlib/Order/Filter/AtTopBot/Disjoint.lean` is also rewritten), and no description was provided, so the substantive parts of the diff are undocumented: twelve declarations are deleted and regenerated by `to_dual` as new declarations (e.g. `Filter.disjoint_atTop_atBot`, `Set.iUnion_Ici`, `Set.iUnion_Icc_left`, `Set.Iio_disjoint_Ioi_of_le`), `@[simp]` is dropped from `Set.Ioi_disjoint_Iio_same`, `Set.Ioi_disjoint_Iio_iff` and the two duals generated from them, and two new dual lemmas (`Set.Ici_disjoint_Iio`, `Set.Ioi_disjoint_Iic`) come into existence.",
+     "requested_change": "Update the title to cover both files (e.g. `feat(Order): use to_dual for interval and atTop/atBot disjointness lemmas`) and add a description stating that the hand-written `αᵒᵈ` duplicates are replaced by `to_dual`-generated declarations, which of them are now generated under their old names, and which attributes change.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep2/tasks/35c76d76ed584cd540980f1377c1a34d42f699fc08094cc40e8bac01afa82fb4/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__3c476b90-f89d-4250-b517-a448e367ebda.jsonl"
+  },
+  "GPT3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_same]`; the generated dual `Set.Iio_disjoint_Ioi_same` likewise is no longer a simp lemma, so existing `simp` proofs of these disjointness goals regress.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` lost its `simp` attribute when it was changed from `@[simp]` to `@[to_dual Iio_disjoint_Ioi_iff]`; the generated dual `Set.Iio_disjoint_Ioi_iff` likewise is no longer a simp lemma, removing the previous simplification rule for these disjointness propositions.",
+     "requested_change": "Change the attribute to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_same]`, and a bare tag applies no attribute to the source, nor to the generated dual `Set.Iio_disjoint_Ioi_same` (only `(attr := …)` does). Both lemmas were `@[simp]` before the PR, so `simp` no longer closes goals it used to close, e.g. `Disjoint (Ioi (1:ℤ)) (Iio 1)` now fails with \"simp made no progress\" although the pre-PR lemma was a simp lemma; all sibling tags in the file use the `(attr := simp)` spelling, so this looks unintended.",
+     "requested_change": "Change line 78 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which re-tags both the source and the generated dual with `simp`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` loses its `@[simp]` attribute: the PR replaced the `@[simp]` line with a bare `@[to_dual Iio_disjoint_Ioi_iff]`, which attaches no attribute to the source or to the generated dual `Set.Iio_disjoint_Ioi_iff`. Both were `@[simp]` before the PR, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` to `¬a < b` in densely ordered types (verified: `Disjoint (Ioi (2:ℚ)) (Iio 1)` is no longer closed by `simp`, although `DenselyOrdered ℚ` is found).",
+     "requested_change": "Change line 82 to `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, which re-tags both the source and the generated dual with `simp`.",
+     "severity": "blocking"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/b9ce4077d5f0c642b1bf73be6102455e4ced1f3fb164bed9de47ae3193a19045/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__ec57cfe8-bd46-449a-b02b-3b6de339d026.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:78",
+     "claim": "`Set.Ioi_disjoint_Iio_same` silently lost its `@[simp]` tag: the base file had `@[simp] theorem Ioi_disjoint_Iio_same` and `@[simp] theorem Iio_disjoint_Ioi_same`, but the tag was replaced by `@[to_dual Iio_disjoint_Ioi_same]`, so neither the original nor its generated dual is in the simp set any more. Every other declaration dualised in this PR keeps its attribute with the `(attr := …)` form (`Iic_disjoint_Ioi`, `Iio_disjoint_Ici`, `Ici_disjoint_Iic`, `iUnion_Iic`, `iUnion_Iio`, all four `iUnion_…_right`), so this is an unintended regression of a public lemma's simp behaviour rather than a deliberate API change.",
+     "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, which applies `@[simp]` to both the original and the generated dual, or — if the tag is deliberately being dropped — say so in the PR description (which is currently empty).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:82",
+     "claim": "`Set.Ioi_disjoint_Iio_iff` silently lost its `@[simp]` tag for the same reason as `Set.Ioi_disjoint_Iio_same`: the base file had `@[simp]` on `Ioi_disjoint_Iio_iff` and on the hand-written `Iio_disjoint_Ioi_iff`, whereas the PR writes `@[to_dual Iio_disjoint_Ioi_iff]`, so neither the lemma nor its generated dual is a simp lemma any more — inconsistent with the `(attr := simp)` transfers used for the rest of the file.",
+     "requested_change": "Use `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Disjoint (Ioi a) (Iio b) ↔ ¬a < b` and its dual, or explain the removal in the PR description.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Order/Interval/Set/Disjoint.lean:145",
+     "claim": "`Set.iUnion_Ioc_eq_Ioi_self_iff` is a hand-written order dual of `Set.iUnion_Ico_eq_Iio_self_iff` (and `Set.biUnion_Ioc_eq_Ioi_self_iff` of `Set.biUnion_Ico_eq_Iio_self_iff`) whose proof merely repeats the original's proof with `Ici`/`Iio` swapped (`simp [← Ioi_inter_Iic, ← inter_iUnion, subset_def]` versus `simp [← Ici_inter_Iio, ← iUnion_inter, subset_def]`). This is exactly the hand-written-dual pattern this PR removes elsewhere in the same file, but the conversion stops at `end Preorder`, leaving these two duals (and their duplicated proofs) written by hand; the practice is that such a dual is produced by the generator from its source rather than restated.",
+     "requested_change": "Tag the `Ico` sources and delete the restated duals: `@[to_dual (attr := simp)]` on `Set.iUnion_Ico_eq_Iio_self_iff` and on `Set.biUnion_Ico_eq_Iio_self_iff` (the `(attr := simp)` form keeps `@[simp]` on both source and dual), removing the hand-written `iUnion_Ioc_eq_Ioi_self_iff` / `biUnion_Ioc_eq_Ioi_self_iff`; `to_dual` autogenerates precisely those two names.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep3/tasks/1a10362e0aba2af4d50f7687d414625adaaccdbc1203bb722865f3c61d6531e6/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__38d68a14-d0be-4a75-839a-de28968e8235.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_36822.md"
+}

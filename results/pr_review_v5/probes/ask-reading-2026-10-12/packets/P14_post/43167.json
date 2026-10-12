@@ -1,0 +1,1538 @@
+{
+ "asks": [
+  {
+   "id": "p0009",
+   "pr": 43167,
+   "family": "F9",
+   "in_census": true,
+   "entries": [
+    "P030"
+   ],
+   "text": "```suggestion\n```",
+   "path": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+   "line": 13,
+   "author": "kim-em",
+   "at": "2026-08-28T03:12:21Z",
+   "matcher_text": {
+    "ask_id": "p0009",
+    "path": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+    "code_at_comment": "@@ -10,6 +10,7 @@ public import Mathlib.Algebra.Group.Pointwise.Set.Lattice\n public import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas\n public import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic\n public import Mathlib.Algebra.Group.Submonoid.Pointwise\n+public import Mathlib.GroupTheory.Commutator.Basic",
+    "comment": "```suggestion\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is unused: this PR moved the only commutator-dependent lemma (`normalizer_inf_normalizer_le_normalizer_sup`) out of this file, and the file now contains no occurrence of `⁅` or `commutator` at all, so the import is precisely the kind of redundant import `shake` asks authors to drop.",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: `lean_verify_edit` on this file with that single line removed compiles with no errors and no warnings. If the intent was instead for `Mathlib/GroupTheory/Commutator/Basic.lean` to get `Pointwise`, note the direction cannot be had together with this import (it would be an import cycle) — with the lemma moved to `Algebra/Group/Subgroup/Basic.lean`, no import is needed on either side.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is unused: this PR moved the only commutator-dependent lemma (`normalizer_inf_normalizer_le_normalizer_sup`) out of this file, and the file now contains no occurrence of `⁅` or `commutator` at all, so the import is precisely the kind of redundant import `shake` asks authors to drop.",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: `lean_verify_edit` on this file with that single line removed compiles with no errors and no warnings. If the intent was instead for `Mathlib/GroupTheory/Commutator/Basic.lean` to get `Pointwise`, note the direction cannot be had together with this import (it would be an import cycle) — with the lemma moved to `Algebra/Group/Subgroup/Basic.lean`, no import is needed on either side.",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Subgroup.Pointwise` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but this file does not use that module; the added import is an unnecessary high-level dependency.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Subgroup.Pointwise` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but this file does not use that module; the added import is an unnecessary high-level dependency.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "T1": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses it. The file never mentions a commutator or `⁅`, and the moved lemma now sits in `Subgroup/Basic.lean`, which Pointwise already imports. So the line only adds a dependency edge from a low-level `Algebra/Group` file to `GroupTheory/Commutator/Basic`, and through it `QuotientGroup.Defs`.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses it. The file never mentions a commutator or `⁅`, and the moved lemma now sits in `Subgroup/Basic.lean`, which Pointwise already imports. So the line only adds a dependency edge from a low-level `Algebra/Group` file to `GroupTheory/Commutator/Basic`, and through it `QuotientGroup.Defs`.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "AP1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Pointwise.lean` gains `public import Mathlib.GroupTheory.Commutator.Basic`, but nothing in the file mentions commutators (`content_search` for `⁅|commutator|Commutator` in this file matches only this import line), so the import is unused; the direction is also backwards for a file in `Algebra/Group`, since `Mathlib.GroupTheory.Commutator.Basic` is a consumer of subgroup API (and after this PR cannot import `Pointwise.lean` at all).",
+      "requested_change": "Delete the import. If it was added because some declaration in `Commutator/Basic.lean` needs something from `Pointwise.lean`, add the import to that file instead (the PR avoided exactly that by moving `inf_normalizer_le_normalizer_sup` into `Algebra/Group/Subgroup/Basic.lean`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Pointwise.lean` gains `public import Mathlib.GroupTheory.Commutator.Basic`, but nothing in the file mentions commutators (`content_search` for `⁅|commutator|Commutator` in this file matches only this import line), so the import is unused; the direction is also backwards for a file in `Algebra/Group`, since `Mathlib.GroupTheory.Commutator.Basic` is a consumer of subgroup API (and after this PR cannot import `Pointwise.lean` at all).",
+      "requested_change": "Delete the import. If it was added because some declaration in `Commutator/Basic.lean` needs something from `Pointwise.lean`, add the import to that file instead (the PR avoided exactly that by moving `inf_normalizer_le_normalizer_sup` into `Algebra/Group/Subgroup/Basic.lean`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in the file uses it: `content_search` for `commutator`/`⁅` in this file returns no hits, and `lean_verify_edit` deleting exactly this line recompiles the whole file with no errors. It is presumably a leftover from the state in which the new material still lived in `Pointwise.lean` (the declaration this PR moved out was the only commutator-adjacent thing there). As it stands every file that imports this low-level algebra module now transitively depends on `GroupTheory/Commutator/Basic` for nothing.",
+      "requested_change": "Remove the line `public import Mathlib.GroupTheory.Commutator.Basic` (line 13) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If the dependency is actually wanted somewhere, put the import in the file that needs it (the only user of the new API is `Mathlib/GroupTheory/Commutator/Basic.lean` itself), not in `Pointwise`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in the file uses it: `content_search` for `commutator`/`⁅` in this file returns no hits, and `lean_verify_edit` deleting exactly this line recompiles the whole file with no errors. It is presumably a leftover from the state in which the new material still lived in `Pointwise.lean` (the declaration this PR moved out was the only commutator-adjacent thing there). As it stands every file that imports this low-level algebra module now transitively depends on `GroupTheory/Commutator/Basic` for nothing.",
+      "requested_change": "Remove the line `public import Mathlib.GroupTheory.Commutator.Basic` (line 13) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If the dependency is actually wanted somewhere, put the import in the file that needs it (the only user of the new API is `Mathlib/GroupTheory/Commutator/Basic.lean` itself), not in `Pointwise`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses the commutator API: the only user of the moved declaration (`normalizer_inf_normalizer_le_normalizer_sup`, now `inf_normalizer_le_normalizer_sup` in `Subgroup/Basic.lean`) was deleted here and the two remaining references in this file were updated to the new name. The added line is a leftover that gives a foundational `Algebra/...` file a dependency on `GroupTheory/Commutator/Basic` (and hence on `QuotientGroup`).",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If some other module was relying on this re-export, that module should import `Mathlib.GroupTheory.Commutator.Basic` directly.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses the commutator API: the only user of the moved declaration (`normalizer_inf_normalizer_le_normalizer_sup`, now `inf_normalizer_le_normalizer_sup` in `Subgroup/Basic.lean`) was deleted here and the two remaining references in this file were updated to the new name. The added line is a leftover that gives a foundational `Algebra/...` file a dependency on `GroupTheory/Commutator/Basic` (and hence on `QuotientGroup`).",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If some other module was relying on this re-export, that module should import `Mathlib.GroupTheory.Commutator.Basic` directly.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "DX1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` added on line 13 of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` is unused. Nothing in this file mentions the commutator API (no occurrence of `commutator`, `addCommutator` or the `⁅⁆` notation), and the only renamed declaration the file had to be adjusted for — `Subgroup.inf_normalizer_le_normalizer_sup`, used at lines 344 and 350 — lives in `Mathlib.Algebra.Group.Subgroup.Basic`, which this file already reaches through its pre-existing `Mathlib.GroupTheory.GroupAction.ConjAct` → `Mathlib.GroupTheory.Subgroup.Centralizer` → `Mathlib.GroupTheory.Subgroup.Center` → `Mathlib.Algebra.Group.Subgroup.Basic` chain. As it stands the import makes a low-level `Algebra/` file depend on `GroupTheory/Commutator` (pulling in `QuotientGroup.Defs`, `Coset.Defs`, `Congruence.Hom`).",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: the file compiles with exactly this line removed, with no errors and no warnings, and the merge-base library compiled without this import, so reverting it cannot break anything.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` added on line 13 of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` is unused. Nothing in this file mentions the commutator API (no occurrence of `commutator`, `addCommutator` or the `⁅⁆` notation), and the only renamed declaration the file had to be adjusted for — `Subgroup.inf_normalizer_le_normalizer_sup`, used at lines 344 and 350 — lives in `Mathlib.Algebra.Group.Subgroup.Basic`, which this file already reaches through its pre-existing `Mathlib.GroupTheory.GroupAction.ConjAct` → `Mathlib.GroupTheory.Subgroup.Centralizer` → `Mathlib.GroupTheory.Subgroup.Center` → `Mathlib.Algebra.Group.Subgroup.Basic` chain. As it stands the import makes a low-level `Algebra/` file depend on `GroupTheory/Commutator` (pulling in `QuotientGroup.Defs`, `Coset.Defs`, `Congruence.Hom`).",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: the file compiles with exactly this line removed, with no errors and no warnings, and the merge-base library compiled without this import, so reverting it cannot break anything.",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` (line 13), but nothing in the file uses it: the file has no commutator or bracket. The moved lemma went to `Subgroup/Basic.lean`, which this file already imports. So the import only makes a foundational file heavier.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` (line 13), but nothing in the file uses it: the file has no commutator or bracket. The moved lemma went to `Subgroup/Basic.lean`, which this file already imports. So the import only makes a foundational file heavier.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Pointwise.lean` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but none of the changes in this file need that higher-level import; it only adds an unnecessary dependency from the algebra subgroup pointwise file into group theory.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "`Pointwise.lean` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but none of the changes in this file need that higher-level import; it only adds an unnecessary dependency from the algebra subgroup pointwise file into group theory.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is not needed by this file: nothing in `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` mentions commutators (grep for `commutator`/`⁅` returns nothing), and the only thing the file now needs from the module the moved lemma landed in, `Subgroup.inf_normalizer_le_normalizer_sup` (used at lines 344 and 350), is already available through the existing `public import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas`, which directly imports `Mathlib.Algebra.Group.Subgroup.Basic`. The import also makes an `Algebra` file depend on `GroupTheory` for no reason.",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is not needed by this file: nothing in `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` mentions commutators (grep for `commutator`/`⁅` returns nothing), and the only thing the file now needs from the module the moved lemma landed in, `Subgroup.inf_normalizer_le_normalizer_sup` (used at lines 344 and 350), is already available through the existing `public import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas`, which directly imports `Mathlib.Algebra.Group.Subgroup.Basic`. The import also makes an `Algebra` file depend on `GroupTheory` for no reason.",
+      "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses commutators; the only related change there is the rename to `inf_normalizer_le_normalizer_sup`, which now lives in `Mathlib/Algebra/Group/Subgroup/Basic.lean`, already imported. So the import only adds a new dependency: Pointwise.lean did not see `Mathlib.GroupTheory.Commutator.Basic` (or the `QuotientGroup.Defs` it imports) before this PR.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses commutators; the only related change there is the rename to `inf_normalizer_le_normalizer_sup`, which now lives in `Mathlib/Algebra/Group/Subgroup/Basic.lean`, already imported. So the import only adds a new dependency: Pointwise.lean did not see `Mathlib.GroupTheory.Commutator.Basic` (or the `QuotientGroup.Defs` it imports) before this PR.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "GPT1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` in `Subgroup/Pointwise.lean` is unused after moving `inf_normalizer_le_normalizer_sup` to `Subgroup/Basic`, and unnecessarily makes this pointwise subgroup file publicly depend on commutator/quotient-group theory.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` in `Subgroup/Pointwise.lean` is unused after moving `inf_normalizer_le_normalizer_sup` to `Subgroup/Basic`, and unnecessarily makes this pointwise subgroup file publicly depend on commutator/quotient-group theory.",
+      "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+      "severity": "advisory"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in Pointwise.lean uses commutators. The lemma the PR touches there moved *out* of the file into `Subgroup/Basic.lean`, which Pointwise already imports. So the new import is unused, and it makes Pointwise (and everything downstream of it) depend on `Commutator.Basic` and hence `QuotientGroup.Defs`.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from the imports of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to delete the unused Commutator.Basic import from Pointwise.lean.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+      "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in Pointwise.lean uses commutators. The lemma the PR touches there moved *out* of the file into `Subgroup/Basic.lean`, which Pointwise already imports. So the new import is unused, and it makes Pointwise (and everything downstream of it) depend on `Commutator.Basic` and hence `QuotientGroup.Defs`.",
+      "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from the imports of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+      "severity": "blocking"
+     },
+     "note_m2": "Delete unused Commutator import from Pointwise.lean; every reviewer asks for it."
+    }
+   },
+   "entries_text": {
+    "P030": "A file does not import a module it does not need or that another of its imports already provides."
+   }
+  },
+  {
+   "id": "p0010",
+   "pr": 43167,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P254"
+   ],
+   "text": ":robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_left`. So `⁅H ⊔ K, N⁆` would be `commutator_sup_right`, and `⁅N, H ⊔ K⁆` at line 357 `commutator_sup_left`.",
+   "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+   "line": 337,
+   "author": "kim-em",
+   "at": "2026-08-28T03:12:21Z",
+   "matcher_text": {
+    "ask_id": "p0010",
+    "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "code_at_comment": "(H K N : Subgroup G) [(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal] :\n+    ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n+  refine le_antisymm ?_\n+    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n+  have hH : ⁅H, N⁆ ≤ ⁅H, N⁆ ⊔ ⁅K, N⁆ := le_sup_left\n+  have hK : ⁅K, N⁆ ≤ ⁅H, N⁆ ⊔ ⁅K, N⁆ := le_sup_right\n+  rw [← QuotientGroup.ker_mk' (⁅H, N⁆ ⊔ ⁅K, N⁆), ← Subgroup.map_eq_bot_iff,\n+    map_commutator, Subgroup.commutator_eq_bot_iff_le_centralizer] at hH hK ⊢\n+  rw [map_sup]\n+  exact sup_le hH hK\n+\n+theorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by",
+    "comment": ":robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_left`. So `⁅H ⊔ K, N⁆` would be `commutator_sup_right`, and `⁅N, H ⊔ K⁆` at line 357 `commutator_sup_left`.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "T1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "AP1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "DX1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "GPT1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer flags the left/right naming swap of commutator_sup_left/right.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Left/right naming swap of commutator_sup_left/right; no reviewer raises it."
+    }
+   },
+   "entries_text": {
+    "P254": "A declaration's name and namespace follow the pattern of its siblings' and analogues' names (the same abbreviation of a hypothesis, the same ordering of parts, the same namespace for the same kind of construction), not a fuller or different spelling."
+   }
+  },
+  {
+   "id": "p0011",
+   "pr": 43167,
+   "family": "F4",
+   "in_census": true,
+   "entries": [
+    "P263"
+   ],
+   "text": "Missing `@[to_additive]` here, on line 357, and on the private lemma",
+   "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+   "line": 337,
+   "author": "kim-em",
+   "at": "2026-08-28T03:12:21Z",
+   "matcher_text": {
+    "ask_id": "p0011",
+    "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "code_at_comment": "(H K N : Subgroup G) [(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal] :\n+    ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n+  refine le_antisymm ?_\n+    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n+  have hH : ⁅H, N⁆ ≤ ⁅H, N⁆ ⊔ ⁅K, N⁆ := le_sup_left\n+  have hK : ⁅K, N⁆ ≤ ⁅H, N⁆ ⊔ ⁅K, N⁆ := le_sup_right\n+  rw [← QuotientGroup.ker_mk' (⁅H, N⁆ ⊔ ⁅K, N⁆), ← Subgroup.map_eq_bot_iff,\n+    map_commutator, Subgroup.commutator_eq_bot_iff_le_centralizer] at hH hK ⊢\n+  rw [map_sup]\n+  exact sup_le hH hK\n+\n+theorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by",
+    "comment": "Missing `@[to_additive]` here, on line 357, and on the private lemma",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` (and `commutator_sup_right` at line 357) are declared without `@[to_additive]`, so the additive counterparts `AddSubgroup.commutator_sup_left`/`commutator_sup_right` do not exist, even though every other commutator declaration in this file has its additive twin and the three sibling lemmas added by this same PR (`commutator_mono_left` line 154, `commutator_mono_right` line 158, `commutator_le_of_le` line 286) all carry `@[to_additive]`.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, to `commutator_sup_right`, and also to the private auxiliary `commutator_sup_left'` (line 326): the translated proof of the two public statements calls the auxiliary, so the translation only goes through when the auxiliary is tagged too. Verified: with `@[to_additive]` on all three the file compiles; with it on only the two public ones Lean reports `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`. The translated value is not type correct` (application `@commutator_sup_left' (↥M) M.toAddGroup`).",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` (and `commutator_sup_right` at line 357) are declared without `@[to_additive]`, so the additive counterparts `AddSubgroup.commutator_sup_left`/`commutator_sup_right` do not exist, even though every other commutator declaration in this file has its additive twin and the three sibling lemmas added by this same PR (`commutator_mono_left` line 154, `commutator_mono_right` line 158, `commutator_le_of_le` line 286) all carry `@[to_additive]`.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, to `commutator_sup_right`, and also to the private auxiliary `commutator_sup_left'` (line 326): the translated proof of the two public statements calls the auxiliary, so the translation only goes through when the auxiliary is tagged too. Verified: with `@[to_additive]` on all three the file compiles; with it on only the two public ones Lean reports `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`. The translated value is not type correct` (application `@commutator_sup_left' (↥M) M.toAddGroup`).",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` is a new public commutator API theorem without a generated additive counterpart; the same omission affects the immediately derived `commutator_sup_right`, leaving no `AddSubgroup.addCommutator_sup_left/right` despite the surrounding API being mirrored with `to_additive`.",
+      "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, to `commutator_sup_left`, and to `commutator_sup_right` (or otherwise provide the corresponding additive theorems).",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` is a new public commutator API theorem without a generated additive counterpart; the same omission affects the immediately derived `commutator_sup_right`, leaving no `AddSubgroup.addCommutator_sup_left/right` despite the surrounding API being mirrored with `to_additive`.",
+      "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, to `commutator_sup_left`, and to `commutator_sup_right` (or otherwise provide the corresponding additive theorems).",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "T1": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` has no `@[to_additive]`, and neither has its private helper `commutator_sup_left'`, so no `AddSubgroup.commutator_sup_left` is generated. Almost every `Subgroup` commutator lemma in this file carries `@[to_additive]`, including the new `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` in this same PR.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, and also to `commutator_sup_left'` if the quotient-based helper is kept.",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` has no `@[to_additive]`, and neither has its private helper `commutator_sup_left'`, so no `AddSubgroup.commutator_sup_left` is generated. Almost every `Subgroup` commutator lemma in this file carries `@[to_additive]`, including the new `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` in this same PR.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, and also to `commutator_sup_left'` if the quotient-based helper is kept.",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "AP1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` and `commutator_sup_right` are the only declarations in `Commutator/Basic.lean` (besides the pre-existing `commutator_eq_bot_of_disjoint`) that carry no additive counterpart: everything else in the file, including `commutator_le_of_le` four lines above, is `@[to_additive]`d, and the additive statements (`⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆` for `AddSubgroup`, `[N.Normal]`) are meaningful and generatable.",
+      "requested_change": "Put `@[to_additive]` on the private helper `commutator_sup_left'` and on `commutator_sup_left` and `commutator_sup_right` (this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`); only the helper's attribute is needed for the translation of the two theorems to typecheck. If `to_additive` cannot be made to work, write the additive versions by hand. `@[to_additive]` directly on the two theorems alone fails (`to_additive failed to add declaration ... The translated value is not type correct`), so the helper has to be additivized as well.",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` and `commutator_sup_right` are the only declarations in `Commutator/Basic.lean` (besides the pre-existing `commutator_eq_bot_of_disjoint`) that carry no additive counterpart: everything else in the file, including `commutator_le_of_le` four lines above, is `@[to_additive]`d, and the additive statements (`⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆` for `AddSubgroup`, `[N.Normal]`) are meaningful and generatable.",
+      "requested_change": "Put `@[to_additive]` on the private helper `commutator_sup_left'` and on `commutator_sup_left` and `commutator_sup_right` (this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`); only the helper's attribute is needed for the translation of the two theorems to typecheck. If `to_additive` cannot be made to work, write the additive versions by hand. `@[to_additive]` directly on the two theorems alone fails (`to_additive failed to add declaration ... The translated value is not type correct`), so the helper has to be additivized as well.",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only new declarations in the file (and, with the helper at line 326, are the only new declarations in the PR besides `inf_normalizer_le_normalizer_sup`) that are not marked `@[to_additive]`, while `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` added in the same PR are, and so is every sibling in the file (`commutator_le_sup`, `commutator_le_inf`, `commutator_mono`, `normalizer_commutator_ge_left`, ...). The additive statements are meaningful and are lost from the API: `AddSubgroup` commutators distribute over `⊔` in the same way, and an additive group need not be commutative.",
+      "requested_change": "Annotate all three declarations: `@[to_additive] private theorem commutator_sup_left' …`, `@[to_additive] theorem commutator_sup_left …` and `@[to_additive] theorem commutator_sup_right …` (the private helper must be annotated too, since `commutator_sup_right`'s proof mentions `commutator_sup_left`, which otherwise has no additive counterpart).",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only new declarations in the file (and, with the helper at line 326, are the only new declarations in the PR besides `inf_normalizer_le_normalizer_sup`) that are not marked `@[to_additive]`, while `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` added in the same PR are, and so is every sibling in the file (`commutator_le_sup`, `commutator_le_inf`, `commutator_mono`, `normalizer_commutator_ge_left`, ...). The additive statements are meaningful and are lost from the API: `AddSubgroup` commutators distribute over `⊔` in the same way, and an additive group need not be commutative.",
+      "requested_change": "Annotate all three declarations: `@[to_additive] private theorem commutator_sup_left' …`, `@[to_additive] theorem commutator_sup_left …` and `@[to_additive] theorem commutator_sup_right …` (the private helper must be annotated too, since `commutator_sup_right`'s proof mentions `commutator_sup_left`, which otherwise has no additive counterpart).",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are declared without `@[to_additive]`, although every other declaration in `GroupTheory/Commutator/Basic.lean` is `to_additive`-tagged — including the three other lemmas this same PR adds (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le`). The additive counterparts of the PR's main results (`AddSubgroup.addCommutator_sup_left`, `AddSubgroup.addCommutator_sup_right`) are therefore missing from the API, and the omission looks like an oversight rather than a deliberate choice.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left` (line 337), to `commutator_sup_right` (line 357), and to the private helper `commutator_sup_left'` (line 326) — the helper must carry the attribute as well, since the translated proofs of the two public lemmas refer to it.",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are declared without `@[to_additive]`, although every other declaration in `GroupTheory/Commutator/Basic.lean` is `to_additive`-tagged — including the three other lemmas this same PR adds (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le`). The additive counterparts of the PR's main results (`AddSubgroup.addCommutator_sup_left`, `AddSubgroup.addCommutator_sup_right`) are therefore missing from the API, and the omission looks like an oversight rather than a deliberate choice.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left` (line 337), to `commutator_sup_right` (line 357), and to the private helper `commutator_sup_left'` (line 326) — the helper must carry the attribute as well, since the translated proofs of the two public lemmas refer to it.",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "DX1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only declarations in this section that are not `@[to_additive]`, so the additive API `AddSubgroup.addCommutator_sup_left` / `AddSubgroup.addCommutator_sup_right` is missing. Every neighbouring declaration is additivized, including the three helpers this PR adds itself (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le` → `AddSubgroup.addCommutator_le_of_le`), and the additive statements are directly parallel to them, so this is an inconsistency in the file's own practice rather than a deliberate omission.",
+      "requested_change": "Mark all three declarations `@[to_additive]`: the private `commutator_sup_left'` (line 326) as well as `commutator_sup_left` (line 337) and `commutator_sup_right` (line 357). Verified: replacing lines 326-358 with the same three declarations carrying `@[to_additive]` compiles with no errors and no warnings, and `#check @_root_.AddSubgroup.addCommutator_sup_left` then reports `∀ {G} [AddGroup G] (H K N : AddSubgroup G) [N.Normal], ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. Note that the private helper must be additivized too: putting `@[to_additive]` on only the two public theorems fails with `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`: The translated value is not type correct ... in the application @commutator_sup_left' (↥M) M.toAddGroup` (the proof of `commutator_sup_left` goes through `commutator_sup_left'`).",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only declarations in this section that are not `@[to_additive]`, so the additive API `AddSubgroup.addCommutator_sup_left` / `AddSubgroup.addCommutator_sup_right` is missing. Every neighbouring declaration is additivized, including the three helpers this PR adds itself (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le` → `AddSubgroup.addCommutator_le_of_le`), and the additive statements are directly parallel to them, so this is an inconsistency in the file's own practice rather than a deliberate omission.",
+      "requested_change": "Mark all three declarations `@[to_additive]`: the private `commutator_sup_left'` (line 326) as well as `commutator_sup_left` (line 337) and `commutator_sup_right` (line 357). Verified: replacing lines 326-358 with the same three declarations carrying `@[to_additive]` compiles with no errors and no warnings, and `#check @_root_.AddSubgroup.addCommutator_sup_left` then reports `∀ {G} [AddGroup G] (H K N : AddSubgroup G) [N.Normal], ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. Note that the private helper must be additivized too: putting `@[to_additive]` on only the two public theorems fails with `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`: The translated value is not type correct ... in the application @commutator_sup_left' (↥M) M.toAddGroup` (the proof of `commutator_sup_left` goes through `commutator_sup_left'`).",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` (and the private `commutator_sup_left'` it needs) has no `@[to_additive]`. Every other `Subgroup` declaration around it carries one (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), so the `AddSubgroup` counterpart is missing.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left'` and add `@[to_additive /-- ... -/]` to `commutator_sup_left`, so that `AddSubgroup.commutator_sup_left` is generated.",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` (and the private `commutator_sup_left'` it needs) has no `@[to_additive]`. Every other `Subgroup` declaration around it carries one (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), so the `AddSubgroup` counterpart is missing.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left'` and add `@[to_additive /-- ... -/]` to `commutator_sup_left`, so that `AddSubgroup.commutator_sup_left` is generated.",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "The new distributivity theorems `Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are not tagged `@[to_additive]`, so the corresponding `AddSubgroup.addCommutator_sup_left/right` API is missing despite the surrounding commutator API being additive-translated.",
+      "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, `commutator_sup_left`, and `commutator_sup_right` so that the additive distributivity lemmas are generated as well.",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "The new distributivity theorems `Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are not tagged `@[to_additive]`, so the corresponding `AddSubgroup.addCommutator_sup_left/right` API is missing despite the surrounding commutator API being additive-translated.",
+      "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, `commutator_sup_left`, and `commutator_sup_right` so that the additive distributivity lemmas are generated as well.",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` (and the private helper `Subgroup.commutator_sup_left'` they rest on, line 326) are the only declarations in this file without `@[to_additive]`, so the additive counterparts of the PR's main results are missing from the API, although every sibling has them (`AddSubgroup.addCommutator_le_right`, `AddSubgroup.addCommutator_le_of_le`, `AddSubgroup.addCommutator_mono_left`, ... all exist).",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, `commutator_sup_right` and to the private `commutator_sup_left'`; this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`, matching the naming of the existing additive siblings. Tagging the private helper is required for the translation to succeed (tagging only the public ones fails, see evidence).",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` (and the private helper `Subgroup.commutator_sup_left'` they rest on, line 326) are the only declarations in this file without `@[to_additive]`, so the additive counterparts of the PR's main results are missing from the API, although every sibling has them (`AddSubgroup.addCommutator_le_right`, `AddSubgroup.addCommutator_le_of_le`, `AddSubgroup.addCommutator_mono_left`, ... all exist).",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, `commutator_sup_right` and to the private `commutator_sup_left'`; this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`, matching the naming of the existing additive siblings. Tagging the private helper is required for the translation to succeed (tagging only the public ones fails, see evidence).",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` (with its private helper `commutator_sup_left'`) and `Subgroup.commutator_sup_right` have no `@[to_additive]`. Every neighbouring lemma in this `Subgroup` block has it (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), as do the PR's own new lemmas `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`. So the additive versions are silently missing, even though the proofs translate as written.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`. This produces `AddSubgroup.addCommutator_sup_left` and `AddSubgroup.addCommutator_sup_right`.",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` (with its private helper `commutator_sup_left'`) and `Subgroup.commutator_sup_right` have no `@[to_additive]`. Every neighbouring lemma in this `Subgroup` block has it (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), as do the PR's own new lemmas `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`. So the additive versions are silently missing, even though the proofs translate as written.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`. This produces `AddSubgroup.addCommutator_sup_left` and `AddSubgroup.addCommutator_sup_right`.",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "GPT1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` is exposed only in the global `[N.Normal]` case and the new sup-distributivity API has no additive version, even though the proof only needs `H ≤ normalizer N` and `K ≤ normalizer N`.",
+      "requested_change": "Add `@[to_additive] theorem commutator_sup_left_of_le_normalizer (H K N : Subgroup G) (hHN : H ≤ normalizer N) (hKN : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`, add the corresponding right-hand theorem, and make the current `[N.Normal]` `commutator_sup_left`/`commutator_sup_right` into `@[to_additive]` corollaries using `le_normalizer_of_normal`. Mark the private helper `commutator_sup_left'` with `@[to_additive]` if it remains used by the additive proof.",
+      "severity": "advisory"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`Subgroup.commutator_sup_left` is exposed only in the global `[N.Normal]` case and the new sup-distributivity API has no additive version, even though the proof only needs `H ≤ normalizer N` and `K ≤ normalizer N`.",
+      "requested_change": "Add `@[to_additive] theorem commutator_sup_left_of_le_normalizer (H K N : Subgroup G) (hHN : H ≤ normalizer N) (hKN : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`, add the corresponding right-hand theorem, and make the current `[N.Normal]` `commutator_sup_left`/`commutator_sup_right` into `@[to_additive]` corollaries using `le_normalizer_of_normal`. Mark the private helper `commutator_sup_left'` with `@[to_additive]` if it remains used by the additive proof.",
+      "severity": "advisory"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` and its private helper `commutator_sup_left'` are the only new commutator lemmas in the PR without `@[to_additive]`. The file tags essentially every `Subgroup` commutator lemma with it, including the PR's own `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`, so `AddSubgroup` gets no version of the distributivity result.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left` and to the private `commutator_sup_left'` it uses. This generates `AddSubgroup.addCommutator_sup_left`.",
+      "severity": "blocking"
+     },
+     "note_m1": "to_additive on sup_left, sup_right and private helper; R3/R8/R13 split it over two findings (best given).",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+      "claim": "`commutator_sup_left` and its private helper `commutator_sup_left'` are the only new commutator lemmas in the PR without `@[to_additive]`. The file tags essentially every `Subgroup` commutator lemma with it, including the PR's own `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`, so `AddSubgroup` gets no version of the distributivity result.",
+      "requested_change": "Add `@[to_additive]` to `commutator_sup_left` and to the private `commutator_sup_left'` it uses. This generates `AddSubgroup.addCommutator_sup_left`.",
+      "severity": "blocking"
+     },
+     "note_m2": "to_additive on both theorems and the private helper; all reviewers ask (R3, R8, R13 split across two findings)."
+    }
+   },
+   "entries_text": {
+    "P263": "A declaration about a multiplicative structure comes with its additive counterpart, and one about an additive structure with its multiplicative counterpart where that exists, generated by `to_additive` when it can be and written by hand otherwise."
+   }
+  },
+  {
+   "id": "p0012",
+   "pr": 43167,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P113"
+   ],
+   "text": "`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime.",
+   "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+   "line": 326,
+   "author": "kim-em",
+   "at": "2026-08-28T03:12:21Z",
+   "matcher_text": {
+    "ask_id": "p0012",
+    "path": "Mathlib/GroupTheory/Commutator/Basic.lean",
+    "code_at_comment": "@@ -311,6 +323,40 @@ theorem commutator_le_map_commutator {f : G →* G'} {K₁ K₂ : Subgroup G'} (\n \n variable (H₁ H₂)\n \n+private theorem commutator_sup_left' (H K N : Subgroup G) [(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal] :",
+    "comment": "`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "T1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "AP1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "DX1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "GPT2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "AP3": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "GPT1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the primed helper; R3/R13 delete it via a new proof, others only ask for a docstring.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename primed private helper. Others only docstring it (R1,R4,R8,R10) or delete it (R3,R13); none addresses the name."
+    }
+   },
+   "entries_text": {
+    "P113": "A lemma variant is distinguished from its siblings by naming the term of its statement that differs, not by appending primes."
+   }
+  }
+ ],
+ "pr": 43167,
+ "sessions": {
+  "X1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses commutators; the only related change there is the rename to `inf_normalizer_le_normalizer_sup`, which now lives in `Mathlib/Algebra/Group/Subgroup/Basic.lean`, already imported. So the import only adds a new dependency: Pointwise.lean did not see `Mathlib.GroupTheory.Commutator.Basic` (or the `QuotientGroup.Defs` it imports) before this PR.",
+     "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` (with its private helper `commutator_sup_left'`) and `Subgroup.commutator_sup_right` have no `@[to_additive]`. Every neighbouring lemma in this `Subgroup` block has it (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), as do the PR's own new lemmas `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`. So the additive versions are silently missing, even though the proofs translate as written.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`. This produces `AddSubgroup.addCommutator_sup_left` and `AddSubgroup.addCommutator_sup_right`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "The PR puts `@[gcongr]` on the one-sided `commutator_mono_left` and `commutator_mono_right` but not on the two-sided `Subgroup.commutator_mono`. As a result `gcongr` cannot close a goal where both arguments of `⁅·, ·⁆` change, such as `⁅H₁, K₁⁆ ≤ ⁅H₂, K₂⁆`. A `@[gcongr]` tag on `commutator_mono` alone already covers the one-sided goals, so the one-sided tags do not help.",
+     "requested_change": "Tag `commutator_mono` with `@[to_additive (attr := gcongr)]` and drop `(attr := gcongr)` from `commutator_mono_left` and `commutator_mono_right`, keeping those two as plain `@[to_additive]` lemmas. This is the setup `LieSubmodule.mono_lie`, `mono_lie_left` and `mono_lie_right` already use in `Mathlib/Algebra/Lie/IdealOperations.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` assumes `[N.Normal]`, but the proof uses normality only once: in `hHKN`, to get `⁅H, N⁆ ≤ N` and `⁅K, N⁆ ≤ N` from `commutator_le_right`. Both follow from `H ≤ normalizer N` and `K ≤ normalizer N` by `le_normalizer_iff_commutator_le_right`, so the lemma is stated under a stronger hypothesis than it needs. The quotient step already works inside `M = H ⊔ K ⊔ N`, where `N` does not have to be normal in `G`.",
+     "requested_change": "State the general version, e.g. `theorem commutator_sup_left_of_le_normalizer {H K N : Subgroup G} (hH : H ≤ normalizer N) (hK : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`, with the current proof and `hHKN := sup_le (le_normalizer_iff_commutator_le_right.mp hH) (le_normalizer_iff_commutator_le_right.mp hK)`. Derive the `[N.Normal]` statement as `commutator_sup_left_of_le_normalizer le_normalizer_of_normal le_normalizer_of_normal`, and treat `commutator_sup_right` the same way.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+     "claim": "The two deprecated aliases added in `Mathlib/Algebra/Group/Subgroup/Basic.lean` spell out the multiplicative and additive versions by hand, including a `_root_.AddSubgroup...` alias. A single `to_additive` alias generates both.",
+     "requested_change": "Replace the two alias blocks with `@[to_additive (attr := deprecated (since := \"2026-08-27\"))] alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "`commutator_sup_left'` and `commutator_sup_left` sit inside `namespace Subgroup` but still write `Subgroup.map_eq_bot_iff`, `Subgroup.commutator_eq_bot_iff_le_centralizer` and `Subgroup.normal_subgroupOf_of_le_normalizer`. The prefixes are redundant; unqualified, the names resolve without ambiguity.",
+     "requested_change": "Drop the `Subgroup.` prefixes: write `← map_eq_bot_iff` and `commutator_eq_bot_iff_le_centralizer` in the `rw` of `commutator_sup_left'`, and `convert normal_subgroupOf_of_le_normalizer this` in `commutator_sup_left`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in Pointwise.lean uses commutators. The lemma the PR touches there moved *out* of the file into `Subgroup/Basic.lean`, which Pointwise already imports. So the new import is unused, and it makes Pointwise (and everything downstream of it) depend on `Commutator.Basic` and hence `QuotientGroup.Defs`.",
+     "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from the imports of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` and its private helper `commutator_sup_left'` are the only new commutator lemmas in the PR without `@[to_additive]`. The file tags essentially every `Subgroup` commutator lemma with it, including the PR's own `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`, so `AddSubgroup` gets no version of the distributivity result.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left` and to the private `commutator_sup_left'` it uses. This generates `AddSubgroup.addCommutator_sup_left`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+     "claim": "`commutator_sup_right` lacks `@[to_additive]`, unlike its neighbours in the file, so there is no `AddSubgroup` version of `⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆`.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_right`, together with the same attribute on `commutator_sup_left`, which it uses. This generates `AddSubgroup.addCommutator_sup_right`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "The PR tags only the one-sided lemmas `commutator_mono_left` and `commutator_mono_right` with `gcongr`. The two-sided `commutator_mono` stays untagged, and gcongr looks lemmas up by exactly which arguments vary, so `gcongr` cannot close `⁅A, C⁆ ≤ ⁅B, D⁆` when both arguments change.",
+     "requested_change": "Also tag the existing `commutator_mono` with `@[to_additive (attr := gcongr)]`, so gcongr/grw handle the case where both arguments vary as well as the one-sided cases the PR covers.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The proof of `commutator_sup_left` detours through the quotient `(H ⊔ K ⊔ N) ⧸ (⁅H, N⁆ ⊔ ⁅K, N⁆)`. That needs a separate private helper `commutator_sup_left'`, five `have`s for containment in `M`, `subgroupOf` transport with `convert`, and two large `simp` calls. The key fact it establishes, that `H ⊔ K` normalises `⁅H, N⁆ ⊔ ⁅K, N⁆`, already gives the result by closure induction on `H ⊔ K`, with the existing `commutatorElement_mul_left_eq_conj_mul` and `commutatorElement_inv_left` identities.",
+     "requested_change": "Prove `commutator_sup_left` directly and delete the private `commutator_sup_left'`:\ntheorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n  refine le_antisymm ?_\n    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n  have hX : ⁅H, N⁆ ⊔ ⁅K, N⁆ ≤ N := sup_le (commutator_le_right H N) (commutator_le_right K N)\n  have hHK : H ⊔ K ≤ normalizer (⁅H, N⁆ ⊔ ⁅K, N⁆ : Subgroup G) := sup_le\n    (by grw [le_normalizer_iff_commutator_le_right, hX, ← le_sup_left])\n    (by grw [le_normalizer_iff_commutator_le_right, hX, ← le_sup_right])\n  rw [sup_eq_closure H K] at hHK\n  rw [commutator_le]\n  intro g hg\n  rw [sup_eq_closure H K] at hg\n  induction hg using closure_induction with\n  | mem x hx =>\n    rcases hx with hx | hx\n    · exact fun n hn ↦ mem_sup_left (commutator_mem_commutator hx hn)\n    · exact fun n hn ↦ mem_sup_right (commutator_mem_commutator hx hn)\n  | one => simp\n  | mul x y hx hy ihx ihy =>\n    intro n hn\n    rw [commutatorElement_mul_left_eq_conj_mul]\n    exact mul_mem ((mem_normalizer_iff.mp (hHK hx) _).mp (ihy n hn)) (ihx n hn)\n  | inv x hx ihx =>\n    intro n hn\n    rw [commutatorElement_inv_left, ← commutatorElement_inv]\n    exact (mem_normalizer_iff''.mp (hHK hx) _).mp (inv_mem (ihx n hn))",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Subgroup/Basic.lean:524",
+     "claim": "The PR moves the binary `inf_normalizer_le_normalizer_sup` into `Subgroup/Basic.lean`, next to `inf_normalizer_le_normalizer_inf` and `iInf_normalizer_le_normalizer_iInf`. Its indexed counterpart `iInf_normalizer_le_normalizer_iSup` stays behind in `Pointwise.lean`, so the sup pair is now split across files while the inf pair sits together.",
+     "requested_change": "Move `iInf_normalizer_le_normalizer_iSup` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` to `Mathlib/Algebra/Group/Subgroup/Basic.lean`, directly after `inf_normalizer_le_normalizer_sup`. Its proof is unchanged, and `iSup_normal` in Pointwise still finds it through the existing import.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R3",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses it. The file never mentions a commutator or `⁅`, and the moved lemma now sits in `Subgroup/Basic.lean`, which Pointwise already imports. So the line only adds a dependency edge from a low-level `Algebra/Group` file to `GroupTheory/Commutator/Basic`, and through it `QuotientGroup.Defs`.",
+     "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` has no `@[to_additive]`, and neither has its private helper `commutator_sup_left'`, so no `AddSubgroup.commutator_sup_left` is generated. Almost every `Subgroup` commutator lemma in this file carries `@[to_additive]`, including the new `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` in this same PR.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, and also to `commutator_sup_left'` if the quotient-based helper is kept.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+     "claim": "`commutator_sup_right` has no `@[to_additive]`, unlike its siblings in the file. Its additive counterpart is therefore missing, even though the additive version of `commutator_comm` that its proof uses exists.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_right`. This needs `commutator_sup_left` to be tagged as well.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The proof of `commutator_sup_left` goes a long way round. It needs a private primed helper `commutator_sup_left'` that works in the quotient by `⁅H, N⁆ ⊔ ⁅K, N⁆`, and then moves everything into `M := H ⊔ K ⊔ N` through `subgroupOf`, two `map_subtype_inj` simp transfers and a `convert`. That is about 30 lines. A direct elementwise argument is shorter and needs no helper. The key facts are that `H ⊔ K` normalizes `L := ⁅H, N⁆ ⊔ ⁅K, N⁆` (which the PR already proves) and that `commutatorElement_mul_left_eq_conj_mul` and `commutatorElement_inv_left` already exist in this file.",
+     "requested_change": "Delete the private `commutator_sup_left'`, and prove the `≤` direction directly by `commutator_le` plus `closure_induction` on `H ⊔ K = closure (H ∪ K)`, using that `H ⊔ K ≤ normalizer L`:\n@[to_additive]\ntheorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n  refine le_antisymm (commutator_le.mpr fun g hg n hn ↦ ?_)\n    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n  set L := ⁅H, N⁆ ⊔ ⁅K, N⁆\n  have hL : L ≤ N := sup_le (commutator_le_right H N) (commutator_le_right K N)\n  have hHK : closure ((H : Set G) ∪ K) ≤ normalizer (L : Set G) := by\n    rw [← sup_eq_closure]\n    exact sup_le\n      (le_normalizer_iff_commutator_le_right.mpr <| (commutator_mono_right hL).trans le_sup_left)\n      (le_normalizer_iff_commutator_le_right.mpr <| (commutator_mono_right hL).trans le_sup_right)\n  rw [sup_eq_closure] at hg\n  induction hg using closure_induction with\n  | mem x hx =>\n    exact hx.elim (fun hx ↦ mem_sup_left (commutator_mem_commutator hx hn))\n      (fun hx ↦ mem_sup_right (commutator_mem_commutator hx hn))\n  | one => simp\n  | mul x y hx _ ihx ihy =>\n    rw [commutatorElement_mul_left_eq_conj_mul]\n    exact mul_mem ((mem_normalizer_iff.mp (hHK hx) _).mp ihy) ihx\n  | inv x hx ih =>\n    rw [commutatorElement_inv_left]\n    exact (mem_normalizer_iff''.mp (hHK hx) _).mp (by simpa using inv_mem ih)\n\n@[to_additive]\ntheorem commutator_sup_right (N H K : Subgroup G) [N.Normal] : ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆ := by\n  simp_rw [commutator_comm N, commutator_sup_left]\n",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "The PR puts `gcongr` on the two one-sided lemmas `commutator_mono_left` and `commutator_mono_right`, but not on the two-argument `commutator_mono` they are derived from. The canonical `gcongr` lemma is the one in which both arguments vary, as with the Lie-ideal analogue: `LieSubmodule.mono_lie` is `@[gcongr]`, while `mono_lie_left` and `mono_lie_right` are untagged. Tagging `commutator_mono` already covers one-sided goals.",
+     "requested_change": "Change `commutator_mono`'s attribute to `@[to_additive (attr := gcongr)]`, and drop `(attr := gcongr)` from `commutator_mono_left` and `commutator_mono_right`, keeping them as plain `@[to_additive]` API lemmas.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+     "claim": "The rename uses two hand-written deprecated aliases, one for `Subgroup` and one spelled `_root_.AddSubgroup....`, for a lemma that is `@[to_additive]`. A single `to_additive` deprecated alias generates both and keeps them in sync.",
+     "requested_change": "Replace the two aliases in `Mathlib/Algebra/Group/Subgroup/Basic.lean` with\n@[to_additive (attr := deprecated (since := \"2026-08-27\"))]\nalias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:334",
+     "claim": "The PR moves the binary `inf_normalizer_le_normalizer_sup` to `Subgroup/Basic.lean`, where it now sits beside `inf_normalizer_le_normalizer_inf` and `iInf_normalizer_le_normalizer_iInf`. Its indexed version `iInf_normalizer_le_normalizer_iSup` is left behind in `Pointwise.lean`, although it does not depend on anything pointwise. This splits the `sup`/`iSup` pair across two files.",
+     "requested_change": "Move `iInf_normalizer_le_normalizer_iSup` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` to `Mathlib/Algebra/Group/Subgroup/Basic.lean`, directly after `inf_normalizer_le_normalizer_sup`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` (line 13), but nothing in the file uses it: the file has no commutator or bracket. The moved lemma went to `Subgroup/Basic.lean`, which this file already imports. So the import only makes a foundational file heavier.",
+     "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` (and the private `commutator_sup_left'` it needs) has no `@[to_additive]`. Every other `Subgroup` declaration around it carries one (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), so the `AddSubgroup` counterpart is missing.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left'` and add `@[to_additive /-- ... -/]` to `commutator_sup_left`, so that `AddSubgroup.commutator_sup_left` is generated.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+     "claim": "`commutator_sup_right` has no `@[to_additive]`, unlike its siblings in the file, so `AddSubgroup.commutator_sup_right` is missing.",
+     "requested_change": "Add `@[to_additive]` (with an additive docstring) to `commutator_sup_right`, after adding it to `commutator_sup_left`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` is stated only for a binary `⊔`. The same argument proves the indexed statement `⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆` for `N` normal, and the binary version follows from it in one line.",
+     "requested_change": "Add `theorem commutator_iSup_left {ι : Sort*} (H : ι → Subgroup G) (N : Subgroup G) [N.Normal] : ⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆`, together with a private `commutator_iSup_left'` that assumes `[(⨆ i, ⁅H i, N⁆).Normal]`. Then derive `commutator_sup_left` as `by simpa [iSup_bool_eq] using commutator_iSup_left (fun b ↦ cond b H K) N`, and add `commutator_iSup_right` in the same way.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` assumes `[N.Normal]`, but the proof uses normality only once, in `hHKN : ⁅H, N⁆ ⊔ ⁅K, N⁆ ≤ N`. That step needs only `H` and `K` to normalize `N`.",
+     "requested_change": "State the general result as `theorem commutator_sup_left_of_le_normalizer {H K N : Subgroup G} (hH : H ≤ normalizer N) (hK : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. Prove `hHKN` as `sup_le (le_normalizer_iff_commutator_le_right.mp hH) (le_normalizer_iff_commutator_le_right.mp hK)`, and derive `commutator_sup_left` from it as `commutator_sup_left_of_le_normalizer le_normalizer_of_normal le_normalizer_of_normal`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` is the main result of the PR and is declared with `theorem`, but it has no docstring.",
+     "requested_change": "Add a docstring, e.g. `/-- If `N` is normal, then `⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. -/` (and the same docstring in its `to_additive` form).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The 18-line proof of `commutator_sup_left` has no comment saying what it does. It passes to `M := H ⊔ K ⊔ N`, where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal, and works in the quotient through `commutator_sup_left'`. That strategy is stated only in the PR description, so the two nested `suffices` steps are hard to follow.",
+     "requested_change": "Add short comments to the proof: before `let M`, say that it works inside `M = H ⊔ K ⊔ N`, where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal, and applies `commutator_sup_left'` there. Before the second `suffices`, say that it remains to show `M` normalizes `⁅H, N⁆ ⊔ ⁅K, N⁆`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "Inside `namespace Subgroup`, `commutator_sup_left` writes `Subgroup.normal_subgroupOf_of_le_normalizer` (line 348). The prefix is already supplied by the enclosing namespace.",
+     "requested_change": "Write `convert normal_subgroupOf_of_le_normalizer this`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "In `commutator_sup_left`, `hHNM` and `hKNM` are named `have`s whose proofs are one-term (`commutator_le_of_le hHM hNM`, `commutator_le_of_le hKM hNM`). Each is used only once, as a simp argument six lines later (line 349), and they sit far above that use.",
+     "requested_change": "Delete the two `have`s and pass the terms directly in the second `suffices` block: `simp [← map_subtype_inj, map_sup, map_commutator, hHM, hKM, hNM, commutator_le_of_le hHM hNM, commutator_le_of_le hKM hNM]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "`commutator_sup_left'` is a private auxiliary result declared with `theorem` and has no docstring. Nothing says it is the version that assumes `⁅H, N⁆ ⊔ ⁅K, N⁆` normal, used to compute in the quotient.",
+     "requested_change": "Declare it with `lemma` and add a docstring, e.g. `/-- Auxiliary version of `commutator_sup_left`, assuming instead that `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal, so that the computation can be carried out in the quotient by it. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "Inside `namespace Subgroup`, `commutator_sup_left'` writes `Subgroup.map_eq_bot_iff` and `Subgroup.commutator_eq_bot_iff_le_centralizer` (lines 332-333). The enclosing namespace already supplies that prefix.",
+     "requested_change": "Write `rw [← QuotientGroup.ker_mk' (⁅H, N⁆ ⊔ ⁅K, N⁆), ← map_eq_bot_iff, map_commutator, commutator_eq_bot_iff_le_centralizer] at hH hK ⊢`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "`commutator_sup_left'` proves the `≥` direction by applying the named monotonicity lemma directly: `sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right)`. `gcongr` discharges that step.",
+     "requested_change": "Write `refine le_antisymm ?_ (sup_le (by gcongr; exact le_sup_left) (by gcongr; exact le_sup_right))`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "`commutator_mono_left` is `commutator_mono h le_rfl`, an instantiation of an existing lemma with no simpler content. It is added only to carry `@[gcongr]`, but tagging `commutator_mono` itself is enough: `gcongr` and `grw` then handle the one-sided goals as well.",
+     "requested_change": "Put `@[to_additive (attr := gcongr)]` on `commutator_mono` and delete `commutator_mono_left`. Use `gcongr` (or `commutator_mono h le_rfl`) at its uses in `commutator_sup_left'`. If it is kept as API, declare it with `lemma`, since it has no docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:158",
+     "claim": "`commutator_mono_right` is `commutator_mono le_rfl h`, an instantiation of `commutator_mono` added only to carry `@[gcongr]`. A `@[gcongr]` tag on `commutator_mono` already lets `gcongr`/`grw` rewrite in the right argument.",
+     "requested_change": "Delete `commutator_mono_right` and tag `commutator_mono` with `@[to_additive (attr := gcongr)]` instead. If it is kept as API, declare it with `lemma`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:285",
+     "claim": "`commutator_le_of_le` only combines `commutator_le_sup` with `sup_le` (`(commutator_le_sup K₁ K₂).trans (sup_le h₁ h₂)`) and adds no simplification of the statement. Its vague `_of_le` name follows none of its siblings `commutator_le_sup/inf/left/right`, and its only uses are two `have`s in `commutator_sup_left`.",
+     "requested_change": "Delete `commutator_le_of_le` and write `(commutator_le_sup H N).trans (sup_le hHM hNM)` (and the `K` analogue) at its uses. If it is kept, declare it with `lemma`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:357",
+     "claim": "`commutator_sup_right` is a public `theorem`, the right-hand mirror of the PR's main result, and has no docstring.",
+     "requested_change": "Add a docstring, e.g. `/-- If `N` is normal, then `⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆`. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+     "claim": "The deprecated alias in `Subgroup/Basic.lean` puts `@[deprecated (since := \"2026-08-27\")]` inline before `alias`, and its header wraps onto a second line (lines 530-531). The `AddSubgroup` alias just below puts the attribute on its own line.",
+     "requested_change": "Put the attribute on its own line: `@[deprecated (since := \"2026-08-27\")]` and then `alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup`, which fits on one line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup",
+     "claim": "The additive deprecated alias `_root_.AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup` is written by hand, although `to_additive` generates it from the multiplicative alias.",
+     "requested_change": "Replace both aliases with one generated pair: `@[to_additive (attr := deprecated (since := \"2026-08-27\"))]` on its own line, then `alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 18,
+     "target": "Mathlib/Algebra/Group/Subgroup/Basic.lean:524",
+     "claim": "`inf_normalizer_le_normalizer_sup` moves to `Subgroup/Basic.lean`, next to `inf_normalizer_le_normalizer_inf` and `iInf_normalizer_le_normalizer_iInf`. Its indexed form `iInf_normalizer_le_normalizer_iSup` is left behind in `Pointwise.lean`, so the four normalizer lemmas are split across two files for no reason.",
+     "requested_change": "Move `iInf_normalizer_le_normalizer_iSup` from `Pointwise.lean` to `Subgroup/Basic.lean` as well, directly after `inf_normalizer_le_normalizer_sup`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 19,
+     "target": "Mathlib/Algebra/Group/Subgroup/Basic.lean:524",
+     "claim": "Renaming `normalizer_inf_normalizer_le_normalizer_sup` to `inf_normalizer_le_normalizer_sup` is not needed for the PR's purpose, the commutator distributivity. Only the move to an earlier file is needed. The rename adds deprecations and touches callers in a feature PR.",
+     "requested_change": "Keep the old name when moving the lemma and do the rename, with its deprecations, in a separate PR, or ask a maintainer to accept the rename here.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` is exposed only in the global `[N.Normal]` case and the new sup-distributivity API has no additive version, even though the proof only needs `H ≤ normalizer N` and `K ≤ normalizer N`.",
+     "requested_change": "Add `@[to_additive] theorem commutator_sup_left_of_le_normalizer (H K N : Subgroup G) (hHN : H ≤ normalizer N) (hKN : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`, add the corresponding right-hand theorem, and make the current `[N.Normal]` `commutator_sup_left`/`commutator_sup_right` into `@[to_additive]` corollaries using `le_normalizer_of_normal`. Mark the private helper `commutator_sup_left'` with `@[to_additive]` if it remains used by the additive proof.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:151",
+     "claim": "The PR registers `gcongr` only on `Subgroup.commutator_mono_left` and `Subgroup.commutator_mono_right`, leaving the two-sided monotonicity theorem `Subgroup.commutator_mono` unavailable to `gcongr`; consequently `gcongr` does not close the natural goal `⁅H₁, H₂⁆ ≤ ⁅K₁, K₂⁆` from both inequalities at once.",
+     "requested_change": "Change the attribute on `commutator_mono` to `@[to_additive (attr := gcongr)]`; the one-sided lemmas can remain as convenience lemmas.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` in `Subgroup/Pointwise.lean` is unused after moving `inf_normalizer_le_normalizer_sup` to `Subgroup/Basic`, and unnecessarily makes this pointwise subgroup file publicly depend on commutator/quotient-group theory.",
+     "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only declarations in this section that are not `@[to_additive]`, so the additive API `AddSubgroup.addCommutator_sup_left` / `AddSubgroup.addCommutator_sup_right` is missing. Every neighbouring declaration is additivized, including the three helpers this PR adds itself (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le` → `AddSubgroup.addCommutator_le_of_le`), and the additive statements are directly parallel to them, so this is an inconsistency in the file's own practice rather than a deliberate omission.",
+     "requested_change": "Mark all three declarations `@[to_additive]`: the private `commutator_sup_left'` (line 326) as well as `commutator_sup_left` (line 337) and `commutator_sup_right` (line 357). Verified: replacing lines 326-358 with the same three declarations carrying `@[to_additive]` compiles with no errors and no warnings, and `#check @_root_.AddSubgroup.addCommutator_sup_left` then reports `∀ {G} [AddGroup G] (H K N : AddSubgroup G) [N.Normal], ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. Note that the private helper must be additivized too: putting `@[to_additive]` on only the two public theorems fails with `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`: The translated value is not type correct ... in the application @commutator_sup_left' (↥M) M.toAddGroup` (the proof of `commutator_sup_left` goes through `commutator_sup_left'`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The new `public import Mathlib.GroupTheory.Commutator.Basic` added on line 13 of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` is unused. Nothing in this file mentions the commutator API (no occurrence of `commutator`, `addCommutator` or the `⁅⁆` notation), and the only renamed declaration the file had to be adjusted for — `Subgroup.inf_normalizer_le_normalizer_sup`, used at lines 344 and 350 — lives in `Mathlib.Algebra.Group.Subgroup.Basic`, which this file already reaches through its pre-existing `Mathlib.GroupTheory.GroupAction.ConjAct` → `Mathlib.GroupTheory.Subgroup.Centralizer` → `Mathlib.GroupTheory.Subgroup.Center` → `Mathlib.Algebra.Group.Subgroup.Basic` chain. As it stands the import makes a low-level `Algebra/` file depend on `GroupTheory/Commutator` (pulling in `QuotientGroup.Defs`, `Coset.Defs`, `Congruence.Hom`).",
+     "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: the file compiles with exactly this line removed, with no errors and no warnings, and the merge-base library compiled without this import, so reverting it cannot break anything.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/c1ae1f6b0e821212a9a56c716376b6f975ce668f700de51e70eb100a4f7b1100/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__1e938d8f-53da-47ae-a10b-ca74c54358dd.jsonl"
+  },
+  "AP1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` and `commutator_sup_right` are the only declarations in `Commutator/Basic.lean` (besides the pre-existing `commutator_eq_bot_of_disjoint`) that carry no additive counterpart: everything else in the file, including `commutator_le_of_le` four lines above, is `@[to_additive]`d, and the additive statements (`⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆` for `AddSubgroup`, `[N.Normal]`) are meaningful and generatable.",
+     "requested_change": "Put `@[to_additive]` on the private helper `commutator_sup_left'` and on `commutator_sup_left` and `commutator_sup_right` (this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`); only the helper's attribute is needed for the translation of the two theorems to typecheck. If `to_additive` cannot be made to work, write the additive versions by hand. `@[to_additive]` directly on the two theorems alone fails (`to_additive failed to add declaration ... The translated value is not type correct`), so the helper has to be additivized as well.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "`Pointwise.lean` gains `public import Mathlib.GroupTheory.Commutator.Basic`, but nothing in the file mentions commutators (`content_search` for `⁅|commutator|Commutator` in this file matches only this import line), so the import is unused; the direction is also backwards for a file in `Algebra/Group`, since `Mathlib.GroupTheory.Commutator.Basic` is a consumer of subgroup API (and after this PR cannot import `Pointwise.lean` at all).",
+     "requested_change": "Delete the import. If it was added because some declaration in `Commutator/Basic.lean` needs something from `Pointwise.lean`, add the import to that file instead (the PR avoided exactly that by moving `inf_normalizer_le_normalizer_sup` into `Algebra/Group/Subgroup/Basic.lean`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "`commutator_mono_left` and `commutator_mono_right` are one-line specializations of `commutator_mono` (`commutator_mono h le_rfl` / `commutator_mono le_rfl h`) added so that `gcongr`/`grw` can see the commutator's monotonicity, while the general monotonicity lemma `commutator_mono` is left without the `gcongr` attribute, so the attribute is on some of the family but not on the general sibling (there is no comment recording why it is excluded). Tagging the general lemma is sufficient: `gcongr` accepts the two-hypothesis form.",
+     "requested_change": "Tag `commutator_mono` as `@[to_additive (attr := gcongr)]` and drop the two specializations (their two uses in `commutator_sup_left'` become `commutator_mono le_sup_left le_rfl` and `commutator_mono le_sup_right le_rfl`); alternatively keep the specializations but tag `commutator_mono` as well and say why the one-sided forms are wanted.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Subgroup/Basic.lean:533",
+     "claim": "The additive deprecation alias is written by hand (`alias _root_.AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup := AddSubgroup.inf_normalizer_le_normalizer_sup`) although `to_additive` generates it, and the deprecation attribute is not passed through `to_additive (attr := ...)`; the current block is also internally inconsistent, with the attribute inline on the multiplicative alias (line 530) and on its own line on the additive one (line 533).",
+     "requested_change": "Replace lines 530-535 by the single declaration `@[to_additive (attr := deprecated (since := \"2026-08-27\"))] alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup` (attribute on its own line above the two-line header), which generates both the `Subgroup.` and deprecated `AddSubgroup.` names.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "`commutator_sup_left'` is a `private theorem` with no docstring, so the reason it exists (the general form, under `[(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal]` in the ambient group, from which the public theorem is transported into `H ⊔ K ⊔ N`) has to be inferred from the proof.",
+     "requested_change": "Give it a short docstring saying what it is for (the equality holds as soon as `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal; the public `commutator_sup_left` obtains that instance by passing to `H ⊔ K ⊔ N`). While there, consider whether the statement should be public API rather than `private`, since it is the more general form of the PR's main result.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left`, the result the PR is about, is stated as a `theorem` and has no docstring; the same holds for the new `commutator_sup_right`, `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` (only pre-existing declarations such as `commutator_def` and `commutator` carry docstrings in this file), whereas a `theorem` is meant for results important enough to be documented and `lemma` for auxiliary ones.",
+     "requested_change": "Add a docstring to `commutator_sup_left` and `commutator_sup_right` (e.g. “If `N` is normal then the commutator with `H ⊔ K` is the supremum of the commutators”, noting the `[N.Normal]` hypothesis); either document the auxiliary `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` as well or state them as `lemma`s.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:342",
+     "claim": "In `commutator_sup_left`, the `have`s `hHNM`/`hKNM` are declared six lines before the first step that uses them: neither the first `suffices` statement nor its `simpa` (lines 344-346) mentions them, their first use being the `simp [..., hHNM, hKNM]` inside the proof of the second `suffices` (line 349).",
+     "requested_change": "Move the two `have`s down to just before the second `suffices` (line 347), which is the first step that uses them.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/941deefb56c1df6ed245f598f1b45bf00e765c2884d86fde5ab2e1a11d97b1fc/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__cb62878c-1cac-4f64-bd9a-d6103c9740df.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "`Pointwise.lean` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but none of the changes in this file need that higher-level import; it only adds an unnecessary dependency from the algebra subgroup pointwise file into group theory.",
+     "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` is stated only for `[N.Normal]`, but the proof only needs `H ⊔ K` to normalize `N`, so the public theorem is stronger-hypothesized than necessary.",
+     "requested_change": "Weaken the theorem to take a hypothesis such as `h : H ⊔ K ≤ normalizer N`, use `le_sup_left.trans h` and `le_sup_right.trans h` where the proof currently uses `commutator_le_right`, and update `commutator_sup_right` to take the same hypothesis. If the normal-instance spelling is desired, derive it as a corollary using `le_normalizer_of_normal`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The new distributivity theorems `Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are not tagged `@[to_additive]`, so the corresponding `AddSubgroup.addCommutator_sup_left/right` API is missing despite the surrounding commutator API being additive-translated.",
+     "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, `commutator_sup_left`, and `commutator_sup_right` so that the additive distributivity lemmas are generated as well.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses the commutator API: the only user of the moved declaration (`normalizer_inf_normalizer_le_normalizer_sup`, now `inf_normalizer_le_normalizer_sup` in `Subgroup/Basic.lean`) was deleted here and the two remaining references in this file were updated to the new name. The added line is a leftover that gives a foundational `Algebra/...` file a dependency on `GroupTheory/Commutator/Basic` (and hence on `QuotientGroup`).",
+     "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If some other module was relying on this re-export, that module should import `Mathlib.GroupTheory.Commutator.Basic` directly.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` are declared without `@[to_additive]`, although every other declaration in `GroupTheory/Commutator/Basic.lean` is `to_additive`-tagged — including the three other lemmas this same PR adds (`commutator_mono_left`, `commutator_mono_right`, `commutator_le_of_le`). The additive counterparts of the PR's main results (`AddSubgroup.addCommutator_sup_left`, `AddSubgroup.addCommutator_sup_right`) are therefore missing from the API, and the omission looks like an oversight rather than a deliberate choice.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left` (line 337), to `commutator_sup_right` (line 357), and to the private helper `commutator_sup_left'` (line 326) — the helper must carry the attribute as well, since the translated proofs of the two public lemmas refer to it.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/d8bd58b43d4ec88e23848a3c1407d291d214c4619cd725f56963446f58917935/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__4b930ef6-d178-443d-bf95-a0cb718b9cb3.jsonl"
+  },
+  "AP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is unused: this PR moved the only commutator-dependent lemma (`normalizer_inf_normalizer_le_normalizer_sup`) out of this file, and the file now contains no occurrence of `⁅` or `commutator` at all, so the import is precisely the kind of redundant import `shake` asks authors to drop.",
+     "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`). Verified: `lean_verify_edit` on this file with that single line removed compiles with no errors and no warnings. If the intent was instead for `Mathlib/GroupTheory/Commutator/Basic.lean` to get `Pointwise`, note the direction cannot be had together with this import (it would be an import cycle) — with the lemma moved to `Algebra/Group/Subgroup/Basic.lean`, no import is needed on either side.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` (and `commutator_sup_right` at line 357) are declared without `@[to_additive]`, so the additive counterparts `AddSubgroup.commutator_sup_left`/`commutator_sup_right` do not exist, even though every other commutator declaration in this file has its additive twin and the three sibling lemmas added by this same PR (`commutator_mono_left` line 154, `commutator_mono_right` line 158, `commutator_le_of_le` line 286) all carry `@[to_additive]`.",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, to `commutator_sup_right`, and also to the private auxiliary `commutator_sup_left'` (line 326): the translated proof of the two public statements calls the auxiliary, so the translation only goes through when the auxiliary is tagged too. Verified: with `@[to_additive]` on all three the file compiles; with it on only the two public ones Lean reports `@[to_additive] failed to add declaration `AddSubgroup.addCommutator_sup_left`. The translated value is not type correct` (application `@commutator_sup_left' (↥M) M.toAddGroup`).",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`commutator_sup_left` is stated only for the binary `⊔` although the indexed version holds with the same hypothesis: for `[N.Normal]`, `⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆`, and the binary lemma is an immediate corollary (its right-hand side `⨆ i, ⁅H i, N⁆` is `iSup_le` of the monotone images, and the ≤ direction follows from the lemma itself by induction on finite subsets). The library states the indexed form for the sibling normalizer result (`iInf_normalizer_le_normalizer_iSup`, next to the binary `inf_normalizer_le_normalizer_sup`), so the binary-only statement is below the reusable level the area uses.",
+     "requested_change": "Add `theorem commutator_iSup_left {ι : Sort*} (H : ι → Subgroup G) (N : Subgroup G) [N.Normal] : ⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆` (and the corresponding `commutator_iSup_right`, `⁅N, ⨆ i, H i⁆ = ⨆ i, ⁅N, H i⁆`), deriving `commutator_sup_left`/`commutator_sup_right` from it as the binary instances, or at least adding the indexed statement alongside.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "The private auxiliary `commutator_sup_left'` carries no docstring, so the reason it exists (it is the binary statement with the instance `(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal` available, which is what makes the quotient computation in `commutator_sup_left` applicable) has to be inferred from the proof and from the two use sites.",
+     "requested_change": "Give `commutator_sup_left'` a one-line docstring saying what it is for, e.g. \"/-- The binary statement of `commutator_sup_left` in the case where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal; proved by passing to the quotient by it. -/\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:154",
+     "claim": "`commutator_mono_left` and `commutator_mono_right` (and `commutator_le_of_le` at line 286) are undocumented auxiliary results declared as `theorem`, while the PR's headline results `commutator_sup_left`/`commutator_sup_right` are also undocumented `theorem`s; per the practice `theorem` is reserved for statements important enough to carry a docstring and plain auxiliary lemmas are `lemma`.",
+     "requested_change": "Declare the three trivial derived lemmas `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` as `lemma` (or give them docstrings), and give `commutator_sup_left`/`commutator_sup_right` short docstrings stating the result, since they are the main statements of the PR.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/69766680081834651cc01ddbb7a478953765da1b22eb4518dfe4bb20bc524385/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__dc47339c-cbcb-4419-bdf6-4c8f5aeb0218.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "`Subgroup.Pointwise` now publicly imports `Mathlib.GroupTheory.Commutator.Basic`, but this file does not use that module; the added import is an unnecessary high-level dependency.",
+     "requested_change": "Delete the `public import Mathlib.GroupTheory.Commutator.Basic` line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` is a new public commutator API theorem without a generated additive counterpart; the same omission affects the immediately derived `commutator_sup_right`, leaving no `AddSubgroup.addCommutator_sup_left/right` despite the surrounding API being mirrored with `to_additive`.",
+     "requested_change": "Add `@[to_additive]` to the private helper `commutator_sup_left'`, to `commutator_sup_left`, and to `commutator_sup_right` (or otherwise provide the corresponding additive theorems).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in the file uses it: `content_search` for `commutator`/`⁅` in this file returns no hits, and `lean_verify_edit` deleting exactly this line recompiles the whole file with no errors. It is presumably a leftover from the state in which the new material still lived in `Pointwise.lean` (the declaration this PR moved out was the only commutator-adjacent thing there). As it stands every file that imports this low-level algebra module now transitively depends on `GroupTheory/Commutator/Basic` for nothing.",
+     "requested_change": "Remove the line `public import Mathlib.GroupTheory.Commutator.Basic` (line 13) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`. If the dependency is actually wanted somewhere, put the import in the file that needs it (the only user of the new API is `Mathlib/GroupTheory/Commutator/Basic.lean` itself), not in `Pointwise`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` — the two headline results of this PR — are the only new declarations in the file (and, with the helper at line 326, are the only new declarations in the PR besides `inf_normalizer_le_normalizer_sup`) that are not marked `@[to_additive]`, while `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` added in the same PR are, and so is every sibling in the file (`commutator_le_sup`, `commutator_le_inf`, `commutator_mono`, `normalizer_commutator_ge_left`, ...). The additive statements are meaningful and are lost from the API: `AddSubgroup` commutators distribute over `⊔` in the same way, and an additive group need not be commutative.",
+     "requested_change": "Annotate all three declarations: `@[to_additive] private theorem commutator_sup_left' …`, `@[to_additive] theorem commutator_sup_left …` and `@[to_additive] theorem commutator_sup_right …` (the private helper must be annotated too, since `commutator_sup_right`'s proof mentions `commutator_sup_left`, which otherwise has no additive counterpart).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/4b511c2f23387e0ee0d2006d880281748c2266d49e1536f30c5d88ab64d95d5e/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__ca91ce98-ccec-4d11-9df7-ab97702ef68b.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:13",
+     "claim": "The newly added `public import Mathlib.GroupTheory.Commutator.Basic` is not needed by this file: nothing in `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` mentions commutators (grep for `commutator`/`⁅` returns nothing), and the only thing the file now needs from the module the moved lemma landed in, `Subgroup.inf_normalizer_le_normalizer_sup` (used at lines 344 and 350), is already available through the existing `public import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas`, which directly imports `Mathlib.Algebra.Group.Subgroup.Basic`. The import also makes an `Algebra` file depend on `GroupTheory` for no reason.",
+     "requested_change": "Delete line 13 (`public import Mathlib.GroupTheory.Commutator.Basic`) from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "`Subgroup.commutator_sup_left` and `Subgroup.commutator_sup_right` (and the private helper `Subgroup.commutator_sup_left'` they rest on, line 326) are the only declarations in this file without `@[to_additive]`, so the additive counterparts of the PR's main results are missing from the API, although every sibling has them (`AddSubgroup.addCommutator_le_right`, `AddSubgroup.addCommutator_le_of_le`, `AddSubgroup.addCommutator_mono_left`, ... all exist).",
+     "requested_change": "Add `@[to_additive]` to `commutator_sup_left`, `commutator_sup_right` and to the private `commutator_sup_left'`; this yields `AddSubgroup.addCommutator_sup_left`/`addCommutator_sup_right`, matching the naming of the existing additive siblings. Tagging the private helper is required for the translation to succeed (tagging only the public ones fails, see evidence).",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:326",
+     "claim": "The private lemma `Subgroup.commutator_sup_left'`, the key step of the whole PR (it computes `⁅H ⊔ K, N⁆` in `G ⧸ (⁅H,N⁆ ⊔ ⁅K,N⁆)`), carries no docstring saying what it is for; a reader cannot tell from the name that it is the general form of `commutator_sup_left` under the weaker hypothesis that `⁅H,N⁆ ⊔ ⁅K,N⁆` is normal.",
+     "requested_change": "Add a docstring to `commutator_sup_left'`, e.g. `/-- Distributivity of the commutator over `⊔` in the first argument, in the case where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal; proved by passing to `G ⧸ (⁅H, N⁆ ⊔ ⁅K, N⁆)`. This is the key step for `commutator_sup_left`. -/`. If the lemma is not meant to be public, at least document it (see the practice that private auxiliaries are documented).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The new declarations are all `theorem`s without docstrings: `commutator_sup_left` and `commutator_sup_right` are the interesting statements of the PR, yet undocumented, while `commutator_mono_left` (154), `commutator_mono_right` (158) and `commutator_le_of_le` (285) are plain one-line corollaries declared `theorem` with no docstring.",
+     "requested_change": "Give `commutator_sup_left` and `commutator_sup_right` docstrings (they are the important results), and declare the auxiliary results `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le` with `lemma` rather than `theorem`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:332",
+     "claim": "Inside `namespace Subgroup` (the block opened at line 127) the prefixes in `Subgroup.map_eq_bot_iff` (line 332), `Subgroup.commutator_eq_bot_iff_le_centralizer` (line 333) and `Subgroup.normal_subgroupOf_of_le_normalizer` (line 348) are redundant, since the enclosing namespace already supplies them.",
+     "requested_change": "Write `map_eq_bot_iff`, `commutator_eq_bot_iff_le_centralizer` and `normal_subgroupOf_of_le_normalizer` without the `Subgroup.` prefix in `commutator_sup_left'` (line 332-333) and `commutator_sup_left` (line 348).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/GroupTheory/Commutator/Basic.lean:337",
+     "claim": "The 18-line proof of `commutator_sup_left` contains no comment at all, although its strategy is non-obvious (set `M := H ⊔ K ⊔ N`, transport the statement to `Subgroup G`-subgroups of `M` with `subgroupOf`, apply the private quotient computation there, and prove `M ≤ normalizer (⁅H,N⁆ ⊔ ⁅K,N⁆)` by the `grw` chain at lines 351-355); the only place that strategy is explained is the PR description.",
+     "requested_change": "Add two or three short comments inside the proof, e.g. before the first `suffices`: `-- work inside M := H ⊔ K ⊔ N, where all the subgroups involved live`, before the second: `-- it remains to show M normalizes ⁅H,N⁆ ⊔ ⁅K,N⁆, so that the commutator is normal in M`, and a note that the final `grw` shows `N ≤ normalizer` and `H,K ≤ normalizer` of the commutator sup.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/11713c2714c6952a295eb083fba2dae03cd42d18ee26ba36f73db63054e45e03/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__02ac6a75-49ac-46c1-9b44-6d53f235f10d.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_43167.md"
+}

@@ -1,0 +1,94 @@
+set	ask	pr	family	in_census	entries	DX	AP	X	T	TA	OP	GPT	text
+D12	d0001	33066	F10	False		2	1	2	0	0	1	0	```suggestion /-- An isometric linear equivalence of two Hilbert spaces induces an equivalence of ```
+D12	d0002	33066	F5	True	P086	0	0	0	0	0	0	0	This is just the pre-existing constructor for `ContinuousAlgEquiv`: ``` ContinuousAlgEquiv.mk.{u_1, u_2, u_3} {R : Type u_1} {A : Type u_2} {B : Type u_3} [Comm
+D12	d0003	33066	F6	True	P007	0	0	0	0	0	0	0	You can still phrase this as: ```suggestion     Function.Surjective (LinearIsometryEquiv.conjStarAlgEquiv : (V ≃ₗᵢ[𝕜] W) → _) := by ``` and I think Lean shouldn
+D12	d0004	33066	F10	True	P181	0	0	0	0	0	0	0	This is nice, but it would be even nicer if it were interspersed throughout the code.
+D12	d0005	33066	F9	True	P012	0	1	0	0	0	0	0	```suggestion section auxiliaryDefs  variable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0) ```
+D12	d0006	33066	F8	False		0	0	1	0	0	1	0	The naming of your `have`s could use some work. Please improve them.
+D12	d0007	33066	F9	False		0	0	2	0	0	1	0	I guess your contention regarding imports is that because this file is a leaf, the import increase doesn't matter?
+D12	d0008	33098	F1	True	P005	0	0	0	0	0	0	0	This and the next three lemmas can be proven with this, although for it to work on `finite_minimalCover`, you have to add ```lean attribute [grind .] finite_emp
+D12	d0009	33098	F1	True	P005	0	0	0	0	0	0	0	This and the next two lemmas can be proven with this, although for it to work on `isSeparated_maximalSeparatedSet`, you have to add ```lean attribute [grind .] 
+D12	d0010	33098	F8	True	P019	3	3	2	0	0	2	3	```suggestion lemma encard_minimalCover (h : coveringNumber ε A ≠ ⊤) : ```
+D12	d0011	33098	F8	True	P019	3	3	2	0	0	2	3	```suggestion lemma encard_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) : ```
+D12	d0012	33098	F8	True	P019	3	3	2	0	0	1	3	```suggestion lemma encard_le_of_isSeparated (h_subset : C ⊆ A) ```
+D12	d0013	33098	F1	True	P011	1	1	0	0	0	1	1	I'm having trouble selecting the whole proof for a suggestion in the GitHub interface, but here's a golf. There's some shuffling, but the main point is to use `
+D12	d0014	33098	F1	True	P011 P018	3	3	2	0	0	2	1	We now have `by_cases!` to automatically push your negations in the alternate branch. And we have this nice `IsCover.coveringNumber_le_encard` lemma, we might a
+D12	d0015	33098	F1	True	P216 P347	3	2	2	0	0	2	2	```suggestion   rcases Set.eq_empty_or_nonempty A with (rfl | h_nonempty)   · simp ```
+D12	d0016	33098	F9	False		0	0	2	0	0	0	0	otherwise style guidelines would require to indent all lines below the first `calc` line. ```suggestion     coveringNumber ε A ≤ coveringNumber (ε / 2) B := cal
+D12	d0018	33117	F4	True	P201	0	0	0	0	0	0	0	There is some new metaprogramming that can help here: the `to_fun` attribute. To get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn
+D12	d0019	33145	F8	True	P019 P130 P432	3	3	2	0	0	2	1	```suggestion theorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α] ```
+D12	d0020	33145	F8	True	P019 P130 P432	3	3	2	0	0	2	1	```suggestion theorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α] ```
+D12	d0021	33145	F4	True	P340	3	3	2	0	0	2	3	There's a trick you can use for this kind of thing by using the `OrderDual`. ```suggestion     lowerBounds (f '' S) = lowerBounds (range f) :=   hS.continuous_u
+D12	d0022	33145	F8	True	P019 P130	0	0	2	0	0	2	0	```suggestion theorem Dense.ciSup {α : Type*} [TopologicalSpace α] ```
+D12	d0023	33145	F8	True	P019 P130	0	0	2	0	0	2	0	```suggestion theorem Dense.ciInf {α : Type*} [TopologicalSpace α] ```
+D12	d0024	33145	F4	True	P340	3	3	2	0	0	2	3	```suggestion     ⨅ i, f i = ⨅ s : S, f s :=   hS.ciSup (α := αᵒᵈ) hf h ```
+D12	d0025	33145	F8	True	P019 P130	0	0	2	0	0	2	0	```suggestion theorem Dense.ciSup' {α : Type*} [TopologicalSpace α] ```
+D12	d0026	33145	F1	True	P011	1	0	2	0	0	2	3	It's easier if you case split on whether the range of the function from the subtype is bounded above or not. ```suggestion   by_cases h : BddAbove (range (fun x
+D12	d0027	33145	F8	True	P019 P130	0	0	2	0	0	2	0	```suggestion theorem Dense.ciInf' {α : Type*} [TopologicalSpace α] ```
+D12	d0028	33145	F4	True	P340	3	3	2	0	0	2	3	```suggestion     ⨅ i, f i = ⨅ s : S, f s :=   hS.ciSup' (α := αᵒᵈ) hf ```
+D12	d0029	33145	F6	True	P157	0	0	0	0	0	0	0	"I suggest turning the declarations involving `iSup` and `iInf` around so that they read: ```lean     ⨆ s : S, f s = ⨆ i, f i := by ``` instead."
+D12	d0030	33149	CORR	False		3	3	2	0	0	2	3	Mathlib has a no-axioms policy. Please don't introduce any new axioms.
+D12	d0031	33149	F5	True	P074 P086 P259	3	3	2	0	0	2	0	Mathlib already has Parseval's identity. Please use that instead (and if you really need a version specialised to e.g. the standard basis in R^n, add it there).
+D12	d0032	33149	F12	True	P038 P103	0	3	0	0	0	0	0	Hi! It's good to hear that you want to contribute to mathlib. That said, your code raises a number of questions: did you use AI to generate it? (If so, which pa
+D12	d0033	33149	F12	True	P333	3	2	0	0	0	0	0	Actually, let me close this PR for now: as I see it, it would need to be completely rewritten to have a change of being acceptable to mathlib --- and the rewrit
+D12	d0034	33149	CORR	True	P086	3	3	2	0	0	2	3	"Dear Jeff,  I'm happy to hear if my initial impression is wrong. (We are receiving a fair number of posts that are AI-generated with very little effort or und"
+D12	d0035	33285	F1	True	P040	0	0	2	0	0	2	0	"here's an even better golf ```suggestion     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q :=   fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2 ```"
+D12	d0036	33285	F1	True	P018 P040	0	0	2	0	0	0	0	"or ```lean   simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff] ``` or ```lean   exact I.cotangentEquivIdeal.injective (I.cotangentEquivIdeal.app"
+D12	d0038	33294	F8	True	P108	0	0	0	0	0	0	0	"```suggestion theorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f) ```"
+D12	d0039	33294	F1	True	P057	0	0	1	0	0	1	0	"```suggestion     rw [h.map_iSup (bddAbove_of_small _)] ``` no? "
+D12	d0041	33305	F9	True	P084	0	1	2	0	0	2	1	"bors r- bors d+  There's a line that's too long: https://github.com/leanprover-community/mathlib4/actions/runs/20522522089/job/58960134164?pr=33305#step:22:3"
+D12	d0042	33321	F10	False		3	3	2	0	0	2	3	```suggestion In the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the ```
+D12	d0043	33321	F6	True	P199	0	0	2	0	0	1	0	Isn't this abusing the defeq between predicates and sets? ```suggestion def IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=   {j | IsM
+D12	d0044	33321	F10	False		3	2	2	0	0	2	2	```suggestion The proof needs a set of ordered coefficients, even though the ultimate existence statement does ```
+D12	d0045	33337	F8	True	P019	0	0	0	0	0	0	0	```suggestion theorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] : ```
+D12	d0046	33337	F8	True	P019	2	1	1	0	0	0	0	```suggestion theorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] : ```
+D12	d0047	33362	F9	True	P001	2	2	1	0	0	0	0	Why not move these a few lines below so that it's on the `Complex` namespace?
+D12	d0048	33421	F8	True	P113 P432	0	0	0	0	0	0	0	How about `round_eq_div`?
+D12	d0049	33421	F6	True	P165	0	0	0	0	0	0	0	Is this not something very general that should exist as a lemma? Same in the next theorem
+D12	d0051	33421	F7	True	P063	0	0	0	0	0	0	0	"Better I think as ```suggestion theorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :     k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by"
+P14_post	p0000	41930	F12	True	P041	0	0	0	0	0	0	0	Can you explain why the old names are bad / wrong?
+P14_post	p0002	42184	F7	True	P010	3	3	2	2	1	0	3	It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclas
+P14_post	p0003	42184	F6	True	P100	0	0	0	1	1	0	0	and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)
+P14_post	p0004	42814	F6	True	P153	0	0	0	0	0	0	0	Can you add an alias for the right to left implication? Or maybe even removing the other one (I don't see any reasonable application).
+P14_post	p0005	42814	F7	True	P063 P086	0	0	0	0	0	0	0	Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating 
+P14_post	p0006	42814	F4	True	P201	0	0	0	0	0	0	0	Can this be generated by `mk_iff`?
+P14_post	p0007	42814	F2	True	P048	0	1	0	1	1	0	0	```suggestion variable {D : ℤ}  theorem isFundamentalDiscr_def : ``` then you can remove `{D : ℤ}` in various declarations.
+P14_post	p0008	43024	F8	False		3	2	1	2	1	0	0	"```suggestion lemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M] ```"
+P14_post	p0009	43167	F9	True	P030	3	3	2	2	1	0	3	```suggestion ```
+P14_post	p0010	43167	F8	True	P254	0	0	0	0	0	0	0	:robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put th
+P14_post	p0011	43167	F4	True	P263	3	3	2	2	1	0	3	Missing `@[to_additive]` here, on line 357, and on the private lemma
+P14_post	p0012	43167	F8	True	P113	0	0	0	0	0	0	0	`commutator_sup_left_of_normal` (or `_right_` after the swap) rather than a prime.
+P14_post	p0013	43192	F10	False		3	3	2	2	1	0	3	```suggestion # Modules over presheaves of commutative rings ```
+P14_post	p0014	43192	F2	True	P276	0	1	2	2	1	0	2	Could you add `by cat_disch` as default tactics?
+P14_post	p0015	43192	F2	True	P100 P276	0	0	2	2	1	0	2	(This may apply to other definitions below.)
+P14_post	p0016	43192	F8	True	P254	1	0	2	1	1	0	0	I would prefer the name `homMk` (overall, there is an hesitation in mathlib about `mkHom` or `homMk`). In the `PresheafOfModules` namespace, there is a `homMk` 
+P14_val	v0016	26755	F12	True	P100	3	3	2	2	1	0	3	How many `noncomputable`s from this file are still necessary? `coeMonoidHom` looks like it can be computable too?
+P14_val	v0029	28649	F10	True	P185	0	3	0	0	0	0	0	I disagree with this one, please revert.
+P14_val	v0030	28649	F10	True	P278	0	1	0	1	1	0	0	spell out `mgf` instead?
+P14_val	v0031	28649	F10	False		0	1	0	0	0	0	0	I'm not sure about this one
+P14_val	v0053	29842	F12	True	P041	0	0	0	0	0	0	0	"How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition.  If y"
+P14_val	v0055	29842	F1	True	P018	2	2	1	1	1	0	0	"if you want, you can make it more compact: ```suggestion   rw [tendsto_norm_atTop_iff_cobounded] at hc   simpa using Tendsto.congr' this <| (tendsto_inv₀_cob"
+P14_val	v0056	29842	F12	True	P041	0	0	0	0	0	0	0	"> but if I fail, then I would prefer to have one of the ""generalize lemmas"" PRs merged so that we can generalize downstream proofs here and there before general"
+P14_val	v0060	30458	F2	True	P329 P369	0	0	0	1	1	0	0	"you don't need to section these off just keep things the same as before, collect the common variables, and then add variables as needed so, in this case, inst"
+P14_val	v0061	30458	F2	True	P369	0	0	0	1	1	0	0	"following the above suggestion: ```suggestion variable [IsRightCancel α] in @[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := "
+P14_val	v0062	30458	F1	True	P329	0	2	2	2	1	0	0	does the old proof not work?
+P14_val	v0063	30458	F1	True	P329	0	2	2	2	1	0	0	same here, does the old proof not work?
+P14_val	v0064	30641	F8	True	P105	0	0	1	2	1	0	0	I think `x` might be more conventional for a real number --- though this file uses a mix of different conventions (sometimes `x`, sometimes `a` and `b`, sometim
+P14_val	v0065	30641	F8	False		1	1	0	0	0	0	0	There's no `ha` in scope, so this could be `ha`, right?
+P14_val	v0066	30641	F1	True	P060	3	1	2	2	1	0	2	Can you prove the \leq version here directly?
+P14_val	v0067	30641	F1	True	P005	0	0	0	1	1	0	0	Can `positivity` do this (untested)?
+P14_val	v0068	30641	F1	True	P094	0	0	0	1	1	0	0	Can `gcongr` do this (or do you need to provide the side condition manually)?
+P14_val	v0090	32875	F3	True	P315	0	0	0	0	0	0	0	Both of these should probably be tagged with `grind`.
+P14_val	v0091	32875	F3	False		0	0	0	0	0	0	0	Same here.
+P14_val	v0092	32875	F1	True	P018 P401	0	0	0	2	1	0	0	`simpa using`?
+P14_val	v0093	32875	F1	True	P018 P040	0	0	0	0	0	0	0	````suggestion Tendsto μs L (𝓝 μ) :=   tendsto_of_forall_isClosed_limsup_le (by simpa using h) ````
+P14_val	v0094	32875	F1	True	P018 P401	1	2	2	2	1	0	0	````suggestion simpa [this] using (Kernel.compProd_apply_prod hs ht).symm ````
+P14_val	v0095	32875	F1	True	P018 P401	1	2	2	2	1	0	0	simpa
+P14_val	v0105	34091	F1	True	P011	0	0	0	0	0	0	0	Surely this is a one-liner using `infinite_pigeonhole_card_lt`?
+P14_val	v0106	34091	F2	True	P392	0	3	2	2	1	0	0	```suggestion theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] : ```
+P14_val	v0107	34091	F2	True	P392	0	3	2	2	1	0	0	```suggestion theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ```
+P14_val	v0108	34091	F2	True	P392	0	3	2	2	1	0	0	```suggestion theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] : ```
+P14_val	v0109	34091	F10	False		3	3	2	2	1	0	3	```suggestion /-- A function whose domain's cardinality is infinite and strictly greater than its codomain's ```
+P14_val	v0110	34091	F10	False		3	3	2	2	1	0	3	Similarly in comments below
+P14_val	v0131	36822	F3	True	P098	3	3	2	2	1	0	3	simp?
+P14_val	v0132	36822	F3	True	P098	3	3	2	2	1	0	3	simp?

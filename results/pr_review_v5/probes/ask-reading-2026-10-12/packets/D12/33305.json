@@ -1,0 +1,563 @@
+{
+ "asks": [
+  {
+   "id": "d0041",
+   "pr": 33305,
+   "family": "F9",
+   "in_census": true,
+   "entries": [
+    "P084"
+   ],
+   "text": "bors r-\r\nbors d+\r\n\r\nThere's a line that's too long: https://github.com/leanprover-community/mathlib4/actions/runs/20522522089/job/58960134164?pr=33305#step:22:36",
+   "path": null,
+   "line": null,
+   "author": "bryangingechen",
+   "at": "2025-12-26T22:48:19Z",
+   "matcher_text": {
+    "ask_id": "d0041",
+    "path": null,
+    "code_at_comment": "",
+    "comment": "bors r-\r\nbors d+\r\n\r\nThere's a line that's too long: https://github.com/leanprover-community/mathlib4/actions/runs/20522522089/job/58960134164?pr=33305#step:22:36",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The edited line 23, \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\", is 101 characters. That is over Mathlib's 100-character limit, so `linter.style.longLine` fires on it.",
+      "requested_change": "Rewrap the paragraph so that no line exceeds 100 characters, moving \"details\" to the next line:\n\"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\"",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The edited line 23, \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\", is 101 characters. That is over Mathlib's 100-character limit, so `linter.style.longLine` fires on it.",
+      "requested_change": "Rewrap the paragraph so that no line exceeds 100 characters, moving \"details\" to the next line:\n\"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "GPT3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "OP2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` now has a line that is too long. Changing `GroupTheory/Submonoid/Units.lean` to `Algebra/Group/Submonoid/Units.lean` makes line 23 101 characters, and Mathlib's limit is 100 (`linter.style.longLine`). Searching for `^.{101,}$` finds this as the only over-long line under `Mathlib/GroupTheory`. The new path itself is correct: `Submonoid.units` is declared in `Mathlib/Algebra/Group/Submonoid/Units.lean`, and that file has an implementation section.",
+      "requested_change": "Re-wrap the paragraph so that `details` moves to the next line:\n```\n`N.leftInv` is distinct from `N.units`, which is the subgroup of `Mˣ` containing all units that are\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` now has a line that is too long. Changing `GroupTheory/Submonoid/Units.lean` to `Algebra/Group/Submonoid/Units.lean` makes line 23 101 characters, and Mathlib's limit is 100 (`linter.style.longLine`). Searching for `^.{101,}$` finds this as the only over-long line under `Mathlib/GroupTheory`. The new path itself is correct: `Submonoid.units` is declared in `Mathlib/Algebra/Group/Submonoid/Units.lean`, and that file has an implementation section.",
+      "requested_change": "Re-wrap the paragraph so that `details` moves to the next line:\n```\n`N.leftInv` is distinct from `N.units`, which is the subgroup of `Mˣ` containing all units that are\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "X1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The edited line 23 `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details` is 101 characters, over Mathlib's 100-character limit. The path grew by two characters and the paragraph was not rewrapped. Mathlib's `linter.style.longLine` flags it, and CI builds with warnings as errors.",
+      "requested_change": "Rewrap the paragraph so that `details` moves to the next line: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\" / \"details on related constructions.\"",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The edited line 23 `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details` is 101 characters, over Mathlib's 100-character limit. The path grew by two characters and the paragraph was not rewrapped. Mathlib's `linter.style.longLine` flags it, and CI builds with warnings as errors.",
+      "requested_change": "Rewrap the paragraph so that `details` moves to the next line: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\" / \"details on related constructions.\"",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "DX2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "OP1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "In the module docstring of `Inverses.lean`, the edited line 23 is now 101 characters long: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\". Mathlib's 100-character limit is enforced by `linter.style.longLine`, and CI treats warnings as errors, so this new line breaks the lint.",
+      "requested_change": "Move the last word to the next line:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "In the module docstring of `Inverses.lean`, the edited line 23 is now 101 characters long: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\". Mathlib's 100-character limit is enforced by `linter.style.longLine`, and CI treats warnings as errors, so this new line breaks the lint.",
+      "requested_change": "Move the last word to the next line:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "DX1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "AP3": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "GPT2": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The module doc line containing the updated `Mathlib/Algebra/Group/Submonoid/Units.lean` reference is 101 characters long, exceeding Mathlib's 100-character style limit.",
+      "requested_change": "Wrap the sentence after `for more`:\n\n```lean\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The module doc line containing the updated `Mathlib/Algebra/Group/Submonoid/Units.lean` reference is 101 characters long, exceeding Mathlib's 100-character style limit.",
+      "requested_change": "Wrap the sentence after `for more`:\n\n```lean\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "DX3": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "AP2": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The line this PR rewrites in the module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` (the docstring object this PR modifies) is now 101 characters long: `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details`. It was 99 characters before the change, so this PR pushed it over the 100-character limit enforced by the `linter.style.longLine` linter (`Mathlib/Tactic/Linter/Style.lean`, member of `linter.mathlibStandardSet`, enabled for Mathlib in `lakefile.lean` and reported by `lake exe lint-style`). Compiling the file exactly as the PR leaves it reports `This line exceeds the 100 character limit, please shorten it!` at line 23; no other line of any file in this PR does.",
+      "requested_change": "Rewrap the sentence so no line exceeds 100 characters, e.g.:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+      "claim": "The line this PR rewrites in the module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` (the docstring object this PR modifies) is now 101 characters long: `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details`. It was 99 characters before the change, so this PR pushed it over the 100-character limit enforced by the `linter.style.longLine` linter (`Mathlib/Tactic/Linter/Style.lean`, member of `linter.mathlibStandardSet`, enabled for Mathlib in `lakefile.lean` and reported by `lake exe lint-style`). Compiling the file exactly as the PR leaves it reports `This line exceeds the 100 character limit, please shorten it!` at line 23; no other line of any file in this PR does.",
+      "requested_change": "Rewrap the sentence so no line exceeds 100 characters, e.g.:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    },
+    "AP1": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "These flag the 101-character line in Submonoid/Inverses.lean and rewrap it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached = flags the 101-character line in Inverses.lean and rewraps it."
+    }
+   },
+   "entries_text": {
+    "P084": "A line is broken when, and only when, it exceeds the 100-character limit; a call, short proof, one-line declaration with its attribute, or docstring that fits on one line stays on one line."
+   }
+  }
+ ],
+ "pr": 33305,
+ "sessions": {
+  "X1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The PR replaces the stale TODO reference `Mathlib/Algebra/Hom/GroupAction.lean` with `Mathlib/Algebra/Group/Action/Hom.lean`, which is the wrong file. `Mathlib/Algebra/Group/Action/Hom.lean` ('Homomorphisms and group actions': `MulAction.compHom`, `Function.Surjective.mulActionLeft`, ...) never mentions `MulActionHom` or `α →[N] β`. The old file was moved to `Mathlib/GroupTheory/GroupAction/Hom.lean`, which defines `MulActionHom`/`DistribMulActionHom` and the notation `α →[N] β` and is the module this file itself imports (`public import Mathlib.GroupTheory.GroupAction.Hom`). So the new link still points somewhere other than where the TODO's instances belong.",
+     "requested_change": "In the TODO, change `Mathlib/Algebra/Group/Action/Hom.lean` to `Mathlib/GroupTheory/GroupAction/Hom.lean`: \"Add left actions of, e.g., `M` on `α →[N] β` to `Mathlib/GroupTheory/GroupAction/Hom.lean` and\" (94 characters, fits the line limit).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "The edited line 23 `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details` is 101 characters, over Mathlib's 100-character limit. The path grew by two characters and the paragraph was not rewrapped. Mathlib's `linter.style.longLine` flags it, and CI builds with warnings as errors.",
+     "requested_change": "Rewrap the paragraph so that `details` moves to the next line: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\" / \"details on related constructions.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "module_doc in Mathlib/GroupTheory/GroupExtension/Defs.lean",
+     "claim": "The PR edits this TODO block but leaves a stale reference two lines below the edited bullet: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is now a `deprecated_module (since := \"2025-06-14\")` shim that only re-imports `Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree`. The TODO being cited ('The relationship between `H2` and group extensions') lives in the Homological file. It is the only remaining reference in Mathlib to that deprecated path.",
+     "requested_change": "Replace the second bullet's parenthetical with \"(which is also stated as a TODO in\" / \"`Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).\". The path is rewrapped onto its own line because a one-line version is 112 characters.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "Once pointed at the right file, the TODO's first half is already done for `α →[N] β`. `Mathlib/GroupTheory/GroupAction/Hom.lean` already provides the left actions `SMul R (X →ₑ[σ] Y)` and `MulAction R (X →ₑ[σ] Y)` (under `[SMulCommClass N R Y]`), which specialise to `α →[N] β`. What is still missing is a left action on `A →+[N] B` and the `SMulCommClass` instances between left actions and the `Mᵈᵐᵃ` right actions, so the TODO as reworded still asks for work that exists.",
+     "requested_change": "While fixing the link, reword the TODO to what is still open, e.g. \"Add left actions of, e.g., `M` on `A →+[N] B` to `Mathlib/GroupTheory/GroupAction/Hom.lean`\" / \"(the ones on `α →[N] β` are already there), and `SMulCommClass` instances saying that left and\" / \"right actions commute.\"",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The TODO's new file reference is still wrong. `Mathlib/Algebra/Hom/GroupAction.lean` was the ported location of the `MulActionHom` file, which now lives at `Mathlib/GroupTheory/GroupAction/Hom.lean`, and this file imports it (`public import Mathlib.GroupTheory.GroupAction.Hom`). The PR points instead to `Mathlib/Algebra/Group/Action/Hom.lean`. That file (\"Homomorphisms and group actions\": `MulAction.compHom`, `Function.Surjective.mulActionLeft`, ...) never mentions `→[`, `→ₑ` or `MulActionHom`, so it is not where left actions on `α →[N] β` belong. The TODO is also partly out of date: `Mathlib/GroupTheory/GroupAction/Hom.lean` already has the left actions `instance : SMul R (X →ₑ[σ] Y)` (line 427) and `MulAction R (X →ₑ[σ] Y)` (line 464). Only the `SMulCommClass` part is still missing.",
+     "requested_change": "Replace `Mathlib/Algebra/Group/Action/Hom.lean` with `Mathlib/GroupTheory/GroupAction/Hom.lean`. Since the left actions now exist there, also reduce the TODO to the missing part, e.g. \"Add `SMulCommClass` instances saying that the left actions on `α →[N] β` defined in `Mathlib/GroupTheory/GroupAction/Hom.lean` commute with the right actions defined here.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "The edited line 23, \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\", is 101 characters. That is over Mathlib's 100-character limit, so `linter.style.longLine` fires on it.",
+     "requested_change": "Rewrap the paragraph so that no line exceeds 100 characters, moving \"details\" to the next line:\n\"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\"",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "module_doc in Mathlib/GroupTheory/GroupExtension/Defs.lean",
+     "claim": "The PR edits this TODO block to fix file references, but the next bullet still cites the stale path `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean`. That file is now only a `deprecated_module (since := \"2025-06-14\")` stub that re-imports `Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree`. The real file holds `groupCohomology.H2` and the TODO \"The relationship between `H2` and group extensions\". This is the only stale reference of this kind left under Mathlib/GroupTheory.",
+     "requested_change": "Change the reference to `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`, wrapping it to stay within 100 columns:\n\"  (which is also stated as a TODO in\n  `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).\"",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "In the module docstring of `Inverses.lean`, the edited line 23 is now 101 characters long: \"in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details\". Mathlib's 100-character limit is enforced by `linter.style.longLine`, and CI treats warnings as errors, so this new line breaks the lint.",
+     "requested_change": "Move the last word to the next line:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The new TODO ref in the `ActionHom.lean` module docstring points to the wrong file. `Mathlib/Algebra/Group/Action/Hom.lean` does not define `α →[N] β`. It only has `MulAction.compHom`, `MulAction.compHom_smul_def`, `MulAction.isPretransitive_compHom`, `MonoidHom.smulOneHom`, `Function.Surjective.mulActionLeft` and `monoidHomEquivMulActionIsScalarTower`. `MulActionHom` and `DistribMulActionHom` are defined in `Mathlib/GroupTheory/GroupAction/Hom.lean`, which is the module this file imports (`public import Mathlib.GroupTheory.GroupAction.Hom`). The old `Mathlib/Algebra/Hom/GroupAction.lean` was renamed to that file.",
+     "requested_change": "Change the reference to `Mathlib/GroupTheory/GroupAction/Hom.lean`. That file already has the left actions `MulActionHom.instSMulOfSMulCommClass` and `MulActionHom.instMulActionOfSMulCommClass`, so also cut the TODO down to the missing `SMulCommClass` instances between the left action and the `Mᵈᵐᵃ` action.",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:51",
+     "claim": "The PR edits this TODO block in the `GroupExtension/Defs.lean` module docstring but leaves line 52 pointing to `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean`. That module is now an empty deprecation stub (no declarations; its only import is `Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree`). The real file has moved under `Homological/`, so this ref is stale too.",
+     "requested_change": "Replace it with:\n```\n  (which is also stated as a TODO in\n  `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).\n```\nThe split keeps the line under 100 characters.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "The module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` now has a line that is too long. Changing `GroupTheory/Submonoid/Units.lean` to `Algebra/Group/Submonoid/Units.lean` makes line 23 101 characters, and Mathlib's limit is 100 (`linter.style.longLine`). Searching for `^.{101,}$` finds this as the only over-long line under `Mathlib/GroupTheory`. The new path itself is correct: `Submonoid.units` is declared in `Mathlib/Algebra/Group/Submonoid/Units.lean`, and that file has an implementation section.",
+     "requested_change": "Re-wrap the paragraph so that `details` moves to the next line:\n```\n`N.leftInv` is distinct from `N.units`, which is the subgroup of `Mˣ` containing all units that are\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The TODO in the module docstring of `Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean` now points to the wrong file. The old path `Mathlib/Algebra/Hom/GroupAction.lean` was the ported name of the file that defines `α →[N] β`, which is now `Mathlib/GroupTheory/GroupAction/Hom.lean`. The PR's replacement, `Mathlib/Algebra/Group/Action/Hom.lean`, is a different file (\"Homomorphisms and group actions\": `MulAction.compHom`, `Function.Surjective.mulActionLeft`, ...). It does not define or mention `MulActionHom`, and it imports nothing about it. Left actions of `M` on `α →[N] β` would belong next to the definition of `MulActionHom`. This file already imports that file as `Mathlib.GroupTheory.GroupAction.Hom`.",
+     "requested_change": "Change the TODO to: \"Add left actions of, e.g., `M` on `α →[N] β` to `Mathlib/GroupTheory/GroupAction/Hom.lean` and `SMulCommClass` instances saying that left and right actions commute.\" The line stays under 100 characters.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "The module doc in `GroupExtension/Defs.lean` still contains a stale file reference: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is only a deprecated forwarding module, while the TODO it points to now lives in the homological group cohomology file.",
+     "requested_change": "Replace that reference with `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`, splitting the line to stay under the 100-character limit.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "In the module doc of `Mathlib/GroupTheory/GroupExtension/Defs.lean` (the very block this PR edits) the reference to `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is itself stale: that path is now only a `deprecated_module (since := \"2025-06-14\")` stub, and the TODO it cites (\"The relationship between `H2` and group extensions\") is in `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`. This is the only remaining reference to that deprecated path anywhere in Mathlib, while every other moved-file reference in the repo was already repointed by this PR, so the sweep is incomplete.",
+     "requested_change": "Repoint it to the current file, rewrapping so no line exceeds 100 columns, e.g. replace lines 51-52 with:\n- there is a bijection between equivalence classes of group extensions and `groupCohomology.H2`\n  (which is also stated as a TODO in\n  `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).\n(Because the correct path is longer, it cannot stay on one line.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:93",
+     "claim": "The docstring of `AddGroupExtension.Equiv` instructs the reader to use `AddGroupExtension.Equiv.ofMonoidHom`, a declaration that does not exist. The additive constructor generated by `@[to_additive]` from `GroupExtension.Equiv.ofMonoidHom` (defined at `Mathlib/GroupTheory/GroupExtension/Basic.lean:117`) is `AddGroupExtension.Equiv.ofAddMonoidHom`, since `Monoid` is translated to `AddMonoid`. This stale name reference sits in one of the files the PR is cleaning up references in.",
+     "requested_change": "Replace `AddGroupExtension.Equiv.ofMonoidHom` with `AddGroupExtension.Equiv.ofAddMonoidHom` on line 93, i.e.\n  Use `AddGroupExtension.Equiv.ofAddMonoidHom` in `Mathlib/GroupTheory/GroupExtension/Basic.lean` to",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/0cc3726335b200ce18ac81891a5a7497aba6a76b7f95bd65ea8fbfa134a1ae78/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__7dff8720-0ae7-4b0c-94ce-e6d51bf9f7e1.jsonl"
+  },
+  "AP1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Perm/Sign.lean:29",
+     "claim": "The module docstring of `Mathlib/GroupTheory/Perm/Sign.lean`, which this PR edits, ends with a blank line (line 29) before its closing `-/` (line 30). Mathlib's docstring practice is that the closing delimiter follows the last line of text directly, with no blank line before it.",
+     "requested_change": "Delete the blank line so the docstring ends\n```\nOther lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`\n-/\n```\n(verified: the file still compiles with this change).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Abelianization/Defs.lean:23",
+     "claim": "The module docstring of `Mathlib/GroupTheory/Abelianization/Defs.lean`, whose text this PR edits, ends with a blank line (line 23) before its closing `-/` (line 24), whereas the closing delimiter should directly follow the last line of text.",
+     "requested_change": "Delete the blank line at line 23 so the docstring ends `... equivalent abelianizations` immediately followed by `-/` (verified: the file still compiles with this change).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/FreeAbelianGroup.lean:65",
+     "claim": "The module docstring of `Mathlib/GroupTheory/FreeAbelianGroup.lean`, whose text this PR edits, ends with a blank line (line 65) before its closing `-/` (line 66), whereas the closing delimiter should directly follow the last line of text.",
+     "requested_change": "Delete the blank line at line 65 so the docstring ends `are about `FreeAbelianGroup.map`.` immediately followed by `-/` (verified: the file still compiles with this change).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/b3e7293a73d2cba178eefad6dc0d9c68ccde3013fe084d4accf0ff292b500be9/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__c27d6f13-c88a-4f6f-aa1e-f7bebf4d9550.jsonl"
+  },
+  "GPT2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The module doc TODO in `ActionHom.lean` now points readers to `Mathlib/Algebra/Group/Action/Hom.lean`, but the API named in the TODO (`α →[N] β`/`A →+[N] B`, i.e. `MulActionHom`/`DistribMulActionHom`) is declared in `Mathlib/GroupTheory/GroupAction/Hom.lean`; the new file reference is therefore the wrong target for this TODO.",
+     "requested_change": "Rewrite the TODO to point to `Mathlib/GroupTheory/GroupAction/Hom.lean` and avoid saying to add the already-existing left action on `α →[N] β`, for example:\n\n```lean\nAdd the missing left actions, e.g. on `A →+[N] B`, to\n`Mathlib/GroupTheory/GroupAction/Hom.lean`, and add `SMulCommClass` instances saying that\nleft and right actions commute.\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "The module doc in `GroupExtension/Defs.lean` still references `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean`, which is now only a deprecated wrapper; the TODO it cites is in `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`.",
+     "requested_change": "Replace the reference with the Homological path, wrapping it to keep the line short:\n\n```lean\n  (which is also stated as a TODO in\n  `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "The module doc line containing the updated `Mathlib/Algebra/Group/Submonoid/Units.lean` reference is 101 characters long, exceeding Mathlib's 100-character style limit.",
+     "requested_change": "Wrap the sentence after `for more`:\n\n```lean\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The TODO's target file is wrong. The TODO asks to \"Add left actions of, e.g., `M` on `α →[N] β`\", but `α →[N] β` is `MulActionHom`, which is declared in `Mathlib/GroupTheory/GroupAction/Hom.lean` (line 84), and the instances the TODO asks for already exist there: `SMul R (X →ₑ[σ] Y)` (line 427) and `MulAction R (X →ₑ[σ] Y)` (line 464) in the same file. The file the doc now names, `Mathlib/Algebra/Group/Action/Hom.lean`, is a low-level file (`assert_not_exists MonoidWithZero`, importing only `Algebra.Group.Action.Pretransitive` and `Algebra.Group.Hom.Defs`) that does not mention `MulActionHom` at all and could not host such instances. So the PR replaces the stale ref with a ref to a file that cannot contain the referenced material.",
+     "requested_change": "Point the TODO at `Mathlib/GroupTheory/GroupAction/Hom.lean` (the file that defines `α →[N] β` and already carries its `SMul`/`MulAction` instances); or, since those left-action instances are already present, delete the TODO's first clause and keep only the remaining request.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "The docstring still cites a stale file: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is now a `deprecated_module (since := \"2025-06-14\")` stub, so a reader following the ref lands on a file that only redirects. The file that actually carries the referenced TODO is `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`. This is in the same module docstring the PR is fixing for stale refs, immediately after the hunk the PR edits, and is the same kind of defect.",
+     "requested_change": "Change the ref on this line to `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/4a22de160feadbffe148ac8feda287dbc4bc1433f158158f4651479fe22f2b1d/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__76c1574d-5caf-4bc1-9cd1-83ba3a6eaa25.jsonl"
+  },
+  "AP2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean:23",
+     "claim": "The line this PR rewrites in the module docstring of `Mathlib/GroupTheory/Submonoid/Inverses.lean` (the docstring object this PR modifies) is now 101 characters long: `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details`. It was 99 characters before the change, so this PR pushed it over the 100-character limit enforced by the `linter.style.longLine` linter (`Mathlib/Tactic/Linter/Style.lean`, member of `linter.mathlibStandardSet`, enabled for Mathlib in `lakefile.lean` and reported by `lake exe lint-style`). Compiling the file exactly as the PR leaves it reports `This line exceeds the 100 character limit, please shorten it!` at line 23; no other line of any file in this PR does.",
+     "requested_change": "Rewrap the sentence so no line exceeds 100 characters, e.g.:\n```\nin `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more\ndetails on related constructions.\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Perm/Sign.lean:28",
+     "claim": "The sentence this PR rewrites in the module docstring of `Mathlib/GroupTheory/Perm/Sign.lean` — `Other lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`` — is a full sentence in documentation but has no terminating period; the surrounding docstring text (`The main definition of this file is `Equiv.Perm.sign`, associating a `ℤˣ` sign with a permutation.` etc.) is punctuated normally.",
+     "requested_change": "End the sentence with a period: `Other lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`.**.**`",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Perm/Sign.lean:29",
+     "claim": "The module docstring of `Mathlib/GroupTheory/Perm/Sign.lean` (the docstring object this PR edits, at line 28) ends with a blank line at line 29 and the closing `-/` alone on line 30, instead of the closing `-/` following the last line of text directly.",
+     "requested_change": "Delete the blank line so the closing `-/` sits directly after the last text line:\n```\nOther lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`.\n-/`",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Abelianization/Defs.lean:23",
+     "claim": "The module docstring of `Mathlib/GroupTheory/Abelianization/Defs.lean`, whose text this PR edits at line 15, ends with a blank line at line 23 and the closing `-/` alone on line 24, rather than the `-/` following the last line of text (`* `MulEquiv.abelianizationCongr`: Equivalent groups have equivalent abelianizations`) directly.",
+     "requested_change": "Delete the blank line at line 23 so that the docstring ends:\n```\n* `MulEquiv.abelianizationCongr`: Equivalent groups have equivalent abelianizations\n-/`",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/FreeAbelianGroup.lean:65",
+     "claim": "The module docstring of `Mathlib/GroupTheory/FreeAbelianGroup.lean`, whose text this PR edits at line 25, ends with a blank line at line 65 and the closing `-/` alone on line 66 instead of following the last line of text (`are about `FreeAbelianGroup.map`.`) directly.",
+     "requested_change": "Delete the blank line at line 65, so that the docstring ends `... are about `FreeAbelianGroup.map`.\n-/`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/3ba1009dbc962a7d4363d0e8145d6d21850b9c7f3db75850b15e9cde0e9c0dae/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__11b9703f-cda5-4ca6-8884-0f5219811b1e.jsonl"
+  },
+  "GPT3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "The `GroupExtension/Defs.lean` module doc still contains a stale file reference: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is only a deprecated wrapper, so this documentation still points readers at the old location.",
+     "requested_change": "Replace it with `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean:52",
+     "claim": "The module docstring of `Mathlib/GroupTheory/GroupExtension/Defs.lean` still cites `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` for the `groupCohomology.H2`/group-extension TODO (line 52), but that path is only a deprecated shim: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` contains nothing but `public import Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree` and `deprecated_module (since := \"2025-06-14\")`. This is the same class of stale reference the PR is fixing two lines above it (lines 49-50), so it should be fixed here too.",
+     "requested_change": "Change the path on line 52 to the live file: ``Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean``.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Abelianization/Defs.lean:13",
+     "claim": "The first sentence of the module docstring, \"This file defines the commutator and the abelianization of a group\", is inaccurate, and the PR is editing this very docstring (the following sentence). `Mathlib/GroupTheory/Abelianization/Defs.lean` no longer defines the commutator: it only uses `commutator G` in the definition of `Abelianization` and in `Abelianization.ker_of`/`Abelianization.commutator_subset_ker`; `Subgroup.commutator` is defined in the imported file `Mathlib/GroupTheory/Commutator/Basic.lean`, whose module doc lists \"`commutator`: defines the commutator of a group `G` as a subgroup of `G`\".",
+     "requested_change": "Reword the opening sentence to \"This file defines the abelianization of a group.\" (optionally adding that it is the quotient by the commutator subgroup `commutator G`, which is defined in `Mathlib/GroupTheory/Commutator/Basic.lean`).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/3ec7b9901447b982e72c2549d735f131079091ee766eb155af5e5a15e8748ab0/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__bd8fe361-599e-422c-96dc-3e03c427d35d.jsonl"
+  },
+  "AP3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean:19",
+     "claim": "The TODO in the module docstring of `Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean` has been redirected to `Mathlib/Algebra/Group/Action/Hom.lean`, but that file is the one about actions *induced by* homomorphisms (it contains `Function.Surjective.mulActionLeft`, `MulAction.compHom`, `MonoidHom.smulOneHom` and `monoidHomEquivMulActionIsScalarTower`); it never mentions `MulActionHom` or the notation `α →[N] β`, so it is not the file where the requested \"left actions of `M` on `α →[N] β`\" and the corresponding `SMulCommClass` instances belong. The stale reference `Mathlib/Algebra/Hom/GroupAction.lean` named the file that defines `MulActionHom`, i.e. `Mathlib/GroupTheory/GroupAction/Hom.lean`.",
+     "requested_change": "Point the TODO at `Mathlib/GroupTheory/GroupAction/Hom.lean` instead of `Mathlib/Algebra/Group/Action/Hom.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Perm/Sign.lean:28",
+     "claim": "The changed line of the module docstring of `Mathlib/GroupTheory/Perm/Sign.lean` is a sentence that does not end in a period (\"Other lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`\"), and the docstring's closing `-/` is left on its own after a blank line (line 29 blank, line 30 `-/`), rather than following the last line of text directly.",
+     "requested_change": "End the sentence with a period (`... `Mathlib/GroupTheory/Perm/Finite.lean`.`) and delete the blank line so that the closing `-/` follows the last line of text directly.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/12dbb237b242c77ada9e217a81cdb3b22a533c6617ffa845a7d4cabf20f4748a/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__3f2ce508-ef71-42ea-a0bf-828daa5dfb09.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/D12_33305.md"
+}

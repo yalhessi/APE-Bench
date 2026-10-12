@@ -1,0 +1,1202 @@
+{
+ "asks": [
+  {
+   "id": "v0029",
+   "pr": 28649,
+   "family": "F10",
+   "in_census": true,
+   "entries": [
+    "P185"
+   ],
+   "text": "I disagree with this one, please revert.",
+   "path": "Mathlib/Probability/Martingale/Upcrossing.lean",
+   "line": 698,
+   "author": "grunweg",
+   "at": "2025-08-19T17:26:39Z",
+   "matcher_text": {
+    "ask_id": "v0029",
+    "path": "Mathlib/Probability/Martingale/Upcrossing.lean",
+    "code_at_comment": "@@ -695,7 +695,7 @@ This inequality is central for the martingale convergence theorem as it provides\n for the upcrossings.\n \n We note that on top of taking the supremum on both sides of the inequality, we had also used\n-the monotone convergence theorem on the left hand side to take the supremum outside of the\n+the monotone convergence theorem on the left-hand side to take the supremum outside of the",
+    "comment": "I disagree with this one, please revert.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "TA1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "GPT1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "`the monotone convergence theorem on the left hand side to take the supremum outside of the` is changed to `left-hand side` in the section docstring of the variant upcrossing estimate. This is a hyphenation preference, not a misspelling: the library uses both spellings freely (`the left hand side` in e.g. Mathlib/MeasureTheory/Function/LpSeminorm/Basic.lean:241, `the left-hand side` in e.g. Mathlib/Probability/Kernel/Posterior.lean:232), and no style-guide rule mandates the hyphenated form, so the PR gains only the rewriting of another author's sentence.",
+      "requested_change": "Drop this hunk, i.e. keep `on the left hand side`, leaving the file's genuine typos (`liminfs`, `compostition`, `measurablity`, `gaussian`) as the content of the PR.",
+      "severity": "advisory"
+     },
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "`the monotone convergence theorem on the left hand side to take the supremum outside of the` is changed to `left-hand side` in the section docstring of the variant upcrossing estimate. This is a hyphenation preference, not a misspelling: the library uses both spellings freely (`the left hand side` in e.g. Mathlib/MeasureTheory/Function/LpSeminorm/Basic.lean:241, `the left-hand side` in e.g. Mathlib/Probability/Kernel/Posterior.lean:232), and no style-guide rule mandates the hyphenated form, so the PR gains only the rewriting of another author's sentence.",
+      "requested_change": "Drop this hunk, i.e. keep `on the left hand side`, leaving the file's genuine typos (`liminfs`, `compostition`, `measurablity`, `gaussian`) as the content of the PR.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "AP3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "The hyphenation change `on the left hand side` → `on the left-hand side` is a purely stylistic reformulation of correct existing prose, not a typo fix; both spellings are equally established in the library (about 20 files use each), so there is no practice making this change obligatory and it should be left to the original author.",
+      "requested_change": "Drop this hunk and keep the original `the monotone convergence theorem on the left hand side to take the supremum outside of the`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "The hyphenation change `on the left hand side` → `on the left-hand side` is a purely stylistic reformulation of correct existing prose, not a typo fix; both spellings are equally established in the library (about 20 files use each), so there is no practice making this change obligatory and it should be left to the original author.",
+      "requested_change": "Drop this hunk and keep the original `the monotone convergence theorem on the left hand side to take the supremum outside of the`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "T1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "AP2": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "The change \"on the left hand side\" → \"on the left-hand side\" is hyphenation only. `content_search` shows Mathlib prose uses both spellings freely (unhyphenated e.g. `Mathlib/Data/Matrix/Basic.lean:690`, hyphenated e.g. `Mathlib/Analysis/Normed/Lp/PiLp.lean:918`), this file contains no other occurrence of either, and no style-guide rule mandates the hyphen, so the hunk is a purely cosmetic rewrite of the original author's prose.",
+      "requested_change": "Drop this hunk (keep \"the monotone convergence theorem on the left hand side to take the supremum outside of the integral\").",
+      "severity": "advisory"
+     },
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+      "claim": "The change \"on the left hand side\" → \"on the left-hand side\" is hyphenation only. `content_search` shows Mathlib prose uses both spellings freely (unhyphenated e.g. `Mathlib/Data/Matrix/Basic.lean:690`, hyphenated e.g. `Mathlib/Analysis/Normed/Lp/PiLp.lean:918`), this file contains no other occurrence of either, and no style-guide rule mandates the hyphen, so the hunk is a purely cosmetic rewrite of the original author's prose.",
+      "requested_change": "Drop this hunk (keep \"the monotone convergence theorem on the left hand side to take the supremum outside of the integral\").",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "DX3": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Revert 'left-hand side' hyphenation: R3, R5, R8 ask to drop the hunk.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding asks to drop the left-hand side hyphenation hunk."
+    }
+   },
+   "entries_text": {
+    "P185": "A purely stylistic change to existing code or prose that the style guide does not mandate is left to the original author's taste, not made by a third party."
+   }
+  },
+  {
+   "id": "v0030",
+   "pr": 28649,
+   "family": "F10",
+   "in_census": true,
+   "entries": [
+    "P278"
+   ],
+   "text": "spell out `mgf` instead?",
+   "path": "Mathlib/Probability/Moments/Basic.lean",
+   "line": 25,
+   "author": "grunweg",
+   "at": "2025-08-19T17:26:56Z",
+   "matcher_text": {
+    "ask_id": "v0030",
+    "path": "Mathlib/Probability/Moments/Basic.lean",
+    "code_at_comment": "@@ -22,9 +22,9 @@ import Mathlib.Probability.IdentDistrib\n ## Main results\n \n * `ProbabilityTheory.IndepFun.mgf_add`: if two real random variables `X` and `Y` are independent\n-  and their mgfs are defined at `t`, then `mgf (X + Y) μ t = mgf X μ t * mgf Y μ t`\n+  and their MGFs are defined at `t`, then `mgf (X + Y) μ t = mgf X μ t * mgf Y μ t`",
+    "comment": "spell out `mgf` instead?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "TA1": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "This PR makes the module docstring inconsistent: 'MGFs' and 'CGFs' (lines 25 and 27) are capitalised, while line 30 of the same list still says 'the cgf exists'. The rest of `Probability/Moments` writes lowercase 'mgf' in prose. In all three places the docstring uses an identifier-style abbreviation where the full term should be written out.",
+      "requested_change": "Write the terms out consistently. Line 25 becomes 'and their moment generating functions are defined at `t`, then', line 27 becomes 'and their cumulant generating functions are defined at `t`, then', and line 30 becomes 'the cumulant generating function exists, ...'. Rewrap to stay within 100 columns. If the abbreviation is kept, at least make line 30 read 'the CGF exists', so that one spelling is used throughout the docstring.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "This PR makes the module docstring inconsistent: 'MGFs' and 'CGFs' (lines 25 and 27) are capitalised, while line 30 of the same list still says 'the cgf exists'. The rest of `Probability/Moments` writes lowercase 'mgf' in prose. In all three places the docstring uses an identifier-style abbreviation where the full term should be written out.",
+      "requested_change": "Write the terms out consistently. Line 25 becomes 'and their moment generating functions are defined at `t`, then', line 27 becomes 'and their cumulant generating functions are defined at `t`, then', and line 30 becomes 'the cumulant generating function exists, ...'. Rewrap to stay within 100 columns. If the abbreviation is kept, at least make line 30 read 'the CGF exists', so that one spelling is used throughout the docstring.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "GPT1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring for `ProbabilityTheory.IndepFun.mgf_add` / `ProbabilityTheory.IndepFun.cgf_add` now writes \"their MGFs are defined at `t`\" and \"their CGFs are defined at `t`\", while three lines below the same `## Main results` list still says \"the cgf exists\" and \"using `mgf` instead of `cgf`\", and the rest of the file writes the abbreviations lower-case (`mgf`, `cgf` in the `## Main definitions` bullets, in the same form as `pdf` in `Mathlib/Probability/Distributions/Gaussian/Real.lean`). Tokens `MGF`/`CGF` occur nowhere else in Mathlib prose (only the identifiers `complexMGF`, `MGFAnalytic`, `HasSubgaussianMGF`), so the edit introduces a second spelling of the same notion inside one docstring.",
+      "requested_change": "Keep the lower-case spelling the file and the library use: \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\". (If the all-caps form is wanted, then \"the cgf exists\" on line 30 and the `mgf`/`cgf` mentions in the following bullet must be capitalized too, so at least one spelling is used for the whole block.)",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring for `ProbabilityTheory.IndepFun.mgf_add` / `ProbabilityTheory.IndepFun.cgf_add` now writes \"their MGFs are defined at `t`\" and \"their CGFs are defined at `t`\", while three lines below the same `## Main results` list still says \"the cgf exists\" and \"using `mgf` instead of `cgf`\", and the rest of the file writes the abbreviations lower-case (`mgf`, `cgf` in the `## Main definitions` bullets, in the same form as `pdf` in `Mathlib/Probability/Distributions/Gaussian/Real.lean`). Tokens `MGF`/`CGF` occur nowhere else in Mathlib prose (only the identifiers `complexMGF`, `MGFAnalytic`, `HasSubgaussianMGF`), so the edit introduces a second spelling of the same notion inside one docstring.",
+      "requested_change": "Keep the lower-case spelling the file and the library use: \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\". (If the all-caps form is wanted, then \"the cgf exists\" on line 30 and the `mgf`/`cgf` mentions in the following bullet must be capitalized too, so at least one spelling is used for the whole block.)",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalises the acronyms in prose (\"mgfs\" to \"MGFs\", \"cgfs\" to \"CGFs\") in the Main results list, but two lines further down the same list still says \"the cgf exists\" (line 30). The list is now inconsistent within itself.",
+      "requested_change": "On line 30 change \"the cgf exists\" to \"the CGF exists\", matching the PR's \"MGFs\"/\"CGFs\" (the code-quoted `mgf`/`cgf` on lines 32-33 stay as they are).",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalises the acronyms in prose (\"mgfs\" to \"MGFs\", \"cgfs\" to \"CGFs\") in the Main results list, but two lines further down the same list still says \"the cgf exists\" (line 30). The list is now inconsistent within itself.",
+      "requested_change": "On line 30 change \"the cgf exists\" to \"the CGF exists\", matching the PR's \"MGFs\"/\"CGFs\" (the code-quoted `mgf`/`cgf` on lines 32-33 stay as they are).",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "AP3": {
+     "R": "R5",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now capitalises the abbreviations — `their MGFs are defined at t` (line 25) and `their CGFs are defined at t` (line 27) — but the very next bullet of the same list still writes `the cgf exists` / `of cgf` in lower case (lines 30, 33), so the same construct is now spelled two different ways inside one docstring. It also departs from the library-wide spelling of these abbreviations in prose, which is lower case (`Mathlib/Probability/Moments/ComplexMGF.lean`: \"The moment generating function (mgf) is …\"; `Mathlib/Probability/Moments/SubGaussian.lean`: \"moment generating function (mgf)\"; `Mathlib/Probability/Moments/Tilted.lean`: \"moment generating function (`mgf`) and the cumulant generating function (`cgf`)\").",
+      "requested_change": "Revert the capitalisation to `mgfs` / `cgfs` so the abbreviation matches line 30 and the rest of Mathlib, or (if capitalisation is wanted) also write `the CGF exists` on line 30 and `of `CGF`` on line 33 and the corresponding `mgf` occurrences, so the spelling is uniform throughout the file.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now capitalises the abbreviations — `their MGFs are defined at t` (line 25) and `their CGFs are defined at t` (line 27) — but the very next bullet of the same list still writes `the cgf exists` / `of cgf` in lower case (lines 30, 33), so the same construct is now spelled two different ways inside one docstring. It also departs from the library-wide spelling of these abbreviations in prose, which is lower case (`Mathlib/Probability/Moments/ComplexMGF.lean`: \"The moment generating function (mgf) is …\"; `Mathlib/Probability/Moments/SubGaussian.lean`: \"moment generating function (mgf)\"; `Mathlib/Probability/Moments/Tilted.lean`: \"moment generating function (`mgf`) and the cumulant generating function (`cgf`)\").",
+      "requested_change": "Revert the capitalisation to `mgfs` / `cgfs` so the abbreviation matches line 30 and the rest of Mathlib, or (if capitalisation is wanted) also write `the CGF exists` on line 30 and `of `CGF`` on line 33 and the corresponding `mgf` occurrences, so the spelling is uniform throughout the file.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "partial",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Moments/Basic.lean:15",
+      "claim": "The changed module doc still contains local typography inconsistencies: the `centralMoment` bullet is missing a space after the declaration-name colon, and the Chernoff-bound bullet says `the cgf exists` even though this PR changes the neighboring prose to use uppercase `MGFs`/`CGFs`.",
+      "requested_change": "Change `` `ProbabilityTheory.centralMoment X p μ`:`p`th `` to `` `ProbabilityTheory.centralMoment X p μ`: `p`th `` and change `the cgf exists` to `the CGF exists`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Moments/Basic.lean:15",
+      "claim": "The changed module doc still contains local typography inconsistencies: the `centralMoment` bullet is missing a space after the declaration-name colon, and the Chernoff-bound bullet says `the cgf exists` even though this PR changes the neighboring prose to use uppercase `MGFs`/`CGFs`.",
+      "requested_change": "Change `` `ProbabilityTheory.centralMoment X p μ`:`p`th `` to `` `ProbabilityTheory.centralMoment X p μ`: `p`th `` and change `the cgf exists` to `the CGF exists`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "T1": {
+     "R": "R7",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' on lines 25 and 27, but line 30 of the same list still says 'such that the cgf exists'. So the docstring now spells the abbreviation two ways. Elsewhere `Probability/Moments` writes it lowercase in prose: ComplexMGF.lean:18,20,21,32 'the mgf', MGFAnalytic.lean:20, SubGaussian.lean:32,107,110, and 'pdf' in Distributions/*. That lowercase spelling refers to the Lean definitions `mgf`/`cgf`.",
+      "requested_change": "Use one spelling throughout the list. Either revert lines 25 and 27 to the area's lowercase 'mgfs'/'cgfs' (or write `mgf`s/`cgf`s), or keep the capitals and change line 30 to 'such that the CGF exists'.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' on lines 25 and 27, but line 30 of the same list still says 'such that the cgf exists'. So the docstring now spells the abbreviation two ways. Elsewhere `Probability/Moments` writes it lowercase in prose: ComplexMGF.lean:18,20,21,32 'the mgf', MGFAnalytic.lean:20, SubGaussian.lean:32,107,110, and 'pdf' in Distributions/*. That lowercase spelling refers to the Lean definitions `mgf`/`cgf`.",
+      "requested_change": "Use one spelling throughout the list. Either revert lines 25 and 27 to the area's lowercase 'mgfs'/'cgfs' (or write `mgf`s/`cgf`s), or keep the capitals and change line 30 to 'such that the CGF exists'.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "AP2": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now spells the abbreviation in the capitalised form \"MGFs\" (l.25) and \"CGFs\" (l.27), while the very same docstring spells these notions out in its `## Main definitions` section (\"moment generating function\", \"cumulant generating function\", l.17–20) and still says \"the cgf exists\" two lines later (l.30). One docstring therefore now writes the same notion three different ways, and this capitalised abbreviation has no other prose occurrence in Mathlib (the library writes the abbreviation in lower case, e.g. `Mathlib/Probability/Moments/ComplexMGF.lean` l.15: \"The moment generating function (mgf) is …\").",
+      "requested_change": "Write the notions out in the `## Main results` bullets: \"and their moment generating functions are defined at `t`\" and \"and their cumulant generating functions are defined at `t`\", and change l.30 to \"such that the cumulant generating function exists\". (If the abbreviation is kept, it must then be spelled identically in all three places, i.e. l.30 becomes \"the CGF exists\".)",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now spells the abbreviation in the capitalised form \"MGFs\" (l.25) and \"CGFs\" (l.27), while the very same docstring spells these notions out in its `## Main definitions` section (\"moment generating function\", \"cumulant generating function\", l.17–20) and still says \"the cgf exists\" two lines later (l.30). One docstring therefore now writes the same notion three different ways, and this capitalised abbreviation has no other prose occurrence in Mathlib (the library writes the abbreviation in lower case, e.g. `Mathlib/Probability/Moments/ComplexMGF.lean` l.15: \"The moment generating function (mgf) is …\").",
+      "requested_change": "Write the notions out in the `## Main results` bullets: \"and their moment generating functions are defined at `t`\" and \"and their cumulant generating functions are defined at `t`\", and change l.30 to \"such that the cumulant generating function exists\". (If the abbreviation is kept, it must then be spelled identically in all three places, i.e. l.30 becomes \"the CGF exists\".)",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The capitalization change to `MGFs`/`CGFs` is not carried through the doc block it edits: the very next bullet still reads \"such that the cgf exists\" (line 30), so the `## Main results` list now mixes \"CGFs\" (line 27) with \"cgf\" (line 30). The area's established prose in fact writes these abbreviations lower case, matching the function names (`mgf`, `cgf`): ComplexMGF.lean lines 18, 20, 21, 32 (\"of the interval of definition of the mgf\"), MGFAnalytic.lean line 20, SubGaussian.lean lines 32, 44, 110.",
+      "requested_change": "Make the block consistent with the rest of the file and of the area's prose by reverting both abbreviations to lower case (`mgfs`, `cgfs`); alternatively, if the capitalized spelling is wanted, also change line 30 to \"such that the CGF exists\" so the same abbreviation is not spelt two ways five lines apart.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The capitalization change to `MGFs`/`CGFs` is not carried through the doc block it edits: the very next bullet still reads \"such that the cgf exists\" (line 30), so the `## Main results` list now mixes \"CGFs\" (line 27) with \"cgf\" (line 30). The area's established prose in fact writes these abbreviations lower case, matching the function names (`mgf`, `cgf`): ComplexMGF.lean lines 18, 20, 21, 32 (\"of the interval of definition of the mgf\"), MGFAnalytic.lean line 20, SubGaussian.lean lines 32, 44, 110.",
+      "requested_change": "Make the block consistent with the rest of the file and of the area's prose by reverting both abbreviations to lower case (`mgfs`, `cgfs`); alternatively, if the capitalized spelling is wanted, also change line 30 to \"such that the CGF exists\" so the same abbreviation is not spelt two ways five lines apart.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' in two bullets (lines 25 and 27), but the next bullet in the same list still reads 'For `t` nonnegative such that the cgf exists' (line 30). The Main results list now uses two spellings of the same abbreviation.",
+      "requested_change": "On line 30 change 'such that\\n  the cgf exists' to 'such that\\n  the CGF exists', so the list uses one spelling.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' in two bullets (lines 25 and 27), but the next bullet in the same list still reads 'For `t` nonnegative such that the cgf exists' (line 30). The Main results list now uses two spellings of the same abbreviation.",
+      "requested_change": "On line 30 change 'such that\\n  the cgf exists' to 'such that\\n  the CGF exists', so the list uses one spelling.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "DX3": {
+     "R": "R11",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module documentation of `ProbabilityTheory.mgf`/`ProbabilityTheory.cgf` now spells the abbreviation inconsistently: the PR capitalises it in two bullets of `## Main results` (`their MGFs are defined at `t`` on line 25 and `their CGFs are defined at `t`` on line 27) but the next bullet in the same list still reads ``For `t` nonnegative such that the cgf exists`` (line 30). The capitalised form also appears nowhere else in the library, while the library's prose writes these abbreviations lower case (`the mgf` in `Mathlib/Probability/Moments/ComplexMGF.lean:20`, `Mathlib/Probability/Moments/SubGaussian.lean:107`, `the cdf` in `Mathlib/Probability/CDF.lean:22`).",
+      "requested_change": "Pick one spelling and apply it throughout the module doc. Preferably revert lines 25 and 27 to the lower-case `mgfs`/`cgfs`, matching the rest of the library; if the capitalised form is kept, capitalise the remaining occurrence on line 30 (`the CGF exists`) as well so the bullet list is internally consistent.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module documentation of `ProbabilityTheory.mgf`/`ProbabilityTheory.cgf` now spells the abbreviation inconsistently: the PR capitalises it in two bullets of `## Main results` (`their MGFs are defined at `t`` on line 25 and `their CGFs are defined at `t`` on line 27) but the next bullet in the same list still reads ``For `t` nonnegative such that the cgf exists`` (line 30). The capitalised form also appears nowhere else in the library, while the library's prose writes these abbreviations lower case (`the mgf` in `Mathlib/Probability/Moments/ComplexMGF.lean:20`, `Mathlib/Probability/Moments/SubGaussian.lean:107`, `the cdf` in `Mathlib/Probability/CDF.lean:22`).",
+      "requested_change": "Pick one spelling and apply it throughout the module doc. Preferably revert lines 25 and 27 to the lower-case `mgfs`/`cgfs`, matching the rest of the library; if the capitalised form is kept, capitalise the remaining occurrence on line 30 (`the CGF exists`) as well so the bullet list is internally consistent.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now writes \"and their MGFs are defined at `t`\" (line 25) and \"and their CGFs are defined at `t`\" (line 27). These are the only capitalised prose occurrences of these abbreviations in the whole library: a case-sensitive search for standalone `MGF`/`CGF` finds nothing outside these two lines, while prose elsewhere always writes them lowercase (`Probability/Moments/ComplexMGF.lean` \".moment generating function (mgf). \", \"of definition of the mgf\", `Probability/Moments/SubGaussian.lean` \"moment generating function (mgf)\", `Probability/Moments/Tilted.lean`, `Probability/Moments/IntegrableExpMul.lean`). The change also makes this one doc comment internally inconsistent: line 30 of the same docstring, untouched, still says \"the cgf exists\".",
+      "requested_change": "Revert the capitalisation to the library's lowercase spelling, i.e. write \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\" (or rephrase as \"the mgf of `X` and the mgf of `Y` are defined at `t`\"), so the block agrees with line 30 and with the rest of Mathlib.",
+      "severity": "advisory"
+     },
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Probability/Moments/Basic.lean:25",
+      "claim": "The module docstring now writes \"and their MGFs are defined at `t`\" (line 25) and \"and their CGFs are defined at `t`\" (line 27). These are the only capitalised prose occurrences of these abbreviations in the whole library: a case-sensitive search for standalone `MGF`/`CGF` finds nothing outside these two lines, while prose elsewhere always writes them lowercase (`Probability/Moments/ComplexMGF.lean` \".moment generating function (mgf). \", \"of definition of the mgf\", `Probability/Moments/SubGaussian.lean` \"moment generating function (mgf)\", `Probability/Moments/Tilted.lean`, `Probability/Moments/IntegrableExpMul.lean`). The change also makes this one doc comment internally inconsistent: line 30 of the same docstring, untouched, still says \"the cgf exists\".",
+      "requested_change": "Revert the capitalisation to the library's lowercase spelling, i.e. write \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\" (or rephrase as \"the mgf of `X` and the mgf of `Y` are defined at `t`\"), so the block agrees with line 30 and with the rest of Mathlib.",
+      "severity": "advisory"
+     },
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Spell out mgf: R1, R8 ask to write moment generating functions; others want lowercase revert or CGF consistency.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Read as: write moment generating function in full. Reverting to lowercase or capitalising line 30 is partial."
+    }
+   },
+   "entries_text": {
+    "P278": "A docstring describes in full mathematical words (`homomorphism`, `multiplicative monoid`), not with the abbreviations used in identifiers (`hom`) or a pasted Lean expression."
+   }
+  },
+  {
+   "id": "v0031",
+   "pr": 28649,
+   "family": "F10",
+   "in_census": false,
+   "entries": [],
+   "text": "I'm not sure about this one",
+   "path": "Mathlib/Probability/Moments/Variance.lean",
+   "line": 452,
+   "author": "grunweg",
+   "at": "2025-08-19T17:27:12Z",
+   "matcher_text": {
+    "ask_id": "v0031",
+    "path": "Mathlib/Probability/Moments/Variance.lean",
+    "code_at_comment": "@@ -449,7 +449,7 @@ lemma variance_le_sub_mul_sub [IsProbabilityMeasure μ] {a b : ℝ} {X : Ω →\n       linarith\n     _ = (b - μ[X]) * (μ[X] - a) := by ring\n \n-/-- **Popoviciu's inequality on variance**\n+/-- **Popoviciu's inequality on variances**",
+    "comment": "I'm not sure about this one",
+    "replies_to": null
+   },
+   "outcomes": {
+    "TA1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "GPT1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "X2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "AP3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Variance.lean:452",
+      "claim": "The retitled docstring of `variance_le_sq_of_bounded` — `**Popoviciu's inequality on variances**` — now disagrees with the docstring of its immediate neighbour `variance_le_sub_mul_sub` in the same file, `**The Bhatia-Davis inequality on variance**` (line 419). The change from singular to plural makes the two sibling titles, which describe the same kind of bound on the variance of one random variable, spell the notion differently in one file.",
+      "requested_change": "Make the two sibling titles consistent: either keep `on variance` here (singular, matching the Bhatia-Davis title) or also change the Bhatia-Davis title on line 419 to the plural.",
+      "severity": "advisory"
+     },
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Probability/Moments/Variance.lean:452",
+      "claim": "The retitled docstring of `variance_le_sq_of_bounded` — `**Popoviciu's inequality on variances**` — now disagrees with the docstring of its immediate neighbour `variance_le_sub_mul_sub` in the same file, `**The Bhatia-Davis inequality on variance**` (line 419). The change from singular to plural makes the two sibling titles, which describe the same kind of bound on the variance of one random variable, spell the notion differently in one file.",
+      "requested_change": "Make the two sibling titles consistent: either keep `on variance` here (singular, matching the Bhatia-Davis title) or also change the Bhatia-Davis title on line 419 to the plural.",
+      "severity": "advisory"
+     },
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "GPT3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "T1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "AP2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "DX3": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R5 questions 'variances', offering to keep singular 'on variance'.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R5 asks to keep singular 'on variance' (revert the Popoviciu title change)."
+    }
+   },
+   "entries_text": {}
+  }
+ ],
+ "pr": 28649,
+ "sessions": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The paragraph this PR edits (it hyphenates 'left-hand side' on line 698) still states a wrong identity: line 703 reads $U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}$, which sums the same indicator N times, and line 705 says $\\{U_N(a, b) < N\\}$ is measurable 'since $U_N(a, b)$ is a stopping time'. $U_N(a, b)$ is the upcrossing count, not a stopping time. What the code proves (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) is a sum of indicators of $\\{\\tau_i < N\\}$ over the upper crossing times $\\tau_i$ (`upperCrossingTime a b f N i`), which are the stopping times.",
+     "requested_change": "Replace lines 702-706 with: \"$$\\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\\n$$\\n$U_N(a, b)$ is measurable as each $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a\\nstopping time.\" ($\\tau_n$ is the notation the file's own module doc sets up at lines 73-83.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The PR fixes 'measurablity' in this module doc, but the same doc's Main statements entry for the composition is wrong in two ways. It names `ProbabilityTheory.integral_comp`, but the lemma is declared inside `namespace Kernel` (line 359), so its name is `ProbabilityTheory.Kernel.integral_comp`. And it writes the statement with the lintegral `∫⁻`, although this file is about the Bochner integral and the lemma (line 417-418) states `∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`.",
+     "requested_change": "Change lines 30-31 to \"* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.\"",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' in two bullets (lines 25 and 27), but the next bullet in the same list still reads 'For `t` nonnegative such that the cgf exists' (line 30). The Main results list now uses two spellings of the same abbreviation.",
+     "requested_change": "On line 30 change 'such that\\n  the cgf exists' to 'such that\\n  the CGF exists', so the list uses one spelling.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "Replacing 'liminfs' with 'limit inferiors' does not fix a typo. 'liminfs' is Mathlib's own term: the defining file's title is '# liminfs and limsups of functions and filters' (Order/LiminfLimsup.lean), and BorelSpace/Order.lean also uses it. 'limit inferiors' is also not the standard English plural, which is 'limits inferior'.",
+     "requested_change": "Revert line 133 to '/-- A realization of a stochastic process with bounded upcrossings and bounded liminfs is'.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The PR edits this module doc but leaves the `integral_comp` bullet wrong in two ways. It cites `ProbabilityTheory.integral_comp`, which does not exist: the theorem is declared inside `namespace Kernel`, so its name is `ProbabilityTheory.Kernel.integral_comp`. It also gives the statement with the Lebesgue integral `∫⁻`, although this file and that theorem are about the Bochner integral `∫`.",
+     "requested_change": "Change lines 30-31 to:\n* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "This module doc is being typo-fixed, but its title still says \"the composition and the composition-products of two kernels\". Two kernels have one composition-product, and the next line of the doc says \"the composition and the composition-product of two kernels\".",
+     "requested_change": "Change line 10 to `# Bochner integral of a function against the composition and the composition-product of two kernels`. This also brings the line from 100 characters down to 99.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The PR capitalises the acronyms in prose (\"mgfs\" to \"MGFs\", \"cgfs\" to \"CGFs\") in the Main results list, but two lines further down the same list still says \"the cgf exists\" (line 30). The list is now inconsistent within itself.",
+     "requested_change": "On line 30 change \"the cgf exists\" to \"the CGF exists\", matching the PR's \"MGFs\"/\"CGFs\" (the code-quoted `mgf`/`cgf` on lines 32-33 stay as they are).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "In the module doc this PR edits, the `centralMoment` bullet has no space after the colon (\"`ProbabilityTheory.centralMoment X p μ`:`p`th central moment\"). Every other bullet in the list has one.",
+     "requested_change": "On line 15 insert a space: \"* `ProbabilityTheory.centralMoment X p μ`: `p`th central moment of `X` with respect to measure `μ`,\". The line is then 99 characters.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The PR fixes wording in this file's section doc, but the file's header module doc still has typos. Three Main results bullets are missing \"of\": \"part b the L¹ martingale convergence theorem\" (line 32) and \"part c the L¹ martingale convergence theorem\" (lines 35 and 38). Line 17 writes \"an L¹ bounded submartingale\", while the rest of the file writes \"L¹-bounded\".",
+     "requested_change": "Change line 17 to \"an L¹-bounded submartingale\", and change \"part b the\" and \"part c the\" to \"part b of the\" and \"part c of the\" on lines 32, 35 and 38. With \"of\" added, line 38 is too long, so re-wrap lines 38-40 as:\n* `MeasureTheory.Integrable.tendsto_eLpNorm_condExp`: part c of the L¹ martingale convergence\n  theorem: given a `⨆ n, ℱ n`-measurable function `g` where `ℱ` is a filtration, `𝔼[g | ℱ n]`\n  converges in L¹ to `g`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "MeasureTheory.not_frequently_of_upcrossings_lt_top",
+     "claim": "The docstring says \"has bounded upcrossing from below `a` to above `b`\", with \"upcrossing\" in the singular. The hypothesis is about the count `upcrossings a b f ω ≠ ∞`, and the next two docstrings in the file say \"infinite upcrossings\" and \"bounded upcrossings\".",
+     "requested_change": "Change the first line of the docstring to \"/-- If a stochastic process has bounded upcrossings from below `a` to above `b`,\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:138",
+     "claim": "The PR rewrites \"bounded liminfs\" as \"bounded limit inferiors\". The usual English plural is \"limits inferior\". The plural is also inaccurate here: the hypothesis `hf₁ : liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞` is a single limit inferior, of the norm of one realization, being finite.",
+     "requested_change": "Reword the first sentence of the docstring to: \"/-- A realization of a stochastic process with bounded upcrossings and with a finite limit inferior\\nof its norm is convergent.\" Keep the second paragraph as it is.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The paragraph this PR edits states the target inequality as $(b - a) \\sup_N \\mathbb{E}[U_N(a, b)] \\le \\sup_N \\mathbb{E}[f_N]$. The theorem it describes, `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part`, bounds by the positive part: `ENNReal.ofReal (b - a) * ∫⁻ ω, upcrossings a b f ω ∂μ ≤ ⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺) ∂μ`. This also matches the header's Doob estimate with $\\mathbb{E}[(f_N - a)^+]$.",
+     "requested_change": "Change line 692 to `  (b - a) \\sup_N \\mathbb{E}[U_N(a, b)] \\le \\sup_N \\mathbb{E}[(f_N - a)^+].`",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The measurability argument in the same edited paragraph is wrong as written. The display $U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}$ has a summand that does not depend on $i$. The text then says \"$U_N(a, b)$ is a stopping time\". The code (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) actually sums the indicators of $\\{\\tau_i < N\\}$ for the upper crossing times $\\tau_i$ (`upperCrossingTime a b f N i`). Measurability comes from `isStoppingTime_upperCrossingTime`, not from $U_N$ being a stopping time.",
+     "requested_change": "Replace lines 703-706 with:\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\n$$\n$U_N(a, b)$ is measurable as each $\\{\\tau_i < N\\}$ is a measurable set since the upper crossing\ntime $\\tau_i$ is a stopping time.\nThis uses the $\\tau_n$ notation from the file's proof outline.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The PR replaces 'bounded liminfs' with 'bounded limit inferiors', which is not the standard plural: the plural of the postpositive 'limit inferior' is 'limits inferior'. The original 'liminfs' was not a typo either: Mathlib uses it in prose elsewhere (Order/LiminfLimsup.lean:11 '# liminfs and limsups of functions and filters', MeasureTheory/Constructions/BorelSpace/Order.lean:34 'Countable liminfs and limsups').",
+     "requested_change": "Write 'with bounded upcrossings and bounded limits inferior is convergent', or revert to the original 'bounded liminfs'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' on lines 25 and 27, but line 30 of the same list still says 'such that the cgf exists'. So the docstring now spells the abbreviation two ways. Elsewhere `Probability/Moments` writes it lowercase in prose: ComplexMGF.lean:18,20,21,32 'the mgf', MGFAnalytic.lean:20, SubGaussian.lean:32,107,110, and 'pdf' in Distributions/*. That lowercase spelling refers to the Lean definitions `mgf`/`cgf`.",
+     "requested_change": "Use one spelling throughout the list. Either revert lines 25 and 27 to the area's lowercase 'mgfs'/'cgfs' (or write `mgf`s/`cgf`s), or keep the capitals and change line 30 to 'such that the CGF exists'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The PR fixes 'measurablity' in this module docstring, but leaves two factual errors in its Main statements entry for the composition. (1) It names `ProbabilityTheory.integral_comp`, which does not exist: the theorem is declared inside `namespace Kernel` at line 417, so it is `ProbabilityTheory.Kernel.integral_comp`. (2) Its displayed formula uses the Lebesgue integral `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`, although the file and that theorem are about the Bochner integral (`∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`). The title also says 'the composition-products' where the body says 'the composition-product'.",
+     "requested_change": "Change the bullet to: `* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.` In the title, replace 'the composition-products of two kernels' with 'the composition-product of two kernels'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The PR edits this docstring ('left-hand side'), but its formulas misstate the code. (1) The measurability identity reads `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}`, which is circular. It then says $U_N(a,b)$ is measurable 'since $U_N(a, b)$ is a stopping time'. But `upcrossingsBefore_eq_sum` sums the indicators of `{n | upperCrossingTime a b f N n ω < N}`, i.e. of $\\{\\tau_i < N\\}$, and the stopping time used is `upperCrossingTime` (`Adapted.isStoppingTime_upperCrossingTime`). (2) The target inequality is written with RHS `\\sup_N \\mathbb{E}[f_N]`, whereas `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part` proves the bound by `⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺)`, i.e. $\\sup_N \\mathbb{E}[(f_N - a)^+]$.",
+     "requested_change": "In this docstring, replace `\\mathbf{1}_{\\{U_N(a, b) < N\\}}` with `\\mathbf{1}_{\\{\\tau_i < N\\}}`. Replace '$U_N(a, b)$ is measurable as $\\{U_N(a, b) < N\\}$ is a measurable set since $U_N(a, b)$ is a stopping time' with '$U_N(a, b)$ is measurable as $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a stopping time'. Change `\\sup_N \\mathbb{E}[f_N]` to `\\sup_N \\mathbb{E}[(f_N - a)^+]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:138",
+     "claim": "The PR fixes the docstring of this theorem but not the typo in its name: 'uncrossing' should be 'upcrossings'. The hypothesis is `upcrossings a b f ω < ∞`, and the sibling names in the file are `not_frequently_of_upcrossings_lt_top` and `upcrossings_eq_top_of_frequently_lt`. The name is used once, in `Submartingale.exists_ae_tendsto_of_bdd`.",
+     "requested_change": "Rename to `tendsto_of_upcrossings_lt_top`. Add `@[deprecated (since := \"2025-08-19\")] alias tendsto_of_uncrossing_lt_top := tendsto_of_upcrossings_lt_top`, and update the call in `Submartingale.exists_ae_tendsto_of_bdd`. This can be done here or in a follow-up chore PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "This typo-fix PR edits two other docstrings in this file but leaves three typos in its Main results list. Lines 32, 35 and 38 read 'part b the L¹ martingale convergence theorem' and 'part c the L¹ martingale convergence theorem', each missing 'of'; line 28 has the correct 'part a of the L¹ martingale convergence theorem'.",
+     "requested_change": "Change 'part b the' to 'part b of the' (line 32) and 'part c the' to 'part c of the' (lines 35 and 38), re-wrapping to the 100-character limit.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The LaTeX in this docstring, in the file the PR is fixing, has typos. Line 267 `\\|\\|f_m - g\\|_1` has a doubled `\\|`. Lines 279 and 284 have `\\mathbb|g|` with `{E}` missing. Line 294 has `\\mathbb{E}[g \\mid \\mathcal{F}_n = ...` with the closing `]` missing. 'the usual literary definition' (line 261) should be 'the usual definition in the literature'.",
+     "requested_change": "Change `\\le \\|\\|f_m - g\\|_1` to `\\le \\|f_m - g\\|_1`. Change both `\\mathbb|g|` to `\\mathbb{E}|g|`. Change `\\mathbb{E}[g \\mid \\mathcal{F}_n = \\mathbb{E}[h \\mid \\mathcal{F}_n]` to `\\mathbb{E}[g \\mid \\mathcal{F}_n] = \\mathbb{E}[h \\mid \\mathcal{F}_n]`. Change 'usual literary definition' to 'usual definition in the literature'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The PR edits this module docstring, but line 15 still has no space after the colon ('`ProbabilityTheory.centralMoment X p μ`:`p`th central moment'). The neighbouring bullets all use ': '.",
+     "requested_change": "Change '`ProbabilityTheory.centralMoment X p μ`:`p`th' to '`ProbabilityTheory.centralMoment X p μ`: `p`th'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Probability/Moments/Variance.lean:452",
+     "claim": "The PR fixes the Popoviciu docstring in this file but leaves the module docstring's matching bullet with a missing space: 'is at most`((b - a) / 2) ^ 2`'.",
+     "requested_change": "Change 'at most`((b - a) / 2) ^ 2`' to 'at most `((b - a) / 2) ^ 2`' on line 34.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The module docstring this PR edits misstates the second main statement. It names `ProbabilityTheory.integral_comp`, which does not exist: the lemma is declared inside `namespace Kernel`, so its name is `ProbabilityTheory.Kernel.integral_comp`. It also gives the formula with the Lebesgue integral `∫⁻`, but the lemma, like the whole file, is about the Bochner integral `∫`.",
+     "requested_change": "Replace lines 30-31 with:\n* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The displayed identity in the section docstring this PR edits is wrong. `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}` equals `N · 1{U_N < N}`, not `U_N`. The next sentence also says `U_N(a, b)` 'is a stopping time'. The code it describes (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) sums the indicators of `{upperCrossingTime a b f N i < N}`. Measurability comes from `upperCrossingTime` being a stopping time.",
+     "requested_change": "Replace lines 703-706 with:\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\n$$\nwhere $\\tau_i$ is the `i`-th upper crossing time `upperCrossingTime a b f N i`, $U_N(a, b)$ is\nmeasurable as each $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a stopping time\n(`Adapted.isStoppingTime_upperCrossingTime`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "MeasureTheory.tendsto_of_uncrossing_lt_top (docstring)",
+     "claim": "The docstring change from 'bounded liminfs' to 'bounded limit inferiors' fixes no typo. 'liminfs' is the library's own spelling (the title of `Mathlib/Order/LiminfLimsup.lean` is '# liminfs and limsups of functions and filters'), and it names the `liminf` in hypothesis `hf₁`. 'limit inferiors' is a nonstandard plural (traditionally 'limits inferior'). The hunk is a stylistic rewording of the original author's prose that reads worse, so it should be left out of a typo-fix PR.",
+     "requested_change": "Revert line 133 to `/-- A realization of a stochastic process with bounded upcrossings and bounded liminfs is`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "This PR makes the module docstring inconsistent: 'MGFs' and 'CGFs' (lines 25 and 27) are capitalised, while line 30 of the same list still says 'the cgf exists'. The rest of `Probability/Moments` writes lowercase 'mgf' in prose. In all three places the docstring uses an identifier-style abbreviation where the full term should be written out.",
+     "requested_change": "Write the terms out consistently. Line 25 becomes 'and their moment generating functions are defined at `t`, then', line 27 becomes 'and their cumulant generating functions are defined at `t`, then', and line 30 becomes 'the cumulant generating function exists, ...'. Rewrap to stay within 100 columns. If the abbreviation is kept, at least make line 30 read 'the CGF exists', so that one spelling is used throughout the docstring.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The title of the module docstring this PR edits has a typo that the typo pass missed. It says 'the composition and the composition-products of two kernels'. The file treats a single composition-product, and the body says 'the composition and the composition-product of two kernels' (line 12).",
+     "requested_change": "Change line 10 to `# Bochner integral of a function against the composition and the composition-product of two kernels`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The typo pass in this file missed three items in the Main results list. They read 'part b the L¹ martingale convergence theorem' (line 32) and 'part c the L¹ martingale convergence theorem' (lines 35 and 38), dropping the 'of' that line 28 has ('part a of the L¹ martingale convergence theorem').",
+     "requested_change": "Insert 'of' in lines 32, 35 and 38 ('part b of the', 'part c of the') and rewrap so that no line exceeds 100 columns. Line 38 is already 100 characters, so its item becomes '...tendsto_eLpNorm_condExp`: part c of the L¹ martingale convergence' followed by 'theorem: given a ...'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Probability/Moments/Variance.lean:452",
+     "claim": "The Main results entry for the lemma whose docstring this PR edits (`variance_le_sq_of_bounded`, Popoviciu's inequality) has a missing space, a typo the pass missed: 'is at most`((b - a) / 2) ^ 2`.'",
+     "requested_change": "Change line 34 to '  `a ≤ X ≤ b` almost everywhere is at most `((b - a) / 2) ^ 2`.'",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The formulas in the module docstring this PR edits lack the standard spacing. They read `μ[X^p]`, `μ[(X - μ[X])^p]`, `μ[exp(t*X)]` and `exp(- t*ε + cgf X ℙ t)`: no spaces around `^` and `*`, a space after the prefix `-`, and no space before the application argument. There is also no space after the colon in '`ProbabilityTheory.centralMoment X p μ`:`p`th'. The declaration docstrings in the same file use the spaced forms (`μ[X ^ p]` at line 47, `μ[(X - μ[X]) ^ p]` at line 51).",
+     "requested_change": "Write `μ[X ^ p]`, `μ[(X - μ[X]) ^ p]`, `μ[exp (t * X)]` and `exp (-t * ε + cgf X ℙ t)`, and add the space in '`ProbabilityTheory.centralMoment X p μ`: `p`th'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "None of the list items in the module docstring this PR edits ends with a period. That includes the two Main results items whose lines the PR changes (lines 25 and 27, which are complete 'if ... then ...' sentences) and the four Main definitions items.",
+     "requested_change": "End each list item with a period: lines 14, 16, 18, 20 and the item endings at lines 25 and 27 (for example '... then `mgf (X + Y) μ t = mgf X μ t * mgf Y μ t`.').",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:37",
+     "claim": "The module docstring this PR edits, at the very paragraph the PR changes, uses the ad hoc heading '## Implementation details' instead of the style guide's '## Implementation notes'.",
+     "requested_change": "Rename the heading at line 33 to `## Implementation notes`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The section docstring this PR edits has a blank line between its last line of text and the closing `-/`.",
+     "requested_change": "Delete the blank line 102 so that `-/` directly follows 'submartingale converges to its `limitProcess` almost everywhere.'",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The section docstring this PR edits has a blank line between its last line of text and the closing `-/`.",
+     "requested_change": "Delete the blank line 707 so that `-/` directly follows 'stopping time.'",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/Probability/Kernel/Composition/CompNotation.lean:9",
+     "claim": "The comment attached to the module docstring this PR edits refers to another module as 'the `MeasureComp` file' instead of by its file path.",
+     "requested_change": "Write the reference as `Mathlib/Probability/Kernel/Composition/MeasureComp.lean`, for example '(for example `Mathlib/Probability/Kernel/Composition/MeasureComp.lean`)'.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/Probability/Distributions/Gaussian/Real.lean:43",
+     "claim": "The six docstrings this PR edits in this file still use the identifier-style abbreviation 'pdf' ('The Gaussian pdf is nonnegative.', 'The Gaussian distribution pdf integrates to 1 ...') instead of the term it abbreviates. The definition's own docstring at line 43 spells it out ('Probability density function of the Gaussian distribution ...').",
+     "requested_change": "Write 'probability density function' in place of 'pdf'. For example: 'The Gaussian probability density function is positive when the variance is not zero.', and 'The probability density function of the Gaussian distribution integrates to 1 when the variance is not zero.' (lines 57, 62, 67, 72, 100 and 118).",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "ProbabilityTheory.gaussianPDFReal (docstring)",
+     "claim": "The docstring this PR edits is a noun phrase ('Probability density function of the Gaussian distribution with mean `μ` and variance `v`.') but ends with a full stop.",
+     "requested_change": "Drop the final full stop: `/-- Probability density function of the Gaussian distribution with mean `μ` and variance `v` -/`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:30",
+     "claim": "The module doc for `ProbabilityTheory.integral_comp` misstates the theorem: this file proves the Bochner-integral statement, but the displayed main-statement bullet uses lintegral notation `∫⁻`.",
+     "requested_change": "Replace the displayed formula in the `integral_comp` bullet with Bochner integrals, for example `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:703",
+     "claim": "The module doc's measurability formula for `U_N(a, b)` is mathematically wrong: it sums indicators of the event `{U_N(a, b) < N}` and then says this is measurable because `U_N(a, b)` is a stopping time, but the stopping times are the upper-crossing times, not the upcrossing count.",
+     "requested_change": "Rewrite the displayed formula and following sentence to use the event that the `i`-th upper crossing time is before `N`, e.g. `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i(a, b) < N\\}}`, and say that these events are measurable by the stopping-time property of the upper crossing times.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:133",
+     "claim": "The docstring for `tendsto_of_uncrossing_lt_top` says a single realization has bounded `limit inferiors`, but the theorem has one `liminf` hypothesis, so the new plural phrase is ungrammatical and misleading.",
+     "requested_change": "Change the phrase to a singular form such as `finite liminf` or `bounded limit inferior`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The module docstring now writes \"and their MGFs are defined at `t`\" (line 25) and \"and their CGFs are defined at `t`\" (line 27). These are the only capitalised prose occurrences of these abbreviations in the whole library: a case-sensitive search for standalone `MGF`/`CGF` finds nothing outside these two lines, while prose elsewhere always writes them lowercase (`Probability/Moments/ComplexMGF.lean` \".moment generating function (mgf). \", \"of definition of the mgf\", `Probability/Moments/SubGaussian.lean` \"moment generating function (mgf)\", `Probability/Moments/Tilted.lean`, `Probability/Moments/IntegrableExpMul.lean`). The change also makes this one doc comment internally inconsistent: line 30 of the same docstring, untouched, still says \"the cgf exists\".",
+     "requested_change": "Revert the capitalisation to the library's lowercase spelling, i.e. write \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\" (or rephrase as \"the mgf of `X` and the mgf of `Y` are defined at `t`\"), so the block agrees with line 30 and with the rest of Mathlib.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:138",
+     "claim": "`MeasureTheory.tendsto_of_uncrossing_lt_top` is misspelled: \"uncrossing\" is not a term here, the quantity in its own hypothesis is `upcrossings a b f ω < ∞`, the docstring this PR edits says \"bounded upcrossings\", and every sibling declaration in the file spells it `upcrossings` (`upcrossings`, `upcrossingsBefore`, `Adapted.measurable_upcrossings`, `upcrossings_eq_top_of_frequently_lt`, `Submartingale.upcrossings_ae_lt_top`, `upcrossingsBefore_eq_sum`). Since this PR's stated purpose is typo fixing and it already edits this declaration's docstring, this misspelled name is the typo it leaves behind.",
+     "requested_change": "Rename the declaration to `tendsto_of_upcrossings_lt_top`, update the single in-file use at line 191 (`exact tendsto_of_uncrossing_lt_top h₂ h₁`), and keep the old name working via `@[deprecated (since := \"2025-08-19\")] alias tendsto_of_uncrossing_lt_top := tendsto_of_upcrossings_lt_top`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:133",
+     "claim": "The docstring of `MeasureTheory.tendsto_of_uncrossing_lt_top` was changed to \"bounded upcrossings and bounded limit inferiors\". The term used in this file and in the statement is `liminf` (same file lines 83, 95, 96 and the hypothesis `liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞` at line 138), and Mathlib prose spells it `liminf`/`liminfs` (e.g. `Mathlib/Order/LiminfLimsup.lean` \"# liminfs and limsups of functions and filters\", `Mathlib/MeasureTheory/Constructions/BorelSpace/Order.lean` \"Countable liminfs and limsups\"). The article-less plural \"limit inferiors\" appears nowhere else in the library: the only other uses of the phrase are three singular occurrences with an article (\"the right-side limit inferior of ...\", `Analysis/Calculus/MeanValue.lean`, `Analysis/Calculus/Deriv/Slope.lean`), and the assumption is a single liminf per realization, so the plural misdescribes it.",
+     "requested_change": "Restore the term used by the statement and the rest of the file, e.g. \"A realization of a stochastic process with bounded upcrossings and bounded liminfs is convergent.\" (or singular \"and bounded liminf\").",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:703",
+     "claim": "The module doc paragraph edited by this PR (\"... on the left-hand side ...\") contains a false displayed identity: `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}`. The summand does not depend on `i`, so the right-hand side is `N * 𝟙_{U_N(a,b) < N}`, not `U_N(a,b)`; the indicator also uses a threshold `N` where the index `i` is meant. The intended justification (`U_N` is a sum of indicators of measurable sets) is given by `upcrossingsBefore_eq_sum`, whose statement is `upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`, with `upcrossingsBefore a b f N ω = sSup {n | upperCrossingTime a b f N n ω < N}`.",
+     "requested_change": "Correct the display to the identity the text is actually using, e.g. `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i(a, b) < N\\}}` with `τ_i = upperCrossingTime` (matching `upcrossingsBefore_eq_sum`), or equivalently `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) \\ge i\\}}`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/9cafd0507e1320431fb5e89966b2f5af230cebc9dc99280c44532d96198713b1/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__7b24786a-c944-4e66-beb5-a49c4f3be2c8.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The module docstring for `ProbabilityTheory.IndepFun.mgf_add` / `ProbabilityTheory.IndepFun.cgf_add` now writes \"their MGFs are defined at `t`\" and \"their CGFs are defined at `t`\", while three lines below the same `## Main results` list still says \"the cgf exists\" and \"using `mgf` instead of `cgf`\", and the rest of the file writes the abbreviations lower-case (`mgf`, `cgf` in the `## Main definitions` bullets, in the same form as `pdf` in `Mathlib/Probability/Distributions/Gaussian/Real.lean`). Tokens `MGF`/`CGF` occur nowhere else in Mathlib prose (only the identifiers `complexMGF`, `MGFAnalytic`, `HasSubgaussianMGF`), so the edit introduces a second spelling of the same notion inside one docstring.",
+     "requested_change": "Keep the lower-case spelling the file and the library use: \"and their mgfs are defined at `t`\" / \"and their cgfs are defined at `t`\". (If the all-caps form is wanted, then \"the cgf exists\" on line 30 and the `mgf`/`cgf` mentions in the following bullet must be capitalized too, so at least one spelling is used for the whole block.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "`Implementationwise, we have `tendsto_of_no_upcrossings` which shows that` is replaced by `In terms of implementation, we have ...` in the section docstring of the a.e. martingale convergence theorem. The original sentence is grammatical (\"implementationwise\" is a standard informal adverb) and nothing in the Mathlib style guide mandates the substitute, so this hunk is a restyling of the original author's prose rather than the typo fix the PR title announces.",
+     "requested_change": "Drop this hunk, i.e. restore `Implementationwise, we have `tendsto_of_no_upcrossings` which shows that`, or broaden the PR title/description so it does not claim the diff is typo fixes only.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "`the monotone convergence theorem on the left hand side to take the supremum outside of the` is changed to `left-hand side` in the section docstring of the variant upcrossing estimate. This is a hyphenation preference, not a misspelling: the library uses both spellings freely (`the left hand side` in e.g. Mathlib/MeasureTheory/Function/LpSeminorm/Basic.lean:241, `the left-hand side` in e.g. Mathlib/Probability/Kernel/Posterior.lean:232), and no style-guide rule mandates the hyphenated form, so the PR gains only the rewriting of another author's sentence.",
+     "requested_change": "Drop this hunk, i.e. keep `on the left hand side`, leaving the file's genuine typos (`liminfs`, `compostition`, `measurablity`, `gaussian`) as the content of the PR.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/f7e096ea0a16fc6b24f472dcdcb888cb8043c8702590b2b9f2409d754f9b64f5/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__05165cb7-0f66-4f27-887f-3eedde9398ab.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:30",
+     "claim": "The module documentation for `ProbabilityTheory.integral_comp` still describes the Bochner integral theorem with lower-integral notation `∫⁻`, so the documented statement does not match the actual theorem.",
+     "requested_change": "Replace the displayed statement in this bullet by the Bochner-integral version, for example `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:703",
+     "claim": "The displayed formula in the upcrossing module documentation is mathematically wrong: the indicator `{U_N(a, b) < N}` is independent of the summation index, but it should test the i-th upper-crossing time.",
+     "requested_change": "Replace the indicator in the display with one depending on the i-th upper-crossing time, e.g. `\\mathbf{1}_{\\{T_i(a, b) < N\\}}`, and define `T_i` in the surrounding sentence if needed.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:30",
+     "claim": "The `## Main statements` bullet documenting `ProbabilityTheory.integral_comp` writes the lintegral notation `∫⁻ z, f z ∂((η ∘ₖ κ) a) = ∫⁻ x, ∫⁻ y, f y ∂(η x) ∂(κ a)`, but `integral_comp` (IntegralCompProd.lean:417) is the Bochner-integral statement `∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`. The module doc states this file proves the Bochner-integral version, and the immediately preceding bullet for `integral_compProd` correctly uses `∫`; the `∫⁻` formula is the one of `ProbabilityTheory.Kernel.lintegral_comp`, quoted correctly at lines 15-17.",
+     "requested_change": "In the `ProbabilityTheory.integral_comp` bullet replace the three `∫⁻` with `∫`, i.e. write `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`, matching the statement and the neighbouring `integral_compProd` bullet.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The capitalization change to `MGFs`/`CGFs` is not carried through the doc block it edits: the very next bullet still reads \"such that the cgf exists\" (line 30), so the `## Main results` list now mixes \"CGFs\" (line 27) with \"cgf\" (line 30). The area's established prose in fact writes these abbreviations lower case, matching the function names (`mgf`, `cgf`): ComplexMGF.lean lines 18, 20, 21, 32 (\"of the interval of definition of the mgf\"), MGFAnalytic.lean line 20, SubGaussian.lean lines 32, 44, 110.",
+     "requested_change": "Make the block consistent with the rest of the file and of the area's prose by reverting both abbreviations to lower case (`mgfs`, `cgfs`); alternatively, if the capitalized spelling is wanted, also change line 30 to \"such that the CGF exists\" so the same abbreviation is not spelt two ways five lines apart.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Moments/Basic.lean:15",
+     "claim": "The module doc edited by this PR still contains a typo two bullets above the edited lines: \"`ProbabilityTheory.centralMoment X p μ`:`p`th central moment of `X` with respect to measure `μ`,\" has no space after the colon before the opening backtick, unlike the parallel bullets on lines 13, 17 and 19.",
+     "requested_change": "Insert a space: \"`ProbabilityTheory.centralMoment X p μ`: `p`th central moment of `X` with respect to measure `μ`,\".",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/15e2ec72f1524a55a0e58ee0c94747bb196ff36b1ef8d60199c893caa5b35093/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__b249a564-0545-40f2-b77e-f1075471877f.jsonl"
+  },
+  "AP2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The module docstring now spells the abbreviation in the capitalised form \"MGFs\" (l.25) and \"CGFs\" (l.27), while the very same docstring spells these notions out in its `## Main definitions` section (\"moment generating function\", \"cumulant generating function\", l.17–20) and still says \"the cgf exists\" two lines later (l.30). One docstring therefore now writes the same notion three different ways, and this capitalised abbreviation has no other prose occurrence in Mathlib (the library writes the abbreviation in lower case, e.g. `Mathlib/Probability/Moments/ComplexMGF.lean` l.15: \"The moment generating function (mgf) is …\").",
+     "requested_change": "Write the notions out in the `## Main results` bullets: \"and their moment generating functions are defined at `t`\" and \"and their cumulant generating functions are defined at `t`\", and change l.30 to \"such that the cumulant generating function exists\". (If the abbreviation is kept, it must then be spelled identically in all three places, i.e. l.30 becomes \"the CGF exists\".)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Moments/Basic.lean:15",
+     "claim": "In the same module docstring this PR edits for typos, the `centralMoment` bullet still has a missing space between the code span and the colon: \"`ProbabilityTheory.centralMoment X p μ`:`p`th central moment …\". This is a docstring typo that the PR leaves behind, and it is the only occurrence of this glued-colon form in the whole `Mathlib/Probability` tree (a `content_search` for `` `:[A-Za-z`] `` over the base tree matches only this line there).",
+     "requested_change": "Add the missing space: \"* `ProbabilityTheory.centralMoment X p μ`: `p`th central moment of `X` …\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "This hunk replaces existing, correct prose (\"Implementationwise, we have `tendsto_of_no_upcrossings` which shows that …\") by a rewording (\"In terms of implementation, we have …\"). It is not a typo correction: the original sentence is grammatical and neither its spelling nor its meaning was wrong, so this is a third-party stylistic rewrite of the original author's wording, which is left to that author's taste and adds review cost with no gain.",
+     "requested_change": "Drop this hunk so that the module docstring keeps \"Implementationwise, we have `tendsto_of_no_upcrossings` which shows that …\", and restrict the PR to genuine corrections.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The change \"on the left hand side\" → \"on the left-hand side\" is hyphenation only. `content_search` shows Mathlib prose uses both spellings freely (unhyphenated e.g. `Mathlib/Data/Matrix/Basic.lean:690`, hyphenated e.g. `Mathlib/Analysis/Normed/Lp/PiLp.lean:918`), this file contains no other occurrence of either, and no style-guide rule mandates the hyphen, so the hunk is a purely cosmetic rewrite of the original author's prose.",
+     "requested_change": "Drop this hunk (keep \"the monotone convergence theorem on the left hand side to take the supremum outside of the integral\").",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/9bde05175061e91f179031c9a8b13eb888f5f7d0d4053bf01fdc35f5142cddc1/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__373e726c-c537-4fe6-b332-dfef870a9412.jsonl"
+  },
+  "GPT3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean:30",
+     "claim": "The module doc's main-statements entry for `ProbabilityTheory.integral_comp` still displays a lintegral formula (`∫⁻ z, ...`), but `integral_comp` is the Bochner-integral theorem in this file and its statement uses `∫ z, ...`.",
+     "requested_change": "Change the displayed formula in the `ProbabilityTheory.integral_comp` bullet from `∫⁻ z, f z ∂((η ∘ₖ κ) a)` to `∫ z, f z ∂((η ∘ₖ κ) a)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:701",
+     "claim": "The module doc's displayed identity for `U_N(a, b)` is mathematically wrong: it sums indicators of `{U_N(a, b) < N}`, which does not depend on the summation index, whereas the formal theorem below sums indicators of the event that the `i`-th upper crossing time is before `N`.",
+     "requested_change": "Replace the displayed identity and following sentence with a version using the `i`-th upper crossing time, e.g. `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{T_i(a, b) < N\\}}`, and say measurability follows because each `T_i(a, b)` is a stopping time.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:32",
+     "claim": "The changed module doc still has typo-level grammar errors in the main-results bullets: it says `part b the L¹ martingale convergence theorem` and `part c the ...` instead of `part b of the ...` / `part c of the ...`.",
+     "requested_change": "Insert `of` after `part b` and both occurrences of `part c`, wrapping the last bullet so the added word does not create a long line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Moments/Basic.lean:15",
+     "claim": "The changed module doc still contains local typography inconsistencies: the `centralMoment` bullet is missing a space after the declaration-name colon, and the Chernoff-bound bullet says `the cgf exists` even though this PR changes the neighboring prose to use uppercase `MGFs`/`CGFs`.",
+     "requested_change": "Change `` `ProbabilityTheory.centralMoment X p μ`:`p`th `` to `` `ProbabilityTheory.centralMoment X p μ`: `p`th `` and change `the cgf exists` to `the CGF exists`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The module documentation of `ProbabilityTheory.mgf`/`ProbabilityTheory.cgf` now spells the abbreviation inconsistently: the PR capitalises it in two bullets of `## Main results` (`their MGFs are defined at `t`` on line 25 and `their CGFs are defined at `t`` on line 27) but the next bullet in the same list still reads ``For `t` nonnegative such that the cgf exists`` (line 30). The capitalised form also appears nowhere else in the library, while the library's prose writes these abbreviations lower case (`the mgf` in `Mathlib/Probability/Moments/ComplexMGF.lean:20`, `Mathlib/Probability/Moments/SubGaussian.lean:107`, `the cdf` in `Mathlib/Probability/CDF.lean:22`).",
+     "requested_change": "Pick one spelling and apply it throughout the module doc. Preferably revert lines 25 and 27 to the lower-case `mgfs`/`cgfs`, matching the rest of the library; if the capitalised form is kept, capitalise the remaining occurrence on line 30 (`the CGF exists`) as well so the bullet list is internally consistent.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:703",
+     "claim": "The module-doc block `### Variant of the upcrossing estimate` that this PR edits (its changed line is 698, `left-hand side`) displays an identity that is false as written: `U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}`. The right-hand side is `N` when `U_N(a,b) < N` and `0` otherwise, so it can only equal `U_N(a,b)` when `U_N(a,b)` is `0` or `N`, whereas `U_N(a,b)` may take any value in `{0,…,N}`. The identity actually used to prove measurability is `upcrossingsBefore_eq_sum` (line 711): `upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`, i.e. the sum of the indicators of the *crossing times* being `< N`, in agreement with the definition given earlier in the same file, `U_N(a, b) := \\sup \\{n \\mid \\tau_n < N\\}` (line 83).",
+     "requested_change": "Correct the displayed formula to the identity proved by `upcrossingsBefore_eq_sum`, i.e. replace the indicator `\\mathbf{1}_{\\{U_N(a, b) < N\\}}` by the indicator of the `i`-th upper crossing time being smaller than `N` (e.g. `\\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}` with `\\tau_i` the `i`-th upper crossing time), so that the following sentence `$U_N(a, b)$ is measurable as `\\{U_N(a, b) < N\\}` is a measurable set` refers to the crossing-time set instead.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/47d5ce594a468f5ec6ed9007099f6f38074645ca00654868e0981715a23e9ac6/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__5bfca080-05c1-40ba-be55-3b3a2b6e57c3.jsonl"
+  },
+  "AP3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Probability/Moments/Basic.lean:25",
+     "claim": "The module docstring now capitalises the abbreviations — `their MGFs are defined at t` (line 25) and `their CGFs are defined at t` (line 27) — but the very next bullet of the same list still writes `the cgf exists` / `of cgf` in lower case (lines 30, 33), so the same construct is now spelled two different ways inside one docstring. It also departs from the library-wide spelling of these abbreviations in prose, which is lower case (`Mathlib/Probability/Moments/ComplexMGF.lean`: \"The moment generating function (mgf) is …\"; `Mathlib/Probability/Moments/SubGaussian.lean`: \"moment generating function (mgf)\"; `Mathlib/Probability/Moments/Tilted.lean`: \"moment generating function (`mgf`) and the cumulant generating function (`cgf`)\").",
+     "requested_change": "Revert the capitalisation to `mgfs` / `cgfs` so the abbreviation matches line 30 and the rest of Mathlib, or (if capitalisation is wanted) also write `the CGF exists` on line 30 and `of `CGF`` on line 33 and the corresponding `mgf` occurrences, so the spelling is uniform throughout the file.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Probability/Moments/Variance.lean:452",
+     "claim": "The retitled docstring of `variance_le_sq_of_bounded` — `**Popoviciu's inequality on variances**` — now disagrees with the docstring of its immediate neighbour `variance_le_sub_mul_sub` in the same file, `**The Bhatia-Davis inequality on variance**` (line 419). The change from singular to plural makes the two sibling titles, which describe the same kind of bound on the variance of one random variable, spell the notion differently in one file.",
+     "requested_change": "Make the two sibling titles consistent: either keep `on variance` here (singular, matching the Bhatia-Davis title) or also change the Bhatia-Davis title on line 419 to the plural.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Martingale/Convergence.lean:90",
+     "claim": "The rewrite `Implementationwise, we have …` → `In terms of implementation, we have …` is a purely stylistic reformulation of existing prose that the style guide does not mandate: the original sentence is correct English, so the change is not a typo fix and should be left to the original author's taste rather than made in a cleanup PR.",
+     "requested_change": "Drop this hunk and restore the original `Implementationwise, we have `tendsto_of_no_upcrossings` which shows that`; the surrounding text is unaffected.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Martingale/Upcrossing.lean:698",
+     "claim": "The hyphenation change `on the left hand side` → `on the left-hand side` is a purely stylistic reformulation of correct existing prose, not a typo fix; both spellings are equally established in the library (about 20 files use each), so there is no practice making this change obligatory and it should be left to the original author.",
+     "requested_change": "Drop this hunk and keep the original `the monotone convergence theorem on the left hand side to take the supremum outside of the`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/c153f148d6873b5a739ba607f528b892528a89d08ac80850c361a02a8432ac9d/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__bfd7d03d-a8ce-447e-8c8e-b6ba34068e66.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_28649.md"
+}

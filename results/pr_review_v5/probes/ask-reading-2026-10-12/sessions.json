@@ -1,0 +1,1900 @@
+{
+ "D12/33066": {
+  "X1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/ask-reading/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/f314592d3535c98ad2f7925bb1864dbd316431bdd4aee2e443b5af1f53ee1f02/samples/0/attempts/attempt_1_20261010113144/ape_agent_session_20261010_113144__7cc41c79-0c05-464c-8049-0f546703270b.jsonl"
+  },
+  "AP1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/3228134c9430a460244baebf45e914c907860b604052f64357a5062e7209b748/samples/0/attempts/attempt_1_20261010120539/ape_agent_session_20261010_120539__f9f0a778-5c45-407f-9147-e682c8066319.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/12f6e9905c36b1d5332ca0aac5b834ea2d09b6dc26a6ca8d75d38fe5c0e3e786/samples/0/attempts/attempt_1_20261010122300/ape_agent_session_20261010_122300__8556933c-4931-44bc-9eca-a29f2cb328f3.jsonl"
+  },
+  "AP2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/80c0f840da0f977281d45aaa7b66a6236f2e908b4174702b470c3643d8db32b1/samples/0/attempts/attempt_1_20261010125543/ape_agent_session_20261010_125543__69960e9d-195c-4868-9492-6d676287a0ae.jsonl"
+  },
+  "GPT3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/c2ef9bf9724f029f97cce66e5ca5c707c5e6c7faa0cc0230e2433b23ca9d90c9/samples/0/attempts/attempt_1_20261010131051/ape_agent_session_20261010_131051__d02e1dec-e37a-449c-a711-8b55a988e77e.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/36c12e456e05b09a95385e0ed348c45403a5a2d5bb71b63fb7812a1fb3410743/samples/0/attempts/attempt_1_20261010134346/ape_agent_session_20261010_134346__c4580ea9-204a-4d93-9d93-b5acd5291854.jsonl"
+  }
+ },
+ "D12/33098": {
+  "X1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/e3c99a3c595867e37c509fee26445ce2536ab61b6f72343a321e6759e67cc88c/samples/0/attempts/attempt_1_20261010113530/ape_agent_session_20261010_113530__1ad5af74-8bcb-4a8c-b4e3-7c53a472e93c.jsonl"
+  },
+  "AP1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/abd2a5435716a32579fa6d642d791abdba44dfe592c8437ba476a2f6b4f03dd1/samples/0/attempts/attempt_1_20261010120642/ape_agent_session_20261010_120642__de1acf9b-2fbd-4213-9f2e-5a725a8cfbc7.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/d8bb64a991ee18bfb856bc232e231378b2183fac871749037079efc5fb511f4b/samples/0/attempts/attempt_1_20261010122503/ape_agent_session_20261010_122503__0bfa4dec-e13f-49f0-9ed5-316c29391bec.jsonl"
+  },
+  "AP2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/d3827e34e78d7a63d0c5b06846b87b1a9aefc0b510706e27e3f313aec4364675/samples/0/attempts/attempt_1_20261010125752/ape_agent_session_20261010_125752__b430d06f-dd57-4008-ba25-b97d5770b910.jsonl"
+  },
+  "GPT3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/08922e52a9831d01a2a00b5a0acb721725bca918bae83d93150a7714f0087643/samples/0/attempts/attempt_1_20261010131255/ape_agent_session_20261010_131255__9092844d-4224-464b-bd12-1fa9311c607e.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/73c48ea5245fed1caf11c3a06706a741370c8799709d1975ccee6ced9742805b/samples/0/attempts/attempt_1_20261010134843/ape_agent_session_20261010_134843__a17a9fb9-b972-4ed9-91fb-0e37e75f3b1d.jsonl"
+  }
+ },
+ "D12/33117": {
+  "X1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/195eeddc0a27e247d0b1b5cdf0f8feac110ad5d0e3b8accc70fb6dc5d3ba9c46/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__5071c34b-f9ba-4c3e-b06b-64693b9546a8.jsonl"
+  },
+  "AP1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/bad6fb265e69963959ca1d72392e40a33a98fd9f15b5f16c1370f32f5a106225/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115511__59dafdf5-0612-4126-8d52-93e0bc630e9b.jsonl"
+  },
+  "GPT2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/5ea9afafaab2a8b46599bd0ccb99580c185465b1cc6f78cbd5bfcfed37a7832e/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__43c46551-e1ac-43dd-9eb8-7615161f7c7e.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/602a5e3aa0712a888d6b00725e4b9da9c35bcf17bffe8a9fe4eb530268fe49b0/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124323__101e0aa8-1099-46a1-bcb7-4957686ac014.jsonl"
+  },
+  "GPT3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/3b5c6876f85e17af955dfba42451a8b29bacd09efe7ba2b6998822c08e299a5f/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__bec7a0cd-3113-4e94-8f17-7fc38dc6a3a1.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/46a433ed59346d1aa6102118f3faca5a9dd57308be346c5ea91ac0c24f35a931/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133419__438784c2-784c-41c3-a421-cb66286ebacf.jsonl"
+  }
+ },
+ "D12/33145": {
+  "X1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/15baafc1193d48c58fb76ffd32045da17faf966aae0db1396ace885289662f83/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__a65bfe83-9924-46f7-b4b0-6fe527728c38.jsonl"
+  },
+  "AP1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/2886a45450196acd7d2ed077ee4dde028c00902fcb3b2ae83b600c8a2eec3478/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115512__b2b20bd3-6dce-4bf6-a889-1ea42b6f6162.jsonl"
+  },
+  "GPT2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/5285261ad682c7cd06065e864a7ad3028f8573719dfa32a1f2d4159dd97605c7/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__77cfaba2-66df-47f5-9450-72e69a175538.jsonl"
+  },
+  "AP2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/f9593a31934eec2f3297f5791daf666f8f633f543e42c5b0f20d031083d7ec9c/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124323__4c0feaa6-b119-40ed-8beb-a64d546ab2af.jsonl"
+  },
+  "GPT3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/a1ae1058e8bf9ace788526b77f64b311de787227e47fd6c65160d6a827b9caf8/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__f0bdc277-2453-46ea-bc47-f748856fd1da.jsonl"
+  },
+  "AP3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/74a04294fd99954ae0218c00cf8f1c5d8b76ea05d7fd37e41f16e8039770c624/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__599b6c80-6607-4064-8f3a-949125674062.jsonl"
+  }
+ },
+ "D12/33149": {
+  "X1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/64ee94e40f64a2d75a93a0ca7f99146e9203271fdf20562083d082f932e737bd/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__14a92807-7640-4883-9ad9-4b4fb2724b40.jsonl"
+  },
+  "AP1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/736d2de94382b5d0afe04b761c269c6cd303e012458f500eff34ab6806ddb833/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__39f1554c-95fe-40cf-a23c-fbc074fe5f89.jsonl"
+  },
+  "GPT2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/561e3f914e4afd67ef67625753446f87f7b6a0dbb8fb997aa9c26f06c434d705/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__e51d6ece-cdc6-471d-967a-aaedb0888666.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/4ecbc83967f75d33e6b4d4141432ab420204fd679624b1d4dd9943ba9c9c6dee/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__70cf2b81-ec35-4202-8ff7-fa45cb36fe01.jsonl"
+  },
+  "GPT3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/bf03ebb41628977a7c94b6dc22faabf25e2519d82879de7b7884e3b859c15cfc/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__2ef79faf-769c-4391-a500-b1fc3a815684.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/92712501d585dd7dda94f8fd918d651a4d76d0387b774c0a3e1181ce9faabc31/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__59202026-442b-44be-8e61-b64d005613fe.jsonl"
+  }
+ },
+ "D12/33285": {
+  "X1": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/88b7d8e42d051866086c39a467da078dbb96683d75ecce7bdc896f04c82215b7/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112052__d00bc179-1c0c-4e19-a54c-71f6d3699293.jsonl"
+  },
+  "AP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/ee081e2872fc7a253092d82f12db937c007da54efc4a7b0640ac437a36b7a566/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115511__1572e3fc-ddb3-4f78-b8d1-a257820b5cf4.jsonl"
+  },
+  "GPT2": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/5a11478b71519af5ed313dc992cdb80b4eb443569cf532be07041dd32787f038/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__7f39263c-dc41-4083-a133-9942fdfc5ac0.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/386dd738a52e4c27b7f8f8eb5f90dcccd4e8d9d495513629be4e6b5ff7553261/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124323__9eb98153-682c-4e48-b98a-025599bebdc7.jsonl"
+  },
+  "GPT3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/118801349576d4e4759b725ccc2f28beaacf73c86bcd67fe5f8b96e3f87061d8/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__727be303-b783-49fc-a250-bf3aa2de457e.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/4f815255c564a8e046ce4ab5fd7f2c740a159925bed403338dc1f7fed521833b/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__adab42eb-fe6e-4efe-bfe1-83b5535e7f31.jsonl"
+  }
+ },
+ "D12/33294": {
+  "X1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/328013b5954686439d438074826b046f09538c1a10c2c9f88acb3893334d12f6/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__e16f7370-c5c9-4f0c-8fa2-1f27cc90138e.jsonl"
+  },
+  "AP1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/0d61078d0a20a218a342b15b2fa973b541347f4e3ab1c3322cb531849c54833a/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115511__1f605dca-27da-457d-b36f-056fa9d6280b.jsonl"
+  },
+  "GPT2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/dcc829170c1a1ed64a9cc51f601f25a333ea4ee25435a13e6e569a0dad3fe05d/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__b4d1f845-706b-42c5-bc4f-6250a58456b3.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/f5b5413895bb0b3cdc5dfd0eb026af142751b80ff12080f87cd74b4ec7295c48/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__b77d676b-7788-4bcd-802a-7436c7230b06.jsonl"
+  },
+  "GPT3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/f08f7f912502001ddfa7a1fb576b5c6a07370dc44e628e1e9cec1e0204933bbc/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130620__e8367adf-3a8e-45b0-954c-67880efe52c5.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/1049d839fd55cce54325f4165b263ae84a954694d5413a6bfcbbb344149e4887/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__fb939f66-d5ce-4a2f-9b41-aa0ef48f0846.jsonl"
+  }
+ },
+ "D12/33305": {
+  "X1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/0cc3726335b200ce18ac81891a5a7497aba6a76b7f95bd65ea8fbfa134a1ae78/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__7dff8720-0ae7-4b0c-94ce-e6d51bf9f7e1.jsonl"
+  },
+  "AP1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/b3e7293a73d2cba178eefad6dc0d9c68ccde3013fe084d4accf0ff292b500be9/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__c27d6f13-c88a-4f6f-aa1e-f7bebf4d9550.jsonl"
+  },
+  "GPT2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/4a22de160feadbffe148ac8feda287dbc4bc1433f158158f4651479fe22f2b1d/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__76c1574d-5caf-4bc1-9cd1-83ba3a6eaa25.jsonl"
+  },
+  "AP2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/3ba1009dbc962a7d4363d0e8145d6d21850b9c7f3db75850b15e9cde0e9c0dae/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__11b9703f-cda5-4ca6-8884-0f5219811b1e.jsonl"
+  },
+  "GPT3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/3ec7b9901447b982e72c2549d735f131079091ee766eb155af5e5a15e8748ab0/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__bd8fe361-599e-422c-96dc-3e03c427d35d.jsonl"
+  },
+  "AP3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/12dbb237b242c77ada9e217a81cdb3b22a533c6617ffa845a7d4cabf20f4748a/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__3f2ce508-ef71-42ea-a0bf-828daa5dfb09.jsonl"
+  }
+ },
+ "D12/33321": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/8710b9b26c1f284e0d76d04c8152c9102c34f57eda79c137eb5b403d4d4fd0b5/samples/0/attempts/attempt_1_20261010113756/ape_agent_session_20261010_113756__c4f814e9-b291-444b-baf7-ca77f638c6e8.jsonl"
+  },
+  "AP1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/2e32946c1de869068770e07fcbffcc4cd80d6d9fa08ac82e7bb577946048f0d7/samples/0/attempts/attempt_1_20261010120728/ape_agent_session_20261010_120728__8b8b89fe-3818-42aa-b25f-0f47292d8f6a.jsonl"
+  },
+  "GPT2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/3f37efccdc7fea914d534e8b786b500b160e4bbad1ed1c22e670416bcdd44321/samples/0/attempts/attempt_1_20261010123347/ape_agent_session_20261010_123347__eb750f9b-3279-43fe-8b0b-925d658f6c2b.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/c67be38cd2858aca805f688d434baad1a0e4f5e9296ed237a066f78f44d3c709/samples/0/attempts/attempt_1_20261010125818/ape_agent_session_20261010_125818__a0620364-2e2a-4530-9e68-58aa11f415ac.jsonl"
+  },
+  "GPT3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/606260a069841f258660f103ce9f26e01829f3ee700e8b6118ba0b94eaf119e4/samples/0/attempts/attempt_1_20261010131344/ape_agent_session_20261010_131344__817f9c6a-47f4-4be9-876a-3a0cf8143a35.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/c1c2d1de3e041a940212b568b91e7118ae19e3f2eedf130cd8174159e91f5ebe/samples/0/attempts/attempt_1_20261010134905/ape_agent_session_20261010_134905__1ce7183e-89b7-443f-94ed-7643cf0b8973.jsonl"
+  }
+ },
+ "D12/33337": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R6",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/47bf83d119413dffb772722b1aebd4320366106a89bf07a12afc50b4170fec87/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__600cacd8-d4c0-4fa0-bd0c-f91c785211bd.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/14f784844ac092eaed081970db30a3bf4fd145d3dc7fb3a5f35eba4eae66fd05/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__eef0bb8c-d7c7-4585-b88e-97eebf1e5765.jsonl"
+  },
+  "GPT2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/0af2c69263d73afec69805f50484f5d4ab4119b47e693b0781b3069df9227506/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121508__678ca676-98c2-4d4f-8622-9468f14e35c9.jsonl"
+  },
+  "AP2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/8f4b9c71c4960dcbca6b85701fb6e8b19a73bc2b3543763faea8aa128be75808/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__cba625a0-774a-4bb0-874a-584fd5be4f5a.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/29bcaea822c182b9c017a0b4afb095b822491d3bee00b8ad979022691c189e55/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130620__9554eb5e-fbb0-4c24-8dd6-ec9752ee331e.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/0ea8e7f1b23b7ed8f1b7d0730ffef4eac352d161ebd485fc7c8f7e398614630a/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__d0a83464-7705-4371-a4bb-8c86a601c41e.jsonl"
+  }
+ },
+ "D12/33362": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/31c35e68883b30f25436c3d3a083a8a96404f1534ffef39969359d221daaf4a0/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__e9bf4ace-2b16-4ccc-bff0-d126459934e4.jsonl"
+  },
+  "AP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/f331807eb69d95d709d5d7318712a42bb87a5b463aec150dd80c0ef8dc3c50b8/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115511__9bcdec85-9155-4329-9f6c-2daf90cd9c95.jsonl"
+  },
+  "GPT2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/b398b476b7b912f7df4b5fac4bedf7c533572bc1d6cc7f58b0f3e5d0191e14ee/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121509__695a4bcf-37de-426e-8a5d-bad6cf80623a.jsonl"
+  },
+  "AP2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/39b0e95f224e4b71ab7785b92ee2939cdbd39cd9f192434117713acd392072c9/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__aab03a9f-4680-43e0-a0a5-9a9bba155076.jsonl"
+  },
+  "GPT3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/99916e7197db8f7908e22784abda93550bb0d109d21cb59132152bef7be83e6b/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__48cd50e0-e60b-4b0b-9be7-dfb7d51a094d.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/866a5d353c39009ab0c9b6a434ab232e82b310492c0cd39e8d0bb87bb624025c/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__12ee8aa1-04ee-4b3e-b3a7-f2e8141feedb.jsonl"
+  }
+ },
+ "D12/33421": {
+  "X1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "OP1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+  },
+  "OP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2"
+  },
+  "GPT1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/dd7bf3224185759117f95bbf9320aa4dc1ba42cdf53c84eb35e8691a247967e3/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112050__1eb21e03-dbaa-4b7a-8108-c4edf6c996ce.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/fbe17b77c0f829467ed9a5213e89b171ec0f49013ed0bcc3542ec61731f72b65/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__112161bf-a860-4a4e-8dd0-06dfd33b1252.jsonl"
+  },
+  "GPT2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/1b9373ff1f62d6aab293aaf1f5c4929014b6c62ffd5e857ff78e75f0f242e528/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121508__1b673a57-75a9-449f-951e-65dfef6256ff.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/7cb370d57a27ac10d20beea128828497496ab285f75b49ba9a86cb7f0ca928c5/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__c736e73e-f57a-4c02-93e8-3dc07a2dcf98.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/0a1ecc3703299eff0e32fc55baa17cfaec141b19cfc38a72428fdb5d0346943e/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__7849eab1-d4ab-4d1c-a90d-d06dc20eb316.jsonl"
+  },
+  "AP3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/fe22f3aaf9c4d62afa8bc9122535d69902d6d046f20d63998345beb551c7873f/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__8edcf40c-d1a3-4f4c-8d6d-85c97c3fdea3.jsonl"
+  }
+ },
+ "P14_post/41930": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/976672d8703e7ff23e2325bd78617b416c112e2dd11b42ee22f84fb37cb07f90/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__f6064e3b-3c84-4dc2-903f-d20c7e99a7f8.jsonl"
+  },
+  "AP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/f3dd2f35e1a0bfd05841c7cb6b548d951f88e02485c2c29a03d6a6c7e53181f6/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__4abb550b-384b-4e97-a02c-6e963698dfdd.jsonl"
+  },
+  "GPT2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/197fdcb10de8bb6c24926c05822bca583c00707c02b7ba4375696cc2bead0dc3/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__e8e2a569-2e71-4df6-949c-a01b98c920da.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/75f338b5e782a6e222bf597d049684d292b987a5605530846f4ea692296cffce/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__c09ad8a3-2dd8-47c8-8503-a54921cc6fb1.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/38d79a9d6ef13ff68280f9c54d16e562d2112674a36b0a4f38e54dc50a3b7490/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__3984c14b-2e4c-47f2-a6a4-a76d277f6a7c.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/00840733b36020b20785bbf2d6810c01fcd22ddd6eb3dbfa41fd1157e0d930fa/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__1752caca-4da7-4dbd-9d0a-c4669d2c211b.jsonl"
+  }
+ },
+ "P14_post/42184": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R6",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/b4e8a9270db3e9901c3108b7a211177c731fe790a8c97235873c2d8e7dcc3831/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__b9c6f893-cc97-4533-9513-ca183a0abf68.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/913362878606e751673e9b87b58f9c252aeebc9c14efbaf4d444c4edc837470b/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__12531e6a-7494-455b-9761-93c7f24dadf6.jsonl"
+  },
+  "GPT2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/1bd7c89613f3a87c71a337738da856c1c0cf970132a6c256aa89e87a51542549/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__76e1e2f0-ab30-4619-aa9a-c47c64f1f03f.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/fd94a6911f259846ff910bf89dd0a2dd93ff35048ae0a45969660df8dcab1e80/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__6a071e30-467b-4ddc-bdc4-529894835c00.jsonl"
+  },
+  "GPT3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/5874725093b5882dae5416ce740e3c90c76c5ad29f0cdd1cb7b843f22c461c13/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__d252efa8-0f88-4589-a52a-0463f845fc78.jsonl"
+  },
+  "AP3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/71ee0012a26f1f551a5210db0581b8d565db8b65529d5d13d0b63e47a63bac90/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__8f06f5c9-5c46-4efd-ac8f-0601bfd0ac0e.jsonl"
+  }
+ },
+ "P14_post/42814": {
+  "X1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/adc2986d5b821e86205d5779313fef0d05233c7c3df037a168d5ecbaefc221ca/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__569e7732-6bca-4147-b270-11cd74b06f4e.jsonl"
+  },
+  "AP1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/9e7d86b356e0680fbf4f9cc1a05e986a55978f4502a7ef0b7e0fc35e7335b3d2/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__ff1e1979-5202-42e9-9ba1-c759086bb224.jsonl"
+  },
+  "GPT2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/3372a4a2942f56b1d67b5f121bd3c46d06d5909121ed4e45511eb155803ef0e5/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__efaf813f-ba76-41ea-8397-035a38a87c83.jsonl"
+  },
+  "AP2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/3aa5cf338d73a7f60c0590a1e66f24cdff73c486a54e339ca5755a72f7107dcf/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__820a103c-918e-4fc6-9a6b-f80c864260fb.jsonl"
+  },
+  "GPT3": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/c2f03a60a38b175ee4e9eb6bc90daa4e61384fd44a724915785fe048f77e04bc/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064014__323e9a7f-c2be-4b5c-9956-fbd9ad1a01d8.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/eb8e99aadfac2ff6495d1ed3dcf77380675a62078d438ead9023dacbb8b760ff/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__deb9b81f-1326-4793-8997-e0b276002826.jsonl"
+  }
+ },
+ "P14_post/43024": {
+  "X1": {
+   "R": "R3",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/cdb017f913e4d78bf10be4d194f2ff4361602d439591be49a44363be584c3a48/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__5b400078-aaf2-42cd-8a73-22452cbc9688.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep1/tasks/cf8f586f8ea137dd76b29b545c0e743527d1899a0433117d80db45644c35373e/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__f045d2cd-c142-409a-97ad-d3b8b3fb978e.jsonl"
+  },
+  "GPT2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/883d6ea24cc908e018341d959bad8b4a7fb0fdb516ce10eaa749e64f7a303715/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051549__327fd8d1-bcda-4f2a-880e-e1f8b4d19c86.jsonl"
+  },
+  "AP2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep2/tasks/6b12c09a9bf1c60cc53c9a4971f71fcc3fb87c2ece302052a5568001aa330c4c/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__dbec595a-cc17-44fe-8a22-6fca4bbe8c61.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/7f6a9025d1202c6c903088ff485b6dcab09affcfb93d9906a662912f85150094/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__1b9347fa-f90b-4cad-8e0c-aeec9c2d4ea9.jsonl"
+  },
+  "AP3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep3/tasks/21a2463caff3c26f82f286e3d1690158ae7b6b690d5d0ee7ecfb20cdc732acd7/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__b5f3636f-1a26-4f20-8a10-7c32e83b1300.jsonl"
+  }
+ },
+ "P14_post/43167": {
+  "X1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R3",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/c1ae1f6b0e821212a9a56c716376b6f975ce668f700de51e70eb100a4f7b1100/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__1e938d8f-53da-47ae-a10b-ca74c54358dd.jsonl"
+  },
+  "AP1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/941deefb56c1df6ed245f598f1b45bf00e765c2884d86fde5ab2e1a11d97b1fc/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__cb62878c-1cac-4f64-bd9a-d6103c9740df.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/d8bd58b43d4ec88e23848a3c1407d291d214c4619cd725f56963446f58917935/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__4b930ef6-d178-443d-bf95-a0cb718b9cb3.jsonl"
+  },
+  "AP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/69766680081834651cc01ddbb7a478953765da1b22eb4518dfe4bb20bc524385/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__dc47339c-cbcb-4419-bdf6-4c8f5aeb0218.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/4b511c2f23387e0ee0d2006d880281748c2266d49e1536f30c5d88ab64d95d5e/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__ca91ce98-ccec-4d11-9df7-ab97702ef68b.jsonl"
+  },
+  "AP3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/11713c2714c6952a295eb083fba2dae03cd42d18ee26ba36f73db63054e45e03/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__02ac6a75-49ac-46c1-9b44-6d53f235f10d.jsonl"
+  }
+ },
+ "P14_post/43192": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/aa36b6b25d7ae4c369f33f73924bbbe5f8f07b33d49d85c871a07e073923118a/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__4401e690-21d8-4738-b797-ea8f2c8e0e81.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep1/tasks/9229d562c0892dc7c82da33ffcacb3585bd16bed1efd0165f0b1756e6a08dc40/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__e2272e50-778f-4bb7-8fd5-2f35507db6b6.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/726f4f68669c3ad84b6ccabbd5fe5404bb8605263210f129c378d62bf6038222/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__9c0222ba-1361-4144-b1d8-98f4ceae70d0.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep2/tasks/2f677481ebed4ee433246929ccbcd9739ce0e7fd5bdb397572eb353607d06899/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__9c453008-1de4-4223-80b9-88ae74eba222.jsonl"
+  },
+  "GPT3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/e73909293fa7d22584385897c6495862e6923d0e66d4c009beb436cd81555827/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__bf57efe1-67f0-4887-a410-b34f1dd62c43.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep3/tasks/f2f2f873e96de63c3ec996477c68ee293beff7f264a4cbe0534adfe848df4dc4/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__4e3d737d-34a5-444a-b90e-c3ed016cc075.jsonl"
+  }
+ },
+ "P14_val/26755": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/bd30d4ed1823eea7089358491c162c72a4bd040692da1a5626fbcd5960c76719/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__bbc29e47-187e-4249-b979-4c59ae95dcca.jsonl"
+  },
+  "AP1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep1/tasks/a2870b253e1f40ee45df5aabfc57e631dfc5db9074187830c38b752a5e1d4ac3/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__af6d14d8-2f23-422a-af28-1d14c7d4f7d3.jsonl"
+  },
+  "GPT2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/ca38b2618788d72985d6350d9404a9aa49b49589810f79b0c671db566dc4e49c/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__25d3108c-d4f6-4f8e-bdb3-70d2c2a0f609.jsonl"
+  },
+  "AP2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep2/tasks/08eb26f3618e8f104f81e5afb5556786b9ea29d737e7c194cb3af0e3ac86cfb8/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__8c61bfd3-144e-4efc-9b6d-00d17e38099a.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/d1dd8ba8a62b006489eaab7d3a36ac3ad70c67303b411338c363cc1771438c5e/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063826__e9fc29d0-afc1-4dff-bfaf-5a6c15db0185.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep3/tasks/99ef91034623533a7bd43d4f58af52dc294344946c32bdfcfe10dbd92984fb1f/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__2f8c27a4-1212-4c33-8897-17b961c14f47.jsonl"
+  }
+ },
+ "P14_val/28649": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/9cafd0507e1320431fb5e89966b2f5af230cebc9dc99280c44532d96198713b1/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__7b24786a-c944-4e66-beb5-a49c4f3be2c8.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/f7e096ea0a16fc6b24f472dcdcb888cb8043c8702590b2b9f2409d754f9b64f5/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__05165cb7-0f66-4f27-887f-3eedde9398ab.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/15e2ec72f1524a55a0e58ee0c94747bb196ff36b1ef8d60199c893caa5b35093/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__b249a564-0545-40f2-b77e-f1075471877f.jsonl"
+  },
+  "AP2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/9bde05175061e91f179031c9a8b13eb888f5f7d0d4053bf01fdc35f5142cddc1/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__373e726c-c537-4fe6-b332-dfef870a9412.jsonl"
+  },
+  "GPT3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/47d5ce594a468f5ec6ed9007099f6f38074645ca00654868e0981715a23e9ac6/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__5bfca080-05c1-40ba-be55-3b3a2b6e57c3.jsonl"
+  },
+  "AP3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/c153f148d6873b5a739ba607f528b892528a89d08ac80850c361a02a8432ac9d/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__bfd7d03d-a8ce-447e-8c8e-b6ba34068e66.jsonl"
+  }
+ },
+ "P14_val/29842": {
+  "X1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/71751a7f149bacca4b50cfc67584392a77ff5011325bbd6311c5814fafc4ca60/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__b865e3e0-060a-4969-951a-c880712274ef.jsonl"
+  },
+  "AP1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/9a8eed47e4630c7d80545ee7bbd3fb74c223ef1ff3003c48d2c5eaf0c8f89783/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__95faf061-70a0-4131-a9e8-0f24de250662.jsonl"
+  },
+  "GPT2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/1e16541bedb9063d5625334f06bfe7545a774cb2b7a4e08e1ed91689e1c7dcaa/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__edc7e216-1cdb-4a98-a749-145edb4cde5d.jsonl"
+  },
+  "AP2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/351d00fd6c560eaef5be50685ec031ac39761dd6a586d1e241169791c4e3c2ee/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__b6d8c7f6-87da-4069-9a57-60294cba8ab4.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/103546da4d0f5bedfc5cd6b918a9a5d0ef51f97962b6b54f382fd28d07473ae0/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__5a85dd07-d0ea-4046-871d-f082c63902af.jsonl"
+  },
+  "AP3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/9ad7b80884d56a59a7f72cace5a8355aacd182d8429721d1ee90eaab51528935/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__f5234cb1-7233-401a-9409-2b5948c63f25.jsonl"
+  }
+ },
+ "P14_val/30458": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/9ae4e963dcb1b27aeb18000d1cf26b1024b168609c26e480d02d22baed19edd8/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__7d8c5b9d-0f93-4f10-897c-d927707b16f3.jsonl"
+  },
+  "AP1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/6a24bbde4b5b49cec7546928be370249864edc08f8696a42598bc9c422ea9661/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__9d603ef1-a851-4b93-9618-aee278708609.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/f3508b7e9a73c035fa77b3ec0ff87d4841e3ea6b154cc70fc4049b64312f58e4/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__1f15fa9c-c457-45e5-ac98-b85cb614645b.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/b4126f2e433a7e6c8c7f5b61c42515fb8c5eb3e02f347514f95696e27a8b0131/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__31100d3e-22ce-4421-9dd2-d29260d4f52e.jsonl"
+  },
+  "GPT3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/8aea49726fd254a798caff4b151eb108bd4e265332967c928986e41a7cd92776/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__a5cbf5cc-fd5c-478a-b3b6-c724e96b6fac.jsonl"
+  },
+  "AP3": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/4f50a85e29378d22e4d4eeb50e800ad3db4ad6cc354b18432ef10af428b4567c/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__1dcf6db9-109d-4456-8995-aa8f7c62fab3.jsonl"
+  }
+ },
+ "P14_val/30641": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/8027bfaffff4697f4a737ecf48549bd4824e379fe9767108cd58c1d2364e45b2/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__493d2f1e-c3a9-4e7e-8b99-b63be32d7141.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/3e2c5b4de620cbecece0657a5306831c4171db1e6ae4f8abc1e40605623cf24a/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__cdd2d0cb-6d38-4d31-9ce2-b946bdb4854b.jsonl"
+  },
+  "GPT2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/e260eff11c1a75fad24d0e2cb0e961b0cb6f9bf81538764479820afbae465808/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__76cfa9ef-0fff-45ba-b61d-aec233c3c26b.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/3e6b3d5dd178d8c854af3ff69d293d707d808f8fd7ad294d8a69a06ed0ff1fa9/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__a1e18c21-842d-4573-99af-d9d6edcde6b4.jsonl"
+  },
+  "GPT3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/487c802d32375864356a0ce80717f7984537aa8514ab1e49bd8bef3e543481e2/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__8a541dab-3452-4ed5-9d4c-9cb22974669d.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/795653a67d22c9b261a2399b3e20a107a8c1d608056fc0f6f270681774541a1e/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__6b4e850f-7caf-4410-aa6f-9a8dcf61a709.jsonl"
+  }
+ },
+ "P14_val/32875": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/693691a6437e37c20b51db25c6a53fef860b9881ddb1ac038c23b66bc0144d51/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__13793702-e56c-4d61-951e-24bfee60baf6.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/e274aab9a037d5b8e216ce04915df028d075f7bae7f98c6b43b136e377d342cd/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__a852a7ab-4f34-4364-98b9-ca112ef815c4.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/3513f27bbbb36ae3baa4b4fd91652e8f4b2a317f86acd6ba029e7433648dca10/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__d188a43d-09cc-411e-b2e2-019923b6fb34.jsonl"
+  },
+  "AP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/bf030d510a08503661f8a84f8ba42a4ffb03b2b9c1a447a58e6ba366e0068f12/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__b4e9e251-9eaf-4ee9-91db-e6812978eead.jsonl"
+  },
+  "GPT3": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/399ab577d3465b122970536740b0dc2939d8a2256347361698fbd5453e36e5a3/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063824__aa00fcda-24d0-473e-97ce-bd021fb0c39e.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/a55ceeb7248f9cf22872433cae008af1daf7d3812475879cb59d372542a17cd2/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__dae02de0-bd1c-4c4a-b1df-110a63656908.jsonl"
+  }
+ },
+ "P14_val/34091": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/ea8a8ae63afc27cd3d4a462ec59350987883277a0138d2781493850fe38ac2e2/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__ad0db53c-b933-4e39-adda-f7938485e9a1.jsonl"
+  },
+  "AP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/026bdc45fee4db697aab80dbf0545e0273302cfa6f0eae95b6fdf937523779e2/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__2c30cfb2-09fc-41b7-b948-d14410a541c1.jsonl"
+  },
+  "GPT2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/8402e8ab3dfeffa97c8dee73921600ca400dad5b5937de98657947e179665c32/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__e1da9026-d166-421a-99d0-8bf20c511d2f.jsonl"
+  },
+  "AP2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/869fa560705d500971518e6cf1c29e64e5d38d376142bb88af796192c19f3139/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__ec8cec84-57a3-49af-90e9-78526fea2f7d.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/549730dd0942c4e2c5d5524a1bd2959f38aee40deb52ea544307af4cd88d4e47/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__cd88bbfc-b7c3-491f-8efb-55d4e3c38b59.jsonl"
+  },
+  "AP3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/1ca893e2f4560f45e28f603846ad57a44fa0033cf858fc7350a5e56949f795a9/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__663a142f-e552-4a60-8855-ffe6630b72b8.jsonl"
+  }
+ },
+ "P14_val/36822": {
+  "X1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null
+  },
+  "T1": {
+   "R": "R4",
+   "kind": "claude",
+   "run": null
+  },
+  "TA1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null
+  },
+  "GPT1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1"
+  },
+  "DX1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/a2c880a003a68730d7cbf24fc70307069b9ec94a7ce4be8908a5f6aa8f787ea0/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__a782c696-06fe-49b0-a0d0-bd35d928dc5c.jsonl"
+  },
+  "AP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep1",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep1/tasks/4668e0daab967156a5b37f6d4f16eeba58587df8c8e404de8d962adcce674dc3/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__d7ef3ab2-6798-414d-b8c3-6d8d02f15d5e.jsonl"
+  },
+  "GPT2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2"
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/81df877b1e27075b172f7a23f60d83793887d817cc74b414484dfcf996e7b113/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__adad2d04-8215-497c-8094-c652532b3347.jsonl"
+  },
+  "AP2": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep2",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep2/tasks/35c76d76ed584cd540980f1377c1a34d42f699fc08094cc40e8bac01afa82fb4/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__3c476b90-f89d-4250-b517-a448e367ebda.jsonl"
+  },
+  "GPT3": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3"
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/b9ce4077d5f0c642b1bf73be6102455e4ced1f3fb164bed9de47ae3193a19045/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__ec57cfe8-bd46-449a-b02b-3b6de339d026.jsonl"
+  },
+  "AP3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep3",
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep3/tasks/1a10362e0aba2af4d50f7687d414625adaaccdbc1203bb722865f3c61d6531e6/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__38d68a14-d0be-4a75-839a-de28968e8235.jsonl"
+  }
+ }
+}

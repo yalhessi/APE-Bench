@@ -1,0 +1,918 @@
+{
+ "asks": [
+  {
+   "id": "v0053",
+   "pr": 29842,
+   "family": "F12",
+   "in_census": true,
+   "entries": [
+    "P041"
+   ],
+   "text": "How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition.\r\n\r\nIf you've changed your mind, could you explain why in the PR description?",
+   "path": null,
+   "line": null,
+   "author": "eric-wieser",
+   "at": "2025-09-21T10:36:35Z",
+   "matcher_text": {
+    "ask_id": "v0053",
+    "path": null,
+    "code_at_comment": "",
+    "comment": "How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition.\r\n\r\nIf you've changed your mind, could you explain why in the PR description?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "partial",
+     "m1_finding": 10,
+     "m1_finding_text": {
+      "i": 10,
+      "target": "PR #29842 (title/description)",
+      "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+      "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+      "severity": "advisory"
+     },
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "partial",
+     "m2_finding": 10,
+     "m2_finding_text": {
+      "i": 10,
+      "target": "PR #29842 (title/description)",
+      "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+      "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "AP2": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:109",
+      "claim": "The PR has no description and its title (`feat(TangentCone): generalize some lemmas to TVS`) does not say which lemmas were generalized, nor that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` (with its `protected alias` giving `UniqueDiffWithinAt.of_closure`/`.closure`) and `UniqueDiffWithinAt.mono_closure` are unchanged and merely relocated past the TVS block. Because the diff renders those three theorems as deletions plus re-additions, a reader cannot tell from the PR text that the bodies and `@[simp]` tags are untouched, nor which of the surrounding lemmas (`tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`, `.mono`, `uniqueDiffWithinAt_congr`, `uniqueDiffWithinAt_inter`, `.inter`, `uniqueDiffWithinAt_inter'`, `.inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`, `UniqueDiffOn.inter`, `IsOpen.uniqueDiffOn`) now require only `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`.",
+      "requested_change": "Write a PR description that (a) lists the declarations whose hypotheses were weakened to `[AdditiveGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E]` — in particular `tangentConeAt.lim_zero` and the two blocks of `nhds`-lemmas above — and (b) states explicitly that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` + alias and `UniqueDiffWithinAt.mono_closure` are unchanged (`@[simp]` tags kept) and were only moved down so that the `TVS` section can contain the generalized lemmas; optionally make the title say this (`...: generalize nhds/lim_zero lemmas to TVS, move closure lemmas`).",
+      "severity": "advisory"
+     },
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:109",
+      "claim": "The PR has no description and its title (`feat(TangentCone): generalize some lemmas to TVS`) does not say which lemmas were generalized, nor that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` (with its `protected alias` giving `UniqueDiffWithinAt.of_closure`/`.closure`) and `UniqueDiffWithinAt.mono_closure` are unchanged and merely relocated past the TVS block. Because the diff renders those three theorems as deletions plus re-additions, a reader cannot tell from the PR text that the bodies and `@[simp]` tags are untouched, nor which of the surrounding lemmas (`tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`, `.mono`, `uniqueDiffWithinAt_congr`, `uniqueDiffWithinAt_inter`, `.inter`, `uniqueDiffWithinAt_inter'`, `.inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`, `UniqueDiffOn.inter`, `IsOpen.uniqueDiffOn`) now require only `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`.",
+      "requested_change": "Write a PR description that (a) lists the declarations whose hypotheses were weakened to `[AdditiveGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E]` — in particular `tangentConeAt.lim_zero` and the two blocks of `nhds`-lemmas above — and (b) states explicitly that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` + alias and `UniqueDiffWithinAt.mono_closure` are unchanged (`@[simp]` tags kept) and were only moved down so that the `TVS` section can contain the generalized lemmas; optionally make the title say this (`...: generalize nhds/lim_zero lemmas to TVS, move closure lemmas`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:147",
+      "claim": "The PR carries no description, and its title ('generalize some lemmas to TVS') describes only half of the diff: the same PR also relocates declarations between sections (`tangentConeAt_closure` from before `tangentConeAt.lim_zero` into the `section Normed` at 149, and `uniqueDiffWithinAt_closure`, its `UniqueDiffWithinAt.of_closure`/`closure` alias and `UniqueDiffWithinAt.mono_closure` from the top of the `section Normed` after `UniqueDiffWithinAt.congr_pt` into the `section Normed` at 479). The practice requires the title and description to say precisely what the change is, including what moves where.",
+      "requested_change": "Add a PR description stating both halves, e.g.: 'Weaken the hypotheses of `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds` and of the `UniqueDiffWithinAt`/`UniqueDiffOn` lemmas from `mono_nhds` up to `IsOpen.uniqueDiffOn` from `NormedAddCommGroup`/`NormedSpace` to `[ContinuousAdd E]`/`[ContinuousSMul 𝕜 E]`; as a consequence `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure`/`closure` and `UniqueDiffWithinAt.mono_closure` move into the `section Normed` blocks (statements, proofs and `@[simp]` attributes unchanged).'",
+      "severity": "advisory"
+     },
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:147",
+      "claim": "The PR carries no description, and its title ('generalize some lemmas to TVS') describes only half of the diff: the same PR also relocates declarations between sections (`tangentConeAt_closure` from before `tangentConeAt.lim_zero` into the `section Normed` at 149, and `uniqueDiffWithinAt_closure`, its `UniqueDiffWithinAt.of_closure`/`closure` alias and `UniqueDiffWithinAt.mono_closure` from the top of the `section Normed` after `UniqueDiffWithinAt.congr_pt` into the `section Normed` at 479). The practice requires the title and description to say precisely what the change is, including what moves where.",
+      "requested_change": "Add a PR description stating both halves, e.g.: 'Weaken the hypotheses of `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds` and of the `UniqueDiffWithinAt`/`UniqueDiffOn` lemmas from `mono_nhds` up to `IsOpen.uniqueDiffOn` from `NormedAddCommGroup`/`NormedSpace` to `[ContinuousAdd E]`/`[ContinuousSMul 𝕜 E]`; as a consequence `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure`/`closure` and `UniqueDiffWithinAt.mono_closure` move into the `section Normed` blocks (statements, proofs and `@[simp]` attributes unchanged).'",
+      "severity": "advisory"
+     },
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial."
+    }
+   },
+   "entries_text": {
+    "P041": "A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module docstring or PR description, saying why it is useful and how it will be used."
+   }
+  },
+  {
+   "id": "v0055",
+   "pr": 29842,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P018"
+   ],
+   "text": "if you want, you can make it more compact:\r\n```suggestion\r\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\r\n  simpa using Tendsto.congr' this <| (tendsto_inv₀_cobounded.comp hc).smul hd\r\n```",
+   "path": "Mathlib/Analysis/Calculus/TangentCone.lean",
+   "line": 120,
+   "author": "themathqueen",
+   "at": "2025-09-21T12:41:37Z",
+   "matcher_text": {
+    "ask_id": "v0055",
+    "path": "Mathlib/Analysis/Calculus/TangentCone.lean",
+    "code_at_comment": " n in l, ‖c n‖⁻¹ * ‖c n • d n‖ = ‖d n‖ := by\n-    refine (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn => ?_\n-    rw [norm_smul, ← mul_assoc, inv_mul_cancel₀, one_mul]\n-    rwa [Ne, norm_eq_zero]\n-  have D : Tendsto (fun n => ‖d n‖) l (𝓝 0) := Tendsto.congr' this C\n-  rw [tendsto_zero_iff_norm_tendsto_zero]\n-  exact D\n+  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n+    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n+  apply Tendsto.congr' this\n+  rw [tendsto_norm_atTop_iff_cobounded] at hc\n+  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd",
+    "comment": "if you want, you can make it more compact:\r\n```suggestion\r\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\r\n  simpa using Tendsto.congr' this <| (tendsto_inv₀_cobounded.comp hc).smul hd\r\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X1": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The new proof of `tangentConeAt.lim_zero` builds the eventual equality from `eventually_ne_of_tendsto_norm_atTop` before rewriting `hc` to `cobounded`. It then uses `apply Tendsto.congr' this` and a separate `simpa`. Once `hc` is rewritten to `cobounded`, `hc.eventually_ne_cobounded 0` gives the side condition directly and the proof fits in three lines.",
+      "requested_change": "Rewrite `hc` first and fold the eventual equality into a `filter_upwards`:\n```lean\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine .congr' ?_ (by simpa using (tendsto_inv₀_cobounded.comp hc).smul hd)\n  filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The new proof of `tangentConeAt.lim_zero` builds the eventual equality from `eventually_ne_of_tendsto_norm_atTop` before rewriting `hc` to `cobounded`. It then uses `apply Tendsto.congr' this` and a separate `simpa`. Once `hc` is rewritten to `cobounded`, `hc.eventually_ne_cobounded 0` gives the side condition directly and the proof fits in three lines.",
+      "requested_change": "Rewrite `hc` first and fold the eventual equality into a `filter_upwards`:\n```lean\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine .congr' ?_ (by simpa using (tendsto_inv₀_cobounded.comp hc).smul hd)\n  filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+      "claim": "The rewritten proof of `tangentConeAt.lim_zero` mixes the two equivalent forms of the hypothesis `hc`: it first extracts non-vanishing from the norm form via `eventually_ne_of_tendsto_norm_atTop hc 0`, and only afterwards rewrites `hc` with `tendsto_norm_atTop_iff_cobounded` for `tendsto_inv₀_cobounded.comp hc`. Rewriting `hc` first keeps the whole proof in the `cobounded` language (so `hc.eventually_ne_cobounded 0` can be used, matching the neighbouring `tendsto_inv₀_cobounded` usage) and lets the `apply Tendsto.congr'` + `simpa` pair collapse into a single `simpa only [...] using ...`.",
+      "requested_change": "```\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have h : (fun n => (c n)⁻¹ • c n • d n) =ᶠ[l] d :=\n    (hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' h\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+      "claim": "The rewritten proof of `tangentConeAt.lim_zero` mixes the two equivalent forms of the hypothesis `hc`: it first extracts non-vanishing from the norm form via `eventually_ne_of_tendsto_norm_atTop hc 0`, and only afterwards rewrites `hc` with `tendsto_norm_atTop_iff_cobounded` for `tendsto_inv₀_cobounded.comp hc`. Rewriting `hc` first keeps the whole proof in the `cobounded` language (so `hc.eventually_ne_cobounded 0` can be used, matching the neighbouring `tendsto_inv₀_cobounded` usage) and lets the `apply Tendsto.congr'` + `simpa` pair collapse into a single `simpa only [...] using ...`.",
+      "requested_change": "```\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have h : (fun n => (c n)⁻¹ • c n • d n) =ᶠ[l] d :=\n    (hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' h\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The three closing tactic steps of `tangentConeAt.lim_zero` (`apply Tendsto.congr' this`, `rw [tendsto_norm_atTop_iff_cobounded] at hc`, `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`) do what a single call performs: `apply` only unfolds `Tendsto.congr'`, `rw … at hc` only replaces `hc` by `tendsto_norm_atTop_iff_cobounded.mp hc` inside the closing term, and `simpa` only discharges `0 • y = 0`. A maintainer asked for exactly this merged shape on this proof when it was proposed before (PR #21065: “`rw [tendsto_norm_atTop_iff_cobounded] at hc` … `simpa only […] using tendsto_inv₀_cobounded.comp hc |>.smul hd`”).",
+      "requested_change": "Replace the last three lines by one `simpa`:\n\n```lean\n  have this : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using Tendsto.congr' this\n    ((tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.mp hc)).smul hd)\n```\n\n(Equivalently, derive the eventual equality from `hc.eventually_ne_cobounded 0` with `filter_upwards` as in the maintainer's suggestion.)",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The three closing tactic steps of `tangentConeAt.lim_zero` (`apply Tendsto.congr' this`, `rw [tendsto_norm_atTop_iff_cobounded] at hc`, `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`) do what a single call performs: `apply` only unfolds `Tendsto.congr'`, `rw … at hc` only replaces `hc` by `tendsto_norm_atTop_iff_cobounded.mp hc` inside the closing term, and `simpa` only discharges `0 • y = 0`. A maintainer asked for exactly this merged shape on this proof when it was proposed before (PR #21065: “`rw [tendsto_norm_atTop_iff_cobounded] at hc` … `simpa only […] using tendsto_inv₀_cobounded.comp hc |>.smul hd`”).",
+      "requested_change": "Replace the last three lines by one `simpa`:\n\n```lean\n  have this : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using Tendsto.congr' this\n    ((tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.mp hc)).smul hd)\n```\n\n(Equivalently, derive the eventual equality from `hc.eventually_ne_cobounded 0` with `filter_upwards` as in the maintainer's suggestion.)",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The rewritten proof of `tangentConeAt.lim_zero` processes the same hypothesis `hc` twice in two different forms: it first extracts `c n ≠ 0` from the norm form of `hc` (`eventually_ne_of_tendsto_norm_atTop hc 0`) and only afterwards rewrites `hc` into its cobounded form with `rw [tendsto_norm_atTop_iff_cobounded] at hc`. The cobounded form itself yields `c n ≠ 0` for free (`Filter.Tendsto.eventually_ne_cobounded`, `Mathlib/Topology/Bornology/Basic.lean:256`), so the `rw` should come first and the two closing steps (`apply Tendsto.congr' this` followed by `simpa using ...`) can be folded into a single `simpa only`; as written the two facts about `hc` are derived in an order that makes the proof harder to follow than necessary.",
+      "requested_change": "Reorder the proof — rewrite `hc` first and derive non-zero-ness from the cobounded form — e.g.:\n```lean\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n := by\n    filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n  simpa only [← tendsto_congr' this, zero_smul] using (tendsto_inv₀_cobounded.comp hc).smul hd\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The rewritten proof of `tangentConeAt.lim_zero` processes the same hypothesis `hc` twice in two different forms: it first extracts `c n ≠ 0` from the norm form of `hc` (`eventually_ne_of_tendsto_norm_atTop hc 0`) and only afterwards rewrites `hc` into its cobounded form with `rw [tendsto_norm_atTop_iff_cobounded] at hc`. The cobounded form itself yields `c n ≠ 0` for free (`Filter.Tendsto.eventually_ne_cobounded`, `Mathlib/Topology/Bornology/Basic.lean:256`), so the `rw` should come first and the two closing steps (`apply Tendsto.congr' this` followed by `simpa using ...`) can be folded into a single `simpa only`; as written the two facts about `hc` are derived in an order that makes the proof harder to follow than necessary.",
+      "requested_change": "Reorder the proof — rewrite `hc` first and derive non-zero-ness from the cobounded form — e.g.:\n```lean\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n := by\n    filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n  simpa only [← tendsto_congr' this, zero_smul] using (tendsto_inv₀_cobounded.comp hc).smul hd\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The tail of `tangentConeAt.lim_zero`, `apply Tendsto.congr' this` / `rw [tendsto_norm_atTop_iff_cobounded] at hc` / `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`, is three tactic calls that one `simpa` performs: the `rw ... at hc` is a single-use conversion, and the `congr'` step is a rewrite `simpa` can do itself.",
+      "requested_change": "Merge the three calls into one `simpa`:\n```lean\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [← tendsto_congr' this, zero_smul] using\n    (tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.1 hc)).smul hd\n```\n(or, alternatively, `rw [tendsto_norm_atTop_iff_cobounded] at hc` first and get the eventual inequality from `hc.eventually_ne_cobounded 0`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+      "claim": "The tail of `tangentConeAt.lim_zero`, `apply Tendsto.congr' this` / `rw [tendsto_norm_atTop_iff_cobounded] at hc` / `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`, is three tactic calls that one `simpa` performs: the `rw ... at hc` is a single-use conversion, and the `congr'` step is a rewrite `simpa` can do itself.",
+      "requested_change": "Merge the three calls into one `simpa`:\n```lean\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [← tendsto_congr' this, zero_smul] using\n    (tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.1 hc)).smul hd\n```\n(or, alternatively, `rw [tendsto_norm_atTop_iff_cobounded] at hc` first and get the eventual inequality from `hc.eventually_ne_cobounded 0`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "AP2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+      "claim": "In the new proof of `tangentConeAt.lim_zero` the auxiliary `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n` has a one-line proof term and is used at exactly one place (the `Tendsto.congr'` call on line 118), so it should be inlined at that use site rather than named, per the practice on short single-use `have`s.",
+      "requested_change": "Replace lines 116-120 by:\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine Tendsto.congr' ((hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)) ?_\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd\n(the `rw` moves up so the inlined term can use the cobounded form of `hc`; if you prefer to keep the rewrite where it is, inline the same term using `eventually_ne_of_tendsto_norm_atTop hc 0`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+      "claim": "In the new proof of `tangentConeAt.lim_zero` the auxiliary `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n` has a one-line proof term and is used at exactly one place (the `Tendsto.congr'` call on line 118), so it should be inlined at that use site rather than named, per the practice on short single-use `have`s.",
+      "requested_change": "Replace lines 116-120 by:\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine Tendsto.congr' ((hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)) ?_\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd\n(the `rw` moves up so the inlined term can use the cobounded form of `hc`; if you prefer to keep the rewrite where it is, inline the same term using `eventually_ne_of_tendsto_norm_atTop hc 0`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Compacting the lim_zero tail (rw hc first, fold congr' into simpa) proposed by several reviewers.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Reached when the finding compacts the lim_zero tail (fold congr' and simpa, rw hc first)."
+    }
+   },
+   "entries_text": {
+    "P018": "Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call."
+   }
+  },
+  {
+   "id": "v0056",
+   "pr": 29842,
+   "family": "F12",
+   "in_census": true,
+   "entries": [
+    "P041"
+   ],
+   "text": "> but if I fail, then I would prefer to have one of the \"generalize lemmas\" PRs merged so that we can generalize downstream proofs here and there before generalizing the definition.\r\n\r\nI'm fine with this, please just write something to this effect in the PR description.",
+   "path": null,
+   "line": null,
+   "author": "eric-wieser",
+   "at": "2025-09-21T12:55:30Z",
+   "matcher_text": {
+    "ask_id": "v0056",
+    "path": null,
+    "code_at_comment": "",
+    "comment": "> but if I fail, then I would prefer to have one of the \"generalize lemmas\" PRs merged so that we can generalize downstream proofs here and there before generalizing the definition.\r\n\r\nI'm fine with this, please just write something to this effect in the PR description.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "X1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "DX1": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "AP3": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "GPT2": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "TA1": {
+     "R": "R9",
+     "m1": "partial",
+     "m1_finding": 10,
+     "m1_finding_text": {
+      "i": 10,
+      "target": "PR #29842 (title/description)",
+      "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+      "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "partial",
+     "m2_finding": 10,
+     "m2_finding_text": {
+      "i": 10,
+      "target": "PR #29842 (title/description)",
+      "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+      "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+      "severity": "advisory"
+     },
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "AP2": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:109",
+      "claim": "The PR has no description and its title (`feat(TangentCone): generalize some lemmas to TVS`) does not say which lemmas were generalized, nor that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` (with its `protected alias` giving `UniqueDiffWithinAt.of_closure`/`.closure`) and `UniqueDiffWithinAt.mono_closure` are unchanged and merely relocated past the TVS block. Because the diff renders those three theorems as deletions plus re-additions, a reader cannot tell from the PR text that the bodies and `@[simp]` tags are untouched, nor which of the surrounding lemmas (`tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`, `.mono`, `uniqueDiffWithinAt_congr`, `uniqueDiffWithinAt_inter`, `.inter`, `uniqueDiffWithinAt_inter'`, `.inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`, `UniqueDiffOn.inter`, `IsOpen.uniqueDiffOn`) now require only `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`.",
+      "requested_change": "Write a PR description that (a) lists the declarations whose hypotheses were weakened to `[AdditiveGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E]` — in particular `tangentConeAt.lim_zero` and the two blocks of `nhds`-lemmas above — and (b) states explicitly that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` + alias and `UniqueDiffWithinAt.mono_closure` are unchanged (`@[simp]` tags kept) and were only moved down so that the `TVS` section can contain the generalized lemmas; optionally make the title say this (`...: generalize nhds/lim_zero lemmas to TVS, move closure lemmas`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:109",
+      "claim": "The PR has no description and its title (`feat(TangentCone): generalize some lemmas to TVS`) does not say which lemmas were generalized, nor that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` (with its `protected alias` giving `UniqueDiffWithinAt.of_closure`/`.closure`) and `UniqueDiffWithinAt.mono_closure` are unchanged and merely relocated past the TVS block. Because the diff renders those three theorems as deletions plus re-additions, a reader cannot tell from the PR text that the bodies and `@[simp]` tags are untouched, nor which of the surrounding lemmas (`tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`, `.mono`, `uniqueDiffWithinAt_congr`, `uniqueDiffWithinAt_inter`, `.inter`, `uniqueDiffWithinAt_inter'`, `.inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`, `UniqueDiffOn.inter`, `IsOpen.uniqueDiffOn`) now require only `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`.",
+      "requested_change": "Write a PR description that (a) lists the declarations whose hypotheses were weakened to `[AdditiveGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E]` — in particular `tangentConeAt.lim_zero` and the two blocks of `nhds`-lemmas above — and (b) states explicitly that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` + alias and `UniqueDiffWithinAt.mono_closure` are unchanged (`@[simp]` tags kept) and were only moved down so that the `TVS` section can contain the generalized lemmas; optionally make the title say this (`...: generalize nhds/lim_zero lemmas to TVS, move closure lemmas`).",
+      "severity": "advisory"
+     },
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "AP1": {
+     "R": "R11",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:147",
+      "claim": "The PR carries no description, and its title ('generalize some lemmas to TVS') describes only half of the diff: the same PR also relocates declarations between sections (`tangentConeAt_closure` from before `tangentConeAt.lim_zero` into the `section Normed` at 149, and `uniqueDiffWithinAt_closure`, its `UniqueDiffWithinAt.of_closure`/`closure` alias and `UniqueDiffWithinAt.mono_closure` from the top of the `section Normed` after `UniqueDiffWithinAt.congr_pt` into the `section Normed` at 479). The practice requires the title and description to say precisely what the change is, including what moves where.",
+      "requested_change": "Add a PR description stating both halves, e.g.: 'Weaken the hypotheses of `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds` and of the `UniqueDiffWithinAt`/`UniqueDiffOn` lemmas from `mono_nhds` up to `IsOpen.uniqueDiffOn` from `NormedAddCommGroup`/`NormedSpace` to `[ContinuousAdd E]`/`[ContinuousSMul 𝕜 E]`; as a consequence `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure`/`closure` and `UniqueDiffWithinAt.mono_closure` move into the `section Normed` blocks (statements, proofs and `@[simp]` attributes unchanged).'",
+      "severity": "advisory"
+     },
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/Calculus/TangentCone.lean:147",
+      "claim": "The PR carries no description, and its title ('generalize some lemmas to TVS') describes only half of the diff: the same PR also relocates declarations between sections (`tangentConeAt_closure` from before `tangentConeAt.lim_zero` into the `section Normed` at 149, and `uniqueDiffWithinAt_closure`, its `UniqueDiffWithinAt.of_closure`/`closure` alias and `UniqueDiffWithinAt.mono_closure` from the top of the `section Normed` after `UniqueDiffWithinAt.congr_pt` into the `section Normed` at 479). The practice requires the title and description to say precisely what the change is, including what moves where.",
+      "requested_change": "Add a PR description stating both halves, e.g.: 'Weaken the hypotheses of `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds` and of the `UniqueDiffWithinAt`/`UniqueDiffOn` lemmas from `mono_nhds` up to `IsOpen.uniqueDiffOn` from `NormedAddCommGroup`/`NormedSpace` to `[ContinuousAdd E]`/`[ContinuousSMul 𝕜 E]`; as a consequence `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure`/`closure` and `UniqueDiffWithinAt.mono_closure` move into the `section Normed` blocks (statements, proofs and `@[simp]` attributes unchanged).'",
+      "severity": "advisory"
+     },
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "T1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    },
+    "X2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask is to state the definition-vs-lemmas plan in the description; findings only ask to describe the diff.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to state the generalize-lemmas-first plan; generic description asks are partial."
+    }
+   },
+   "entries_text": {
+    "P041": "A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module docstring or PR description, saying why it is useful and how it will be used."
+   }
+  }
+ ],
+ "pr": 29842,
+ "sessions": {
+  "X1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "UniqueDiffWithinAt.mono",
+     "claim": "The PR moves `UniqueDiffWithinAt.mono` into the TVS section below `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and keeps the proof `h.mono_nhds <| nhdsWithin_mono _ st`. So the lemma now takes both continuity instances, but the statement does not need them: `tangentConeAt_mono` and `closure_mono` hold in any topological module, and `tangentConeAt_mono` already sits in the continuity-free part of the TVS section.",
+     "requested_change": "Put `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (just after `UniqueDiffWithinAt.congr_pt`) and prove it directly:\n```lean\ntheorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) :\n    UniqueDiffWithinAt 𝕜 t x :=\n  ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩\n```\nThen `UniqueDiffWithinAt.mono_nhds` and the other lemmas follow the variable line as before.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The new proof of `tangentConeAt.lim_zero` builds the eventual equality from `eventually_ne_of_tendsto_norm_atTop` before rewriting `hc` to `cobounded`. It then uses `apply Tendsto.congr' this` and a separate `simpa`. Once `hc` is rewritten to `cobounded`, `hc.eventually_ne_cobounded 0` gives the side condition directly and the proof fits in three lines.",
+     "requested_change": "Rewrite `hc` first and fold the eventual equality into a `filter_upwards`:\n```lean\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine .congr' ?_ (by simpa using (tendsto_inv₀_cobounded.comp hc).smul hd)\n  filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "mem_tangentConeAt_of_openSegment_subset",
+     "claim": "The PR re-partitions `TangentCone.lean` into TVS and Normed sections but leaves `mem_tangentConeAt_of_openSegment_subset` and `mem_tangentConeAt_of_segment_subset` in the Normed section, over `[NormedAddCommGroup G] [NormedSpace ℝ G]`. Their proofs use only `mem_tangentConeAt_of_pow_smul` (already TVS) and the algebra of `openSegment` and `segment`, with no norm or continuity on `G`.",
+     "requested_change": "Move `mem_tangentConeAt_of_openSegment_subset` and `mem_tangentConeAt_of_segment_subset` into the continuity-free part of the TVS section (next to `mem_tangentConeAt_of_pow_smul` / `tangentConeAt_mono`), stated for `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`, with the proofs unchanged. Keep the deprecated aliases next to them.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "UniqueDiffWithinAt.mono",
+     "claim": "The PR moves `UniqueDiffWithinAt.mono` into the TVS block after `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`, so the lemma now requires both instances. It does not need either. Monotonicity in the set follows directly from `tangentConeAt_mono`, which carries no continuity assumption, together with `closure_mono`. Going through `mono_nhds` (and so `tangentConeAt_mono_nhds` and `tangentConeAt.lim_zero`) is what adds the continuity requirement.",
+     "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` in the `UniqueDiff`/`TVS` section and prove it without `mono_nhds`: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "UniqueDiffWithinAt.mono",
+     "claim": "After the move into the TVS section, `UniqueDiffWithinAt.mono` sits below `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and so carries both assumptions. It needs neither: monotonicity in the set follows from `tangentConeAt_mono` and `closure_mono`, which hold in any `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]`. The PR therefore states it more narrowly than it holds, in a PR whose purpose is to generalize these lemmas to TVS.",
+     "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (after `UniqueDiffWithinAt.congr_pt`) and prove it directly: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "tangentConeAt_subset_zero",
+     "claim": "`tangentConeAt_subset_zero` and its consumer `UniqueDiffWithinAt.accPt` stay in the `Normed` section, but their proofs use only `tangentConeAt.lim_zero`, `Tendsto.add` and `tendsto_nhds_unique`. These are the same ingredients the PR now provides in the TVS section, plus Hausdorffness. The PR's generalization stops short at lemmas it has just made generalizable.",
+     "requested_change": "Move `tangentConeAt_subset_zero` and `UniqueDiffWithinAt.accPt` into the TVS section after `tangentConeAt_inter_nhds`, where `[ContinuousSMul 𝕜 E] [ContinuousAdd E]` are in scope. Add `[T2Space E]` to both, keep the proofs unchanged, and break `accPt`'s signature after the `h` binder to stay under 100 characters.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "UniqueDiffWithinAt.mono",
+     "claim": "`UniqueDiffWithinAt.mono` (L441-443) sits after the PR's new `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (L433), so it now assumes both, but monotonicity in the set needs no continuity at all: the span of the tangent cone grows by `tangentConeAt_mono` (already TVS, no continuity) and `x ∈ closure s` grows by `closure_mono`. Routing it through `mono_nhds` makes a PR that generalizes these lemmas leave one of them stated more narrowly than it has to be.",
+     "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and prove it directly:\n```lean\ntheorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) :\n    UniqueDiffWithinAt 𝕜 t x :=\n  ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The PR's new proof of `tangentConeAt.lim_zero` names an auxiliary `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n` whose proof is a one-line term, and uses it only once, in the next line `apply Tendsto.congr' this`.",
+     "requested_change": "Inline the `have` at its only use:\n```lean\n  refine .congr' ((eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦\n    inv_smul_smul₀ hn (d n)) ?_\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The tail of `tangentConeAt.lim_zero`, `apply Tendsto.congr' this` / `rw [tendsto_norm_atTop_iff_cobounded] at hc` / `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`, is three tactic calls that one `simpa` performs: the `rw ... at hc` is a single-use conversion, and the `congr'` step is a rewrite `simpa` can do itself.",
+     "requested_change": "Merge the three calls into one `simpa`:\n```lean\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [← tendsto_congr' this, zero_smul] using\n    (tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.1 hc)).smul hd\n```\n(or, alternatively, `rw [tendsto_norm_atTop_iff_cobounded] at hc` first and get the eventual inequality from `hc.eventually_ne_cobounded 0`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The PR rewrites `tangentConeAt.lim_zero`, and its new proof uses `fun n hn ↦`, but its statement keeps `=>`: `(hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y))`, so the two arrow styles are mixed within one declaration.",
+     "requested_change": "Write the statement's lambdas with `↦`: `(hc : Tendsto (fun n ↦ ‖c n‖) l atTop) (hd : Tendsto (fun n ↦ c n • d n) l (𝓝 y))`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "mem_tangentConeAt_of_openSegment_subset",
+     "claim": "`mem_tangentConeAt_of_openSegment_subset` (L242) and `mem_tangentConeAt_of_segment_subset` (L257) stay in the `Normed` section with `[NormedAddCommGroup G] [NormedSpace ℝ G]`, but the proof uses only the module structure: it applies `mem_tangentConeAt_of_pow_smul`, which already lives in the TVS section and has no continuity assumption, plus `openSegment_eq_image` and algebra. That is exactly the kind of lemma the PR sets out to move to TVS.",
+     "requested_change": "Move both lemmas (and their deprecated aliases) into the `TVS` section of `TangentCone`, stated for `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`, and drop the then-unused `variable [NormedAddCommGroup G] [NormedSpace ℝ G]` from `section Normed`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "uniqueDiffWithinAt_convex",
+     "claim": "`uniqueDiffWithinAt_convex` and `uniqueDiffOn_convex` (section `RealNormed`, L595-613) assume a real normed space, but everything the proof uses holds in a real topological vector space: `Submodule.eq_top_of_nonempty_interior'`, `Convex.openSegment_closure_interior_subset_interior`, `isOpenMap_sub_right`, and the segment lemma, once that is generalized.",
+     "requested_change": "After generalizing `mem_tangentConeAt_of_openSegment_subset`, change `section RealNormed`'s variables to `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G] [IsTopologicalAddGroup G] [ContinuousSMul ℝ G]` (and rename the section accordingly, e.g. `RealTVS`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "tangentConeAt_mono_field",
+     "claim": "`tangentConeAt_mono_field`, `UniqueDiffWithinAt.mono_field` and `UniqueDiffOn.mono_field` (L548-586) stay in the UniqueDiff `Normed` section, and the PR re-adds that section's `variable {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebra 𝕜 𝕜']` and `[NormedSpace 𝕜' E] [IsScalarTower 𝕜 𝕜' E]` lines just for them. Yet their proofs never use a norm on `E`, only the module structures, the scalar tower and `algebraMap_cobounded_le_cobounded` on the fields. Their docstrings are also inaccurate: they say \"`E` is a normed vector space\", `tangentConeAt_mono_field`'s says \"Given `x ∈ s`\" with no such hypothesis, and `UniqueDiffOn.mono_field`'s says \"the larger field `𝕜`\" where it means `𝕜'`.",
+     "requested_change": "Move the three `mono_field` lemmas to a TVS section with `[AddCommGroup E] [Module 𝕜 E] [Module 𝕜' E] [IsScalarTower 𝕜 𝕜' E] [TopologicalSpace E]` (no continuity needed). Remove `[NormedSpace 𝕜' E] [IsScalarTower 𝕜 𝕜' E]` from the Normed section's `variable`, and fix the docstrings: drop \"normed\" and \"Given `x ∈ s`\", and write `𝕜'` for the larger field.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "tangentConeAt_subset_zero",
+     "claim": "`tangentConeAt_subset_zero` (L298) and `UniqueDiffWithinAt.accPt` (L308) remain in the `Normed` section, although the proof uses only `tangentConeAt.lim_zero` (now TVS), `tendsto_const_nhds.add` (`ContinuousAdd`) and `tendsto_nhds_unique` (`T2Space`), so they hold in any Hausdorff TVS.",
+     "requested_change": "Move `tangentConeAt_subset_zero` and `UniqueDiffWithinAt.accPt` into the TVS section after `variable [ContinuousAdd E]`, adding `[T2Space E]` to them.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "section Normed (TangentCone.lean L149, L479)",
+     "claim": "The two `section Normed` commands the PR adds (L149, after `end TVS` at L147, and L479, after `end TVS` at L477) are each followed directly by a `variable` line, with no blank line between the `section` command and the following command.",
+     "requested_change": "Insert a blank line after each `section Normed`, i.e. `section Normed`, then an empty line, then the `variable` block.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "variable {x y : E} {s t : Set E} (TangentCone.lean L85, L153, L414, L483)",
+     "claim": "Re-splitting the TVS and Normed sections, the PR re-declares `variable {x y : E} {s t : Set E}` in each new `section Normed` (L153, L483), on top of the copies in the TVS sections (L85, L414): four identical variable lines. They need only `E : Type*`, which is already a file-level variable at L76.",
+     "requested_change": "Declare `variable {x y : E} {s t : Set E}` once, right after `variable {E F G : Type*}` (L76), and delete the four per-section copies.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "PR #29842 (title/description)",
+     "claim": "The title `feat(TangentCone): generalize some lemmas to TVS` does not say which lemmas or under what assumptions, and no description says it either (none is recoverable). The diff moves `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`/`mono`/`inter`/`inter'`, `uniqueDiffWithinAt_congr`/`_inter`/`_inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`/`uniqueDiffOn` and `UniqueDiffOn.inter` to TVS, and reorders `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure/closure` and `mono_closure` without changing them.",
+     "requested_change": "Write a description listing the lemmas generalized to topological vector spaces and the assumptions they now take (`[ContinuousSMul 𝕜 E]`, plus `[ContinuousAdd E]` for the `mono_nhds`/`congr`/`inter` family). State that `tangentConeAt_closure` and the `*_closure` lemmas are only moved. Make the title more specific, e.g. `feat(Analysis/Calculus/TangentCone): generalize lim_zero, mono_nhds and congr lemmas to TVS`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:441",
+     "claim": "`UniqueDiffWithinAt.mono` still carries the surrounding `[ContinuousAdd E] [ContinuousSMul 𝕜 E]` assumptions, but this subset-monotonicity result only needs the basic `UniqueDiffWithinAt` assumptions and the algebraic monotonicity of `tangentConeAt`.",
+     "requested_change": "Move `UniqueDiffWithinAt.mono` before the `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` line, or wrap it in `omit [ContinuousAdd E] [ContinuousSMul 𝕜 E] in`, proving it directly with `tangentConeAt_mono` and `closure_mono`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:298",
+     "claim": "`tangentConeAt_subset_zero` is the only lemma in the region of the file this PR restructured whose proof never uses the norm, yet it is left stated under the `Normed` section's `[NormedAddCommGroup E] [NormedSpace 𝕜 E]`. Its proof uses only `tangentConeAt.lim_zero` (which this PR has just made TVS-level), `Tendsto.add` and `tendsto_nhds_unique`, so it should have been moved into the TVS section together with the lemmas it now depends on (the same applies to `UniqueDiffWithinAt.accPt`, line 308, whose proof is `tangentConeAt_subset_zero` plus `Dense`/`Submodule.span` bookkeeping).",
+     "requested_change": "Move `tangentConeAt_subset_zero` up into the TVS section and state it under `variable [ContinuousSMul 𝕜 E] [ContinuousAdd E] [T2Space E]` (drop the normed section variables); move `UniqueDiffWithinAt.accPt` along with it under `[ContinuousSMul 𝕜 E] [ContinuousAdd E] [T2Space E] [Nontrivial E]` (`gcongr` then resolves against the ambient instances).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:242",
+     "claim": "`mem_tangentConeAt_of_openSegment_subset` (and `mem_tangentConeAt_of_segment_subset`, line 257) are stated for `[NormedAddCommGroup G] [NormedSpace ℝ G]`, but the norm plays no role in the proof: it only uses `openSegment`, `mem_tangentConeAt_of_pow_smul` (already TVS-level) with `r = 1/2` and `abel`. These are exactly the sort of lemma this PR is generalising, and they sit in the `Normed` section that the PR just (re)created.",
+     "requested_change": "State the `G`-block lemmas for an arbitrary topological `ℝ`-module: `variable [AddCommGroup G] [Module ℝ G] [TopologicalSpace G]` (e.g. in its own section next to the TVS section, or with the hypotheses inlined) instead of `[NormedAddCommGroup G] [NormedSpace ℝ G]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+     "claim": "The rewritten proof of `tangentConeAt.lim_zero` mixes the two equivalent forms of the hypothesis `hc`: it first extracts non-vanishing from the norm form via `eventually_ne_of_tendsto_norm_atTop hc 0`, and only afterwards rewrites `hc` with `tendsto_norm_atTop_iff_cobounded` for `tendsto_inv₀_cobounded.comp hc`. Rewriting `hc` first keeps the whole proof in the `cobounded` language (so `hc.eventually_ne_cobounded 0` can be used, matching the neighbouring `tendsto_inv₀_cobounded` usage) and lets the `apply Tendsto.congr'` + `simpa` pair collapse into a single `simpa only [...] using ...`.",
+     "requested_change": "```\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have h : (fun n => (c n)⁻¹ • c n • d n) =ᶠ[l] d :=\n    (hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' h\n```",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/71751a7f149bacca4b50cfc67584392a77ff5011325bbd6311c5814fafc4ca60/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__b865e3e0-060a-4969-951a-c880712274ef.jsonl"
+  },
+  "AP1": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:116",
+     "claim": "In the new proof of `tangentConeAt.lim_zero` the auxiliary `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n` has a one-line proof term and is used at exactly one place (the `Tendsto.congr'` call on line 118), so it should be inlined at that use site rather than named, per the practice on short single-use `have`s.",
+     "requested_change": "Replace lines 116-120 by:\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine Tendsto.congr' ((hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)) ?_\n  simpa using (tendsto_inv₀_cobounded.comp hc).smul hd\n(the `rw` moves up so the inlined term can use the cobounded form of `hc`; if you prefer to keep the rewrite where it is, inline the same term using `eventually_ne_of_tendsto_norm_atTop hc 0`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:147",
+     "claim": "The PR carries no description, and its title ('generalize some lemmas to TVS') describes only half of the diff: the same PR also relocates declarations between sections (`tangentConeAt_closure` from before `tangentConeAt.lim_zero` into the `section Normed` at 149, and `uniqueDiffWithinAt_closure`, its `UniqueDiffWithinAt.of_closure`/`closure` alias and `UniqueDiffWithinAt.mono_closure` from the top of the `section Normed` after `UniqueDiffWithinAt.congr_pt` into the `section Normed` at 479). The practice requires the title and description to say precisely what the change is, including what moves where.",
+     "requested_change": "Add a PR description stating both halves, e.g.: 'Weaken the hypotheses of `tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds` and of the `UniqueDiffWithinAt`/`UniqueDiffOn` lemmas from `mono_nhds` up to `IsOpen.uniqueDiffOn` from `NormedAddCommGroup`/`NormedSpace` to `[ContinuousAdd E]`/`[ContinuousSMul 𝕜 E]`; as a consequence `tangentConeAt_closure`, `uniqueDiffWithinAt_closure`, `UniqueDiffWithinAt.of_closure`/`closure` and `UniqueDiffWithinAt.mono_closure` move into the `section Normed` blocks (statements, proofs and `@[simp]` attributes unchanged).'",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/9a8eed47e4630c7d80545ee7bbd3fb74c223ef1ff3003c48d2c5eaf0c8f89783/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__95faf061-70a0-4131-a9e8-0f24de250662.jsonl"
+  },
+  "GPT2": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": []
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:242",
+     "claim": "`mem_tangentConeAt_of_openSegment_subset` (line 242) and `mem_tangentConeAt_of_segment_subset` (line 257) are still stated with `[NormedAddCommGroup G] [NormedSpace ℝ G]`, although their proofs use nothing normed: the whole argument is `mem_tangentConeAt_of_pow_smul` (already TVS-level in this file) plus the module algebra `openSegment_eq_image`, `sub_smul`, `smul_sub`, `abel`, and `mem_tangentConeAt_of_segment_subset` just composes the open-segment version with `openSegment_subset_segment`. The PR is exactly the one that moves this file's lemmas down to the TVS level (`tangentConeAt.lim_zero`, `tangentConeAt_mono_nhds`, …), so leaving these two segment lemmas at the normed level is a missed generalization of the same kind: they can be stated for any topological vector space over ℝ.",
+     "requested_change": "State both lemmas in a TVS section for `G`, i.e. under `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]` (they are about `G`, so they cannot go into the existing `section TVS` for `E`; give them their own `section TVS` with those three variables, or pass the hypotheses explicitly), and keep the proofs verbatim: nothing in them mentions the norm.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:298",
+     "claim": "`tangentConeAt_subset_zero` (line 298), and consequently `UniqueDiffWithinAt.accPt` (line 308) which is derived from it, are still stated with `[NormedAddCommGroup E] [NormedSpace 𝕜 E]`, although the proof only uses `tangentConeAt.lim_zero` (which this PR moves to the TVS level), `Tendsto.add` (i.e. `[ContinuousAdd E]`) and `tendsto_nhds_unique`. The only normed ingredient is separation, i.e. `[T2Space E]`; the norm itself is never used. Since the PR generalizes the neighbouring `𝓝`-lemmas to a TVS, this one should be brought to the same level as well.",
+     "requested_change": "Move `tangentConeAt_subset_zero` into the TVS section (or a TVS section of its own) and state it under `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E] [T2Space E]`; then `UniqueDiffWithinAt.accPt` can be stated under the same hypotheses plus `[Nontrivial E]`. Both proofs are unchanged. (This is a strict generalization: `T2Space E` and the other instances are found from `NormedAddCommGroup E`/`NormedSpace 𝕜 E`.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/1e16541bedb9063d5625334f06bfe7545a774cb2b7a4e08e1ed91689e1c7dcaa/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051525__edc7e216-1cdb-4a98-a749-145edb4cde5d.jsonl"
+  },
+  "AP2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:109",
+     "claim": "The PR has no description and its title (`feat(TangentCone): generalize some lemmas to TVS`) does not say which lemmas were generalized, nor that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` (with its `protected alias` giving `UniqueDiffWithinAt.of_closure`/`.closure`) and `UniqueDiffWithinAt.mono_closure` are unchanged and merely relocated past the TVS block. Because the diff renders those three theorems as deletions plus re-additions, a reader cannot tell from the PR text that the bodies and `@[simp]` tags are untouched, nor which of the surrounding lemmas (`tangentConeAt_mono_nhds`, `tangentConeAt_congr`, `tangentConeAt_inter_nhds`, `UniqueDiffWithinAt.mono_nhds`, `.mono`, `uniqueDiffWithinAt_congr`, `uniqueDiffWithinAt_inter`, `.inter`, `uniqueDiffWithinAt_inter'`, `.inter'`, `uniqueDiffWithinAt_of_mem_nhds`, `IsOpen.uniqueDiffWithinAt`, `UniqueDiffOn.inter`, `IsOpen.uniqueDiffOn`) now require only `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`.",
+     "requested_change": "Write a PR description that (a) lists the declarations whose hypotheses were weakened to `[AdditiveGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousAdd E] [ContinuousSMul 𝕜 E]` — in particular `tangentConeAt.lim_zero` and the two blocks of `nhds`-lemmas above — and (b) states explicitly that `tangentConeAt_closure`, `uniqueDiffWithinAt_closure` + alias and `UniqueDiffWithinAt.mono_closure` are unchanged (`@[simp]` tags kept) and were only moved down so that the `TVS` section can contain the generalized lemmas; optionally make the title say this (`...: generalize nhds/lim_zero lemmas to TVS, move closure lemmas`).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/351d00fd6c560eaef5be50685ec031ac39761dd6a586d1e241169791c4e3c2ee/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__b6d8c7f6-87da-4069-9a57-60294cba8ab4.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:441",
+     "claim": "`UniqueDiffWithinAt.mono` still depends on `[ContinuousAdd E] [ContinuousSMul 𝕜 E]` only because its proof goes through `UniqueDiffWithinAt.mono_nhds`; ordinary set monotonicity follows directly from `tangentConeAt_mono` and `closure_mono`, so these continuity assumptions are unnecessarily strong.",
+     "requested_change": "State `UniqueDiffWithinAt.mono` without the continuity section variables, for example by wrapping it in `omit [ContinuousAdd E] [ContinuousSMul 𝕜 E] in` (or moving it before those variables) and prove it directly:\n```lean\nomit [ContinuousAdd E] [ContinuousSMul 𝕜 E] in\ntheorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) :\n    UniqueDiffWithinAt 𝕜 t x :=\n  ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩\n```",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The rewritten proof of `tangentConeAt.lim_zero` processes the same hypothesis `hc` twice in two different forms: it first extracts `c n ≠ 0` from the norm form of `hc` (`eventually_ne_of_tendsto_norm_atTop hc 0`) and only afterwards rewrites `hc` into its cobounded form with `rw [tendsto_norm_atTop_iff_cobounded] at hc`. The cobounded form itself yields `c n ≠ 0` for free (`Filter.Tendsto.eventually_ne_cobounded`, `Mathlib/Topology/Bornology/Basic.lean:256`), so the `rw` should come first and the two closing steps (`apply Tendsto.congr' this` followed by `simpa using ...`) can be folded into a single `simpa only`; as written the two facts about `hc` are derived in an order that makes the proof harder to follow than necessary.",
+     "requested_change": "Reorder the proof — rewrite `hc` first and derive non-zero-ness from the cobounded form — e.g.:\n```lean\ntheorem tangentConeAt.lim_zero {α : Type*} (l : Filter α) {c : α → 𝕜} {d : α → E}\n    (hc : Tendsto (fun n => ‖c n‖) l atTop) (hd : Tendsto (fun n => c n • d n) l (𝓝 y)) :\n    Tendsto d l (𝓝 0) := by\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n := by\n    filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n  simpa only [← tendsto_congr' this, zero_smul] using (tendsto_inv₀_cobounded.comp hc).smul hd\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:298",
+     "claim": "`tangentConeAt_subset_zero` is one of the lemmas this PR's new TVS API makes reachable, but it was left in the `section Normed`: its proof uses only the just-generalized `tangentConeAt.lim_zero` (hence `[ContinuousSMul 𝕜 E]` and, via `tendsto_const_nhds.add`, `[ContinuousAdd E]`) together with `tendsto_nhds_unique` (hence `[T2Space E]`). No metric or normed hypothesis on `E` is used at all, so the statement is currently less general than its own proof: the docstring even describes it purely topologically, and the neighbouring `UniqueDiffWithinAt.accPt` (line 308) only routes through it and so is in the same position.",
+     "requested_change": "State `tangentConeAt_subset_zero` (and `UniqueDiffWithinAt.accPt`) under the TVS hypotheses plus `[T2Space E]` — i.e. move them out of `section Normed` into the TVS section (or a small section adding `variable [T2Space E]`), keeping `[Nontrivial E]` on `UniqueDiffWithinAt.accPt`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/103546da4d0f5bedfc5cd6b918a9a5d0ef51f97962b6b54f382fd28d07473ae0/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063825__5a85dd07-d0ea-4046-871d-f082c63902af.jsonl"
+  },
+  "AP3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:242",
+     "claim": "`mem_tangentConeAt_of_openSegment_subset` (and, through it, `mem_tangentConeAt_of_segment_subset`) is left inside the `section Normed` that this PR re-adds at lines 149-153, so its type still quantifies over `NormedAddCommGroup G`/`NormedSpace ℝ G` (`#check @mem_tangentConeAt_of_openSegment_subset` shows `∀ {G} [NormedAddCommGroup G] [NormedSpace ℝ G] ...`), even though its proof uses no normed fact: the whole proof is `mem_tangentConeAt_of_pow_smul` (a TVS-section lemma), `openSegment_eq_image` and `abel`. This is exactly the generality the PR is supposed to give this family (`openSegment ℝ x y ⊆ s → y - x ∈ tangentConeAt ℝ s x` is meaningful for an arbitrary topological ℝ-module), and `G` is used by nothing else in lines 154-401.",
+     "requested_change": "State both lemmas at TVS generality instead of under the normed variables, e.g. in the TVS part of the file inside their own small section with `variable [AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`:\n\n```lean\ntheorem mem_tangentConeAt_of_openSegment_subset {s : Set G} {x y : G} (h : openSegment ℝ x y ⊆ s) :\n    y - x ∈ tangentConeAt ℝ s x := by\n  refine mem_tangentConeAt_of_pow_smul one_half_pos.ne' (by norm_num) ?_\n  ...\n```\n(proof unchanged), and then drop the now-unused `variable [NormedAddCommGroup G] [NormedSpace ℝ G]` from the `section Normed` at line 152.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/Calculus/TangentCone.lean:113",
+     "claim": "The three closing tactic steps of `tangentConeAt.lim_zero` (`apply Tendsto.congr' this`, `rw [tendsto_norm_atTop_iff_cobounded] at hc`, `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`) do what a single call performs: `apply` only unfolds `Tendsto.congr'`, `rw … at hc` only replaces `hc` by `tendsto_norm_atTop_iff_cobounded.mp hc` inside the closing term, and `simpa` only discharges `0 • y = 0`. A maintainer asked for exactly this merged shape on this proof when it was proposed before (PR #21065: “`rw [tendsto_norm_atTop_iff_cobounded] at hc` … `simpa only […] using tendsto_inv₀_cobounded.comp hc |>.smul hd`”).",
+     "requested_change": "Replace the last three lines by one `simpa`:\n\n```lean\n  have this : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)\n  simpa only [zero_smul] using Tendsto.congr' this\n    ((tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.mp hc)).smul hd)\n```\n\n(Equivalently, derive the eventual equality from `hc.eventually_ne_cobounded 0` with `filter_upwards` as in the maintainer's suggestion.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/9ad7b80884d56a59a7f72cace5a8355aacd182d8429721d1ee90eaab51528935/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__f5234cb1-7233-401a-9409-2b5948c63f25.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_29842.md"
+}
