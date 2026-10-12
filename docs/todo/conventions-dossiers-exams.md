@@ -148,6 +148,14 @@ and the fact sheet in `docs/research/conventions-dossiers-review-2026-10/`.
 
 ## Start here (after the round)
 
+**2026-10-12, the assessment** (`docs/research/conventions-assessment-2026-10-12.md`). The step-3
+drop rule above is met: by the yield guard on the ten PRs, and by the ≤ +0.05 bar on both fresh
+cells (P14's other four PRs −0.04, dev −0.01). The knowledge layer stands (the exact brief, three
+models); the ask-free delivery and the understanding layers do not. The assessment's §4 lists what
+stays untried for a `docs/dead-ends.md` entry, §6 the misses on the table's sets by kind (no kind
+above 0.08 of a set's asks), and §7 the options with ceilings: the harness for the free model first,
+then analogue retrieval and a closer battery; the fresh-set AP run only as a closing measurement.
+
 **2026-10-11, the one reviewer table qualifies stage AP**
 (`results/pr_review_v5/probes/one-reviewer-table-2026-10-10/README.md`, Result).
 - **AP on DeepSeek:** +0.20 on validation small12, the PRs stage AP was read on. It is 0.00 on the

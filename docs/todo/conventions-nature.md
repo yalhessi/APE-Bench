@@ -91,6 +91,16 @@ verdict, since the rule is over all 1,070 outside asks). So the answer to "how
 many" is a floor: more than four hundred at this grain, still rising at about one per ten asks, with
 the written guidance covering the head and not the tail.
 
+**A sub-hypothesis for study 4, surfaced 2026-10-12 and not pursued** (`docs/research/conventions-assessment-2026-10-12.md` §6).
+Stage H found maintainers raise a settled convention at 5% or fewer of the places it applies, which is
+why "apply strictly" is a volume lever. A migration in progress may be the exception: the `grind` asks
+(32875 v0090 and v0091, 33098 d0008 and d0009, from different maintainers) are raised at every new
+lemma of the kind, and no ask-free reviewer reaches any of them. If demand at applicable places is
+near 1 for an emerging convention and near 0.05 for a settled one, maturity is the one field that
+would license strict application, and the census has no such field. Test on the record first: for the
+migration entries (`grind`, `to_dual`, `fun_prop`, `to_fun`) against stage H's ten rules, the ask
+rate at applicable places on census PRs in the same window.
+
 **Start here** (studies 2-4, or extending the census).
 - read: `results.md` in the census directory; `reader_rubric_census_v1.md` (what a principle is, the
   grain rule, the thresholds); `reader_A/codebook.json` and `reader_B/codebook.json` (the census

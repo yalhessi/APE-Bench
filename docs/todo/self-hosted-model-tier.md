@@ -122,6 +122,16 @@ is the only bill.
 4. **A config twin** of the solo config, with runs named `iter_`, as the ELM tier's comment block
    requires.
 
+**The harness, not the conventions, as the free tier's next lever (surfaced 2026-10-12, not
+pursued;** `docs/research/conventions-assessment-2026-10-12.md` §7, option A). The one reviewer
+table reads Opus +0.10 on the matcher and +4 of 23 on the judge for the X route over the project
+harness, with the same packet information verified equal; DeepSeek has only ever run under `ape_agent`
+with contract v2, and every ask-free conventions delivery on it is null off-sample. Two cells, $0,
+three reps each in one seal with DX: brief X under `ape_agent` (the brief alone), then an agentic
+shell harness over the local server with the probe packet and `./ptool` (the tools and the loop).
+The X route's confound must not carry over: Claude Code's system prompt, CLAUDE.md and MEMORY.md
+were in X's context, so part of its gain may be project text.
+
 **What would close it** — two gates, stated before any run:
 1. **Speed.** 12 concurrent solo sessions on the dev held-out 12, with cache share at or above 80%.
    Wall clock compared with the Opus subscription run on disk.
