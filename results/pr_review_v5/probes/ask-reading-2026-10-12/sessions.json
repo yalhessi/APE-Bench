@@ -29,7 +29,7 @@
    "R": "R10",
    "kind": "solo",
    "run": "iter_ds41_conv_dev_base_rep1",
-   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/ask-reading/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/f314592d3535c98ad2f7925bb1864dbd316431bdd4aee2e443b5af1f53ee1f02/samples/0/attempts/attempt_1_20261010113144/ape_agent_session_20261010_113144__7cc41c79-0c05-464c-8049-0f546703270b.jsonl"
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/f314592d3535c98ad2f7925bb1864dbd316431bdd4aee2e443b5af1f53ee1f02/samples/0/attempts/attempt_1_20261010113144/ape_agent_session_20261010_113144__7cc41c79-0c05-464c-8049-0f546703270b.jsonl"
   },
   "AP1": {
    "R": "R5",

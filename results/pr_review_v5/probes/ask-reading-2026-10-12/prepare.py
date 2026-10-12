@@ -43,45 +43,41 @@ CODEBOOK = {e["id"]: e.get("principle") for e in
             jload(ROOT / "results/pr_review_v5/adjudications/conventions-census-v1/reader_A/codebook.json")}
 
 
-def session_file(run: str, pr: int):
-    """The transcript of `run`'s session on `pr`: TaskStorage's successful attempt, else the one attempt dir."""
-    tasks = ROOT / ".ape/runs" / run / "tasks"
-    if not tasks.is_dir():
-        return None
-    for td in tasks.iterdir():
-        tr = td / "task_result.json"
-        if not tr.is_file():
+_SESSIONS_BY_RUN: dict = {}
+
+
+def _sessions_of(run: str) -> dict:
+    """PR -> session transcript for every attempt of `run`, through the persisted samples
+    (`tool_outcomes._attempt_dirs`, which reads `TaskStorage`), never the directory layout."""
+    if run in _SESSIONS_BY_RUN:
+        return _SESSIONS_BY_RUN[run]
+    sys.path.insert(0, str(ROOT))
+    sys.path.insert(0, str(ROOT / "src"))
+    from src.mathlib_review.analysis.tool_outcomes import _attempt_dirs  # noqa: E402
+    from src.mathlib_review.analysis.trajectory import _SESSION_GLOB  # noqa: E402
+    root = ROOT / ".ape/runs" / run
+    out: dict = {}
+    for attempt in asyncio.run(_attempt_dirs(root / "tasks", root)):
+        task_dir = next((p for p in attempt.parents if (p / "task_result.json").is_file()), None)
+        if task_dir is None:
             continue
-        r = jload(tr)
+        r = jload(task_dir / "task_result.json")
         n = r.get("pr_number") or (r.get("metadata") or {}).get("pr_number")
         if n is None:
-            # the episode id carries the PR
-            s = json.dumps(r)
-            m = re.search(r"mathlib4:(\d+):round", s)
+            m = re.search(r"mathlib4:(\d+):round", json.dumps(r))
             n = int(m.group(1)) if m else None
-        if int(n or -1) != int(pr):
-            continue
-        path = None
-        try:
-            sys.path.insert(0, str(ROOT / "src"))
-            from ape.orchestration.persistence import TaskStorage  # noqa
-            st = TaskStorage(td, td.name)
-            samples = asyncio.run(st.load_all_samples())
-            for s in samples.values():
-                a = s.successful_attempt
-                if a is not None:
-                    path = Path(getattr(a, "path", None) or getattr(a, "attempt_path", None) or "")
-                    break
-        except Exception:
-            path = None
-        if not path or not path.is_dir():
-            atts = sorted((td / "samples/0/attempts").glob("attempt_*"))
-            path = atts[-1] if atts else None
-        if path is None:
-            return None
-        f = sorted(path.glob("ape_agent_session_*.jsonl"))
-        return str(f[-1]) if f else None
-    return None
+        sessions = sorted(attempt.glob(_SESSION_GLOB))
+        if n is not None and sessions:
+            out[int(n)] = str(sessions[-1])  # a later attempt of the same PR replaces an earlier one
+    _SESSIONS_BY_RUN[run] = out
+    return out
+
+
+def session_file(run: str, pr: int):
+    """The transcript of `run`'s session on `pr`, or None."""
+    if not (ROOT / ".ape/runs" / run / "tasks").is_dir():
+        return None
+    return _sessions_of(run).get(int(pr))
 
 
 def ap_section(transcript: str):
