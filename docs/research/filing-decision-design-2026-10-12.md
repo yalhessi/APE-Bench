@@ -1,9 +1,12 @@
 # The filing decision: knowledge as authority, not as facts. A general design from the per-ask reading of P14 and D12 (2026-10-12; draft for adversarial review)
 
-**Status** — draft, **not a conclusion**. Written from one reading programme
-(`results/pr_review_v5/probes/ask-reading-2026-10-12/`, six readers, one per batch, counts
-provisional), the one reviewer table (`docs/research/beating-solo-2026-10.md`) and the record. To be
-put through an adversarial round before anything is built or run. Branch `ask-reading`.
+**Status** — the first draft (§0–§8) was put through an adversarial round on 2026-10-12 (four
+reviewers: the record, the reading's mechanics, generality and falsifiability, and an advocate for a
+different design; `filing-decision-design-2026-10-12/`). **§9–§12 are what survived it.** The draft is
+kept verbatim above so the next session does not re-derive it. Written from one reading programme
+(`results/pr_review_v5/probes/ask-reading-2026-10-12/`, six readers, one per batch, counts provisional),
+the one reviewer table (`docs/research/beating-solo-2026-10.md`) and the record. Nothing built, nothing
+run. Branch `ask-reading`.
 
 **The request** (the user, 2026-10-12): *"We need to review every ask in P14 and D12 with the DeepSeek
 and DeepSeek + AP runs to try and understand better what goes wrong. We are hypothesizing here about
@@ -273,3 +276,135 @@ this model (gpt-5.5 and Qwen say contracts do not move weak models).
   a direction are three harness features the reading records as grounds for misses.
 - The readers shared one scratchpad and overwrote each other's helpers; nothing was lost, but each
   reader should get its own.
+
+## 9. What the adversarial round did to the draft (2026-10-12)
+
+Four reviews, each in `filing-decision-design-2026-10-12/`: `review-record.md` (21 verdicts),
+`review-mechanics.md` (re-coding and re-counting from the transcripts), `review-generality.md`,
+`alternative-design.md`. Consolidated:
+
+| element of the draft | verdict | the evidence |
+|---|---|---|
+| The reading's numbers (§1.1–1.4) | **stand**, with slips: held-and-ignored is 46, not 45; §1.5's family list sums to 22 | recomputed from the jsonl by two reviewers |
+| "A guess about maintainers" as a ground (22 rows) | **wrong: 6 rows.** The word `maintainer` marks 22; in 16 the reviewer *predicts the ask correctly* and drops it on the brief, on worth, or on nothing | mechanics §2, hand-coded 105 rows |
+| The inadmissible-ground count (63 rows, 32 asks) | **64 rows on 37 asks**; and **41 rows state no listed ground**: 15 wrong technical justifications without a check, 13 unstated, 8 "convention satisfied", 6 correct refutations (v0105) | mechanics §2 |
+| "The section changed no knowledge column" | **false**: 11 asks change DX→AP; `demand` has three meanings across readers; "15 need a fact" is 9–17 | mechanics §4 |
+| The 24 never-reached asks | **24 only with Opus+AP as ask-free on `match_D12`**; 29 without TA; 32 on the assessment's seals; five D12 asks flip between matcher passes | mechanics §3 |
+| Inter-reader agreement | 25 of 30 (K 9/10, C 5/8, V 5/6, O 6/6); the five disagreements on three undefined boundaries; one batch's K share is a reader effect, so §1.1's 81/65 split is reader-dependent at the tens | mechanics §1 |
+| §0, §3.4: "an explicit authority order, which the record's experiments lacked" | **already exists, as prose**: `CONVENTIONS_PRECEDENCE` (`src/mathlib_review/analysis/probes.py:442-456`), stages D and AP, is ranks 1, 3, 4, the question rule and five of the seven inadmissible grounds, verbatim. With the PR's own asks +0.197/+0.179; off them −0.04 / −0.01 | record row 1; `one-reviewer-table-2026-10-10/README.md:185` |
+| "The free model will follow the order" | **not shown**: under that paragraph 46 held sentences ignored, 39 dropped (20 on the grounds it names: "probability 0.35. Skip it", "overly pedantic"); DP filed no question in 131 findings; S2 wrote `conforms` on excluded grounds at 2 of 8 misses. Every record result that moved filings was structural (forced abstention 0.20→0.50; `target_verdicts` 112/112; D1 stable 6→8; S2 1→5 of 13); every rule about grounds read null (F +0.03, G +0.000) | record rows 6–7; alternative §2.5 |
+| Rule 1, "a failed check becomes a question" | **the record's named untried item, set aside on volume**; narrowed there to `ask_author` (the check failed for want of a piece the author could add). **It cannot score**: judge v9 marks a question false (`judge/protocol.py:65`); the matcher has no question form. D1 records the inverse for *changes*: a tool-contradicted change is refuted, not filed | record rows 2, 10; `2026-10-06-generation-without-suppression.md:142,197` |
+| Rank 1, "a check that decides" | **conflicts with the linter-as-oracle dead end** as stated: a passing linter dates availability, not a convention; the census bar swept 0.80→0.20 moved nothing | record rows 4, 12 |
+| Rank 2, "the library's current practice with direction" | **amend**: siblings and plurality are already inadmissible under the paragraph; the direction sources (deprecation stream, mechanism catalogue, dated forms) **do not exist**; the 21:7 instance is a cited correction (`.claude/rules/mathlib-review.md`) | record rows 3, 11 |
+| §3.3 "one structure" | **seven sources, five unbuilt**; §4 assigns ranks to past designs by outcome | generality §1 |
+| §4 instances | S2 removes three grounds, not one; detectors decide 7, not 10; D1 did not "lack the order", it is the instance rule 1 reverses | record rows 8–10 |
+| §5–§6 volume | **understated by an order of magnitude**: a regex over 156 transcripts' reasoning finds the grounds a median of 60 (DX) / 53 (AP) times a session; 20–30 named-and-dropped concerns against 3.8–6.2 filed and 3.6 asks a PR; expected 15–40 findings a PR; the record's pass-throughs sit there (stage G "all" 149/12 at 0.081; the places engine 68 at 7%; S2 13 of 14 unasked). "No cap" misreads the 2026-09-22 ruling, which every plan since read as "measure the gate, do not design one"; AP's yield guard and D1's ≤ 2.0 control guard are the record's standard | generality §3; record rows 16–18 |
+| §6 as a test | **tests R against AP, not the order against its absence**; in-sample; no statistic; the matcher cost (~0.6M subscription tokens a seal) unstated; the 40-disposition re-read measures phrasing | generality §4; record row 16 |
+| §0 "every narrow design is one authority or one question" | **over-claimed**: the levers that moved the wall were the model and the harness | record row 20 |
+| The negative guard; the direction lesson for AI PRs; §8's gold defects | **stand** | generality §7; alternative §3 |
+
+**Where the diagnosis lands after the corrections.** The reviewer names the maintainer's concern at
+most of its misses and clears it; but the clearing is less "a guess that maintainers would not ask"
+(6 rows) than worth (27), a plurality or a tool's count (22), the file's siblings (13), a check it did
+not run or ran on the wrong candidate (15 + 11), and **nothing stated at all (13)**. Prose about grounds
+cannot reach an unstated ground. What reached this model's filings in the record was always a change
+in what the submission *may contain*. That is the alternative's point, and the generality review's,
+and the record review's, arrived at separately.
+
+## 10. The design that survives
+
+Not an authority order the reviewer is told. **A submission contract the harness enforces, and a
+boundary.** Four clauses, each one already measured in part:
+
+1. **`conforms` is refusable.** A cell may be closed as conforming only with one of three evidence
+   types the harness can see: a tool-call id (a check the harness ran, whose output is attached), a
+   quoted line of the reviewed code that already has the required form, or a cited convention id
+   whose example the reviewer matched. Anything else at a cell is a candidate. A submission with a bare
+   `conforms` is handed back (D1's hand-back mechanism, `structured.py`, already does this for missing
+   cells). This is S2's rule generalised from the detector list to every cell and made refusable
+   rather than stated. It covers, by construction, the 15 wrong justifications stated without a check,
+   the 13 unstated grounds, the 11 failed-check clearances and the 27 worth-grounds: none is an
+   evidence type. Siblings and pluralities are not evidence types either, which is all the "direction"
+   rule needs to say at the contract.
+2. **The negative guard.** A cited convention clears only the cell that names it (p0012, p0008: a
+   satisfied prime rule was used to clear the name the maintainer asked to change).
+3. **`ask_author` is a legal disposition**, in the generation plan's narrowed form: the check could
+   not be run, or it failed for want of a piece the author could add; it carries the check's output.
+   Not "questions legal everywhere" (60 failed checks on one PR). This needs the measurement fixed
+   first (§12): the judge and the matchers have no question form, and five gold asks take it.
+4. **The boundary.** Stage 1, the reviewer, may not withhold: every cell ends as `conforms` (with
+   evidence), a candidate (with typed evidence: `check`, `form`, `convention`, `construction`,
+   `analogue`, `own`; and `would_clear_on`, the ground on which it would have left it out), or
+   `ask_author`. Its candidate set is stored per sample. Stage 2 is a policy over the stored set,
+   replayable without a reviewer run; the draft's authority order is its first policy, and it is
+   selection, named as such and ordered after the generator as the 2026-09-22 ruling requires. The
+   generator is measured by what it *names* (the matchers over All(G)); the policy by what it keeps.
+
+**The question set** stays as the knowledge-side change, as D1's concern axis extended by the
+questions the audit never asks (what shape a caller wants; is there a mechanism for this shape; what
+the proof uses of a constant; the library's current form; what the file costs its importers), declared
+as a `knob()` on the structured task (record row 21). Its sources are *later work*, listed with what
+each would reach: the mechanism catalogue and the deprecation stream (direction, 6–9 asks), analogue
+retrieval (2), constructions (1), none of them built.
+
+**What is dropped from the draft**: the rank numbers as a prompt device; "a check decides" as an
+authority over conventions (a check decides the question the check was written for: compiles, the
+lint's own rule, a count against a threshold the rule states; never a convention's demand); "no cap"
+and "nothing withheld on worth" (stage 1 withholds nothing; stage 2 keeps the record's two guards);
+the 40-disposition phrasing re-read; the claim that every record design is an instance.
+
+**Volume, sized now.** Stage 1 on a control PR: 10–20 candidates (the alternative's lexicon prior over
+33304/33315/33438), against 0–1 findings today. Stage 2's first policy, if it keeps what the draft's
+order keeps, publishes at the per-place engine's rate unless the guards bind. The guards are
+pre-registered as failure conditions of the *published* set: asks reached per published finding no
+lower than solo's (AP's yield guard), and ≤ 2.0 published findings a control PR (D1's). Whether the
+unasked candidates are welcome is the adjudication the record has not done; stage 1's `would_clear_on`
+tallies, over ask PRs and controls alike, are its first corpus.
+
+## 11. The experiment, revised (pre-registered here; nothing run)
+
+Conditions, the free reviewer, the same 26 PRs and packets, three reps, one seal, the table's two blind
+matchers, with a question form added to the matcher rubric before the seal:
+
+- **G** — stage 1: the D1 cell contract with the extended question axis, `conforms` refusable, the
+  negative guard, `ask_author` legal, the AP section as `convention` evidence. No withholding. Stored.
+- **All(G)** — every candidate published: the ceiling of what G named. Offline.
+- **A(G)** — the draft's authority order as a policy over G's stored candidates, one adjudicator call a
+  PR (mechanical for `check` and `form`; a model read for `convention` and `own`). Offline.
+- **R** — the draft's in-line condition (the order stated to the reviewer), *only if* bar 1 passes:
+  the prompt-versus-contract contrast.
+
+The never-reached core is fixed as the assessment's definition (Opus+AP excluded, the table's seals):
+**32 asks**; the inadmissible-`K` set as the mechanics review's hand coding: **37 asks**.
+
+Bars:
+1. **Does a reviewer that may not withhold still name?** All(G) reaches ≥ 24 of the 37 and ≥ 8 of the
+   32, on the union of three reps, both matchers. Below 16 of 37 the contract suppresses naming and the
+   design is written to `dead-ends.md`.
+2. **Does the policy keep the reach?** A(G) keeps ≥ 80% of All(G)'s reached asks while its published set
+   meets both guards on the control PRs and on yield. Failing the guards with the reach kept is the
+   places test again, and is reported as that.
+3. **Prompt or contract**, if R runs: A(G) − R ≥ 4 of the 37 on both matchers, paired by rep, says the
+   boundary is needed; |A(G) − R| ≤ 2 says the in-line order suffices and the boundary is dropped.
+4. Side readings: All(G) − A(G), the first measurement of the order as a policy; `would_clear_on` by
+   ground over every candidate, the adjudication rubric's first corpus; a re-read of 30 G cells by the
+   protocol's codes for the C3 counts (delivered or derived departures not filed; `conforms` without
+   evidence; compiled edits with no finding).
+
+Cost: G is three DeepSeek runs of 26 PRs on the local tier, about 35 min each, $0; All(G) and A(G) are
+offline. The seal and the matchers are the cost, about 0.5–1M subscription tokens on the primary
+account; R adds three runs and another seal. The build is the D1 subclass of
+`.claude/rules/mathlib-review.md` (three edits) plus the refusable `conforms` and the stored candidate
+set: small, native. Everything is in-sample; the fresh 40-PR set is the deciding set after.
+
+## 12. Decisions for the user, and what is settled without one
+
+- **Settled by the round**: the authority order is not a prompt; the knowledge the reviewer lacks is
+  rarely a fact about the code; the misses are named concerns cleared on grounds a contract can refuse
+  and prose cannot; volume is the cost and is bounded by numbers already on disk.
+- **Yours**: whether to spend the seal-and-matcher tokens on G (and R); whether the question form goes
+  into the matcher rubric now (it changes what every future seal can score, so it is a boundary, not a
+  patch); whether stage 2 being selection, named as such, is acceptable under the ruling's ordering
+  (generator first, measured uncapped) — the alternative argues it is, the draft tried to avoid the
+  word.
+- **To fix regardless**: §8's gold defects; the matcher's question form; a per-reader scratchpad.
