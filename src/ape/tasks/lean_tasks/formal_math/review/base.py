@@ -790,10 +790,15 @@ class BasePRReviewTask(BaseLeanTask):
             ) -> Dict[str, Any]:
                 return await record(findings, merge_ready_as_is, confidence, message)
 
+    def _finding_budget(self) -> int:
+        """The most findings a submission records; 0 for no limit. A design that withholds
+        nothing (`filing_contract.py`) overrides it."""
+        return self.config.task_config.finding_budget
+
     def _normalize_findings(self, findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Coerce raw tool input into the PredictionRecord finding shape; drop empties,
         clamp severity, enforce the budget, keep optional evidence."""
-        budget = self.config.task_config.finding_budget
+        budget = self._finding_budget()
         if 0 < budget < len(findings) and self.logger:
             # Cut silently, a finding past the budget looks like one never filed.
             self.logger.warning("submit_findings: %d findings past the budget of %d not recorded",

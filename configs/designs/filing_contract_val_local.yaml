@@ -1,0 +1,10 @@
+# Design G, `filing_contract` (docs/research/filing-decision-design-2026-10-12.md §10-§11; pre-registered in
+# results/pr_review_v5/probes/filing-contract-2026-10-12/README.md), on the self-hosted DeepSeek tier: the
+# val set's contract-v2 DeepSeek config with the submission changed (a conforming cell needs evidence the
+# task verifies; every candidate and question is filed). States the design and nothing else
+# (tests/datasets/test_pr_review_v5_designs.py); the conventions section is set at invocation, as the
+# DeepSeek AP runs set it (task_config.context_file).
+extends: ../pr_review_v5_val_small12_local_ds41_contract2.yaml
+
+dataset:
+  design: filing_contract
