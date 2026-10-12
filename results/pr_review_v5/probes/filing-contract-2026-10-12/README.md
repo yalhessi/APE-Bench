@@ -133,5 +133,6 @@ that size inside the run's limits (160 turns, 16,080,000 tokens a PR, as the DX/
 the harness, not the bars, and nothing in them reads an ask):
 - every smoke session ends with a submitted result;
 - at most 10% of a session's cells are `unstated`;
-- no session stops on its turn or token limit.
+- no session stops on its turn or token limit;
+- every session's first message carries the conventions section and the contract.
 Otherwise the job stops, releases the node, and the smoke is read by hand before anything else runs.
