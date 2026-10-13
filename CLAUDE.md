@@ -40,6 +40,13 @@ default (user, 2026-09-24).
   2026-09-23 `work-enumeration` and `arms-speak` built per-target verdicts plus ask-without-fix in
   parallel, and the second found the first only when its paid run was already going. The
   `[session]` line counts sessions in *this* tree, so it cannot see one in another worktree.
+- **Before building an experiment, falsify its premise on what is already on disk.** State the
+  diagnosis as a claim about existing transcripts or labels, check it by reading (an hour at most),
+  then test the mechanism on a few sessions by hand or by replay. A design, a pre-registration and a
+  run on the sets come only after that signal. The adversarial round attacks the premise before the
+  design. 2026-10-12/13: two days on a contract that forbids withholding
+  (`results/pr_review_v5/probes/filing-contract-2026-10-12/`), when a half-hour reading of the places
+  it was built from showed the reviewer had the topic and not the fix.
 - **Record a lesson the moment it is learned**, in the strongest place it fits, in this order: a test
   or a refusal in code → a hook → this file → `.claude/rules/<area>.md` → `docs/dead-ends.md`.
   Never only in the conversation: compaction drops it, and the same mistake gets made again.
