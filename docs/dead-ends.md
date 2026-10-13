@@ -344,6 +344,16 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   **Reopens if:** a design changes what the reviewer knows at the partial-only places, which these
   numbers point to, rather than whether it may withhold; or one of the untried forms beats AP's union on
   the 37.
+- **Knowledge taken from the library as the decider of the fix** (2026-10-13, a premise check, nothing
+  built) — for the 41 asks no free-reviewer session reached, four readers looked for an artifact at the
+  base commit that decides the maintainer's change (`results/pr_review_v5/probes/library-knowledge-2026-10-13/`,
+  pre-registered). **7 of 41** (5 on re-check) are decided; **19** the library points to, but the ask is
+  a choice among its options (`ciSup` against keeping `continuous_`, `toLinearMap_` against `coe_`, a
+  `grind` tag the maintainer adds); 11 are judgement and 4 history. Below the pre-registered 13. **Why
+  stopped:** what decides these asks is maintainers' preference among the library's options, which the
+  library does not record. **Reopens if:** the library is paired with a record of which option
+  maintainers prefer, the source the conventions list already draws on, and that pairing is tested on
+  the 19.
 
 ## Retracted conclusions — do not re-derive
 
