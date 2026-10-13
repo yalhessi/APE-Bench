@@ -189,3 +189,10 @@ harness-blind, two matchers a batch of 4, 3 and 4 PRs, by the table's `run_match
 launched by `run_g_matching.sh` on the primary token, with the user's approval of about 10-13M processed tokens
 (2026-10-13; the table's seals ran at 4.0-4.5k tokens a finding a matcher, and the dry inputs of val and post hold
 309 G findings and 99 anchor findings). The bars are read by hand afterwards.
+
+**What is committed of G's runs (2026-10-13).** Every run file except `ledgers.jsonl` (and `arm_pool.jsonl`,
+ignored for every run). A `convention` evidence item must quote at least 30 characters of the conventions
+section, and in five ledgers (dev reps 1-2, post reps 1 and 3, val rep 1) the quote is a census comment body,
+which is never committed; `.gitignore` keeps all twelve G ledgers out. Scanned with every 40-character
+fragment of the section's comment lines: no other G run file carries one. The ledgers stay on disk, and
+each session's result in `.ape/runs/` holds the same ledger.
