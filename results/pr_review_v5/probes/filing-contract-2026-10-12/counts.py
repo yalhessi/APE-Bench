@@ -105,7 +105,7 @@ def main() -> int:
             mark = "  (control)" if pr in CONTROLS else ""
             print(f"  {pr}  {len(cells):5}  {len(findings):5}  {questions:9}  {row.get('conforms_refused', 0):16}"
                   f"  {self_only:7} of {len(conforming):<5}  {withheld:8}{mark}")
-            filed_by_set[tag][pr] = len(findings)
+            filed_by_set[tag].setdefault(pr, []).append(len(findings))  # one entry a rep, not the last rep's
             total_filed += len(findings)
             total_withheld += withheld
     print(f"\nA(G) withholds {total_withheld} of {total_filed} filed findings "
@@ -116,13 +116,14 @@ def main() -> int:
     print("\nFindings a PR beside the solo reviewer's published findings on the same PRs (rep 1-3):")
     for tag, filed in filed_by_set.items():
         solo = {label: {pr: solo_published(tag, pr, label) for pr in filed} for label in LABELS}
-        print(f"  {tag}: PR      G  " + "  ".join(solo))
+        print(f"  {tag}: PR      G (mean of {max(map(len, filed.values()))} reps)  " + "  ".join(solo))
         for pr in sorted(filed):
-            print(f"    {pr}{'*' if pr in CONTROLS else ' '} {filed[pr]:3}  "
+            print(f"    {pr}{'*' if pr in CONTROLS else ' '} {sum(filed[pr]) / len(filed[pr]):5.1f}  "
                   + "  ".join(f"{solo[name][pr]:>{len(name)}}" for name in solo))
-        means = [sum(filed.values()) / len(filed)] + [sum(solo[name].values()) / len(filed) for name in solo]
+        means = ([sum(sum(v) / len(v) for v in filed.values()) / len(filed)]
+                 + [sum(solo[name].values()) / len(filed) for name in solo])
         print(f"    mean   " + "  ".join(f"{mean:.1f}" for mean in means))
-    controls = [n for filed in filed_by_set.values() for pr, n in filed.items() if pr in CONTROLS]
+    controls = [n for filed in filed_by_set.values() for pr, ns in filed.items() if pr in CONTROLS for n in ns]
     if controls:
         print(f"\nControls: {controls}, mean {sum(controls) / len(controls):.1f} a PR (bar 2: at most 2.0, "
               "over three controls and three reps)")

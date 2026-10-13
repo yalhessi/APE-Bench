@@ -1,0 +1,254 @@
+{
+ "41930": {
+  "G1": {
+   "findings": 3,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 2
+   }
+  },
+  "DX1": {
+   "findings": 1,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 5
+   }
+  },
+  "AP1": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 3,
+   "compiles": 11,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 3
+   }
+  },
+  "G3": {
+   "findings": 3,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 6
+   }
+  }
+ },
+ "42184": {
+  "G1": {
+   "findings": 4,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 5
+   }
+  },
+  "DX1": {
+   "findings": 2,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "AP1": {
+   "findings": 4,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "G2": {
+   "findings": 4,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 3
+   }
+  },
+  "G3": {
+   "findings": 5,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 3
+   }
+  }
+ },
+ "42814": {
+  "G2": {
+   "findings": 20,
+   "compiles": 19,
+   "compile_split": {
+    "lean_verify_edit": 17,
+    "lean_verify": 2
+   }
+  },
+  "AP1": {
+   "findings": 10,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 1
+   }
+  },
+  "G1": {
+   "findings": 16,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 2
+   }
+  },
+  "DX1": {
+   "findings": 3,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 2
+   }
+  },
+  "G3": {
+   "findings": 18,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 2
+   }
+  }
+ },
+ "43024": {
+  "G1": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 2
+   }
+  },
+  "AP1": {
+   "findings": 2,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 1
+   }
+  },
+  "DX1": {
+   "findings": 1,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "G3": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 0
+   }
+  }
+ },
+ "43167": {
+  "G3": {
+   "findings": 14,
+   "compiles": 14,
+   "compile_split": {
+    "lean_verify_edit": 13,
+    "lean_verify": 1
+   }
+  },
+  "AP1": {
+   "findings": 7,
+   "compiles": 12,
+   "compile_split": {
+    "lean_verify_edit": 11,
+    "lean_verify": 1
+   }
+  },
+  "DX1": {
+   "findings": 2,
+   "compiles": 15,
+   "compile_split": {
+    "lean_verify_edit": 11,
+    "lean_verify": 4
+   }
+  },
+  "G1": {
+   "findings": 12,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 2
+   }
+  },
+  "G2": {
+   "findings": 13,
+   "compiles": 14,
+   "compile_split": {
+    "lean_verify_edit": 13,
+    "lean_verify": 1
+   }
+  }
+ },
+ "43192": {
+  "G1": {
+   "findings": 9,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 4
+   }
+  },
+  "DX1": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 2
+   }
+  },
+  "AP1": {
+   "findings": 6,
+   "compiles": 11,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 5
+   }
+  },
+  "G2": {
+   "findings": 13,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 9,
+    "lean_verify": 1
+   }
+  },
+  "G3": {
+   "findings": 12,
+   "compiles": 15,
+   "compile_split": {
+    "lean_verify_edit": 10,
+    "lean_verify": 5
+   }
+  }
+ }
+}

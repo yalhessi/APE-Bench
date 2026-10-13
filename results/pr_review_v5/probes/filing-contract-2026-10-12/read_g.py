@@ -120,6 +120,14 @@ def main() -> int:
         print(f"Bar 3  A(G) reaches {len(kept & k37)} of All(G)'s {len(all_g & k37)} on the 37 ({share:.0%}; bar 80%)")
         print("Reach on all asks, per session: " + ", ".join(
             f"{s} {len(reached[s])}/{len(asks)}" for s in G + ("DX1", "AP1")))
+        everyone = set(asks)
+        print("  beside them, the table's sessions on its own seals: " + ", ".join(
+            f"{s} {len(table.get(s, set()) & everyone)}/{len(asks)}" for c in ("DX", "AP") for s in (f"{c}1", f"{c}2", f"{c}3")))
+        for cond, union in (("G", all_g), ("DX", set().union(*(table.get(f"DX{r}", set()) for r in (1, 2, 3)))),
+                            ("AP", set().union(*(table.get(f"AP{r}", set()) for r in (1, 2, 3))))):
+            print(f"  union of three reps, {cond}: {len(union & everyone)}/{len(asks)}"
+                  + (f"; reached by G and by no DX or AP session: {len(all_g - set().union(*table.values()))}"
+                     if cond == "G" else ""))
         for s in ("DX1", "AP1"):
             drift = len(reached[s] ^ table.get(s, set()))
             print(f"  anchor {s}: {len(reached[s])} here, {len(table.get(s, set()))} on the table's seals, "
