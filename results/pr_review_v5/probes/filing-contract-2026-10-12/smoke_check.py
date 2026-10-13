@@ -3,6 +3,8 @@
 Every smoke session ends with a submitted result; at most 10% of a session's cells are `unstated`;
 no session stops on its turn or token limit. Prints one line per session and exits 1 if any check
 fails. Reads `run_manifest.json`, `ledgers.jsonl` and each task's `task_outcome.json`; no ask is read.
+Also prints, without gating on it, the `conforms` cells whose only verified item is a lookup of the
+subject's own name (amendment 2: that proves the declaration exists, nothing about the concern).
 
 usage (repo root): ape/bin/python <this file> <run name> [<run name> ...]
 """
@@ -13,6 +15,10 @@ from pathlib import Path
 RUNS = Path("results/pr_review_v5/runs")
 APE = Path(".ape/runs")
 LIMIT_STOPS = {"paused_max_turns", "paused_token_limit", "paused_cost_limit"}
+# Run as a file, so the repo root is not on the path unless put there: the gate's first run died on
+# `No module named 'src'` with PYTHONPATH=<root>/src alone (job 479060, amendment 2).
+sys.path.insert(0, str(Path.cwd()))
+sys.path.insert(0, str(Path.cwd() / "src"))
 
 
 def rows(path: Path):
@@ -56,6 +62,15 @@ def first_messages(run: str) -> dict:
     return out
 
 
+def self_lookup_only(cell: dict) -> bool:
+    """True when every verified closing item of a `conforms` cell is a lookup of the subject itself."""
+    closing = [item for item in cell.get("evidence") or []
+               if item.get("verified") and item.get("kind") in ("check", "quote")]
+    leaf = (cell.get("declaration") or "").split(".")[-1]
+    return bool(closing) and all(item.get("kind") == "check" and not item.get("edit")
+                                 and (item.get("lookup") or "").split(".")[-1] == leaf for item in closing)
+
+
 def main() -> int:
     ok = True
     for run in sys.argv[1:]:
@@ -85,10 +100,13 @@ def main() -> int:
             share = unstated / len(cells) if cells else 1.0
             filed = len(row.get("findings") or [])
             refused = row.get("conforms_refused")
+            conforming = [cell for cell in cells if cell.get("disposition") == "conforms"]
+            self_only = sum(1 for cell in conforming if self_lookup_only(cell))
             verdict = "ok" if share <= 0.10 else "FAIL"
             ok = ok and share <= 0.10
             print(f"  {verdict} PR {pr}: {len(cells)} cells, {unstated} unstated ({share:.0%}), "
-                  f"{filed} filed, {refused} conforms refused")
+                  f"{filed} filed, {refused} conforms refused; "
+                  f"{self_only} of {len(conforming)} conforms closed by a self-lookup alone")
     return 0 if ok else 1
 
 

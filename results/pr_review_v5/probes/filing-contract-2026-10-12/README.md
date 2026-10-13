@@ -136,3 +136,45 @@ the harness, not the bars, and nothing in them reads an ask):
 - no session stops on its turn or token limit;
 - every session's first message carries the conventions section and the contract.
 Otherwise the job stops, releases the node, and the smoke is read by hand before anything else runs.
+
+## Amendment 2 (2026-10-13, after the smoke, before any rep)
+
+**The gate stopped on its own check script, not on the smoke.** Job 479060 brought up the server (job
+479545, serving at 22:24 on 2026-10-12), passed both probes (17x19, gsm8k 19/20, thinking carried) and
+ran the four smoke sessions, all `completed with success` with no retries, 22:25 to 23:07.
+`smoke_check.py` then died with `No module named 'src'`: it runs as a file with `PYTHONPATH=<root>/src`,
+which leaves the repo root off the path. The gate read the crash as a failed check, stopped and released
+the node, as written. The script now puts the root on the path itself. Re-run by hand, every check holds:
+
+| PR | cells | unstated | filed | `conforms` refused | tokens (limit 16.08M) | turns (limit 160) |
+|---|---|---|---|---|---|---|
+| 33145 | 41 | 0 | 18 | 2 | 5.6M | 41 |
+| 33294 | 551 | 0 | 8 | 47 | 10.0M | 39 |
+| 30641 | 29 | 0 | 8 | 0 | 3.0M | 28 |
+| 42814 | 89 | 0 | 12 | 3 | 3.9M | 28 |
+
+Every first message carries the conventions section and the contract.
+
+**Read by hand, as the stop requires.** The contract binds mechanically: no cell is left unstated, 52 bare
+`conforms` were refused and resubmitted, and every candidate and question was filed. One way of closing a
+cell proves less than the design intends: a `check` that looks up the subject's own name. It verifies
+that the declaration exists, which is given, and nothing about the concern. On 33294 it is the only
+closing item on 359 of 543 conforming cells, across statement, library, docstring, placement and name;
+the commonest reasons are "Unchanged." (107) and "Lemma; none required." (83, on docstring cells). On the
+smaller PRs it closes 6 of 23, 3 of 21 and 18 of 77, mostly `library` cells whose reason cites the base
+corpus and other names.
+
+**Decision: the reps run as registered; the evidence rule is not changed.**
+1. Refusing a self-lookup alone moves the cheap close to a quote of the subject's own code, which is as
+   verifiable and as silent about the concern (quotes already close 94 cells on 33294). The general fix,
+   evidence that bears on its concern, is a design change and needs its own round.
+2. 33294 used 10.0M of its 16.08M tokens; real evidence on some 359 more cells would likely exceed it.
+3. The PRs where it dominates carry few core asks: 33294 holds 1 of the 37 and 1 of the 32; 33149 (341
+   cells, not in the smoke) holds 1 of the 37.
+
+**Reported beside bars 1 and 2, not a bar:** per PR and rep, the conforming cells closed by a self-lookup
+alone (`smoke_check.self_lookup_only`), and the core asks on PRs where those are more than half of the
+conforming cells, listed apart from the other misses.
+
+The gate is resubmitted unchanged: `run_g.sh` skips the complete smoke runs, `smoke_check.py` re-runs
+and gates the reps.
