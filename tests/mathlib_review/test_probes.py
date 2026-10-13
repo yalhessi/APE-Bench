@@ -435,6 +435,17 @@ def test_the_matcher_rubric_is_rendered_for_the_counts_and_unchanged_for_six():
     assert "on one Mathlib pull request. Six anonymous reviewers" in one
 
 
+def test_the_question_form_rubric_is_the_old_one_with_one_paragraph_more():
+    old = probes.MATCHER_RUBRIC.read_text()
+    new = probes.MATCHER_RUBRIC_QUESTIONS.read_text()
+    added = new.replace(old.split("\nAlso give the index")[0], "", 1).split("\nAlso give the index")[0]
+    assert added.startswith("\nA finding may be a question to the author.") and added.count("\n\n") == 0
+    assert new.replace(added, "", 1) == old
+    five = probes.matcher_rubric(5, 8, probes.MATCHER_RUBRIC_QUESTIONS)
+    assert "Five anonymous reviewers, `R1` to `R5`" in five and "question to the author" in five
+    assert "question to the author" not in probes.matcher_rubric(5, 8)
+
+
 def test_a_packet_relative_tmp_path_is_not_flagged_but_a_real_one_is(tmp_path):
     folder = tmp_path / "pr1" / "X1"
     (folder / "tmp").mkdir(parents=True)

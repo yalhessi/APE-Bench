@@ -780,6 +780,9 @@ def log_call(log: Path, stamp: str, tool: str, args: str, out: Path, status: int
 KEEP = ("target", "claim", "requested_change", "severity")
 _REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"), "a compiled check")]
 MATCHER_RUBRIC = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/matcher_rubric.md")
+#: The same rubric with one paragraph more: a finding may be a question to the author (the filing
+#: contract's pre-registration, 2026-10-12). A separate file, so every earlier seal stays reproducible.
+MATCHER_RUBRIC_QUESTIONS = MATCHER_RUBRIC.with_name("matcher_rubric_questions.md")
 
 
 #: With `harness_blind`, also the cues a conventions condition leaves in its own words: a codebook
@@ -1130,11 +1133,12 @@ _NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "
             9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
 
 
-def matcher_rubric(reviewers: int, prs: int) -> str:
+def matcher_rubric(reviewers: int, prs: int, source: Path = MATCHER_RUBRIC) -> str:
     """The matcher rubric for this many reviewers and PRs. It was written for six and six, and
-    for those it is returned unchanged."""
+    for those it is returned unchanged. `source` is `MATCHER_RUBRIC` or `MATCHER_RUBRIC_QUESTIONS`;
+    either reaches the matcher as `matcher_rubric.md`, the name its prompt reads."""
 
-    text = MATCHER_RUBRIC.read_text()
+    text = source.read_text()
     word = lambda n: _NUMBERS.get(n, str(n))
     pr_phrase = "one Mathlib pull request" if prs == 1 else f"{word(prs)} Mathlib pull requests"
     text = text.replace("on six Mathlib pull requests. Six anonymous reviewers, `R1` to `R6`",

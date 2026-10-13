@@ -239,6 +239,9 @@ def build_parser() -> argparse.ArgumentParser:
         parsers[name].add_argument("--seal", required=True, type=Path)
     parsers["match-inputs"].add_argument("--sources", required=True, type=Path,
                                          help='JSON {session: {"kind": "claude|solo|lead", "run": ...}}')
+    parsers["match-inputs"].add_argument("--question-form", action="store_true",
+                                         help="the rubric that judges a question to the author like any "
+                                              "finding (probes.MATCHER_RUBRIC_QUESTIONS)")
     parsers["match-inputs"].add_argument("--harness-blind", action="store_true",
                                          help="cut Claude sessions to the solo budget, locate their targets "
                                               "as path:line, and redact the conventions cues (probes.match_inputs)")
@@ -765,7 +768,8 @@ def _probe(args, logger) -> int:
         reviewers = {len(labels) for labels in seal.values()}
         if len(reviewers) != 1:
             raise SystemExit(f"every sealed PR needs the same number of reviewers, got {sorted(reviewers)}")
-        rubric = probes.matcher_rubric(reviewers.pop(), len(seal))
+        rubric = probes.matcher_rubric(reviewers.pop(), len(seal), probes.MATCHER_RUBRIC_QUESTIONS
+                                       if args.question_form else probes.MATCHER_RUBRIC)
         for d in probes.judge_folders(args.out, 2, files, probes.MATCHER_RUBRIC, rubric_text=rubric):
             print(json.dumps({"folder": str(d.resolve()),
                               "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))
