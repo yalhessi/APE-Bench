@@ -196,3 +196,9 @@ section, and in five ledgers (dev reps 1-2, post reps 1 and 3, val rep 1) the qu
 which is never committed; `.gitignore` keeps all twelve G ledgers out. Scanned with every 40-character
 fragment of the section's comment lines: no other G run file carries one. The ledgers stay on disk, and
 each session's result in `.ape/runs/` holds the same ledger.
+
+**The matchers' audit, G_P14_val (2026-10-13 07:01).** One flag in four folders, `b2/m1`: the matcher ran its
+own helper script, `tmp/build.py` in its folder, with the repository's interpreter
+(`/research/.../APE-Bench/ape/bin/python`), a path outside the folder. Read by hand: its calls read only its
+folder (the rubric, the asks, the five reviewers' findings), and the script assembles `matches.json` from
+judgments the matcher wrote into it by hand, as the prompt allows. Cleared; the seal was merged and unblinded.

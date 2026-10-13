@@ -22,6 +22,8 @@ for x in "G_P14_val configs/probe_sets/val_small12.yaml 4" "G_P14_post configs/p
          "G_D12 configs/probe_sets/dev_medium_0_3_0.yaml 4"; do
   set -- $x
   [ -f "$HERE/match_$1/unblinded.json" ] && continue
-  bash $TABLE/run_matching.sh "$1" "$2" "blinding_$1_SEALED.json" "sources_$1.json" "$3" || { echo "$(date -Is) STOP: matching $1 exited $?"; exit 5; }
+  bash $TABLE/run_matching.sh "$1" "$2" "blinding_$1_SEALED.json" "sources_$1.json" "$3"
+  rc=$?  # taken at once: a `$(date)` in the message reset `$?` and printed 0 for an audit flag (07:01)
+  [ $rc -eq 0 ] || { echo "$(date -Is) STOP: matching $1 exited $rc (4: a matcher's audit flagged; read it, record it in the README, then run_matching.sh ... merge)"; exit 5; }
 done
 echo "$(date -Is) matching finished: $HERE/match_G_*/unblinded.json"
