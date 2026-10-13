@@ -181,3 +181,41 @@ def test_no_new_config_reads_its_brief_from_results():
     assert not gone, ("these no longer read a brief from results/; remove them from "
                       "PROMPT_FROM_RESULTS so the list only shrinks:\n"
                       + "\n".join(f"  {p}" for p in gone))
+
+
+# --- every probe is in the questions index, and a new protocol says what it checked first -----
+
+#: `docs/questions.md` (2026-10-13): one line per question an experiment answered. It exists
+#: because a probe was proposed that re-ran the week-old conventions-ceiling result under a new
+#: name. A probe directory is one with a README or a PROTOCOL; its name must appear in the index,
+#: and a PROTOCOL written after the index opens with the section naming the lines it was checked
+#: against. The two protocols that predate the index are the only exemptions, and the set may only
+#: shrink.
+QUESTIONS_INDEX = Path("docs/questions.md")
+ALREADY_ANSWERED = "## Already answered?"
+PROTOCOLS_BEFORE_THE_INDEX = frozenset({
+    "results/pr_review_v5/probes/ask-reading-2026-10-12/PROTOCOL.md",
+    "results/pr_review_v5/probes/library-knowledge-2026-10-13/PROTOCOL.md",
+})
+
+
+def _probe_dirs():
+    files = _tracked("results/pr_review_v5/probes/*/README.md") + _tracked("results/pr_review_v5/probes/*/PROTOCOL.md")
+    return sorted({path.parent.name for path in files})
+
+
+def test_every_probe_is_in_the_questions_index():
+    index = QUESTIONS_INDEX.read_text(encoding="utf-8")
+    missing = [name for name in _probe_dirs() if name not in index]
+    assert not missing, ("these probes have no line in docs/questions.md; add the question each "
+                         "answered, with its number:\n  " + "\n  ".join(missing))
+
+
+def test_a_new_protocol_opens_with_what_was_already_answered():
+    protocols = _tracked("results/pr_review_v5/probes/*/PROTOCOL.md")
+    lacking = [str(p) for p in protocols if str(p) not in PROTOCOLS_BEFORE_THE_INDEX
+               and ALREADY_ANSWERED not in p.read_text(encoding="utf-8")]
+    assert not lacking, (f"a protocol must open with `{ALREADY_ANSWERED}`, naming the docs/questions.md "
+                         "lines it was checked against:\n  " + "\n  ".join(lacking))
+    gone = sorted(p for p in PROTOCOLS_BEFORE_THE_INDEX if not Path(p).is_file())
+    assert not gone, "remove from PROTOCOLS_BEFORE_THE_INDEX; the list only shrinks:\n  " + "\n  ".join(gone)

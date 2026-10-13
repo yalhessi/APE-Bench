@@ -14,6 +14,11 @@ default (user, 2026-09-24).
 - `docs/plans/STATUS.md` — every planned item marked built / partial / not built, checked against the tree.
 - `docs/dead-ends.md` — abandoned threads and retracted conclusions, each with what would reopen it.
   **Check it before starting, or "rediscovering", a direction.** If a proposal is on that list, say so.
+- `docs/questions.md` — **every question an experiment has already answered**, in plain words with
+  its number and its path. Read the relevant section before proposing a probe, a design or a run, and
+  after any compaction; a new probe's `PROTOCOL.md` opens with `## Already answered?`, and the tree
+  lint keeps every probe directory listed. Added 2026-10-13 after a probe was proposed that would have
+  re-run the week-old conventions-ceiling result.
 - `docs/todo/README.md` — the open hypotheses: what is worth doing, the motivating result that made
   it interesting, and what would close it. **Read it with `dead-ends.md` before proposing a
   direction**, and when a session surfaces a hypothesis it will not pursue, write it there before the
