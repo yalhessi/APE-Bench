@@ -7,12 +7,14 @@
 # usage: bash run_matching.sh <name> <set.yaml> <seal file> <sources file> <PRs a batch> [merge]
 #   merge: the matchers have run and a flag was read by hand (README); check, merge and unblind only.
 #   e.g. bash run_matching.sh P14_val configs/probe_sets/val_small12.yaml blinding_P14_val_SEALED.json sources_P14_val.json 4
+# Another probe's seals: MATCH_DIR=<its directory> (seal, sources and match_<name> live there) and
+# MATCH_FLAGS for `probe match-inputs` (the filing contract's `--question-form`, 2026-10-13).
 set -euo pipefail
 name=$1; set_yaml=$2; seal=$3; sources=$4; size=$5; mode=${6:-run}
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$(git -C "$HERE" rev-parse --show-toplevel)"
 export PYTHONPATH=$PWD/src
-T=${HERE#$PWD/}; P=results/pr_review_v5/probes/conventions-ceiling-2026-10-04
+T=${MATCH_DIR:-${HERE#$PWD/}}; P=results/pr_review_v5/probes/conventions-ceiling-2026-10-04
 S=/research/projects/proofedit/ya475/table_scratch
 TOKEN_VAR=CLAUDE_CODE_OAUTH_TOKEN
 source $P/token_window.sh
@@ -33,7 +35,7 @@ for k in range(0, len(prs), size):
 EOF
 : > "$work.prompts"
 for b in "$work"/b*/; do
-  probe match-inputs --set "$set_yaml" --seal "$b/seal.json" --sources "$T/$sources" --out "$b" --harness-blind \
+  probe match-inputs --set "$set_yaml" --seal "$b/seal.json" --sources "$T/$sources" --out "$b" --harness-blind ${MATCH_FLAGS:-} \
     | grep '"prompt"' >> "$work.prompts"
 done
 echo "$(date -Is) $name: $(wc -l < "$work.prompts") matcher folders"

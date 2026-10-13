@@ -178,3 +178,14 @@ conforming cells, listed apart from the other misses.
 
 The gate is resubmitted unchanged: `run_g.sh` skips the complete smoke runs, `smoke_check.py` re-runs
 and gates the reps.
+
+## The matching, as built (2026-10-13, before any matcher runs)
+
+As registered, with nothing read from G's findings against an ask. Seals `blinding_G_{P14_val,P14_post,D12}_SEALED.json`
+(`probe seal`, sessions G1 G2 G3 DX1 AP1; 8, 6 and 12 PRs, the 26 with asks), sources `sources_G_*.json` (G from
+`filing_g_<set>_rep<n>`; DX1 and AP1 the table's own entries), the question-form rubric
+`gpt52-postcutoff-2026-09-29/matcher_rubric_questions.md` (sha256 `c1094ab650c2…`) through `match-inputs --question-form`,
+harness-blind, two matchers a batch of 4, 3 and 4 PRs, by the table's `run_matching.sh` (`MATCH_DIR`, `MATCH_FLAGS`),
+launched by `run_g_matching.sh` on the primary token, with the user's approval of about 10-13M processed tokens
+(2026-10-13; the table's seals ran at 4.0-4.5k tokens a finding a matcher, and the dry inputs of val and post hold
+309 G findings and 99 anchor findings). The bars are read by hand afterwards.
