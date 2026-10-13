@@ -317,6 +317,33 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   the reviewer's output on these conventions is the detector's, so its value is whether maintainers
   would accept unasked filings, the open adjudication), or a detector family is found whose
   conventions hold a large share of asks.
+- **The filing decision as a contract the harness enforces, design G** (2026-10-13) — the reviewer may
+  not withhold. Every (declaration, concern) cell gets an answer, plus file and PR cells; `conforms` is
+  refused without a verified quote of the subject's own code or a re-run check; every other cell is
+  filed as a change or a question to the author; no finding budget
+  (`src/ape/tasks/lean_tasks/formal_math/review/filing_contract.py`). Run on DeepSeek-V4.1-Flash with
+  AP's conventions section, three reps on P14 and D12, 87 of 87 sessions; one blind seal of G1-3 + DX1
+  + AP1 with a question-form rubric (`results/pr_review_v5/probes/filing-contract-2026-10-12/`, README
+  pre-registered and amended before each reading). The motivation was the per-ask reading: at 37 asks a
+  session named the maintainer's concern and cleared it on a ground the contract refuses. **Evidence:**
+  All(G), the union of three reps, reaches **14 of those 37** on both matchers. AP's three reps had
+  reached 15 of them, 13 the same asks, and DX's 8. G reaches **0 of the 32 never reached** (16 partial),
+  and no ask that no DX or AP session had reached. Per session it reaches 39-40 of 93 against AP's 36-41
+  and DX's 30-33. It files 2-4 times as much: 6.4 / 8.6 / 14.8 a PR on val / post / dev, **4.9 on a
+  control** against a bar of 2.0, and 0.128 asks reached a finding against DX1's 0.320. The matchers
+  agree on 465 of 465 cells, and the anchors sit 1-2 asks from their table matches. **Why stopped:** the
+  pre-registered line, below 16 of 37. Forbidding the clear made the reviewer file at those places, and
+  what it filed is mostly not the maintainer's change: 12 of the 37, and 16 of the 32, reached only
+  partially. Naming a concern is not having the change; the reading's "names and clears" counted the
+  former. Provisional: one model, the sets the design was read on, one seal. **Untried:**
+  - the pre-registered form, a stage 1 that names into a scratch ledger and submits only its candidates;
+  - evidence that must bear on its concern (the smoke's self-lookup closes, amendment 2, fell under 3% in
+    the reps, so this is not what failed);
+  - the contract on another model, and without the conventions section.
+
+  **Reopens if:** a design changes what the reviewer knows at the partial-only places, which these
+  numbers point to, rather than whether it may withhold; or one of the untried forms beats AP's union on
+  the 37.
 
 ## Retracted conclusions — do not re-derive
 

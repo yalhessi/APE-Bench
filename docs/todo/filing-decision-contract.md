@@ -1,7 +1,10 @@
 # The filing decision: a contract the harness enforces, and a stage boundary
 
-**Status** — open, 2026-10-12, **for a fresh session**; designed and adversarially reviewed, nothing
-built, nothing run. The write-up with the round's verdicts is
+**Status** — **closed 2026-10-13: moved to `docs/dead-ends.md`** ("The filing decision as a contract the
+harness enforces, design G"). Built and run as pre-registered: All(G) reached 14 of the 37 and 0 of the 32,
+below the dead-end line of 16, the same asks AP's three reps had reached, at 2-4 times the findings
+(`results/pr_review_v5/probes/filing-contract-2026-10-12/bars.txt`, `5263d4a6`). What follows is the entry
+as it stood before the run. Designed and adversarially reviewed 2026-10-12. The write-up with the round's verdicts is
 `docs/research/filing-decision-design-2026-10-12.md` (§9–§12) and `filing-decision-design-2026-10-12/`.
 **Cost** — the generator runs are free (DeepSeek on `first`, ~35 min a rep); the seal and the matchers
 are about 0.5–1M subscription tokens on the primary account, the user's call.
