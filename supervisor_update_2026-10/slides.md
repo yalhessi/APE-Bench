@@ -29,6 +29,9 @@ style: |
   .panel { border: 2px solid #d6dcea; border-radius: 12px; padding: 10px 16px; }
   .panel h2 { font-size: 26px; margin: 0 0 6px; }
   .panel pre { font-size: 18px; margin: 6px 0; }
+  section.block pre { font-size: 16.5px; line-height: 1.32; }
+  section.block h1 { font-size: 36px; margin-bottom: 10px; }
+  section.block .take { font-size: 22px; margin-top: 10px; }
   section.rules { font-size: 22px; }
   section.rules h1 { font-size: 36px; }
   section.rules .katex-display { margin: 6px 0; }
@@ -67,181 +70,202 @@ What are we actually asking a reviewer to do?
 
 # Why a formulation, and why this one
 
-APE-Bench defines its task in prose: an instruction, a pinned environment, dual verification. Success is a relation between an edit and an **instruction**.
+APE-Bench states its task so that it does not matter who performs it: the same input, the same output, the same check. Its specification sits **in the input**, as the instruction, and the checker is fixed.
 
-Review has no instruction. Success has to be a relation between an ask and what the **community prefers**. So the formulation must separate four things the evaluation keeps confusing:
+Review has to be stated the same way: what any performer sees, what any performer emits, and what makes the emission correct, with no reference to who performed it or how we score it.
 
-- compiles from merge-ready;
-- the direction of an ask from its target;
-- the maintainer's path from other acceptable targets;
-- for a convention, where it *applies* from where a maintainer would *raise* it.
+What review lacks is a stated specification. The thing a reviewer enforces is unwritten, not satisfied by the library itself, time-varying and reviewer-varying. Every formulation of review has to put it somewhere.
 
 <div class="take">
 
-Written as judgements and rules, both tasks fit on a slide each, and the difference is one missing premise.
+"Environment plus diff, out comes natural language" underspecifies three things: the output has no type, there is no correctness criterion, and "context" hides what review is about.
 
 </div>
 
 <!--
-APE-Bench (arXiv 2504.19110, v3): Section 3 and 4.1. "Each task specifies a natural-language
-instruction, a pinned environment (repository commit and toolchain)"; the task contract has
-environment bindings, objectives, boundaries, verification protocols; "Verification requires both
-compilation (modifications type-check) and semantic validation (objectives met)", the latter by LLM
-judges on requirement alignment, scope control and semantic correctness. No tuple, equation or rule
-in the paper. The rules on the next slide are our rendering of that prose.
+From the 22 September session. The task and the instrument are different things: gold, repetitions,
+controls and adjudication are the instrument. APE-Bench's paper (Sections 3 and 4.1) gives the task in
+prose: instruction, pinned environment, boundaries, dual verification.
 -->
 
 ---
 
-<!-- _class: rules -->
+<!-- _class: block -->
 
-# APE-Bench, as rules
+# The formulation
 
-A task is $\langle E, I, B, V\rangle$ cut from a real commit: environment $E$ pins the repository state $s_0$ and toolchain; instruction $I$ is synthesised from the commit's diff; boundaries $B$ say what may change; $V$ is the verification protocol. The agent returns a patch $p$.
+```text
+APE-Bench    author(L_b, d) = δ                 correct iff  δ ∈ S(L_b, d)          kernel, and a judge of d
 
-$$
-\frac{p \text{ returned}}{s_1 = s_0 \oplus p}\ \text{(Edit)}
-\qquad
-\frac{\text{touched}(p) \subseteq B}{\text{InBounds}(p)}\ \text{(Bound)}
-\qquad
-\frac{E \vdash s_1 \text{ elaborates}}{\text{Syn}(s_1)}\ \text{(Compile)}
-$$
+Instance     (L_b, δ, d)                        the library at base b · the diff · the stated purpose
+Solutions    S(L_b, d) = { δ' : L_b + δ' compiles  ∧  δ' realises d }
+Purpose      P                                  the library's purpose: a constant of the setting, like the kernel
+Preference   ≽_t  =  P evaluated at (L_b, tools_t)    a preorder on S · unstated · drifts as the state moves
+Acceptable   A_t(L_b, d) ⊆ S(L_b, d)            the region ≽_t does not require leaving
 
-$$
-\frac{\text{Judge}(I,\ s_0 \to s_1) = \text{aligned} \wedge \text{in scope} \wedge \text{correct}}{\text{Sem}(I, s_1)}\ \text{(Judge)}
-\qquad
-\frac{\text{InBounds}(p)\quad \text{Syn}(s_1)\quad \text{Sem}(I, s_1)}{\text{Success}(\langle E,I,B,V\rangle, p)}\ \text{(Done)}
-$$
+review(L_b, δ, d) = D, a set of diagnostics, each
+    where    sites in δ, or PR-level (on d)
+    what     a separator: a predicate δ fails and every δ'' ∈ A_t satisfies
+    why      the norm, or the mathematics, it rests on
+    grade    error if A_t requires the move · warning if ≽_t merely prefers it · hint
+    fix?     a witness δ'' ∈ S(L_b, d) on the accepted side                           kernel-checkable
 
-<div class="take">
-
-The commit fixes the direction; $I$ states it; the judge checks against $I$. The agent's whole job is reaching $s_1$.
-
-</div>
-
----
-
-<!-- _class: rules -->
-
-# Review, as rules
-
-Base commit $b$; states $S_b$ a contribution can be edited into; $s_0$ the PR as submitted; an edit $e$ gives $s \oplus e$. Three relations on $S_b$: $C$ compiles, $M$ merge-ready, $\preceq$ the community's preference, **partial**. An ask is $a = \langle p, d, t\rangle$: a place, a direction, a target.
-
-$$
-\frac{\mathcal{K}(b) \vdash s \text{ elaborates}}{s \in C}\ \text{(Compile)}
-\qquad
-\frac{s \in M}{s \in C}\ \text{(Merge}\subseteq\text{Compile)}
-\qquad
-\frac{s \in M \quad s \preceq s'}{s' \in M}\ \text{(Up)}
-\qquad
-\frac{}{\preceq\ =\ \preceq_{\,\text{date}(b)}}\ \text{(Dated)}
-$$
-
-$$
-\frac{s \prec s \oplus e}{\text{Ask}\langle p(e),\ d(e),\ s \oplus e\rangle \text{ valid at } s}\ \text{(Ask)}
-\qquad
-\frac{\text{Ask}(a) \text{ valid} \quad \neg\text{Blocking}(a)}{\text{Advisory}(a)}\ \text{(Advise)}
-\qquad
-\frac{\text{maintainer's review } R^\ast \text{ of } s_0}{R^\ast \subseteq \text{ValidAsks}(s_0)}\ \text{(Gold is a lower bound)}
-$$
-
-$$
-\frac{s_0 \notin M \qquad \forall m \in M,\ s_0 \preceq m \Rightarrow d(a) \text{ applied in } m}{\text{Blocking}(a)}\ \text{(Block)}
-$$
-
-$$
-\frac{a \in R \quad a^\ast \in R^\ast \quad p(a)=p(a^\ast) \quad d(a)=d(a^\ast)}{\text{Issue}(a)}
-\qquad
-\frac{\text{Issue}(a) \quad t(a) = t(a^\ast)}{\text{Fix}(a)}
-\qquad
-\frac{\text{Issue}(a) \quad t(a), t(a^\ast) \in M \quad t(a) \parallel t(a^\ast)}{\text{Divergence}(a)}
-$$
+correct iff  sound:    every separator is one ≽_t imposes, at its grade
+             complete: every error-grade separator between δ and A_t is in D
+merge   iff  δ ∈ A_t(L_b, d)                    one round:  δ_{i+1} = author(L_b, d, δ_i, D_i)
+```
 
 <div class="take">
 
-No premise mentions an instruction. Success is a relation to $\preceq$ and $M$, which nobody writes down: we see one chain per PR, and $M$ only through merges. Divergence is derivable, and today unadjudicated.
+Authoring is construction against a stated specification. Review is prediction of an unstated, drifting one, whose samples are produced by its own members.
 
 </div>
 
+<!--
+The only change from the type-checker draft is the target: a preorder over the solutions of this task,
+not a set the library is supposed to belong to. Legacy code is not in S of this task, so the base is
+never asked to satisfy the standard; "world" is gone, the input is APE's kind of input, and the
+preference is what the performer brings, as an author brings idiom. P is stable across years; the
+preference drifts because the state it is evaluated against changes: a new tactic arrives, an API grows
+past the size where the old naming is discoverable.
+-->
+
 ---
 
-<!-- _class: rules -->
+# Three purposes, three checks
 
-# A convention, as a rule
+`d` is the PR's purpose, proposed by the author. `P` is the library's, a constant. The kernel checks `δ` against `d` on the compile half only, and never sees `P`.
 
-What populates $\preceq$. A convention $c$ is a guarded rule: a trigger (the situation at a place), a required form, a scope, and defeaters.
+| check | compares | case in the record |
+|---|---|---|
+| **faithfulness** | what δ realises against what d claims | #33149: three vacuous definitions, and it compiled |
+| **scope** | what d claims against P | #33149: many definitions, no supporting lemmas |
+| **placement** | δ against P at the current state, within S(L_b, d) | every naming, golf and generality ask |
 
-$$
-\frac{\text{trigger}_c(s, p) \qquad (\text{area}(p),\ \text{date}(b)) \in \text{scope}_c \qquad \neg\,\text{defeated}_c(s, p)}{s \ \prec\ s[\,p := \text{form}_c\,]}\ \text{(Conv}_c\text{)}
-$$
+<div class="take">
 
-- **Undefined:** no trigger fires. Silence is the correct output.
+The kernel verifies the PR relative to its own purpose; review verifies it relative to the library's. Requests come in two kinds: hold d and move δ within S, or amend d, which changes S. That is the gold's local-against-design split.
+
+</div>
+
+<!--
+In Mathlib d is proposed and judged against P, so scope is open; in an FLT-scale project d is issued by
+the blueprint, so scope is closed, and APE-Bench sits with FLT: its instruction is issued, never
+proposed. A generalisation request is P saying the purpose should have been larger; a duplication
+request is P saying the purpose is already realised in the base. Scope labels in the record: 27 local,
+13 design, 3 borderline.
+-->
+
+---
+
+<!-- _class: tbl -->
+
+# The other versions are settings of the same block
+
+| version | slot | setting | answer key? | cannot express |
+|---|---|---|---|---|
+| verdict (MathlibPR) | output | the bit δ ∈ A_t | no | anything but the bit |
+| written rules | ≽_t | the documented rules at t | yes | unwritten conventions, fit, scope |
+| recent practice | ≽_t | accepted solutions nearby | yes | the first asks of a new convention |
+| preferred alternative (ProofJudge) | output | the fix alone | via the kernel | questions, scope, PR-level asks |
+| **request emission (ours)** | — | the block as written | no | nothing; no answer key either |
+| consequential | correctness | δ_{i+1} ∈ A_t | no | needs an acceptance oracle |
+
+**Roles, not rivals:** request emission is the task; the others instrument it.
+
+<!--
+The stated standard, in both forms, is the self-contained sub-task where an answer key exists and the
+mechanisable fraction is explicit; the preferred alternative is how a preference on a fix is elicited and
+kernel-checked (two thirds of V2 gold arrives as a suggestion block); the consequential version is the
+validation that any of it matters to an author; the verdict is reported for comparability with MathlibPR.
+-->
+
+
+---
+
+# What the reviewer does with the sample
+
+The PR is one draw from S. Four operations, each with a counterpart in the record.
+
+1. **Membership.** Is the draw in S at all? The kernel settles the compile half for free. "Realises d" is not free: #33149 compiled and was outside S.
+2. **Placement.** Where does the draw sit under ≽_t? Nobody has ≽_t written down, so the reviewer places δ against reference points: the tree, recent accepted solutions, and the alternative they would have written. **This is the wall the record measured.**
+3. **Separation.** Emit the few separators that cut δ off from A_t, graded and dischargeable. Maintainers under-report on purpose.
+4. **Update.** In Mathlib the decision on this draw moves ≽_t. Requesting a spelling at 17% adoption is a deliberate push.
+
+<!--
+The author's turn is the inverse: resample S subject to the separators, which is APE with added
+constraints, until a draw lands in A_t. The Δ dead end reads correctly here: the author's next draw is
+one point on the accepted side and does not identify the separators. Placement is where the agent
+fails: it draws from S well enough that most gold sites had a candidate, and cannot rank its draws
+under ≽_t (selection at chance).
+-->
+
+---
+
+# A convention as a guarded rule
+
+A convention `c` emits a separator when its **trigger** holds at a place in δ, the place is in its **scope** (area, date), and no **defeater** applies. Its grade is error if A_t requires the form, warning if ≽_t merely prefers it.
+
+- **Undefined:** no trigger fires. Silence is correct.
 - **Nondeterministic:** the trigger fires and maintainers accept several forms. The output is a question, not a change.
-- **Decidability of the trigger:** by syntax, by execution, by lookup, or by judgement. Each has its own delivery.
+- **The trigger is decidable** by syntax, by execution, by lookup, or by judgement. Each has its own delivery.
 
 <div class="take">
 
-Part 3 measures each premise: how many rules there are (the census), what happens when the reviewer is told which fire (the ceiling), and that the trigger fires at about twenty times the places a maintainer asks. The defeater premise is where the maintainer's reasoning lives.
+Part 3 measures each premise: how many such rules there are, what happens when the reviewer is told which fire, and that the trigger fires at about twenty times the places a maintainer asks. The defeater premise is where the maintainer's reasoning lives.
 
 </div>
-
-<!--
-This is the 5 October framing: precondition = trigger (kind of object plus situation),
-postcondition = the form after the fix, often a rewrite that must still compile; scope = where the
-rule is measured to hold, by area and date; undefined = no trigger; nondeterministic = several
-accepted forms (squeezing a non-terminal simp). It fits about half the census; judgement
-conventions ("a long proof is split") have the trigger "always".
--->
 
 ---
 
 # The picture
 
 ```text
-              ·  s*  maintainer's target        ·  s'  reviewer's target
-               \                                /
-  merge-ready M ─\──────────────────────────────/───────────────
-                  \                            /
-                   ·  s″  right direction, short of M
-                    \                        /
-  compiles  C  ·· s₀ ·························  the PR as submitted
-                     \
-                      ·  s‴  a change nobody asked for, not above s₀
+                 ·  δ*  maintainer's witness             ·  δ'  reviewer's witness
+                  \                                     /
+   A_t(L_b, d)  ───\───────────────────────────────────/─────────   the acceptable region
+                    \                                 /
+                     ·  δ″  right separator, witness short of A_t
+                      \                             /
+   S(L_b, d)  ·· δ ·····································   the PR: compiles, realises d
+                       \
+                        ·  δ‴  a change no separator requires
 ```
 
-| the judge asks | in the rules |
+| the judge asks | in the formulation |
 |---|---|
-| same issue | Issue$(a)$: same place, same direction |
-| strict fix | Fix$(a)$: same target |
-| neither, but both in $M$ | Divergence$(a)$: unadjudicated today |
+| same issue | the same separator: where and what |
+| strict fix | the same witness δ* |
+| neither, both in A_t | δ' and δ* incomparable under ≽_t: unadjudicated today |
 
 ---
 
-# Merge-ready or not: three compiling PRs
+# Membership, then placement: three compiling PRs
 
-- **#33304** — doc fix, merged untouched. <span class="above">Already in M.</span> The right review is empty.
-- **#33305** — the same kind of PR, one blocking ask: a line too long. <span class="below">One step below.</span>
-- **#33149** — Navier–Stokes, AI-assisted, 19 new axioms, vacuous definitions. <span class="below">Far below, closed.</span>
+- **#33304** — doc fix, merged untouched. <span class="above">δ ∈ A_t.</span> D is empty, and that is correct.
+- **#33305** — the same kind of PR; one error-grade separator, a line too long. <span class="below">One cut from A_t.</span>
+- **#33149** — Navier–Stokes, AI-assisted. 19 axioms, vacuous definitions. <span class="below">Outside S: it compiles but does not realise d.</span>
 
 <div class="take">
 
-$M$ is not a lint set. Blocking asks draw its line; advisory asks move inside it. Of the 23 scored asks on the twelve convening PRs, 4 are blocking.
+A_t is not a lint set. The error grade draws its boundary; warnings move inside it. Of the 23 scored separators on the twelve convening PRs, 4 are error-grade.
 
 </div>
 
 <!--
-All three from the convening's twelve December-2025 PRs. 33305's line was located by neither
-reviewer in six runs. 33149: the compiler answered correctly, the meaning was wrong.
+33305's line was located by neither reviewer in six runs. 33149 is a membership failure first (the
+definitions do not say what the claim says), then a scope failure (definitions without lemmas), and
+only then a placement question. The compiler answered correctly; the meaning was wrong.
 -->
 
 ---
 
-# Taste inside M: PR #33098
+# Placement inside A_t: PR #33098
 
 <div class="cols">
 <div class="panel">
 
-## as submitted
+## δ, as submitted
 
 ```lean
 lemma minimalCover_subset :
@@ -257,14 +281,14 @@ lemma minimalCover_subset :
 </div>
 <div class="panel">
 
-## two one-liners, both compile
+## two witnesses, both in S
 
-**maintainer**
+**maintainer's δ***
 ```lean
   grind [minimalCover]
 ```
 
-**our reviewer**
+**our reviewer's δ'**
 ```lean
   simpa [minimalCover, h]
 ```
@@ -274,42 +298,26 @@ lemma minimalCover_subset :
 
 <div class="take">
 
-Both above $s_0$, the PR merges with either. The order between them is a convention in motion. The judge says "same issue, not the fix"; the order says "a divergence inside $M$".
+One separator ("this proof should be one tactic call"), two witnesses, both in A_t. ≽_t between them is a convention in motion. The judge says "same issue, not the fix"; the formulation says "a warning-grade preference, unadjudicated".
 
 </div>
 
 <!--
-grind: 0% of Mathlib files Jan 2025, 14.5% by May 2026. The reviewer produced a compiling grind
-proof in a probe and still submitted simpa: selection, not capability.
+grind: 0% of Mathlib files January 2025, 14.5% by May 2026. The reviewer produced a compiling grind
+proof in a probe and still submitted simpa: a placement decision, not a capability gap.
 -->
 
 ---
 
-# What else the order lets us say
+# What the formulation does not settle
 
-- **Under-reach:** right direction, target short of $s^\ast$. #33117: *delete* the twin lemma vs *generate* it.
-- **Gold is a lower bound:** a finding absent from the maintainer's review is unaligned, not wrong.
-- **Clean PRs:** $s_0 \in M$, so every finding is sideways or down.
-- **The order is dated:** `toLinearMap_` is the ask while the library counts 4,707 to 50 the other way.
-- **A fix is a path, not an edge:** intermediate states may not even compile.
-
-<!--
-8 of the 10 asks never hit on the convening set were located and asked wrongly. The scaffolded
-reviewer emitted 3 to 5 findings per run on the clean PRs; the whole-PR reviewer 0. Nothing in the
-evaluation adjudicates the ~90% of findings that are off gold.
--->
-
----
-
-# What it does not give us
-
-- $\preceq$ is never observed. Each PR shows one chain; "incomparable" and "never compared" look alike.
-- $M$ is seen only through merges.
-- "Divergence we are fine with" has no adjudicator yet. Only a maintainer can say so.
+- **≽_t is one object only as an idealisation.** Two maintainers sample it differently; each review is one sample, and partly *constitutes* the target. "Recover the review that occurred" is retrodiction of one sample.
+- **A_t is seen only through merges**, and the gold is a lower bound on the separators ≽_t imposes.
+- **Two witnesses in A_t** have no adjudicator yet. Only a maintainer can say the other fix was fine too.
 
 <div class="take">
 
-The question, in these terms: from $s_0$ alone, produce asks whose targets lie in $M$, preferring the maintainers' own order. Score direction and target against the one path on record.
+The question, in these terms: from (L_b, δ, d) alone, emit the separators ≽_t imposes, at their grades, with witnesses where S allows one. Score soundness and completeness against the one sample on record.
 
 </div>
 
@@ -346,13 +354,13 @@ and the October revisit. Sources slide at the end.
 
 # ① Score: the unit decides what "correct" means
 
-| unit scored | who | in the order |
+| unit scored | who | in the formulation |
 |---|---|---|
-| whole PR → merge-ready | MathlibPR | a **point**: is $s_0 \in M$? |
-| declaration before / after | ProofJudge | an **edge**: is $s \prec s'$? |
-| hunk → comments | SWR-Bench, SWE-PRBench | place and concern |
-| review → tests | c-CRAB | the target, executed |
-| one maintainer request | ours | direction and target |
+| whole PR → merge-ready | MathlibPR | the one bit: δ ∈ A_t |
+| declaration before / after | ProofJudge | one pairwise sample of ≽_t |
+| hunk → comments | SWR-Bench, SWE-PRBench | a separator's *where* and *why* |
+| review → tests | c-CRAB | the witness, executed |
+| one maintainer request | ours | separator, grade and witness |
 
 <div class="take">
 
