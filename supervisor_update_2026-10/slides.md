@@ -19,6 +19,10 @@ style: |
   h2 { font-size: 30px; color: #1d2b53; }
   table { font-size: 24px; }
   section.tbl table { font-size: 22px; }
+  section.dense { font-size: 22px; }
+  section.dense table { font-size: 19px; }
+  section.dense h1 { font-size: 34px; margin-bottom: 10px; }
+  section.dense li { margin: 2px 0; }
   blockquote { border-left: 6px solid #e0a020; background: #fff8e6; padding: 8px 18px; font-style: normal; }
   pre { font-size: 20px; }
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -273,66 +277,96 @@ Four questions, five weeks
 
 </div>
 
-**The baseline, frozen.** One session, the whole PR, the brief, the tools, compile-my-edit.
-On the twelve dev PRs: Opus 5.5 **9, 9, 7** of 23 · self-hosted DeepSeek **8, 6, 9** · GPT 5.5 **2–5**.
+The baseline: one session, the whole PR, the brief, the tools, compile-my-edit. Twelve dev PRs, 23 asks, judged.
 
-**Four questions.** Does decomposition by concern beat it? Where is the wall?
-What does the community actually ask for? Can a reviewer be given that knowledge?
+| model | harness | asks of 23, per run |
+|---|---|---|
+| Claude Opus 5.5 | ours | 9, 9, 7 |
+| DeepSeek-V4.1-Flash, self-hosted | ours | 8, 6, 9 |
+| GPT 5.5 | ours | 2 to 5 |
 
 <!--
 Instruments built since the convening: validation and test sets 2025-06..2026-03 (50 main + 10 AI
 each), 1,000 validation PRs read by two blind readers, six post-cutoff PRs, blind matchers beside
-the judge.
+the judge. The Opus row is the hygiene baseline (tools fixed); under the earlier project harness it
+read 7, 7.
 -->
 
 ---
 
-# Q1 · Decomposition by concern: the specialist arms
+# Q1 · Decomposition by concern (GPT 5.2, reasoning off)
 
-| held-out 12, three reps | arms + lead | one agent |
+| held-out 12, three reps each | ten arms + a lead | one agent |
 |---|---|---|
-| asks hit per rep | 7, 5, 6 | 4, 4, 1 |
-| hit in all three | **5** | 0 |
-| findings on the clean PRs | 3, 4, 5 | **0** |
-| billed per rep | $14.59 | **$1.90** |
+| asks hit per run | 7, 5, 6 | 4, 4, 1 |
+| hit in all three runs | **5** | 0 |
+| findings on the two clean PRs | 3, 4, 5 | **0** |
+| billed per run | $14.59 | **$1.90** |
 
-- The generalist did the work: 64 of 71 matches. The arms withheld. The gate discarded what was found.
+**Why it was a wall.** 21 of 23 asks were located by some run, 13 asked correctly: at the right declaration, the reviewer asked for something else. More structure moved volume, not the ask.
 
 <div class="take">
 
-21 of 23 asks were *located* by somebody; 13 *asked* correctly. We had decomposed the output by concern. The gap was knowledge at the place, not attention.
+The wall is what the reviewer concludes at a place it has reached. First suspect: the model's reasoning.
 
 </div>
 
 <!--
-Specialists: 37% of spend, 10% of matches, six arms matched nothing. Forced to answer: 0.20 → 0.50
-on four PRs, clean PR 1 → 36 findings. The admission gate discarded 71-83% of found asks.
+The generalist arm made 64 of the 71 matches; the specialists took 37% of spend for 10%; six arms
+matched nothing. The admission gate discarded 71-83% of the asks the run had already found. Every
+gpt-5.2 call before 30 September ran with reasoning off: 0 reasoning tokens in 2,857 of 2,857 arm
+attempts.
 -->
 
 ---
 
-<!-- _class: tbl -->
+<!-- _class: dense -->
 
-# Q2 · Where is the wall: harness, prompt, or model?
+# Q2 · Reasoning, harness, or model?
 
-| reviewer | of 23 | settles |
-|---|---|---|
-| GPT 5.2 / 5.5, three harnesses | 2–5 | the harness does not limit GPT |
-| Opus 5.5 on GPT's exact messages | 10 | the prompt text does not limit GPT |
-| Opus 4.8 / Opus 5 / Opus 5.5 | 3 / 8 / 7–12 | the model moves the wall |
-| Qwen3.5-397B, self-hosted | 2, 0, 2 | the floor |
-| **DeepSeek-V4.1-Flash, self-hosted** | **8, 6, 9** | a free iteration tier |
+| model | harness | reasoning | dev, of 23 | post-cutoff reach |
+|---|---|---|---|---|
+| GPT 5.2 | ours | off | 2 | 0.02–0.17 |
+| GPT 5.2 | ours · Claude Code · Codex | carried | 2–3 | 0.21 · 0.25 · 0.29 |
+| GPT 5.5 | ours · Codex | carried | 3 | 0.31 · 0.25 |
+| Opus 4.8 · Opus 5 · Opus 5.5 | ours | on | 3 · 8 · 7–9 | — |
+| Opus 5.5 | its own shell | on | 11–12 | 0.47 |
+| Qwen3.5-397B, self-hosted | ours | off | 2, 0, 2 | — |
+| DeepSeek-V4.1-Flash, self-hosted | ours | off · high, carried | 5 · 8, 6, 9 | — |
+
+- **Reasoning:** GPT 5.2 barely moves (2 → 2–3) though every session now finishes at a third of the cost. DeepSeek: 5 → 8, 6, 9, only with its thinking carried between turns.
+- **Harness:** three harnesses with GPT 5.2 held reach the same. Ours costs Opus 5.5 about three asks against its own shell.
+- **Model:** Opus 4.8 → 5 → 5.5 is 3 → 8 → 7–12. Not the prompt: Opus on GPT 5.2's exact messages reaches 10.
+
+<!--
+dev = twelve held-out PRs, 23 obligations, judge v9. post-cutoff = six PRs created after the Claude
+models' cutoff, 16 asks, reach per session by blind matchers. "carried" = reasoning at high effort
+with the reasoning items passed back between tool calls; "off" = no reasoning tokens. GPT 5.4 carried
+reads 0.19 (ours) and 0.31 (Codex) on post-cutoff. Qwen's one reasoning-high run had its thinking
+dropped by our client (defect found 7 October) and is not a reasoning reading.
+-->
+
+---
+
+# Q2 · What the strong model knows that the others lack
+
+Of 67 asks GPT 5.2 never reaches and Opus 5.5 does, the reviewer had visited the object in 63.
+
+| the miss, at a visited declaration | asks |
+|---|---|
+| a convention or a library mechanism it does not know (`@[to_fun]`, `toLinearMap_`, dot notation) | 25 |
+| a compile nobody ran (`positivity`, `simpa`, the old proof, `grind`) | 19 |
+| an analogue in the library not compared | 6 |
 
 <div class="take">
 
-The misses are judgement at a *visited* declaration: a convention or mechanism the reviewer does not know, or a compile nobody ran. So: what does the strong model know that the others lack?
+The wall is knowledge at a place already reached. So: what is the knowledge, and can it be supplied?
 
 </div>
 
 <!--
-Of 67 asks the weaker reviewers never reach, 63 had the object visited: unknown convention or mechanism
-25, compile not run 19, analogue not compared 6. Our harness costs Claude volume: 22% fewer findings
-at the same hit rate than the probe harness (11-12).
+Phase 1 residual mechanisms, two blind readers over the transcripts; the labels overlap. Only 4 of 67
+were never attempted.
 -->
 
 ---
@@ -357,9 +391,9 @@ The next slides measure each premise: how many such rules there are, what happen
 
 ---
 
-# Q3 · What does the community ask for? The census
+# Q3 · How many conventions? The census
 
-**How:** the 1,833 first-round asks on 1,000 validation PRs. Two blind readers each wrote the principle behind every ask as one sentence, keeping a running codebook.
+**How:** the 1,833 first-round asks on 1,000 validation PRs. Two blind reader sessions of Opus 5.5 each wrote the principle behind every ask as one sentence, keeping a running codebook.
 
 - **409 and 407 principles**, two apart. Not saturated: one ask in ten still brings a new one.
 - **Small head, long tail:** top 10 cover 22%, top 50 cover 55%, 370 in the tail.
@@ -375,14 +409,15 @@ Review is not a hundred rules. Four deterministic detectors for the head cover 2
 
 # Q3 · Does knowing the convention help? The ceiling
 
-Tell the reviewer *which* census conventions the maintainers invoked on this PR, as general sentences, no location. Compare with the same reviewer unbriefed.
+Tell the reviewer *which* census conventions the maintainers invoked on this PR, as general sentences, no location. Fourteen held-out PRs, 46 asks, blind matchers.
 
-| reviewer | unbriefed | briefed | gain |
-|---|---|---|---|
-| Opus 5.5 | 0.47 | 0.74 | **+0.27** |
-| GPT 5.5 | 0.24 | 0.46 | **+0.22** |
-| DeepSeek, three reps | 0.28 | 0.50 | **+0.22** |
-| DeepSeek, with precedence and an example | 0.28 | 0.70 | **+0.42** |
+| model | runs | unbriefed | briefed | gain |
+|---|---|---|---|---|
+| Claude Opus 5.5 | 2 | 0.47 | 0.74 | **+0.27** |
+| GPT 5.5 | 1 | 0.24 | 0.46 | **+0.22** |
+| DeepSeek-V4.1-Flash | 3 | 0.28 | 0.50 | **+0.22** |
+| DeepSeek, with precedence and an example each | 3 | 0.28 | 0.70 | **+0.42** |
+| Qwen3.5-397B | 3 | 0.03 | 0.09 | +0.05 |
 
 <div class="take">
 
@@ -391,8 +426,7 @@ Knowledge is the lever, for the free model as much as the paid ones. But this is
 </div>
 
 <!--
-Fourteen held-out PRs, 46 asks, blind matchers. Qwen at the floor: +0.05. Of 17 asks no unbriefed
-session of any model reaches, briefed sessions reach 11.
+Of 17 asks no unbriefed session of any model reaches, briefed sessions reach 11.
 -->
 
 ---
@@ -401,19 +435,19 @@ session of any model reaches, briefed sessions reach 11.
 
 # Q4 · Getting the knowledge in without the answer key
 
-| delivery, least to most assertive | result |
-|---|---|
-| guides and the catalogue as prompt text | null |
-| the applicable entries, picked from the diff | +0.03 |
-| pinpointed at the place, "check whether it applies" | 0.00: overridden at 9 of 21 places |
-| asserted as applying, with precedence | +0.20 on the PRs it was built on; 0.00 on fresh ones |
-| deterministic detectors as facts | valid, 2.9% of asks |
-| a filing contract: no withholding | 14 of 37, at 4.9 findings per clean PR |
-| dossiers and exams per convention | not built: the bare sentence already works at the place |
+| delivery, least to most assertive | model | result |
+|---|---|---|
+| guides and the catalogue as prompt text | GPT 5.4, GPT 5.2 | null at N=115 |
+| the applicable entries, picked from the diff | Opus 5.5 | +0.03 |
+| pinpointed at the place, "check if it applies" | Opus 5.5 | 0.00: overridden at 9 of 21 places |
+| asserted as applying, with precedence | DeepSeek; Opus 5.5 | +0.20 on the PRs it was built on; 0.00 on fresh |
+| deterministic detectors as facts | GPT 5.5 | valid, 2.9% of asks |
+| a filing contract: no withholding | DeepSeek | 14 of 37, at 4.9 findings per clean PR |
+| dossiers and exams per convention | not run | the bare sentence already works |
 
 <div class="take">
 
-And maintainers raise a convention at **5% or fewer** of the places it applies. Predicting which: ~7% precision.
+Maintainers raise a convention at **≤ 5%** of the places it applies; predicting which: ~7% precision.
 
 </div>
 
@@ -421,7 +455,7 @@ And maintainers raise a convention at **5% or fewer** of the places it applies. 
 
 # The mechanism, on one PR
 
-PR #42814. The maintainer asked for `variable {D}` declared once. The reviewer held that exact convention at that exact declaration, and wrote:
+Opus 5.5 on PR #42814. The maintainer asked for `variable {D}` declared once. The reviewer held that exact convention at that exact declaration, and wrote:
 
 > "Mathlib does not require these, so I would not request them."
 
@@ -440,8 +474,8 @@ The model acts on a convention it is told applies: solved. Which of the hundreds
 
 | layer | status |
 |---|---|
-| **knowledge** — the census holds what maintainers ask; a reviewer acts on it when told | supported, replicated |
-| **delivery without the asks** — pick the applicable conventions from the PR | not supported off-sample |
+| **knowledge** — the census holds what maintainers ask; a reviewer acts on it when told | supported on Opus 5.5, GPT 5.5 and DeepSeek |
+| **delivery without the asks** — pick the applicable conventions from the PR | not supported off-sample, on DeepSeek and on Opus 5.5 |
 | **understanding** — dossiers and exams | not supported; drop rule met |
 
 - A third of asks escape every unbriefed session of every model, spread thin across kinds: the tail.
@@ -465,17 +499,17 @@ A maintainer's decision to raise a convention, or not, is **reasoning on evidenc
 
 So the harness should gather and weigh that evidence, not learn a preference.
 
-| option | ceiling | cost |
-|---|---|---|
-| the harness for the free model | ~+0.10 | $0, a day |
-| analogue retrieval for the design asks | ~0.075 of asks | a measurement first |
-| a closer battery as packet facts | ~0.065 of asks | compute |
-| the per-place engine | 0.40–0.55 in-census | 25× filings; needs adjudication |
+| option | model | ceiling | cost |
+|---|---|---|---|
+| the harness for the free model: its own shell, files it rereads | DeepSeek | ~+0.10 | $0, a day |
+| analogue retrieval for the design asks | any | ~0.075 of asks | a measurement first |
+| a closer battery as packet facts | any | ~0.065 of asks | compute |
+| the per-place engine | DeepSeek | 0.40–0.55 in-census | 25× filings; needs adjudication |
 
 <!--
 Dense.ciSup: the statement is a supremum, the library names such lemmas ciSup, the lemma is not about
-continuity, so continuous_ goes. All ceilings on 93 asks over 26 PRs used to develop the designs;
-the fresh 40-PR set has built workspaces and has never been read.
+continuity, so continuous_ goes. All ceilings on 93 asks over 26 PRs used to develop the designs; the
+fresh 40-PR set has built workspaces and has never been read.
 -->
 
 ---
@@ -486,16 +520,11 @@ the fresh 40-PR set has built workspaces and has never been read.
 
 | point | what we measured |
 |---|---|
-| **The standard cannot be told as text.** | Mathlib's guides injected into the prompt: null at N=115 in June. The census as a list of 25: +0.03. The same sentences stated as applying here: +0.26. |
-| **Evidence shows a finding is true, not that it is wanted.** | Every finding we file carries a compile receipt, and 90% of them match no maintainer ask. Every selector we tried on the findings alone sits at chance, AUC 0.49–0.52. |
-| **Diversity buys recall; voting loses it.** | The solo reviewer's three runs never hit the same ask twice. Four runs unioned reach 12 of 23, at 7 findings per clean PR. |
-| **Splitting the review up does not find more.** | Ten specialist arms against one agent: neither wins. The arms' generalist made 64 of the 71 matches; the specialists took 37% of spend for 10%. |
-| **A reviewer allowed to stay silent will.** | Arms refused the option to abstain: 0.20 → 0.50 of the asks on the same four PRs, and the clean PR went from 1 finding to 36. |
-
-<!--
-dead-ends.md "statute"; conventions-ceiling stages F and exact; selection-signal.md; the ensemble-union
-reading; the A/B spine (ab-heldout12-obligation-spine.md); forbid_abstention on the fanout four.
--->
+| **The standard cannot be told as text.** | Mathlib's guides in the prompt, GPT 5.4 and 5.2: null at N=115. The census as a list of 25, Opus 5.5: +0.03. The same sentences stated as applying here: +0.26. |
+| **Evidence shows a finding is true, not that it is wanted.** | GPT 5.2 arms: every finding carries a compile receipt, and 90% match no maintainer ask. Every selector on the findings alone sits at chance, AUC 0.49–0.52. |
+| **Diversity buys recall; voting loses it.** | GPT 5.2 solo: three runs never hit the same ask twice. Opus 5.x: four runs unioned reach 12 of 23, at 7 findings per clean PR. |
+| **Splitting the review up does not find more.** | GPT 5.2: ten arms against one agent, neither wins. The arms' generalist made 64 of 71 matches; the specialists took 37% of spend for 10%. |
+| **A reviewer allowed to stay silent will.** | GPT 5.2 arms refused the option to abstain: 0.20 → 0.50 on the same four PRs, and the clean PR went from 1 finding to 36. |
 
 ---
 
