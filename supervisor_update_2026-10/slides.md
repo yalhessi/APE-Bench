@@ -127,13 +127,11 @@ emit         D, a set of requests
 Preference   ≽_t  on S(C_b, p)                    P evaluated at the current code · unstated · drifts
 Acceptable   A_t  ⊆ S(C_b, p)                     the region ≽_t does not require leaving
 
-a request    a test on revised PRs: the submitted δ fails it, acceptable revisions pass it
-             required    no acceptable revision fails it
-             preferred   the community favours revisions that pass it, but would merge either way
-             witness?    one revision that passes it, compiles, and still realises p      kernel-checkable
+a request    a test on revised PRs: the submitted δ fails it, revisions ≽_t favours pass it
+             witness?   one revision that passes it, compiles, and still realises p        kernel-checkable
 
-correct iff  sound:     every test in D is one the community would set, at that grade
-             complete:  no required test is missing
+correct iff  sound:     every test in D is one the community would set
+             complete:  if δ ∉ A_t, some test in D is passed by every revision in A_t
 merge   iff  δ ∈ A_t             next base (merge(C_b, δ), P)      one round: δ_{i+1} = author(C_b, p, δ_i, D_i)
 ```
 
@@ -155,14 +153,14 @@ the preference drifts because the state it is evaluated against changes.
 
 | PR | what the review said | the line of the block |
 |---|---|---|
-| **#33149** | three vacuous definitions; 19 axioms | δ ∉ S: "realises p" fails. "No axioms" is a required test from P |
-| **#33305** | one doc-comment line too long | δ ∈ S, one required test: δ ∉ A_t |
+| **#33149** | three vacuous definitions; 19 axioms | δ ∉ S: "realises p" fails. "No axioms" is a test every revision in A_t passes |
+| **#33305** | one doc-comment line too long | δ ∈ S, δ ∉ A_t: one test separates them |
 | **#33304** | nothing | δ ∈ A_t: D is empty, correctly |
-| **#33098** | make this proof one tactic call | one preferred test, two witnesses (`grind`, `simpa`), both in A_t |
+| **#33098** | make this proof one tactic call | δ ∈ A_t already; one test ≽_t favours, two witnesses (`grind`, `simpa`) |
 
 <div class="take">
 
-Of the convening's 23 requests, 4 are required. Most of review is preferred: placement inside A_t.
+Of the convening's 23 tests, 4 separate the PR from A_t. The rest are preferences inside it: placement.
 
 </div>
 
@@ -178,7 +176,7 @@ grind went from 0% of Mathlib files in January 2025 to 14.5% by May 2026.
 
 1. **Membership.** Is δ in S? The kernel settles "compiles"; "realises p" needs a judge.
 2. **Placement.** Where is δ under ≽_t? Judged against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
-3. **Request.** The few tests that cut δ off from A_t, at their grades. Maintainers under-report on purpose.
+3. **Request.** The few tests worth setting: those that cut δ off from A_t, and the preferences that matter. Maintainers under-report on purpose.
 4. **Update.** Merging moves C, so ≽_t moves; P does not.
 
 <!--
@@ -198,7 +196,7 @@ draws under ≽_t.
 
 <div class="take">
 
-The task: from (C_b, δ, p) alone, emit the tests the community would set, at their grades, with witnesses. Score soundness and completeness against the one sample on record.
+The task: from (C_b, δ, p) alone, emit the tests the community would set, with witnesses. Score soundness and completeness against the one sample on record.
 
 </div>
 
@@ -388,7 +386,7 @@ at the same hit rate than the probe harness (11-12).
 ```text
 trigger_c holds at a place in δ     (area, date) ∈ scope_c     no defeater
 ──────────────────────────────────────────────────────────────────────────
-a test at that place:  required if A_t demands the form, preferred if ≽_t favours it
+a test at that place: revisions with the form are the ones ≽_t favours
 ```
 
 - No trigger fires: silence is correct.
