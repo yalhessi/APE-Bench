@@ -243,11 +243,11 @@ docs/research/code-review-systems-survey-2026-09.md.
 
 | point | evidence | for us |
 |---|---|---|
-| **A reviewer cannot be told the standard as text.** | guidelines in the prompt: Atlassian +5% | ≽_t has to reach the reviewer some other way |
-| **A true finding is not a wanted one. Precision is learned from which comments got acted on.** | Atlassian: checking truth did nothing; a gate trained on 50k resolved comments +15–20pp. Alibaba: a filter judging worth deleted real defects; restricted to truth, 36% → 88% | truth is free from the kernel; "would the community set this test" has no outcome data to learn from |
+| **A reviewer cannot be told the standard as text.** | guidelines in the prompt: Atlassian +5% | ≽_t has to reach the reviewer another way |
+| **Evidence shows a finding is true, not wanted. Many evidenced findings; few get acted on.** | Atlassian: 4% of comments match a human one, 38.7% get resolved; a truth check did nothing, a gate trained on 50k resolved comments +15–20pp | evidence shows only the checkable part of ≽_t, which the kernel gives us free; nothing on record shows the rest |
 | **Diversity buys recall; voting loses it.** | aggregating reviews +44% F1; an ensemble's union +83%; majority vote a "popularity trap" | run several passes, keep the union, never vote |
 | **Splitting the review up does not find more.** | Di Biase: decomposed diffs found no more defects; Alibaba's file grouping cut recall 20% → 12.7% | specialists are not where recall comes from |
-| **A reviewer allowed to stay silent will.** | Cursor needed "aggressive" prompts once restraint made it quiet | silence has to be made illegal, and the cost measured on clean PRs |
+| **A reviewer allowed to stay silent will.** | Cursor needed "aggressive" prompts once restraint made it quiet | make silence illegal; measure the cost on clean PRs |
 
 <!--
 Sources: RovoDev, Atlassian (2601.01129); open-code-review's commit history (the filter fix, the grouping
@@ -487,7 +487,7 @@ the fresh 40-PR set has built workspaces and has never been read.
 | point | what we measured |
 |---|---|
 | **The standard cannot be told as text.** | Mathlib's guides injected into the prompt: null at N=115 in June. The census as a list of 25: +0.03. The same sentences stated as applying here: +0.26. |
-| **A true finding is not a wanted one.** | Every finding we file carries a compile receipt, and 90% of them match no maintainer ask. Every selector we tried on the findings alone sits at chance, AUC 0.49–0.52. |
+| **Evidence shows a finding is true, not that it is wanted.** | Every finding we file carries a compile receipt, and 90% of them match no maintainer ask. Every selector we tried on the findings alone sits at chance, AUC 0.49–0.52. |
 | **Diversity buys recall; voting loses it.** | The solo reviewer's three runs never hit the same ask twice. Four runs unioned reach 12 of 23, at 7 findings per clean PR. |
 | **Splitting the review up does not find more.** | Ten specialist arms against one agent: neither wins. The arms' generalist made 64 of the 71 matches; the specialists took 37% of spend for 10%. |
 | **A reviewer allowed to stay silent will.** | Arms refused the option to abstain: 0.20 → 0.50 of the asks on the same four PRs, and the clean PR went from 1 finding to 36. |
