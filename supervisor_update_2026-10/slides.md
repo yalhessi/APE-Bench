@@ -75,18 +75,18 @@ What are we actually asking a reviewer to do?
 
 ```text
 Library     L = (C, P)          code C, and a purpose P        P is constant across years
-PR          (δ, d)              a diff δ, and a purpose d      what this change is for
+PR          (δ, p)              a diff δ, and a purpose p      what this change is for
 
 merge(C, δ)                     the code after δ               defined iff the patch applies
 merge(C, δ) compiles            the kernel accepts it
-δ realises d in C               the diff does what d says      decided by a judge
+δ realises p in C               the diff does what p says      decided by a judge
 
-S(C, d)  =  { δ : merge(C, δ) compiles  ∧  δ realises d in C }      the solutions of a task
+S(C, p)  =  { δ : merge(C, δ) compiles  ∧  δ realises p in C }      the solutions of a task
 ```
 
 <div class="take">
 
-Merging changes the code, not the purpose: merge(L, δ) = (merge(C, δ), P). Both tasks live in S; they differ in what is given and what is emitted.
+Merging and compiling act on code; P stays fixed. Both tasks live in S; they differ in what is given and what is emitted.
 
 </div>
 
@@ -97,9 +97,9 @@ Merging changes the code, not the purpose: merge(L, δ) = (merge(C, δ), P). Bot
 # APE-Bench
 
 ```text
-given        (C_b, d)            d stated as an instruction, cut from a real commit
+given        (C_b, p)            p stated as an instruction, cut from a real commit
 emit         δ
-correct iff  δ ∈ S(C_b, d)       the kernel decides "compiles", a judge decides "realises"
+correct iff  δ ∈ S(C_b, p)       the kernel decides "compiles", a judge decides "realises"
 ```
 
 <div class="take">
@@ -121,22 +121,20 @@ evaluated agent: 47 of 100 tasks.
 # Reviewing
 
 ```text
-given        (C_b, δ, d)                         the diff, and d as the author's claim; P in the background
-emit         D, a set of diagnostics
+given        (C_b, δ, p)                          P in the background
+emit         D, a set of requests
 
-Preference   ≽_t  =  P evaluated at (C_b, tools_t)      a preorder on S(C_b, d) · unstated · drifts
-Acceptable   A_t(C_b, d) ⊆ S(C_b, d)             the region ≽_t does not require leaving
+Preference   ≽_t  on S(C_b, p)                    P evaluated at the current code · unstated · drifts
+Acceptable   A_t  ⊆ S(C_b, p)                     the region ≽_t does not require leaving
 
-each diagnostic
-    where    sites in δ, or PR-level (on d)
-    what     a separator: δ fails it, every δ'' ∈ A_t satisfies it
-    why      the norm, or the mathematics, it rests on
-    grade    error if A_t requires the move · warning if ≽_t prefers it · hint
-    fix?     a witness δ'' ∈ S(C_b, d) on the accepted side                  kernel-checkable
+a request    a test on revised PRs: the submitted δ fails it, acceptable revisions pass it
+             required    no acceptable revision fails it
+             preferred   the community favours revisions that pass it, but would merge either way
+             witness?    one revision that passes it, compiles, and still realises p      kernel-checkable
 
-correct iff  sound:    every separator is one ≽_t imposes, at its grade
-             complete: every error-grade separator between δ and A_t is in D
-merge   iff  δ ∈ A_t(C_b, d)      then L_{b+1} = (merge(C_b, δ), P)      one round:  δ_{i+1} = author(C_b, d, δ_i, D_i)
+correct iff  sound:     every test in D is one the community would set, at that grade
+             complete:  no required test is missing
+merge   iff  δ ∈ A_t             next base (merge(C_b, δ), P)      one round: δ_{i+1} = author(C_b, p, δ_i, D_i)
 ```
 
 <div class="take">
@@ -157,21 +155,21 @@ the preference drifts because the state it is evaluated against changes.
 
 | check | compares | case |
 |---|---|---|
-| **faithfulness** | δ realises d in C_b | #33149: vacuous definitions, and it compiled |
-| **scope** | P licenses d | #33149: many definitions, no supporting lemmas |
-| **placement** | δ's place under ≽_t, within S(C_b, d) | every naming, golf and generality ask |
+| **faithfulness** | δ realises p in C_b | #33149: vacuous definitions, and it compiled |
+| **scope** | P licenses p | #33149: many definitions, no supporting lemmas |
+| **placement** | δ's place under ≽_t, within S(C_b, p) | every naming, golf and generality ask |
 
 <div class="take">
 
-The kernel checks the code. A judge checks δ against d. Review checks δ and d against P.
+The kernel checks the code. A judge checks δ against p. Review checks δ and p against P.
 
 </div>
 
 <!--
-Two kinds of request: hold d and move δ within S (golf, naming, style, docs, placement), or amend d,
+Two kinds of request: hold p and move δ within S (golf, naming, style, docs, placement), or amend p,
 which changes S (generalise, factor the family, drop a definition). That is the gold's
-local-against-design split: 27 local, 13 design, 3 borderline. In Mathlib d is proposed, so scope is
-open; in an FLT-scale project d is issued by the blueprint, so scope is closed; APE-Bench sits with FLT.
+local-against-design split: 27 local, 13 design, 3 borderline. In Mathlib p is proposed, so scope is
+open; in an FLT-scale project p is issued by the blueprint, so scope is closed; APE-Bench sits with FLT.
 -->
 
 ---
@@ -203,13 +201,13 @@ version is the validation that any of it matters to an author; the verdict is fo
 
 1. **Membership.** Is the draw in S? The kernel settles half. #33149 compiled and was outside S.
 2. **Placement.** Where does it sit under ≽_t? Placed against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
-3. **Separation.** Emit the few separators that cut δ off from A_t. Maintainers under-report on purpose.
+3. **Request.** Emit the few tests that cut δ off from A_t. Maintainers under-report on purpose.
 4. **Update.** Merging moves C, so ≽_t moves; P does not. A spelling requested at 17% adoption is a push.
 
 <!--
-The author's turn is the inverse: resample S subject to the separators until a draw lands in A_t. The
+The author's turn is the inverse: resample S subject to the tests until a draw lands in A_t. The
 Δ dead end reads correctly here: the author's next draw is one point on the accepted side and does not
-identify the separators. Placement is where the agent fails: most gold sites had a candidate, and it
+identify the tests. Placement is where the agent fails: most gold sites had a candidate, and it
 cannot rank its draws under ≽_t.
 -->
 
@@ -220,7 +218,7 @@ cannot rank its draws under ≽_t.
 ```text
 trigger_c holds at a place in δ     (area, date) ∈ scope_c     no defeater
 ──────────────────────────────────────────────────────────────────────────
-a separator at that place, at its grade:  error if A_t requires the form, warning if ≽_t prefers it
+a request at that place:  required if A_t demands the form, preferred if ≽_t favours it
 ```
 
 - No trigger fires: silence is correct.
@@ -240,18 +238,18 @@ Part 3 measures each premise. The defeater is where the maintainer's reasoning l
 ```text
                  ·  δ*  maintainer's witness             ·  δ'  reviewer's witness
                   \                                     /
-   A_t(C_b, d)  ───\───────────────────────────────────/─────────   the acceptable region
+   A_t(C_b, p)  ───\───────────────────────────────────/─────────   the acceptable region
                     \                                 /
-                     ·  δ″  right separator, witness short of A_t
+                     ·  δ″  right test, witness short of A_t
                       \                             /
-   S(C_b, d)  ·· δ ·····································   the PR: compiles, realises d
+   S(C_b, p)  ·· δ ·····································   the PR: compiles, realises p
                        \
-                        ·  δ‴  a change no separator requires
+                        ·  δ‴  a change no test requires
 ```
 
 | the judge asks | in the formulation |
 |---|---|
-| same issue | the same separator |
+| same issue | the same test |
 | strict fix | the same witness |
 | neither, both in A_t | incomparable under ≽_t: unadjudicated today |
 
@@ -260,12 +258,12 @@ Part 3 measures each premise. The defeater is where the maintainer's reasoning l
 # Membership, then placement: three compiling PRs
 
 - **#33304** — merged untouched. <span class="above">δ ∈ A_t.</span> D is empty, correctly.
-- **#33305** — one error-grade separator: a line too long. <span class="below">One cut from A_t.</span>
-- **#33149** — 19 axioms, vacuous definitions. <span class="below">Outside S: compiles, does not realise d.</span>
+- **#33305** — one required test: no line over the limit. <span class="below">One cut from A_t.</span>
+- **#33149** — 19 axioms, vacuous definitions. <span class="below">Outside S: compiles, does not realise p.</span>
 
 <div class="take">
 
-The error grade draws A_t's boundary; warnings move inside it. On the convening's 23 separators, 4 are errors.
+Required tests draw A_t's boundary; preferred ones move inside it. Of the convening's 23 requests, 4 are required.
 
 </div>
 
@@ -309,7 +307,7 @@ lemma minimalCover_subset :
 
 <div class="take">
 
-One separator, two witnesses. ≽_t between them is a convention in motion: a warning-grade preference, unadjudicated.
+One test, two witnesses. ≽_t between them is a convention in motion: a preferred request, unadjudicated.
 
 </div>
 
@@ -328,7 +326,7 @@ proof in a probe and still submitted simpa: a placement decision, not a capabili
 
 <div class="take">
 
-The task: from (C_b, δ, d) alone, emit the separators ≽_t imposes, at their grades, with witnesses. Score soundness and completeness against the one sample on record.
+The task: from (C_b, δ, p) alone, emit the tests the community would set, at their grades, with witnesses. Score soundness and completeness against the one sample on record.
 
 </div>
 
@@ -369,9 +367,9 @@ and the October revisit. Sources slide at the end.
 |---|---|---|
 | whole PR → merge-ready | MathlibPR | the one bit: δ ∈ A_t |
 | declaration before / after | ProofJudge | one pairwise sample of ≽_t |
-| hunk → comments | SWR-Bench, SWE-PRBench | a separator's *where* and *why* |
+| hunk → comments | SWR-Bench, SWE-PRBench | a request's site and reason |
 | review → tests | c-CRAB | the witness, executed |
-| one maintainer request | ours | separator, grade and witness |
+| one maintainer request | ours | request, grade and witness |
 
 <div class="take">
 
