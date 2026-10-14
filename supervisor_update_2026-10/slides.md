@@ -212,29 +212,27 @@ What review systems have in common, and where they part
 
 <!-- _class: tbl -->
 
-# Each other approach pins one part, and pays for it
+# The question each published formulation answers
 
-| approach | what it pins | what it gives up |
+| work | the question | in the formulation |
 |---|---|---|
-| verdict | the output: only "is δ acceptable" | everything but one bit; models cannot beat "it builds" |
-| written rules | the standard: the documented rules | every convention that is not written down |
-| recent practice | the standard: what was accepted nearby | the first asks of a convention in motion |
-| preferred alternative | the output: a fix only | questions, scope, PR-level asks |
-| consequential | correctness: the author's next revision is acceptable | needs an acceptance oracle; confounds reviewer and author |
-| **request emission, ours** | nothing | the answer key: only one maintainer's review, a lower bound |
+| MathlibPR | Is this PR merge-ready? | δ ∈ A_t ? |
+| Tricorder, BitsAI-CR, AutoCommenter | Which written rules does it break? | which tests from the written part of ≽_t δ fails |
+| Qodo, Greptile, Semgrep | Where does it depart from what we accepted lately? | tests read off recent points of ≽_t |
+| ProofJudge | Of these two versions, which would the maintainer take? | ≽_t on a given pair (δ, δ'') |
+| c-CRAB; resolution rates | Did the author act on the comment? | δ_{i+1} passes the test |
+| SWR-Bench, SWE-PRBench, **ours** | What would the reviewer ask for? | the tests the community would set on δ, with witnesses |
 
 <div class="take">
 
-We kept the whole task: hence recall against a lower bound, not precision and F1.
+Only the last asks for the tests themselves. The others ask what an answer key can settle: membership, a written rule, a given pair, an outcome.
 
 </div>
 
 <!--
-Who does what: verdict is MathlibPR; written rules are Tricorder, BitsAI-CR, AutoCommenter; recent
-practice is Qodo, Greptile, Semgrep memories; preferred alternative is ProofJudge; consequential is
-c-CRAB and the resolution rates at Atlassian and Cursor; request emission is SWR-Bench, SWE-PRBench and
-ours. MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge:
-recovers reviewer preference on 63.5-80.8% of 218 before/after pairs.
+MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge: recovers
+reviewer preference on 63.5-80.8% of 218 before/after pairs. Sources in
+docs/research/code-review-systems-survey-2026-09.md.
 -->
 
 ---
