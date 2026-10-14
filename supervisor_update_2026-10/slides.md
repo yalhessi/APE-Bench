@@ -29,6 +29,11 @@ style: |
   .panel { border: 2px solid #d6dcea; border-radius: 12px; padding: 10px 16px; }
   .panel h2 { font-size: 26px; margin: 0 0 6px; }
   .panel pre { font-size: 18px; margin: 6px 0; }
+  section.rules { font-size: 22px; }
+  section.rules h1 { font-size: 36px; }
+  section.rules .katex-display { margin: 6px 0; }
+  section.rules .katex { font-size: 1.02em; }
+  section.rules .take { font-size: 22px; margin-top: 10px; }
   .above { color: #1a7f37; font-weight: bold; }
   .below { color: #b3261e; font-weight: bold; }
   footer { font-size: 16px; color: #888; }
@@ -60,42 +65,133 @@ What are we actually asking a reviewer to do?
 
 ---
 
-# Two tasks on the same code
+# Why a formulation, and why this one
 
-**APE-Bench:** given an instruction, reach the state.
-Success = the edit compiles, and a judge agrees it does what the instruction says.
+APE-Bench defines its task in prose: an instruction, a pinned environment, dual verification. Success is a relation between an edit and an **instruction**.
 
-**Review:** given the state, produce the instruction.
-The PR already compiles. Nobody hands the reviewer an ask.
+Review has no instruction. Success has to be a relation between an ask and what the **community prefers**. So the formulation must separate four things the evaluation keeps confusing:
+
+- compiles from merge-ready;
+- the direction of an ask from its target;
+- the maintainer's path from other acceptable targets;
+- for a convention, where it *applies* from where a maintainer would *raise* it.
 
 <div class="take">
 
-APE-Bench gives the direction and asks for the target. Review asks for the direction. The direction is where maintainers spend their time.
+Written as judgements and rules, both tasks fit on a slide each, and the difference is one missing premise.
 
 </div>
 
 <!--
-APE-Bench: tasks synthesised from real Mathlib commits; "dual verification", syntactic compilation
-plus semantic requirement satisfaction; best evaluated agent 47 of 100 tasks.
+APE-Bench (arXiv 2504.19110, v3): Section 3 and 4.1. "Each task specifies a natural-language
+instruction, a pinned environment (repository commit and toolchain)"; the task contract has
+environment bindings, objectives, boundaries, verification protocols; "Verification requires both
+compilation (modifications type-check) and semantic validation (objectives met)", the latter by LLM
+judges on requirement alignment, scope control and semantic correctness. No tuple, equation or rule
+in the paper. The rules on the next slide are our rendering of that prose.
 -->
 
 ---
 
-# A partial order on contribution states
+<!-- _class: rules -->
 
-For a PR against base commit $b$, take every state it could be edited into.
+# APE-Bench, as rules
 
-- $C$: the states that **compile**. Cheap, decidable, the kernel's job.
-- $\preceq$: the community's **preference**. Partial: two golfs, two names, often incomparable.
-- $M \subseteq C$: the states a maintainer would **merge**. Upward closed. Not decidable.
+A task is $\langle E, I, B, V\rangle$ cut from a real commit: environment $E$ pins the repository state $s_0$ and toolchain; instruction $I$ is synthesised from the commit's diff; boundaries $B$ say what may change; $V$ is the verification protocol. The agent returns a patch $p$.
 
-A **review** of $s_0$ is a set of asks, each a direction and a target: $s_0 \prec s_i$. The maintainer's asks and the author's replies trace one path into $M$.
+$$
+\frac{p \text{ returned}}{s_1 = s_0 \oplus p}\ \text{(Edit)}
+\qquad
+\frac{\text{touched}(p) \subseteq B}{\text{InBounds}(p)}\ \text{(Bound)}
+\qquad
+\frac{E \vdash s_1 \text{ elaborates}}{\text{Syn}(s_1)}\ \text{(Compile)}
+$$
+
+$$
+\frac{\text{Judge}(I,\ s_0 \to s_1) = \text{aligned} \wedge \text{in scope} \wedge \text{correct}}{\text{Sem}(I, s_1)}\ \text{(Judge)}
+\qquad
+\frac{\text{InBounds}(p)\quad \text{Syn}(s_1)\quad \text{Sem}(I, s_1)}{\text{Success}(\langle E,I,B,V\rangle, p)}\ \text{(Done)}
+$$
 
 <div class="take">
 
-"Verifiable correctness is not enough" is the statement $M \subsetneq C$.
+The commit fixes the direction; $I$ states it; the judge checks against $I$. The agent's whole job is reaching $s_1$.
 
 </div>
+
+---
+
+<!-- _class: rules -->
+
+# Review, as rules
+
+Base commit $b$; states $S_b$ a contribution can be edited into; $s_0$ the PR as submitted; an edit $e$ gives $s \oplus e$. Three relations on $S_b$: $C$ compiles, $M$ merge-ready, $\preceq$ the community's preference, **partial**. An ask is $a = \langle p, d, t\rangle$: a place, a direction, a target.
+
+$$
+\frac{\mathcal{K}(b) \vdash s \text{ elaborates}}{s \in C}\ \text{(Compile)}
+\qquad
+\frac{s \in M}{s \in C}\ \text{(Merge}\subseteq\text{Compile)}
+\qquad
+\frac{s \in M \quad s \preceq s'}{s' \in M}\ \text{(Up)}
+\qquad
+\frac{}{\preceq\ =\ \preceq_{\,\text{date}(b)}}\ \text{(Dated)}
+$$
+
+$$
+\frac{s \prec s \oplus e}{\text{Ask}\langle p(e),\ d(e),\ s \oplus e\rangle \text{ valid at } s}\ \text{(Ask)}
+\qquad
+\frac{\text{Ask}(a) \text{ valid} \quad \neg\text{Blocking}(a)}{\text{Advisory}(a)}\ \text{(Advise)}
+\qquad
+\frac{\text{maintainer's review } R^\ast \text{ of } s_0}{R^\ast \subseteq \text{ValidAsks}(s_0)}\ \text{(Gold is a lower bound)}
+$$
+
+$$
+\frac{s_0 \notin M \qquad \forall m \in M,\ s_0 \preceq m \Rightarrow d(a) \text{ applied in } m}{\text{Blocking}(a)}\ \text{(Block)}
+$$
+
+$$
+\frac{a \in R \quad a^\ast \in R^\ast \quad p(a)=p(a^\ast) \quad d(a)=d(a^\ast)}{\text{Issue}(a)}
+\qquad
+\frac{\text{Issue}(a) \quad t(a) = t(a^\ast)}{\text{Fix}(a)}
+\qquad
+\frac{\text{Issue}(a) \quad t(a), t(a^\ast) \in M \quad t(a) \parallel t(a^\ast)}{\text{Divergence}(a)}
+$$
+
+<div class="take">
+
+No premise mentions an instruction. Success is a relation to $\preceq$ and $M$, which nobody writes down: we see one chain per PR, and $M$ only through merges. Divergence is derivable, and today unadjudicated.
+
+</div>
+
+---
+
+<!-- _class: rules -->
+
+# A convention, as a rule
+
+What populates $\preceq$. A convention $c$ is a guarded rule: a trigger (the situation at a place), a required form, a scope, and defeaters.
+
+$$
+\frac{\text{trigger}_c(s, p) \qquad (\text{area}(p),\ \text{date}(b)) \in \text{scope}_c \qquad \neg\,\text{defeated}_c(s, p)}{s \ \prec\ s[\,p := \text{form}_c\,]}\ \text{(Conv}_c\text{)}
+$$
+
+- **Undefined:** no trigger fires. Silence is the correct output.
+- **Nondeterministic:** the trigger fires and maintainers accept several forms. The output is a question, not a change.
+- **Decidability of the trigger:** by syntax, by execution, by lookup, or by judgement. Each has its own delivery.
+
+<div class="take">
+
+Part 3 measures each premise: how many rules there are (the census), what happens when the reviewer is told which fire (the ceiling), and that the trigger fires at about twenty times the places a maintainer asks. The defeater premise is where the maintainer's reasoning lives.
+
+</div>
+
+<!--
+This is the 5 October framing: precondition = trigger (kind of object plus situation),
+postcondition = the form after the fix, often a rewrite that must still compile; scope = where the
+rule is measured to hold, by area and date; undefined = no trigger; nondeterministic = several
+accepted forms (squeezing a non-terminal simp). It fits about half the census; judgement
+conventions ("a long proof is split") have the trigger "always".
+-->
 
 ---
 
@@ -113,10 +209,11 @@ A **review** of $s_0$ is a set of asks, each a direction and a target: $s_0 \pre
                       ·  s‴  a change nobody asked for, not above s₀
 ```
 
-| the judge asks | in the order |
+| the judge asks | in the rules |
 |---|---|
-| same issue | the ask's **direction** is the maintainer's |
-| strict fix | the ask's **target** is $s^\ast$ |
+| same issue | Issue$(a)$: same place, same direction |
+| strict fix | Fix$(a)$: same target |
+| neither, but both in $M$ | Divergence$(a)$: unadjudicated today |
 
 ---
 
