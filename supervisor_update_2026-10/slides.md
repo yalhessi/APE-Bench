@@ -74,18 +74,19 @@ What are we actually asking a reviewer to do?
 # The shared pieces
 
 ```text
-L_b          the library at base commit b
-d            a purpose: what a change is for
-δ            a diff against L_b
+Library     L = (C, P)          code C, and a purpose P        P is constant across years
+PR          (δ, d)              a diff δ, and a purpose d      what this change is for
 
-S(L_b, d)    { δ : L_b + δ compiles  ∧  δ realises d }        the solutions of the task
-                     compiles     decided by the kernel
-                     realises d   decided by a judge
+merge(C, δ)                     the code after δ               defined iff the patch applies
+merge(C, δ) compiles            the kernel accepts it
+δ realises d in C               the diff does what d says      decided by a judge
+
+S(C, d)  =  { δ : merge(C, δ) compiles  ∧  δ realises d in C }      the solutions of a task
 ```
 
 <div class="take">
 
-Both tasks live in this space. They differ in what is given and what is emitted.
+Merging changes the code, not the purpose: merge(L, δ) = (merge(C, δ), P). Both tasks live in S; they differ in what is given and what is emitted.
 
 </div>
 
@@ -96,9 +97,9 @@ Both tasks live in this space. They differ in what is given and what is emitted.
 # APE-Bench
 
 ```text
-given        (L_b, d)            d stated as an instruction, cut from a real commit
+given        (C_b, d)            d stated as an instruction, cut from a real commit
 emit         δ
-correct iff  δ ∈ S(L_b, d)       dual verification: the kernel, and a judge of d
+correct iff  δ ∈ S(C_b, d)       the kernel decides "compiles", a judge decides "realises"
 ```
 
 <div class="take">
@@ -120,23 +121,22 @@ evaluated agent: 47 of 100 tasks.
 # Reviewing
 
 ```text
-given        (L_b, δ, d)                         the diff, and d as the author's claim
+given        (C_b, δ, d)                         the diff, and d as the author's claim; P in the background
 emit         D, a set of diagnostics
 
-Purpose      P                                   the library's purpose: a constant of the setting
-Preference   ≽_t  =  P evaluated at (L_b, tools_t)      a preorder on S · unstated · drifts
-Acceptable   A_t(L_b, d) ⊆ S(L_b, d)             the region ≽_t does not require leaving
+Preference   ≽_t  =  P evaluated at (C_b, tools_t)      a preorder on S(C_b, d) · unstated · drifts
+Acceptable   A_t(C_b, d) ⊆ S(C_b, d)             the region ≽_t does not require leaving
 
 each diagnostic
     where    sites in δ, or PR-level (on d)
     what     a separator: δ fails it, every δ'' ∈ A_t satisfies it
     why      the norm, or the mathematics, it rests on
     grade    error if A_t requires the move · warning if ≽_t prefers it · hint
-    fix?     a witness δ'' ∈ S on the accepted side                          kernel-checkable
+    fix?     a witness δ'' ∈ S(C_b, d) on the accepted side                  kernel-checkable
 
 correct iff  sound:    every separator is one ≽_t imposes, at its grade
              complete: every error-grade separator between δ and A_t is in D
-merge   iff  δ ∈ A_t(L_b, d)                     one round:  δ_{i+1} = author(L_b, d, δ_i, D_i)
+merge   iff  δ ∈ A_t(C_b, d)      then L_{b+1} = (merge(C_b, δ), P)      one round:  δ_{i+1} = author(C_b, d, δ_i, D_i)
 ```
 
 <div class="take">
@@ -157,13 +157,13 @@ the preference drifts because the state it is evaluated against changes.
 
 | check | compares | case |
 |---|---|---|
-| **faithfulness** | what δ realises · what d claims | #33149: vacuous definitions, and it compiled |
-| **scope** | what d claims · P | #33149: many definitions, no supporting lemmas |
-| **placement** | δ · P at the current state, within S | every naming, golf and generality ask |
+| **faithfulness** | δ realises d in C_b | #33149: vacuous definitions, and it compiled |
+| **scope** | P licenses d | #33149: many definitions, no supporting lemmas |
+| **placement** | δ's place under ≽_t, within S(C_b, d) | every naming, golf and generality ask |
 
 <div class="take">
 
-The kernel checks δ against d. Review checks δ and d against P.
+The kernel checks the code. A judge checks δ against d. Review checks δ and d against P.
 
 </div>
 
@@ -204,7 +204,7 @@ version is the validation that any of it matters to an author; the verdict is fo
 1. **Membership.** Is the draw in S? The kernel settles half. #33149 compiled and was outside S.
 2. **Placement.** Where does it sit under ≽_t? Placed against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
 3. **Separation.** Emit the few separators that cut δ off from A_t. Maintainers under-report on purpose.
-4. **Update.** The decision moves ≽_t. A spelling requested at 17% adoption is a push.
+4. **Update.** Merging moves C, so ≽_t moves; P does not. A spelling requested at 17% adoption is a push.
 
 <!--
 The author's turn is the inverse: resample S subject to the separators until a draw lands in A_t. The
@@ -240,11 +240,11 @@ Part 3 measures each premise. The defeater is where the maintainer's reasoning l
 ```text
                  ·  δ*  maintainer's witness             ·  δ'  reviewer's witness
                   \                                     /
-   A_t(L_b, d)  ───\───────────────────────────────────/─────────   the acceptable region
+   A_t(C_b, d)  ───\───────────────────────────────────/─────────   the acceptable region
                     \                                 /
                      ·  δ″  right separator, witness short of A_t
                       \                             /
-   S(L_b, d)  ·· δ ·····································   the PR: compiles, realises d
+   S(C_b, d)  ·· δ ·····································   the PR: compiles, realises d
                        \
                         ·  δ‴  a change no separator requires
 ```
@@ -328,7 +328,7 @@ proof in a probe and still submitted simpa: a placement decision, not a capabili
 
 <div class="take">
 
-The task: from (L_b, δ, d) alone, emit the separators ≽_t imposes, at their grades, with witnesses. Score soundness and completeness against the one sample on record.
+The task: from (C_b, δ, d) alone, emit the separators ≽_t imposes, at their grades, with witnesses. Score soundness and completeness against the one sample on record.
 
 </div>
 
