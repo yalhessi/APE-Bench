@@ -212,77 +212,67 @@ What review systems have in common, and where they part
 
 <!-- _class: tbl -->
 
-# Where published work puts the specification
+# One slot fixed, one answer key bought
 
-| version | slot | setting | who | answer key? |
-|---|---|---|---|---|
-| verdict | output | the bit δ ∈ A_t | MathlibPR | no |
-| written rules | ≽_t | the documented rules at t | Tricorder, BitsAI-CR, AutoCommenter | for the codified part |
-| recent practice | ≽_t | accepted solutions nearby | Qodo, Greptile, Semgrep memories | one convention behind |
-| preferred alternative | output | the fix alone | ProofJudge | via the kernel |
-| **request emission** | — | the block as written | SWR-Bench, SWE-PRBench, **ours** | no |
-| consequential | correctness | δ_{i+1} ∈ A_t | c-CRAB; resolution rates at Atlassian, Cursor | needs an acceptance oracle |
+| version | what it fixes | who | the price |
+|---|---|---|---|
+| verdict | the output is the bit δ ∈ A_t | MathlibPR | one bit, and it saturates |
+| written rules | ≽_t is the documented rules at t | Tricorder, BitsAI-CR, AutoCommenter | only the codified part |
+| recent practice | ≽_t is the accepted solutions nearby | Qodo, Greptile, Semgrep | one convention behind |
+| preferred alternative | the output is the fix alone | ProofJudge | no questions, scope, PR-level asks |
+| consequential | correct iff δ_{i+1} ∈ A_t | c-CRAB; resolution rates | needs an acceptance oracle |
+| **request emission** | nothing | SWR-Bench, SWE-PRBench, **ours** | no answer key: one maintainer's sample |
 
 <div class="take">
 
-Each buys an answer key by shrinking the task. Ours keeps the task and gives up the key.
+Ours keeps the whole task. Its only key is the review that occurred, a lower bound.
 
 </div>
 
 <!--
-Read from primary sources in September, revisited in October: docs/research/code-review-systems-survey-2026-09.md
-and open-code-review-comparison-2026-09.md. MathlibPR: models and agents cannot separate merge-ready from
-build-passing PRs. ProofJudge: recovers reviewer preference between a declaration and its accepted revision
-on 63.5-80.8% of 218 pairs.
+MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge recovers
+reviewer preference between a declaration and its accepted revision on 63.5-80.8% of 218 pairs. Sources
+in docs/research/code-review-systems-survey-2026-09.md.
 -->
 
 ---
 
-# How deployed reviewers produce and filter requests
+# One pipeline; precision from the soundness gate
 
 ```text
-generators          →   a verifier         →   a value gate          →   dedup   →   acted-on
-propose tests           checks truth:          checks soundness:         one test    the author
-(specialists,           the witness            would the community       once        passed it
- many passes)           compiles, the claim    set this test?
-                        is grounded            learned from outcomes
+generators     →   truth gate         →   soundness gate            →   dedup   →   acted-on
+propose tests      the witness            would the community           one test    the author
+                   compiles; the          set this test?                once        passed it
+                   claim is grounded      learned from outcomes
 ```
 
-- Atlassian: a factual judge did little; an actionability gate trained on 50k resolutions, **+15–20pp**.
-- Alibaba: a filter that judged value deleted real defects; refutation-only, **36% → 88%** precision.
-- Google: a threshold per rule, and 22 rules switched off: useful 54% → 66%.
-
-<div class="take">
-
-Truth is cheap. Soundness is where precision comes from, and it is learned from outcomes at scale.
-
-</div>
+**We have** generators, the truth gate (the compile receipt) and dedup.
+**We lack** the soundness gate and the acted-on signal. Both are learned from outcomes, at a scale Mathlib does not have.
 
 <!--
-ByteDance, Google, Atlassian, Uber, Cursor, OpenAI, Anthropic and Alibaba converge on the same five
-parts. Ours has generators, a verifier (the compile receipt) and dedup; the value gate and the acted-on
-signal need a deployment. Uber's largest gain was suppressing whole low-value categories.
+ByteDance, Google, Atlassian, Uber, Cursor, OpenAI, Anthropic and Alibaba arrived at the same five parts
+independently. Evidence for "soundness, not truth" is on the next slide.
 -->
 
 ---
 
-# What the evidence settles
+<!-- _class: tbl -->
 
-- **≽_t cannot be told as a list.** Guidelines in the prompt: Atlassian +5%, ours null.
-- **Diversity buys recall; voting loses it.** Aggregating reviews lifts F1 up to 44%; the oracle over an ensemble's union gains up to 83%; majority vote is a "popularity trap".
-- **More context hurts.** Eight models degrade monotonically with structured context; on Mathlib, diagnostics give "limited and uneven gains".
-- **Decomposition changes effort and noise, not recall.** Di Biase's experiment; Alibaba's grouping, 20% → 12.7%; our arms against one agent.
+# Five points the evidence settles
 
-<div class="take">
-
-And restraint is the enemy: Cursor needed "aggressive" prompts; our arms went 0.20 → 0.50 when refused the option to stay silent.
-
-</div>
+| point | literature | our experiments |
+|---|---|---|
+| **≽_t cannot be told as text.** | guidelines in the prompt: Atlassian +5% | June injection null at N=115; the catalogue as a list +0.03, the same sentences asserted at the place +0.26 |
+| **Truth gates do not buy precision; soundness gates do.** | Atlassian: factual judge minimal, actionability gate +15–20pp; Alibaba: refutation-only filter 36% → 88% | every artifact-only selector at chance, AUC 0.49–0.52; nothing adjudicates the 90% of findings off gold |
+| **Diversity buys recall; voting loses it.** | aggregation +44% F1; ensemble union +83%, majority vote a "popularity trap" | solo reps never hit the same ask twice; four passes unioned 12 of 23, at 7 findings per clean PR |
+| **Decomposition changes effort, not recall.** | Di Biase: no more defects found; Alibaba grouping 20% → 12.7% | arms against one agent: neither wins; specialists 10% of matches for 37% of spend |
+| **Restraint is the enemy.** | Cursor needed "aggressive" prompts | arms refused silence: 0.20 → 0.50, and the clean PR 1 → 36 findings |
 
 <!--
-SWR-Bench (2509.01494); LLM ensembles for code (2510.21513); SWE-PRBench (2603.26130); MathlibPR
-(2605.07147); Di Biase et al. (1805.10978); Cursor's Bugbot write-up; our forbid_abstention result on the
-four fanout PRs, clean PR 1 to 36 findings.
+Literature: RovoDev (2601.01129), open-code-review's commit history, SWR-Bench (2509.01494), LLM
+ensembles for code (2510.21513), Di Biase et al. (1805.10978), Cursor's Bugbot write-up. Ours:
+dead-ends.md "statute", conventions-ceiling stages F and exact, selection-signal.md, ensemble-union
+reading, the A/B spine, forbid_abstention on the fanout four.
 -->
 
 ---
