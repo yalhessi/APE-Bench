@@ -571,3 +571,295 @@ then passes and checks.
 
 </div>
 </div>
+
+---
+
+<!-- _class: section-title -->
+
+# 3 · What we did, and where we stand
+
+Four questions, five weeks, and the results that answered them
+
+---
+
+<!-- _class: small -->
+
+# The thesis, the baseline, and the instruments
+
+<div class="box">
+
+**The project is about understanding, and then decomposing, the review process.** That is what can make
+a harness more useful than one agent with tools. So one agent with tools is the baseline, always, and a
+design earns its place only by beating it.
+
+</div>
+
+<div class="cols">
+<div class="case-panel">
+
+## The baseline, frozen
+
+One session, the whole PR, the reviewer's brief, the context tools and compile-my-edit. On the twelve
+dev PRs (23 asks, judged): Opus 5.5 **9, 9, 7**; the free self-hosted DeepSeek **8, 6, 9**; GPT 5.5
+**2 to 5**. Strong and unstable: no two runs agree on much.
+
+</div>
+<div class="case-panel">
+
+## The instruments, built since the convening
+
+A validation set and a test set from 2025-06 to 2026-03 (50 main + 10 AI-generated each), with small
+versions; **1,000 validation PRs** read by two blind readers; **six post-cutoff PRs** the Claude models
+cannot have seen; blind matchers beside the judge.
+
+</div>
+</div>
+
+**Four questions organised the work.** Does decomposition by concern beat the baseline? Where is the
+wall? What does the community actually ask for? Can a reviewer be given that knowledge?
+
+---
+
+<!-- _class: small -->
+
+# Q1 · Decomposition by concern: the specialist arms
+
+The design at the convening: a lead routes the PR's units to a generalist and ten specialists (naming,
+duplication, proof-golf, docs, …); an evidence gate admits findings; a merge dedups.
+
+<div class="cols">
+<div class="case-panel">
+
+## Measured on the held-out 12, three reps
+
+| | arms + lead | one agent |
+|---|---|---|
+| asks hit per rep | 7, 5, 6 | 4, 4, 1 |
+| hit in all three reps | **5** | 0 |
+| union of both | 13 of 23 | |
+| findings on the two clean PRs | 3, 4, 5 | **0** |
+| billed per rep | $14.59 | **$1.90** |
+
+Neither wins: reproducible against precise, at 7.7× the cost.
+
+</div>
+<div class="case-panel">
+
+## Where it was weak
+
+- **The generalist did the work:** 64 of 71 matches; the specialists took 37% of spend for 10% of matches, six matched nothing.
+- **The arms withheld.** Refused the option to abstain, four PRs went 0.20 → 0.50 of asks, and the clean PR 1 → 36 findings.
+- **The gate discarded** 71–83% of the asks the run had already found.
+- **Packed units starved targets:** candidates per declaration 0.49 → 0.15.
+
+</div>
+</div>
+
+<div class="box" style="margin-top:6px">
+
+**The reading that changed the direction:** 21 of 23 asks were located by somebody, 13 asked correctly.
+We had decomposed the *output* by concern; the gap was *knowledge at the place*, not attention.
+
+</div>
+
+---
+
+<!-- _class: small -->
+
+# Q2 · Where is the wall: the harness, the prompt, or the model?
+
+Same brief, same tools, same twelve dev PRs (23 asks), crossed over models and harnesses.
+
+| reviewer | harness | of 23 | what it settles |
+|---|---|---|---|
+| GPT 5.2, GPT 5.5 | ours, three harnesses tried | 2 to 5 | three harnesses with the model held reach the same: the harness does not limit GPT |
+| Opus 5.5 on GPT's exact messages | the probe harness | 10 | the prompt text does not limit GPT |
+| Opus 4.8 / Opus 5 / Opus 5.5 | ours | 3 / 8 / 7–9 | the model generation moves the wall |
+| Opus 5.5 | the probe harness (own shell, files) | 11–12 | our harness costs Claude volume: 22% fewer findings at the same hit rate |
+| Qwen3.5-397B, self-hosted | ours | 2, 0, 2 | the floor; thirteen prompt settings left it there |
+| **DeepSeek-V4.1-Flash, self-hosted** | ours | **8, 6, 9** | a free iteration tier, once its earlier thinking was kept |
+
+**What the misses are.** Of 67 asks the weaker reviewers never reach, 63 had the object visited. The
+misses are judgement at an attended place: an unknown convention or mechanism (25), a compile nobody
+ran (19), an analogue not compared (6).
+
+<div class="box" style="margin-top:4px">
+
+The wall moved with the **model**, and barely otherwise. So: what does it know that the others lack?
+
+</div>
+
+---
+
+<!-- _class: small -->
+
+# Q3 · What does the community ask for? The census
+
+**How it was made.** The 1,833 first-round maintainer asks on the 1,000 validation PRs, disjoint from
+every evaluation set. Two blind readers, in one seeded order, each wrote the principle behind each ask
+as one sentence (a situation, and the form preferred in it), keeping a running codebook.
+
+<div class="cols">
+<div class="case-panel">
+
+## What came out
+
+- **409 and 407 principles**, two apart, coinciding in size four times; readers agree on 0.81 of asks.
+- **Not saturated:** one ask in ten still brings a principle the census lacks.
+- **A small head, a long tail:** the top 10 cover 22% of asks, the top 50 cover 55%; 370 entries sit in the tail, two fifths seen once.
+- Rules and standards split evenly (841 against 828); one open conflict (two maintainers, opposite rules on a non-terminal `simp`).
+
+</div>
+<div class="case-panel">
+
+## Does it generalise?
+
+On fresh PRs the census never read, 14 of them created after it was written: an entry behind **39 of
+46** and **40 of 47** asks (85%), the same primary entry on 38 of 38. The seven outside are docstring
+slips and two new norms.
+
+**What it rules out.** Deterministic detectors for the head: four conventions built and validated hold
+**2.9%** of asks between them. Recall is in the tail.
+
+</div>
+</div>
+
+---
+
+<!-- _class: small -->
+
+# Q3 · Does knowing the convention help? The ceiling
+
+**The condition.** Tell the reviewer which census conventions the maintainers invoked on this PR, as
+general sentences with no location ("a lemma whose statement is a supremum is named `ciSup…`"), and
+compare with the same reviewer unbriefed. Fourteen held-out PRs, 46 asks, blind matchers.
+
+| reviewer | unbriefed, reach per session | told the PR's conventions | gain |
+|---|---|---|---|
+| Opus 5.5 | 0.47 | 0.73–0.75 | **+0.26 / +0.28** |
+| GPT 5.5 | 0.24 | 0.46 | **+0.22** |
+| DeepSeek-V4.1-Flash, three reps | 0.28 | 0.50 | **+0.22** |
+| DeepSeek, told them with precedence and an example each | 0.28 | 0.70 | **+0.42** |
+| Qwen3.5-397B, the floor model | 0.03 | 0.09 | +0.05 |
+
+<div class="box">
+
+**The knowledge is the lever.** Told which conventions are in play, every reviewer acts on them, the free
+one as much as the paid ones. Of the 17 asks on these PRs that no unbriefed session of any model reaches,
+the briefed sessions reach 11. This is the answer key, so it is a ceiling, not a design. The design
+question became: can the reviewer be given this without the answer key?
+
+</div>
+
+---
+
+<!-- _class: small -->
+
+# Q4 · The delivery design space, without the answer key
+
+Each row is one way of getting the census into the reviewer, from least to most assertive.
+
+| delivery | what the reviewer gets | result |
+|---|---|---|
+| guides and the catalogue as prompt text | Mathlib's written guidance, summarised | null: N=115 in June; the floor model's worst setting |
+| the applicable list, picked from the diff | the 25 census entries a selector thinks apply | **+0.03** |
+| pinpointed at the place, asked to verify | the right sentence at the right declaration | **0.00**: overridden at 9 of 21 places the answer key reached |
+| asserted with precedence and examples | the picks stated as applying here, outranking the reviewer | **+0.20** on the eight PRs it was developed on; **0.00 and −0.01** on fresh PRs |
+| deterministic detectors as packet facts | "this declaration departs from convention X" | valid, 2.9% of asks; with a disposition rule, 13 of 14 unasked facts filed |
+| a filing contract: no withholding | a verdict per declaration and concern, silence refused | 14 of the 37 asks it was built for, at 4.9 findings per clean PR (bar 2.0) |
+| dossiers and exams per convention | an evidence-built understanding, tested before use | not built: the bare sentence at the place already passes 25–29 of 39; examples made the model more conservative |
+
+**The demand side.** Maintainers raise a convention at **5% or fewer** of the places its situation
+occurs; predicting which places reads AUC 0.56–0.78 at about **7% precision**.
+
+---
+
+<!-- _class: small -->
+
+# The mechanism, on one PR
+
+PR #42814. The maintainer asked for `variable {D}` declared once rather than repeated. The reviewer held
+that exact convention at that exact declaration, and wrote:
+
+> "Mathlib does not require these, so I would not request them."
+
+<div class="cols">
+<div class="box">
+
+**The assertion, not the content, carries the gain.** The same sentence at the same place moves the
+reviewer when stated as *applying here*, not when offered for verification. That is why guideline
+injection reads near null in every industrial report too.
+
+</div>
+<div class="box">
+
+**But asserting without the answer key means asserting wrongly.** An ask-free pick of 25 entries holds
+about 2.8 true asks. Under precedence the reviewer files the other 22 as well; under verification it
+overrides the right ones.
+
+</div>
+</div>
+
+<div class="box" style="margin-top:10px">
+
+The conventions problem splits in two. **The model acts on a convention it is told applies:** solved.
+**Which of the hundreds that apply would this maintainer raise here:** open, and every ask-free design
+so far tried to answer it from the PR alone.
+
+</div>
+
+---
+
+<!-- _class: small -->
+
+# Where we stand, 14 October
+
+| layer | claim | status |
+|---|---|---|
+| **knowledge** | the census holds what maintainers ask for; a reviewer acts on it when told it applies | **supported, replicated** on three models |
+| **delivery without the asks** | the applicable conventions can be chosen from the PR and delivered for that gain | **not supported off-sample** |
+| **understanding** (dossiers, exams) | richer representations fix misapplication | **not supported**; its pre-registered drop rule is met |
+
+**What one session still misses.** A third of the asks escape every unbriefed session of every model,
+spread across kinds, none above 8% of a set: naming judgement, statement and API design, a proof to try,
+a library mechanism, a migration in progress, a scope conflict, PR history. The census tail, from the other side.
+
+**The newest premise check** (13 October): of 41 asks the free reviewer never reaches, an artifact at the
+base commit *decides* the fix for 7; for 19 the library *points to* the change but the ask is a choice
+among its options (`ciSup` against keeping `continuous_`); 11 are judgement, 4 need the PR's history.
+
+<div class="box" style="margin-top:4px">
+
+**Publishable now, as a result about the task:** a convention census with its saturation curve;
+knowledge, selection and filing separated by experiment; demand as a small, unpredictable subset of
+applicability; the assertion mechanism. No other review system has measured any of the four.
+
+</div>
+
+---
+
+<!-- _class: small -->
+
+# What this says about the next design
+
+<div class="box">
+
+**A maintainer's decision to raise a convention, or not, is reasoning on evidence that can be
+reconstructed**, though the comment never states it: positive evidence (the trigger holds here, the
+library's precedent, the PR's intent) and negative evidence (an exception, a deliberate local deviation,
+a cost). Taste is a small residual. `Dense.ciSup`: the statement is a supremum, the library names such
+lemmas `ciSup`, the lemma is not about continuity, so `continuous_` goes.
+
+</div>
+
+So the harness should **gather and weigh the evidence a maintainer would**, not learn a preference from
+the asks or predict demand from the PR's surface. Read that way, the options with a ceiling above the noise:
+
+| option | ceiling on the sets we hold | cost |
+|---|---|---|
+| the harness for the free model: its own shell, files it rereads | about +0.10 by the Opus analogy, unmeasured for DeepSeek | $0 generation, a day to build |
+| analogue retrieval for the design asks, delivered as a refutable fact | up to 0.075 of asks a set, the largest never-reached class | a measurement on 43 labelled asks first |
+| a deterministic closer battery as packet facts | about 0.065 of asks a set | compute; a persistent Lean checker makes it minutes a PR |
+| the per-place engine: every picked convention asked at every changed place | 0.40–0.55 of in-census asks, the only design above +0.10 | 25× the filings at 7% precision; needs the adjudication of unasked departures |
+
+<p class="muted">All on 93 asks over 26 PRs used to develop the designs. The fresh 40-PR set has built workspaces and has never been read.</p>
