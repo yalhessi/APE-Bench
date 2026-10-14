@@ -237,57 +237,23 @@ docs/research/code-review-systems-survey-2026-09.md.
 
 ---
 
-# One pipeline; precision from the soundness gate
-
-```text
-generators     →   truth gate         →   soundness gate            →   dedup   →   acted-on
-propose tests      the witness            would the community           one test    the author
-                   compiles; the          set this test?                once        passed it
-                   claim is grounded      learned from outcomes
-```
-
-**We have** generators, the truth gate (the compile receipt) and dedup.
-**We lack** the soundness gate and the acted-on signal. Both are learned from outcomes, at a scale Mathlib does not have.
-
-<!--
-ByteDance, Google, Atlassian, Uber, Cursor, OpenAI, Anthropic and Alibaba arrived at the same five parts
-independently. Evidence for "soundness, not truth" is on the next slide.
--->
-
----
-
 <!-- _class: tbl -->
 
-# Five points the evidence settles
+# What the literature settles, and what it leaves us
 
-| point | literature | our experiments |
+| point | evidence | for us |
 |---|---|---|
-| **≽_t cannot be told as text.** | guidelines in the prompt: Atlassian +5% | June injection null at N=115; the catalogue as a list +0.03, the same sentences asserted at the place +0.26 |
-| **Truth gates do not buy precision; soundness gates do.** | Atlassian: factual judge minimal, actionability gate +15–20pp; Alibaba: refutation-only filter 36% → 88% | every artifact-only selector at chance, AUC 0.49–0.52; nothing adjudicates the 90% of findings off gold |
-| **Diversity buys recall; voting loses it.** | aggregation +44% F1; ensemble union +83%, majority vote a "popularity trap" | solo reps never hit the same ask twice; four passes unioned 12 of 23, at 7 findings per clean PR |
-| **Decomposition changes effort, not recall.** | Di Biase: no more defects found; Alibaba grouping 20% → 12.7% | arms against one agent: neither wins; specialists 10% of matches for 37% of spend |
-| **Restraint is the enemy.** | Cursor needed "aggressive" prompts | arms refused silence: 0.20 → 0.50, and the clean PR 1 → 36 findings |
+| **A reviewer cannot be told the standard as text.** | guidelines in the prompt: Atlassian +5% | ≽_t has to reach the reviewer some other way |
+| **A true finding is not a wanted one. Precision is learned from which comments got acted on.** | Atlassian: checking truth did nothing; a gate trained on 50k resolved comments +15–20pp. Alibaba: a filter judging worth deleted real defects; restricted to truth, 36% → 88% | truth is free from the kernel; "would the community set this test" has no outcome data to learn from |
+| **Diversity buys recall; voting loses it.** | aggregating reviews +44% F1; an ensemble's union +83%; majority vote a "popularity trap" | run several passes, keep the union, never vote |
+| **Splitting the review up does not find more.** | Di Biase: decomposed diffs found no more defects; Alibaba's file grouping cut recall 20% → 12.7% | specialists are not where recall comes from |
+| **A reviewer allowed to stay silent will.** | Cursor needed "aggressive" prompts once restraint made it quiet | silence has to be made illegal, and the cost measured on clean PRs |
 
 <!--
-Literature: RovoDev (2601.01129), open-code-review's commit history, SWR-Bench (2509.01494), LLM
-ensembles for code (2510.21513), Di Biase et al. (1805.10978), Cursor's Bugbot write-up. Ours:
-dead-ends.md "statute", conventions-ceiling stages F and exact, selection-signal.md, ensemble-union
-reading, the A/B spine, forbid_abstention on the fanout four.
+Sources: RovoDev, Atlassian (2601.01129); open-code-review's commit history (the filter fix, the grouping
+regression); SWR-Bench (2509.01494); LLM ensembles for code (2510.21513); Di Biase et al. (1805.10978);
+Cursor's Bugbot write-up. Our own evidence on each point is the last slide of Part 3.
 -->
-
----
-
-# What formal mathematics changes
-
-- **The witness is kernel-checkable.** Truth is free: the strongest filter the industry trains for.
-- **Soundness is the whole problem.** The compiler neither finds the test nor picks among witnesses. MathlibPR: models cannot tell δ ∈ A_t from δ ∈ S.
-- **The outcome data is small, and moves.** About 30 people merge; 0.7% of review comments cite a norm; `grind` went 0% → 14.5% of files in a year.
-
-<div class="take">
-
-The wall is placement. Part 3 says what moved it.
-
-</div>
 
 ---
 
@@ -510,6 +476,25 @@ So the harness should gather and weigh that evidence, not learn a preference.
 Dense.ciSup: the statement is a supremum, the library names such lemmas ciSup, the lemma is not about
 continuity, so continuous_ goes. All ceilings on 93 asks over 26 PRs used to develop the designs;
 the fresh 40-PR set has built workspaces and has never been read.
+-->
+
+---
+
+<!-- _class: tbl -->
+
+# The same five points, in our experiments
+
+| point | what we measured |
+|---|---|
+| **The standard cannot be told as text.** | Mathlib's guides injected into the prompt: null at N=115 in June. The census as a list of 25: +0.03. The same sentences stated as applying here: +0.26. |
+| **A true finding is not a wanted one.** | Every finding we file carries a compile receipt, and 90% of them match no maintainer ask. Every selector we tried on the findings alone sits at chance, AUC 0.49–0.52. |
+| **Diversity buys recall; voting loses it.** | The solo reviewer's three runs never hit the same ask twice. Four runs unioned reach 12 of 23, at 7 findings per clean PR. |
+| **Splitting the review up does not find more.** | Ten specialist arms against one agent: neither wins. The arms' generalist made 64 of the 71 matches; the specialists took 37% of spend for 10%. |
+| **A reviewer allowed to stay silent will.** | Arms refused the option to abstain: 0.20 → 0.50 of the asks on the same four PRs, and the clean PR went from 1 finding to 36. |
+
+<!--
+dead-ends.md "statute"; conventions-ceiling stages F and exact; selection-signal.md; the ensemble-union
+reading; the A/B spine (ab-heldout12-obligation-spine.md); forbid_abstention on the fanout four.
 -->
 
 ---
