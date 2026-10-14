@@ -277,13 +277,9 @@ Four questions, five weeks
 
 </div>
 
-The baseline: one session, the whole PR, the brief, the tools, compile-my-edit. Twelve dev PRs, 23 asks, judged.
+**The baseline:** one session, the whole PR, the brief, the tools, and compile-my-edit. Its numbers, by model, come with Q2.
 
-| model | harness | asks of 23, per run |
-|---|---|---|
-| Claude Opus 5.5 | ours | 9, 9, 7 |
-| DeepSeek-V4.1-Flash, self-hosted | ours | 8, 6, 9 |
-| GPT 5.5 | ours | 2 to 5 |
+**Four questions.** Does decomposition by concern beat it? Where is the wall? What does the community actually ask for? Can a reviewer be given that knowledge?
 
 <!--
 Instruments built since the convening: validation and test sets 2025-06..2026-03 (50 main + 10 AI
