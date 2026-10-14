@@ -29,10 +29,10 @@ style: |
   .panel { border: 2px solid #d6dcea; border-radius: 12px; padding: 10px 16px; }
   .panel h2 { font-size: 26px; margin: 0 0 6px; }
   .panel pre { font-size: 18px; margin: 6px 0; }
-  section.block pre { font-size: 16.5px; line-height: 1.32; }
-  section.block.lg pre { font-size: 21px; line-height: 1.4; }
-  section.block h1 { font-size: 36px; margin-bottom: 10px; }
-  section.block .take { font-size: 22px; margin-top: 10px; }
+  section.formulation pre { font-size: 16.5px; line-height: 1.32; }
+  section.formulation.lg pre { font-size: 21px; line-height: 1.4; }
+  section.formulation h1 { font-size: 36px; margin-bottom: 10px; }
+  section.formulation .take { font-size: 22px; margin-top: 10px; }
   section.rules { font-size: 22px; }
   section.rules h1 { font-size: 36px; }
   section.rules .katex-display { margin: 6px 0; }
@@ -69,7 +69,7 @@ What are we actually asking a reviewer to do?
 
 ---
 
-<!-- _class: block lg -->
+<!-- _class: formulation lg -->
 
 # The shared pieces
 
@@ -92,7 +92,7 @@ Merging and compiling act on code; P stays fixed. Both tasks live in S; they dif
 
 ---
 
-<!-- _class: block lg -->
+<!-- _class: formulation lg -->
 
 # APE-Bench
 
@@ -116,7 +116,7 @@ evaluated agent: 47 of 100 tasks.
 
 ---
 
-<!-- _class: block -->
+<!-- _class: formulation -->
 
 # Reviewing
 
@@ -151,7 +151,7 @@ the preference drifts because the state it is evaluated against changes.
 
 # The formulation on four PRs
 
-| PR | what the review said | the line of the block |
+| PR | what the review said | in the formulation |
 |---|---|---|
 | **#33149** | three vacuous definitions; 19 axioms | δ ∉ S: "realises p" fails. "No axioms" is a test every revision in A_t passes |
 | **#33305** | one doc-comment line too long | δ ∈ S, δ ∉ A_t: one test separates them |
@@ -188,7 +188,7 @@ draws under ≽_t.
 
 ---
 
-# What the block does not give us
+# What the formulation does not settle
 
 - **≽_t is never observed.** Each review is one sample of it, and partly constitutes it.
 - **A_t is seen only through merges.** The gold is a lower bound.
@@ -212,27 +212,29 @@ What review systems have in common, and where they part
 
 <!-- _class: tbl -->
 
-# One slot fixed, one answer key bought
+# Each other approach pins one part, and pays for it
 
-| version | what it fixes | who | the price |
-|---|---|---|---|
-| verdict | the output is the bit δ ∈ A_t | MathlibPR | one bit, and it saturates |
-| written rules | ≽_t is the documented rules at t | Tricorder, BitsAI-CR, AutoCommenter | only the codified part |
-| recent practice | ≽_t is the accepted solutions nearby | Qodo, Greptile, Semgrep | one convention behind |
-| preferred alternative | the output is the fix alone | ProofJudge | no questions, scope, PR-level asks |
-| consequential | correct iff δ_{i+1} ∈ A_t | c-CRAB; resolution rates | needs an acceptance oracle |
-| **request emission** | nothing | SWR-Bench, SWE-PRBench, **ours** | no answer key: one maintainer's sample |
+| approach | what it pins | what it gives up |
+|---|---|---|
+| verdict | the output: only "is δ acceptable" | everything but one bit; models cannot beat "it builds" |
+| written rules | the standard: the documented rules | every convention that is not written down |
+| recent practice | the standard: what was accepted nearby | the first asks of a convention in motion |
+| preferred alternative | the output: a fix only | questions, scope, PR-level asks |
+| consequential | correctness: the author's next revision is acceptable | needs an acceptance oracle; confounds reviewer and author |
+| **request emission, ours** | nothing | the answer key: only one maintainer's review, a lower bound |
 
 <div class="take">
 
-Ours keeps the whole task. Its only key is the review that occurred, a lower bound.
+We kept the whole task: hence recall against a lower bound, not precision and F1.
 
 </div>
 
 <!--
-MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge recovers
-reviewer preference between a declaration and its accepted revision on 63.5-80.8% of 218 pairs. Sources
-in docs/research/code-review-systems-survey-2026-09.md.
+Who does what: verdict is MathlibPR; written rules are Tricorder, BitsAI-CR, AutoCommenter; recent
+practice is Qodo, Greptile, Semgrep memories; preferred alternative is ProofJudge; consequential is
+c-CRAB and the resolution rates at Atlassian and Cursor; request emission is SWR-Bench, SWE-PRBench and
+ours. MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge:
+recovers reviewer preference on 63.5-80.8% of 218 before/after pairs.
 -->
 
 ---
