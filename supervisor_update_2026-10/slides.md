@@ -151,176 +151,48 @@ the preference drifts because the state it is evaluated against changes.
 
 ---
 
-# Three purposes, three checks
+# The formulation on four PRs
 
-| check | compares | case |
+| PR | what the review said | the line of the block |
 |---|---|---|
-| **faithfulness** | δ realises p in C_b | #33149: vacuous definitions, and it compiled |
-| **scope** | P licenses p | #33149: many definitions, no supporting lemmas |
-| **placement** | δ's place under ≽_t, within S(C_b, p) | every naming, golf and generality ask |
+| **#33149** | three vacuous definitions; 19 axioms | δ ∉ S: "realises p" fails. "No axioms" is a required test from P |
+| **#33305** | one doc-comment line too long | δ ∈ S, one required test: δ ∉ A_t |
+| **#33304** | nothing | δ ∈ A_t: D is empty, correctly |
+| **#33098** | make this proof one tactic call | one preferred test, two witnesses (`grind`, `simpa`), both in A_t |
 
 <div class="take">
 
-The kernel checks the code. A judge checks δ against p. Review checks δ and p against P.
+Of the convening's 23 requests, 4 are required. Most of review is preferred: placement inside A_t.
 
 </div>
 
 <!--
-Two kinds of request: hold p and move δ within S (golf, naming, style, docs, placement), or amend p,
-which changes S (generalise, factor the family, drop a definition). That is the gold's
-local-against-design split: 27 local, 13 design, 3 borderline. In Mathlib p is proposed, so scope is
-open; in an FLT-scale project p is issued by the blueprint, so scope is closed; APE-Bench sits with FLT.
+All four from the twelve December-2025 PRs in the convening talk. 33305's line was located by neither
+reviewer in six runs. On 33098 the maintainer asked for grind, our reviewer chose simpa; both compile;
+grind went from 0% of Mathlib files in January 2025 to 14.5% by May 2026.
 -->
 
 ---
 
-<!-- _class: tbl -->
+# What a reviewer has to do
 
-# The other versions are settings of the same block
-
-| version | slot | setting | answer key? | cannot express |
-|---|---|---|---|---|
-| verdict (MathlibPR) | output | the bit δ ∈ A_t | no | anything but the bit |
-| written rules | ≽_t | the documented rules at t | yes | unwritten conventions, fit, scope |
-| recent practice | ≽_t | accepted solutions nearby | yes | the first asks of a new convention |
-| preferred alternative (ProofJudge) | output | the fix alone | via the kernel | questions, scope, PR-level asks |
-| **request emission (ours)** | — | the block as written | no | nothing; no answer key either |
-| consequential | correctness | δ_{i+1} ∈ A_t | no | needs an acceptance oracle |
-
-**Roles, not rivals:** request emission is the task; the others instrument it.
+1. **Membership.** Is δ in S? The kernel settles "compiles"; "realises p" needs a judge.
+2. **Placement.** Where is δ under ≽_t? Judged against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
+3. **Request.** The few tests that cut δ off from A_t, at their grades. Maintainers under-report on purpose.
+4. **Update.** Merging moves C, so ≽_t moves; P does not.
 
 <!--
-The stated standard, in both forms, is the self-contained sub-task where an answer key exists; the
-preferred alternative is how a preference on a fix is elicited and kernel-checked; the consequential
-version is the validation that any of it matters to an author; the verdict is for comparability.
+The author's turn is the inverse: resample S subject to the tests until a draw lands in A_t. The Δ dead
+end reads correctly here: the author's next draw is one point on the passing side and does not identify
+the tests. Placement is where the agent fails: most gold sites had a candidate, and it cannot rank its
+draws under ≽_t.
 -->
 
 ---
 
-# What the reviewer does with the sample
+# What the block does not give us
 
-1. **Membership.** Is the draw in S? The kernel settles half. #33149 compiled and was outside S.
-2. **Placement.** Where does it sit under ≽_t? Placed against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
-3. **Request.** Emit the few tests that cut δ off from A_t. Maintainers under-report on purpose.
-4. **Update.** Merging moves C, so ≽_t moves; P does not. A spelling requested at 17% adoption is a push.
-
-<!--
-The author's turn is the inverse: resample S subject to the tests until a draw lands in A_t. The
-Δ dead end reads correctly here: the author's next draw is one point on the accepted side and does not
-identify the tests. Placement is where the agent fails: most gold sites had a candidate, and it
-cannot rank its draws under ≽_t.
--->
-
----
-
-# A convention as a guarded rule
-
-```text
-trigger_c holds at a place in δ     (area, date) ∈ scope_c     no defeater
-──────────────────────────────────────────────────────────────────────────
-a request at that place:  required if A_t demands the form, preferred if ≽_t favours it
-```
-
-- No trigger fires: silence is correct.
-- Several accepted forms: a question, not a change.
-- The trigger is decided by syntax, execution, lookup, or judgement.
-
-<div class="take">
-
-Part 3 measures each premise. The defeater is where the maintainer's reasoning lives.
-
-</div>
-
----
-
-# The picture
-
-```text
-                 ·  δ*  maintainer's witness             ·  δ'  reviewer's witness
-                  \                                     /
-   A_t(C_b, p)  ───\───────────────────────────────────/─────────   the acceptable region
-                    \                                 /
-                     ·  δ″  right test, witness short of A_t
-                      \                             /
-   S(C_b, p)  ·· δ ·····································   the PR: compiles, realises p
-                       \
-                        ·  δ‴  a change no test requires
-```
-
-| the judge asks | in the formulation |
-|---|---|
-| same issue | the same test |
-| strict fix | the same witness |
-| neither, both in A_t | incomparable under ≽_t: unadjudicated today |
-
----
-
-# Membership, then placement: three compiling PRs
-
-- **#33304** — merged untouched. <span class="above">δ ∈ A_t.</span> D is empty, correctly.
-- **#33305** — one required test: no line over the limit. <span class="below">One cut from A_t.</span>
-- **#33149** — 19 axioms, vacuous definitions. <span class="below">Outside S: compiles, does not realise p.</span>
-
-<div class="take">
-
-Required tests draw A_t's boundary; preferred ones move inside it. Of the convening's 23 requests, 4 are required.
-
-</div>
-
----
-
-# Placement inside A_t: PR #33098
-
-<div class="cols">
-<div class="panel">
-
-## δ, as submitted
-
-```lean
-lemma minimalCover_subset :
-    minimalCover ε A ⊆ A := by
-  by_cases h : coveringNumber ε A ≠ ⊤
-  · simp only [minimalCover, ne_eq, h,
-      not_false_eq_true, ↓reduceDIte]
-    exact (exists_set_encard_eq_coveringNumber h)
-      .choose_spec.1
-  · simp [minimalCover, h]
-```
-
-</div>
-<div class="panel">
-
-## two witnesses, both in A_t
-
-**maintainer's δ***
-```lean
-  grind [minimalCover]
-```
-
-**our reviewer's δ'**
-```lean
-  simpa [minimalCover, h]
-```
-
-</div>
-</div>
-
-<div class="take">
-
-One test, two witnesses. ≽_t between them is a convention in motion: a preferred request, unadjudicated.
-
-</div>
-
-<!--
-grind: 0% of Mathlib files January 2025, 14.5% by May 2026. The reviewer produced a compiling grind
-proof in a probe and still submitted simpa: a placement decision, not a capability gap.
--->
-
----
-
-# What it does not settle
-
-- **≽_t is an idealisation.** Each review is one sample of it, and partly constitutes it.
+- **≽_t is never observed.** Each review is one sample of it, and partly constitutes it.
 - **A_t is seen only through merges.** The gold is a lower bound.
 - **Two witnesses in A_t** have no adjudicator yet.
 
@@ -340,149 +212,92 @@ What review systems have in common, and where they part
 
 ---
 
-# Five decisions every review system makes
+<!-- _class: tbl -->
 
-```text
- ① SCORE      what is one review, and what makes it right?
- ② KNOW       where does the judgement come from?
- ③ GENERATE   how are findings produced?
- ④ CHECK      what is filtered, and on what grounds?
- ⑤ DELIVER    when is it shown, and what is learned?
-```
+# Where published work puts the specification
 
-Read from primary sources: ByteDance, Google, Atlassian, Uber, Cursor, OpenAI, Anthropic, Alibaba; the benchmarks; MathlibPR and ProofJudge for Mathlib.
+| version | slot | setting | who | answer key? |
+|---|---|---|---|---|
+| verdict | output | the bit δ ∈ A_t | MathlibPR | no |
+| written rules | ≽_t | the documented rules at t | Tricorder, BitsAI-CR, AutoCommenter | for the codified part |
+| recent practice | ≽_t | accepted solutions nearby | Qodo, Greptile, Semgrep memories | one convention behind |
+| preferred alternative | output | the fix alone | ProofJudge | via the kernel |
+| **request emission** | — | the block as written | SWR-Bench, SWE-PRBench, **ours** | no |
+| consequential | correctness | δ_{i+1} ∈ A_t | c-CRAB; resolution rates at Atlassian, Cursor | needs an acceptance oracle |
+
+<div class="take">
+
+Each buys an answer key by shrinking the task. Ours keeps the task and gives up the key.
+
+</div>
 
 <!--
-Surveys: docs/research/code-review-systems-survey-2026-09.md, open-code-review-comparison-2026-09.md,
-and the October revisit. Sources slide at the end.
+Read from primary sources in September, revisited in October: docs/research/code-review-systems-survey-2026-09.md
+and open-code-review-comparison-2026-09.md. MathlibPR: models and agents cannot separate merge-ready from
+build-passing PRs. ProofJudge: recovers reviewer preference between a declaration and its accepted revision
+on 63.5-80.8% of 218 pairs.
 -->
 
 ---
 
-<!-- _class: tbl -->
-
-# ① Score: the unit decides what "correct" means
-
-| unit scored | who | in the formulation |
-|---|---|---|
-| whole PR → merge-ready | MathlibPR | the one bit: δ ∈ A_t |
-| declaration before / after | ProofJudge | one pairwise sample of ≽_t |
-| hunk → comments | SWR-Bench, SWE-PRBench | a request's site and reason |
-| review → tests | c-CRAB | the witness, executed |
-| one maintainer request | ours | request, grade and witness |
-
-<div class="take">
-
-Every offline gold is a lower bound. Atlassian: 4% of comments match a human one, 38.7% get resolved. Deployed systems score online: was it acted on.
-
-</div>
-
----
-
-# ② Know: where the judgement comes from
-
-- Rules inside a **trained** checker: ByteDance, 16.8% → 57% precision with its taxonomy.
-- Norms learned from **comments** at scale: Google, ~800k norm-citing comments.
-- Guidelines **in the prompt**: Atlassian +5%; ours in June, null.
-- Team **feedback as memory**: Greptile, Semgrep, Qodo.
-
-<div class="take">
-
-Knowledge as prompt text is near null wherever measured. What moves is trained on outcomes, at a scale Mathlib does not have: 0.7% of its review comments cite a norm.
-
-</div>
-
----
-
-# ③ Generate: one pass, specialists, or many passes
-
-- **One whole-diff pass:** strong and unstable. Our solo's three runs never hit the same ask twice.
-- **Specialists** by concern or by evidence source: decomposition alone did not buy recall, here or at Alibaba.
-- **Many passes:** Cursor votes over 8; aggregation lifts F1 up to 44%; ensembles gain up to 83% on the union, but majority vote is a "popularity trap".
-
-<div class="take">
-
-Diversity buys recall; voting throws it away. And restraint is the enemy: Cursor needed "aggressive" prompts; our arms went 0.20 → 0.50 when refused the option to stay silent.
-
-</div>
-
----
-
-# ④ Check: truth is safe, value moves precision
-
-<div class="cols">
-<div class="panel">
-
-## on truth
-
-- Atlassian's factual judge: minimal impact.
-- Alibaba's filter deleted real defects while it judged value; refutation-only, 36% → 88%.
-- Ours: compile the proposed edit in place.
-
-</div>
-<div class="panel">
-
-## on value
-
-- Atlassian's actionability gate, trained on 50k resolutions: +15–20pp.
-- Uber: suppress whole categories.
-- Google: a threshold per rule; switch off any past ~10% "not useful".
-
-</div>
-</div>
-
-<div class="take">
-
-In Lean the truth filter is free. Precision everywhere comes from the value filter, learned from outcomes. Google's rule is our thesis: a false positive is anything the user did not want to see.
-
-</div>
-
----
-
-# The convergent design, and the open disagreements
+# How deployed reviewers produce and filter requests
 
 ```text
-specialised generators → separate verifier → suppression tuned on feedback → dedup → acted-on metric
+generators          →   a verifier         →   a value gate          →   dedup   →   acted-on
+propose tests           checks truth:          checks soundness:         one test    the author
+(specialists,           the witness            would the community       once        passed it
+ many passes)           compiles, the claim    set this test?
+                        is grounded            learned from outcomes
 ```
 
-Ours has the first, second and fourth. The other two need a deployment.
+- Atlassian: a factual judge did little; an actionability gate trained on 50k resolutions, **+15–20pp**.
+- Alibaba: a filter that judged value deleted real defects; refutation-only, **36% → 88%** precision.
+- Google: a threshold per rule, and 22 rules switched off: useful 54% → 66%.
 
-- **Verdict before reasoning?** ByteDance says yes, Alibaba says no. Different model kinds.
-- **More context?** Eight models got *worse* with structured context. Structure helps to pose questions, hurts as padding.
-- **Deterministic or agentic?** Deterministic spine; the agent for retrieval and judgement.
-- **Decompose the change?** Changes effort and noise, not recall.
+<div class="take">
+
+Truth is cheap. Soundness is where precision comes from, and it is learned from outcomes at scale.
+
+</div>
+
+<!--
+ByteDance, Google, Atlassian, Uber, Cursor, OpenAI, Anthropic and Alibaba converge on the same five
+parts. Ours has generators, a verifier (the compile receipt) and dedup; the value gate and the acted-on
+signal need a deployment. Uber's largest gain was suppressing whole low-value categories.
+-->
+
+---
+
+# What the evidence settles
+
+- **≽_t cannot be told as a list.** Guidelines in the prompt: Atlassian +5%, ours null.
+- **Diversity buys recall; voting loses it.** Aggregating reviews lifts F1 up to 44%; the oracle over an ensemble's union gains up to 83%; majority vote is a "popularity trap".
+- **More context hurts.** Eight models degrade monotonically with structured context; on Mathlib, diagnostics give "limited and uneven gains".
+- **Decomposition changes effort and noise, not recall.** Di Biase's experiment; Alibaba's grouping, 20% → 12.7%; our arms against one agent.
+
+<div class="take">
+
+And restraint is the enemy: Cursor needed "aggressive" prompts; our arms went 0.20 → 0.50 when refused the option to stay silent.
+
+</div>
+
+<!--
+SWR-Bench (2509.01494); LLM ensembles for code (2510.21513); SWE-PRBench (2603.26130); MathlibPR
+(2605.07147); Di Biase et al. (1805.10978); Cursor's Bugbot write-up; our forbid_abstention result on the
+four fanout PRs, clean PR 1 to 36 findings.
+-->
 
 ---
 
 # What formal mathematics changes
 
-- **Truth is cheap.** A proposed fix compiles or not: the strongest filter the industry trains for, free.
-- **Value is the whole problem.** The compiler neither finds the issue nor picks among valid fixes.
-- **The data is small, and moves.** ~30 people merge; no 50k-resolution labels; `grind` went 0% → 14.5% in a year.
+- **The witness is kernel-checkable.** Truth is free: the strongest filter the industry trains for.
+- **Soundness is the whole problem.** The compiler neither finds the test nor picks among witnesses. MathlibPR: models cannot tell δ ∈ A_t from δ ∈ S.
+- **The outcome data is small, and moves.** About 30 people merge; 0.7% of review comments cite a norm; `grind` went 0% → 14.5% of files in a year.
 
 <div class="take">
 
-MathlibPR: models cannot tell merge-ready from build-passing PRs. ProofJudge: recovers reviewer preference on before/after pairs. Neither asks *where* the gap sits.
-
-</div>
-
----
-
-<!-- _class: tbl -->
-
-# The map
-
-| decision | converged | contested | open for Lean |
-|---|---|---|---|
-| ① score | acted-on signal | offline gold as precision | adjudicate off-gold once |
-| ② know | trained per-rule checkers | prompt guidelines | knowledge **asserted at the place** |
-| ③ generate | specialists + passes | decomposition alone; voting | the **model and harness** as the lever |
-| ④ check | truth gate + value gate | truth judge alone | compile as the truth gate |
-| ⑤ deliver | diff-time, per-rule tuning | — | author-side; no feedback loop |
-
-<div class="take">
-
-Since the convening the wall moved when the model or the harness changed, not when parts were added.
+The wall is placement. Part 3 says what moved it.
 
 </div>
 
@@ -565,6 +380,26 @@ Of 67 asks the weaker reviewers never reach, 63 had the object visited: unknown 
 25, compile not run 19, analogue not compared 6. Our harness costs Claude volume: 22% fewer findings
 at the same hit rate than the probe harness (11-12).
 -->
+
+---
+
+# Q3 · A convention, in the formulation
+
+```text
+trigger_c holds at a place in δ     (area, date) ∈ scope_c     no defeater
+──────────────────────────────────────────────────────────────────────────
+a test at that place:  required if A_t demands the form, preferred if ≽_t favours it
+```
+
+- No trigger fires: silence is correct.
+- Several accepted forms: a question, not a change.
+- The trigger is decided by syntax, execution, lookup, or judgement.
+
+<div class="take">
+
+The next slides measure each premise: how many such rules there are, what happens when the reviewer is told which fire, and how often a firing trigger is a maintainer's test.
+
+</div>
 
 ---
 
