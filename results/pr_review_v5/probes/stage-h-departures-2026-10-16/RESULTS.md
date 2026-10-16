@@ -18,3 +18,40 @@ so only 14 unflagged touched declarations exist on the 13 merged PRs. What step 
 the 145 located unasked places (69%) reach merge byte-for-byte unchanged**, and no rule has a majority of its
 places changed. Whether those 100 are conforming code, places outside the rule, or departures nobody asked
 about is step 2's question; "gone" includes renames and moves, so the 31% is an upper bound on fixes.
+
+## Step 2: how many flagged places are departures at all (`score_step2.py`, `readings/R1.jsonl`, `R2.jsonl`)
+
+Two readers, independent, on 60 seeded unasked places and the 6 asked places as blind calibration. Calibration:
+R1 4 of 6 (fails the 5-of-6 bar), R2 5 of 6 (passes); both missed the same asked place (H055, P011, read as
+conforming). By the pre-registered fallback the headline is read on the items both agree on (59 of 66).
+
+| | departs | conforms | excluded | needs a compile or search | unclear | departs of decided |
+|---|---|---|---|---|---|---|
+| R1 | 14 | 32 | 7 | 5 | 2 | 26% |
+| R2 | 16 | 32 | 4 | 5 | 3 | 31% |
+| **both agree** | 13 | 31 | 4 | 4 | 2 | **27%** |
+
+**By the rule: mixed** (27%, just over the 25% line; the 60% line is far). The estimated ask rate per real
+departure is 6 / (6 + 0.27 × 199) = **about 10%**, three to four times the 2.9% computed per flagged place.
+
+**By kind of rule the reading is not mixed** (both readers pooled; small per-rule n):
+
+| rules | departs of decided | what it says |
+|---|---|---|
+| decided by a search (P011 use the existing API, P100 give the siblings the same variant, P126 spell it as the file does, P254 name it like its siblings) | 15% (7 of 46) | flagged places mostly conform |
+| decided by a compile (P005 a finishing tactic closes it, P010 drop an unneeded hypothesis, P018 merge consecutive steps, P040 write the block as a term) | 24% (9 of 37), 10 more need a compile | mostly conform where a reader can tell |
+| decided by reading the layout (P084 line breaks, P048 shared arguments as `variable`) | 64% (14 of 22) | mostly real departures nobody asked about |
+
+Per rule, the substantive ones read almost all conforming: P010 0 of 10, P254 0 of 16, P011 1 of 6, P100 2 of 12,
+P040 2 of 12. The cosmetic ones read mostly departing: P084 10 of 12, P018 6 of 10.
+
+**What it says, with the departures probe beside it.** The "5% of applicable places" was computed over places
+where a rule's *situation* occurs. For the substantive rules most such places already do what the rule asks,
+so the 5% was mostly conforming code in the denominator, as the user suspected. For the layout rules (line
+breaks, `variable` lines, merging steps) the flagged places are mostly real departures and they pass to merge
+unasked (step 1: 69% unchanged), as dot notation did. Even counted per real departure, maintainers ask at
+about 10%, not 100%; the substantive rules have too few departures in the sample to say how much higher their
+own rate is.
+
+Limits: 60 places on 13 PRs; two readers of one model family, one below the calibration bar; 10 compile-rule
+places could not be settled without running Lean; rules chosen knowing the probe asks (stage H's own limit).

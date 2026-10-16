@@ -1,6 +1,6 @@
 # Principles, scope and currency: where the idea holds and where it fails (plan, 2026-10-16)
 
-Status: pre-registered; adversarial round done (amendment 1). **Queue, set by the user 2026-10-16, both run in parallel so neither is dropped:** (1) R1, the maintainers' stated grounds (`results/pr_review_v5/probes/stated-grounds-2026-10-16/`); (2) the 5% re-examined at its source, stage H's 205 flagged places through survival-at-merge and a calibrated reading (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`). Earlier: nothing run. Written in this session from the user's
+Status: pre-registered; adversarial round done (amendment 1). **Queue, set by the user 2026-10-16, both run in parallel so neither is dropped; both done 2026-10-16, results in their RESULTS.md:** (1) R1, the maintainers' stated grounds (`results/pr_review_v5/probes/stated-grounds-2026-10-16/`); (2) the 5% re-examined at its source, stage H's 205 flagged places through survival-at-merge and a calibrated reading (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`). Earlier: nothing run. Written in this session from the user's
 picture (2026-10-14, 10-16); the tests run in a fresh session once the round is read.
 
 ## Already answered?
