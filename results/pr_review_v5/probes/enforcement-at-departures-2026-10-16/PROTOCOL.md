@@ -158,3 +158,9 @@ rationalising; its labels are reported and the main reading uses only items both
 - **20% or less:** most are departures from the convention as held that nobody asked about; for these
   conventions maintainers enforce where they notice;
 - between: mixed. `contested` is reported on its own and counted in neither.
+
+**Note to amendment 2 (2026-10-16, after readers B flagged it, before any scoring).** Three declarations on
+PR 30402 carry both a P108 and a P113 fact; `build_items.py` and `scope.py` joined facts on (PR, path,
+line, declaration) without the producer, so the P108 item I090 shows the P113 statement (the same place as
+I071). I090 is dropped from scoring as a defective packet; the three rows of `scope.jsonl` on those
+declarations may carry the other detector's counts, which moves the scope table by at most 3 of 184.

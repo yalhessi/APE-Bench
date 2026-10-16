@@ -18,6 +18,7 @@ from src.mathlib_review.io import jsonl_rows  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 ERROR = {"excluded", "invalid"}
+DEFECTIVE = {"I090"}
 
 
 def labels(reader: str) -> dict:
@@ -42,6 +43,9 @@ def share(rows) -> str:
 
 def main() -> int:
     key = {row["item"]: row for row in jsonl_rows(HERE / "reading_items.jsonl")}
+    # I090's packet carries the P113 statement for a P108 fact (a join without the producer); dropped
+    # before scoring (PROTOCOL.md, note to amendment 2).
+    key = {i: k for i, k in key.items() if i not in DEFECTIVE}
     readers = {r: labels(r) for r in ("A", "B")}
     for r, got in readers.items():
         missing = sorted(set(key) - set(got))
