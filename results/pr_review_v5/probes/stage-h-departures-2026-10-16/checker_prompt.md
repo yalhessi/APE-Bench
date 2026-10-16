@@ -20,6 +20,7 @@ ape/bin/python -m src.mathlib_review.review.cli tool <name> --episodes inputs/pr
 `... tool describe ...` once to see their arguments. `lean_verify_edit` with `path`, `declaration_name` and
 `new_declaration` compiles the whole file with that declaration replaced; its `outcome` is `compiled`,
 `compile_errors` (an answer about the code), or `timeout`/`environment_failure` (no answer).
+File paths in tool arguments start with `target/`, e.g. `target/Mathlib/LinearAlgebra/LinearPMap.lean`.
 
 For each place, do what the rule's **check** says, and nothing else:
 - **compile rules** (P005, P010, P018, P040): read the declaration (`file_read`), write at most six candidate
