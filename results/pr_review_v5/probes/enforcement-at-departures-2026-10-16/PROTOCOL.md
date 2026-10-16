@@ -88,3 +88,38 @@ Three conventions with a countable shape, head entries; nothing here reads the t
 cannot be attributed. A fix by merge does not say who fixed it or why (round 2, the author, CI); the
 PR store's later rounds can split that afterwards. The clone ends 2026-05-14, so PRs merged after it
 read `no_merge_commit`.
+
+## Amendment 1 (2026-10-16, after the survival result, before this step runs): the scope check
+
+The survival result: asked departures fixed 8 of 9, unasked 2 of 113. Two readings remain: (a) the
+maintainers hold a narrower convention than the detector's shape, and a surviving "departure" follows its
+own scope's practice (the user's picture: the PR instantiates the convention as its scope does); (b)
+they hold the convention and fix what they notice. A deterministic step before any reader, `scope.py`:
+
+For each checkable fact (survived or fixed), at its PR's base commit
+(`inputs/pull_requests/evaluation/val1000-2025-06-2026-03-v1/draw.json` `accepted[].base_sha`), the
+practice of the same file, excluding the PR's own lines:
+- **P057** (`Prefix.lemma x`): uses of `Prefix.lemma <identifier>` (the departure form) against uses of
+  `<identifier>.lemma` (the convention form) in the file. The library-wide undotted count of the same
+  `Prefix.lemma` is reported beside it (the dotted library count is confounded by other namespaces'
+  lemmas with the same leaf, so it is not used).
+- **P108** (`fooBar_of_baz` beside `FooBar`): declarations in the file named `fooBar_of_…` against
+  declarations named `FooBar.of_…`.
+- **P113** (a primed declaration beside its unprimed sibling): declarations in the file whose leaf ends in
+  a prime and whose unprimed leaf is declared in the same file (pairs already there).
+
+A file's practice is the **departure form** if it has at least 2 occurrences of the departure form and at
+least as many as of the convention form; the **convention form** if the convention form has at least 2 and
+more; **none** otherwise. For P113 the convention form is not countable, so the practice is departure
+(2 or more prior pairs) or none.
+
+**Reading rule, fixed now.** Over survivors with a practice (not `none`):
+- departure form in **60% or more**: survival is explained by scope; the PR wrote what its file writes,
+  the global sentence is broader than the convention as held, and the reviewer's question at a place is
+  "what does this scope do", which supports the picture;
+- convention form in **50% or more**: the PR departed from its own file's practice and it reached merge
+  unasked; enforcement is where noticed, for these conventions;
+- otherwise mixed, reported per convention. The `none` share is reported, and the 13 fixed facts are
+  reported as the contrast (expected: convention form).
+A file new in the PR has no practice at base (`new_file`, counted with `none`); its directory's
+practice at base is reported beside it and not ruled on.
