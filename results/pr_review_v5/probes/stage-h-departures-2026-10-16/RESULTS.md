@@ -55,3 +55,27 @@ own rate is.
 
 Limits: 60 places on 13 PRs; two readers of one model family, one below the calibration bar; 10 compile-rule
 places could not be settled without running Lean; rules chosen knowing the probe asks (stage H's own limit).
+
+## Corrections after the adversarial review (2026-10-16; `review2-departures.md`, `review2-synthesis.md` beside the plan)
+
+**A framing leak in step 2's packets.** Each packet showed "what the blind pass noted here", the pinpointer's
+note. Every departure both readers agreed on (13 of 13) was one the note had already named; where the note was
+neutral they agreed on none (0 of 26). The pinpointer's status was `departs` on the two layout rules only, so the
+substantive/layout split may echo the earlier pass rather than measure the code. It also coincides with the
+rules' check kind (read, search, compile), which decides both what the pinpointer marked and what a reader
+without Lean can verify.
+
+**What changes.**
+- **(b) "substantive rules mostly conform": weakened.** On the substantive rules 17 of 29 `conforms` rest on
+  something checked, 4 on not finding anything and 7 on "reads no better"; the departure share runs 12-49% by how
+  those count. It holds for naming like siblings (P254) and unneeded hypotheses (P010, though the rebuild its
+  check needs was not run); it is unsupported for "use the existing API" (P011): H008 was a real departure,
+  asked ("similar below") and fixed, and the shared calibration miss H055's asked lemma existed at base.
+- **(c) "about 10% per departure": falls as a single number.** The interval is 3.6-23%; the census missed two
+  asks (8, not 6); per rule it runs from about 65% (P011) to about 5% (line breaks); 21 places are on an
+  AI-generated PR closed unmerged.
+- **(a) layout departures merge unasked: weakened** to dot notation and line breaks; line-break "departures"
+  break stage G's own rule, which base Mathlib breaks in 11-24% of two-line signatures; `variable` rests on one
+  agreed item, merged steps on three uncompiled low-confidence ones.
+- **Stands:** the 205 are places where a rule's situation occurs (82 declarations, some under nine rules), not
+  departures, so the 2.9% was never a rate per departure.

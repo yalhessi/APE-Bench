@@ -437,3 +437,10 @@ paths:
   when a maintainer asks). Before any number about where a convention "applies", write the convention with
   its precedence and the line maintainers draw, and calibrate it on departures they actually fixed, held
   out from the derivation; a statement that fails that check measures us, not them.
+- **A reader's packet must not carry an earlier pass's verdict or note about the place (2026-10-16).** In the
+  stage-H re-reading (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`), each packet showed "what the
+  blind pass noted here"; every departure both readers agreed on (13 of 13) was one that note had named, and none
+  where it was neutral (0 of 26), so the reading reproduced the earlier pass. Calibration did not catch it: it
+  caught 1 of 4 known departures whose note did not name the fix. Show the code, the rule and the library; never a
+  prior model's reading of the place. Two readers of one model family on one prompt act as one reader run twice
+  (the same quoted phrase in 68% of notes, stated-grounds), so their agreement is not independence.

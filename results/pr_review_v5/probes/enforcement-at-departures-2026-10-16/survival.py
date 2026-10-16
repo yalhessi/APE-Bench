@@ -43,7 +43,11 @@ def file_at(sha: str, path: str):
 
 def declared_in_tree(sha: str, leaf: str) -> bool:
     """A declaration whose (possibly qualified) name ends in `leaf` exists somewhere at `sha`."""
-    pattern = rf"^\s*(?:@\[[^\]]*\]\s*)?(?:protected\s+|private\s+|noncomputable\s+|nonrec\s+)*{DECL}\s+(?:[\w'.]+\.)?{re.escape(leaf)}{END}"
+    # POSIX ERE for `git grep -E`: no `(?:`, `\s`, `\w` or lookahead (the Python form never matched; review2).
+    kw = "(theorem|lemma|def|instance|abbrev|structure|class|inductive)"
+    ere_leaf = re.sub(r"([.^$*+?()\[\]{}|\\])", r"\\\1", leaf)
+    pattern = (r"^[[:space:]]*(@\[[^]]*\][[:space:]]*)?((protected|private|noncomputable|nonrec)[[:space:]]+)*"
+               + kw + r"[[:space:]]+([[:alnum:]_'.]+\.)?" + ere_leaf + r"([^[:alnum:]_']|$)")
     return bool(git("grep", "-l", "-E", pattern, sha, "--", "Mathlib").strip())
 
 

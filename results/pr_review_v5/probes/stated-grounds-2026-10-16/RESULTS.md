@@ -31,3 +31,21 @@ included preference words so preference is not selected out. A defect fixed afte
 write-up: `select.py` compared a boolean AI flag to the string "True", so the first run's AI marginal was
 empty; the fix leaves the selection and batches identical (checked) and only adds the 56 AI-authored asks
 to their marginal.
+
+## Corrections after the adversarial review (2026-10-16; `review2-grounds.md` beside the plan)
+
+- **The verdict depends on counting `fact` for the picture**, a choice the protocol made in advance. A
+  taste-driven maintainer cites facts too. With `fact` neutral, preference + authority is 35% (28-43%), over the
+  one-third line for both readers and every marginal; a fairer rival category lands at 31%. **At the registered
+  lines the honest reading is mixed, not supported.**
+- **Counts in the table above were summed over both readers** for the principles and scopes named. Per ask, the
+  scopes named are library 17, file 7, area 4: area-level scope is under 2% of stated grounds. 8 of 12
+  readability-as-principle items are first-person; 8 of 19 generality grounds restate the ask.
+- **The two readers act as one reader run twice** (the same quoted phrase in 68% of notes); a third reading of
+  30 items agreed on 25, and 4 of its 5 changes moved away from the picture.
+- **Selection.** Of 40 unselected asks read, 11 state a ground the markers missed (mostly "the library does it
+  this way"), so about 37% of asks state one, not 17%; 2 state a preference, 14 are bare enforcement of a
+  convention. Explicit "optional / nit / won't insist" is 2.2% of asks, so amendment 1's "hedging 28%" was
+  mostly politeness.
+- **What stands:** a stated reason is usually a checkable fact or a named value; first-person taste is about
+  16% of stated grounds (about 2% of all asks). It says nothing about the scope layer or the attention rival.

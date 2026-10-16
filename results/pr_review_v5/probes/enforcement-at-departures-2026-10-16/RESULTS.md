@@ -190,3 +190,16 @@ What the two readings show together, without reading a number off either:
 they fixed caught a wrong statement twice, so the check works; producing a statement that passes it took
 more than nine asks. For placement and dot notation, with more asks behind them, the first statement
 passed its check.
+
+## Corrections after the adversarial review (2026-10-16; `docs/plans/2026-10-16-principles-scope-currency/review2-departures.md`)
+
+- **A defect in `survival.py`**: the tree-wide name search used Python regex syntax that `git grep -E` rejects, so
+  it never matched. Fixed; 5 rows move toward survival (unasked fixed: 2 of 115, unchanged in substance);
+  `scope.py` re-run (unasked survivors with a file practice: departure form 31 of 36). The tables above are the
+  first run's and differ by these rows.
+- **Placement**: 85-97% not departures, not 97%. 19 of 34 lemmas already sit in their main argument's namespace
+  and 8 were not introduced by the PR; the one fixed case shaped like the contested exclusions (I044) went the
+  detector's way, and its ask is quoted in `conventions_as_held.md`, so placement's blind calibration is one item.
+  The direction (the detector's sentence is broader than the convention) stands.
+- **Dot notation** stands. **Primes** stand as not readable. **Survival cannot tell** conforming code from an
+  unasked departure; it says only that nothing but an ask changes these places.
