@@ -69,7 +69,7 @@ def main() -> int:
         agreed = [readers["A"][i] for i in ids if i in agree]
         print(f"  both agree: {share(agreed)}  (on {len(agreed)} items)")
     grounds = Counter(row.get("ground") for got in readers.values() for i, row in got.items()
-                      if key[i]["role"] == "open" and row["label"] == "excluded")
+                      if i in key and key[i]["role"] == "open" and row["label"] == "excluded")
     print("\ngrounds named for `excluded` (both readers):", dict(grounds.most_common()))
     print("\ncontrol PRs only (open items on PRs with no asks at all):")
     for r, got in readers.items():
