@@ -148,3 +148,12 @@ It sees no reader label, no note, no `asked` flag and no score. Per row it write
   the result is stated as depending on the reading, with the rows that decide it listed.
 - The `looser` rows are reported on their own as departures from the principle beyond the rule as written.
   That bears on the plan's question of how far a rule is an instance of something broader.
+
+**Descriptive field, added before the audit runs (after PR 35140, 53 of 66 places checked).** On K001 and
+K062 the only finishing call that compiled is a hinted `aesop` longer than the proof it replaces. The rule's
+literal check is met, but the result is not one a maintainer would want; P005's check, unlike P040's, has no
+"reads no worse" clause. The auditor also records, per `departs` row, `"longer": true|false|null`: whether
+the departing candidate is longer, in characters, than the code it replaces (null where there is no
+candidate, as for search and read rules). It is reported as a count beside each reading and changes no
+verdict. Judging which literal departures a maintainer would want is the open question, not something to
+settle after seeing the data.
