@@ -54,7 +54,7 @@ def main() -> int:
         found = [k for k, p in MARKERS.items() if re.search(p, text, re.I)]
         if found:
             selected.append({"cid": cid, "pr": rows[cid]["pr"], "path": rows[cid]["path"], "markers": found,
-                             "ai": rows[cid].get("ai") == "True", "rank": rank.get(lab["principle_id"])})
+                             "ai": rows[cid].get("ai") in (True, "True"), "rank": rank.get(lab["principle_id"])})
     random.Random(SEED).shuffle(selected)
     for n, s in enumerate(selected):
         s["batch"] = n % BATCHES + 1
