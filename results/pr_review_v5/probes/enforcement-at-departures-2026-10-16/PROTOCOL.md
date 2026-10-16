@@ -123,3 +123,38 @@ more; **none** otherwise. For P113 the convention form is not countable, so the 
   reported as the contrast (expected: convention form).
 A file new in the PR has no practice at base (`new_file`, counted with `none`); its directory's
 practice at base is reported beside it and not ruled on.
+
+## Amendment 2 (2026-10-16, after the scope check, before any survivor is read): reading the 77
+
+The 77 unasked survivors with no local practice (P108 36, P113 25, P057 16; 49 PRs, 34 on control
+PRs) are read against `conventions_as_held.md`, written first from Mathlib's naming page, the codebook
+and the maintainers' own words under each entry. One correction recorded there before reading: the
+maintainers' P057 asks cover data receivers (a matrix `A`, a set `s`), so "hypotheses only" is not a
+scope limit. No mechanical exclusion applies: no P057 survivor's prefix is qualified beyond its
+receiver's type.
+
+**Items.** The 77, plus the 13 fixed departures as a blind calibration set (90), shuffled with seed
+20261016, opaque ids, list committed with this amendment (`reading_items.jsonl`). Each packet holds the
+convention's section, the fact as the detector stated it, and the excerpt of the PR's diff at the
+reviewed head (`data/pull_requests/pr/<n>/compares/<head>.json`) around the declaration; readers may
+read the library at the base commit with git and may not read the merged commit, any later commit, or
+the PR's review comments.
+
+**Labels**, one primary plus a note: `departure` (a maintainer holding the convention as written would
+ask for the change here), `excluded` (the convention as held does not cover this place; the ground
+named: main-hypothesis namespace, near-identical variant, structure-field pattern, resolution differs,
+other), `contested` (both forms are established practice here, the convention unsettled), `invalid` (the
+fact misdescribes the code), `unclear`.
+
+**Two readers**, independent, each reading all 90 in two batches.
+
+**Calibration.** A reader who labels fewer than 9 of the 13 fixed departures `departure` is
+rationalising; its labels are reported and the main reading uses only items both readers agree on.
+
+**Reading rule.** Construct error = (`excluded` + `invalid`) over labelled items (not `unclear`), on the
+77, per convention and pooled, each reader and both-agree:
+- **50% or more:** the 5% denominator was mostly ours; the detectors' sentence is broader than the
+  convention as held, and the reviewer's task is the narrower convention;
+- **20% or less:** most are departures from the convention as held that nobody asked about; for these
+  conventions maintainers enforce where they notice;
+- between: mixed. `contested` is reported on its own and counted in neither.
