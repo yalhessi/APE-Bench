@@ -1,0 +1,9 @@
+# The 14 census PRs of stage H's places read in results/pr_review_v5/probes/stage-h-departures-2026-10-16/.
+# Cut from the sealed val1000 draw by convention-detectors-2026-10-06/stage5_release.py.
+name: stage_h_v1
+release: inputs/probes/stage-h-v1
+dataset_config: configs/pr_review_v5_stage_h_v1_build.yaml
+pr_numbers: [26301, 26979, 27054, 28678, 30652, 31081, 32598, 33879, 35140, 36430, 36577, 37052, 37190, 37341]
+feedback: {draw: val1000-2025-06-2026-03-v1}
+cid_prefix: v
+probe_dir: results/pr_review_v5/probes/stage-h-departures-2026-10-16/build

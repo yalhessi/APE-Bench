@@ -1,0 +1,133 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-10-16T13:56:50Z",
+  "dataset_id": "mathlib-pr-review-evaluation",
+  "derived_artifacts": [
+    {
+      "path": "derived/funnel.jsonl",
+      "records": 14,
+      "role": "eligibility_funnel",
+      "schema_version": "funnel1",
+      "sha256": "6dacc556691be63d3c75a9d51d11231f02ed3631b126af7681f5976b98f92b4b"
+    },
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 14,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "9ccd615865095b814c94773d4a022f188cf3bb973474fa27089b743674a31812"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 29,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "42a7757249ecaffebbb7e0de4a000e0f8aa40393f95ac03793c4a977560c2cb6"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 29,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "eef5d933adb1afbc11e7c5e5f66753acc08f1e049670233ae8fc1c8b4bbb8059"
+    },
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 205,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "771c5acb60fa138834e95a8502e411bf84c299a6393e59a1ae1fdf18ebf4ac1c"
+    },
+    {
+      "path": "derived/evaluation_strata.jsonl",
+      "records": 14,
+      "role": "strata_and_ai_labels",
+      "schema_version": "evaluation-strata1",
+      "sha256": "958099c80599e5262c9ecc42dc2f26720d49953d6dda2857f6c985bd22a5d538"
+    }
+  ],
+  "generator_git_commit": "f419fda1713102df458f9d0201e8547c6fc246c5",
+  "generator_tree_state": "dirty",
+  "generator_versions": {
+    "change_graph": "cg1_builder_v3",
+    "definitions": "pull-request-definitions/2",
+    "episodes": "raw_first_round_v1",
+    "events": "pull_request_store_v1",
+    "frame": "evaluation-frame/1",
+    "funnel": "raw_first_round_v1",
+    "inventory": "modification-inventory/1",
+    "renderer": "candidate-prompt/14",
+    "store": "pull-request-store/1",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 14,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "3d4206d06334f776fc58990579b1d499756d8edd39d210bc01a4186442eba91d"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 14,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "867630cd3d3432050056b9f509d677320c9b1c2c1f124fd373559eeeb3991613"
+    }
+  ],
+  "pr_numbers": [
+    26301,
+    26979,
+    27054,
+    28678,
+    30652,
+    31081,
+    32598,
+    33879,
+    35140,
+    36430,
+    36577,
+    37052,
+    37190,
+    37341
+  ],
+  "release": "val1000-2025-06-2026-03-v1",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 762,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "d287b928cde882862394fc36439b0aa0c3ee6bf075ceceaada5c3be29e1e2e76"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "/research/projects/proofedit/ya475/APE-Bench/data/pull_requests",
+      "records": 14,
+      "role": "pull_request_store",
+      "schema_version": null,
+      "sha256": "71dc9c3325b2bc1e3391803be674c16ec1d090992d51b18c1772f7e5c64d8cc8"
+    },
+    {
+      "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+      "records": 64,
+      "role": "reviewer_roster",
+      "schema_version": null,
+      "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+    },
+    {
+      "path": "inputs/pull_requests/evaluation/val1000-2025-06-2026-03-v1/seal.json",
+      "records": 14,
+      "role": "evaluation_seal",
+      "schema_version": null,
+      "sha256": "fae46685717ab3352aa5bfbc40f300c25b3e6fd08d4dcc0f6c47424d2e05aaf8"
+    }
+  ],
+  "split": "test"
+}

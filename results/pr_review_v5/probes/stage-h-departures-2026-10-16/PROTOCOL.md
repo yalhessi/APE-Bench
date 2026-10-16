@@ -91,3 +91,32 @@ alternative, a contrasting precedent or a measured length) 28, `hedged` 13, `neu
    (search and compile kinds), both readers pooled: 30 points or more, it survives; 15 or less, it collapses.
 3. **Calibration** by note type: departs on the 4 `names_fix` and the 3 `neutral` asked places, per reader; a
    reader under 5 of 7 is reported, and its labels are read only where both agree.
+
+## Step 4, pre-registered (2026-10-16, before any check runs): each rule's own check, run with tools
+
+Step 3 left one confound: readers without Lean judged the substantive rules, whose checks are a compile or a
+search. Step 4 runs the rule's own check at the same 66 places in each PR's reviewed workspace (base snapshots
+built by `build/base_build_rows.jsonl`, reviewed workspaces by `release.prebuild --reviewed` on
+`configs/pr_review_v5_stage_h_v1_build.yaml`, release `inputs/probes/stage-h-v1`), PR by PR as workspaces
+become ready.
+
+**The checker.** One agent per PR, given the note-free packets (`stageh_packets_blind`) and the project's tools
+through `cli tool` (`lean_verify_edit`, `declaration_search`, `content_search`, `file_read`) on that PR's reviewed
+workspace; it never sees reader labels, notes or merged code. Per place it does exactly what the rule's `check`
+says and records every call:
+- **compile rules** (P005 finishing tactic, P010 drop or weaken a hypothesis, P018 merge consecutive steps,
+  P040 a term for a short block): at most six candidate edits a place, each compiled; `departs` if one the
+  check describes compiles (and, for P010, the hypothesis is removed or weakened), `conforms` if none does;
+- **search rules** (P011 existing API, P100 siblings' variant, P126 the file's spelling, P254 siblings' names):
+  the search the check describes, at the base or in the PR's own files; `departs` if it finds what the check
+  names (for P011, a derivation that compiles), `conforms` if it does not;
+- **read rules** (P048, P084): measured from the code (shared binders; joined line lengths ≤ 100);
+- `undecided` when a call times out or the environment fails; never a guess.
+
+**Reading rule, fixed now.** On the open substantive places, against the note-free readers (step 3):
+- the share of reader-`conforms` places where the check finds a departure: **30% or more**, readers' substantive
+  "conforms" was largely not checking, and the substantive departure share is the check's; **10% or less**,
+  readers' "conforms" holds and the split stands as step 3 measured it; between, mixed;
+- the substantive departure share by the checks alone, and by rule; the 7 asked places as calibration
+  (the check should find each departure: at least 5 of 7);
+- reported as each PR finishes; the reading is made on all PRs whose workspaces build, with the unbuilt named.
