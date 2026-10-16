@@ -120,3 +120,31 @@ says and records every call:
 - the substantive departure share by the checks alone, and by rule; the 7 asked places as calibration
   (the check should find each departure: at least 5 of 7);
 - reported as each PR finishes; the reading is made on all PRs whose workspaces build, with the unbuilt named.
+
+### Step 4 amendment (2026-10-16, after 7 of 14 PRs are checked, 38 of 66 places; before any audit label)
+
+**Why.** Two committed rows depart only under a reading looser than the rule's literal `check`. On K045 the
+checker merged `intro` then `cases` into `rintro`, which is not among P018's four combined forms (a `rw` list,
+`rwa`, `by_contra!`, one `calc` step), and the checker said so. On K031, `use 1; simp` is two calls where P005
+asks for one finishing tactic. The checkers were told to do what the check says. But a capable checker
+generalises the check to the principle behind it, and that is a different measurement: the rule as stage G
+wrote it, or the principle it instantiates. Re-labelling those rows myself, after seeing the scores, would be
+choosing the reading that suits.
+
+**The audit.** After the last PR is checked, one auditor agent reads every check row: the item, the rule's
+`trigger` and `check` text from `conventions-ceiling-2026-10-04/rules.json`, and the row's verdict and evidence.
+It sees no reader label, no note, no `asked` flag and no score. Per row it writes `audit.jsonl`
+`{"item", "reading": "literal|looser|incomplete", "why"}`:
+- `departs` row: `literal` if the compiled or found candidate is a form the check names and does what the
+  check asks; `looser` if it departs only under a broader reading (another combining form, two calls where
+  one is asked, a judgement the check leaves open).
+- `conforms` row: `literal` if the check was done as described; `incomplete` if a form the check names was
+  not tried.
+
+**Reading.**
+- The strict reading counts `looser` as `conforms`; `incomplete` stays `conforms` and is counted. The
+  checker's own verdicts are the second reading.
+- Both are reported against the 30% and 10% lines. If the two readings fall on different sides of a line,
+  the result is stated as depending on the reading, with the rows that decide it listed.
+- The `looser` rows are reported on their own as departures from the principle beyond the rule as written.
+  That bears on the plan's question of how far a rule is an instance of something broader.
