@@ -111,3 +111,81 @@ split. The remaining confound is the one the review named second: substantive ru
 a search, which these readers could only partly do (no Lean), so "conforms" there is still a reader's judgement;
 running each rule's own check at the places is the measurement that would settle it. Within that limit:
 substantive rules' flagged places mostly conform (about three quarters), layout rules' mostly depart.
+
+## Step 4: each rule's own check, run with tools (`score_step4.py`, `checks/*.jsonl`, `audit.jsonl`)
+
+All 14 reviewed workspaces built; one checker agent a PR ran each rule's check at its places (248 tool calls,
+none undecided). After 7 PRs, two rows showed the checkers generalising a check beyond its wording, so an
+audit was pre-registered (PROTOCOL.md, step 4 amendment): one auditor, blind to readers, notes, asked flags and
+scores, marked each row against the rule's literal check. It found 50 `literal`, 15 `looser`, 1 `incomplete`.
+
+**Calibration passes under both readings: 6 of 7 asked places depart.** The miss, K023 (use the existing API),
+searched the base only; the audit marks it `incomplete`.
+
+**The pre-registered line depends on the reading.** Share of note-free reader `conforms` on open substantive
+places where the check finds `departs`:
+
+| reading | S1 | S2 | pooled | by the line |
+|---|---|---|---|---|
+| strict (audited `looser` counts as conforms) | 8 of 35 | 6 of 29 | **22%** (14 of 64) | mixed |
+| the checkers' verdicts as written | 19 of 35 | 13 of 29 | **50%** (32 of 64) | readers were largely not checking |
+
+The rows that decide it are the 15 `looser` ones: all six "merge consecutive steps" (P018) departures use a
+combining form the check does not list (`simpa ... using`, `rintro`, a rewrite replacing `simp` or `aesop`); five
+of seven "a term for a short block" (P040) departures leave the check's "reads no worse" unsettled; and four
+single rows (K016, K026, K027, K030) rest on a contested reference spelling or a one-line gain. In the other
+direction, under the strict reading 7 reader `departs` labels meet a check `conforms`; under the checkers'
+reading none do.
+
+**Departure share, open places** (layout: 11 of 11 under both readings):
+
+| rule | strict | as written | reader S1 | reader S2 |
+|---|---|---|---|---|
+| P005 a finishing tactic closes it | 7/7 | 7/7 | 2/6 | 2/5 |
+| P010 drop an unneeded hypothesis | 0/5 | 0/5 | 0/5 | 0/4 |
+| P011 use the existing API | 1/2 | 2/2 | 1/2 | 1/2 |
+| P018 merge consecutive steps | 0/6 | 6/6 | 1/6 | 3/5 |
+| P040 a term for a short block | 2/7 | 7/7 | 1/6 | 1/6 |
+| P100 give the siblings the same variant | 4/6 | 4/6 | 1/6 | 2/6 |
+| P126 spell it as the file does | 2/7 | 3/7 | 2/6 | 2/7 |
+| P254 name it like its siblings | 0/8 | 2/8 | 2/8 | 1/8 |
+| **substantive, pooled** | **33%** | **65%** | 22% | 28% |
+
+Descriptive, changing no verdict: 10 of 48 departing candidates are longer than the code they replace, 4 of
+them among `literal` rows (K001 and K062: the one finishing call that compiled is a hinted `aesop` twice the
+length of the proof).
+
+**Exploratory, not pre-registered: what happened to the places by merge** (step 1's outcome joined per place):
+
+| | n | unchanged | changed | gone | not followed |
+|---|---|---|---|---|---|
+| asked (calibration) | 7 | 0 | 2 | 3 | 2 |
+| open, departs by the literal check | 27 | **20** | 5 | 2 | 0 |
+| open, departs only under a looser reading | 15 | 9 | 5 | 1 | 0 |
+| open, conforms by the check | 17 | 15 | 0 | 2 | 0 |
+
+"Changed" may be an unrelated edit to the declaration, so these are upper bounds on fixes.
+
+**What it says about the 5%.**
+- Step 2-3's explanation, that the 5% was mostly conforming code in the denominator, **holds only for the
+  substantive rules, and only under the strict reading** (33% depart, against the readers' 22-28%); under the
+  checkers' reading they depart at 65%. **Over all ten rules it does not hold:** the layout places all depart,
+  so under the strict reading 46% of the 59 open places depart (27), under the checkers' 71% (42). The ask
+  rate per departure is then 6.2% or 4.1% by step 2's formula, 8.2% or 5.4% with the census's two missed
+  asks. Either way it stays near 5%, not the 10% step 2 estimated.
+- So, read literally, these ten rules are broken at about half the places their situation occurs, and three
+  quarters of those breaks reach merge unchanged. If the rules as written were the maintainers' rules, the
+  user's objection would stand: a library is not kept coherent by rules enforced one time in twenty.
+- **What the record does show is that the rules as written carry no exceptions.** None of the ten has a
+  `not_when` condition (11 of all 52 rules have one). Their literal checks count changes no maintainer would
+  want: P005 counts a longer `aesop` call; P084 counts every line join that fits in 100 characters, which base
+  Mathlib does not follow (step 2 corrections). On the user's picture, maintainers decide on positive *and*
+  negative evidence, and the rules as written encode only the positive half. That is a hypothesis this step
+  makes sharp, not one it tests: the 20 literal departures that merged unchanged are the sample on which it
+  can be tested. The test is whether a blind reader, given the place and the code around it, can state a
+  reason not to ask that holds across PRs, while not finding one at the asked places. That is the plan's
+  silence test (R4), now with verified departures instead of the decoy places it planned to read.
+
+Limits: 59 open places on 14 PRs, 2 to 8 per rule; one checker a place and one auditor, all of one model
+family; at most six candidate edits a place, so a `conforms` on a compile rule is "none of six compiled";
+searches at the base, not recent master (K023); the merge cross is exploratory and "changed" is not "fixed".
