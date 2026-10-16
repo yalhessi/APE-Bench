@@ -23,6 +23,7 @@ FACTS = {"dot_notation": Path("results/pr_review_v5/probes/convention-detectors-
          "primed_names": Path("results/pr_review_v5/probes/convention-detectors-2026-10-06/census/primed_names/facts.jsonl")}
 REPO = Path("data/code_execute/repos/mathlib4/source")
 DECL = r"(?:theorem|lemma|def|instance|abbrev|structure|class|inductive)"
+END = r"(?![\w'])"  # the end of a name; `\b` fails after a trailing prime (`foo'`), which read every primed name as gone
 _CALL_FACT = re.compile(r"^`(?P<prefix>[^`\s]+)\.(?P<lemma>[^`\s.]+) (?P<arg>[^`\s]+)` applies")
 _PLACE_FACT = re.compile(r"inside it, it is `(?P<dotted>[^`]+)`")
 
@@ -42,12 +43,12 @@ def file_at(sha: str, path: str):
 
 def declared_in_tree(sha: str, leaf: str) -> bool:
     """A declaration whose (possibly qualified) name ends in `leaf` exists somewhere at `sha`."""
-    pattern = rf"^\s*(?:@\[[^\]]*\]\s*)?(?:protected\s+|private\s+|noncomputable\s+|nonrec\s+)*{DECL}\s+(?:[\w'.]+\.)?{re.escape(leaf)}\b"
+    pattern = rf"^\s*(?:@\[[^\]]*\]\s*)?(?:protected\s+|private\s+|noncomputable\s+|nonrec\s+)*{DECL}\s+(?:[\w'.]+\.)?{re.escape(leaf)}{END}"
     return bool(git("grep", "-l", "-E", pattern, sha, "--", "Mathlib").strip())
 
 
 def declared_in(text: str, leaf: str) -> bool:
-    pattern = rf"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:protected\s+|private\s+|noncomputable\s+|nonrec\s+)*{DECL}\s+(?:[\w'.]+\.)?{re.escape(leaf)}\b"
+    pattern = rf"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:protected\s+|private\s+|noncomputable\s+|nonrec\s+)*{DECL}\s+(?:[\w'.]+\.)?{re.escape(leaf)}{END}"
     return re.search(pattern, text) is not None
 
 
@@ -64,8 +65,8 @@ def classify(row: dict, sha: str):
         m = _CALL_FACT.match(row["text"])
         if m:
             prefix, lemma, arg = m.group("prefix"), m.group("lemma"), m.group("arg")
-            call = re.compile(rf"\b{re.escape(prefix)}\.{re.escape(lemma)}\s+{re.escape(arg)}\b")
-            dotted = re.compile(rf"\b{re.escape(arg)}\.{re.escape(lemma)}\b")
+            call = re.compile(rf"(?<![\w'.]){re.escape(prefix)}\.{re.escape(lemma)}\s+{re.escape(arg)}{END}")
+            dotted = re.compile(rf"(?<![\w'.]){re.escape(arg)}\.{re.escape(lemma)}{END}")
             if call.search(text):
                 return "survived", "the undotted call is still in the file"
             if dotted.search(text):
@@ -73,18 +74,22 @@ def classify(row: dict, sha: str):
             return "fixed_other", "neither form is in the file (rewritten or removed)"
         p = _PLACE_FACT.search(row["text"])
         if p:
-            if declared_in(text, leaf) or declared_in_tree(sha, leaf):
-                return "survived", "the undotted name is still declared"
+            if declared_in(text, leaf):
+                return "survived", "the undotted name is still declared in the file"
             dotted_leaf = p.group("dotted").rsplit(".", 1)[-1]
-            if declared_in(text, dotted_leaf) or declared_in_tree(sha, dotted_leaf):
-                return "fixed_renamed", "the dotted name is declared and the undotted one is not"
+            if declared_in(text, dotted_leaf):
+                return "fixed_renamed", "the dotted name is declared in the file and the undotted one is not"
+            if declared_in_tree(sha, leaf):
+                return "survived", "the undotted name is declared in another file"
             return "gone", "neither name is declared at merge"
         return "unparsed", "fact text of an unknown shape"
     if row["producer"] == "primed_names":
-        if declared_in(text, leaf) or declared_in_tree(sha, leaf):
-            return "survived", "the primed name is still declared"
-        if declared_in(text, leaf.rstrip("'")) or declared_in_tree(sha, leaf.rstrip("'")):
-            return "fixed_renamed", "the primed name is gone and its unprimed sibling remains"
+        if declared_in(text, leaf):
+            return "survived", "the primed name is still declared in the file"
+        if declared_in(text, leaf.rstrip("'")):
+            return "fixed_renamed", "the primed name is gone from the file and its unprimed sibling remains"
+        if declared_in_tree(sha, leaf):
+            return "survived", "the primed name is declared in another file"
         return "gone", "neither the primed name nor its sibling is declared at merge"
     return "unparsed", "unknown producer"
 
