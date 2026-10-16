@@ -69,3 +69,39 @@ GitHub marks a merged PR closed (31709 reads unmerged in the store and its merge
 12 PRs (22 facts) closed after it, merge state unknown here. Corrected 2026-10-16 from a first reading
 that called all 28 unmerged; "co-located" asks are not asks about the fact; the exact-ask list is 10 facts; one run,
 deterministic, re-runnable in 15 s.
+
+## The scope check (amendment 1; `scope.py`, `scope.jsonl`)
+
+Each surviving or fixed departure's own file at the PR's base commit: does the file already use the
+departure form (2 or more, at least as many as the convention form), the convention form, or neither?
+
+| stratum | n | file uses the departure form | file uses the convention form | no practice | new file |
+|---|---|---|---|---|---|
+| dot notation, survived unasked | 67 | 10 (67%) | 5 (33%) | 41 | 11 |
+| dot notation, survived, co-located with an ask | 47 | 2 | 8 (80%) | 19 | 18 |
+| dot notation, fixed | 7 | 0 | 0 | 6 | 1 |
+| primed names, survived unasked | 44 | 19 | 0 | 20 | 5 |
+| primed names, survived, co-located | 26 | 2 | 0 | 11 | 13 |
+| primed names, fixed | 6 | 2 | 0 | 2 | 2 |
+| **pooled, survived unasked** | 111 | **29 (85%)** | **5 (15%)** | 61 | 16 |
+
+**By the pre-registered rule, survival is explained by scope** (85% ≥ 60%), and the reading stops at
+that altitude because the ground is thin:
+- **Only 34 of 111 unasked survivors (31%) have a measurable file practice.** For the other 77 the file
+  says nothing (no prior uses either way, or the file is new); scope as measured here explains nothing
+  about them. Their directories, for the new files: 14 departure, 2 convention, 31 none.
+- **For primed names the measure can only find the departure form** (the convention form, naming the
+  differing term, is not countable), and the two *fixed* primed names sit in files full of primes too. So
+  for primes the file practice does not separate what maintainers fixed from what they let through.
+- **For dot notation the contrast is empty** (the 7 fixed calls have no measurable file practice), and 3
+  of the 5 "convention form" survivors spot-checked are the detector's known invalid case
+  (`PullbackCone.IsLimit.lift ht`, where `ht.lift` is a different, general lemma), so the file's dotted
+  uses count another lemma.
+- Library-wide, the surviving dot-notation calls' own spelling is rare: a median of 1 other undotted use
+  of the same `Prefix.lemma` in all of Mathlib at base, 0 for 19 of 42.
+
+**What it says, provisionally.** Where the file has a practice, the PR nearly always matches it, which
+is what the user's picture predicts (the PR instantiates the convention as its scope does, and a
+maintainer does not ask). But two thirds of the unasked survivors have no local practice to follow, and
+for them this check is silent. Reading those (77) under each convention's stated motivation and scope
+decides between "our sentence is broader than the convention" and "a departure nobody noticed".
