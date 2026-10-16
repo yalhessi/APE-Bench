@@ -1,0 +1,1 @@
+{"item": "K033", "rule": "P084", "verdict": "departs", "calls": 2, "compiled_candidates": 0, "evidence": "Measured lines 206-224: none over 100 (max 91). Broken lines that fit joined: have g call lines 217+218 join to 99 chars; have hB' := by + grind (221+222) join to 97; signature binders split (210 could take [DecidableEq β], 47); docstring line 206 could take \"and,\" (71)."}
