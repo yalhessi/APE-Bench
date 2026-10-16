@@ -68,3 +68,26 @@ items both readers agree on are read.
   these rules;
 - between: mixed. `needs_tools` is reported by rule and check kind (compile, lookup, read): it is the share
   a reading cannot settle and a tool-using reviewer would have to.
+
+## Step 3, pre-registered (2026-10-16, after the adversarial review, before any re-read label): the same places without the note
+
+The adversarial review (`review2-departures.md`) found step 2's packets carried the pinpointer's note, and every
+departure both readers agreed on was one the note named. Step 3 re-reads **the same 66 places with the note
+removed** and nothing else changed (same rule text, same two maintainer asks, same code excerpt, same base),
+under new ids and a new order (seed 20261019, `step3_items.jsonl`), by two new readers, same labels.
+
+**Note types, coded before any re-read label** (`note_types.jsonl`): `names_fix` (the note names a concrete
+alternative, a contrasting precedent or a measured length) 28, `hedged` 13, `neutral` 25. **Calibration**: the
+7 asked places, the original 6 and H008 (asked via "similar below" on another place; review2), 4 with a
+`names_fix` note and 3 with a `neutral` one.
+
+**Reading rule, fixed now.**
+1. **Does departure track the note when the note is gone?** The share of `departs` among decided labels at
+   `neutral`-note places, against step 2's (1 of 42 pooled):
+   - 20% or more: the notes suppressed departures where they were silent; step 2 under-read neutral places;
+   - 5% or less while `names_fix` places stay at 50% or more: readers find departures where the pinpointer did,
+     unaided; the note was informative rather than the reading's source.
+2. **Does the rule-kind split survive?** Departs share on layout rules (P084, P048) minus on substantive rules
+   (search and compile kinds), both readers pooled: 30 points or more, it survives; 15 or less, it collapses.
+3. **Calibration** by note type: departs on the 4 `names_fix` and the 3 `neutral` asked places, per reader; a
+   reader under 5 of 7 is reported, and its labels are read only where both agree.
