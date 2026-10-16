@@ -164,3 +164,14 @@ PR 30402 carry both a P108 and a P113 fact; `build_items.py` and `scope.py` join
 line, declaration) without the producer, so the P108 item I090 shows the P113 statement (the same place as
 I071). I090 is dropped from scoring as a defective packet; the three rows of `scope.jsonl` on those
 declarations may carry the other detector's counts, which moves the scope table by at most 3 of 184.
+
+## Amendment 3 (2026-10-16, after the reading, before the re-read): primes, with the convention re-derived
+
+The first reading failed its calibration on primes alone (both readers excluded 4 of 6 fixed primes,
+post hoc). `conventions_as_held.md` gains "Primed names, revised", derived only from prime asks not on any
+calibration item. **Items:** the 25 open primed survivors and the 6 fixed primes (31), reshuffled with
+seed 20261017 under new ids (`reading_items_primes.jsonl`, `packets_primes/`), packets as before with the
+revised section. Labels as in amendment 2, plus the ground `not_introduced` (a name the PR only moves or
+touches). **Two new readers.** **Calibration bar: 5 of the 6 fixed primes labelled `departure`** (the moved
+one may read either way under the revised rule). **Reading rule** as in amendment 2 on the 25. If the
+calibration fails again, primes are reported as not readable by this method.

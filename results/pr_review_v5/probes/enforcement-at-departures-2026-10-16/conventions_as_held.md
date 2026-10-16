@@ -60,3 +60,31 @@ sibling, so a prime is not a departure as such; the asks object where the two st
 that the prime hides how ("pretty different"), and accept an explanation in a docstring as an
 alternative. The naming page's only primed name is a structure field (`map_one'`) beside its bundled
 lemma, a standing Mathlib pattern.
+
+## Primed names, revised (2026-10-16, after the first reading failed its calibration on primes)
+
+The first version above permitted a prime beside a primary sibling and accepted a docstring as an
+explanation; readers following it excluded 4 of the 6 primes maintainers had fixed. This version is
+derived from the prime asks that are **not** on any calibration item (v0207, v0477, v0958, v1207, v1524,
+v1552, v1935 in the window; o0202, o0840 outside it); the four asks on fixed items (v1057, v1096, v1490,
+v2081) are not used, so the calibration stays held out.
+
+**Rule.**
+- A prime marks the secondary of a pair whose primary form is unprimed; maintainers assign primes that
+  way on purpose ("I think you should rename `div` to `div'` and `div₀'` to `div`"). A primed name with no
+  primary unprimed sibling is unprimed ("Maybe remove the prime in this one also?").
+- **Where the variant differs from its sibling in something a name can say** (an extra or different
+  hypothesis, a specialisation, a different function or structure, a different quantification), the
+  maintainers ask for a name that says it, and a docstring does not substitute: "I know it's verbose, but
+  the `''` version is so uninformative" (with a descriptive rename); a descriptive name or an
+  `_of_mem_maximalIdeal` suffix in place of the prime; "Am I remembering correctly that the reason there is
+  a prime here is because the unprimed version would be specialized to `n = ⊤`?".
+- **A prime is accepted where it follows an established Mathlib prime pattern** whose difference is not
+  naturally a word: argument order or form by analogy with `le_trans'` ("`assoc'` makes sense to me, by
+  analogy with `le_trans'`"), or a name mirroring a primed component of its own statement ("`ι'_hom'` …
+  I feel there should be `hom'` in the name").
+- **A primed name the PR only moves or touches** is an opportunity, not a requirement: "This PR could be
+  an opportunity to 'unprime' `CatCommSq.iso'`? (Or maybe in a separate PR?)".
+
+**Attitude.** Hedged and maintainer-dependent: "I understand some Mathlib maintainers don't feel so fondly
+about primed theorem names."
