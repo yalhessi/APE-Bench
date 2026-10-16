@@ -17,6 +17,9 @@ Rules:
   `PROTOCOL.md` opens with an `## Already answered?` section naming the lines it was checked against.
   Research write-ups with a measurement are listed by hand.
 - A line is added in the commit that records the result; a superseded line is edited, not deleted.
+- This file lists *results*. An `## Already answered?` check also reads `docs/todo/README.md` for
+  open hypotheses and `docs/dead-ends.md`: on 2026-10-16 a plan restated the user's own todo
+  (`conventions-nature.md`, studies 2-4) because its check read only this file.
 
 Standing terms: "the solo reviewer" is one whole-PR session with the brief and the tools; "the free
 reviewer" is self-hosted DeepSeek-V4.1-Flash; "the 14 held-out PRs" are validation small12's 8 ask
