@@ -426,3 +426,14 @@ paths:
   (`lean_verify` compiles a snippet against the library, `lean_verify_edit` compiles the reviewed
   file with an edit); a refusal says which spellings exist; and a tool a run cannot answer with
   is out of the grant, not in the prompt.
+- **A convention's one-line sentence, and a detector built on it, misstate the convention; check a
+  statement against what maintainers fixed before measuring with it (2026-10-16).** The "maintainers raise a
+  convention at 5% of the places it applies" figure did not survive being taken apart
+  (`results/pr_review_v5/probes/enforcement-at-departures-2026-10-16/`). For namespace placement the
+  detector proposed the conclusion's namespace while the convention as held puts a lemma in its main
+  hypothesis's namespace first: 97% of the unasked "departures" were not departures. For primed names two
+  written versions of the convention, each from the maintainers' words, both failed to reproduce the primes
+  maintainers had fixed. Only dot notation measured as stated (real departures, merged unasked, fixed only
+  when a maintainer asks). Before any number about where a convention "applies", write the convention with
+  its precedence and the line maintainers draw, and calibrate it on departures they actually fixed, held
+  out from the derivation; a statement that fails that check measures us, not them.

@@ -160,3 +160,33 @@ fixed; the one-line sentence and the detector's shape both misstate it.
 Limits: two readers of one model family with the conventions as I wrote them; 76 items on 49 PRs; three
 conventions with a countable shape; the calibration bar met exactly, and the per-convention calibration
 split is post hoc.
+
+## Primes, re-read with the convention re-derived (amendment 3; `score_primes.py`)
+
+Two new readers on 31 items (the 25 open primes and the 6 fixed primes as blind calibration), with the
+prime convention re-derived only from prime asks not on any calibration item.
+
+| | reader C | reader D | both agree (27 of 31) |
+|---|---|---|---|
+| calibration: fixed primes labelled `departure` (bar 5 of 6) | **4** | **4** | |
+| open primes: departure / excluded / contested | 10 / 14 / 1 | 14 / 11 / 0 | 10 / 11 / 0 |
+| construct error | 58% | 44% | 52% |
+
+**By the pre-registered rule, primes are not readable by this method:** the calibration failed again.
+The two misses are the same for both readers: the moved lemma (`integral_countable'`, which the
+amendment allowed to read either way, and the maintainer did ask to unprime) and `constantCoeff_subst'`,
+excluded because the same file already uses `coeff_subst'` for the same difference; maintainers renamed it
+anyway, so a file's own primed precedent did not license the prime for them.
+
+What the two readings show together, without reading a number off either:
+- the verdict moves with how the convention is written: the first version gave 83% construct error, the
+  re-derived one 44-58%, and 6 of the 25 survivors flipped from "fine" to "departure" (4 were departures
+  under both, 15 under neither);
+- neither version reproduced what maintainers fixed; the asks hedge ("some Mathlib maintainers don't feel
+  so fondly about primed theorem names"), and nine asks may be too few to fix the line. Whether primes are
+  maintainer-dependent, or a rule that needs more asks to state, this reading cannot say.
+
+**The method's own lesson.** Writing a convention from maintainers' words and checking it against what
+they fixed caught a wrong statement twice, so the check works; producing a statement that passes it took
+more than nine asks. For placement and dot notation, with more asks behind them, the first statement
+passed its check.
