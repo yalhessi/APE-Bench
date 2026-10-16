@@ -62,7 +62,10 @@ maintainers do not enforce at 90-98% of the places it fires, which is the constr
 
 ## Limits
 
-Two conventions with a countable shape; 44 facts on 28 PRs have no merged commit because the PRs were
-never merged: the local PR store (`data/pull_requests/pr/<n>/listing.json`) has all 28 closed unmerged, so
-they are correctly outside the denominator, not missing data; "co-located" asks are not asks about the fact; the exact-ask list is 10 facts; one run,
+Two conventions with a countable shape; 44 facts on 28 PRs have no merged commit in the clone (HEAD
+2026-05-14). The store's "closed, not merged" does not separate them: Mathlib merges through bors, so
+GitHub marks a merged PR closed (31709 reads unmerged in the store and its merge commit is in the clone).
+16 PRs (22 facts) closed before the clone's HEAD with no merge commit in it, so they are probably unmerged;
+12 PRs (22 facts) closed after it, merge state unknown here. Corrected 2026-10-16 from a first reading
+that called all 28 unmerged; "co-located" asks are not asks about the fact; the exact-ask list is 10 facts; one run,
 deterministic, re-runnable in 15 s.
