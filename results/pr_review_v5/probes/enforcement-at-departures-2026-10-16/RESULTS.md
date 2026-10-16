@@ -105,3 +105,58 @@ is what the user's picture predicts (the PR instantiates the convention as its s
 maintainer does not ask). But two thirds of the unasked survivors have no local practice to follow, and
 for them this check is silent. Reading those (77) under each convention's stated motivation and scope
 decides between "our sentence is broader than the convention" and "a departure nobody noticed".
+
+## The survivors read under the conventions as held (amendment 2; `readings/`, `score_reading.py`)
+
+Two readers, independent, each on all 89 scored items (I090 dropped as a defective packet before
+scoring): the 76 open survivors and 13 fixed departures as blind calibration. Both readers pass the
+pre-registered calibration bar at exactly 9 of 13; agreement 85 of 89.
+
+| convention | n | departure | excluded | invalid | contested | construct error (both agree) | rule's reading |
+|---|---|---|---|---|---|---|---|
+| placement in the predicate's namespace (P108) | 35 | 1 | 33-34 | 0 | 0-1 | **33 of 34 = 97%** | denominator ours |
+| primed names (P113) | 25 | 4-6 | 19-21 | 0 | 0 | 19 of 23 = 83% | denominator ours, **but see below** |
+| dot notation for a call (P057) | 16 | 12-13 | 0 | 3 | 0-1 | **3 of 15 = 20%** | enforcement where noticed |
+| pooled | 76 | 17-20 | 52-54 | 3 | 0-2 | 55 of 72 = 76% | denominator ours |
+
+Grounds for `excluded`, both readers: the lemma has a main hypothesis whose namespace the rule
+prefers, so the detector's conclusion-namespace proposal is not what the convention asks (58); a
+docstring explains the prime (17); a minor variant beside a primary sibling (15); other (17: mostly names
+that already existed at base and were moved or given an attribute, which the detector reads as new; the
+prime inherited from a function name such as `toLin'`). Invalid: the detector misparsed two calls
+(`AlgEquiv.spectrum_eq Matrix.toLinAlgEquiv' A`; `Sieve.bind` taking a `Presieve`).
+
+**Read by convention, not pooled; one finding is post hoc and says so.** The four calibration items the
+readers labelled `excluded` are all primed names: of the 6 fixed primed names, both readers excluded 4
+(I001 "docstring explains", I018 "an existing name, moved", I021 and I087 "a minor variant"), where
+maintainers had in fact asked for the rename, including "you can remove the prime from the name of the
+lemma above" on a lemma the PR was only moving. Placement passed its calibration (2 of 2) and dot
+notation passed (5 of 5). So:
+
+- **Placement (P108): the detector's construct was wrong.** It proposes the conclusion's namespace
+  (`X.of_Y`) from the name and conclusion; the convention as held puts a lemma with a main hypothesis in
+  that hypothesis's namespace, and the conclusion's namespace only when there is none. 97% of the
+  unasked survivors are not departures from the convention as held. For this convention the low ask
+  rate was ours.
+- **Dot notation (P057): mostly real departures, unasked, merged.** 12-13 of 16 survivors depart from
+  the convention as held; with the survival result (0 of 32 unasked calls fixed on control PRs) this
+  convention is enforced where a maintainer notices, typically while rewriting a line (most asks under
+  it are suggestion blocks that arrive with a golf). Its stated motivation is readability and
+  compactness, not correctness.
+- **Primed names (P113): not readable from this reading.** The written "as held" text permitted a
+  prime beside a primary sibling and accepted a docstring as an explanation, and the readers followed it;
+  the maintainers' actual line is stricter (they asked to unprime minor variants, documented ones and
+  moved ones). The 83% is an upper bound on the construct error for primes, and the true convention is
+  closer to "a new or touched primed name is renamed when a maintainer looks at it".
+
+**Back to the question.** The "5% of applicable places" does not survive as a single number. For
+placement it was our detector's sentence, broader than and partly contrary to the convention as held.
+For dot notation it is real: departures from a readability convention pass to merge unless a maintainer
+happens to rewrite the line. For primes our own written version of the convention was too permissive, so
+the readers cannot settle it. What carries over to design: a convention has to be stated with its
+precedence rules and the maintainers' actual line, read from their asks, and checked against what they
+fixed; the one-line sentence and the detector's shape both misstate it.
+
+Limits: two readers of one model family with the conventions as I wrote them; 76 items on 49 PRs; three
+conventions with a countable shape; the calibration bar met exactly, and the per-convention calibration
+split is post hoc.
