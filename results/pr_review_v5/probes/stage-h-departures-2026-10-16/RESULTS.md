@@ -79,3 +79,35 @@ without Lean can verify.
   agreed item, merged steps on three uncompiled low-confidence ones.
 - **Stands:** the 205 are places where a rule's situation occurs (82 declarations, some under nine rules), not
   departures, so the 2.9% was never a rate per departure.
+
+## Step 3: the same places without the pinpointer's note (`score_step3.py`, `readings/S1.jsonl`, `S2.jsonl`)
+
+Two new readers, the same 66 places, the note removed and nothing else changed. Calibration (7 asked places,
+H008 added): **6 of 7 for both readers**, 4 of 4 where the note had named the fix and 2 of 3 where it was neutral
+(step 2: 1 of 4 reader labels there). Agreement 53 of 66.
+
+**1. Did departures track the note?** Departs among decided labels on the 59 open places, by the note the place
+had in step 2:
+
+| note | with the note (step 2) | without (step 3) | step 3, both agree |
+|---|---|---|---|
+| named a fix or a contrast (24) | 54% | 68% | 81% (13 of 16) |
+| hedged (13) | 9% | 12% | 10% |
+| neutral (22) | 3% | 16% | 17% (3 of 18) |
+
+By the pre-registered lines, **neither**: neutral places rose to 16% (the line for "the notes suppressed
+departures" was 20%), and the readers, unaided, found departures at most of the places the pinpointer had named
+(68%). So the note was mostly informative, the pinpointer's notes were largely right about where departures are,
+and it suppressed some departures where it was silent.
+
+**2. Does the rule-kind split survive?** Yes, and it widens: layout rules 86% departing (P084 92%, P048 80%)
+against substantive rules 25% (pooled), a 61-point gap (step 2: 45). Per substantive rule: drop an unneeded
+hypothesis (P010) 0 of 9, a term instead of a short block (P040) 17%, name like the siblings (P254) 19%, give the
+siblings the same variant (P100) 25%, spell as the file does (P126) 31%, a finishing tactic (P005) 36%, merge
+steps (P018) 36%, use the existing API (P011) 2 of 4.
+
+**What changes in the read.** The framing leak is measured and small: removing the note did not create the
+split. The remaining confound is the one the review named second: substantive rules are decided by a compile or
+a search, which these readers could only partly do (no Lean), so "conforms" there is still a reader's judgement;
+running each rule's own check at the places is the measurement that would settle it. Within that limit:
+substantive rules' flagged places mostly conform (about three quarters), layout rules' mostly depart.

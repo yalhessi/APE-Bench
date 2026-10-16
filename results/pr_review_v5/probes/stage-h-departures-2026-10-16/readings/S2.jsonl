@@ -1,0 +1,66 @@
+{"item": "K001", "label": "conforms", "confidence": "medium", "note": "Uniqueness branch `ext; apply (hF _).hom_ext` needs the hypothesis's hom_ext; no simp/cat_disch plausibly closes it unaided, and naturality is already a term."}
+{"item": "K002", "label": "conforms", "confidence": "low", "note": "Binary union has no mirrored or primed sibling left without it; finite unions are covered by the countable isMeagre_iUnion the same PR generalizes."}
+{"item": "K003", "label": "departs", "confidence": "medium", "note": "Manual `exact ⟨fun h ↦ ⟨h 0, h 1⟩, … fin_cases i <;> tauto⟩` after rw; `Fin.forall_fin_two` exists, so `rw [NatTrans.isIso_iff_isIso_app, Fin.forall_fin_two]` or simp closes it."}
+{"item": "K004", "label": "conforms", "confidence": "low", "note": "`rw [IsMeagre, compl_union]; exact inter_mem hs ht`: compl_union is not definitional, so a term needs `▸`; mirrors file's meagre_empty/isMeagre_iUnion style."}
+{"item": "K005", "label": "conforms", "confidence": "low", "note": "Visible change `@[to_dual /-- See also … -/]` is on its own line like the PR's other to_dual attributes; sup'_prodMap's own changed lines not shown."}
+{"item": "K006", "label": "conforms", "confidence": "low", "note": "Primed name for the preorder variant follows the usual variant convention; no differing library pattern for preorder versions of twoδ maps found at base."}
+{"item": "K007", "label": "departs", "confidence": "low", "note": "`(h : f ≫ g = fg := by cat_disch)` repeated in twoδ₂Toδ₁ and twoδ₁Toδ₀; autoParam variables exist in Mathlib, so one variable line could hold it."}
+{"item": "K008", "label": "departs", "confidence": "low", "note": "domain_sSup and mem_domain_sSup_iff both repeat `{c : Set (E →ₗ.[R] F)}` and `(hc : DirectedOn …)`; though existing neighbours repeat them too."}
+{"item": "K009", "label": "departs", "confidence": "low", "note": "`abbrev twoδ₂Toδ₁' :` broken though the type fits (75 chars joined); continuation also has 5-space indent. Base file breaks after colon by habit."}
+{"item": "K010", "label": "departs", "confidence": "low", "note": "Hand-built NatTrans fields; `evaluationJointlyReflectsColimits` with the empty-cocone equivalence gives isInitial in one line from library API."}
+{"item": "K011", "label": "departs", "confidence": "low", "note": "emptyRows and emptyCols repeat `(A : Matrix m n R)`; could be a section variable, though file lemmas each state A (explicit or implicit)."}
+{"item": "K012", "label": "departs", "confidence": "low", "note": "isTerminal and isInitial both take `{F : C ⥤ D}`; it could join the existing `variable {C D …}` line."}
+{"item": "K013", "label": "departs", "confidence": "medium", "note": "Signature `… (F.obj X)) : IsInitial F :=` fits in 80 chars; docstring wrapped at 69 chars; `by ext; apply …` fits on one line."}
+{"item": "K014", "label": "conforms", "confidence": "low", "note": "Goal already finished by `aesop` after a necessary rw with explicit directedness arguments; no clearly shorter single finishing tactic."}
+{"item": "K015", "label": "departs", "confidence": "low", "note": "`simp_rw [← hb]` then `exact b.span_eq` (twice); `simpa [← hb] using b.span_eq` / `b.linearIndependent` should merge each pair."}
+{"item": "K016", "label": "conforms", "confidence": "low", "note": "Non-dependent lemmas consistently use `tprod R …` while Dep ones use `⨂ₜ` notation; file mixes both; arrow ↦ matches file."}
+{"item": "K017", "label": "conforms", "confidence": "low", "note": "All visible hom/inv _app siblings (app, app_app, app_app_app) get `+to_dual` together; app_hom/app_inv linked via `to_dual existing`."}
+{"item": "K018", "label": "needs_tools", "confidence": "low", "note": "`rw [Subsingleton.elim i i₀]; simp` could merge to `simp [Subsingleton.elim i i₀]`, but dependent `s i` types may block simp; needs a compile."}
+{"item": "K019", "label": "conforms", "confidence": "high", "note": "`[IsEmpty n]` is exactly what the statement needs; no other side condition added."}
+{"item": "K020", "label": "conforms", "confidence": "low", "note": "Attribute order varies (`simp, to_dual none` vs `to_dual none, reassoc`) but appears driven by reassoc needing to_dual first; no clear spelling clash."}
+{"item": "K021", "label": "departs", "confidence": "low", "note": "rw then exact with fin_cases; one call `rw [NatTrans.isIso_iff_isIso_app, Fin.forall_fin_one]` should close the goal."}
+{"item": "K022", "label": "excluded", "confidence": "medium", "note": "rw followed by aesop is not one of the mergeable kinds (rw list, rwa, by_contra!, calc); rw list already merged."}
+{"item": "K023", "label": "conforms", "confidence": "low", "note": "No dependent MultilinearMap.ofSubsingleton at base (only constant family), so hand-building the multilinear map is needed."}
+{"item": "K024", "label": "unclear", "confidence": "low", "note": "Proof truncated; visible steps are obtain/let/have constructions, no rw chain visibly closable by a finishing tactic."}
+{"item": "K025", "label": "unclear", "confidence": "low", "note": "The iff declaration's signature is not shown (only module docstring and the of_basis lemma); cannot check its hypotheses."}
+{"item": "K026", "label": "conforms", "confidence": "low", "note": "isTerminal/isInitial are named in parallel; library uses varied names (isTerminalOf…), no single pattern clearly violated."}
+{"item": "K027", "label": "departs", "confidence": "low", "note": "Made public, `Complex.norm_map_zero'` becomes API duplicating `norm_zero` under a field-derived name; analogue naming would differ."}
+{"item": "K028", "label": "departs", "confidence": "low", "note": "`by rw [NatTrans.isIso_iff_isIso_app]; exact ⟨…⟩` is `(NatTrans.isIso_iff_isIso_app _).trans ⟨…⟩` as a term."}
+{"item": "K029", "label": "unclear", "confidence": "low", "note": "The proof of iff_exists_basis_kaehlerDifferential is not shown in the packet."}
+{"item": "K030", "label": "conforms", "confidence": "low", "note": "Proof already uses rank_kaehlerDifferential lemmas; no base API turns IsStandardSmooth plus rank into relative dimension directly."}
+{"item": "K031", "label": "departs", "confidence": "high", "note": "`rw [submatrix_empty, det_fin_zero, SignType.coe_one]` closes a 0×0 det goal; file's fromRows_unitlike does the same with `use 1; simp`."}
+{"item": "K032", "label": "conforms", "confidence": "medium", "note": "`domain_sSup` matches sibling `domain_sup` and other `domain_<construction>` lemmas in the file."}
+{"item": "K033", "label": "departs", "confidence": "high", "note": "Signature split into one binder per line ([DecidableEq β], (B …), (s …)) though they fit together; several lines well under 100."}
+{"item": "K034", "label": "departs", "confidence": "medium", "note": "Manual Acc induction; `⟨InvImage.wf ULift.down wellFounded_lt⟩` derives it directly from library API."}
+{"item": "K035", "label": "conforms", "confidence": "medium", "note": "Block destructures a class instance with obtain and uses apply/rwa; a term version would need match and reads worse."}
+{"item": "K036", "label": "conforms", "confidence": "high", "note": "`[Subsingleton ι]` and i₀ are both needed for the equivalence; nothing to drop or weaken."}
+{"item": "K037", "label": "conforms", "confidence": "medium", "note": "`subsingletonEquivDep_apply_tprod` follows `tmulEquivDep` Dep suffix and `subsingletonEquiv_apply_tprod` pattern."}
+{"item": "K038", "label": "conforms", "confidence": "low", "note": "All four naturality siblings (1, 2, 1', 2') receive the same `to_dual none` treatment."}
+{"item": "K039", "label": "conforms", "confidence": "medium", "note": "Block has a case split and rw; a match-term version would read worse."}
+{"item": "K040", "label": "conforms", "confidence": "high", "note": "`[IsEmpty m]` is needed; no extra hypothesis."}
+{"item": "K041", "label": "departs", "confidence": "low", "note": "Generalized countable iUnion, but no biUnion/sUnion versions, though file's IsGδ has iInter/biInter/sInter siblings."}
+{"item": "K042", "label": "conforms", "confidence": "low", "note": "`by ext; apply (hF _).hom_ext` is two tactics; a NatTrans.ext/funext term reads no better."}
+{"item": "K043", "label": "departs", "confidence": "low", "note": "homMk₂_app_two moved to numeral `2` plus primed form; homMk₃/₄/₅ app lemmas still use `⟨k, by valid⟩` at base, change not shown."}
+{"item": "K044", "label": "departs", "confidence": "medium", "note": "`{I : Type*} (b : …)` line could take `(hb : …) :` within 88 chars."}
+{"item": "K045", "label": "excluded", "confidence": "low", "note": "`use 1; rw […]` and `intro; cases` are not the listed mergeable kinds; rw list is already a single call."}
+{"item": "K046", "label": "conforms", "confidence": "medium", "note": "Changed docstring lines align with file usage (`a homothety`, `free module`, singular transvection)."}
+{"item": "K047", "label": "conforms", "confidence": "medium", "note": "to_dual keeps existing name inf'_product_left; names match siblings."}
+{"item": "K048", "label": "departs", "confidence": "low", "note": "With `private` removed, the first signature line (72 chars) could take `(hb : sb * s₁ = rb * s₂)` within 97 chars."}
+{"item": "K049", "label": "conforms", "confidence": "medium", "note": "`@[to_dual]` regenerates the removed `inf_sup_inf` under its existing name."}
+{"item": "K050", "label": "departs", "confidence": "low", "note": "Hand-built NatTrans fields; `evaluationJointlyReflectsLimits _ fun X ↦ (isLimitMapConeEmptyConeEquiv _ _).symm (hF X)` derives it."}
+{"item": "K051", "label": "conforms", "confidence": "low", "note": "basisKaehlerOfIsCompl had no _apply lemma at base, but 6 added lines precede it and `simp [basisKaehler]` suggests one was added."}
+{"item": "K052", "label": "conforms", "confidence": "medium", "note": "to_dual keeps the existing name inf_product_left; matches siblings."}
+{"item": "K053", "label": "departs", "confidence": "low", "note": "`rw [IsMeagre, compl_union]` then `exact inter_mem hs ht`; `simpa [IsMeagre] using inter_mem hs ht` should do both."}
+{"item": "K054", "label": "departs", "confidence": "medium", "note": "Signature continuation starts with `: IsMeagre …`; every other broken signature in the file ends its line with ` :`."}
+{"item": "K055", "label": "departs", "confidence": "low", "note": "`h` removed from the variable line and repeated with an autoParam in both defs; `variable (h : … := by cat_disch)` is possible."}
+{"item": "K056", "label": "departs", "confidence": "medium", "note": "After ContinuousSMul→ContinuousConstSMul, `[TopologicalSpace 𝕜]` is unused yet still included in the instance."}
+{"item": "K057", "label": "departs", "confidence": "medium", "note": "isMeagre_iUnionNat repeats the proof; it is just `isMeagre_iUnion hs` (ℕ is Countable)."}
+{"item": "K058", "label": "conforms", "confidence": "medium", "note": "`[Nontrivial S]` is needed: over a trivial S, rank is 1 while relative dimension 0 holds, so the iff fails."}
+{"item": "K059", "label": "departs", "confidence": "medium", "note": "`@[to_dual … ofComponents'` broken before `/-- The dual of `ofComponents` -/]`; joined line is 92 chars."}
+{"item": "K060", "label": "departs", "confidence": "medium", "note": "Writes `(D R S) (P.val (v k))` while the file and the PR's other lemma write `D R S (P.val …)` without parentheses."}
+{"item": "K061", "label": "departs", "confidence": "low", "note": "fin_cases case analysis; `rw [NatTrans.isIso_iff_isIso_app, Fin.forall_fin_succ, Fin.forall_fin_two]` from library should give it."}
+{"item": "K062", "label": "conforms", "confidence": "medium", "note": "Uniqueness branch needs `(hF _).hom_ext`; no standard finishing tactic closes it unaided."}
+{"item": "K063", "label": "departs", "confidence": "low", "note": "`lemma emptyCols_isTotallyUnimodular … :` plus `A.IsTotallyUnimodular :=` fits in 93 chars."}
+{"item": "K064", "label": "conforms", "confidence": "low", "note": "`by ext; apply (hF _).hom_ext` is two tactics; a term needs NatTrans.ext and funext and reads no better."}
+{"item": "K065", "label": "needs_tools", "confidence": "low", "note": "Fields close by `rw [Subsingleton.elim i i₀]; simp` and `have h …; simp [h]`; whether one simp closes these dependent goals needs a compile."}
+{"item": "K066", "label": "conforms", "confidence": "medium", "note": "Own-line `@[to_dual (attr := simp)]` matches the PR's other to_dual attributes; the old inline `@[simp]` style is gone from the file."}
