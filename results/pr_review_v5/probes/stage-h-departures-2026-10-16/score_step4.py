@@ -8,6 +8,9 @@ the note-free readers S1, S2 of step 3. Reports, on the PRs checked so far, with
   2. the substantive departure share by the checks alone, and by rule, beside step 3's readers on the same places;
   3. calibration: the 7 asked places, the check should find each departure (at least 5 of 7);
   4. the layout places (read rules, measured), check against readers.
+With audit.jsonl present (PROTOCOL.md, step 4 amendment), sections 1-3 are reported twice: the strict reading
+(an audited `looser` departure counts as `conforms`) first, then the checker's verdicts as written; the
+`looser` and `incomplete` rows are listed.
 
 usage (repo root): ape/bin/python <this file>
 """
@@ -29,12 +32,42 @@ def frac(d: int, n: int) -> str:
     return f"{d}/{n}" + (f" = {d / n:.0%}" if n else "")
 
 
-def main() -> int:
-    key = {row["item"]: row for row in jsonl_rows(HERE / "step3_items.jsonl")}
+def load_checks() -> dict:
     checks = {}
     for path in sorted((HERE / "checks").glob("*.jsonl")):
         for row in jsonl_rows(path):
             checks[row["item"]] = row
+    return checks
+
+
+def strict(checks: dict, audit: dict) -> dict:
+    """The strict reading: a departure the audit calls `looser` counts as `conforms`."""
+    out = {}
+    for i, c in checks.items():
+        looser = c["verdict"] == "departs" and audit.get(i, {}).get("reading") == "looser"
+        out[i] = {**c, "verdict": "conforms"} if looser else c
+    return out
+
+
+def main() -> int:
+    checks = load_checks()
+    audit_path = HERE / "audit.jsonl"
+    audit = {row["item"]: row for row in jsonl_rows(audit_path)} if audit_path.is_file() else {}
+    if not audit:
+        return report(checks)
+    print(f"audit: {len(audit)} of {len(checks)} rows; "
+          f"looser {sorted(i for i, a in audit.items() if a['reading'] == 'looser')}; "
+          f"incomplete {sorted(i for i, a in audit.items() if a['reading'] == 'incomplete')}; "
+          f"rows not audited {sorted(i for i in checks if i not in audit)}")
+    print("\n" + "=" * 30 + " STRICT READING (looser departures count as conforms) " + "=" * 30)
+    report(strict(checks, audit))
+    print("\n" + "=" * 30 + " CHECKER'S VERDICTS AS WRITTEN " + "=" * 30)
+    report(checks)
+    return 0
+
+
+def report(checks: dict) -> int:
+    key = {row["item"]: row for row in jsonl_rows(HERE / "step3_items.jsonl")}
     readers = {r: {row["item"]: row for row in jsonl_rows(HERE / "readings" / f"{r}.jsonl")} for r in ("S1", "S2")}
     by_pr = defaultdict(list)
     for i, k in key.items():
