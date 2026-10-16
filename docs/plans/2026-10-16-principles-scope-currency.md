@@ -170,3 +170,128 @@ widen thresholds.
   and the tests second (confounds: gold as a lower bound, census labelling bias, scope defined after
   seeing the ask, dates), before anything runs.
 - A line goes into `docs/questions.md` for each test as its result lands.
+
+## Amendment 1 (2026-10-16, after the adversarial round; nothing has run)
+
+Three independent reviews, in `2026-10-16-principles-scope-currency/`: `review-premise.md` (the picture),
+`review-validity.md` (each test's confounds), `review-feasibility.md` (data, cost, whether outcomes
+discriminate). Each computed new numbers from disk; none spent.
+
+### What the round found
+
+**A miss in "Already answered?".** `docs/todo/conventions-nature.md` (2026-09-29) states this picture in
+the user's own words and plans its studies 2-4 (scope, conflict, maturity), naming the author join and
+the P014/P133 pair as starting points. This plan is those studies with weaker statistics. The index
+lists results, not open todos; the check must read `docs/todo/README.md` too.
+
+**Parts of the picture the record already contradicts, with numbers.**
+- *Taste a small residual:* readers coded 15 of the 41 hardest asks preference or history and 19 more a
+  choice; maintainers hedge 28% of census asks, ask 33% as questions, state no ground in 80%, cite a norm
+  in 0.68% of all comments; two opposite rules on one situation coexist (P014 17 asks, P133 7), separated
+  by reviewer, not by area or period.
+- *One concern, one design:* the library carries two forms at scale with no deprecation between them (48
+  against 21, 793 against 440, 130 against 481); the census is unsaturated (one new principle per ten
+  asks, 166 singletons). Maintainers tolerate two designs and ask for one at a place.
+- *Scope decides:* 18 of 53 head conventions are area-concentrated beyond chance, about 5 after a
+  reviewer control; area and reviewer are collinear (74 reviewers, top five 31%). In 9 of the 41 hard
+  asks the local precedent was the PR's form and the maintainer asked against it; no rule (narrowest,
+  widest or newest wins) fits more than about half.
+- *A decision at a place:* 17% of asks repeat a (PR, principle) pair; P100 is the propagation rule;
+  maintainers raise a settled convention at 1 in 20 to 1 in 400 of the places it applies. Most
+  applicable places are not decided at all.
+- *The reviewer lacked the layers, not the sentence:* the sentence at the place writes the change for
+  64-74% of in-census asks and is itself the scope-resolved instantiation; every general-form delivery
+  above it read null; what moved recall was the model (+0.22) and the harness (+0.10).
+
+**Parts supported:** the census holds the knowledge (39 of 46, 40 of 47 asks); currency is real for a
+few migrations (`grind` 4.0% → 14.5% of files, enforcement 9.1 → 22.4 per thousand); misses are at read
+places (1 of 558 unattended).
+
+**The strongest rival picture:** demand at about 5% of applicable places, calibrated by volume and
+attention, not reconstructible from the code. Every reviewer hits 0.09-0.11 asks per finding whatever it
+knows. Under it, knowledge layers predict applicability and not which place gets the ask. Tests 1, 2, 3,
+5 as written pass under this rival and under four others; only a controlled test 6 and a fixed test 4
+separate them.
+
+**Validity.** Test 4's pool is not silence (every pair is a convention raised elsewhere on the same PR;
+67% on four PRs; 21% PR-level entries fired at hunks). Test 2's co-occurrence is 94% expected by chance
+for large entries. Test 5's "shift" is undefined and tracks composition (AI-authored share of asks 3.6%
+→ 23.6% across the halves). Test 1's bar is pre-met (readers' tags agree at κ 0.75). Test 6 lacks a
+no-principle arm and a sentence arm, and 34 of its 41 asks are in the strong model's training window.
+The stop rule's lines disagree with the tests' fail lines, and no sample list was seeded.
+
+**Feasibility.** The census joins (cid → PR, path, author, month, for every ask; day dates by one script).
+Three data claims were wrong: the deprecation list is not stored (rebuild from `since :=` over two
+snapshots); the "departs" pool is 123-209 pairs on 27 entries and 13 PRs, so stratifying by principle is
+not possible; the 19 partial rows are single-reader. Readings cost 20-25k tokens an ask: the original
+battery is 8-9M reader tokens over five or six session days, not "under a million".
+
+### The battery, revised
+
+Retired: test 1 as a gate; test 2's pair count; test 5's count split; test 3's margin; test 4's sample;
+test 6 without controls. Replaced by:
+
+- **R1. The maintainers' stated grounds** (new; the direct measurement). The about 370 census asks that
+  state any ground, bodies rebuilt by `census/provenance/materialise_bodies.py`, two readers blind to the
+  codebook, coded `principle` / `scope_form` / `currency` / `authority` / `preference` / `fact` / `other`;
+  the 76 external references coded form / principle / decision. **Falsifier:** `preference` plus
+  `authority` at or above a third, or `principle` under a tenth. About 600k tokens.
+- **R2. Scope with author as the separating variable** (test 2 fixed; deterministic). For the
+  area-concentrated entries and the incompatible pairs, the author, area and month distribution of each
+  side; a side counts only with 3 or more asks. **Falsifier:** more than half the separations are by
+  author within one area and period. Entries whose text already holds both forms under an "or" clause
+  are counted and reported.
+- **R3. Scope resolution has no consistent direction** (test 3 fixed). For every countable ask among the
+  41 plus 21 seeded census draws (list committed first), one reader writes the grep predicates for the
+  asked and the PR's form blind to which is asked; another counts them at the base commit at file,
+  directory, area, library, and last-90-days; dominance needs 5 or more occurrences; the 2×2 (scope ×
+  library) is the result, with the dev rows apart. **Falsifier of the scope layer:** no single level wins in
+  75% of decided cases. The cases where the maintainer asked against the local precedent are reported by
+  name.
+- **R4. Silence** (test 4 fixed). First a gold-free statistic over all unasked and decoy "departs" places:
+  diff the place between the reviewed head and the merged commit; `fixed_in_merge` or `kept`. Then read
+  only `kept` places: 20 seeded from the 836 decoy pairs and 20 from the unasked-exact pairs (caps 4 a PR,
+  3 an entry, PR-level entries excluded at declaration places), with 10 of the 33 asked "departs" pairs
+  mixed in unlabelled as the readers' calibration; labels non-exclusive: `raised_elsewhere_on_pr`,
+  `raised_later_round`, `trigger_absent`, `scope_form`, `exception`, `unraised`, `unclear`, with `raised_later`
+  and `fixed_anyway` computed from the PR store, not read. **Read only if** the calibration misfiles under
+  15% of real asks. **Thresholds on the decoy `kept` sample:** `unraised` ≥ 60% → silence is mostly
+  attention; ≤ 20% → mostly reconstructible; `scope_form` + `exception` ≥ 50% by both readers → scope is
+  the mechanism.
+- **R5. Currency as rate per applicable place** (test 5 fixed; the `conventions-nature` study 4
+  sub-hypothesis). The about 14 countable entries (stage H's rules, the detectors' four, `grind`,
+  `to_dual`, `fun_prop`, `mk_iff`): applicable places on census PRs by base month, the ask rate at them,
+  a PR-clustered permutation null stratified by AI-authorship and area; first ask taken from the whole
+  reviewer corpus; repository signals listed and dated before reading (deprecation stream rebuilt, linter
+  landing commits, guideline changes), Zulip thread dates beside them, signal PR ≠ ask PR and at least a
+  day earlier. **Thresholds:** ≥ 3 of 14 show a monotone rate change at p < 0.05 → a layer worth sizing;
+  0 → not at this window; in ≥ half the shifts a repository signal precedes the first ask → measurable
+  from snapshots.
+- **R6. The principle without the sentence, same model, controlled** (test 6 fixed; the only new cell and
+  the only spend). Paired arms on the same asks and places, both models: (a) place and search, no
+  principle, no sentence; (b) the sentence, no search; (c) the principle statement with search; (d) the
+  sentence with search. The 26 derivable asks of the 41 (judgement and history excluded) plus 4 seeded
+  draws; the 7 post-cutoff asks reported apart from the in-window ones as the memory split. Non-asks: 8
+  `scope_form` from R4 and 7 decoy `kept`, plus asked "departs" pairs as decoys whose right answer is
+  departs. Blind matchers see the derived form only. **Thresholds, relative:** (c) within 2 asks of (b)
+  and (c) − (a) ≥ 8 of 30 for the strong model; (c)'s conforms rate on non-asks minus on asks ≥ 0.4. Agentic
+  sessions with tools: about 45 prompts × 4 arms × 2 models; free tier for one, the subscription for the
+  other, the user's call.
+
+**Stratification** is by rank (head: top 50; tail) and by AI-authored PR as marginals only; 11 tags × 2
+bands over 40 rows is not a stratum. R1's principle statements, if any are written, are written before R3
+and R6 and not revised during them.
+
+### Order, cost, one stop rule
+
+1. R2 and R4's `fixed_in_merge` statistic: deterministic, a day, no reader.
+2. R1: about 600k tokens, the direct test of the picture.
+3. R3 and R4's reading, with different readers for each: about 2.5M tokens.
+4. R5: a day of computation plus the rebuilt deprecation stream.
+5. R6 only if R3's informative cell and R4's `scope_form` + `exception` line both hold.
+
+About 4-5M reader tokens before R6, three or four session days. **Stop rule, one line:** if R1 reads
+`preference` + `authority` at a third or more *and* R4 reads `unraised` at 60% or more on the decoy
+sample, the picture in its strong form is false on this record and R6 does not run; what is written up is
+the split by rank and by AI-authorship, since the round predicts the picture holds in the head and fails
+in the tail.
