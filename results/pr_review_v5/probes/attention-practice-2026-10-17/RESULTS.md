@@ -80,6 +80,9 @@ counted.
 
 ## What it says about the 5%
 
+*Superseded by the corrections after review 4, below; kept as it was told.*
+
+
 - **For these six rules of form, no rule is held by maintainers and enforced at 5%.** Either the rule as written is
   not their practice (three rules: their own code, their suggestions and the library break it at 10-86%), or the
   code already keeps it at 95-99% whoever writes it (two rules). The one mixed rule (blank lines) is broken at
@@ -96,3 +99,57 @@ counted.
 
 Limits: six rules of form; round-1 attention only; "active reviewer" is a count threshold (30 logins); the control
 was amended after it failed; the targeted measure undercounts fixes made inside rewrites; one reader for step 4.
+
+## Corrections after adversarial review 4 (2026-10-17; `review4-measurement.md`, `review4-inference.md`, `review4-direction.md` beside the plan)
+
+Three reviewers re-checked the detectors (precision 14-16 of 16 per rule), hand-checked merge outcomes, relabelled
+the declines blind, and recomputed the readings with other denominators, thresholds and windows. Every number above
+reproduces; several readings do not survive.
+
+**What changes.**
+- **The headline switched measures and falls as worded.** "No rule is held by maintainers and enforced at 5%"
+  compared departures per opportunity. Per departure, every one of the six rules is asked at under 2%, the practiced
+  ones included: one tactic per line at 5 of 443, with 81% of its departures reaching merge. The tension the user
+  named appears here in a mild form: rules that are practice are kept by authors, and their few departures go
+  mostly unasked, even where a maintainer looks.
+- **Step 2: two rules are robustly not practice, not three.** Theorem docstrings (86% in active reviewers' own code,
+  85% without the largest contributor) and term proofs on their own line (26%) hold under every cut. Line joins is
+  **mixed**: counting the conforming one-line signatures in the denominator, active reviewers break it at 16.5%,
+  others 10.2%, the library 6.5%; and one author carries 76 of the 176 departures. One tactic per line is **mixed**
+  on tactic proofs (6.2%, 7.4%, AI-flagged 11.8%); term-mode proofs were 27% of its denominator. Class hypotheses as
+  `[C x]` stand (98-100% kept), but that is Lean's ordinary form for an inferable argument, so it separates nothing.
+  Blank lines around commands is two rules: 89% of its departures are a command next to another command; a command
+  next to a declaration departs at 2% in every group. No Mathlib linter enforces any of the six.
+- **"Maintainers' own code" is no separate source for rules of form.** It sits within 0-11 points of other authors'
+  code and the library's for all six. "As much as the library" is wrong for line joins and term-proof placement:
+  code untouched since the port departs at 1% and 8%, human code since then at 12-15% and 14-19%.
+- **Step 3: "where they look, maintainers act on the practiced rules" falls.** Near a round-1 comment, 57% of all
+  touched theorems and lemmas change by merge whatever they contain (56% of those with no departure; 19% elsewhere
+  on reviewed PRs, 6% on unreviewed ones). A rewrite drops a `;` line 30 of 47 times and adds a docstring 5 of 117
+  times, so the contrast between rules is where the construct sits (proof against header), not the rule. Action on
+  the rule itself: one tactic per line split onto lines at 8 of 65 near a comment (1 of 174 elsewhere); blank lines
+  7 of 31, mostly one PR (25908); line joins 9-16% counting joins hidden by renames. Fixes in the rule's own form are
+  asked fixes: unasked attended departures were fixed that way 1 of 61, 1 of 23 and 0 of 31 times.
+- **The control stands on the facts, with less reach.** The six survivors' files are outside the linter's import
+  closure; the ten fixes are real rewraps. But the control tests matching by line text only. The added check is
+  **12 of 15**, not 13 (one "fixed" row still holds its `;`), on 7 PRs, six in one. Amendment 1's "no other step-3
+  number had been read" is not literally true: the per-rule status counts printed before the control line; nothing
+  split by attention was read.
+- **Q3 cannot be read at any scale here.** The arms are empty by construction: four detectors fire only where the
+  header was added (edited arms 0-1), and files that break a practiced rule at 50% or more barely exist (8 of 239,
+  0 of 19).
+- **Step 4 falls below the line on a second reading.** A blind relabel finds 6 of 23 convention declines grounded in a
+  fact about the place (26%, mixed), against 8 of 24 (interval 18-53%). About half of the 24 are a reviewer marking
+  their own suggestion optional; only about 3 are a maintainer leaving another person's convention request on a fact
+  about the place. Both readers are one model family.
+- **Smaller.** "1,448 of 2,583 (56%)" is 1,448 of 1,903 (76%): the denominator still held the dropped theorems. Of
+  the 10 line-join "fixes", 4 are not joins (an added `@[simp]` pushes the join past 100).
+- **Reach.** The six rules carry 29 of 1,669 census asks with a principle (1.7%) and 5 of the 93 asks on the
+  reviewer's evaluation sets. Only line breaks is among the ten rules behind the 5% figure, which came mostly from
+  substantive and naming rules this probe does not reach.
+
+**The read, at the altitude the reviews leave.** For six rules of form: two rule texts are broader than anyone's
+practice; the rest are kept by authors at 83-99% without asks; departures of every rule are asked at under 2% and
+mostly reach merge; where a maintainer comments, code is rewritten about half the time whatever it holds, and action
+on the rule itself is uncommon (one tactic per line 12%, line joins 9-16%, blank lines 23% mostly from one PR). Maintainers rarely write why they leave something (35-38 declines found by
+phrase in all review traffic). Nothing here measures the substantive conventions that carry most asks.

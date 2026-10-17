@@ -307,3 +307,29 @@ the merge commit), and whether evidence at the place (new or edited code, the fi
 attended departures are left; then reads the 77 comments in which maintainers decline something. R4 runs, if at
 all, only in review 3's form (§2.5), on rules where this probe finds attended departures left and a predicate.
 
+## Amendment 3 (2026-10-17, after review 4 of the attention-practice probe)
+
+**R4 does not run.** Amendment 2's condition was a readable place predicate at attended departures; review 4 found
+the arms empty by construction for rules of form, and the stated declines (35-38 in all review traffic) too few and
+mostly a reviewer's own optional suggestion.
+
+**What the thread leaves, ranked by review 4 (`review4-direction.md` §3) by expected progress toward issue recall:**
+1. **Currency at the never-reached asks** (R5, narrowed). 9 of the 24 asks no condition reaches need a newer form or
+   mechanism (four are the `grind` roll-out on two PRs; `to_fun`, `mk_iff`, the `toLinearMap` naming, an autoparam
+   constructor, a sibling's form). First test, deterministic, half a day: for each, did adoption in merged code and
+   earlier asks rise before the PR (first cut: `grind`-attribute commits ran 10-24 a month from 2025-07, about five
+   months before both PRs)? Stop under 5 of 9 with a preceding signal, or if a one-turn free-model test given the
+   newer form writes the asked change at under 3 of 9. Ceiling 9 of 93 asks. It stays a corroborating source beside
+   the census entry (the dead ends on linters and surface statistics as sources of conventions).
+2. **Is the text the practice, for the compile-checkable head conventions** (a finishing tactic closes it, 56 asks;
+   merge steps, 37). First test: a fixed battery of finishing tactics on 60 multi-step blocks in maintainers' merged
+   code and 60 in others', Lean CPU, no tokens. At most 5% depart: the text is practice, state it strictly. 20% or
+   more: derive the line from half the asks and test it on the other half; stop if nothing separates them twofold.
+   1-2 days. It answers the user's 5% question where the asks live.
+3. **Restate the delivered texts of form**: drop or narrow theorem docstrings and term-proof placement, split blank
+   lines into its two rules, state class hypotheses as strict. An edit folded into the next delivery change; at most
+   1 ask, but 1.83 of the 2.5 findings a control PR the six texts would file are texts nobody keeps.
+
+**Stop:** new 5% probes on rules of form; reading silence or declines for maintainers' reasons on the 973 PRs; Q3 as
+specified; reading "gone by merge" without the 57% rewrite rate beside it; probes with no stated recall ceiling.
+

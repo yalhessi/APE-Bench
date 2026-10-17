@@ -122,3 +122,17 @@ rate at applicable places on census PRs in the same window.
 - study 3 (conflict): start from the entries the readers kept apart as opposite rules (A: P014 and
   P133; B: P015/P025 and P392), the cross-map's near-misses (`crossmap.json` against the label
   co-assignments, listed in the cross-map commit `998840d1`), and rows with a `second_principle_id`.
+
+## Update 2026-10-17: what the 5% thread leaves for studies 4 and the head entries
+
+- **Study 4 (maturity), narrowed to the never-reached asks.** Motivating example: 9 of the 24 asks on the evaluation
+  sets that no condition reaches need a newer form (four are the `grind` roll-out on two PRs); `grind`-attribute
+  commits ran 10-24 a month from 2025-07, about five months before both PRs
+  (`docs/plans/2026-10-16-principles-scope-currency/review4-direction.md` §3, rank 1). Closes when the 9 are traced:
+  under 5 with a preceding adoption signal, it is not currency.
+- **Is the text the practice, for the compile-checkable head entries.** Motivating example: stage H's step 4 found a
+  finishing tactic closing 7 of 7 sampled places, two by a hinted `aesop` twice the proof's length
+  (`probes/stage-h-departures-2026-10-16`), and for rules of form two of six texts are broken by everyone
+  (`probes/attention-practice-2026-10-17`). Closes with a Lean battery on maintainers' merged code (plan amendment 3,
+  item 2).
+

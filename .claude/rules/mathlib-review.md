@@ -463,3 +463,10 @@ paths:
   not. The attention-practice probe's long-line control failed as registered (10 of 16 fixed) because all six
   survivors were in such files (`probes/attention-practice-2026-10-17`, amendment 1); outside `Mathlib/Tactic/` it
   read 10 of 10. Restrict a CI-enforced control to files downstream of the linter before registering it.
+- **"Gone by merge" near a reviewer's comment is mostly rewriting; read it beside the base rate (2026-10-17).** Near a
+  round-1 comment, 57% of touched theorems and lemmas change by merge whatever they contain (56% with no departure),
+  so a departure's disappearance there says little about the rule (`probes/attention-practice-2026-10-17`, review 4).
+  Count only a fix in the rule's own form, and compare it with conforming code under the same attention. A practice
+  rate's denominator must hold the conforming form too (line joins read "not practice" only because one-line
+  signatures were left out), and check one-author concentration before reading a group's rate.
+
