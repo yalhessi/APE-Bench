@@ -295,3 +295,15 @@ About 4-5M reader tokens before R6, three or four session days. **Stop rule, one
 sample, the picture in its strong form is false on this record and R6 does not run; what is written up is
 the split by rank and by AI-authorship, since the round predicts the picture holds in the head and fails
 in the tail.
+
+## Amendment 2 (2026-10-17, after review 3 of stage H's step 4)
+
+Review 3 (`review3-*.md` beside this file) dropped R4 as specified: at the places it would read, no maintainer
+decision is visible (17 of 20 had no comment near), its control was another rule, and a reader asked for a reason
+not to ask always finds one. Its ranked replacement runs first, deterministic and gold-free:
+`probes/attention-practice-2026-10-17` asks, per rule a script can check, whether the rule is the maintainers' own
+practice (their own code and suggestion blocks), whether they fix a departure where they look (round-1 attention,
+the merge commit), and whether evidence at the place (new or edited code, the file's own practice) predicts which
+attended departures are left; then reads the 77 comments in which maintainers decline something. R4 runs, if at
+all, only in review 3's form (§2.5), on rules where this probe finds attended departures left and a predicate.
+
