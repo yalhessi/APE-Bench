@@ -140,3 +140,19 @@ The six rules are rules of form a script can check; the substantive rules (use t
 a hypothesis) are not covered, and the reading says so. Attention is round 1 only. "Active reviewer" is a count
 threshold, not the maintainer team. A targeted fix can still be an author's own clean-up. Departures in PRs merged
 after the clone's HEAD (2026-05-14) or never merged are out.
+
+## Amendment 1 (2026-10-17, after the control failed and before any other step-3 number was read)
+
+**What happened.** The control read 10 of 16 long lines fixed by merge (62%), under the 90% bar, so by the protocol
+nothing else was read. All six that persist sit in `Mathlib/Tactic/` infrastructure (four in
+`Tactic/TacticAnalysis/Declarations.lean`, one in `Tactic/Linter/DirectoryDependency.lean`, one more in the first),
+and each is present at the merge commit at 104-113 characters. The long-line linter is a Lean linter
+(`Mathlib/Tactic/Linter/Style.lean`): it runs only in files that import it, and ordinary files import it through
+`Mathlib.Init`; `DirectoryDependency.lean` imports only `Lean.Message` and is itself imported by `Mathlib.Init`. So
+the outcome found true survivals; the control's premise, that CI lints every `Mathlib/` file, was false for the
+linter's own upstream files. Outside `Mathlib/Tactic/`, 10 of 10 long lines were fixed.
+
+**Change, post hoc and flagged as such.** The control is read on files outside `Mathlib/Tactic/`; there it must
+still reach 90%. A second validity check is added and reported, not gated: departures at which a census ask under
+the same rule sits within a line should mostly be fixed (stage H's asked places were, 8 of 9 and 5 of 5). Every
+step-3 reading is reported as conditional on this amendment.

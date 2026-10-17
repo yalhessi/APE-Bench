@@ -164,13 +164,21 @@ def main() -> int:
     print("status by rule:")
     for rule in RULES + ("LONG",):
         print(f"  {rule:6}", dict(Counter(r["status"] for r in rows if r["rule"] == rule)))
-    lg = [r for r in rows if r["rule"] == "LONG" and r["status"] in ("fixed", "persists")]
+    lg_all = [r for r in rows if r["rule"] == "LONG" and r["status"] in ("fixed", "persists")]
+    print(f"\ncontrol as first registered, every file: {sum(r['status'] == 'fixed' for r in lg_all)}/{len(lg_all)} fixed "
+          f"(failed; amendment 1: the linter does not run in its own upstream `Mathlib/Tactic/` files)")
+    lg = [r for r in lg_all if not r["path"].startswith("Mathlib/Tactic/")]
     lf = sum(r["status"] == "fixed" for r in lg)
     ok = bool(lg) and lf / len(lg) >= 0.9
-    print(f"\nCONTROL long lines fixed by merge (any): {lf}/{len(lg)}" + (f" {lf / len(lg):.0%}" if lg else "")
-          + f" -> {'valid' if ok else 'BROKEN: nothing else is read'}")
+    print(f"CONTROL (amendment 1) long lines outside Mathlib/Tactic/ fixed by merge (any): {lf}/{len(lg)}"
+          + (f" {lf / len(lg):.0%}" if lg else "") + f" -> {'valid' if ok else 'BROKEN: nothing else is read'}")
     if not ok:
         return 1
+    asked = [r for r in rows if r["rule"] in RULES and r["census_ask"] and r["status"] in ("fixed", "persists")]
+    print(f"second check (amendment 1, reported): departures with a census ask under the rule within a line: "
+          f"{sum(r['status'] == 'fixed' for r in asked)}/{len(asked)} fixed (any), "
+          f"{sum(r['status'] == 'fixed' and r['targeted'] for r in asked)} targeted; "
+          f"{dict(Counter((r['rule'], r['status']) for r in asked))}")
     print("\nQ2 fixed by merge (targeted; P392 any), moved code left out")
     q2 = {}
     for rule in RULES:
