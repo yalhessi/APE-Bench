@@ -166,7 +166,7 @@ length of the proof).
 
 "Changed" may be an unrelated edit to the declaration, so these are upper bounds on fixes.
 
-**What it says about the 5%.**
+**What it says about the 5%.** *Superseded by the corrections after review 3, below; kept as it was told.*
 - Step 2-3's explanation, that the 5% was mostly conforming code in the denominator, **holds only for the
   substantive rules, and only under the strict reading** (33% depart, against the readers' 22-28%); under the
   checkers' reading they depart at 65%. **Over all ten rules it does not hold:** the layout places all depart,
@@ -189,3 +189,75 @@ length of the proof).
 Limits: 59 open places on 14 PRs, 2 to 8 per rule; one checker a place and one auditor, all of one model
 family; at most six candidate edits a place, so a `conforms` on a compile rule is "none of six compiled";
 searches at the base, not recent master (K023); the merge cross is exploratory and "changed" is not "fixed".
+
+## Corrections after adversarial review 3 (2026-10-17; `review3-measurement.md`, `review3-inference.md`, `review3-direction.md` beside the plan)
+
+Three reviewers: one re-ran 28 compiles with negative controls, the searches and the line measurements, and
+re-audited every departure before reading the audit; one re-derived the arithmetic, the merge cross and every
+comment on the 16 PRs; one read the record for closed work and ran the cheapest tests on disk.
+
+**The rows reproduce.** Every literal departure re-runs, except K002 and K041 (a missing `IsMeagre` sUnion or
+biUnion lemma counted as a sibling's variant), which the re-audit calls contested. The re-audit agrees with the
+audit on 44 of 48 departures: it also calls K015 and K053 literal, since P018's `required` text names
+`simpa ... using`. All step-4 arithmetic reproduces exactly.
+
+**What changes.**
+- **Calibration, 6 of 7: the count stands; the miss is misdescribed.** K023's asked fix is one step,
+  `update_eq_self`, a lemma at the base, and it compiles. The check looked for a replacement of the whole
+  declaration. The audit's "recent master not searched" is wrong. Calibration only tests that the check finds
+  known departures (5 of the 7 are P011); it cannot catch a check that over-calls.
+- **The pre-registered line can fall in any region.** Strict 22% (14 of 64) has a per-place interval of 11-37%;
+  with K015 and K053 literal it is 23%; without the four literal departures whose fix is longer than the code it is
+  11%. P040's "reads no worse" rows decide more of it (8 cells) than P018's merges (5). And the two labels answer
+  different questions: a reader says whether a maintainer would ask, the check whether the literal check passes.
+  Of the 14 strict cells, 9 are readers predicting the check wrongly and 5 are a different reading or a judgement.
+- **"Stays near 5%, not the 10%" falls.** The intervals hold 10%: with 8 asks the strict rate is 6.3-11.9%; over
+  PRs, 2.3-12.6% strict and 1.6-7.9% as written. The census counts only round-1 asks filed under the same entry,
+  and on these 16 PRs it caught 6 of the 12 round-1 asks at the places. Counting the other 6 and five later-round
+  asks the rate is 8-17% (3.5-34%). Census-wide, over 973 PRs, it is 3-5%. Six of the ten rules had no round-1
+  ask on these PRs; P011 runs 24-38%. The open places sit on 11 PRs (37 declarations), not 14, and the five
+  most-reviewed PRs hold 57 of the 199 unasked places but 5 of the 59 sampled.
+- **"Broken at about half the places" is half selection.** The pinpointer listed P048 and P084 places only where
+  the code departs, so their 11 of 11 is how the places were picked. The substantive rules' checks find a
+  departure at 33-65% of the places their situation occurs.
+- **The merge cross is stronger than stated.** 23 of 27 literal departures are still there at merge, 20 byte for
+  byte; K012, K013 and K024 changed elsewhere in the declaration and kept the departure. None moved toward its own
+  rule: the four that went were removed by asks under other rules. All five followable asked places were fixed as
+  asked. No departure was fixed elsewhere in the PR.
+- **Survival is mostly attention.** 17 of the 20 unchanged had no round-1 comment within 3 lines of the
+  declaration, and 8 sit on PRs with no inline review at all. Departures survived at 17 of 20 where no comment was
+  near and 3 of 7 where one was (one-sided p = 0.05). Round-1 asks a PR grow 2.5 times as PR size grows 15 times:
+  an ask budget alone accounts for a rate this low.
+- **The "no exceptions" explanation falls as evidence.** Stage G's writers saw only asks for a convention, so they
+  could not write a `not_when` from their inputs; drawing ten rules without one has p = 0.16. Rules that have one
+  are asked no more often (1.5% against 1.7% a flagged place). "Changes no maintainer would want" rests on K001 and
+  K062, both rewritten by merge; among the 20, one of eight candidates is longer.
+- **The line-break claim was wrong, and the truth is sharper.** Base Mathlib follows P084's joins in 76-89% of
+  two-line signatures. But maintainers' own round-1 suggestion blocks leave 21 of 76 two-line signatures (28%)
+  joinable, and PR code 21% (369 of 1,791). So P084 as written is broader than what maintainers themselves write:
+  the rule text departs, not the maintainers.
+- **The silence test on the 20 is dropped as specified.** No maintainer decision is visible at 17 of them; the
+  control is mostly another rule (5 of 7 asked places are P011, which appears once in the 20); 7 control places
+  cannot meet the plan's 15% misfile bar; and the picture counts a cost as a reason, so a fluent reader always
+  finds one. A positive result would add exception clauses to seven rules, which is selection, and the general
+  form (a reviewer that weighs reasons not to ask) was tried as the filing contract.
+
+**The read, at the altitude the reviews leave.** By the rules' own checks, substantive situations depart at a
+third to two thirds of places; the departures persist to merge; the asked ones are fixed as asked. The low rate
+is what the census counts (round-1, same-entry asks, about half of the asks at these places) and what maintainers
+look at (departures survive where no maintainer commented), not evidence that a rule fails where it was weighed.
+At least one rule as written (line breaks) is broader than maintainers' own code. Whether maintainers weigh
+negative evidence at places they did look at is untested. Provisional: 59 places, one model family checking.
+
+**Next, ranked by the direction review** (deterministic first, no model):
+1. Separate attention and the PR's ask budget from evidence at the place, at scale, on rules a script can check.
+   A first cut on P084 over 973 PRs: 369 departures, 3 asked; 2 of 31 asked where another ask sits at the same
+   signature, 1 of 338 where none does. The 29 attended-but-unasked places are where silence is a decision.
+2. Check each rule against code maintainers write themselves (suggestion blocks), as done above for P084.
+3. Read the 77 comments in which maintainers decline something ("no need", "fine as is"): the only written record
+   of the negative half.
+
+**Defects recorded.** `follow.py` follows a declaration by its last name component, so `IsMeagre.union` can match
+`IsGδ.union` in the same file; no number moves here. A checker or the auditor could have read commit messages, the
+results tree or the clone; nothing blocked it, and the derivations that differ from the merged code argue against
+copying. The 20 unchanged departures are 18 distinct omissions (two pairs double-count).

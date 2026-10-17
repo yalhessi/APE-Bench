@@ -48,7 +48,11 @@ def apply_patch(base: str, patch: str) -> str:
 
 
 def blocks(text: str) -> dict:
-    """Declaration leaf -> (start line, normalised block text)."""
+    """Declaration leaf -> (start line, normalised block text).
+
+    Known defect (review 3, 2026-10-17): keyed by the last name component, so two declarations sharing a leaf in one
+    file (`IsMeagre.union`, `IsGδ.union`) collide and the first wins; no reported number moved.
+    """
     lines = text.splitlines()
     out = {}
     for i, line in enumerate(lines):

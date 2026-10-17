@@ -444,3 +444,17 @@ paths:
   caught 1 of 4 known departures whose note did not name the fix. Show the code, the rule and the library; never a
   prior model's reading of the place. Two readers of one model family on one prompt act as one reader run twice
   (the same quoted phrase in 68% of notes, stated-grounds), so their agreement is not independence.
+- **An unasked departure is a maintainer's decision only where a maintainer looked; separate attention before
+  reading silence (2026-10-17).** In stage H's step 4 (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`,
+  review 3 beside `docs/plans/2026-10-16-principles-scope-currency.md`), 17 of the 20 departures that reached merge
+  unchanged had no round-1 comment within 3 lines, and departures survived at 17 of 20 where no comment was near
+  against 3 of 7 where one was. A test that asks a reader for a reason not to ask, at places nobody looked at,
+  cannot fail: a fluent reader always finds one. Read silence only where a maintainer commented at or next to the
+  place, against a control under the same rule, with the reasons fixed before reading. Calibration on known
+  departures cannot catch a check that over-calls; it needs places maintainers saw and left. And a rule written
+  from asks alone has no exception clause by construction (stage G's `not_when`), so a missing one is no evidence.
+- **Count asks from every comment and give the rate an interval (2026-10-17).** The census files an ask only in
+  round 1 and only under the entry being measured: on stage H's 16 PRs it caught 6 of the 12 round-1 asks at the
+  flagged places. Six asks put the rate per departure at 2-13%, which held both 5% and 10%; check a rule also
+  against code maintainers type in their own suggestion blocks (for line breaks, 28% of theirs break the rule as
+  stage G wrote it).
