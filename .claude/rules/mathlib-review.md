@@ -458,3 +458,8 @@ paths:
   flagged places. Six asks put the rate per departure at 2-13%, which held both 5% and 10%; check a rule also
   against code maintainers type in their own suggestion blocks (for line breaks, 28% of theirs break the rule as
   stage G wrote it).
+- **A Mathlib linter is a control only in the files it runs in (2026-10-17).** Lean linters run only where imported;
+  ordinary files get them through `Mathlib.Init`, but the linters' own upstream files under `Mathlib/Tactic/` do
+  not. The attention-practice probe's long-line control failed as registered (10 of 16 fixed) because all six
+  survivors were in such files (`probes/attention-practice-2026-10-17`, amendment 1); outside `Mathlib/Tactic/` it
+  read 10 of 10. Restrict a CI-enforced control to files downstream of the linter before registering it.
