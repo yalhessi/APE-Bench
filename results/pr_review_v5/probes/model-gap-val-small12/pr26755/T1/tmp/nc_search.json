@@ -1,0 +1,98 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/Combinatorics/SimpleGraph/Regularity/Uniform.lean",
+   "matches": [
+    {
+     "line_number": 260,
+     "content": "   259|/-- A choice of witnesses of non-uniformity among the parts of a finpartition. -/\n   260|noncomputable def nonuniformWitnesses : Finset (Finset α) :=\n   261|  {t ∈ P.parts | s ≠ t ∧ ¬G.IsUniform ε s t}.image (G.nonuniformWitness ε s)"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Combinatorics/SimpleGraph/Regularity/Chunk.lean",
+   "matches": [
+    {
+     "line_number": 67,
+     "content": "    66|of `U` and `V`. -/\n    67|noncomputable def star (V : Finset α) : Finset (Finset α) :=\n    68|  {A ∈ (chunk hP G ε hU).parts | A ⊆ G.nonuniformWitness ε U V}"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Order/Birkhoff.lean",
+   "matches": [
+    {
+     "line_number": 261,
+     "content": "   260|powerset lattice. -/\n   261|noncomputable def birkhoffSet : LatticeHom α (Set {a : α // SupIrred a}) where\n   262|  toFun := OrderEmbedding.birkhoffSet"
+    },
+    {
+     "line_number": 269,
+     "content": "   268|powerset lattice. -/\n   269|noncomputable def birkhoffFinset : LatticeHom α (Finset {a : α // SupIrred a}) where\n   270|  toFun := OrderEmbedding.birkhoffFinset"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Analysis/LocallyConvex/AbsConvexOpen.lean",
+   "matches": [
+    {
+     "line_number": 47,
+     "content": "    46|\n    47|noncomputable instance AbsConvexOpenSets.instCoeOut : CoeOut (AbsConvexOpenSets 𝕜 E) (Set E) :=\n    48|  ⟨Subtype.val⟩"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Analysis/Convex/Basic.lean",
+   "matches": [
+    {
+     "line_number": 198,
+     "content": "   197|/-- The convex sets form an additive submonoid under pointwise addition. -/\n   198|noncomputable def convexAddSubmonoid : AddSubmonoid (Set E) where\n   199|  carrier := {s : Set E | Convex 𝕜 s}"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/MeasureTheory/Measure/Prod.lean",
+   "matches": [
+    {
+     "line_number": 464,
+     "content": "   463|/-- `μ.prod ν` has finite spanning sets in rectangles of finite spanning sets. -/\n   464|noncomputable def FiniteSpanningSetsIn.prod {ν : Measure β} {C : Set (Set α)} {D : Set (Set β)}\n   465|    (hμ : μ.FiniteSpanningSetsIn C) (hν : ν.FiniteSpanningSetsIn D) :"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Ring/Pointwise/Set.lean",
+   "matches": [
+    {
+     "line_number": 30,
+     "content": "    29|/-- `Set α` has distributive negation if `α` has. -/\n    30|protected noncomputable def hasDistribNeg [Mul α] [HasDistribNeg α] : HasDistribNeg (Set α) where\n    31|  __ := Set.involutiveNeg"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "matches": [
+    {
+     "line_number": 939,
+     "content": "   938|@[to_additive \"`Finset α` is an `AddCommMonoid` under pointwise operations if `α` is. \"]\n   939|protected noncomputable def commMonoid : CommMonoid (Finset α) :=\n   940|  coe_injective.commMonoid _ coe_one coe_mul coe_pow"
+    },
+    {
+     "line_number": 964,
+     "content": "   963|  \"`Finset α` is a subtraction monoid under pointwise operations if `α` is.\"]\n   964|protected noncomputable def divisionMonoid : DivisionMonoid (Finset α) :=\n   965|  coe_injective.divisionMonoid _ coe_one coe_mul coe_inv coe_div coe_pow coe_zpow"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean",
+   "matches": [
+    {
+     "line_number": 173,
+     "content": "   172|on `Set β`\"]\n   173|protected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where\n   174|  mul_smul _ _ _ := image2_assoc mul_smul"
+    }
+   ]
+  }
+ ],
+ "files_available": 6588,
+ "files_scanned": 6588,
+ "files_with_matches": 9,
+ "truncated": false
+}

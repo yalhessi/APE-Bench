@@ -1,0 +1,86 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example (a : α) : Disjoint (Ioi a) (Iio a) := by simp",
+   "pos": {
+    "column": 49,
+    "line": 121
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example (a : α) : Disjoint (Iio a) (Ioi a) := by simp",
+   "pos": {
+    "column": 49,
+    "line": 122
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example [DenselyOrdered α] (a b : α) : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp",
+   "pos": {
+    "column": 79,
+    "line": 123
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example [DenselyOrdered α] (a b : α) : Disjoint (Iio a) (Ioi b) ↔ ¬b < a := by simp",
+   "pos": {
+    "column": 79,
+    "line": 124
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 4 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example (a : α) : Disjoint (Ioi a) (Iio a) := by simp",
+   "pos": {
+    "column": 49,
+    "line": 121
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example (a : α) : Disjoint (Iio a) (Ioi a) := by simp",
+   "pos": {
+    "column": 49,
+    "line": 122
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example [DenselyOrdered α] (a b : α) : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp",
+   "pos": {
+    "column": 79,
+    "line": 123
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`simp` made no progress",
+   "code_line": "example [DenselyOrdered α] (a b : α) : Disjoint (Iio a) (Ioi b) ↔ ¬b < a := by simp",
+   "pos": {
+    "column": 79,
+    "line": 124
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

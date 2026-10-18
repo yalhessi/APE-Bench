@@ -1,0 +1,32 @@
+{
+ "X1": {
+  "kind": "claude"
+ },
+ "X2": {
+  "kind": "claude"
+ },
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep1"
+ },
+ "DX2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep2"
+ },
+ "DX3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_base_rep3"
+ },
+ "AP1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_ap_rep1"
+ },
+ "AP2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_ap_rep2"
+ },
+ "AP3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_val_ap_rep3"
+ }
+}

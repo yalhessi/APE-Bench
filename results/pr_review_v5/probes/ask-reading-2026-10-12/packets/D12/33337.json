@@ -1,0 +1,692 @@
+{
+ "asks": [
+  {
+   "id": "d0045",
+   "pr": 33337,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P019"
+   ],
+   "text": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```",
+   "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+   "line": 198,
+   "author": "j-loreaux",
+   "at": "2025-12-31T16:56:12Z",
+   "matcher_text": {
+    "ask_id": "d0045",
+    "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+    "code_at_comment": "thogonalProjection_mem_subspace_orthogonalComplement_eq_zero (Submodule.coe_mem _), add_zero]\n \n @[deprecated (since := \"2025-07-11\")] alias orthogonalProjection_eq_linear_proj :=\n-  orthogonalProjection_eq_linearProjOfIsCompl\n+  orthogonalProjection_apply_eq_linearProjOfIsCompl\n+@[deprecated (since := \"2025-12-26\")] alias orthogonalProjection_eq_linearProjOfIsCompl :=\n+  orthogonalProjection_apply_eq_linearProjOfIsCompl\n \n-theorem orthogonalProjection_coe_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n+theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :",
+    "comment": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "OP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "GPT2": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "X2": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "DX1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "AP2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "OP1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No reviewer renames the orthogonalProjection lemma to toLinearMap_; several defend its coe_ prefix.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No reviewer asks for toLinearMap_ on the orthogonalProjection lemma; several call its coe_ name correct."
+    }
+   },
+   "entries_text": {
+    "P019": "A lemma's name is built from the names of every declaration in its statement, spelled as those declarations spell them, not from informal synonyms, re-tokenisations or omissions."
+   }
+  },
+  {
+   "id": "d0046",
+   "pr": 33337,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P019"
+   ],
+   "text": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```",
+   "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+   "line": 209,
+   "author": "j-loreaux",
+   "at": "2025-12-31T16:56:23Z",
+   "matcher_text": {
+    "ask_id": "d0046",
+    "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+    "code_at_comment": "pl\n+  LinearMap.ext <| orthogonalProjection_apply_eq_linearProjOfIsCompl\n \n @[deprecated (since := \"2025-07-11\")] alias orthogonalProjection_coe_linearMap_eq_linearProj :=\n-  orthogonalProjection_coe_eq_linearProjOfIsCompl\n+  coe_orthogonalProjection_eq_linearProjOfIsCompl\n+@[deprecated (since := \"2025-12-26\")] alias orthogonalProjection_coe_eq_linearProjOfIsCompl :=\n+  coe_orthogonalProjection_eq_linearProjOfIsCompl\n \n open Submodule in\n-theorem starProjection_coe_eq_isCompl_projection [K.HasOrthogonalProjection] :\n+theorem coe_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :",
+    "comment": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "OP2": {
+     "R": "R1",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` spells the definition `IsCompl.projection` as one camelCase token, `isComplProjection`. No declaration by that name exists. Mathlib writes the dotted name `IsCompl.projection` as `isCompl_projection`, and the existing sibling lemmas in `Mathlib/LinearAlgebra/Projection.lean` all do so: `linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker`. The old name already used that spelling. Only its first half (`starProjection_coe`) needed to become `coe_starProjection`.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection`. Keep the deprecated alias `starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`: the `simpa` in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and the `simp_rw` in `Submodule.starProjection_le_starProjection_iff`.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` spells the definition `IsCompl.projection` as one camelCase token, `isComplProjection`. No declaration by that name exists. Mathlib writes the dotted name `IsCompl.projection` as `isCompl_projection`, and the existing sibling lemmas in `Mathlib/LinearAlgebra/Projection.lean` all do so: `linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker`. The old name already used that spelling. Only its first half (`starProjection_coe`) needed to become `coe_starProjection`.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection`. Keep the deprecated alias `starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`: the `simpa` in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and the `simp_rw` in `Submodule.starProjection_le_starProjection_iff`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` uses the suffix `isComplProjection`, but the object in the statement is `IsCompl.projection`; existing names for this API spell that as `isCompl_projection`, so this rename leaves the lemma off the local/library naming pattern.",
+      "requested_change": "Rename the theorem to `Submodule.coe_starProjection_eq_isCompl_projection`, update the two references in `Positive.lean`, and retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to the renamed theorem.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` uses the suffix `isComplProjection`, but the object in the statement is `IsCompl.projection`; existing names for this API spell that as `isCompl_projection`, so this rename leaves the lemma off the local/library naming pattern.",
+      "requested_change": "Rename the theorem to `Submodule.coe_starProjection_eq_isCompl_projection`, update the two references in `Positive.lean`, and retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to the renamed theorem.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "GPT2": {
+     "R": "R3",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the name component `isComplProjection`, but the existing API for `Submodule.IsCompl.projection` spells this as `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+      "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, update the two uses in `Positive.lean` to that name, and make the deprecated alias `starProjection_coe_eq_isCompl_projection` point to the renamed theorem.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the name component `isComplProjection`, but the existing API for `Submodule.IsCompl.projection` spells this as `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+      "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, update the two uses in `Positive.lean` to that name, and make the deprecated alias `starProjection_coe_eq_isCompl_projection` point to the renamed theorem.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:210",
+      "claim": "Now that the declaration is named for a coercion (`coe_starProjection_...`), its statement still accesses the underlying linear map through the raw structure projection `K.starProjection.toLinearMap` instead of the registered coercion, unlike both its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`, which states `(K.orthogonalProjection : E →ₗ[𝕜] K)`, and the neighbouring `starProjection_isSymmetric` in `Projection/Basic.lean:648`, which states `(K.starProjection : E →ₗ[𝕜] E).IsSymmetric`.",
+      "requested_change": "State the left-hand side through the coercion, matching the new name and the sibling: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection`. The existing proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` still closes it; I verified this statement together with the rename above by recompiling the file.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:210",
+      "claim": "Now that the declaration is named for a coercion (`coe_starProjection_...`), its statement still accesses the underlying linear map through the raw structure projection `K.starProjection.toLinearMap` instead of the registered coercion, unlike both its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`, which states `(K.orthogonalProjection : E →ₗ[𝕜] K)`, and the neighbouring `starProjection_isSymmetric` in `Projection/Basic.lean:648`, which states `(K.starProjection : E →ₗ[𝕜] E).IsSymmetric`.",
+      "requested_change": "State the left-hand side through the coercion, matching the new name and the sibling: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection`. The existing proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` still closes it; I verified this statement together with the rename above by recompiling the file.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "GPT1": {
+     "R": "R5",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the one-off suffix `isComplProjection`, but the existing API names projections coming from an `IsCompl` proof with the spelling `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+      "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to that name, and update the two references in `Positive.lean` accordingly.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the one-off suffix `isComplProjection`, but the existing API names projections coming from an `IsCompl` proof with the spelling `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+      "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to that name, and update the two references in `Positive.lean` accordingly.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "X2": {
+     "R": "R6",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `Submodule.IsCompl.projection` as `isComplProjection`. Everywhere else the library writes it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `linearProjOfIsCompl_isCompl_projection` in Mathlib/LinearAlgebra/Projection.lean, and the old name of this very lemma. The PR is meant to make the names consistent, but it leaves this lemma spelling the same definition differently from all of its siblings.",
+      "requested_change": "Keep the existing spelling of the right-hand side and rename the lemma to `Submodule.coe_starProjection_eq_isCompl_projection`, pointing the 2025-12-26 deprecated alias `starProjection_coe_eq_isCompl_projection` and the two uses in Mathlib/Analysis/InnerProductSpace/Positive.lean (`IsSymmetricProjection.le_iff_range_le_range`, `Submodule.starProjection_le_starProjection_iff`) at that name. If `isComplProjection` is meant to be the new practice, rename the three LinearAlgebra/Projection.lean lemmas above to it in this PR, with deprecations, rather than leave the two spellings side by side.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `Submodule.IsCompl.projection` as `isComplProjection`. Everywhere else the library writes it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `linearProjOfIsCompl_isCompl_projection` in Mathlib/LinearAlgebra/Projection.lean, and the old name of this very lemma. The PR is meant to make the names consistent, but it leaves this lemma spelling the same definition differently from all of its siblings.",
+      "requested_change": "Keep the existing spelling of the right-hand side and rename the lemma to `Submodule.coe_starProjection_eq_isCompl_projection`, pointing the 2025-12-26 deprecated alias `starProjection_coe_eq_isCompl_projection` and the two uses in Mathlib/Analysis/InnerProductSpace/Positive.lean (`IsSymmetricProjection.le_iff_range_le_range`, `Submodule.starProjection_le_starProjection_iff`) at that name. If `isComplProjection` is meant to be the new practice, rename the three LinearAlgebra/Projection.lean lemmas above to it in this PR, with deprecations, rather than leave the two spellings side by side.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "X1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name has a `coe_` prefix, but the statement is written `K.starProjection.toLinearMap = ...`, not as a coercion ascription. For conclusions whose subject is `toLinearMap`, the library's leading prefix is `toLinearMap_`. In this directory, lemmas stated with `.toLinearMap` are named `toLinearMap_*` (`toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in TensorProduct.lean). The `coe_` sibling in this PR, `coe_orthogonalProjection_eq_linearProjOfIsCompl`, is instead stated with the ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. So the name does not match the statement as written.",
+      "requested_change": "Rename the lemma to `Submodule.toLinearMap_starProjection_eq_isCompl_projection`, with the deprecated alias and the Positive.lean use sites updated to match. If `coe_` is kept for symmetry with `coe_orthogonalProjection_eq_linearProjOfIsCompl`, restate the left-hand side as `(K.starProjection : E →ₗ[𝕜] E)` so the statement matches the prefix.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name has a `coe_` prefix, but the statement is written `K.starProjection.toLinearMap = ...`, not as a coercion ascription. For conclusions whose subject is `toLinearMap`, the library's leading prefix is `toLinearMap_`. In this directory, lemmas stated with `.toLinearMap` are named `toLinearMap_*` (`toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in TensorProduct.lean). The `coe_` sibling in this PR, `coe_orthogonalProjection_eq_linearProjOfIsCompl`, is instead stated with the ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. So the name does not match the statement as written.",
+      "requested_change": "Rename the lemma to `Submodule.toLinearMap_starProjection_eq_isCompl_projection`, with the deprecated alias and the Positive.lean use sites updated to match. If `coe_` is kept for symmetry with `coe_orthogonalProjection_eq_linearProjOfIsCompl`, restate the left-hand side as `(K.starProjection : E →ₗ[𝕜] E)` so the statement matches the prefix.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "DX1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` carries the coercion prefix `coe_`, but its statement names the coercion as a projection: `K.starProjection.toLinearMap = ...`. The library spells lemmas of that shape `X.toLinearMap = ...` with the prefix `toLinearMap_` (`toLinearMap_mapIsometry`, `toLinearMap_ofAlgHom`, `toLinearMap_toOpposite`: 21 declarations against 7 for `coe_`), and the sibling renamed in this same PR keeps `coe_` only because its statement really does write the coercion ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. As it stands the name and the statement disagree about what the lemma is about.",
+      "requested_change": "Make name and statement agree, either by renaming to `Submodule.toLinearMap_starProjection_eq_isComplProjection` (updating the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504, and the `@[deprecated]` alias at line 213), or, if the `coe_` name is to be kept, by stating the left-hand side as the coercion ascription: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection` with the same proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` (verified to compile with no warnings).",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` carries the coercion prefix `coe_`, but its statement names the coercion as a projection: `K.starProjection.toLinearMap = ...`. The library spells lemmas of that shape `X.toLinearMap = ...` with the prefix `toLinearMap_` (`toLinearMap_mapIsometry`, `toLinearMap_ofAlgHom`, `toLinearMap_toOpposite`: 21 declarations against 7 for `coe_`), and the sibling renamed in this same PR keeps `coe_` only because its statement really does write the coercion ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. As it stands the name and the statement disagree about what the lemma is about.",
+      "requested_change": "Make name and statement agree, either by renaming to `Submodule.toLinearMap_starProjection_eq_isComplProjection` (updating the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504, and the `@[deprecated]` alias at line 213), or, if the `coe_` name is to be kept, by stating the left-hand side as the coercion ascription: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection` with the same proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` (verified to compile with no warnings).",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` does not match the form of its own statement: the left-hand side is `K.starProjection.toLinearMap`, i.e. the conclusion is headed by the `toLinearMap` projection, and lemmas of that shape lead with `toLinearMap_` in this library (21 declarations vs 7 for `coe_`, per naming_norm, whose verdict for this name is `emerging`). The same rename campaign already made this move elsewhere: `algebraMapCLM_toLinearMap` was renamed to `toLinearMap_algebraMapCLM` (deprecated 2025-12-05, `Mathlib/Topology/Algebra/Algebra.lean:79-83`), and cf. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry`. Leading with `coe_` here also puts it out of step with the `toLinearMap_` spelling used for the same projection in the surrounding area (`isPositive_toLinearMap_iff`, `LinearMap.isometryOfOrthonormal_toLinearMap`).",
+      "requested_change": "Rename the theorem to `Submodule.toLinearMap_starProjection_eq_isComplProjection` and point the deprecated alias `starProjection_coe_eq_isCompl_projection` at the new name. (If instead a `coe`-lemma is intended, write the left-hand side as the coercion ascription `(K.starProjection : E →ₗ[𝕜] E)`, matching the sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`.)",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` does not match the form of its own statement: the left-hand side is `K.starProjection.toLinearMap`, i.e. the conclusion is headed by the `toLinearMap` projection, and lemmas of that shape lead with `toLinearMap_` in this library (21 declarations vs 7 for `coe_`, per naming_norm, whose verdict for this name is `emerging`). The same rename campaign already made this move elsewhere: `algebraMapCLM_toLinearMap` was renamed to `toLinearMap_algebraMapCLM` (deprecated 2025-12-05, `Mathlib/Topology/Algebra/Algebra.lean:79-83`), and cf. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry`. Leading with `coe_` here also puts it out of step with the `toLinearMap_` spelling used for the same projection in the surrounding area (`isPositive_toLinearMap_iff`, `LinearMap.isometryOfOrthonormal_toLinearMap`).",
+      "requested_change": "Rename the theorem to `Submodule.toLinearMap_starProjection_eq_isComplProjection` and point the deprecated alias `starProjection_coe_eq_isCompl_projection` at the new name. (If instead a `coe`-lemma is intended, write the left-hand side as the coercion ascription `(K.starProjection : E →ₗ[𝕜] E)`, matching the sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`.)",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` is not named after its own statement. Its LHS is `K.starProjection.toLinearMap`, i.e. the head of the conclusion is `toLinearMap`, so the leading token should be `toLinearMap`, not `coe` (the census for `.toLinearMap`-subject lemmas prefers `toLinearMap_` 21 to `coe_` 7, e.g. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in `Mathlib/Analysis/InnerProductSpace/TensorProduct.lean`, and a reviewer asked for exactly `toLinearMap_symm_prodEquivOfIsCompl` in this same file three days earlier). Secondary: the rename also re-tokenises the RHS `IsCompl.projection` from `isCompl_projection` into `isComplProjection`, a spelling that occurs nowhere else in Mathlib (the library writes `Submodule.linearProjOfIsCompl_isCompl_projection`, `Submodule.IsCompl.projection_range`), which the move of `coe` to the front does not require.",
+      "requested_change": "Rename to `toLinearMap_starProjection_eq_isComplProjection` and update the new alias target, the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504), and the `starProjection_coe_eq_isCompl_projection` alias. (Equivalently, if the `coe_` prefix is wanted, write the LHS with the registered coercion `(K.starProjection : E →ₗ[𝕜] E)` — this compiles — so that the name matches the statement as `coe_orthogonalProjection_eq_linearProjOfIsCompl` does; and consider keeping `isCompl_projection`.)",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` is not named after its own statement. Its LHS is `K.starProjection.toLinearMap`, i.e. the head of the conclusion is `toLinearMap`, so the leading token should be `toLinearMap`, not `coe` (the census for `.toLinearMap`-subject lemmas prefers `toLinearMap_` 21 to `coe_` 7, e.g. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in `Mathlib/Analysis/InnerProductSpace/TensorProduct.lean`, and a reviewer asked for exactly `toLinearMap_symm_prodEquivOfIsCompl` in this same file three days earlier). Secondary: the rename also re-tokenises the RHS `IsCompl.projection` from `isCompl_projection` into `isComplProjection`, a spelling that occurs nowhere else in Mathlib (the library writes `Submodule.linearProjOfIsCompl_isCompl_projection`, `Submodule.IsCompl.projection_range`), which the move of `coe` to the front does not require.",
+      "requested_change": "Rename to `toLinearMap_starProjection_eq_isComplProjection` and update the new alias target, the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504), and the `starProjection_coe_eq_isCompl_projection` alias. (Equivalently, if the `coe_` prefix is wanted, write the LHS with the registered coercion `(K.starProjection : E →ₗ[𝕜] E)` — this compiles — so that the name matches the statement as `coe_orthogonalProjection_eq_linearProjOfIsCompl` does; and consider keeping `isCompl_projection`.)",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "AP2": {
+     "R": "R11",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The renamed `Submodule.coe_starProjection_eq_isComplProjection` spells the declaration on the right-hand side of its statement, `Submodule.IsCompl.projection`, as the re-tokenisation `isComplProjection`. The library spells that declaration `isCompl_projection` (`Submodule.linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker`), and this PR's own new deprecated alias on line 213, `starProjection_coe_eq_isCompl_projection`, still uses the `isCompl_projection` spelling — so the same declaration is spelled two different ways by this PR.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` (keeping the `coe_` prefix and the `.projection` spelling of the RHS), update the alias at line 213 to `alias starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two users `Submodule.coe_starProjection_eq_isCompl_projection` in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504).",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The renamed `Submodule.coe_starProjection_eq_isComplProjection` spells the declaration on the right-hand side of its statement, `Submodule.IsCompl.projection`, as the re-tokenisation `isComplProjection`. The library spells that declaration `isCompl_projection` (`Submodule.linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker`), and this PR's own new deprecated alias on line 213, `starProjection_coe_eq_isCompl_projection`, still uses the `isCompl_projection` spelling — so the same declaration is spelled two different ways by this PR.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` (keeping the `coe_` prefix and the `.projection` spelling of the RHS), update the alias at line 213 to `alias starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two users `Submodule.coe_starProjection_eq_isCompl_projection` in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504).",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "OP1": {
+     "R": "R12",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `IsCompl.projection` as the single token `isComplProjection`. That reads as if there were a definition called `isComplProjection`, and no such definition exists. Every other Mathlib name that mentions `hpq.projection` spells it `isCompl_projection`: `LinearMap.IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `Submodule.linearProjOfIsCompl_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean`. The old name also used `isCompl_projection`, so the PR changes this part of the name for no reason when it only meant to move `coe` to the front.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` and point the deprecated alias at it:\n```lean\nopen Submodule in\ntheorem coe_starProjection_eq_isCompl_projection [K.HasOrthogonalProjection] :\n    K.starProjection.toLinearMap = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection := by\n  simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]\n\n@[deprecated (since := \"2025-12-26\")] alias starProjection_coe_eq_isCompl_projection :=\n  coe_starProjection_eq_isCompl_projection\n```\nThen update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and `Submodule.starProjection_le_starProjection_iff`).",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `IsCompl.projection` as the single token `isComplProjection`. That reads as if there were a definition called `isComplProjection`, and no such definition exists. Every other Mathlib name that mentions `hpq.projection` spells it `isCompl_projection`: `LinearMap.IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `Submodule.linearProjOfIsCompl_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean`. The old name also used `isCompl_projection`, so the PR changes this part of the name for no reason when it only meant to move `coe` to the front.",
+      "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` and point the deprecated alias at it:\n```lean\nopen Submodule in\ntheorem coe_starProjection_eq_isCompl_projection [K.HasOrthogonalProjection] :\n    K.starProjection.toLinearMap = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection := by\n  simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]\n\n@[deprecated (since := \"2025-12-26\")] alias starProjection_coe_eq_isCompl_projection :=\n  coe_starProjection_eq_isCompl_projection\n```\nThen update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and `Submodule.starProjection_le_starProjection_iff`).",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` bundles two changes: besides moving `coe` to the front, it also rewrites the suffix `isCompl_projection` into `isComplProjection`. The token `isComplProjection` appears nowhere else in Mathlib (census over the whole tree), while every other declaration that names this reference spells it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `linearProjOfIsCompl_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker` — the second of which is the very sibling (`Submodule.linearProjOfIsCompl`-style name) that the renamed lemmas in this same file follow for their RHS token (`linearProjOfIsCompl`). A chore whose stated purpose is a `coe`-prefix rename should not silently re-spell an unrelated part of the name, leaving those other declarations inconsistent.",
+      "requested_change": "Keep the old suffix and rename to `Submodule.coe_starProjection_eq_isCompl_projection` (updating the alias target at line 213-214 and the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504). If the camelCase spelling really is wanted, make it a separate, consistent change covering `linearProjOfIsCompl_is_compl_projection` and `IsIdempotentElem.eq_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean` rather than one isolated token in this PR.",
+      "severity": "advisory"
+     },
+     "note_m1": "toLinearMap_ prefix reached by R7-R10 (R7 also respells suffix); others rename only the isCompl_projection suffix.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+      "claim": "`Submodule.coe_starProjection_eq_isComplProjection` bundles two changes: besides moving `coe` to the front, it also rewrites the suffix `isCompl_projection` into `isComplProjection`. The token `isComplProjection` appears nowhere else in Mathlib (census over the whole tree), while every other declaration that names this reference spells it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `linearProjOfIsCompl_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker` — the second of which is the very sibling (`Submodule.linearProjOfIsCompl`-style name) that the renamed lemmas in this same file follow for their RHS token (`linearProjOfIsCompl`). A chore whose stated purpose is a `coe`-prefix rename should not silently re-spell an unrelated part of the name, leaving those other declarations inconsistent.",
+      "requested_change": "Keep the old suffix and rename to `Submodule.coe_starProjection_eq_isCompl_projection` (updating the alias target at line 213-214 and the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504). If the camelCase spelling really is wanted, make it a separate, consistent change covering `linearProjOfIsCompl_is_compl_projection` and `IsIdempotentElem.eq_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean` rather than one isolated token in this PR.",
+      "severity": "advisory"
+     },
+     "note_m2": "Reached = rename to toLinearMap_ prefix; partial = rename only the isComplProjection suffix (or restate LHS via coercion, R4)."
+    }
+   },
+   "entries_text": {
+    "P019": "A lemma's name is built from the names of every declaration in its statement, spelled as those declarations spell them, not from informal synonyms, re-tokenisations or omissions."
+   }
+  }
+ ],
+ "pr": 33337,
+ "sessions": {
+  "X1": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The rename writes `IsCompl.projection` as the single token `isComplProjection`. That spelling appears nowhere else in Mathlib. Every existing lemma name that mentions `IsCompl.projection` writes it `isCompl_projection`: `Submodule.linearProjOfIsCompl_isCompl_projection`, `LinearMap.IsIdempotentElem.eq_isCompl_projection`, `LinearMap.isIdempotentElem_iff_eq_isCompl_projection_range_ker`, and the old name this PR deprecates, `starProjection_coe_eq_isCompl_projection`. So a PR meant to regularise names adds a new, inconsistent spelling.",
+     "requested_change": "Rename `Submodule.coe_starProjection_eq_isComplProjection` to `Submodule.coe_starProjection_eq_isCompl_projection`. Keep `open Submodule in`, which the dot-notation `.projection` needs. Point the new deprecated alias `starProjection_coe_eq_isCompl_projection` at the new name, and update the two use sites in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (`LinearMap.IsSymmetricProjection.le_iff_range_le_range` and `Submodule.starProjection_le_starProjection_iff`).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The new name has a `coe_` prefix, but the statement is written `K.starProjection.toLinearMap = ...`, not as a coercion ascription. For conclusions whose subject is `toLinearMap`, the library's leading prefix is `toLinearMap_`. In this directory, lemmas stated with `.toLinearMap` are named `toLinearMap_*` (`toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in TensorProduct.lean). The `coe_` sibling in this PR, `coe_orthogonalProjection_eq_linearProjOfIsCompl`, is instead stated with the ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. So the name does not match the statement as written.",
+     "requested_change": "Rename the lemma to `Submodule.toLinearMap_starProjection_eq_isCompl_projection`, with the deprecated alias and the Positive.lean use sites updated to match. If `coe_` is kept for symmetry with `coe_orthogonalProjection_eq_linearProjOfIsCompl`, restate the left-hand side as `(K.starProjection : E →ₗ[𝕜] E)` so the statement matches the prefix.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R6",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `Submodule.IsCompl.projection` as `isComplProjection`. Everywhere else the library writes it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `linearProjOfIsCompl_isCompl_projection` in Mathlib/LinearAlgebra/Projection.lean, and the old name of this very lemma. The PR is meant to make the names consistent, but it leaves this lemma spelling the same definition differently from all of its siblings.",
+     "requested_change": "Keep the existing spelling of the right-hand side and rename the lemma to `Submodule.coe_starProjection_eq_isCompl_projection`, pointing the 2025-12-26 deprecated alias `starProjection_coe_eq_isCompl_projection` and the two uses in Mathlib/Analysis/InnerProductSpace/Positive.lean (`IsSymmetricProjection.le_iff_range_le_range`, `Submodule.starProjection_le_starProjection_iff`) at that name. If `isComplProjection` is meant to be the new practice, rename the three LinearAlgebra/Projection.lean lemmas above to it in this PR, with deprecations, rather than leave the two spellings side by side.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` writes `IsCompl.projection` as the single token `isComplProjection`. That reads as if there were a definition called `isComplProjection`, and no such definition exists. Every other Mathlib name that mentions `hpq.projection` spells it `isCompl_projection`: `LinearMap.IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker` and `Submodule.linearProjOfIsCompl_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean`. The old name also used `isCompl_projection`, so the PR changes this part of the name for no reason when it only meant to move `coe` to the front.",
+     "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` and point the deprecated alias at it:\n```lean\nopen Submodule in\ntheorem coe_starProjection_eq_isCompl_projection [K.HasOrthogonalProjection] :\n    K.starProjection.toLinearMap = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection := by\n  simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]\n\n@[deprecated (since := \"2025-12-26\")] alias starProjection_coe_eq_isCompl_projection :=\n  coe_starProjection_eq_isCompl_projection\n```\nThen update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and `Submodule.starProjection_le_starProjection_iff`).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` spells the definition `IsCompl.projection` as one camelCase token, `isComplProjection`. No declaration by that name exists. Mathlib writes the dotted name `IsCompl.projection` as `isCompl_projection`, and the existing sibling lemmas in `Mathlib/LinearAlgebra/Projection.lean` all do so: `linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker`. The old name already used that spelling. Only its first half (`starProjection_coe`) needed to become `coe_starProjection`.",
+     "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection`. Keep the deprecated alias `starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`: the `simpa` in `LinearMap.IsSymmetricProjection.le_iff_range_le_range` and the `simp_rw` in `Submodule.starProjection_le_starProjection_iff`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the one-off suffix `isComplProjection`, but the existing API names projections coming from an `IsCompl` proof with the spelling `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+     "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to that name, and update the two references in `Positive.lean` accordingly.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` carries the coercion prefix `coe_`, but its statement names the coercion as a projection: `K.starProjection.toLinearMap = ...`. The library spells lemmas of that shape `X.toLinearMap = ...` with the prefix `toLinearMap_` (`toLinearMap_mapIsometry`, `toLinearMap_ofAlgHom`, `toLinearMap_toOpposite`: 21 declarations against 7 for `coe_`), and the sibling renamed in this same PR keeps `coe_` only because its statement really does write the coercion ascription `(K.orthogonalProjection : E →ₗ[𝕜] K)`. As it stands the name and the statement disagree about what the lemma is about.",
+     "requested_change": "Make name and statement agree, either by renaming to `Submodule.toLinearMap_starProjection_eq_isComplProjection` (updating the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504, and the `@[deprecated]` alias at line 213), or, if the `coe_` name is to be kept, by stating the left-hand side as the coercion ascription: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection` with the same proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` (verified to compile with no warnings).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/47bf83d119413dffb772722b1aebd4320366106a89bf07a12afc50b4170fec87/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112051__600cacd8-d4c0-4fa0-bd0c-f91c785211bd.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` is not named after its own statement. Its LHS is `K.starProjection.toLinearMap`, i.e. the head of the conclusion is `toLinearMap`, so the leading token should be `toLinearMap`, not `coe` (the census for `.toLinearMap`-subject lemmas prefers `toLinearMap_` 21 to `coe_` 7, e.g. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry` in `Mathlib/Analysis/InnerProductSpace/TensorProduct.lean`, and a reviewer asked for exactly `toLinearMap_symm_prodEquivOfIsCompl` in this same file three days earlier). Secondary: the rename also re-tokenises the RHS `IsCompl.projection` from `isCompl_projection` into `isComplProjection`, a spelling that occurs nowhere else in Mathlib (the library writes `Submodule.linearProjOfIsCompl_isCompl_projection`, `Submodule.IsCompl.projection_range`), which the move of `coe` to the front does not require.",
+     "requested_change": "Rename to `toLinearMap_starProjection_eq_isComplProjection` and update the new alias target, the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504), and the `starProjection_coe_eq_isCompl_projection` alias. (Equivalently, if the `coe_` prefix is wanted, write the LHS with the registered coercion `(K.starProjection : E →ₗ[𝕜] E)` — this compiles — so that the name matches the statement as `coe_orthogonalProjection_eq_linearProjOfIsCompl` does; and consider keeping `isCompl_projection`.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:184",
+     "claim": "The change is not announced: the title is `chore(Analysis/InnerProductSpace/Projection/Submodule): rename lemmas`, whose Area names only `Projection/Submodule.lean` although `Positive.lean` is also changed, and neither the title nor any stated description says which declarations are renamed to what (three renames, plus the retargeting of two pre-existing deprecated aliases).",
+     "requested_change": "State the renames explicitly (old name → new name) in the PR description and/or title, e.g. `orthogonalProjection_eq_linearProjOfIsCompl → orthogonalProjection_apply_eq_linearProjOfIsCompl`, `orthogonalProjection_coe_eq_linearProjOfIsCompl → coe_orthogonalProjection_eq_linearProjOfIsCompl`, `starProjection_coe_eq_isCompl_projection → coe_starProjection_eq_isComplProjection` (aliases added), and widen the Area to cover `Analysis/InnerProductSpace`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/14f784844ac092eaed081970db30a3bf4fd145d3dc7fb3a5f35eba4eae66fd05/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__eef0bb8c-d7c7-4585-b88e-97eebf1e5765.jsonl"
+  },
+  "GPT2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` introduces the name component `isComplProjection`, but the existing API for `Submodule.IsCompl.projection` spells this as `isCompl_projection` (for example `linearProjOfIsCompl_isCompl_projection` and `IsIdempotentElem.eq_isCompl_projection`).",
+     "requested_change": "Rename this theorem to `coe_starProjection_eq_isCompl_projection`, update the two uses in `Positive.lean` to that name, and make the deprecated alias `starProjection_coe_eq_isCompl_projection` point to the renamed theorem.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The new name `Submodule.coe_starProjection_eq_isComplProjection` does not match the form of its own statement: the left-hand side is `K.starProjection.toLinearMap`, i.e. the conclusion is headed by the `toLinearMap` projection, and lemmas of that shape lead with `toLinearMap_` in this library (21 declarations vs 7 for `coe_`, per naming_norm, whose verdict for this name is `emerging`). The same rename campaign already made this move elsewhere: `algebraMapCLM_toLinearMap` was renamed to `toLinearMap_algebraMapCLM` (deprecated 2025-12-05, `Mathlib/Topology/Algebra/Algebra.lean:79-83`), and cf. `toLinearMap_mapIsometry`, `toLinearMap_mapInclIsometry`. Leading with `coe_` here also puts it out of step with the `toLinearMap_` spelling used for the same projection in the surrounding area (`isPositive_toLinearMap_iff`, `LinearMap.isometryOfOrthonormal_toLinearMap`).",
+     "requested_change": "Rename the theorem to `Submodule.toLinearMap_starProjection_eq_isComplProjection` and point the deprecated alias `starProjection_coe_eq_isCompl_projection` at the new name. (If instead a `coe`-lemma is intended, write the left-hand side as the coercion ascription `(K.starProjection : E →ₗ[𝕜] E)`, matching the sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/0af2c69263d73afec69805f50484f5d4ab4119b47e693b0781b3069df9227506/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121508__678ca676-98c2-4d4f-8622-9468f14e35c9.jsonl"
+  },
+  "AP2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The renamed `Submodule.coe_starProjection_eq_isComplProjection` spells the declaration on the right-hand side of its statement, `Submodule.IsCompl.projection`, as the re-tokenisation `isComplProjection`. The library spells that declaration `isCompl_projection` (`Submodule.linearProjOfIsCompl_isCompl_projection`, `IsIdempotentElem.eq_isCompl_projection`, `isIdempotentElem_iff_eq_isCompl_projection_range_ker`), and this PR's own new deprecated alias on line 213, `starProjection_coe_eq_isCompl_projection`, still uses the `isCompl_projection` spelling — so the same declaration is spelled two different ways by this PR.",
+     "requested_change": "Rename the theorem to `coe_starProjection_eq_isCompl_projection` (keeping the `coe_` prefix and the `.projection` spelling of the RHS), update the alias at line 213 to `alias starProjection_coe_eq_isCompl_projection := coe_starProjection_eq_isCompl_projection`, and update the two users `Submodule.coe_starProjection_eq_isCompl_projection` in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (lines 245 and 504).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/8f4b9c71c4960dcbca6b85701fb6e8b19a73bc2b3543763faea8aa128be75808/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__cba625a0-774a-4bb0-874a-584fd5be4f5a.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` uses the suffix `isComplProjection`, but the object in the statement is `IsCompl.projection`; existing names for this API spell that as `isCompl_projection`, so this rename leaves the lemma off the local/library naming pattern.",
+     "requested_change": "Rename the theorem to `Submodule.coe_starProjection_eq_isCompl_projection`, update the two references in `Positive.lean`, and retarget the deprecated `starProjection_coe_eq_isCompl_projection` alias to the renamed theorem.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "`Submodule.coe_starProjection_eq_isComplProjection` bundles two changes: besides moving `coe` to the front, it also rewrites the suffix `isCompl_projection` into `isComplProjection`. The token `isComplProjection` appears nowhere else in Mathlib (census over the whole tree), while every other declaration that names this reference spells it `isCompl_projection`: `IsIdempotentElem.eq_isCompl_projection`, `linearProjOfIsCompl_isCompl_projection` and `isIdempotentElem_iff_eq_isCompl_projection_range_ker` — the second of which is the very sibling (`Submodule.linearProjOfIsCompl`-style name) that the renamed lemmas in this same file follow for their RHS token (`linearProjOfIsCompl`). A chore whose stated purpose is a `coe`-prefix rename should not silently re-spell an unrelated part of the name, leaving those other declarations inconsistent.",
+     "requested_change": "Keep the old suffix and rename to `Submodule.coe_starProjection_eq_isCompl_projection` (updating the alias target at line 213-214 and the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean`, lines 245 and 504). If the camelCase spelling really is wanted, make it a separate, consistent change covering `linearProjOfIsCompl_is_compl_projection` and `IsIdempotentElem.eq_isCompl_projection` in `Mathlib/LinearAlgebra/Projection.lean` rather than one isolated token in this PR.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/29bcaea822c182b9c017a0b4afb095b822491d3bee00b8ad979022691c189e55/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130620__9554eb5e-fbb0-4c24-8dd6-ec9752ee331e.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+     "claim": "The rename `Submodule.starProjection_coe_eq_isCompl_projection` → `Submodule.coe_starProjection_eq_isComplProjection` also re-tokenises the RHS declaration `Submodule.IsCompl.projection` from `isCompl_projection` into the fused token `isComplProjection`. The `coe`-prefix move is what the naming practice wants, but this second, unrelated change contradicts how the rest of Mathlib spells that projection in lemma names: `Submodule.linearProjOfIsCompl_isCompl_projection`, `LinearMap.IsIdempotentElem.eq_isCompl_projection`, `LinearMap.isIdempotentElem_iff_eq_isCompl_projection_range_ker` (all in `Mathlib/LinearAlgebra/Projection.lean`, the file that defines `Submodule.IsCompl.projection`) all use `isCompl_projection`, and `isComplProjection` occurs nowhere in the library before this PR.",
+     "requested_change": "Keep the corpus spelling: name the declaration `Submodule.coe_starProjection_eq_isCompl_projection`, point the deprecation alias `starProjection_coe_eq_isCompl_projection` at that name, and update the two uses in `Mathlib/Analysis/InnerProductSpace/Positive.lean` (line 245 `simpa [Submodule.coe_starProjection_eq_isCompl_projection]`, line 504 in `simp_rw [...]`). I compiled the file with exactly this rename (lines 208-214 rewritten) and it succeeds.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:210",
+     "claim": "Now that the declaration is named for a coercion (`coe_starProjection_...`), its statement still accesses the underlying linear map through the raw structure projection `K.starProjection.toLinearMap` instead of the registered coercion, unlike both its sibling `coe_orthogonalProjection_eq_linearProjOfIsCompl`, which states `(K.orthogonalProjection : E →ₗ[𝕜] K)`, and the neighbouring `starProjection_isSymmetric` in `Projection/Basic.lean:648`, which states `(K.starProjection : E →ₗ[𝕜] E).IsSymmetric`.",
+     "requested_change": "State the left-hand side through the coercion, matching the new name and the sibling: `(K.starProjection : E →ₗ[𝕜] E) = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection`. The existing proof `simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]` still closes it; I verified this statement together with the rename above by recompiling the file.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:184",
+     "claim": "The PR carries three renames plus four deprecations across two files but has an empty description and a title that says only \"rename lemmas\", so nothing states what is renamed to what, nor that the rename also forces the two use-site updates in `Mathlib/Analysis/InnerProductSpace/Positive.lean`.",
+     "requested_change": "Add a PR description listing the renames, e.g. `Submodule.orthogonalProjection_eq_linearProjOfIsCompl → Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl`, `Submodule.orthogonalProjection_coe_eq_linearProjOfIsCompl → Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl` and `Submodule.starProjection_coe_eq_isCompl_projection → Submodule.coe_starProjection_eq_isCompl_projection` (with the old names kept as deprecated aliases), and mention that `Positive.lean` is touched to follow the rename.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/0ea8e7f1b23b7ed8f1b7d0730ffef4eac352d161ebd485fc7c8f7e398614630a/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__d0a83464-7705-4371-a4bb-8c86a601c41e.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/D12_33337.md"
+}

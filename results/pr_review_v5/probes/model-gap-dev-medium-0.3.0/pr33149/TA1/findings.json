@@ -1,0 +1,366 @@
+[
+ {
+  "target": "PR #33149 (as a whole)",
+  "claim": "The PR presents a proof of global regularity for 3D Navier-Stokes (a Clay Millennium problem), but the file is unrevised generated scaffolding. The argument rests on 19 `axiom`s, one of which proves `False`. The notions in the statement are placeholders: `fourierDecay := True`, `spectralNSResidual := 0`, `GalerkinProjection` constant in time, and `BKMFinite` true for every function. Debugging commands (`#check`, `#print axioms`) and working headings (\"Axioms (after definitions they reference)\") are left in.",
+  "requested_change": "Close the PR rather than review it line by line. Any further contribution should be a small, axiom-free change the author can explain and revise, for example new API about Fourier series on `UnitAddTorus`, written to Mathlib's standards.",
+  "severity": "blocking",
+  "evidence": "Convention: LLM-generated code the submitter cannot revise is closed (and the AI-cleanup convention). lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for: `example : False` from `bkm_implies_regularity (fun _ t _ => |t|) 0 ⟨_, le_rfl⟩` plus `not_differentiableAt_abs_zero`; `BKMFinite ω T := ⟨_, le_rfl⟩`; `SmoothInitial u := fun _ ↦ ⟨0, fun _ _ ↦ trivial⟩`; `SolvesNavierStokes ν u p := fun _ _ _ _ ↦ rfl`; and the main statement proved for arbitrary `ν u₀` with no hypotheses. Zulip (Yury Kudryashov, maintainer, 2025-05-03): \"As for axioms, we will definitely decline a PR with an `axiom` command.\""
+ },
+ {
+  "target": "PR #33149 description",
+  "claim": "The description does not say whether or how AI was used. The file has the marks of generated text: a section headed \"Axioms (after definitions they reference)\", placeholder definitions (`True`, `0`), `#check`/`#print axioms` left at the end, and a docstring claiming a Millennium-problem result.",
+  "requested_change": "Add a statement to the PR description, as the Mathlib AI-use policy requires, of whether AI tools were used to write this PR and how.",
+  "severity": "blocking",
+  "evidence": "Convention: AI-assisted PRs disclose this and how in the description. pr.md has only the two-sentence description and no disclosure. diff.patch lines 186 and 467-469."
+ },
+ {
+  "target": "PR #33149 title and description",
+  "claim": "The title \"Galerkin regularity for Navier-Stokes on T³\" and the description (\"global existence and smoothness for Galerkin approximations\", main result `GalerkinLimit.smooth`) do not describe the change. No Galerkin approximation or limit is constructed: `GalerkinProjection N u₀` is `u₀` held constant in time, whatever `N` is. Nothing about Navier-Stokes is proved, because `SolvesNavierStokes` is true for every `u`.",
+  "requested_change": "Retitle and rewrite the description to state what the file actually contains: placeholder definitions plus axioms. Better, close the PR (see the PR-level finding).",
+  "severity": "advisory",
+  "evidence": "Convention: the PR title and description say precisely what the change is. lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `GalerkinProjection N u₀ x t = GalerkinProjection M u₀ x s := rfl` and the main statement proved with no hypotheses."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The file adds 19 `axiom` declarations: cMoser, cGronwall, cSobolev, cMoser_pos, cGronwall_pos, cSobolev_pos, fourier_ortho_integral, fubini_torus3, fourier_inversion, parseval_orthonormal, bkm_implies_regularity, fourierCoeff_summable, integral_le_const_mul_length, vorticity_integrable, moser_estimate, hs_gronwall_bound, sobolev_embedding, vorticity_hs_bound and smooth_initial_hs_finite. Mathlib does not accept axioms.",
+  "requested_change": "Remove every `axiom`. Results already in the library should be used directly (see the per-axiom findings). Genuine analytic inputs (Sobolev embedding, Moser and Gronwall estimates) should either be proved or become explicit hypotheses of the lemmas that use them; an unproved target statement may be recorded with `proof_wanted`.",
+  "severity": "blocking",
+  "evidence": "grep '^axiom' on the diff gives 19 lines (50-256). Zulip (Yury Kudryashov, maintainer): \"we will definitely decline a PR with an `axiom` command.\" At least three of the axioms are false or inconsistent (separate findings)."
+ },
+ {
+  "target": "bkm_implies_regularity",
+  "claim": "The axiom `bkm_implies_regularity` is inconsistent. `BKMFinite ω T` (`∃ M, ∫ t in 0..T, ω t ≤ M`) holds for every `ω`, so the axiom says every `u : T3 → ℝ → Fin 3 → ℝ` is `SmoothSpacetime`, and in particular that `t ↦ |t|` is `ContDiff ℝ ⊤`. That gives a proof of `False`, and from it every downstream theorem, including `GalerkinLimit.smooth`.",
+  "requested_change": "Delete `bkm_implies_regularity`. The Beale-Kato-Majda criterion cannot be postulated; it must be proved, or taken as an explicit hypothesis with a correctly defined `BKMFinite`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for:\n`example : False := by\n  have h := bkm_implies_regularity (fun _ t _ => |t|) 0 ⟨_, le_rfl⟩\n  have hc : ContDiff ℝ ⊤ (fun t : ℝ => |t|) := h.2 0 0\n  exact not_differentiableAt_abs_zero (hc.differentiable le_top 0)`"
+ },
+ {
+  "target": "fourier_inversion",
+  "claim": "The axiom `fourier_inversion` is false. It asserts pointwise inversion `f x = ∑' k, fourierCoeff3D f k * fourier3D k x` for every continuous `f`. In `ℂ`, `tsum` of a non-summable family is `0`, and `‖fourierCoeff3D f k * fourier3D k x‖ = ‖fourierCoeff3D f k‖`. So for a continuous `f` whose coefficients are not absolutely summable (which exist), the axiom forces `f x = 0` at every `x`.",
+  "requested_change": "Delete the axiom. Use `UnitAddTorus.hasSum_mFourier_series_apply_of_summable`, which carries the hypothesis `Summable (mFourierCoeff f)`, and add that hypothesis wherever inversion is needed.",
+  "severity": "blocking",
+  "evidence": "declaration_search: `UnitAddTorus.hasSum_mFourier_series_apply_of_summable` is at Mathlib/Analysis/Fourier/AddCircleMulti.lean:267 (base). file_read shows it takes `(h : Summable (mFourierCoeff f))`. The falsity argument is mathematical; it was not compiled."
+ },
+ {
+  "target": "parseval_orthonormal",
+  "claim": "The axiom `parseval_orthonormal` is false. It assumes only `Summable (‖c k‖^2)`, but `∑' k, c k * fourier3D k x` is not summable at any `x` when `c ∈ ℓ² \\ ℓ¹`, because `‖fourier3D k x‖ = 1`. Then the left side is `∫ ‖0‖^2 = 0`, while the right side is positive. An example is `c k = 1 / (1 + ‖k‖²)` on `ℤ³`.",
+  "requested_change": "Delete the axiom. State Parseval with the library's L² machinery: `UnitAddTorus.hasSum_sq_mFourierCoeff (f : L²(UnitAddTorus d))`.",
+  "severity": "blocking",
+  "evidence": "declaration_search: `UnitAddTorus.hasSum_sq_mFourierCoeff` is at AddCircleMulti.lean:239 (base), with statement `HasSum (fun i ↦ ‖mFourierCoeff f i‖ ^ 2) (∫ t, ‖f t‖ ^ 2)`. The counterexample is mathematical; it was not compiled."
+ },
+ {
+  "target": "fubini_torus3",
+  "claim": "The axiom `fubini_torus3` is an existing library theorem: `MeasureTheory.integral_fintype_prod_volume_eq_prod` states the same thing, with no integrability hypothesis.",
+  "requested_change": "Delete `fubini_torus3` and use `MeasureTheory.integral_fintype_prod_volume_eq_prod f` at its use site in `fourier3D_orthogonal`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example (f : Fin 3 → UnitAddCircle → ℂ) : ∫ x : T3, ∏ i, f i (x i) = ∏ i, ∫ y : UnitAddCircle, f i y := MeasureTheory.integral_fintype_prod_volume_eq_prod f`. Signature read at Mathlib/MeasureTheory/Integral/Pi.lean:114."
+ },
+ {
+  "target": "fourier_ortho_integral",
+  "claim": "The axiom `fourier_ortho_integral` restates `orthonormal_fourier` for `T = 1` and is provable in four lines.",
+  "requested_change": "Replace the axiom by this theorem, or by direct use of `orthonormal_fourier`:\n`theorem fourier_ortho_integral (n m : ℤ) : ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by\n  have h := orthonormal_iff_ite.mp (orthonormal_fourier (T := 1)) m n\n  rw [MeasureTheory.ContinuousMap.inner_toLp] at h\n  rw [AddCircle.volume_eq_smul_haarAddCircle, ENNReal.ofReal_one, one_smul]\n  simpa [mul_comm, eq_comm] using h`",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (appended example) compiled this proof with no error at its lines. The run's single reported error was in a separate first variant, using `convert`, which was discarded."
+ },
+ {
+  "target": "integral_le_const_mul_length",
+  "claim": "The axiom `integral_le_const_mul_length` is never used. It is also a consequence of library lemmas: `bkm_finite_anyT` already proves the same bound with `intervalIntegral.integral_mono_on` and `intervalIntegral.integral_const`.",
+  "requested_change": "Delete `integral_le_const_mul_length`.",
+  "severity": "blocking",
+  "evidence": "Its name appears in the diff only at its declaration (line 201). bkm_finite_anyT (lines 407-425) proves the bound from library lemmas."
+ },
+ {
+  "target": "moser_estimate",
+  "claim": "Several axioms are declared and never used: `moser_estimate`, `cMoser`, `cMoser_pos`, `cGronwall_pos` and `smooth_initial_hs_finite`. Nothing in the file refers to them.",
+  "requested_change": "Remove these unused declarations, together with all the other axioms.",
+  "severity": "blocking",
+  "evidence": "Convention: a lemma added by a PR is used, tagged or part of its API, or else removed. Searching the diff, each name occurs only at its own declaration (cMoser also inside moser_estimate). Line numbers: 50, 58, 59, 240, 256."
+ },
+ {
+  "target": "T3",
+  "claim": "`abbrev T3 := Fin 3 → UnitAddCircle` duplicates Mathlib's `UnitAddTorus (Fin 3)` (`abbrev UnitAddTorus (d : Type*) := d → UnitAddCircle`). The name `T3` is also ambiguous with the T₃ separation axiom `T3Space`, and it is a root-level declaration.",
+  "requested_change": "Delete `T3` and write `UnitAddTorus (Fin 3)` throughout, importing `Mathlib.Analysis.Fourier.AddCircleMulti`.",
+  "severity": "blocking",
+  "evidence": "declaration_search: `UnitAddTorus` is at Mathlib/Analysis/Fourier/AddCircleMulti.lean:43 (base) and `T3Space` at Mathlib/Topology/Separation/Regular.lean:398. Conventions: no new definition that the library already has; no name with a different established meaning."
+ },
+ {
+  "target": "fourier3D",
+  "claim": "`fourier3D` re-implements `UnitAddTorus.mFourier`; the two agree definitionally.",
+  "requested_change": "Delete `fourier3D` and use `UnitAddTorus.mFourier k` (a bundled `C(UnitAddTorus d, ℂ)`) everywhere.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example (k : Fin 3 → ℤ) (x : T3) : fourier3D k x = UnitAddTorus.mFourier k x := rfl`."
+ },
+ {
+  "target": "fourier1D",
+  "claim": "`fourier1D n := fourier n` is a bare alias of the library's `fourier n`. It adds nothing, and `fourier3D_orthogonal` has to `unfold` it again.",
+  "requested_change": "Delete `fourier1D` and use `fourier` directly.",
+  "severity": "blocking",
+  "evidence": "diff lines 112-113: the body is `fourier n`. Convention: no new definition when an existing library declaration already expresses it."
+ },
+ {
+  "target": "fourierCoeff3D",
+  "claim": "`fourierCoeff3D f k = ∫ x, f x * star (fourier3D k x)` duplicates `UnitAddTorus.mFourierCoeff f n = ∫ t, mFourier (-n) t • f t`, which also comes with Parseval and inversion theorems.",
+  "requested_change": "Delete `fourierCoeff3D` and use `UnitAddTorus.mFourierCoeff`, rewriting `fourierTransform`, `DivergenceFree` and `hsNorm` against it.",
+  "severity": "blocking",
+  "evidence": "file_read of AddCircleMulti.lean:193 gives `def mFourierCoeff (f : UnitAddTorus d → E) (n : d → ℤ) : E := ∫ t, mFourier (-n) t • f t`, and line 60 gives `mFourier_neg`."
+ },
+ {
+  "target": "fourier3D_orthogonal",
+  "claim": "`fourier3D_orthogonal` restates `UnitAddTorus.orthonormal_mFourier` and is proved from two axioms (`fourier_ortho_integral`, `fubini_torus3`). The proof also carries a redundant `have ortho1D := fourier_ortho_integral`, a `have : ∃ i, … ; obtain` detour, and a `have h1 : ∀ x, … := by intro x`.",
+  "requested_change": "Delete the lemma in favour of `UnitAddTorus.orthonormal_mFourier`. If an integral form is wanted, prove it from library lemmas with binder-style `have`s:\n`  have h1 (x : T3) : fourier3D k x * star (fourier3D k' x) = ∏ i : Fin 3, (fourier (k i) (x i) * star (fourier (k' i) (x i))) := by\n    rw [fourier3D, fourier3D, star_prod, ← Finset.prod_mul_distrib]; rfl\n  simp_rw [h1, MeasureTheory.integral_fintype_prod_volume_eq_prod (fun i y ↦ fourier (k i) y * star (fourier (k' i) y)), fourier_ortho_integral]\n  by_cases h : k = k'\n  · simp [h]\n  · obtain ⟨i, hi⟩ := Function.ne_iff.mp h\n    rw [if_neg h]\n    exact Finset.prod_eq_zero (Finset.mem_univ i) (if_neg hi)`",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit compiled this proof (as `fourier3D_orthogonal'`, appended) with no errors or warnings at its lines. declaration_search: `UnitAddTorus.orthonormal_mFourier` is at AddCircleMulti.lean:172."
+ },
+ {
+  "target": "parseval3D",
+  "claim": "`parseval3D` duplicates `UnitAddTorus.hasSum_sq_mFourierCoeff`, and its proof rests on the false axioms `fourier_inversion` and `parseval_orthonormal`.",
+  "requested_change": "Delete `parseval3D`. Obtain Parseval for continuous `f` from `UnitAddTorus.hasSum_sq_mFourierCoeff (f.toLp 2 volume ℂ)` and `UnitAddTorus.mFourierCoeff_toLp`.",
+  "severity": "blocking",
+  "evidence": "file_read of AddCircleMulti.lean:239-251 shows `hasSum_sq_mFourierCoeff` and `mFourierCoeff_toLp`. diff lines 293-300 show parseval3D's proof using both axioms."
+ },
+ {
+  "target": "fourierDecay",
+  "claim": "`fourierDecay u k j n C` is defined as `True`, so `SmoothInitial u` holds for every `u`, and every \"smooth initial data\" hypothesis in the file is empty. The unused-variable linter flags all five arguments, and Mathlib CI treats those warnings as errors.",
+  "requested_change": "Define the decay condition the docstring promises, e.g. `‖fourierTransform u k j‖ * (1 + ‖k‖) ^ n ≤ C`, or delete `fourierDecay` and `SmoothInitial`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example (u : T3 → Fin 3 → ℝ) : SmoothInitial u := fun _ ↦ ⟨0, fun _ _ ↦ trivial⟩`. The as-is compile reports unused variables `u k j n C` at line 92."
+ },
+ {
+  "target": "spectralNSResidual",
+  "claim": "`spectralNSResidual` is the constant `0`, so `SolvesNavierStokes ν u p` holds for every `ν`, `u` and `p`; the theorem's Navier-Stokes conclusion says nothing. The linter flags all five arguments of `spectralNSResidual` as unused, and `p` as unused in `SolvesNavierStokes`.",
+  "requested_change": "Define the actual spectral residual of the incompressible Navier-Stokes system (time derivative, `ν‖k‖²` dissipation, Leray-projected nonlinearity, pressure). Otherwise delete `spectralNSResidual` and `SolvesNavierStokes`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example (ν) (u) (p) : SolvesNavierStokes ν u p := fun _ _ _ _ ↦ rfl`. The as-is compile warns about unused `ν u t k j` (line 137) and `p` (line 142)."
+ },
+ {
+  "target": "GalerkinProjection",
+  "claim": "`GalerkinProjection N u₀ := fun x t j => u₀ x j` ignores both the truncation level `N` and the time `t`, so it is not a Galerkin approximation. `fourierTruncate` and `LerayProjection`, which a Galerkin scheme would use, are defined and never used. Because of this, `galerkin_energy_bound` is `le_rfl`, and the main theorem's \"solution\" is `u₀` held constant in time.",
+  "requested_change": "Define the Galerkin approximation as the solution of the `fourierTruncate N`-projected, Leray-projected ODE system with initial data `fourierTruncate N (fourierTransform u₀)`. Otherwise remove `GalerkinProjection`, `GalerkinAt`, `fourierTruncate` and `LerayProjection`, and the Galerkin terminology.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `GalerkinProjection N u₀ x t = GalerkinProjection M u₀ x s := rfl`. The as-is compile warns about unused `N` (line 150) and `t` (line 151). The names `fourierTruncate` and `LerayProjection` occur only at their own declarations."
+ },
+ {
+  "target": "BKMFinite",
+  "claim": "`BKMFinite ω T := ∃ M : ℝ, ∫ t in (0)..T, ω t ≤ M` is true for every `ω` and `T`: take `M` to be the integral. It does not express finiteness of the Beale-Kato-Majda integral.",
+  "requested_change": "Define it as integrability, e.g. `IntervalIntegrable ω volume 0 T`, or `∫⁻ t in Set.Ioc 0 T, ‖ω t‖ₑ < ∞`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example (ω : ℝ → ℝ) (T : ℝ) : BKMFinite ω T := ⟨_, le_rfl⟩`."
+ },
+ {
+  "target": "smoothInTime",
+  "claim": "`smoothInTime f := ContDiff ℝ ⊤ f` asks for analyticity, not smoothness. In current Mathlib `ContDiff 𝕜 n` takes `n : WithTop ℕ∞`, and `⊤` is `ω` (analytic), while smooth is `∞`. The docstring \"Smooth function of time\" and `SmoothSpacetime` therefore mean the wrong thing.",
+  "requested_change": "Write `ContDiff ℝ ∞ f` with `open scoped ContDiff`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `open scoped ContDiff in example (f : ℝ → ℝ) : smoothInTime f ↔ ContDiff ℝ ω f := Iff.rfl`."
+ },
+ {
+  "target": "spectralCurl",
+  "claim": "`spectralCurl` is not the Fourier symbol of the curl on `UnitAddCircle`. With `fourier n x = exp (2πi n x)` (`fourier_coe_apply`, `T = 1`), `∂ⱼ` corresponds to `2πi kⱼ`, so the factor `2π` is missing. Separately, `(j + 1) % 3` and `(j + 2) % 3` on `Fin 3` reduce modulo `(3 : Fin 3) = 0`: they are no-ops, and only look like modular arithmetic.",
+  "requested_change": "Rewrite as `noncomputable def spectralCurl (û : FourierCoeff) (k : Fin 3 → ℤ) (j : Fin 3) : ℂ :=\n  2 * Real.pi * Complex.I * ((k (j + 1) : ℂ) * û k (j + 2) - (k (j + 2) : ℂ) * û k (j + 1))`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (lines 467-469 replaced by a block of examples) returned outcome=compiled, success=true, 0 errors, 0 new warnings for `example : ∀ j : Fin 3, (j + 1) % 3 = j + 1 ∧ (j + 2) % 3 = j + 2 := by decide`. The rewritten definition compiled in context, with the rest of the file unchanged (lean_verify_edit lines 115-169: compiled, 0 new warnings). `fourier_coe_apply` (Mathlib/Analysis/Fourier/AddCircle.lean:132) gives `exp (2 * π * I * n * x / T)`."
+ },
+ {
+  "target": "linftyNorm",
+  "claim": "`linftyNorm f := ⨆ (x : T3) (j : Fin 3), |f x j|` is a pointwise supremum in `ℝ`, which is `0` for unbounded `f` (`Real.iSup_of_not_bddAbove`), and is not an essential supremum. The axioms `sobolev_embedding` and `bkm_implies_regularity` are stated about this junk value. `l2Norm` likewise re-implements an `L²` norm.",
+  "requested_change": "Use the library seminorms: `MeasureTheory.eLpNorm f ∞ volume` and `MeasureTheory.eLpNorm f 2 volume` (or the `Lp` norms), instead of `linftyNorm` and `l2Norm`.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `Real.iSup_of_not_bddAbove` is at Mathlib/Data/Real/Archimedean.lean:191 and `MeasureTheory.eLpNorm` at Mathlib/MeasureTheory/Function/LpSeminorm/Defs.lean:86."
+ },
+ {
+  "target": "VorticityResponse.regularity",
+  "claim": "`VorticityResponse.regularity` needs none of its hypotheses: its conclusion holds for every `ν` and `u₀`, without `Φ`, `0 < ν`, `SmoothInitial u₀` or `DivergenceFree u₀`. Its proof also unfolds by hand (`intro t _ k j; simp [spectralNSResidual]`, `intro x; ext j; rfl`) what are `rfl` terms.",
+  "requested_change": "Delete the theorem, since its statement is vacuous with the current definitions. If the definitions are repaired, drop every hypothesis the proof does not use, and write the witnesses as a term, e.g. `⟨GalerkinProjection 1 u₀, fun _ _ ↦ 0, …, fun _ _ _ _ ↦ rfl, fun _ ↦ rfl⟩`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit compiled `theorem regularity' (ν : ℝ) (u₀ : T3 → Fin 3 → ℝ) : ∃ u p, SmoothSpacetime u ∧ SolvesNavierStokes ν u p ∧ (∀ x, u x 0 = u₀ x) := ⟨GalerkinProjection 1 u₀, fun _ _ ↦ 0, bkm_implies_regularity _ 1 ⟨_, le_rfl⟩, fun _ _ _ _ ↦ rfl, fun _ ↦ rfl⟩` with no errors."
+ },
+ {
+  "target": "GalerkinLimit.smooth",
+  "claim": "`GalerkinLimit.smooth` has exactly the statement of `VorticityResponse.regularity`, which already quantifies over an arbitrary `Φ`; it only instantiates `Φ` with `⟨1, 2, …⟩`. It sits in a namespace `GalerkinLimit` that names no definition, and no Galerkin limit is taken.",
+  "requested_change": "Keep at most one of the two theorems, named after what it proves. Do not put it in the made-up namespace `GalerkinLimit`. If a `VorticityResponse` literal is needed, write `⟨1, 2, one_pos, one_le_two⟩`.",
+  "severity": "blocking",
+  "evidence": "diff lines 432-465: the two statements are identical. lean_verify_edit compiled `example : VorticityResponse := ⟨1, 2, one_pos, one_le_two⟩`."
+ },
+ {
+  "target": "uniform_vorticity_bound",
+  "claim": "`uniform_vorticity_bound` takes `h_divfree : DivergenceFree u₀` and never uses it. The linter warns about it, which fails Mathlib CI.",
+  "requested_change": "Drop `h_divfree` from `uniform_vorticity_bound` and from its call in `bkm_finite_anyT`. Optionally inline `C` and use `gcongr` with `(cSobolev_pos 3).le` for the two `mul_le_mul_of_nonneg_left` steps.",
+  "severity": "blocking",
+  "evidence": "The as-is compile warns: unused variable `h_divfree` (line 316). lean_verify_edit compiled `uniform_vorticity_bound'` without `h_divfree` (gcongr version) with no errors or warnings."
+ },
+ {
+  "target": "bkm_finite_anyT",
+  "claim": "`bkm_finite_anyT` takes `Φ : VorticityResponse` and never uses it. The linter warns, which fails CI.",
+  "requested_change": "Remove the `Φ` argument and update the call in `VorticityResponse.regularity`.",
+  "severity": "blocking",
+  "evidence": "The as-is compile warns: unused variable `Φ` (line 407). lean_verify_edit compiled `bkm_finite_anyT'` without `Φ`."
+ },
+ {
+  "target": "bkm_finite_anyT",
+  "claim": "The proof of `bkm_finite_anyT` restates `hC N` as a separate `have bound` with `intro`. It rebuilds `t ∈ Set.Icc 0 T` as `Set.mem_Icc.mpr ⟨ht.1, ht.2⟩` from the very hypothesis `ht` of that type, and rewrites `integral_const` by hand.",
+  "requested_change": "Golf to:\n`  obtain ⟨C, hC⟩ := uniform_vorticity_bound u₀ h_smooth h_divfree T hT\n  refine ⟨C * T, ?_⟩\n  calc _ ≤ ∫ _ in (0)..T, C :=\n        intervalIntegral.integral_mono_on hT.le (vorticity_integrable N u₀ T)\n          intervalIntegrable_const fun t ht ↦ hC N t ht\n    _ = C * T := by simp [mul_comm]`",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit compiled this proof (as `bkm_finite_anyT'`) with no errors or warnings."
+ },
+ {
+  "target": "bkm_finite_anyT",
+  "claim": "The name `bkm_finite_anyT` mixes camelCase (`anyT`) into a snake_case theorem name. It also does not follow Mathlib's naming scheme, which names a lemma after its conclusion (`BKMFinite` of the Galerkin vorticity).",
+  "requested_change": "Rename it after its conclusion, e.g. `bkmFinite_linftyNorm_vorticity`, with no `anyT` suffix.",
+  "severity": "advisory",
+  "evidence": "Convention: names follow the case convention of their kind. naming_norm returned `subject_unresolved` (unmeasured), so this rests on the naming guide rather than a census."
+ },
+ {
+  "target": "bkm_coordinate_invariance",
+  "claim": "`bkm_coordinate_invariance` is `intervalIntegral.integral_comp_mul_deriv` specialised to a `TemporalLifting`. It needs none of `Φ`, the lifting's bounds, or `hT : 0 ≤ T`; the linter flags `hT` as unused. Its proof re-derives the substitution in three steps.",
+  "requested_change": "Drop `hT`, and state the lemma for any `C¹` map `φ` with `φ 0 = 0`, or delete it and use `intervalIntegral.integral_comp_mul_deriv` directly:\n`lemma bkm_coordinate_invariance (φ : ℝ → ℝ) (hφ : Differentiable ℝ φ) (hφ' : Continuous (deriv φ)) (hφ0 : φ 0 = 0) (ω : ℝ → ℝ) (hω : Continuous ω) (τ_T : ℝ) :\n    bkmPhysical ω (φ τ_T) = bkmLifted (ω ∘ φ) φ τ_T := by\n  rw [bkmPhysical, bkmLifted, intervalIntegral.integral_comp_mul_deriv (fun x _ ↦ (hφ x).hasDerivAt) hφ'.continuousOn hω, hφ0]`",
+  "severity": "blocking",
+  "evidence": "The as-is compile warns: unused variable `hT` (line 355). lean_verify_edit compiled the general version above with no errors or warnings."
+ },
+ {
+  "target": "tau_interval_finite",
+  "claim": "`tau_interval_finite` assumes `0 < T`, but the conclusion also holds for `T = 0`; only `0 ≤ T` is needed, which is what `φ_surj` takes.",
+  "requested_change": "Weaken `hT : 0 < T` to `hT : 0 ≤ T`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit compiled `tau_interval_finite'` with `(hT : 0 ≤ T)` (proof in the next finding) with no errors."
+ },
+ {
+  "target": "tau_interval_finite",
+  "claim": "`tau_interval_finite` is proved by hand. It case-splits on the sign of `τ_T`, rebuilds the fundamental theorem of calculus to bound `φ τ_T - φ 0`, and ends with a five-line calc (`τ_T = τ_T * 1 = τ_T * (φ_min / φ_min) = …`). The library's mean value inequality and `le_div_iff₀` do the same in a few lines, and do not need `φ_deriv_cont`.",
+  "requested_change": "Golf to:\n`  obtain ⟨τ_T, hτ_T⟩ := L.φ_surj T hT\n  refine ⟨τ_T, hτ_T, (le_div_iff₀ Φ.hmin_pos).2 ?_⟩\n  rcases le_or_gt τ_T 0 with h | h\n  · nlinarith [Φ.hmin_pos]\n  · have := mul_sub_le_image_sub_of_le_deriv L.φ_diff L.φ_deriv_pos h.le\n    rw [sub_zero, L.φ_zero, sub_zero, hτ_T] at this\n    linarith`",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit compiled this proof with no errors or warnings. `mul_sub_le_image_sub_of_le_deriv` was read at Mathlib/Analysis/Calculus/Deriv/MeanValue.lean:324."
+ },
+ {
+  "target": "galerkin_energy_bound",
+  "claim": "`galerkin_energy_bound` is never used. Its hypothesis `ht` is unused (a linter warning), and its content is `le_rfl`, because `GalerkinAt N u₀ t` is definitionally `u₀`. The proof `unfold GalerkinAt GalerkinProjection; rfl` hides this.",
+  "requested_change": "Delete `galerkin_energy_bound`. If it is kept after `GalerkinProjection` is repaired, drop `ht` and do not prove it by `unfold`.",
+  "severity": "blocking",
+  "evidence": "The as-is compile warns: unused variable `ht` (line 306). lean_verify_edit compiled `example … : l2Norm (GalerkinAt N u₀ t) ≤ l2Norm u₀ := le_rfl`. The name occurs nowhere else in the diff."
+ },
+ {
+  "target": "module docstring of Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The module docstring is false and out of step with the code. The title \"Regularity for Navier-Stokes on T³ via Bounded Vorticity-Response Functionals\" and \"This file proves global existence and smoothness of solutions to the incompressible Navier-Stokes equations\" claim a Millennium-problem result. The file proves only statements made vacuous by its placeholder definitions and axioms. The \"Implementation notes\" describe a proof via temporal lifting and BKM coordinate invariance, but `GalerkinLimit.smooth` uses none of `TemporalLifting`, `bkm_coordinate_invariance` or `tau_interval_finite`. The only support offered is the author's own non-peer-reviewed DOI.",
+  "requested_change": "Rewrite the title and summary to state exactly what the file defines and proves. Remove the Navier-Stokes regularity claim and the implementation notes for a route the proofs do not take.",
+  "severity": "blocking",
+  "evidence": "Conventions: a module title states what the file proves; docs stay in step with the code; non-obvious claims need a reference. diff lines 8-35. The proof of VorticityResponse.regularity (lines 432-450) uses only bkm_finite_anyT and bkm_implies_regularity."
+ },
+ {
+  "target": "VorticityResponse",
+  "claim": "`VorticityResponse` is documented as \"A bounded vorticity-response functional Φ : ℝ≥0 → [φ_min, φ_max]\", but it holds only two real numbers with `0 < φ_min ≤ φ_max`. It contains no functional and refers to no vorticity, so the name and docstring describe a structure the definition does not have.",
+  "requested_change": "Either add the functional as a field (with its bounds), or rename the structure to describe what it is (a pair of positive bounds) and correct its docstring.",
+  "severity": "advisory",
+  "evidence": "Convention: a new notion's name describes what it is. diff lines 76-86."
+ },
+ {
+  "target": "VorticityResponse",
+  "claim": "The proof fields of `VorticityResponse` are named `hmin_pos` and `hbounds`, hypothesis-style names, rather than after their statements.",
+  "requested_change": "Rename them after their statements, e.g. `φ_min_pos : 0 < φ_min` and `φ_min_le_φ_max : φ_min ≤ φ_max`.",
+  "severity": "advisory",
+  "evidence": "diff lines 83-86. Mathlib names a proof field after its statement in snake_case."
+ },
+ {
+  "target": "TemporalLifting",
+  "claim": "In `TemporalLifting`, the field `φ_deriv_pos` states `Φ.φ_min ≤ deriv φ τ`, a lower bound and not positivity. The docstring calls `φ` a \"diffeomorphism\", although the fields give only a `C¹` map with bounded derivative and surjectivity onto `[0, ∞)` (documented as \"Surjectivity (global coverage)\"). `φ_diff` together with `φ_deriv_cont` is `ContDiff ℝ 1 φ`.",
+  "requested_change": "Rename `φ_deriv_pos` to `φ_min_le_deriv` (and `φ_deriv_bdd` to `deriv_le_φ_max`), fix the docstrings to say what the fields state, and consider bundling regularity as `ContDiff ℝ 1 φ`.",
+  "severity": "advisory",
+  "evidence": "diff lines 220-235."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The file begins with `import Mathlib`. A Mathlib file must import only what it needs, and importing `Mathlib` creates an import cycle once the file is listed in `Mathlib.lean`.",
+  "requested_change": "Replace `import Mathlib` with\n`import Mathlib.Analysis.Fourier.AddCircleMulti`\n`import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit replacing line 6 with these two imports: outcome=compiled, 0 errors, 0 new warnings."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The new file is not a `module`: it has no `module` keyword, uses plain `import`, and has no `@[expose] public section`. Its neighbours in the same directory (for example `Mathlib/Analysis/ODE/Gronwall.lean`) and its natural import `Mathlib/Analysis/Fourier/AddCircleMulti.lean` are all modules.",
+  "requested_change": "Start the file with `module`, use `public import`, and put the content in `@[expose] public section`.",
+  "severity": "blocking",
+  "evidence": "file_read of target/Mathlib/Analysis/ODE/Gronwall.lean lines 6-32 shows `module`, `public import` and `@[expose] public section`, and so does AddCircleMulti.lean lines 6-19."
+ },
+ {
+  "target": "Mathlib.lean",
+  "claim": "The new file `Mathlib/Analysis/ODE/GalerkinRegularity.lean` is not imported in `Mathlib.lean`, the only changed file is the new one, so CI does not build it as part of Mathlib and the `mk_all` check fails.",
+  "requested_change": "Add `import Mathlib.Analysis.ODE.GalerkinRegularity` (or `public import` under the module system) to `Mathlib.lean`, after fixing `import Mathlib`.",
+  "severity": "blocking",
+  "evidence": "pr.md lists one changed file, and the diff touches only GalerkinRegularity.lean."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The file ends with the debugging commands `#check GalerkinLimit.smooth` and `#print axioms GalerkinLimit.smooth`, which print output on every build. The heading \"## Axioms (after definitions they reference)\" is a note to oneself.",
+  "requested_change": "Delete lines 467-469 (`#check` and `#print axioms`) and the working heading at line 186.",
+  "severity": "blocking",
+  "evidence": "Compile results report infos=2 from these two commands (lean_verify_edit runs report `infos: 2`). Convention: scaffolding and working comments are removed before merging."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "`set_option linter.style.commandStart false` disables a style linter for the whole file to hide four spacing warnings that are easy to fix in the source.",
+  "requested_change": "Remove the `set_option` and fix the spacing: `‖c k‖^2` → `‖c k‖ ^ 2`, `3/2` → `3 / 2`, `5/2` → `5 / 2` (and the other `^2` occurrences).",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit deleting lines 37-38 reported 4 new warnings, all `missing space`: `parseval_orthonormal` (`k‖^2`), `moser_estimate` (`3/2`), `hs_gronwall_bound` and `sobolev_embedding` (`5/2`). Convention: no linter exemption for a warning that can be fixed at its source."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "`open scoped InnerProductSpace` is not needed; the file uses no inner-product notation.",
+  "requested_change": "Delete `open scoped InnerProductSpace` (line 38).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit deleting lines 37-38 compiled with no errors. The only new warnings were the commandStart spacing ones."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The copyright header says `Author: Jeffrey Camlin`; Mathlib's header format requires `Authors:`.",
+  "requested_change": "Change line 4 to `Authors: Jeffrey Camlin`.",
+  "severity": "advisory",
+  "evidence": "diff line 4. Every Mathlib file read (Gronwall.lean, AddCircleMulti.lean) uses `Authors:`."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "Lambdas throughout are written `fun x => …` rather than Mathlib's `fun x ↦ …`. This occurs in 26 lines, for example in `fourier3D`, `fourierTransform`, `SmoothSpacetime`, `LerayProjection`, `fourierTruncate`, `GalerkinProjection`, `spectralCurl`, `invFourier`, `Vorticity`, `GalerkinAt`, `hsNorm`, `bkm_implies_regularity`, `vorticity_integrable`, `moser_estimate`, `vorticity_hs_bound`, `uniform_vorticity_bound`, `fourier3D_orthogonal`, `bkm_finite_anyT` and `VorticityResponse.regularity`.",
+  "requested_change": "Replace every `=>` in a `fun` with `↦`.",
+  "severity": "advisory",
+  "evidence": "`grep -c '=>'` on the reconstructed file gives 26 lines. The batch rewrite of lines 115-169 with `↦` compiled."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "Nine function-valued definitions are written as `:= fun k j => …` or `:= fun x t => …` instead of taking their arguments as binders after the name: `fourier3D`, `fourierTransform`, `LerayProjection`, `fourierTruncate`, `GalerkinProjection`, `spectralCurl`, `invFourier`, `Vorticity` and `GalerkinAt`.",
+  "requested_change": "Move the lambda arguments into binders, e.g. `noncomputable def fourier3D (k : Fin 3 → ℤ) (x : T3) : ℂ := ∏ i : Fin 3, fourier1D (k i) (x i)` and `noncomputable def Vorticity (u : T3 → ℝ → Fin 3 → ℝ) (x : T3) (t : ℝ) : Fin 3 → ℝ := invFourier (spectralCurl (fourierTransform (u · t))) x`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 115-169 with binder-style versions of all nine definitions: compiled, 0 errors, 0 new warnings; the rest of the file was unchanged and still compiled."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "16 of the file's 24 definitions are marked `noncomputable def` one by one; the rest are `Prop`s.",
+  "requested_change": "Open a single `noncomputable section` after the module docstring and drop the per-definition `noncomputable` markers.",
+  "severity": "advisory",
+  "evidence": "`grep -c 'noncomputable def'` gives 16. Convention: a file most of whose definitions are noncomputable opens one `noncomputable section`."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "Every declaration is placed in the root namespace, including generic names such as `fourierTransform`, `invFourier`, `DivergenceFree`, `Vorticity`, `hsNorm`, `l2Norm`, `T3` and `cMoser`. This pollutes the global namespace and collides conceptually with existing Fourier-transform API.",
+  "requested_change": "Put the Fourier-series material in the `UnitAddTorus` namespace (where `mFourier` and `mFourierCoeff` live), and the fluid-dynamics definitions in a dedicated namespace such as `NavierStokes`.",
+  "severity": "advisory",
+  "evidence": "The diff has no `namespace` command. Convention: declarations about a theory go in its established namespace. AddCircleMulti.lean uses `namespace UnitAddTorus`."
+ },
+ {
+  "target": "GalerkinProjection",
+  "claim": "`GalerkinProjection`, `LerayProjection`, `Vorticity` and `GalerkinAt` are definitions whose values are functions (terms), not types or propositions, but they are named in UpperCamelCase.",
+  "requested_change": "Rename them `galerkinProjection`, `lerayProjection`, `vorticity` and `galerkinAt`.",
+  "severity": "advisory",
+  "evidence": "Convention: lowerCamelCase for definitions producing terms. Their types are `… → T3 → ℝ → Fin 3 → ℝ` and `FourierCoeff` (diff lines 132, 150, 164, 168)."
+ },
+ {
+  "target": "smoothInTime",
+  "claim": "`smoothInTime` and `fourierDecay` are `Prop`-valued definitions named in lowerCamelCase. Their siblings `SmoothInitial`, `SmoothSpacetime` and `DivergenceFree` are correctly in UpperCamelCase.",
+  "requested_change": "Rename them `SmoothInTime` and `FourierDecay`.",
+  "severity": "advisory",
+  "evidence": "Convention: Prop-valued definitions use UpperCamelCase. diff lines 92 and 100."
+ },
+ {
+  "target": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "claim": "The file is placed in `Mathlib/Analysis/ODE/`, but Navier-Stokes is a PDE, and the reusable content (Fourier analysis on the 3-torus) belongs with `Mathlib/Analysis/Fourier/AddCircleMulti.lean`. The file name `GalerkinRegularity` names a method rather than the notion the file is about.",
+  "requested_change": "Move any surviving Fourier-on-torus lemmas into `Mathlib/Analysis/Fourier/AddCircleMulti.lean`. Do not add a Navier-Stokes file under `Analysis/ODE`.",
+  "severity": "advisory",
+  "evidence": "Convention: a new file is named for its notion and placed in that theory's directory. AddCircleMulti.lean already holds the torus Fourier API."
+ }
+]

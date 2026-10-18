@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/Convex/Basic.lean","line_start":198,"line_end":198,"replacement":"def convexAddSubmonoid : AddSubmonoid (Set E) where"}

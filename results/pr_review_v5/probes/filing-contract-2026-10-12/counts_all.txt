@@ -1,0 +1,157 @@
+
+filing_g_val_rep1: 8 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  26755     74      3          0                15        0 of 71            0
+  28649     23      6          0                 0        0 of 17            0
+  29842     29      2          0                 7        0 of 27            0
+  30458     71     14          0                 2       14 of 57            0
+  30641     29     12          0                 1        4 of 19            0
+  32875     71      4          0                 3        2 of 67            0
+  34091     53     10          4                12        5 of 43            0
+  36822    110      4          1                 3        4 of 106           0
+
+filing_g_val_rep2: 8 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  26755     74      4          0                16       65 of 70            0
+  28649     23      5          0                 0        0 of 18            0
+  29842     29      4          0                 6        7 of 25            0
+  30458     71     11          0                13        3 of 60            0
+  30641     29      8          0                 7        1 of 21            0
+  32875     71      3          0                 5        6 of 68            0
+  34091     53     10          1                10        9 of 43            0
+  36822    110      3          0                 6        0 of 107           0
+
+filing_g_val_rep3: 8 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  26755     74      3          0                 6       12 of 71            0
+  28649     23      6          0                 0        0 of 17            0
+  29842     29      2          0                13        9 of 27            0
+  30458     71     12          2                 2       20 of 59            0
+  30641     29      9          0                 0        0 of 20            0
+  32875     71      5          0                 4       10 of 66            0
+  34091     53     10          3                 9        0 of 43            0
+  36822    110      4          1                 0        0 of 106           0
+
+filing_g_post_rep1: 6 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  41930     17      3          0                 0        0 of 14            0
+  42184     11      4          0                 1        1 of 7             0
+  42814     89     16          1                 2        1 of 73            1
+  43024     17      1          0                 4        2 of 16            0
+  43167     65     12          0                 2        8 of 53            0
+  43192     80      9          2                 6        0 of 71            0
+
+filing_g_post_rep2: 6 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  41930     17      3          0                 3        0 of 14            0
+  42184     11      4          0                 2        0 of 7             1
+  42814     89     20          1                 1        2 of 69            0
+  43024     17      2          0                 0        6 of 15            0
+  43167     65     13          4                 1        8 of 52            0
+  43192     80     13          2                 1        5 of 67            0
+
+filing_g_post_rep3: 6 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  41930     17      3          0                 1        1 of 14            0
+  42184     11      5          1                 2        1 of 6             0
+  42814     89     18          0                 4        2 of 71            0
+  43024     17      3          0                 2        5 of 14            0
+  43167     65     14          1                 0        0 of 51            0
+  43192     80     12          1                 4        0 of 68            0
+
+filing_g_dev_rep1: 15 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  33066    134     18          3                11        1 of 116           0
+  33098    101     17          0                 4        3 of 84            0
+  33117    149     12          0                 1        0 of 138           0
+  33145     41     20          1                 4        3 of 21            0
+  33149    341     88          0                10        0 of 253           0
+  33285    101      4          1                11        0 of 97            0
+  33294    551     10          2                14        0 of 541           0
+  33304     53      6          0                 1        2 of 47            0  (control)
+  33305     23      6          0                 0        0 of 17            0
+  33315     41      4          0                 0        1 of 37            0  (control)
+  33321    134     12          0                11        0 of 122           1
+  33337     38      1          0                 5        0 of 37            0
+  33362     59     13          0                 1        0 of 46            0
+  33421    197     13          0                 6        4 of 184           4
+  33438     17      5          0                 3        2 of 12            0  (control)
+
+filing_g_dev_rep2: 15 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  33066    134     11          0                 7        0 of 123           0
+  33098    101     20          0                 7       21 of 81            0
+  33117    149     12          0                 0        1 of 138           0
+  33145     41     18          3                 3        0 of 23            0
+  33149    341     44          0                14        2 of 297           0
+  33285    101      4          0                19        0 of 97            0
+  33294    551     10          1                11        1 of 541           2
+  33304     53      6          0                 3        2 of 48            0  (control)
+  33305     23      4          0                 0        0 of 19            0
+  33315     41      5          0                 2        0 of 38            0  (control)
+  33321    134     18          1                 5        0 of 116           1
+  33337     38      3          0                 8        0 of 35            0
+  33362     59      9          0                 2        1 of 50            0
+  33421    197     13          0                 8        5 of 184           0
+  33438     17      5          0                 2        2 of 12            0  (control)
+
+filing_g_dev_rep3: 15 session(s)
+  PR      cells  filed  questions  conforms-refused  self-lookup-only  A(G)-withholds
+  33066    134     16          1                 4        2 of 118           1
+  33098    101     16          1                 9       21 of 85            0
+  33117    149     12          0                 1       23 of 139           0
+  33145     41     18          0                 4        0 of 23            0
+  33149    341    112          0                 5        0 of 229           0
+  33285    101      5          1                 8        4 of 96            0
+  33294    551      4          0                28       97 of 547           0
+  33304     53      5          0                 2        0 of 48            0  (control)
+  33305     23      4          0                 1        0 of 19            0
+  33315     41      3          0                 0        1 of 38            0  (control)
+  33321    134     20          2                 8        0 of 114           0
+  33337     38      6          0                 3        2 of 32            0
+  33362     59     12          0                 2       19 of 47            0
+  33421    197     18          0                 2        2 of 179           4
+  33438     17      5          0                 2        4 of 12            0  (control)
+
+A(G) withholds 15 of 976 filed findings (1.5%; the README's threshold for its own seal is 10%)
+would_clear_on over filed findings, ask PRs: {'nothing': 561, 'maintainers_might_not_ask': 147, 'change_may_be_wrong': 71, 'unstated': 65, 'file_or_siblings': 35, 'worth': 34, 'other': 8, 'brief_or_budget': 7, 'corpus_or_tool_count': 4}
+would_clear_on over filed findings, controls: {'maintainers_might_not_ask': 21, 'nothing': 19, 'file_or_siblings': 2, 'change_may_be_wrong': 1, 'worth': 1}
+
+Findings a PR beside the solo reviewer's published findings on the same PRs (rep 1-3):
+  val: PR      G (mean of 3 reps)  DX1  DX2  DX3  AP1  AP2  AP3
+    26755    3.3    0    0    0    0    0    1
+    28649    5.7    3    3    2    3    4    4
+    29842    2.7    1    0    1    2    1    1
+    30458   12.3    5    4    4    5    7    8
+    30641    9.7    3    3    3    6    9    9
+    32875    4.0    2    4    3    2    4    3
+    34091   10.0    2    2    3    7    7    5
+    36822    3.7    2    2    2    3    2    2
+    mean   6.4  2.2  2.2  2.2  3.5  4.2  4.1
+  post: PR      G (mean of 3 reps)  DX1  DX2  DX3  AP1  AP2  AP3
+    41930    3.0    1    2    2    3    2    1
+    42184    4.3    2    2    2    4    3    3
+    42814   18.0    3    3    3   10    7    7
+    43024    2.0    1    1    1    2    2    1
+    43167   13.0    2    2    2    7    5    6
+    43192   11.3    3    3    4    6    9    6
+    mean   8.6  2.0  2.2  2.3  5.3  4.7  4.0
+  dev: PR      G (mean of 3 reps)  DX1  DX2  DX3  AP1  AP2  AP3
+    33066   15.0    3    2    7   11    7    8
+    33098   17.7    9    6    7   12   12    9
+    33117   12.0    3    3    4    6    9    7
+    33145   18.7    8    6    6   10    7    9
+    33149   81.3   10   11   10   16   17   14
+    33285    4.3    2    2    2    3    4    3
+    33294    8.0    6    5    3    4    3    4
+    33304*   5.7    0    1    1    4    6    6
+    33305    4.7    1    2    2    3    5    2
+    33315*   4.0    1    4    0    1    2    2
+    33321   16.7    4    5    4   10   12    9
+    33337    3.3    1    1    1    2    1    3
+    33362   11.3    5    5    5    7    5    6
+    33421   14.7    5    3    6    7    6    7
+    33438*   5.0    2    2    2    3    3    3
+    mean   14.8  4.0  3.9  4.0  6.6  6.6  6.1
+
+Controls: [6, 6, 5, 4, 5, 3, 5, 5, 5], mean 4.9 a PR (bar 2: at most 2.0, over three controls and three reps)

@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P026",
+  "where": "every declaration in OfCommRing.lean (PresheafOfModulesOfCommRing, mk, obj, map, mkHom, isoMk, unit, restrictScalars, pushforward₀, pushforward, pullback, pullbackPushforwardAdjunction)",
+  "why": "All twelve new declarations are `abbrev`s rather than `def`s."
+ },
+ {
+  "id": "P086",
+  "where": "PresheafOfModulesOfCommRing.pushforward₀",
+  "why": "Duplicates the existing library declaration `PresheafOfModules.pushforward₀OfCommRingCat` named in the PR description."
+ },
+ {
+  "id": "P172",
+  "where": "PresheafOfModulesOfCommRing.pushforward₀ vs PresheafOfModules.pushforward₀OfCommRingCat",
+  "why": "After this PR two library declarations state the same functor; neither is deprecated."
+ },
+ {
+  "id": "P052",
+  "where": "OfCommRing.lean, `module` and `@[expose] public section`",
+  "why": "New file declared as a module with its content in an exposed public section."
+ },
+ {
+  "id": "P051",
+  "where": "Mathlib.lean",
+  "why": "New file OfCommRing.lean added and imported in Mathlib.lean."
+ },
+ {
+  "id": "P431",
+  "where": "OfCommRing.lean, `@[expose] public section`",
+  "why": "`@[expose]` placed on the whole public section rather than on individual definitions."
+ },
+ {
+  "id": "P284",
+  "where": "`universe v v₁ v₂ u₁ u₂ u`; PresheafOfModulesOfCommRing and both section `variable`s",
+  "why": "Hand-declared universes with `Type u₁`, `[Category.{v₁} C]` instead of `Type*`, `Category*`."
+ },
+ {
+  "id": "P272",
+  "where": "unit, restrictScalars, pushforward, pullback, pullbackPushforwardAdjunction",
+  "why": "Five of twelve definitions individually marked `noncomputable`; no `noncomputable section`."
+ },
+ {
+  "id": "P111",
+  "where": "docstrings of mk, obj, mkHom, isoMk",
+  "why": "Docstrings say 'Construct ...', 'Evaluate ...' (acts) rather than describing the value as a noun phrase."
+ },
+ {
+  "id": "P396",
+  "where": "docstrings of PresheafOfModulesOfCommRing, map, unit, restrictScalars, pushforward₀, pushforward, pullback, adjunction",
+  "why": "Noun-phrase docstrings ('The category of ...') end with a full stop."
+ },
+ {
+  "id": "P182",
+  "where": "mk (map, map_comp), mkHom (naturality), isoMk (naturality)",
+  "why": "`∀ {X Y} (f : X ⟶ Y)` binds X Y determined by f; isoMk uses ⦃X Y⦄, mkHom `{}`."
+ },
+ {
+  "id": "P276",
+  "where": "mkHom.naturality, isoMk.naturality, mk.map_id/map_comp",
+  "why": "isoMk's naturality is auto-param `by cat_disch`; mkHom's and mk's proof arguments are not."
+ },
+ {
+  "id": "P127",
+  "where": "PresheafOfModulesOfCommRing (top-level abbrev)",
+  "why": "The abbrev's type is not stated; it is inferred from the body after `:=`."
+ },
+ {
+  "id": "P037",
+  "where": "PresheafOfModulesOfCommRing.pullback, map, obj, mk, unit, pushforward",
+  "why": "Short names like `pullback` clash with `CategoryTheory.Limits.pullback` when namespaces opened; none `protected`."
+ },
+ {
+  "id": "P254",
+  "where": "mkHom, isoMk, pushforward₀; namespace PresheafOfModulesOfCommRing",
+  "why": "`mkHom` beside `isoMk`/`homMk` pattern; `OfCommRing` vs existing `pushforward₀OfCommRingCat` spelling."
+ },
+ {
+  "id": "P025",
+  "where": "module docstring title",
+  "why": "Title '# Modules over presheaves commutative rings' is the file's heading; must state precisely what it provides."
+ },
+ {
+  "id": "P006",
+  "where": "unit `(R : ...)`, pushforward₀ `(F) (R)`, top-level PresheafOfModulesOfCommRing `{C} [Category C]`",
+  "why": "Declarations rebind C, R, F that section `variable`s already declare."
+ },
+ {
+  "id": "P036",
+  "where": "unit (R), pushforward₀ (F) (R), restrictScalars (φ), obj, map, mkHom, isoMk",
+  "why": "Binder kinds chosen for many arguments of new abbrevs; explicit vs implicit by inferability."
+ },
+ {
+  "id": "P050",
+  "where": "`open CategoryTheory Functor Limits`",
+  "why": "`Limits` appears unused in the file, and its `pullback` competes with the local name."
+ },
+ {
+  "id": "P303",
+  "where": "PresheafOfModulesOfCommRing (new abbreviation)",
+  "why": "New abbrev for `PresheafOfModules (R ⋙ forget₂ _ _)`; existing library spellings and `pushforward₀OfCommRingCat` not migrated."
+ },
+ {
+  "id": "P084",
+  "where": "PresheafOfModulesOfCommRing, pushforward₀, pullbackPushforwardAdjunction signatures",
+  "why": "Several signatures broken across lines though they appear to fit within 100 characters."
+ },
+ {
+  "id": "P032",
+  "where": "pushforward₀, mk signatures",
+  "why": "Multi-line signatures break inside the conclusion (after `⥤`) or inside binders, not after the colon."
+ },
+ {
+  "id": "P402",
+  "where": "PresheafOfModulesOfCommRing (new concept and namespace design)",
+  "why": "Introduces a new named concept and namespace to host a dozen abbrevs from open PRs."
+ },
+ {
+  "id": "P105",
+  "where": "obj, map (F a presheaf of modules) vs section PushforwardPullback (F : C ⥤ D)",
+  "why": "Letter `F` names a presheaf of modules in one section and a functor in the next."
+ },
+ {
+  "id": "P425",
+  "where": "map body `PresheafOfModules.map _ _`; pullbackPushforwardAdjunction `... _`; `forget₂ _ _`",
+  "why": "Trailing runs of `_` placeholders in applications."
+ }
+]

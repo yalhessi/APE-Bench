@@ -1,0 +1,1 @@
+{"path":"Mathlib/Topology/Algebra/Order/Floor.lean","declaration_name":"continuousAt_fract","new_declaration":"theorem continuousAt_fract [OrderClosedTopology α] [IsTopologicalAddGroup α]\n    {x : α} (h : x ≠ ⌊x⌋) : ContinuousAt fract x := by\n  unfold fract\n  fun_prop (disch := exact h)"}

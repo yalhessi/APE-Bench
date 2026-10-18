@@ -47,6 +47,7 @@ from .solo import (
 )
 from .structured import STRUCTURED_TASK_TYPE, StructuredReviewTask
 from .structured_critic import CRITIC_TASK_TYPE, StructuredCriticTask
+from .filing_contract import FILING_TASK_TYPE, FilingContractTask
 
 #: The per-PR review designs, by the name a config gives `dataset.design`.
 #:
@@ -62,6 +63,7 @@ DESIGNS = {
     "solo": SoloReviewTask,
     "structured": StructuredReviewTask,
     "structured_critic": StructuredCriticTask,
+    "filing_contract": FilingContractTask,
 }
 
 __all__ = [
@@ -81,4 +83,5 @@ __all__ = [
     "SoloReviewResult", "SoloReviewTask",
     "DESIGNS", "STRUCTURED_TASK_TYPE", "StructuredReviewTask",
     "CRITIC_TASK_TYPE", "StructuredCriticTask",
+    "FILING_TASK_TYPE", "FilingContractTask",
 ]

@@ -1,0 +1,37 @@
+[
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "`pi_map_piCongrLeft` still proves the preimage of a box by hand (the `e_meas`/`s'` lets and the 6-line `have`), which re-derives the existing `Equiv.piCongrLeft_preimage_univ_pi`. The new ending `simp only [pi_pi, this]; exact Fintype.prod_equiv _ _ _ (congrFun rfl)` also uses `congrFun rfl` where `fun _ ↦ rfl` is meant. The same file already proves the identical statement in `measurePreserving_piCongrLeft` (map_eq) with a two-line rewrite chain.",
+  "requested_change": "Replace the proof body with the chain used in `measurePreserving_piCongrLeft`:\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n(If the long proof is kept, at least write `rw [this, pi_pi]` and `Fintype.prod_equiv e _ _ fun _ ↦ rfl` instead of `simp only [pi_pi, this]` and `(congrFun rfl)`.)",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/MeasureTheory/Constructions/Pi.lean, replacing MeasureTheory.Measure.pi_map_piCongrLeft with the 2-line chain: outcome compiled, no errors or warnings. Profiler (set_option trace.profiler true): proof elaboration 0.018 s, against 0.078 s for the PR's proof. The fallback (`rw [this, pi_pi]` then `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`) also compiled. content_search found `Equiv.piCongrLeft_preimage_univ_pi` (Mathlib/Data/Set/Prod.lean:922) and the sibling `measurePreserving_piCongrLeft` (Pi.lean:720-727), whose `map_eq` field is this statement with the roles of ι and ι' swapped and is proved by exactly this rw chain."
+ },
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "The golf `simp only [den_inv, num_intCast]; grind` makes `inv_intCast_den_of_pos` slower: the PR's own profile reports <10 ms before and 17 ms after, and I measured 0.042 s here. A one-line `simp` closes the goal in under 10 ms and matches the sibling `inv_intCast_num_of_pos := by simp [*]`.",
+  "requested_change": "Replace the proof with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or keep the original proof, rather than adding a slower `grind`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean, Rat.inv_intCast_den_of_pos := by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]: compiled, no warnings. Under trace.profiler it does not appear at the 10 ms threshold. The PR's proof under the same profiler took 0.0419 s to elaborate, and the pre-PR proof also stayed under 10 ms. `simp [ha0.ne', ha0.le]` alone leaves `↑a.natAbs = a`. `inv_intCast_den` (line 322) is declared after this lemma, so it cannot be used here (Unknown identifier)."
+ },
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "`Finset.mem_map_equiv` is a low-level `@[simp 1100]` lemma, and its golf to `simp only [mem_map, Equiv.coe_toEmbedding]; grind` makes it slower: the PR's own profile says <10 ms before and 25 ms after, and I measured grind alone at 0.020 s of 0.025 s. A single `simp only` call proves it with no slowdown.",
+  "requested_change": "Replace the proof with `by simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`, or `by simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]`, instead of the `simp only …; grind` pair.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Finset/Image.lean, replacing Finset.mem_map_equiv: both the `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]` and the `simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]` versions compiled with no warnings. Under trace.profiler, the PR proof's elaboration took 0.0254 s (grind 0.0200 s), the original took 0.0110 s, and the single simp-only version did not reach the 10 ms reporting threshold (whole command 0.014 s including the simp attribute). A bare `by grind` fails, so the leading simp only cannot simply be dropped."
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The golfed proof keeps a three-line `have … := by congr; exact (κ.disintegrate _).symm`, uses it through `simp only [this]` (a plain rewrite by a local equation), and then closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. This is a roundabout form of a single rewrite.",
+  "requested_change": "Replace the whole proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, use the file's own idiom `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, which `lintegral_condKernel` and `setLIntegral_condKernel` use.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod := by rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]: compiled, no warnings, elaboration 0.013 s against 0.024 s for the PR's proof. The conv_rhs variant also compiled. The neighbouring lemmas in the same file (lines 46-67) all use the `conv_rhs => rw [← κ.disintegrate κ.condKernel]` pattern."
+ },
+ {
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "As in the kernel version, the golfed proof keeps the `have … := by congr; exact (ρ.disintegrate _).symm`, rewrites with it through `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`, where one `rw` suffices.",
+  "requested_change": "Replace the whole proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`, as the neighbouring `lintegral_condKernel` does.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod := by rw [← compProd_apply_prod hs ht, ρ.disintegrate]: compiled, no warnings, elaboration 0.044 s against 0.056 s for the PR's proof. The conv_rhs variant also compiled (0.046 s)."
+ }
+]

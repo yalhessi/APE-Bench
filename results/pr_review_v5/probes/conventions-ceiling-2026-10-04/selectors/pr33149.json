@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P030",
+  "where": "GalerkinRegularity.lean import block",
+  "why": "The new file imports all of `Mathlib`, far more than it needs."
+ },
+ {
+  "id": "P139",
+  "where": "fourierDecay, spectralNSResidual, GalerkinProjection, SmoothInitial docstrings",
+  "why": "Docstrings describe Fourier decay, NS residual, Galerkin projection, but bodies are `True`, `0`, constant-in-time copy."
+ },
+ {
+  "id": "P025",
+  "where": "module docstring title",
+  "why": "Title claims Navier-Stokes regularity on T³; file proves a statement about placeholder definitions and axioms."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title/description claim Galerkin regularity for Navier-Stokes; the change is axioms plus vacuous definitions."
+ },
+ {
+  "id": "P086",
+  "where": "T3, fourier1D, fourier3D, fourierCoeff3D, smoothInTime, l2Norm, linftyNorm",
+  "why": "New definitions duplicate library notions: UnitAddTorus, fourier, mFourier, mFourierCoeff, ContDiff, Lp norms."
+ },
+ {
+  "id": "P011",
+  "where": "axioms fourier_ortho_integral, parseval_orthonormal, fourier_inversion, integral_le_const_mul_length; parseval3D",
+  "why": "Results available from library Fourier and interval-integral API are postulated as axioms instead of derived."
+ },
+ {
+  "id": "P078",
+  "where": "all `axiom` declarations; module docstring claim of global regularity",
+  "why": "Many unproved mathematical claims (axioms, global NS regularity) whose truth is not evident or justified."
+ },
+ {
+  "id": "P333",
+  "where": "PR as a whole",
+  "why": "Hallmarks of LLM-generated code: axioms, vacuous placeholder definitions, `#print axioms`, unsupported major claim."
+ },
+ {
+  "id": "P038",
+  "where": "PR description",
+  "why": "Apparently AI-assisted PR whose description contains no disclosure of AI use."
+ },
+ {
+  "id": "P374",
+  "where": "section comment `Axioms (after definitions they reference)`; tau_interval_finite calc",
+  "why": "AI-style narrative comments and convoluted arguments left in for review."
+ },
+ {
+  "id": "P101",
+  "where": "`#check GalerkinLimit.smooth`, `#print axioms GalerkinLimit.smooth`, section header notes",
+  "why": "Debugging commands and working notes are left at the end of a library file."
+ },
+ {
+  "id": "P183",
+  "where": "`set_option linter.style.commandStart false`",
+  "why": "A style linter is disabled file-wide instead of fixing the formatting it flags."
+ },
+ {
+  "id": "P293",
+  "where": "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+  "why": "New file about a PDE (Navier-Stokes on the torus) placed in the ODE directory."
+ },
+ {
+  "id": "P152",
+  "where": "T3, fourierTransform",
+  "why": "`T3` clashes with the T3 separation axiom; `fourierTransform` with Mathlib's Fourier transform."
+ },
+ {
+  "id": "P238",
+  "where": "GalerkinProjection, GalerkinLimit.smooth, VorticityResponse",
+  "why": "Names evoke projection, limit, vorticity that the definitions do not involve."
+ },
+ {
+  "id": "P213",
+  "where": "every declaration in GalerkinRegularity.lean",
+  "why": "All declarations sit in the root namespace, none in a namespace for the theory."
+ },
+ {
+  "id": "P010",
+  "where": "uniform_vorticity_bound, galerkin_energy_bound, bkm_coordinate_invariance, bkm_finite_anyT, VorticityResponse.regularity",
+  "why": "Unused hypotheses: `h_divfree`, `ht`, `hT`, `Φ`, `_hν`."
+ },
+ {
+  "id": "P357",
+  "where": "tau_interval_finite, parseval3D, galerkin_energy_bound, fourier3D_orthogonal, fourierTruncate, LerayProjection, moser_estimate, smooth_initial_hs_finite",
+  "why": "Added lemmas, definitions and axioms neither used by the main result nor forming coherent API."
+ },
+ {
+  "id": "P141",
+  "where": "GalerkinProjection, LerayProjection, Vorticity, GalerkinAt, fourierDecay, smoothInTime",
+  "why": "Function-valued defs in UpperCamelCase and Prop-valued defs in lowerCamelCase."
+ },
+ {
+  "id": "P051",
+  "where": "Mathlib.lean (not changed)",
+  "why": "A new library file is added; Mathlib.lean must import it."
+ },
+ {
+  "id": "P052",
+  "where": "GalerkinRegularity.lean header",
+  "why": "New file, not declared as a `module` with a public section."
+ },
+ {
+  "id": "P272",
+  "where": "fourier1D, fourier3D, fourierCoeff3D, invFourier, Vorticity, hsNorm and other noncomputable defs",
+  "why": "About fifteen definitions are each marked `noncomputable` individually in one file."
+ },
+ {
+  "id": "P008",
+  "where": "galerkin_energy_bound, fourier3D_orthogonal, bkm_coordinate_invariance, VorticityResponse.regularity",
+  "why": "New definitions unfolded by hand at use sites (`unfold`, `simp [spectralNSResidual]`) without characterising lemmas."
+ },
+ {
+  "id": "P047",
+  "where": "throughout: fourier3D, GalerkinProjection, Vorticity, bkm_implies_regularity, proofs",
+  "why": "Lambdas are written `fun x => ...` everywhere instead of `↦`."
+ },
+ {
+  "id": "P159",
+  "where": "fourier3D, LerayProjection, fourierTruncate, GalerkinProjection, spectralCurl, invFourier, Vorticity, GalerkinAt",
+  "why": "Function-valued definitions are written `:= fun k j => ...` rather than binders after the name."
+ }
+]

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/InnerProductSpace/Orthogonal.lean", "declaration_name": "Submodule.IsOrtho.map", "new_declaration": "theorem IsOrtho.map (f : E \u2192\u2097\u1d62[\ud835\udd5c] F) {U V : Submodule \ud835\udd5c E} (h : U \u27c2 V) : U.map f \u27c2 V.map f := by\n  simpa [isOrtho_iff_inner_eq] using h"}

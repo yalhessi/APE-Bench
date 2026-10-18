@@ -1,0 +1,66 @@
+{"item": "H001", "label": "excluded", "confidence": "low", "note": "The two defs take h as an autoParam, which differs from the plain h re-added by variable for the lemmas; a deliberate split no single variable line expresses."}
+{"item": "H002", "label": "conforms", "confidence": "high", "note": "Both needed: for trivial S any relative dimension holds while rank is 0; IsStandardSmooth is needed for the reverse direction."}
+{"item": "H003", "label": "excluded", "confidence": "medium", "note": "The base file puts (A : Matrix m n R) in every signature, explicit or implicit by lemma; no variable line for A anywhere."}
+{"item": "H004", "label": "conforms", "confidence": "medium", "note": "No base lemma gives IsStandardSmooth -> relative dimension from rank; four-line proof already uses library rank_kaehlerDifferential."}
+{"item": "H005", "label": "unclear", "confidence": "medium", "note": "Base has 'colinear' in three docstrings (lines 95, 184, 213); the excerpt cannot show whether the PR fixed the other two."}
+{"item": "H006", "label": "departs", "confidence": "low", "note": "intro k f _ _ _ followed by cases k merges into rintro (_ | k) f _ _ _."}
+{"item": "H007", "label": "excluded", "confidence": "low", "note": "After the PR this is the file's only commented-out simp; (attr := simp) is the form to_dual takes, so no competing spelling."}
+{"item": "H008", "label": "conforms", "confidence": "medium", "note": "New file; short ofUniqueHom construction. Base has no pointwise IsTerminal criterion; the evaluationJointlyReflectsLimits route would not be shorter."}
+{"item": "H009", "label": "departs", "confidence": "medium", "note": "With ContinuousConstSMul nothing in the one-instance section uses [TopologicalSpace 𝕜]; it can now be dropped."}
+{"item": "H010", "label": "conforms", "confidence": "low", "note": "Every hom_inv/inv_hom _app, _app_app, _app_app_app lemma in the hunk gets +to_dual; the other siblings are speculative."}
+{"item": "H011", "label": "conforms", "confidence": "medium", "note": "rw then exact of an anonymous constructor with a fin_cases branch; rwa does not apply, and no single tactic plainly merges them."}
+{"item": "H012", "label": "conforms", "confidence": "medium", "note": "The whole naturality family (_1, _2, primed, NatTrans) gets the same to_dual none; no sibling left out."}
+{"item": "H013", "label": "needs_tools", "confidence": "low", "note": "The hbij steps are not in the excerpt; whether a single simp closes them would need a compile."}
+{"item": "H014", "label": "departs", "confidence": "low", "note": "Joined signature is 75 chars and the continuation is mis-indented by five spaces, though the base file breaks after the colon."}
+{"item": "H015", "label": "conforms", "confidence": "low", "note": "The base has no IsMeagre biUnion/sUnion siblings to update; the IsGδ family shows only that they could be added."}
+{"item": "H016", "label": "needs_tools", "confidence": "low", "note": "ext, have h, simp [h]: whether one simp/grind closes it with Subsingleton in dependent types needs a compile."}
+{"item": "H017", "label": "conforms", "confidence": "low", "note": "by ext; apply (hF _).hom_ext is idiomatic for functor homs; the term needs NatTrans.ext plus funext and reads no better."}
+{"item": "H018", "label": "departs", "confidence": "medium", "note": "Writes (D R S) (P.val (v k)); the base file (lines 57, 82) and the PR's other lemma write D R S (P.val ...)."}
+{"item": "H019", "label": "conforms", "confidence": "medium", "note": "Already derived from NatTrans.isIso_iff_isIso_app; no base lemma gives the Fin 3 conjunction directly."}
+{"item": "H020", "label": "excluded", "confidence": "low", "note": "The name predates the PR, which only drops private; it is not a new declaration (though siblings use the general-name-plus-prime pattern)."}
+{"item": "H021", "label": "conforms", "confidence": "medium", "note": "The explicit to_dual name equals the removed hand-written inf'_product_left, so the name matches its sibling."}
+{"item": "H022", "label": "conforms", "confidence": "high", "note": "[Subsingleton ι] is essential; update's DecidableEq comes from the decidableEq_of_subsingleton instance, so there is no extra hypothesis."}
+{"item": "H023", "label": "departs", "confidence": "medium", "note": "The generalised isMeagre_iUnion hs gives the ℕ case directly; the proof instead re-unfolds IsMeagre."}
+{"item": "H024", "label": "excluded", "confidence": "medium", "note": "The file's sSup block (sSup, le_sSup, sSup_le) binds c and hc per signature with varying binder kinds; a new lemma follows that."}
+{"item": "H025", "label": "departs", "confidence": "low", "note": "The three-line signature fits in two (89 and 76 chars), and docstring line one could take 'generators' (87)."}
+{"item": "H026", "label": "conforms", "confidence": "high", "note": "The _apply_tprod affix matches subsingletonEquiv_apply_tprod and isEmptyEquiv_apply_tprod; the Dep suffix matches tmulEquivDep."}
+{"item": "H027", "label": "departs", "confidence": "low", "note": "New file: {F : C ⥤ D} is repeated in both defs while a variable line sits right above; could join it."}
+{"item": "H028", "label": "conforms", "confidence": "low", "note": "by ext; apply (hF _).hom_ext is idiomatic; the term form needs NatTrans.ext plus funext, no more readable."}
+{"item": "H029", "label": "conforms", "confidence": "medium", "note": "The file's other bases (basisCotangent, basisCotangentAway) already have _apply lemmas; the PR completes the pattern."}
+{"item": "H030", "label": "conforms", "confidence": "medium", "note": "compl_union is not definitional, so the term needs ▸ and reads worse; rw then exact is fine."}
+{"item": "H031", "label": "departs", "confidence": "medium", "note": "The joined signature is 93 chars; the base file breaks signatures only past 100."}
+{"item": "H032", "label": "departs", "confidence": "low", "note": "(NatTrans.isIso_iff_isIso_app f).trans ⟨...⟩ is one term of about the same readability."}
+{"item": "H033", "label": "excluded", "confidence": "low", "note": "Same as H001: a deliberate autoParam binder on the defs and a plain h for the lemmas; one variable cannot hold both."}
+{"item": "H034", "label": "conforms", "confidence": "medium", "note": "After ext the goal needs hF's hom_ext; no standard finishing tactic knows to use the hypothesis hF."}
+{"item": "H035", "label": "conforms", "confidence": "medium", "note": "Same as H034: after ext only (hF _).hom_ext closes it; no finisher plausibly does."}
+{"item": "H036", "label": "excluded", "confidence": "medium", "note": "The break predates the PR, which only drops private; the diff does not break the line."}
+{"item": "H037", "label": "departs", "confidence": "low", "note": "The joined signature is 81 chars; breaking before the type is a category-theory habit, but the rule as stated asks to join."}
+{"item": "H038", "label": "conforms", "confidence": "medium", "note": "domain_sSup matches the file's domain_sup and domain_supSpanSingleton."}
+{"item": "H039", "label": "conforms", "confidence": "medium", "note": "A prime for a variant is standard, and the docstring says 'Variant of twoδ₁Toδ₀'; no analogue uses another affix."}
+{"item": "H040", "label": "conforms", "confidence": "high", "note": "[IsEmpty n] is essential to the statement; CommRing is needed for det."}
+{"item": "H041", "label": "conforms", "confidence": "medium", "note": "It adds the union counterpart of IsMeagre.inter; no existing IsMeagre sibling lacks a matching change."}
+{"item": "H042", "label": "conforms", "confidence": "medium", "note": "The attribute now sits on its own line like the file's other to_dual attributes; the inline @[simp] ones are removed."}
+{"item": "H043", "label": "needs_tools", "confidence": "low", "note": "The rw supplies directedness arguments and aesop already finishes; whether one simp with those hints closes it needs a compile."}
+{"item": "H044", "label": "unclear", "confidence": "low", "note": "The by block of iff_exists_basis_kaehlerDifferential is not in the excerpt."}
+{"item": "H045", "label": "conforms", "confidence": "low", "note": "The term would need a match with a nested by for the rw; it would not read better than intro/cases."}
+{"item": "H046", "label": "departs", "confidence": "low", "note": "The to_dual attribute with its docstring joins to 92 chars, under the limit."}
+{"item": "H047", "label": "departs", "confidence": "high", "note": "The continuation line starts with ': IsMeagre'; Mathlib and the file end signature lines with the colon."}
+{"item": "H048", "label": "departs", "confidence": "medium", "note": "ULift's < is defined as x.down < y.down, so wf := InvImage.wf ULift.down wellFounded_lt (or WellFounded.onFun) replaces the hand induction."}
+{"item": "H049", "label": "departs", "confidence": "high", "note": "One short binder per line; the signature fits in one or two lines, and so does the have g with (t := …)."}
+{"item": "H050", "label": "departs", "confidence": "low", "note": "homMk₃–homMk₅ component lemmas keep ⟨n, by valid⟩ with no literal form; the visible diff covers only homMk₂."}
+{"item": "H051", "label": "conforms", "confidence": "high", "note": "[IsEmpty m] is essential; the ring structure is needed for det."}
+{"item": "H052", "label": "needs_tools", "confidence": "low", "note": "Whether simp (via f.isEmpty and det_isEmpty) closes it without the case split needs a compile."}
+{"item": "H053", "label": "conforms", "confidence": "medium", "note": "Matches the analogue Functor.isZero (hF : ∀ X, IsZero (F.obj X)) : IsZero F, same name and namespace."}
+{"item": "H054", "label": "conforms", "confidence": "medium", "note": "The file mostly writes tprod R fun i ↦ ... (38 vs 13), and the old invFun used the same spelling."}
+{"item": "H055", "label": "conforms", "confidence": "medium", "note": "MultilinearMap.ofSubsingleton is non-dependent only; no base API yields the dependent equivalence."}
+{"item": "H056", "label": "conforms", "confidence": "medium", "note": "Dependent types: simp cannot rewrite i inside s i, while rw abstracts it; merging into simp would likely fail."}
+{"item": "H057", "label": "departs", "confidence": "low", "note": "simp/rw [NatTrans.isIso_iff_isIso_app, Fin.forall_fin_two] plausibly closes the Fin 2 iff with no case split."}
+{"item": "H058", "label": "conforms", "confidence": "medium", "note": "Five tactics with obtain, refine and rwa; a single term would need let-destructuring and nested by, which reads worse."}
+{"item": "H059", "label": "departs", "confidence": "low", "note": "simp_rw [← hb] then exact merges into simpa [← hb] using b.span_eq (and likewise for linearIndependent)."}
+{"item": "H060", "label": "conforms", "confidence": "medium", "note": "Bare to_dual auto-translates sup_inf_sup to inf_sup_inf, the removed hand-written name."}
+{"item": "H061", "label": "conforms", "confidence": "medium", "note": "The explicit name inf_product_left matches the removed sibling."}
+{"item": "H062", "label": "departs", "confidence": "low", "note": "rw [IsMeagre, compl_union] then exact merges into simpa [IsMeagre] using inter_mem hs ht."}
+{"item": "H063", "label": "conforms", "confidence": "medium", "note": "FinitePresentation is needed for the reverse direction of the iff; deleting it breaks the statement."}
+{"item": "H064", "label": "needs_tools", "confidence": "low", "note": "rw with explicit directed lemmas then aesop; whether one simp with those terms closes it needs a compile."}
+{"item": "H065", "label": "conforms", "confidence": "medium", "note": "After the PR, simp lemmas consistently write simp before to_dual (also isIso_inv_app); to_dual comes first only beside reassoc."}
+{"item": "H066", "label": "conforms", "confidence": "medium", "note": "New file; short ofUniqueHom construction; no base pointwise-terminal API gives a shorter derivation."}

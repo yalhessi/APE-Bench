@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P356",
+  "where": "def Meromorphic; meromorphicOn_univ",
+  "why": "The PR adds the absolute predicate Meromorphic for the relativised MeromorphicOn/MeromorphicAt, as Continuous is for ContinuousOn."
+ },
+ {
+  "id": "P306",
+  "where": "meromorphicOn_univ",
+  "why": "Lemma identifying MeromorphicOn f Set.univ with Meromorphic f; its name and side orientation are this convention's subject."
+ },
+ {
+  "id": "P323",
+  "where": "Meromorphic.neg ... Meromorphic.fun_iterated_deriv (all 22 lemmas), def Meromorphic",
+  "why": "Every lemma states that an operation preserves the function property Meromorphic and carries @[fun_prop]."
+ },
+ {
+  "id": "P420",
+  "where": "Meromorphic.neg/fun_neg, add/fun_add, sum/fun_sum, ..., iterated_deriv/fun_iterated_deriv",
+  "why": "Each lemma comes as an unexpanded form (f + g) and an expanded lambda form named with the fun_ prefix."
+ },
+ {
+  "id": "P086",
+  "where": "def Meromorphic",
+  "why": "New predicate whose content MeromorphicOn f Set.univ already expresses in the library."
+ },
+ {
+  "id": "P360",
+  "where": "namespace Meromorphic (whole API block)",
+  "why": "New notion parallels MeromorphicAt/MeromorphicOn; the set of their API analogues provided (no smul, inv, const, congr, restriction) is at issue."
+ },
+ {
+  "id": "P103",
+  "where": "def Meromorphic and its lemmas",
+  "why": "A new predicate is introduced; whether its basic API ships in the same PR is the situation."
+ },
+ {
+  "id": "P303",
+  "where": "def Meromorphic (PR description: shorthand for MeromorphicOn … Set.univ)",
+  "why": "New definition abbreviates MeromorphicOn f Set.univ, which existing library statements spell by hand."
+ },
+ {
+  "id": "P037",
+  "where": "Meromorphic.deriv, Meromorphic.sum, Meromorphic.prod, neg, add, sub, mul, div, pow",
+  "why": "Short names like deriv, sum, prod clash with root names when Meromorphic is opened; fun_deriv already needs _root_.deriv."
+ },
+ {
+  "id": "P127",
+  "where": "def Meromorphic",
+  "why": "Definition `def Meromorphic (f : 𝕜 → E) := ∀ x, ...` leaves its type Prop to be inferred."
+ },
+ {
+  "id": "P341",
+  "where": "Meromorphic.sum, fun_sum, prod, fun_prod",
+  "why": "Four routine results declared with `theorem` and no docstring, among siblings declared with `lemma`."
+ },
+ {
+  "id": "P040",
+  "where": "meromorphicOn_univ",
+  "why": "Short tactic proof `by tauto` of an iff a direct term could prove."
+ },
+ {
+  "id": "P003",
+  "where": "meromorphicOn_univ",
+  "why": "Lemma applies MeromorphicOn to canonical argument Set.univ, simpler right side Meromorphic f, tagged @[simp]."
+ },
+ {
+  "id": "P123",
+  "where": "meromorphicOn_univ",
+  "why": "The @[simp] tag trades MeromorphicOn univ for Meromorphic, choosing the simp normal form between two notions."
+ },
+ {
+  "id": "P193",
+  "where": "meromorphicOn_univ",
+  "why": "New definition coincides with MeromorphicOn f Set.univ; a lemma recording the identification is added."
+ },
+ {
+  "id": "P048",
+  "where": "Meromorphic.mul, fun_mul, div, fun_div, pow, fun_pow, zpow, fun_zpow, deriv lemmas",
+  "why": "Binders {f g : 𝕜 → 𝕜}, {n : ℕ}, [CompleteSpace E] repeated across consecutive signatures despite a variable block."
+ },
+ {
+  "id": "P126",
+  "where": "namespace Meromorphic: theorem vs lemma; deriv vs _root_.deriv",
+  "why": "The file mixes theorem/lemma for parallel lemmas and spells deriv both bare and as _root_.deriv."
+ },
+ {
+  "id": "P059",
+  "where": "meromorphicOn_univ (`Meromorphic f  :=`), Meromorphic.fun_neg (`-f x )`)",
+  "why": "Doubled space before := and a space before a closing parenthesis in terms."
+ },
+ {
+  "id": "P255",
+  "where": "docstring of meromorphicOn_univ",
+  "why": "Docstring mentions the declaration Set.univ, so its backticking is at issue."
+ },
+ {
+  "id": "P212",
+  "where": "docstring of meromorphicOn_univ",
+  "why": "Docstring 'A function is meromorphic iff it is meromorphic on Set.univ' restates the statement."
+ },
+ {
+  "id": "P396",
+  "where": "docstring of def Meromorphic",
+  "why": "Docstring 'Meromorphy of a function on all of 𝕜.' is a noun phrase ending in a full stop."
+ },
+ {
+  "id": "P010",
+  "where": "Meromorphic.sum, fun_sum, prod, fun_prod",
+  "why": "Hypothesis `∀ σ, Meromorphic (G σ)` quantifies over all indices though only σ ∈ s are summed."
+ },
+ {
+  "id": "P019",
+  "where": "Meromorphic.iterated_deriv, fun_iterated_deriv",
+  "why": "Name says iterated_deriv while statement uses deriv^[n] (Nat.iterate), so the name-from-statement spelling is at issue."
+ },
+ {
+  "id": "P402",
+  "where": "def Meromorphic; PR description (Zulip thread)",
+  "why": "A new concept's name and design, discussed on Zulip, introduced by this PR."
+ },
+ {
+  "id": "P045",
+  "where": "Mathlib/Analysis/Meromorphic/Basic.lean module docstring",
+  "why": "A new main definition Meromorphic is added to a file whose module docstring lists its main definitions."
+ }
+]

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "line_start": 9, "line_end": 13, "replacement": "public import Mathlib.Algebra.Group.Subgroup.Pointwise\npublic import Mathlib.Algebra.Group.Submonoid.Basic\npublic import Mathlib.Algebra.Order.Group.Defs"}

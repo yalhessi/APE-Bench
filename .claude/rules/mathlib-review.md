@@ -426,3 +426,47 @@ paths:
   (`lean_verify` compiles a snippet against the library, `lean_verify_edit` compiles the reviewed
   file with an edit); a refusal says which spellings exist; and a tool a run cannot answer with
   is out of the grant, not in the prompt.
+- **A convention's one-line sentence, and a detector built on it, misstate the convention; check a
+  statement against what maintainers fixed before measuring with it (2026-10-16).** The "maintainers raise a
+  convention at 5% of the places it applies" figure did not survive being taken apart
+  (`results/pr_review_v5/probes/enforcement-at-departures-2026-10-16/`). For namespace placement the
+  detector proposed the conclusion's namespace while the convention as held puts a lemma in its main
+  hypothesis's namespace first: 97% of the unasked "departures" were not departures. For primed names two
+  written versions of the convention, each from the maintainers' words, both failed to reproduce the primes
+  maintainers had fixed. Only dot notation measured as stated (real departures, merged unasked, fixed only
+  when a maintainer asks). Before any number about where a convention "applies", write the convention with
+  its precedence and the line maintainers draw, and calibrate it on departures they actually fixed, held
+  out from the derivation; a statement that fails that check measures us, not them.
+- **A reader's packet must not carry an earlier pass's verdict or note about the place (2026-10-16).** In the
+  stage-H re-reading (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`), each packet showed "what the
+  blind pass noted here"; every departure both readers agreed on (13 of 13) was one that note had named, and none
+  where it was neutral (0 of 26), so the reading reproduced the earlier pass. Calibration did not catch it: it
+  caught 1 of 4 known departures whose note did not name the fix. Show the code, the rule and the library; never a
+  prior model's reading of the place. Two readers of one model family on one prompt act as one reader run twice
+  (the same quoted phrase in 68% of notes, stated-grounds), so their agreement is not independence.
+- **An unasked departure is a maintainer's decision only where a maintainer looked; separate attention before
+  reading silence (2026-10-17).** In stage H's step 4 (`results/pr_review_v5/probes/stage-h-departures-2026-10-16/`,
+  review 3 beside `docs/plans/2026-10-16-principles-scope-currency.md`), 17 of the 20 departures that reached merge
+  unchanged had no round-1 comment within 3 lines, and departures survived at 17 of 20 where no comment was near
+  against 3 of 7 where one was. A test that asks a reader for a reason not to ask, at places nobody looked at,
+  cannot fail: a fluent reader always finds one. Read silence only where a maintainer commented at or next to the
+  place, against a control under the same rule, with the reasons fixed before reading. Calibration on known
+  departures cannot catch a check that over-calls; it needs places maintainers saw and left. And a rule written
+  from asks alone has no exception clause by construction (stage G's `not_when`), so a missing one is no evidence.
+- **Count asks from every comment and give the rate an interval (2026-10-17).** The census files an ask only in
+  round 1 and only under the entry being measured: on stage H's 16 PRs it caught 6 of the 12 round-1 asks at the
+  flagged places. Six asks put the rate per departure at 2-13%, which held both 5% and 10%; check a rule also
+  against code maintainers type in their own suggestion blocks (for line breaks, 28% of theirs break the rule as
+  stage G wrote it).
+- **A Mathlib linter is a control only in the files it runs in (2026-10-17).** Lean linters run only where imported;
+  ordinary files get them through `Mathlib.Init`, but the linters' own upstream files under `Mathlib/Tactic/` do
+  not. The attention-practice probe's long-line control failed as registered (10 of 16 fixed) because all six
+  survivors were in such files (`probes/attention-practice-2026-10-17`, amendment 1); outside `Mathlib/Tactic/` it
+  read 10 of 10. Restrict a CI-enforced control to files downstream of the linter before registering it.
+- **"Gone by merge" near a reviewer's comment is mostly rewriting; read it beside the base rate (2026-10-17).** Near a
+  round-1 comment, 57% of touched theorems and lemmas change by merge whatever they contain (56% with no departure),
+  so a departure's disappearance there says little about the rule (`probes/attention-practice-2026-10-17`, review 4).
+  Count only a fix in the rule's own form, and compare it with conforming code under the same attention. A practice
+  rate's denominator must hold the conforming form too (line joins read "not practice" only because one-line
+  signatures were left out), and check one-author concentration before reading a group's rate.
+

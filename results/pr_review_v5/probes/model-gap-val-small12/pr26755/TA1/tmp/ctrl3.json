@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean","line_start":774,"line_end":774,"replacement":"\n/-- control -/\ndef ctrlUse : Finset ℕ →* Set ℕ := Finset.coeMonoidHom\n"}

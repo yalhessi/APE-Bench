@@ -1,0 +1,200 @@
+diff --git a/Mathlib/Algebra/Module/Submodule/Map.lean b/Mathlib/Algebra/Module/Submodule/Map.lean
+--- a/Mathlib/Algebra/Module/Submodule/Map.lean
++++ b/Mathlib/Algebra/Module/Submodule/Map.lean
+@@ -597,9 +597,8 @@ theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :
+     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by
+   rw [SetLike.le_def]
+   intro m h
+-  change f₁ m + f₂ m ∈ q
+-  change f₁ m ∈ q ∧ f₂ m ∈ q at h
+-  apply q.add_mem h.1 h.2
++  simp only [mem_comap, mem_inf, LinearMap.add_apply] at h ⊢
++  exact add_mem h.1 h.2
+ 
+ lemma surjOn_iff_le_map [RingHomSurjective τ₁₂] {f : M →ₛₗ[τ₁₂] M₂} {p : Submodule R M}
+     {q : Submodule R₂ M₂} : Set.SurjOn f p q ↔ q ≤ p.map f :=
+diff --git a/Mathlib/Analysis/Calculus/ImplicitContDiff.lean b/Mathlib/Analysis/Calculus/ImplicitContDiff.lean
+--- a/Mathlib/Analysis/Calculus/ImplicitContDiff.lean
++++ b/Mathlib/Analysis/Calculus/ImplicitContDiff.lean
+@@ -88,17 +88,10 @@ def implicitFunctionData (h : IsContDiffImplicitAt n f f' a) :
+     exact LinearMap.range_comp_le_range _ _
+   isCompl_ker := by
+     apply IsCompl.of_eq
+-    · ext x
++    · ext ⟨x, y⟩
+       rw [Submodule.mem_inf, Submodule.mem_bot, LinearMap.mem_ker, ContinuousLinearMap.coe_fst',
+-        LinearMap.mem_ker]
+-      constructor
+-      · intro ⟨h1, h2⟩
+-        rw [← Prod.mk.eta (p := x), h1] at h2
+-        rw [Prod.ext_iff]
+-        refine ⟨h1, h.bijective.injective ?_⟩
+-        simp [h2, map_zero]
+-      · rintro rfl
+-        exact ⟨rfl, map_zero _⟩
++        LinearMap.mem_ker, Prod.ext_iff, ← h.bijective.injective.eq_iff]
++      simp +contextual [Prod.mk_zero_zero]
+     · ext x
+       simp only [Submodule.mem_sup, Submodule.mem_top, iff_true]
+       obtain ⟨y, hy⟩ := h.bijective.surjective (f' x)
+diff --git a/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean b/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean
+--- a/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean
++++ b/Mathlib/Analysis/InnerProductSpace/Orthogonal.lean
+@@ -332,10 +332,7 @@ theorem isOrtho_span {s t : Set E} :
+     mem_orthogonal_singleton_iff_inner_left, Set.mem_singleton_iff, forall_eq]
+ 
+ theorem IsOrtho.map (f : E →ₗᵢ[𝕜] F) {U V : Submodule 𝕜 E} (h : U ⟂ V) : U.map f ⟂ V.map f := by
+-  rw [isOrtho_iff_inner_eq] at *
+-  simp_rw [mem_map, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂,
+-    LinearIsometry.inner_map_map]
+-  exact h
++  aesop (add simp [isOrtho_iff_inner_eq])
+ 
+ theorem IsOrtho.comap (f : E →ₗᵢ[𝕜] F) {U V : Submodule 𝕜 F} (h : U ⟂ V) :
+     U.comap f ⟂ V.comap f := by
+diff --git a/Mathlib/Analysis/Normed/Operator/Banach.lean b/Mathlib/Analysis/Normed/Operator/Banach.lean
+--- a/Mathlib/Analysis/Normed/Operator/Banach.lean
++++ b/Mathlib/Analysis/Normed/Operator/Banach.lean
+@@ -367,14 +367,7 @@ lemma equivRange_symm_toLinearEquiv (hinj : Injective f) (hclo : IsClosed (range
+ @[simp]
+ lemma equivRange_symm_apply (hinj : Injective f) (hclo : IsClosed (range f))
+     (x : E) : (f.equivRange hinj hclo).symm ⟨f x, by simp⟩ = x := by
+-  suffices f ((f.equivRange hinj hclo).symm ⟨f x, by simp⟩) = f x from hinj this
+-  trans f ((f.equivRange hinj hclo).symm.toLinearEquiv ⟨f x, by simp⟩)
+-  · rfl -- is there an API lemma for this already?
+-  simp only [ContinuousLinearEquiv.toLinearEquiv_symm, equivRange_symm_toLinearEquiv]
+-  set x' : LinearMap.range f := ⟨f x, by simp⟩
+-  set f' : E →ₛₗ[σ] F := ↑f
+-  change f' ((LinearEquiv.ofInjective f' hinj).symm x') = _
+-  rw [LinearEquiv.ofInjective_symm_apply (f := f') (h := hinj) x']
++  simp [ContinuousLinearEquiv.symm_apply_eq, Subtype.ext_iff]
+ 
+ section
+ 
+@@ -387,14 +380,8 @@ variable {E F : Type*}
+ /-- If `f : E →L[𝕜] F` is injective with closed range (and `E` and `F` are Banach spaces),
+ `f` is anti-Lipschitz. -/
+ lemma antilipschitz_of_injective_of_isClosed_range (f : E →L[𝕜] F)
+-    (hf : Injective f) (hf' : IsClosed (Set.range f)) : ∃ K, AntilipschitzWith K f := by
+-  let S : (LinearMap.range f) →L[𝕜] E := (f.equivRange hf hf').symm
+-  use ⟨S.opNorm, S.opNorm_nonneg⟩
+-  apply ContinuousLinearMap.antilipschitz_of_bound
+-  intro x
+-  calc ‖x‖
+-    _ = ‖S ⟨f x, by simp⟩‖ := by simp [S]
+-    _ ≤ S.opNorm * ‖f x‖ := le_opNorm S ⟨f x, by simp⟩
++    (hf : Injective f) (hf' : IsClosed (Set.range f)) : ∃ K, AntilipschitzWith K f :=
++  ⟨_, .comp (.subtype_coe (Set.range f)) (f.equivRange hf hf').antilipschitz⟩
+ 
+ /-- An injective bounded linear operator between Banach spaces has closed range
+ iff it is anti-Lipschitz. -/
+diff --git a/Mathlib/Analysis/Normed/Operator/LinearIsometry.lean b/Mathlib/Analysis/Normed/Operator/LinearIsometry.lean
+--- a/Mathlib/Analysis/Normed/Operator/LinearIsometry.lean
++++ b/Mathlib/Analysis/Normed/Operator/LinearIsometry.lean
+@@ -210,12 +210,12 @@ protected theorem isometry : Isometry f :=
+ 
+ lemma isEmbedding (f : F →ₛₗᵢ[σ₁₂] E₂) : IsEmbedding f := f.isometry.isEmbedding
+ 
+--- Should be `@[simp]` but it doesn't fire due to https://github.com/leanprover/lean4/issues/3107.
++@[simp]
+ theorem isComplete_image_iff [SemilinearIsometryClass 𝓕 σ₁₂ E E₂] (f : 𝓕) {s : Set E} :
+     IsComplete (f '' s) ↔ IsComplete s :=
+   _root_.isComplete_image_iff (SemilinearIsometryClass.isometry f).isUniformInducing
+ 
+-@[simp] -- Should be replaced with `LinearIsometry.isComplete_image_iff` when https://github.com/leanprover/lean4/issues/3107 is fixed.
++@[deprecated LinearIsometry.isComplete_image_iff (since := "2025-12-25")]
+ theorem isComplete_image_iff' (f : LinearIsometry σ₁₂ E E₂) {s : Set E} :
+     IsComplete (f '' s) ↔ IsComplete s :=
+   LinearIsometry.isComplete_image_iff _
+diff --git a/Mathlib/LinearAlgebra/Matrix/Rank.lean b/Mathlib/LinearAlgebra/Matrix/Rank.lean
+--- a/Mathlib/LinearAlgebra/Matrix/Rank.lean
++++ b/Mathlib/LinearAlgebra/Matrix/Rank.lean
+@@ -278,11 +278,8 @@ theorem rank_eq_finrank_range_toLin [Finite m] [DecidableEq n] {M₁ M₂ : Type
+   cases nonempty_fintype m
+   let e₁ := (Pi.basisFun R m).equiv v₁ (Equiv.refl _)
+   let e₂ := (Pi.basisFun R n).equiv v₂ (Equiv.refl _)
+-  have range_e₂ : LinearMap.range e₂ = ⊤ := by
+-    rw [LinearMap.range_eq_top]
+-    exact e₂.surjective
+   refine LinearEquiv.finrank_eq (e₁.ofSubmodules _ _ ?_)
+-  rw [← LinearMap.range_comp, ← LinearMap.range_comp_of_range_eq_top (toLin v₂ v₁ A) range_e₂]
++  rw [← LinearMap.range_comp, ← LinearMap.range_comp_of_range_eq_top (toLin v₂ v₁ A) e₂.range]
+   congr 1
+   apply LinearMap.pi_ext'
+   rintro i
+diff --git a/Mathlib/LinearAlgebra/Prod.lean b/Mathlib/LinearAlgebra/Prod.lean
+--- a/Mathlib/LinearAlgebra/Prod.lean
++++ b/Mathlib/LinearAlgebra/Prod.lean
+@@ -653,6 +653,9 @@ theorem snd_comp_prodComm :
+     (LinearMap.snd R M₂ M).comp (prodComm R M M₂).toLinearMap = (LinearMap.fst R M M₂) := by
+   ext <;> simp
+ 
++@[simp]
++theorem symm_prodComm : (prodComm R M M₂).symm = prodComm R M₂ M := rfl
++
+ end prodComm
+ 
+ /-- Product of modules is associative up to linear isomorphism. -/
+diff --git a/Mathlib/RingTheory/Ideal/Cotangent.lean b/Mathlib/RingTheory/Ideal/Cotangent.lean
+--- a/Mathlib/RingTheory/Ideal/Cotangent.lean
++++ b/Mathlib/RingTheory/Ideal/Cotangent.lean
+@@ -151,15 +151,11 @@ theorem cotangentEquivIdeal_apply (x : I.Cotangent) :
+     ↑(I.cotangentEquivIdeal x) = I.cotangentToQuotientSquare x := rfl
+ 
+ theorem cotangentEquivIdeal_symm_apply (x : R) (hx : x ∈ I) :
+-    -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 had to specify `(R₂ := R)` because `I.toCotangent` suggested `R ⧸ I^2` instead
+-    I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x,
+-      -- timeout (200000 heartbeats) without `by exact`
+-      by exact Submodule.mem_map_of_mem (F := R →ₗ[R] R ⧸ I ^ 2) (f := (I ^ 2).mkQ) hx⟩ =
+-      I.toCotangent (R := R) ⟨x, hx⟩ := by
+-  apply I.cotangentEquivIdeal.injective
+-  rw [I.cotangentEquivIdeal.apply_symm_apply]
++    I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x, Submodule.mem_map_of_mem hx⟩ =
++      I.toCotangent ⟨x, hx⟩ := by
++  rw [I.cotangentEquivIdeal.symm_apply_eq]
+   ext
+-  rfl
++  simp
+ 
+ variable {A B : Type*} [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
+ 
+diff --git a/Mathlib/Topology/Algebra/Module/Equiv.lean b/Mathlib/Topology/Algebra/Module/Equiv.lean
+--- a/Mathlib/Topology/Algebra/Module/Equiv.lean
++++ b/Mathlib/Topology/Algebra/Module/Equiv.lean
+@@ -108,9 +108,7 @@ def iInfKerProjEquiv {I J : Set ι} [DecidablePred fun i => i ∈ I] (hd : Disjo
+   toLinearEquiv := LinearMap.iInfKerProjEquiv R φ hd hu
+   continuous_toFun :=
+     continuous_pi fun i =>
+-      Continuous.comp (continuous_apply (A := φ) i) <|
+-        @continuous_subtype_val _ _ fun x =>
+-          x ∈ (⨅ i ∈ J, ker (proj i : (∀ i, φ i) →L[R] φ i) : Submodule R (∀ i, φ i))
++      Continuous.comp (continuous_apply (A := φ) i) <| continuous_subtype_val
+   continuous_invFun :=
+     Continuous.subtype_mk
+       (continuous_pi fun i => by
+@@ -1291,20 +1289,11 @@ This is the continuous linear version of `LinearEquiv.submoduleMap`.
+ This is `ContinuousLinearEquiv.ofSubmodule'` but with map on the right instead of comap on the left.
+ -/
+ def submoduleMap (e : M ≃SL[σ₁₂] M₂) (p : Submodule R M) :
+-    p ≃SL[σ₁₂] Submodule.map e p where
+-  toLinearMap := (e.comp p.subtype).codRestrict (p.map e) (fun ⟨c, hc⟩ ↦ by simpa)
+-  invFun := (e.symm.comp (p.map e).subtype).codRestrict p (fun ⟨c, y, hy, eyc⟩ ↦ by
+-    simpa [← eyc, e.symm_apply_apply])
+-  left_inv x := by ext; simp
+-  right_inv x := by ext; simp
+-  continuous_toFun := by
+-    have : Continuous (e.comp p.subtype) := by dsimp; fun_prop
+-    dsimp
+-    exact continuous_induced_rng.mpr this
+-  continuous_invFun := by
+-    have : Continuous (e.symm.comp (p.map e).subtype) := by dsimp; fun_prop
+-    dsimp
+-    exact continuous_induced_rng.mpr this
++    p ≃SL[σ₁₂] Submodule.map (e : M →ₛₗ[σ₁₂] M₂) p where
++  __ := LinearEquiv.submoduleMap e.toLinearEquiv p
++  continuous_toFun := map_continuous ((e.toContinuousLinearMap.comp p.subtypeL).codRestrict _ _)
++  continuous_invFun := (map_continuous e.symm).restrict fun x hx ↦
++    ((LinearEquiv.submoduleMap e.toLinearEquiv p).symm ⟨x, hx⟩).2
+ 
+ @[simp]
+ lemma submoduleMap_apply (e : M ≃SL[σ₁₂] M₂) (p : Submodule R M) (x : p) :

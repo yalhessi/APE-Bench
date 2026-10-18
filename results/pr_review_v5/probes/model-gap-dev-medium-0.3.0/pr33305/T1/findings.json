@@ -1,0 +1,30 @@
+[
+  {
+    "target": "Mathlib/GroupTheory/Submonoid/Inverses.lean (module docstring)",
+    "claim": "The edited module-doc line 23 (`in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details`) is 101 characters long, so the new path pushes it past Mathlib's 100-character limit and the `linter.style.longLine` linter fires. Mathlib CI treats linter warnings as errors.",
+    "requested_change": "Rewrap the paragraph so no line exceeds 100 characters, e.g. end line 23 after `...Submonoid/Units.lean` for more` and move `details` to the next line: `in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more` / `details on related constructions.`",
+    "severity": "blocking",
+    "evidence": "Measured line lengths of every added line in diff.patch: this is the only one over 100 (101; the removed line was 99). `lean_verify_edit` with no edit on Mathlib/GroupTheory/Submonoid/Inverses.lean: outcome `compiled` but one warning at line 23: \"This line exceeds the 100 character limit, please shorten it!\" (linter.style.longLine). `lean_verify_edit` replacing lines 22-24 with the rewrapped paragraph: outcome `compiled`, no errors, no warnings."
+  },
+  {
+    "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean (module docstring, TODO)",
+    "claim": "The TODO's new reference `Mathlib/Algebra/Group/Action/Hom.lean` points at the wrong file: that file (\"Homomorphisms and group actions\": `Function.Surjective.mulActionLeft`, `MulAction.compHom`, ...) does not define or mention `α →[N] β`. The old file `Mathlib/Algebra/Hom/GroupAction.lean`, which defined the equivariant maps, now lives at `Mathlib/GroupTheory/GroupAction/Hom.lean`, the file this module itself imports. So the PR replaces one stale reference with a wrong one.",
+    "requested_change": "Replace `Mathlib/Algebra/Group/Action/Hom.lean` with `Mathlib/GroupTheory/GroupAction/Hom.lean` on line 19: `Add left actions of, e.g., `M` on `α →[N] β` to `Mathlib/GroupTheory/GroupAction/Hom.lean` and`.",
+    "severity": "blocking",
+    "evidence": "`declaration_search MulActionHom`: declared in `Mathlib/GroupTheory/GroupAction/Hom.lean:84`. `file_read` of that file: its docstring defines `X →[M] Y` as `MulActionHom (@id M) X Y` and `A →+[M] B`. `content_search` for `MulActionHom|→\\[` in `Mathlib/Algebra/Group/Action/Hom.lean`: 0 matches. ActionHom.lean line 9 is `public import Mathlib.GroupTheory.GroupAction.Hom`. `lean_verify_edit` on line 19 with the corrected path: `compiled`, no warnings (line is 94 characters)."
+  },
+  {
+    "target": "Mathlib/GroupTheory/GroupExtension/Defs.lean (module docstring, TODO)",
+    "claim": "The PR edits the first TODO bullet but leaves a stale reference in the next bullet: `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean` is now only a `deprecated_module (since := \"2025-06-14\")` shim that re-exports `Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree`. The TODO about `H2` and group extensions now lives in the Homological file. It is the only remaining reference to that path in Mathlib.",
+    "requested_change": "Point the second TODO bullet at `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`, wrapped to stay under 100 characters: `  (which is also stated as a TODO in` / `  `Mathlib/RepresentationTheory/Homological/GroupCohomology/LowDegree.lean`).`",
+    "severity": "advisory",
+    "evidence": "`file_read` of `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean`: 10 lines, only `public import Mathlib.RepresentationTheory.Homological.GroupCohomology.LowDegree` and `deprecated_module (since := \"2025-06-14\")`. `file_read` of the Homological file: its `## TODO` lists \"The relationship between `H2` and group extensions\". `content_search` for `RepresentationTheory/GroupCohomology/` over all 7445 Mathlib files: the only match is GroupExtension/Defs.lean:52. `lean_verify_edit` replacing lines 51-52 with the rewrapped bullet: `compiled`, no warnings."
+  },
+  {
+    "target": "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean (module docstring, TODO)",
+    "claim": "The first half of the TODO is already done. `Mathlib/GroupTheory/GroupAction/Hom.lean` provides `SMul R (X →ₑ[σ] Y)` and `MulAction R (X →ₑ[σ] Y)` (lines 427-467), so left actions of `M` on `α →[N] β` exist. Only the `SMulCommClass` instances relating them to the `Mᵈᵐᵃ` action are missing. Updating only the file path keeps a TODO that asks for something already in the library.",
+    "requested_change": "Reword the TODO to the remaining work, e.g. `Add `SMulCommClass` instances saying that the left actions of, e.g., `M` on `α →[N] β` (defined in` / ``Mathlib/GroupTheory/GroupAction/Hom.lean`) commute with the right actions defined here.`",
+    "severity": "advisory",
+    "evidence": "`file_read` of Mathlib/GroupTheory/GroupAction/Hom.lean lines 410-485: `instance [SMul M X] [SMul N Y] [SMul R Y] [SMulCommClass N R Y] : SMul R (X →ₑ[σ] Y)` and the `MulAction R (X →ₑ[σ] Y)` instance. `lean_verify_edit` appending two examples to ActionHom.lean: `MulAction M (α →[N] β) := inferInstance` (given `[MulAction M β] [SMulCommClass N M β]`) elaborated without error, and `SMulCommClass Mᵈᵐᵃ R (α →[N] β) := inferInstance` failed with \"failed to synthesize instance of type class SMulCommClass Mᵈᵐᵃ R (α →ₑ[id] β)\". `content_search` for `SMulCommClass` with `ᵈᵐᵃ`/`→[` found only the `Mᵈᵐᵃ M'ᵈᵐᵃ` instances in this file. `lean_verify_edit` replacing lines 17-20 with the reworded TODO: `compiled`, no warnings."
+  }
+]

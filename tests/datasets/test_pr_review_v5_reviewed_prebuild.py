@@ -120,6 +120,40 @@ def test_a_failed_build_is_reported_not_raised_so_the_rest_still_build():
     assert any(level == "error" and "lake said no" in m for level, m in log.lines)
 
 
+def test_a_built_base_is_restored_before_its_reviewed_build_and_a_ready_one_is_not_touched():
+    plan = [ReviewedBuild("k1", _episode(1, SHA_A), READY),
+            ReviewedBuild("k2", _episode(2, SHA_B), MISSING)]
+    order = []
+    manager = _Manager()
+    build = manager.build_reviewed_workspace
+
+    async def restore(base):
+        order.append(("restore", base))
+
+    async def build_after(key, base_commit, **kw):
+        order.append(("build", key))
+        return await build(key, base_commit, **kw)
+
+    manager.build_reviewed_workspace = build_after
+    asyncio.run(build_reviewed_workspaces(plan, manager=manager, logger=_log(), restore_base=restore))
+    assert order == [("restore", SHA_B), ("build", "k2")], "the base directory exists before the build reads it"
+
+
+def test_a_failed_restore_is_reported_and_the_next_episode_still_builds():
+    plan = [ReviewedBuild("k1", _episode(1, SHA_A), MISSING),
+            ReviewedBuild("k2", _episode(2, SHA_B, "d2"), MISSING)]
+    manager, log = _Manager(), _log()
+
+    async def restore(base):
+        if base == SHA_A:
+            raise RuntimeError(f"[{base}] Restore failed: no snapshot")
+
+    results = asyncio.run(build_reviewed_workspaces(plan, manager=manager, logger=log, restore_base=restore))
+    assert [c[0] for c in manager.calls] == ["k2"]
+    assert not results["k1"].success and results["k2"].success
+    assert any(level == "error" and "no snapshot" in m for level, m in log.lines)
+
+
 def test_force_rebuild_is_passed_through_and_rebuilds_ready_ones_too():
     plan = [ReviewedBuild("k1", _episode(1, SHA_A), READY)]
     manager = _Manager()
@@ -180,20 +214,22 @@ def test_with_execute_the_command_checks_the_toolchain_then_builds(monkeypatch):
     async def fake_plan(episodes):
         return plan
 
-    async def fake_build(plan_, *, manager, logger, force_rebuild=False):
-        order.append(("build", [b.key for b in plan_], force_rebuild))
+    async def fake_build(plan_, *, manager, logger, force_rebuild=False, restore_base=None):
+        order.append(("build", [b.key for b in plan_], force_rebuild, restore_base))
         return {}
 
+    restorer = object()
     monkeypatch.setattr(prebuild, "plan_reviewed_builds", fake_plan)
     monkeypatch.setattr(prebuild, "build_reviewed_workspaces", fake_build)
     monkeypatch.setattr(prebuild, "_selected_episodes", lambda config, overrides: ([], object()))
     monkeypatch.setattr(prebuild, "assert_toolchain", lambda scaffold, logger: order.append(("toolchain",)))
     monkeypatch.setattr(prebuild, "_build_manager", lambda scaffold, logger: object())
+    monkeypatch.setattr(prebuild, "_base_restorer", lambda manager, logger: restorer)
 
     prebuild.main(["--reviewed", "--execute", "--force-rebuild",
                    "--config", "configs/pr_review_v5_medium_heldout.yaml"])
 
-    assert order == [("toolchain",), ("build", ["k2"], True)]
+    assert order == [("toolchain",), ("build", ["k2"], True, restorer)], "the base restorer reaches the builds"
 
 
 def test_the_toolchain_is_checked_before_a_manager_exists(monkeypatch):

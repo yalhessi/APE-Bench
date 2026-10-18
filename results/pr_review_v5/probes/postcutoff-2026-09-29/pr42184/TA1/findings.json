@@ -1,0 +1,37 @@
+[
+  {
+    "target": "tprod_nonneg",
+    "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the result does not need: when `L` is `⊥`, `∏'[L] i, f i = ∏ᶠ i, f i` (`tprod_bot`) and a finprod of nonnegative terms is nonnegative. Its siblings in this file, `one_le_tprod` (`tsum_nonneg`) and `tprod_le_one`, carry no `NeBot` assumption and handle the `⊥` case, and the extra instance would also have to be synthesized by any automation (e.g. a positivity extension) that uses the lemma.",
+    "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and treat the trivial-filter case as `tprod_le_one` does, e.g.\n```\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(also using the bound variable `i`, as the hypothesis and the siblings do).",
+    "severity": "blocking",
+    "evidence": "Read `one_le_tprod` (Order.lean:167-173) and `tprod_le_one` (175-182): both split on `L.NeBot` and close the `⊥` case via `tprod_bot`, with no `NeBot` hypothesis. `tprod_bot (hL : ¬L.NeBot) (f) : ∏'[L] b, f b = ∏ᶠ b, f b` (InfiniteSum/Defs.lean:184). `finprod_nonneg` (Finprod.lean:259) needs `IsOrderedRing`, so the bot case uses `finprod_induction` with `mul_nonneg` instead. lean_verify_edit with `declaration_name: tprod_nonneg` and the replacement above (with and without a docstring): outcome `compiled`, no errors, no warnings."
+  },
+  {
+    "target": "section WithZero (Mathlib/Topology/Algebra/InfiniteSum/Order.lean)",
+    "claim": "The new section is named `WithZero`, which is the name of the type constructor `WithZero α`, not the notion its declaration is about; the lemma is about a `CommMonoidWithZero`, and the analogous sections are named after that class (`section CommMonoidWithZero` in `Topology/Algebra/InfiniteSum/Basic.lean:774`, and in `Algebra/Order/BigOperators/GroupWithZero/Finset.lean:25`, where `Finset.prod_nonneg` lives).",
+    "requested_change": "Rename the section to `section CommMonoidWithZero` / `end CommMonoidWithZero` (and, if `HasProd.nonneg` is added beside it, put the shared assumptions in one `variable [CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [TopologicalSpace α] [ClosedIciTopology α] {f : ι → α} {a : α}` line, ordered algebra, order, topology as the file's other sections are).",
+    "severity": "advisory",
+    "evidence": "Diff lines `section WithZero` / `end WithZero`. `WithZero α` is the to_additive image of `WithOne α` (Algebra/Group/WithOne/Defs.lean). content_search `^section (CommMonoidWithZero|WithZero|MonoidWithZero)$` over Mathlib/Topology: the only `WithZero` section is this PR's; the InfiniteSum sibling file uses `CommMonoidWithZero`. lean_verify_edit replacing lines 237-246 with a `section CommMonoidWithZero` holding that variable line, `HasProd.nonneg` and `tprod_nonneg`: outcome `compiled`."
+  },
+  {
+    "target": "tprod_nonneg",
+    "claim": "The family in this file states each order fact at both levels, `HasProd.one_le` with `one_le_tprod` and `HasProd.le_one` with `tprod_le_one`, but the PR adds only the `tprod` form of nonnegativity: there is no `HasProd.nonneg`, and the proof calls the raw filter lemma `ge_of_tendsto'` instead of the file's own wrapper `le_hasProd_of_le_prod`.",
+    "requested_change": "Add the `HasProd` form and derive `tprod_nonneg` from it:\n```\nlemma HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a :=\n  le_hasProd_of_le_prod ha fun _ ↦ prod_nonneg fun i _ ↦ hf i\n```\nand in `tprod_nonneg` use `h.hasProd.nonneg hf` for the multipliable, `NeBot` case.",
+    "severity": "advisory",
+    "evidence": "Order.lean:159-165 (`HasProd.one_le`, `HasProd.le_one`) and 167-182 (`one_le_tprod`, `tprod_le_one`) form the pair pattern; `le_hasProd_of_le_prod` (Order.lean:36-38) is `ge_of_tendsto' hf h`. declaration_search `HasProd.nonneg`: not declared at the base or in this PR. lean_verify_edit (line mode, lines 237-246) with `HasProd.nonneg` as above and `tprod_nonneg` proved by `exact h.hasProd.nonneg hf` in the NeBot branch: outcome `compiled`, no errors or warnings."
+  },
+  {
+    "target": "tprod_nonneg",
+    "claim": "`tprod_nonneg` is declared with `theorem` but has no docstring; by the lemma/theorem convention an undocumented result of this kind is a `lemma`, or else it should carry a docstring (the neighbouring `CommMonoidWithZero` section of `InfiniteSum/Basic.lean` uses `lemma`).",
+    "requested_change": "Either declare it with `lemma`, or keep `theorem` and add a docstring such as `/-- An infinite product of nonnegative terms is nonnegative. -/`.",
+    "severity": "advisory",
+    "evidence": "Diff line `theorem tprod_nonneg ...` with no preceding `/-- -/`. InfiniteSum/Basic.lean:774-799 states its `CommMonoidWithZero` results with `lemma`. lean_verify_edit with the docstring and `lemma` keyword: outcome `compiled`, no warnings."
+  },
+  {
+    "target": "Mathlib.Meta.Positivity (Mathlib/Topology/Algebra/InfiniteSum/Order.lean)",
+    "claim": "This file supplies a positivity extension for `tsum` (`evalTsum`, built on `tsum_nonneg`), but none for `tprod`, so even with the new lemma `positivity` cannot prove `0 ≤ ∏' i, f i ^ 2`.",
+    "requested_change": "Add the analogous `@[positivity tprod _] meta def evalTprod` next to `evalTsum`: match `~q(@tprod _ $ι $instCommMonoid $instTopSpace $f $L)`, prove `∀ i, 0 ≤ f i` with `core`, synthesize `CommMonoidWithZero`, `Preorder`, `ZeroLEOneClass`, `PosMulMono` and `ClosedIciTopology`, and return `.nonnegative` with `tprod_nonneg` (this works without synthesizing `L.NeBot` once that hypothesis is dropped); or leave it as an explicit follow-up.",
+    "severity": "advisory",
+    "evidence": "Order.lean:377-399 (`evalTsum`). content_search for `positivity tprod`/`evalTprod`: none in Mathlib. With the PR as is, appending `example {β : Type*} [CommRing β] [LinearOrder β] [IsStrictOrderedRing β] [TopologicalSpace β] [OrderClosedTopology β] (f : ℕ → β) : 0 ≤ ∏' i, f i ^ 2 := by positivity` gives `failed to prove positivity/nonnegativity/nonzeroness`. With an `evalTprod` written exactly as described (mirroring `evalTsum`, explicit `@tprod_nonneg` application on the NeBot-free lemma) and the same example appended: outcome `compiled`, no errors or warnings."
+  }
+]

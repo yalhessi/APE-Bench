@@ -1,0 +1,87 @@
+{"item": "D001", "decline": "yes", "object": "process", "ground": "none", "quote": "Ok, let's leave it deleted", "note": "After questioning the removed TODO about splitting the file, the reviewer accepts its deletion without giving a reason."}
+{"item": "D002", "decline": "yes", "object": "convention", "ground": "scope", "quote": "that's not an issue for this PR", "note": "Alongside asking to relocate the new lemmas, the reviewer declines moving spectrum.subset_polynomial_aeval out of IsAlgClosed as outside this PR."}
+{"item": "D003", "decline": "no", "object": null, "ground": null, "quote": "No need to name the instance.", "note": "Asks the author to drop the instance name."}
+{"item": "D004", "decline": "yes", "object": "convention", "ground": "none", "quote": "we can leave it as-is for now", "note": "The reviewer drops their own suggestion to derive the lemma from a more general one, with no stated reason."}
+{"item": "D005", "decline": "no", "object": null, "ground": null, "quote": "the `!` is not necessary", "note": "Asks to replace simps! by simps and make the def an instance."}
+{"item": "D006", "decline": "no", "object": null, "ground": null, "quote": "simply not worth it for us to invest", "note": "Declines to spend review time on an AI-generated PR; no code change is declined."}
+{"item": "D007", "decline": "no", "object": null, "ground": null, "quote": "We make a slightly more general definition", "note": "Suggests a revised docstring."}
+{"item": "D008", "decline": "no", "object": null, "ground": null, "quote": "you can combine your first three `have`s", "note": "Asks for a grind/obtain rewrite of the proof."}
+{"item": "D009", "decline": "no", "object": null, "ground": null, "quote": "No need to `subst`", "note": "Asks to replace subst with simp."}
+{"item": "D010", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "Style comment so feel free to ignore", "note": "The reviewer marks their own refine-instead-of-constructor suggestion as optional style."}
+{"item": "D011", "decline": "yes", "object": "process", "ground": "indifference", "quote": "There's no need. It was just a thought", "note": "The reviewer withdraws their own request to split the lemma into its own PR."}
+{"item": "D012", "decline": "yes", "object": "convention", "ground": "economy", "quote": "it's OK to leave it", "note": "A more general sum-of-characters statement without the cardinality assumption is optional if it is tricky to prove."}
+{"item": "D013", "decline": "yes", "object": "content", "ground": "none", "quote": "fine with these `min` and `max` lemmas", "note": "The reviewer accepts the min/max bounds for now rather than requiring the stronger sequence bounds."}
+{"item": "D014", "decline": "no", "object": null, "ground": null, "quote": "No need to apologise!", "note": "Social reply pointing to another thread; no change declined."}
+{"item": "D015", "decline": "no", "object": null, "ground": null, "quote": "either `EuclideanPolygon` or `EuclideanTriangle` should exist", "note": "Asks for a substantial redesign of the polygon definitions and their generality."}
+{"item": "D016", "decline": "no", "object": null, "ground": null, "quote": "a find would be faster", "note": "Asks to replace a full split with a find for performance."}
+{"item": "D017", "decline": "yes", "object": "convention", "ground": "authority", "quote": "Feel free to ignore copilot comments.", "note": "The reviewer dismisses Copilot's request to move the minpoly degree lemmas to a lighter file because Copilot is unreliable."}
+{"item": "D018", "decline": "no", "object": null, "ground": null, "quote": "Do you think we should also change `fderivCLM`?", "note": "Accepts the implicit parameters and asks whether fderivCLM should change to match."}
+{"item": "D019", "decline": "no", "object": null, "ground": null, "quote": "might as well be consistent within the file", "note": "Asks for consistent spelling within the file, indifferent only to which spelling."}
+{"item": "D020", "decline": "no", "object": null, "ground": null, "quote": "the `LaxFunctor` namespace is not necessary here", "note": "Asks to rename the instance to categoryStruct."}
+{"item": "D021", "decline": "no", "object": null, "ground": null, "quote": "show that this functor is a left adjoint", "note": "Asks to derive colimit preservation from an adjunction."}
+{"item": "D022", "decline": "no", "object": null, "ground": null, "quote": "Maybe there is no need for it", "note": "Asks to remove the new nontrivial' lemma."}
+{"item": "D023", "decline": "yes", "object": "content", "ground": "place", "quote": "you can leave it as is", "note": "The stronger filter version is declined if only growth at infinity matters in practice."}
+{"item": "D024", "decline": "no", "object": null, "ground": null, "quote": "better to keep the original implementation", "note": "Asks to keep the original definition and add a csimp lemma."}
+{"item": "D025", "decline": "yes", "object": "convention", "ground": "scope", "quote": "Either way is fine with me.", "note": "Golfing the proof in this PR is optional because the reviewer can do it in a follow-up."}
+{"item": "D026", "decline": "no", "object": null, "ground": null, "quote": "no need to specify it more", "note": "Asks to drop the redundant ENat prefix."}
+{"item": "D027", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "feel free to leave it in", "note": "Removing the {C _} binder is optional at the author's discretion on readability."}
+{"item": "D028", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "This is purely cosmetic, feel free to ignore.", "note": "The reviewer marks their own proof-restructuring suggestion as cosmetic and optional."}
+{"item": "D029", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "I like your proof though", "note": "The reviewer offers a one-line grind proof but says the author's proof is fine."}
+{"item": "D030", "decline": "yes", "object": "convention", "ground": "place", "quote": "plenty of places where it diverges", "note": "Against another reviewer's naming-order request, the reviewer notes the library already diverges and the convention is undecided."}
+{"item": "D031", "decline": "no", "object": null, "ground": null, "quote": "unnecessary to use `whnf` on either", "note": "Asks to remove the whnf calls."}
+{"item": "D032", "decline": "yes", "object": "process", "ground": "indifference", "quote": "We don't need to wait", "note": "The reviewer says there is no need to wait on the context they asked about; either way is fine."}
+{"item": "D033", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "I think it's good either way around.", "note": "The reviewer declines another reviewer's rename to the reversed iff name, leaving it to the author."}
+{"item": "D034", "decline": "yes", "object": "convention", "ground": "none", "quote": "we should definitely keep the current one", "note": "Replacing the Set.center statement with a Submonoid.center version is declined; the current lemma stays either way."}
+{"item": "D035", "decline": "yes", "object": "process", "ground": "indifference", "quote": "No need to if you don't want to", "note": "Splitting the two Opposite files into their own PR is offered as optional."}
+{"item": "D036", "decline": "yes", "object": "convention", "ground": "place", "quote": "Up to you!", "note": "The rewrite of the loop for its edge case is optional since the edge case was tested and causes no issue."}
+{"item": "D037", "decline": "yes", "object": "convention", "ground": "place", "quote": "it doesn't matter because all of this", "note": "The one-line golf is moot because the whole lemma is in the wrong generality."}
+{"item": "D038", "decline": "no", "object": null, "ground": null, "quote": "inclined to leave it nameless", "note": "Asks to make the instance nameless in the ULift namespace."}
+{"item": "D039", "decline": "yes", "object": "convention", "ground": "economy", "quote": "these are not worth the churn", "note": "The author's spacing changes after ? and : are rejected as not worth the churn and review bandwidth (a revert request)."}
+{"item": "D040", "decline": "yes", "object": "unclear", "ground": "authority", "quote": "Feel free to ignore the comments by copilot", "note": "Copilot's review comments may be ignored if they are nonsense; which change is unspecified."}
+{"item": "D041", "decline": "yes", "object": "convention", "ground": "place", "quote": "no need to change this now", "note": "Removing the Nonempty assumption via an NNReal constant is declined since this is implementation detail."}
+{"item": "D042", "decline": "no", "object": null, "ground": null, "quote": "EMetricSpace is a very strong assumption.", "note": "Asks to weaken the assumption and drop the section."}
+{"item": "D043", "decline": "yes", "object": "process", "ground": "none", "quote": "there is no need to split", "note": "The maintainer accepts doing several things in one PR without splitting, giving no reason."}
+{"item": "D044", "decline": "yes", "object": "convention", "ground": "scope", "quote": "this instance can stay inside the SuccOrder section", "note": "Moving the instance out of its section is unneeded because to_dual will soon generate the dual."}
+{"item": "D045", "decline": "no", "object": null, "ground": null, "quote": "No need to repeat too much", "note": "Asks for a shorter lemma name."}
+{"item": "D046", "decline": "no", "object": null, "ground": null, "quote": "If you move this down the file", "note": "Asks to move the lemma and shorten the proof."}
+{"item": "D047", "decline": "no", "object": null, "ground": null, "quote": "No need to unfold `partialSups`", "note": "Asks for a proof cleanup."}
+{"item": "D048", "decline": "no", "object": null, "ground": null, "quote": "no need to do any rewriting", "note": "Supports using IsSelfAdjoint and IsIdempotentElem directly by rebutting the rewriting concern."}
+{"item": "D049", "decline": "no", "object": null, "ground": null, "quote": "There's no need to define `f` directly", "note": "Asks to use Function.update and golf the proof."}
+{"item": "D050", "decline": "yes", "object": "convention", "ground": "place", "quote": "It's fine, just keep it as is", "note": "The module title change is declined since the GCD folder already implies the topic."}
+{"item": "D051", "decline": "yes", "object": "process", "ground": "none", "quote": "Nope, that doesn't matter too much.", "note": "Closing and reopening the PR from a feature branch is unneeded, without a stated reason."}
+{"item": "D052", "decline": "no", "object": null, "ground": null, "quote": "No need to add me as an author.", "note": "Asks to remove the reviewer from the author line."}
+{"item": "D053", "decline": "yes", "object": "content", "ground": "place", "quote": "but not necessary here with the `div` lemma", "note": "An extra inv_cpow_ofReal lemma is optional since the requested div lemma suffices here."}
+{"item": "D054", "decline": "no", "object": null, "ground": null, "quote": "no need to write the coercion explicitly", "note": "Asks to drop explicit coercions."}
+{"item": "D055", "decline": "yes", "object": "convention", "ground": "indifference", "quote": "only if you want: totally up to you", "note": "The further import-reducing lemma moves are optional at the author's choice."}
+{"item": "D056", "decline": "no", "object": null, "ground": null, "quote": "no need to reprove it from scratch", "note": "Asks to use the existing CStarAlgebra.inv_le_inv_iff."}
+{"item": "D057", "decline": "yes", "object": "content", "ground": "indifference", "quote": "I don't mind merging it as is", "note": "The reviewer leaves open whether the semiring notion is correct because they do not care about semirings."}
+{"item": "D058", "decline": "no", "object": null, "ground": null, "quote": "also not necessary (etc etc)", "note": "Asks to remove the set_option lines."}
+{"item": "D059", "decline": "yes", "object": "convention", "ground": "place", "quote": "since it is only used once", "note": "A dedicated command for the to_additive namespace translation is unneeded because it is used only once."}
+{"item": "D060", "decline": "no", "object": null, "ground": null, "quote": "not necessary to use `withReducible` here", "note": "Asks to remove withReducible since simp already sets reducible."}
+{"item": "D061", "decline": "yes", "object": "content", "ground": "place", "quote": "that lemma is not necessary to prove yours", "note": "Within a request for centerMass API, the more general congruence lemma is declined as not needed for this proof."}
+{"item": "D062", "decline": "no", "object": null, "ground": null, "quote": "TotalSpace.mk' F_fiber x (s_loc i x)", "note": "Suggests using TotalSpace.mk'."}
+{"item": "D063", "decline": "no", "object": null, "ground": null, "quote": "there's no need for these shortcut instances", "note": "Asks to remove the shortcut instances."}
+{"item": "D064", "decline": "no", "object": null, "ground": null, "quote": "no need for rewriting: remove the `by`", "note": "Asks for a term-mode proof."}
+{"item": "D065", "decline": "yes", "object": "unclear", "ground": "place", "quote": "If that's too high a performance cost", "note": "Erroring on non-simp flexible tactics in the linter is optional if it costs too much performance."}
+{"item": "D066", "decline": "no", "object": null, "ground": null, "quote": "No need to separate the cases.", "note": "Asks for a shorter proof without case split."}
+{"item": "D067", "decline": "no", "object": null, "ground": null, "quote": "does this work?", "note": "Proposes a simp only shortening."}
+{"item": "D068", "decline": "no", "object": null, "ground": null, "quote": "`Filter` is open, no need to prefix it", "note": "Asks to drop the Filter prefix."}
+{"item": "D069", "decline": "no", "object": null, "ground": null, "quote": "no need to do fragile name manipulation", "note": "Asks to use isConstructorApp?."}
+{"item": "D070", "decline": "no", "object": null, "ground": null, "quote": "No need to put that much space", "note": "Asks for tighter rw formatting."}
+{"item": "D071", "decline": "no", "object": null, "ground": null, "quote": "indentation", "note": "Asks to fix indentation."}
+{"item": "D072", "decline": "yes", "object": "convention", "ground": "place", "quote": "I'll leave it to you.", "note": "The fun_prop approach is left to the author because a side condition defeated it in the reviewer's attempt."}
+{"item": "D073", "decline": "no", "object": null, "ground": null, "quote": "I'm not convinced about this one.", "note": "Questions the lemma and gives a short inline proof."}
+{"item": "D074", "decline": "yes", "object": "convention", "ground": "none", "quote": "I think you can leave it here", "note": "Against another reviewer's move request, the lemma may stay in place, but should be renamed."}
+{"item": "D075", "decline": "no", "object": null, "ground": null, "quote": "no need to build it", "note": "Asks to use exists_seq_tendsto directly."}
+{"item": "D076", "decline": "no", "object": null, "ground": null, "quote": "No need to use the `Nat` version", "note": "Asks to use the generic lemmas."}
+{"item": "D077", "decline": "yes", "object": "unclear", "ground": "indifference", "quote": "I'm ok either way.", "note": "Whether choose should record the annotated type n > 0 + 0 is left open; the reviewer only wants the test."}
+{"item": "D078", "decline": "no", "object": null, "ground": null, "quote": "proved map_id, map_comp in an unbundled form first", "note": "Asks to restructure the functor proofs and use algebraize."}
+{"item": "D079", "decline": "no", "object": null, "ground": null, "quote": "no need to have \"Test plan\"", "note": "Removes the Test plan section from the PR description."}
+{"item": "D080", "decline": "yes", "object": "convention", "ground": "economy", "quote": "more complex than I thought, so feel free", "note": "Dropping the Algebra Q assumption is withdrawn as more complex than expected."}
+{"item": "D081", "decline": "no", "object": null, "ground": null, "quote": "there's no need to have the two", "note": "Asks to remove the special-case theorem."}
+{"item": "D082", "decline": "no", "object": null, "ground": null, "quote": "my comment above was probably unnecessary", "note": "Retracts an earlier process remark; no change is at stake."}
+{"item": "D083", "decline": "no", "object": null, "ground": null, "quote": "can you leave it as a Todo?", "note": "Asks for a link or a TODO."}
+{"item": "D084", "decline": "no", "object": null, "ground": null, "quote": "I don't mind, but better be coherent?", "note": "Asks for consistent have/haveI usage."}
+{"item": "D085", "decline": "yes", "object": "convention", "ground": "none", "quote": "Seems OK in `Function`.", "note": "The alternative of a Pi namespace is declined; the section may stay in Function."}
+{"item": "D086", "decline": "no", "object": null, "ground": null, "quote": "No need for parentheses here.", "note": "Asks to drop parentheses."}
+{"item": "D087", "decline": "yes", "object": "convention", "ground": "place", "quote": "feel free to ignore if it feels wrong", "note": "The reviewer's shorter proof is optional because it arguably abuses defeq."}

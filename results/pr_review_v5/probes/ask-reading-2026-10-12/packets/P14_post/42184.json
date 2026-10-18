@@ -1,0 +1,818 @@
+{
+ "asks": [
+  {
+   "id": "p0002",
+   "pr": 42184,
+   "family": "F7",
+   "in_census": true,
+   "entries": [
+    "P010"
+   ],
+   "text": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)",
+   "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+   "line": 243,
+   "author": "CoolRmal",
+   "at": "2026-07-28T17:25:13Z",
+   "matcher_text": {
+    "ask_id": "p0002",
+    "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+    "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+    "comment": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)",
+    "replies_to": null
+   },
+   "outcomes": {
+    "DX3": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis: the statement is true and provable without it, and the neighbouring lemmas in this very file that do not need `NeBot` are stated without it — the additive twin `tsum_nonneg` (declared as `@[to_additive tsum_nonneg]` on `one_le_tprod`, line 167), `tprod_le_one` (line 176) and `tprod_le_of_prod_le'` (line 149) all handle the trivial-filter case internally (`by_cases hL : L.NeBot` + `tprod_bot`). Requiring `NeBot` makes the new lemma needlessly weaker than them.",
+      "requested_change": "Delete `[L.NeBot]` from the binder list and prove it by splitting on the filter as the file's other NeBot-free lemmas do:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ => mul_nonneg) hf\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis: the statement is true and provable without it, and the neighbouring lemmas in this very file that do not need `NeBot` are stated without it — the additive twin `tsum_nonneg` (declared as `@[to_additive tsum_nonneg]` on `one_le_tprod`, line 167), `tprod_le_one` (line 176) and `tprod_le_of_prod_le'` (line 149) all handle the trivial-filter case internally (`by_cases hL : L.NeBot` + `tprod_bot`). Requiring `NeBot` makes the new lemma needlessly weaker than them.",
+      "requested_change": "Delete `[L.NeBot]` from the binder list and prove it by splitting on the filter as the file's other NeBot-free lemmas do:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ => mul_nonneg) hf\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `tprod_bot` rewrites the product to a `finprod`, which is nonnegative by `finprod_induction`. The sibling lemmas in the same file (`one_le_tprod`, `tprod_le_one`, and hence `tsum_nonneg`) carry no `NeBot` assumption and handle the bot case this way. As written, the extra instance argument makes the lemma weaker than its additive-side counterpart and unusable for a generic `L`, e.g. from a positivity extension.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and split on `L.NeBot` the way `one_le_tprod` does, using the file's own `le_hasProd_of_le_prod` rather than `ge_of_tendsto'`:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_eq_one_of_not_multipliable h]\n      exact zero_le_one\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `tprod_bot` rewrites the product to a `finprod`, which is nonnegative by `finprod_induction`. The sibling lemmas in the same file (`one_le_tprod`, `tprod_le_one`, and hence `tsum_nonneg`) carry no `NeBot` assumption and handle the bot case this way. As written, the extra instance argument makes the lemma weaker than its additive-side counterpart and unusable for a generic `L`, e.g. from a positivity extension.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and split on `L.NeBot` the way `one_le_tprod` does, using the file's own `le_hasProd_of_le_prod` rather than `ge_of_tendsto'`:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_eq_one_of_not_multipliable h]\n      exact zero_le_one\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` requires `[L.NeBot]`, but its statement does not need it: the result also holds for `L = ⊥` (`tprod_bot` reduces the product to `finprod`). The two neighbours it mirrors — `one_le_tprod` (line 167, whose additive image is `tsum_nonneg`) and the generated `tsum_nonneg` itself — are both stated without any `NeBot` assumption, so this lemma is weaker than its siblings for no reason.",
+      "requested_change": "Drop `[L.NeBot]` and dispose of the `L = ⊥` case with `tprod_bot` plus `finprod_induction`, e.g.\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(`by_cases hL` is the same device `one_le_tprod` uses at line 170.)",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` requires `[L.NeBot]`, but its statement does not need it: the result also holds for `L = ⊥` (`tprod_bot` reduces the product to `finprod`). The two neighbours it mirrors — `one_le_tprod` (line 167, whose additive image is `tsum_nonneg`) and the generated `tsum_nonneg` itself — are both stated without any `NeBot` assumption, so this lemma is weaker than its siblings for no reason.",
+      "requested_change": "Drop `[L.NeBot]` and dispose of the `L = ⊥` case with `tprod_bot` plus `finprod_induction`, e.g.\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(`by_cases hL` is the same device `one_le_tprod` uses at line 170.)",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis, so it is stated in less generality than its additive counterpart and its sibling. In the same file, `tsum_nonneg` (the additive counterpart, introduced at line 167 as `@[to_additive tsum_nonneg]` on `one_le_tprod`) has no `[L.NeBot]`, and the multiplicative sibling `one_le_tprod` (lines 167–173) also states its conclusion for every summation filter, disposing of the degenerate case with `tprod_bot`. The nonnegativity statement does not need `L.NeBot`: in the `¬L.NeBot` case `tprod` is `finprod` and nonnegativity follows by induction on the factors.",
+      "requested_change": "Drop `[L.NeBot]` and, in the multipliable branch, split on `L.NeBot` exactly as `one_le_tprod` does, e.g.:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun x y hx hy ↦ mul_nonneg hx hy) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis, so it is stated in less generality than its additive counterpart and its sibling. In the same file, `tsum_nonneg` (the additive counterpart, introduced at line 167 as `@[to_additive tsum_nonneg]` on `one_le_tprod`) has no `[L.NeBot]`, and the multiplicative sibling `one_le_tprod` (lines 167–173) also states its conclusion for every summation filter, disposing of the degenerate case with `tprod_bot`. The nonnegativity statement does not need `L.NeBot`: in the `¬L.NeBot` case `tprod` is `finprod` and nonnegativity follows by induction on the factors.",
+      "requested_change": "Drop `[L.NeBot]` and, in the multipliable branch, split on `L.NeBot` exactly as `one_le_tprod` does, e.g.:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun x y hx hy ↦ mul_nonneg hx hy) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "AP3": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries a `[L.NeBot]` hypothesis that the result does not need: `0 ≤ ∏'[L] x, f x` holds for every summation filter `L`. Its multiplicative siblings in this file, `one_le_tprod` (line 167) and `tprod_le_one` (line 175), and its additive twin `tsum_nonneg` are all stated without `[L.NeBot]`, so this lemma is weaker than the family it joins. `[L.NeBot]` is used only to feed `ge_of_tendsto'`; the degenerate case `¬ L.NeBot`, where `tprod = finprod`, is handled by `tprod_bot` plus `finprod_induction`, exactly as `one_le_tprod` handles it with `tprod_bot` plus `one_le_finprod'`.",
+      "requested_change": "Drop `[L.NeBot]` from the binder list and case split on it in the multipliable branch:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simpa [tprod_bot hL] using\n        finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries a `[L.NeBot]` hypothesis that the result does not need: `0 ≤ ∏'[L] x, f x` holds for every summation filter `L`. Its multiplicative siblings in this file, `one_le_tprod` (line 167) and `tprod_le_one` (line 175), and its additive twin `tsum_nonneg` are all stated without `[L.NeBot]`, so this lemma is weaker than the family it joins. `[L.NeBot]` is used only to feed `ge_of_tendsto'`; the degenerate case `¬ L.NeBot`, where `tprod = finprod`, is handled by `tprod_bot` plus `finprod_induction`, exactly as `one_le_tprod` handles it with `tprod_bot` plus `one_le_finprod'`.",
+      "requested_change": "Drop `[L.NeBot]` from the binder list and case split on it in the multipliable branch:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simpa [tprod_bot hL] using\n        finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "T1": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the statement does not need: when `L` is not `NeBot`, `tprod_bot` turns `∏'[L] i, f i` into `∏ᶠ i, f i`, and that is nonnegative too. The sibling lemmas in this file, `one_le_tprod` (whose additive form is `tsum_nonneg`) and `tprod_le_one`, already handle the `¬ L.NeBot` case this way and carry no `NeBot` assumption. As written, the new lemma is strictly weaker than its siblings for an arbitrary summation filter.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg`. Handle the degenerate filter the way `one_le_tprod` and `tprod_le_one` do: split on `L.NeBot`, and in the `¬ L.NeBot` branch use `rw [tprod_bot hL]; exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`. (`finprod_nonneg` itself needs `CommSemiring` and `IsOrderedRing`, so it is too strong for these typeclasses.) Verified replacement:\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the statement does not need: when `L` is not `NeBot`, `tprod_bot` turns `∏'[L] i, f i` into `∏ᶠ i, f i`, and that is nonnegative too. The sibling lemmas in this file, `one_le_tprod` (whose additive form is `tsum_nonneg`) and `tprod_le_one`, already handle the `¬ L.NeBot` case this way and carry no `NeBot` assumption. As written, the new lemma is strictly weaker than its siblings for an arbitrary summation filter.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg`. Handle the degenerate filter the way `one_le_tprod` and `tprod_le_one` do: split on `L.NeBot`, and in the `¬ L.NeBot` branch use `rw [tprod_bot hL]; exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`. (`finprod_nonneg` itself needs `CommSemiring` and `IsOrderedRing`, so it is too strong for these typeclasses.) Verified replacement:\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "GPT3": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` is stated less generally than the surrounding `tprod` API permits: the extra `[L.NeBot]` assumption is unnecessary, since the non-`NeBot` case reduces to a `finprod` and is also nonnegative.",
+      "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg`, and in the proof split on `L.NeBot`; keep the existing `HasProd`/`ge_of_tendsto'` argument in the `NeBot` branch and prove the bottom-filter branch using `simp only [tprod_bot hL]` followed by `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` is stated less generally than the surrounding `tprod` API permits: the extra `[L.NeBot]` assumption is unnecessary, since the non-`NeBot` case reduces to a `finprod` and is also nonnegative.",
+      "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg`, and in the proof split on `L.NeBot`; keep the existing `HasProd`/`ge_of_tendsto'` argument in the `NeBot` branch and prove the bottom-filter branch using `simp only [tprod_bot hL]` followed by `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the result does not need: when `L` is `⊥`, `∏'[L] i, f i = ∏ᶠ i, f i` (`tprod_bot`) and a finprod of nonnegative terms is nonnegative. Its siblings in this file, `one_le_tprod` (`tsum_nonneg`) and `tprod_le_one`, carry no `NeBot` assumption and handle the `⊥` case, and the extra instance would also have to be synthesized by any automation (e.g. a positivity extension) that uses the lemma.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and treat the trivial-filter case as `tprod_le_one` does, e.g.\n```\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(also using the bound variable `i`, as the hypothesis and the siblings do).",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the result does not need: when `L` is `⊥`, `∏'[L] i, f i = ∏ᶠ i, f i` (`tprod_bot`) and a finprod of nonnegative terms is nonnegative. Its siblings in this file, `one_le_tprod` (`tsum_nonneg`) and `tprod_le_one`, carry no `NeBot` assumption and handle the `⊥` case, and the extra instance would also have to be synthesized by any automation (e.g. a positivity extension) that uses the lemma.",
+      "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and treat the trivial-filter case as `tprod_le_one` does, e.g.\n```\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(also using the bound variable `i`, as the hypothesis and the siblings do).",
+      "severity": "blocking"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` is stated too narrowly: the `[L.NeBot]` assumption is unnecessary, since the bottom-filter case also gives a nonnegative `tprod`.",
+      "requested_change": "Remove `[L.NeBot]` from the theorem assumptions and handle `by_cases hL : L.NeBot`; use the current multipliable/non-multipliable argument in the `hL` branch, and in the other branch reduce with `tprod_bot hL` and close by `finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` is stated too narrowly: the `[L.NeBot]` assumption is unnecessary, since the bottom-filter case also gives a nonnegative `tprod`.",
+      "requested_change": "Remove `[L.NeBot]` from the theorem assumptions and handle `by_cases hL : L.NeBot`; use the current multipliable/non-multipliable argument in the `hL` branch, and in the other branch reduce with `tprod_bot hL` and close by `finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "X2": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `∏'[L]` is a `finprod` (`tprod_bot`), which is nonnegative by `finprod_induction`. Every sibling bound in this file (`one_le_tprod`/`tsum_nonneg`, `tprod_le_one`, `tprod_le_of_prod_le'`) drops `L.NeBot` exactly this way, so the new lemma is strictly weaker than its neighbours, and a `positivity` extension for `tprod` modelled on `evalTsum` (lines 378-399, which calls `tsum_nonneg` with an arbitrary `L`) could not use it, since it would have to synthesize `L.NeBot`.",
+      "requested_change": "Remove `[L.NeBot]` from `tprod_nonneg` and handle the degenerate filter the way `tprod_le_one` does. Use `i` as the bound variable to match the siblings:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · rw [tprod_eq_one_of_not_multipliable h]\n    exact zero_le_one\n```",
+      "severity": "blocking"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `∏'[L]` is a `finprod` (`tprod_bot`), which is nonnegative by `finprod_induction`. Every sibling bound in this file (`one_le_tprod`/`tsum_nonneg`, `tprod_le_one`, `tprod_le_of_prod_le'`) drops `L.NeBot` exactly this way, so the new lemma is strictly weaker than its neighbours, and a `positivity` extension for `tprod` modelled on `evalTsum` (lines 378-399, which calls `tsum_nonneg` with an arbitrary `L`) could not use it, since it would have to synthesize `L.NeBot`.",
+      "requested_change": "Remove `[L.NeBot]` from `tprod_nonneg` and handle the degenerate filter the way `tprod_le_one` does. Use `i` as the bound variable to match the siblings:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · rw [tprod_eq_one_of_not_multipliable h]\n    exact zero_le_one\n```",
+      "severity": "blocking"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "GPT2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`; the same nonnegativity statement is true for a bot summation filter as well, where `tprod` reduces to `finprod`. This makes the new API less general than nearby lemmas such as `one_le_tprod`, which handle the bot case explicitly.",
+      "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg` and add a `¬ L.NeBot` branch using `tprod_bot` and `finprod_induction` (or the corresponding finprod nonnegativity argument).",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`; the same nonnegativity statement is true for a bot summation filter as well, where `tprod` reduces to `finprod`. This makes the new API less general than nearby lemmas such as `one_le_tprod`, which handle the bot case explicitly.",
+      "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg` and add a `¬ L.NeBot` branch using `tprod_bot` and `finprod_induction` (or the corresponding finprod nonnegativity argument).",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary hypothesis `[L.NeBot]`. The statement is true for every `L`, including `L = ⊥` (where `tprod` is the `finprod`), and the two neighbouring `tprod`-level lemmas in this file are deliberately stated without it: `one_le_tprod` (line 167) and `tprod_le_one` (line 175) both start with `by_cases hL : L.NeBot` and dispatch the bottom case via `tprod_bot`. As written, `tprod_nonneg` is strictly weaker than its siblings for no gain, and it is also weaker than its additive counterpart `tsum_nonneg` (the `to_additive` of `one_le_tprod`), which the `positivity` extension instantiates without any `NeBot` argument.",
+      "requested_change": "Drop `[L.NeBot]` and handle the bottom case with `tprod_bot` + `finprod_induction`, mirroring `one_le_tprod`:\n\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · simpa [tprod_bot hL] using finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n\n(Compiled successfully against the reviewed workspace: the whole file accepts this version, so the hypothesis is genuinely redundant.)",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` carries an unnecessary hypothesis `[L.NeBot]`. The statement is true for every `L`, including `L = ⊥` (where `tprod` is the `finprod`), and the two neighbouring `tprod`-level lemmas in this file are deliberately stated without it: `one_le_tprod` (line 167) and `tprod_le_one` (line 175) both start with `by_cases hL : L.NeBot` and dispatch the bottom case via `tprod_bot`. As written, `tprod_nonneg` is strictly weaker than its siblings for no gain, and it is also weaker than its additive counterpart `tsum_nonneg` (the `to_additive` of `one_le_tprod`), which the `positivity` extension instantiates without any `NeBot` argument.",
+      "requested_change": "Drop `[L.NeBot]` and handle the bottom case with `tprod_bot` + `finprod_induction`, mirroring `one_le_tprod`:\n\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · simpa [tprod_bot hL] using finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n\n(Compiled successfully against the reviewed workspace: the whole file accepts this version, so the hypothesis is genuinely redundant.)",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    },
+    "DX2": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement does not need it: for the trivial summation filter `tprod` is `1` (by `tprod_eq_one_of_not_multipliable`, and in fact `multipliable_bot` holds there) resp. `∏ᶠ x, f x` (by `tprod_bot`), and `0 ≤ 1` / `0 ≤ ∏ᶠ x, f x` both hold under the same hypotheses. Every other `∏'`-level order lemma in this file drops `L.NeBot` by case-splitting precisely for this reason — `tprod_le_of_prod_le'` (line 149), `one_le_tprod` (line 168), `tprod_le_one` (line 176) — so as stated the new lemma is the only one that cannot be applied when `L` is trivial, and its `by_cases h : Multipliable f L` split is vacuous in that regime (since `¬ L.NeBot` forces `Multipliable f L`). Note also that the additive analogue `tsum_nonneg` (the `to_additive` image of `one_le_tprod`) is used throughout the library without an `NeBot` argument.",
+      "requested_change": "Drop `[L.NeBot]` from the statement and cover the trivial filter, in the style of `one_le_tprod`:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction _ zero_le_one (fun _ _ ↦ mul_nonzero) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(this exact proof was compiled, with `mul_nonneg` in place of the typo `mul_nonzero`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Every reviewer asks to drop [L.NeBot] via by_cases on L.NeBot with tprod_bot/finprod_induction.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement does not need it: for the trivial summation filter `tprod` is `1` (by `tprod_eq_one_of_not_multipliable`, and in fact `multipliable_bot` holds there) resp. `∏ᶠ x, f x` (by `tprod_bot`), and `0 ≤ 1` / `0 ≤ ∏ᶠ x, f x` both hold under the same hypotheses. Every other `∏'`-level order lemma in this file drops `L.NeBot` by case-splitting precisely for this reason — `tprod_le_of_prod_le'` (line 149), `one_le_tprod` (line 168), `tprod_le_one` (line 176) — so as stated the new lemma is the only one that cannot be applied when `L` is trivial, and its `by_cases h : Multipliable f L` split is vacuous in that regime (since `¬ L.NeBot` forces `Multipliable f L`). Note also that the additive analogue `tsum_nonneg` (the `to_additive` image of `one_le_tprod`) is used throughout the library without an `NeBot` argument.",
+      "requested_change": "Drop `[L.NeBot]` from the statement and cover the trivial filter, in the style of `one_le_tprod`:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction _ zero_le_one (fun _ _ ↦ mul_nonzero) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(this exact proof was compiled, with `mul_nonneg` in place of the typo `mul_nonzero`).",
+      "severity": "advisory"
+     },
+     "note_m2": "All drop [L.NeBot] via by_cases on L.NeBot; bot case via finprod_induction rather than generalised finprod_nonneg."
+    }
+   },
+   "entries_text": {
+    "P010": "A hypothesis that the definition or proof does not need is dropped, or weakened to what it does need, so that the result holds in the greater generality."
+   }
+  },
+  {
+   "id": "p0003",
+   "pr": 42184,
+   "family": "F6",
+   "in_census": true,
+   "entries": [
+    "P100"
+   ],
+   "text": "and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)",
+   "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+   "line": 243,
+   "author": "CoolRmal",
+   "at": "2026-07-28T17:28:50Z",
+   "matcher_text": {
+    "ask_id": "p0003",
+    "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+    "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+    "comment": "and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)",
+    "replies_to": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)"
+   },
+   "outcomes": {
+    "DX3": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "AP3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "T1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "GPT3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "TA1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "The family in this file states each order fact at both levels, `HasProd.one_le` with `one_le_tprod` and `HasProd.le_one` with `tprod_le_one`, but the PR adds only the `tprod` form of nonnegativity: there is no `HasProd.nonneg`, and the proof calls the raw filter lemma `ge_of_tendsto'` instead of the file's own wrapper `le_hasProd_of_le_prod`.",
+      "requested_change": "Add the `HasProd` form and derive `tprod_nonneg` from it:\n```\nlemma HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a :=\n  le_hasProd_of_le_prod ha fun _ ↦ prod_nonneg fun i _ ↦ hf i\n```\nand in `tprod_nonneg` use `h.hasProd.nonneg hf` for the multipliable, `NeBot` case.",
+      "severity": "advisory"
+     },
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+      "claim": "The family in this file states each order fact at both levels, `HasProd.one_le` with `one_le_tprod` and `HasProd.le_one` with `tprod_le_one`, but the PR adds only the `tprod` form of nonnegativity: there is no `HasProd.nonneg`, and the proof calls the raw filter lemma `ge_of_tendsto'` instead of the file's own wrapper `le_hasProd_of_le_prod`.",
+      "requested_change": "Add the `HasProd` form and derive `tprod_nonneg` from it:\n```\nlemma HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a :=\n  le_hasProd_of_le_prod ha fun _ ↦ prod_nonneg fun i _ ↦ hf i\n```\nand in `tprod_nonneg` use `h.hasProd.nonneg hf` for the multipliable, `NeBot` case.",
+      "severity": "advisory"
+     },
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "X2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "GPT2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    },
+    "DX2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Only R8 asks for a HasProd.nonneg version; le_hasProd_of_le_prod proof-golf findings do not add the HasProd lemma.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Only R8 adds HasProd.nonneg; others merely use le_hasProd_of_le_prod in the proof."
+    }
+   },
+   "entries_text": {
+    "P100": "A variant or improvement introduced for one member of a family of siblings (left/right or primed lemma variants, analogous tactics or attributes, parallel code paths in meta-code) is also provided for the other members."
+   }
+  }
+ ],
+ "pr": 42184,
+ "sessions": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `tprod_bot` rewrites the product to a `finprod`, which is nonnegative by `finprod_induction`. The sibling lemmas in the same file (`one_le_tprod`, `tprod_le_one`, and hence `tsum_nonneg`) carry no `NeBot` assumption and handle the bot case this way. As written, the extra instance argument makes the lemma weaker than its additive-side counterpart and unusable for a generic `L`, e.g. from a positivity extension.",
+     "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and split on `L.NeBot` the way `one_le_tprod` does, using the file's own `le_hasProd_of_le_prod` rather than `ge_of_tendsto'`:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_eq_one_of_not_multipliable h]\n      exact zero_le_one\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The file has a `positivity` extension for `tsum` (`Mathlib.Meta.Positivity.evalTsum`, built on `tsum_nonneg`), but none for `tprod`. So even with the new `tprod_nonneg`, `positivity` still fails on goals like `0 ≤ ∏' i, f i ^ 2`.",
+     "requested_change": "Once `[L.NeBot]` is dropped from `tprod_nonneg`, add an `evalTprod` extension next to `evalTsum` in the `Mathlib.Meta.Positivity` namespace, together with a test in `MathlibTest/positivity.lean`:\n```lean\nattribute [local instance] monadLiftOptionMetaM in\n/-- Positivity extension for infinite products.\n\nThis extension only proves non-negativity, strict positivity is more delicate for infinite products\nand requires more assumptions. -/\n@[positivity tprod _]\nmeta def evalTprod : PositivityExt where eval {u α} zα pα? e :=\n  match pα? with | none => pure .none | some pα => do\n  match e with\n  | ~q(@tprod _ $ι $instCommMonoid $instTopSpace $f $L) =>\n    lambdaBoundedTelescope f 1 fun args (body : Q($α)) => do\n      let #[(i : Q($ι))] := args | failure\n      let rbody ← core zα pα body\n      let pbody ← rbody.toNonneg\n      let pr : Q(∀ i, 0 ≤ $f i) ← mkLambdaFVars #[i] pbody\n      let mα' ← synthInstanceQ q(CommMonoidWithZero $α)\n      let oα' ← synthInstanceQ q(Preorder $α)\n      let zα' ← synthInstanceQ q(ZeroLEOneClass $α)\n      let pmα' ← synthInstanceQ q(PosMulMono $α)\n      let instClosed ← synthInstanceQ q(ClosedIciTopology $α)\n      assertInstancesCommute\n      return .nonnegative\n        q(@tprod_nonneg $ι $α $L $mα' $instTopSpace $oα' $zα' $pmα' $instClosed $f $pr)\n  | _ => throwError \"not tprod\"\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new section is named `WithZero`. In Mathlib that name suggests lemmas about the `WithZero` type constructor, as in `GroupTheory/SpecificGroups/Cyclic.lean`, where `section WithZero` holds an instance on `(WithZero G)ˣ`. This section is about a `CommMonoidWithZero`, and the sibling files in the same directory call such sections `section CommMonoidWithZero` (`InfiniteSum/Basic.lean:774`) and `section CommGroupWithZero` (`InfiniteSum/Group.lean:418`).",
+     "requested_change": "Rename the section to `CommMonoidWithZero` (change both `section WithZero` and `end WithZero`). Optionally, as in the file's other sections, hoist the shared binders into a `variable [CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [TopologicalSpace α] [ClosedIciTopology α]` line.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds for every summation filter: when `¬L.NeBot`, `∏'[L]` is a `finprod` (`tprod_bot`), which is nonnegative by `finprod_induction`. Every sibling bound in this file (`one_le_tprod`/`tsum_nonneg`, `tprod_le_one`, `tprod_le_of_prod_le'`) drops `L.NeBot` exactly this way, so the new lemma is strictly weaker than its neighbours, and a `positivity` extension for `tprod` modelled on `evalTsum` (lines 378-399, which calls `tsum_nonneg` with an arbitrary `L`) could not use it, since it would have to synthesize `L.NeBot`.",
+     "requested_change": "Remove `[L.NeBot]` from `tprod_nonneg` and handle the degenerate filter the way `tprod_le_one` does. Use `i` as the bound variable to match the siblings:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · rw [tprod_eq_one_of_not_multipliable h]\n    exact zero_le_one\n```",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new `section WithZero` / `end WithZero` around `tprod_nonneg` is named after the `WithZero` type constructor, which this lemma is not about. The section holds no `variable`s; it only groups a lemma about `CommMonoidWithZero`. The other sections in this file are named after their algebraic-order setting (`OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`), and Mathlib's with-zero sections use the full class name (`MonoidWithZero`, `CommMonoidWithZero`, `GroupWithZero`).",
+     "requested_change": "Rename the section to name the setting, e.g. `section CommMonoidWithZero` ... `end CommMonoidWithZero` (or `MonoidWithZero`), or drop the section wrapper, since it declares no variables.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R6",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the statement does not need: when `L` is not `NeBot`, `tprod_bot` turns `∏'[L] i, f i` into `∏ᶠ i, f i`, and that is nonnegative too. The sibling lemmas in this file, `one_le_tprod` (whose additive form is `tsum_nonneg`) and `tprod_le_one`, already handle the `¬ L.NeBot` case this way and carry no `NeBot` assumption. As written, the new lemma is strictly weaker than its siblings for an arbitrary summation filter.",
+     "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg`. Handle the degenerate filter the way `one_le_tprod` and `tprod_le_one` do: split on `L.NeBot`, and in the `¬ L.NeBot` branch use `rw [tprod_bot hL]; exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`. (`finprod_nonneg` itself needs `CommSemiring` and `IsOrderedRing`, so it is too strong for these typeclasses.) Verified replacement:\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "In the multipliable branch, `tprod_nonneg` calls `ge_of_tendsto' h.hasProd ...` directly. This file already wraps exactly that call as `le_hasProd_of_le_prod` (l.36: `(hf : HasProd f a L) (h : ∀ s, c ≤ ∏ i ∈ s, f i) : c ≤ a := ge_of_tendsto' hf h`), under the same `[ClosedIciTopology α] [L.NeBot]` assumptions.",
+     "requested_change": "Replace `exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` with `exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i`, which goes through the file's own HasProd-order API rather than the raw filter lemma.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "The statement binds the product variable as `x` (`0 ≤ ∏'[L] x, f x`). The surrounding `tprod` lemmas in this file write `∏'[L] i, f i` (`one_le_tprod`, `tprod_le_one`, `Multipliable.tprod_le_of_prod_le`, `tprod_le_of_prod_le'`), and the hypothesis of this same lemma already says `∀ i, 0 ≤ f i`.",
+     "requested_change": "Change the conclusion to `0 ≤ ∏'[L] i, f i`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new section is named `section WithZero` / `end WithZero`. `WithZero` is a Mathlib type constructor (`WithZero α`), and the section contains nothing about it. Its one lemma is about a `CommMonoidWithZero`. The neighbouring sections are named after the algebraic structure they assume (`OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`, `LinearOrderedCommRing`), so the name misleads.",
+     "requested_change": "Rename the section to `section CommMonoidWithZero` ... `end CommMonoidWithZero`. Optionally, hoist the shared assumptions into a section `variable` line, as the sibling sections do.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the result does not need: when `L` is `⊥`, `∏'[L] i, f i = ∏ᶠ i, f i` (`tprod_bot`) and a finprod of nonnegative terms is nonnegative. Its siblings in this file, `one_le_tprod` (`tsum_nonneg`) and `tprod_le_one`, carry no `NeBot` assumption and handle the `⊥` case, and the extra instance would also have to be synthesized by any automation (e.g. a positivity extension) that uses the lemma.",
+     "requested_change": "Drop `[L.NeBot]` from `tprod_nonneg` and treat the trivial-filter case as `tprod_le_one` does, e.g.\n```\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(also using the bound variable `i`, as the hypothesis and the siblings do).",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new section is named `WithZero`, which is the name of the type constructor `WithZero α`, not the notion its declaration is about; the lemma is about a `CommMonoidWithZero`, and the analogous sections are named after that class (`section CommMonoidWithZero` in `Topology/Algebra/InfiniteSum/Basic.lean:774`, and in `Algebra/Order/BigOperators/GroupWithZero/Finset.lean:25`, where `Finset.prod_nonneg` lives).",
+     "requested_change": "Rename the section to `section CommMonoidWithZero` / `end CommMonoidWithZero` (and, if `HasProd.nonneg` is added beside it, put the shared assumptions in one `variable [CommMonoidWithZero α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [TopologicalSpace α] [ClosedIciTopology α] {f : ι → α} {a : α}` line, ordered algebra, order, topology as the file's other sections are).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "The family in this file states each order fact at both levels, `HasProd.one_le` with `one_le_tprod` and `HasProd.le_one` with `tprod_le_one`, but the PR adds only the `tprod` form of nonnegativity: there is no `HasProd.nonneg`, and the proof calls the raw filter lemma `ge_of_tendsto'` instead of the file's own wrapper `le_hasProd_of_le_prod`.",
+     "requested_change": "Add the `HasProd` form and derive `tprod_nonneg` from it:\n```\nlemma HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a :=\n  le_hasProd_of_le_prod ha fun _ ↦ prod_nonneg fun i _ ↦ hf i\n```\nand in `tprod_nonneg` use `h.hasProd.nonneg hf` for the multipliable, `NeBot` case.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is declared with `theorem` but has no docstring; by the lemma/theorem practice an undocumented result of this kind is a `lemma`, or else it should carry a docstring (the neighbouring `CommMonoidWithZero` section of `InfiniteSum/Basic.lean` uses `lemma`).",
+     "requested_change": "Either declare it with `lemma`, or keep `theorem` and add a docstring such as `/-- An infinite product of nonnegative terms is nonnegative. -/`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "This file supplies a positivity extension for `tsum` (`evalTsum`, built on `tsum_nonneg`), but none for `tprod`, so even with the new lemma `positivity` cannot prove `0 ≤ ∏' i, f i ^ 2`.",
+     "requested_change": "Add the analogous `@[positivity tprod _] meta def evalTprod` next to `evalTsum`: match `~q(@tprod _ $ι $instCommMonoid $instTopSpace $f $L)`, prove `∀ i, 0 ≤ f i` with `core`, synthesize `CommMonoidWithZero`, `Preorder`, `ZeroLEOneClass`, `PosMulMono` and `ClosedIciTopology`, and return `.nonnegative` with `tprod_nonneg` (this works without synthesizing `L.NeBot` once that hypothesis is dropped); or leave it as an explicit follow-up.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is stated too narrowly: the `[L.NeBot]` assumption is unnecessary, since the bottom-filter case also gives a nonnegative `tprod`.",
+     "requested_change": "Remove `[L.NeBot]` from the theorem assumptions and handle `by_cases hL : L.NeBot`; use the current multipliable/non-multipliable argument in the `hL` branch, and in the other branch reduce with `tprod_bot hL` and close by `finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` carries an unnecessary hypothesis `[L.NeBot]`. The statement is true for every `L`, including `L = ⊥` (where `tprod` is the `finprod`), and the two neighbouring `tprod`-level lemmas in this file are deliberately stated without it: `one_le_tprod` (line 167) and `tprod_le_one` (line 175) both start with `by_cases hL : L.NeBot` and dispatch the bottom case via `tprod_bot`. As written, `tprod_nonneg` is strictly weaker than its siblings for no gain, and it is also weaker than its additive counterpart `tsum_nonneg` (the `to_additive` of `one_le_tprod`), which the `positivity` extension instantiates without any `NeBot` argument.",
+     "requested_change": "Drop `[L.NeBot]` and handle the bottom case with `tprod_bot` + `finprod_induction`, mirroring `one_le_tprod`:\n\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · simpa [tprod_bot hL] using finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n\n(Compiled successfully against the reviewed workspace: the whole file accepts this version, so the hypothesis is genuinely redundant.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:243",
+     "claim": "The proof step `exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` bypasses the file's own API for exactly this inference: `le_hasProd_of_le_prod` (line 36, `HasProd f a L` plus `∀ s, c ≤ ∏ i ∈ s, f i` gives `c ≤ a`) is the specialization of `ge_of_tendsto'` to `HasProd`, and the mirrored upper-bound lemma in this same file is proved through its `HasProd`-level partner (`Multipliable.tprod_le_of_prod_le`, line 143, is `hasProd_le_of_prod_le hf.hasProd h`). Calling `ge_of_tendsto'` directly leaves `le_hasProd_of_le_prod` with no users in the file and makes the new lemma the only place where the product bound is routed through the raw topological lemma.",
+     "requested_change": "Replace the call by the local lemma:\n\n  · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n\n(Compiled successfully against the reviewed workspace.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/b4e8a9270db3e9901c3108b7a211177c731fe790a8c97235873c2d8e7dcc3831/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__b9c6f893-cc97-4533-9513-ca183a0abf68.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` requires `[L.NeBot]`, but its statement does not need it: the result also holds for `L = ⊥` (`tprod_bot` reduces the product to `finprod`). The two neighbours it mirrors — `one_le_tprod` (line 167, whose additive image is `tsum_nonneg`) and the generated `tsum_nonneg` itself — are both stated without any `NeBot` assumption, so this lemma is weaker than its siblings for no reason.",
+     "requested_change": "Drop `[L.NeBot]` and dispose of the `L = ⊥` case with `tprod_bot` plus `finprod_induction`, e.g.\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp only [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(`by_cases hL` is the same device `one_le_tprod` uses at line 170.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:243",
+     "claim": "The multiplied case of `tprod_nonneg` is proved with the general order lemma `ge_of_tendsto'`, even though this very file defines `le_hasProd_of_le_prod` (line 36) as `ge_of_tendsto' hf h` specialised to `HasProd`, with exactly the assumptions needed here (`[ClosedIciTopology α] [L.NeBot]`); the file's other lemmas of this shape go through that wrapper (`Multipliable.tprod_le_of_prod_le`, line 143 uses `hasProd_le_of_prod_le hf.hasProd h`).",
+     "requested_change": "Replace `ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` with `le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is stated as a `theorem` but carries no docstring, which is the trait that distinguishes a `theorem` from a `lemma` in Mathlib: it is an undocumented auxiliary-looking result rather than a documented statement.",
+     "requested_change": "Either add a docstring, e.g. `/-- An infinite product of nonnegative elements is nonnegative. -/`, or state the result as `lemma tprod_nonneg`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new `section WithZero` is not spelled after the notion its declaration is about: every other section in this file is named exactly like the typeclass it groups (`Preorder`, `OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`, `LinearOrder`, `LinearOrderedCommRing`), whereas `WithZero` is the name of the unrelated type former `WithZero α`; the class actually in play is `CommMonoidWithZero`. The section also binds no `variable`s and holds a single declaration, so it does no grouping work.",
+     "requested_change": "Rename the section to `section CommMonoidWithZero` (matching the file's class-spelled sections) — or drop `section WithZero`/`end WithZero` entirely, since the single declaration binds all its instances in its own signature.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/913362878606e751673e9b87b58f9c252aeebc9c14efbaf4d444c4edc837470b/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__12531e6a-7494-455b-9761-93c7f24dadf6.jsonl"
+  },
+  "GPT2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` unnecessarily assumes `[L.NeBot]`; the same nonnegativity statement is true for a bot summation filter as well, where `tprod` reduces to `finprod`. This makes the new API less general than nearby lemmas such as `one_le_tprod`, which handle the bot case explicitly.",
+     "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg` and add a `¬ L.NeBot` branch using `tprod_bot` and `finprod_induction` (or the corresponding finprod nonnegativity argument).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement does not need it: for the trivial summation filter `tprod` is `1` (by `tprod_eq_one_of_not_multipliable`, and in fact `multipliable_bot` holds there) resp. `∏ᶠ x, f x` (by `tprod_bot`), and `0 ≤ 1` / `0 ≤ ∏ᶠ x, f x` both hold under the same hypotheses. Every other `∏'`-level order lemma in this file drops `L.NeBot` by case-splitting precisely for this reason — `tprod_le_of_prod_le'` (line 149), `one_le_tprod` (line 168), `tprod_le_one` (line 176) — so as stated the new lemma is the only one that cannot be applied when `L` is trivial, and its `by_cases h : Multipliable f L` split is vacuous in that regime (since `¬ L.NeBot` forces `Multipliable f L`). Note also that the additive analogue `tsum_nonneg` (the `to_additive` image of `one_le_tprod`) is used throughout the library without an `NeBot` argument.",
+     "requested_change": "Drop `[L.NeBot]` from the statement and cover the trivial filter, in the style of `one_le_tprod`:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction _ zero_le_one (fun _ _ ↦ mul_nonzero) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\n(this exact proof was compiled, with `mul_nonneg` in place of the typo `mul_nonzero`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new `section WithZero` is misleading: the hypotheses of its only lemma are `CommMonoidWithZero` plus order/topology instances, and this file names each section after its typeclass context (`Preorder`, `OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`, `LinearOrder`, `LinearOrderedCommRing`). Elsewhere `WithZero` names the `WithZero` type constructor (e.g. `section WithZero` in `GroupTheory/SpecificGroups/Cyclic.lean` is about `WithZero G`, `WithZeroMulInt` in `RingTheory/Valuation/Discrete/`), so a reader will expect this section to be about `WithZero α`. The analogous with-zero section in the sibling file `Mathlib/Topology/Algebra/InfiniteSum/Basic.lean` (line 774) is `section CommMonoidWithZero`.",
+     "requested_change": "Rename the section to `section CommMonoidWithZero` / `end CommMonoidWithZero` (this exact rename was compiled).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/1bd7c89613f3a87c71a337738da856c1c0cf970132a6c256aa89e87a51542549/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__76e1e2f0-ab30-4619-aa9a-c47c64f1f03f.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis, so it is stated in less generality than its additive counterpart and its sibling. In the same file, `tsum_nonneg` (the additive counterpart, introduced at line 167 as `@[to_additive tsum_nonneg]` on `one_le_tprod`) has no `[L.NeBot]`, and the multiplicative sibling `one_le_tprod` (lines 167–173) also states its conclusion for every summation filter, disposing of the degenerate case with `tprod_bot`. The nonnegativity statement does not need `L.NeBot`: in the `¬L.NeBot` case `tprod` is `finprod` and nonnegativity follows by induction on the factors.",
+     "requested_change": "Drop `[L.NeBot]` and, in the multipliable branch, split on `L.NeBot` exactly as `one_le_tprod` does, e.g.:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · rw [tprod_bot hL]\n      exact finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun x y hx hy ↦ mul_nonneg hx hy) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is declared as a `theorem` but has no docstring; a `theorem` (unlike a `lemma`) is meant to be an important statement that carries one, and this file's only docstring is the one on the positivity extension `evalTsum` (line 378).",
+     "requested_change": "Add a docstring above the declaration, e.g. `/-- The infinite product of non-negative factors is non-negative. -/`, or, if it is regarded as an auxiliary fact, state it as `lemma tprod_nonneg` instead.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:237",
+     "claim": "The new `section WithZero` is not named after the notion its single declaration is about. `WithZero` is the name of an unrelated existing declaration (the `WithZero α` type former) and appears nowhere in `tprod_nonneg`'s statement, which is about a `CommMonoidWithZero` with `ZeroLEOneClass`/`PosMulMono`. The file's other sections are named after the structure they assume (`OrderedCommMonoid`, `CanonicallyOrderedMul`, `LinearOrderedCommRing`), and the analogous block of `PosMulMono` order lemmas is `section CommMonoidWithZero` in `Mathlib/Algebra/Order/BigOperators/GroupWithZero/Finset.lean` (line 25).",
+     "requested_change": "Rename the section to `section CommMonoidWithZero` (both the opening at line 237 and the closing `end` at line 246).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/fd94a6911f259846ff910bf89dd0a2dd93ff35048ae0a45969660df8dcab1e80/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__6a071e30-467b-4ddc-bdc4-529894835c00.jsonl"
+  },
+  "GPT3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is stated less generally than the surrounding `tprod` API permits: the extra `[L.NeBot]` assumption is unnecessary, since the non-`NeBot` case reduces to a `finprod` and is also nonnegative.",
+     "requested_change": "Remove the `[L.NeBot]` hypothesis from `tprod_nonneg`, and in the proof split on `L.NeBot`; keep the existing `HasProd`/`ge_of_tendsto'` argument in the `NeBot` branch and prove the bottom-filter branch using `simp only [tprod_bot hL]` followed by `finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` carries an unnecessary `[L.NeBot]` hypothesis: the statement is true and provable without it, and the neighbouring lemmas in this very file that do not need `NeBot` are stated without it — the additive twin `tsum_nonneg` (declared as `@[to_additive tsum_nonneg]` on `one_le_tprod`, line 167), `tprod_le_one` (line 176) and `tprod_le_of_prod_le'` (line 149) all handle the trivial-filter case internally (`by_cases hL : L.NeBot` + `tprod_bot`). Requiring `NeBot` makes the new lemma needlessly weaker than them.",
+     "requested_change": "Delete `[L.NeBot]` from the binder list and prove it by splitting on the filter as the file's other NeBot-free lemmas do:\n\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases hL : L.NeBot\n  · by_cases h : Multipliable f L\n    · exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simp [tprod_eq_one_of_not_multipliable h]\n  · rw [tprod_bot hL]\n    exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ => mul_nonneg) hf\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:243",
+     "claim": "The first branch of `tprod_nonneg` re-derives by hand what the file's own lemma `le_hasProd_of_le_prod` (line 36: `[ClosedIciTopology α] [L.NeBot] → HasProd f a L → (∀ s, c ≤ ∏ i ∈ s, f i) → c ≤ a`) already states — `ge_of_tendsto' hf h` is literally its proof — so the new proof bypasses the local API for this exact situation.",
+     "requested_change": "Replace `exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` with `exact le_hasProd_of_le_prod h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/5874725093b5882dae5416ce740e3c90c76c5ad29f0cdd1cb7b843f22c461c13/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__d252efa8-0f88-4589-a52a-0463f845fc78.jsonl"
+  },
+  "AP3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` carries a `[L.NeBot]` hypothesis that the result does not need: `0 ≤ ∏'[L] x, f x` holds for every summation filter `L`. Its multiplicative siblings in this file, `one_le_tprod` (line 167) and `tprod_le_one` (line 175), and its additive twin `tsum_nonneg` are all stated without `[L.NeBot]`, so this lemma is weaker than the family it joins. `[L.NeBot]` is used only to feed `ge_of_tendsto'`; the degenerate case `¬ L.NeBot`, where `tprod = finprod`, is handled by `tprod_bot` plus `finprod_induction`, exactly as `one_le_tprod` handles it with `tprod_bot` plus `one_le_finprod'`.",
+     "requested_change": "Drop `[L.NeBot]` from the binder list and case split on it in the multipliable branch:\n```lean\ntheorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n    [PosMulMono α] [ClosedIciTopology α] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n    0 ≤ ∏'[L] x, f x := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n    · simpa [tprod_bot hL] using\n        finprod_induction (fun x ↦ 0 ≤ x) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is declared as a `theorem` but has no docstring. Mathlib practice is that a `theorem` is a statement important enough to document, while undocumented auxiliary results are declared `lemma`; the declaration as it stands is an undocumented `theorem`.",
+     "requested_change": "Add a one-line docstring above the declaration, e.g. `/-- If all the factors are nonnegative, then so is their infinite product. -/`; if it is meant as an auxiliary result, declare it `lemma` instead of `theorem`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+     "claim": "`tprod_nonneg` is the only declaration in this file with no `@[to_additive]` tag — its neighbours `one_le_tprod` (line 167), `tprod_le_one` (line 175), `HasProd.one_le` (line 159) all carry it — and nothing records why the additive counterpart is excluded. The tag cannot be used as it stands: the additive statement it generates is `tsum_nonneg`, which already exists (generated from `one_le_tprod`) with different hypotheses (`IsOrderedAddMonoid`, `OrderClosedTopology` instead of `ZeroLEOneClass`, `PosMulMono`, `ClosedIciTopology`).",
+     "requested_change": "Either add the tag if an additive counterpart under these hypotheses is wanted, or, since the generated name collides with the existing `tsum_nonneg` of a different type, record the exclusion in a comment with the docstring, e.g. `-- no `@[to_additive]`: its additive translation is `tsum_nonneg`, which already exists (from `one_le_tprod`) with different hypotheses`, following the practice that an attribute present on the siblings is applied to all or its exclusion is documented.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/71ee0012a26f1f551a5210db0581b8d565db8b65529d5d13d0b63e47a63bac90/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__8f06f5c9-5c46-4efd-ac8f-0601bfd0ac0e.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_42184.md"
+}

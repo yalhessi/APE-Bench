@@ -1,0 +1,41 @@
+# R3 — measurement and evaluation (final report as returned, markdown layout normalised; 142k subagent tokens, 54 tool calls, 8.8 min)
+
+**1. Verdict.** The plan does not yet measure what the user asked: it cannot tell "a better deployable reviewer than solo" from "solo run twice" or from "a detector with a model in it". Measurement 0 is pre-registered and sound as a gate, with reading caveats. Measurements 2, 4 and 5 are in-sample by construction. Measurement 3, "the out-of-sample test", runs on a set the project ruled development material on 2026-09-24, and its threshold sits about one obligation above what a second solo pass already gives. Measurement 1 cannot estimate per-rule thresholds from 25 PRs. No measurement has a comparator matched on volume or compute, and the volume guard is three times looser than the record's.
+
+**2. Objections, ranked**
+
+1. **The comparator is wrong: union inflates recall whatever is in it** (read, computed from `audits/iter-ds41-contract2-*`). On dev the pairwise union of two DeepSeek solo reps (four reps) is 8, 10, 10, 10, 11, 9: mean 9.67, against a single-rep mean of 7.67 (high reps) or 7.25 (all four); the union of three or of all four is 11. Measurement 3's bar, solo mean + 3 = 10.67, is about 1 obligation above DX∪DX' — and the record calls one obligation judge noise. Measurement 2 likewise unions A with DX and compares to DX alone; on the probe set DX's three-rep union adds +2.3 (matcher 1) and +1.0 (matcher 2) asks of 39 over its mean. *Refuted if* A∪DX_i is compared against DX_i∪DX_j, paired by rep.
+2. **Dev is not clean, and measurement 3 changes two variables at once** (read). `PROJECT-STATUS.md` and `eval-set-selection.md`: "The held-out 12 stop being the yardstick; they stay development material." Contract v2 (the solo design DX runs) was tuned there; stage G's detectors and the closer battery were designed partly on dev asks (33294 dot notation, 33421, 33117, 33145). Dev's in-census share is unmeasured (the census frame excludes dev). The judge pairs only at anchor (998 of 998) and splits its vote on 10.8% of pairs, so A's dev score also depends on whether segment → `primary_change_id` lands on the gold change. Measurement 3 also switches the selector v0 → v1 with the set, so a failure cannot be attributed. **A fresher set exists:** `val-2025-06-2026-03-v1` minus small12 holds 76 agreed asks on 35 PRs plus ~16 no-ask PRs (computed from `arm-coverage-val-*/events.jsonl` and the reader files); no conventions design touched it and val1000 excludes it. Whether its reviewed workspaces are built is unverified.
+3. **Measurement 1 is not identifiable as specified** (computed from reader A's labels). 25 val1000 PRs give a median of 67 asked pairs (5-95%: 49-96), or 101 if drawn from PRs with ≥ 2 asks, spread over 47-63 entries; only 4-8 entries get ≥ 3 asks, 0-5 get ≥ 5, and only 22-46 of the 100 head entries get any ask. The draft's "about 100 head entries A4 can measure" does not hold. The val1000 entries were written from these very asks (departs-at-asked inflated). Cost ~25 rules × 15-19 places × 2 ≈ 12-24k calls, 20-40 h at the places run's observed rate (621 calls in ~75 min on a shared node), not "a few hours". Absolute confidence thresholds are already refuted three times as a selection signal (within-PR AUC 0.49 over 907 candidates, `selection-signal.md`).
+4. **The volume guard cannot separate a reviewer from a detector.** "DX + 10 findings a PR" allows ~4.8× DX's 2.62. The record's guards were +3.0 a PR (stage D), ≤ 2.0 per control PR (`beyond-the-solo-baseline` §5), and asks reached per finding no lower (stage F failed it, 0.18 against 0.27). The matcher sees all of a reviewer's findings, so reach rises with count; matcher agreement (382 of 390) does not bound shared leniency. Control emission cannot be read in measurement 2: stage F's v0 picks do not exist for control PRs.
+5. **Measurement 4 is uninformative and half self-contradictory.** Its bar is +4 of 46 against the existing undecorrelated +3 — one ask (0.022). The union's gain is by definition the asks reached by 1 of 3 passes, exactly what an agreement-ranked cap demotes; confidence (AUC ~0.5) will not rescue them.
+6. **Measurement 5's recall bar is almost guaranteed.** The templates were read off the probe misses (v0067 `positivity`, v0092/93 `simpa`, v0068 `gcongr`, v0090 `grind`, v0016 `noncomputable`, 36822 `simp`, 30458 replay); the closer battery already produced 8 of 15. The only open quantity, facts per PR, has no threshold.
+7. **Readings to add to measurement 0 before `read` runs.** The pooled AUC has been one PR in the record (0.749 → 0.511 without 33145); here 32875 holds 9 of the 42 asked pairs. Asked pairs use the mean of 2 samples, decoys 1. Three PRs with asked pairs (36822, 43192, 26755) have no decoys. The cap at 10 is computed against 5 decoys a PR, where deployment would have 25 picks plus the gates (optimistic). Add: within-PR AUC; the leave-one-PR-out range; sample-1-only AUC; asked pairs kept on asks DX misses.
+
+**3. Corrected plan**
+
+| # | set | comparison | threshold | noise |
+|---|---|---|---|---|
+| 0 | probe (as running) | as registered, plus objection 7's readings | unchanged | ±0.05-0.07 AUC, clustered |
+| P (new, free) | val remainder and dev | in-census share (assign pass as in Result 1); segment → gold `change_id` hit rate | report; < 50% in census or < 70% pairing → drop the set from gating | – |
+| S (new) | R2's offline selection bench (other-years 248 asks + 39 probe) | DeepSeek v1 against stage F's 0.45 at 10 | R2's own: recall@10 ≥ 0.60 | ±6pp |
+| 2 | 10 stage F PRs (in-sample, engine check) | A∪DX_i against DX_i∪DX_j and against a **decoy engine** (random entries the selector did not pick, same cap) ∪ DX, all under one seal | ≥ +0.10 over DX∪DX' on both matchers; decoy gain ≤ +0.03; added-finding yield ≥ 0.5× DX's asks per finding | one ask = 0.030 |
+| 1′ | ~100 val1000 PRs (fit), other-years PRs (validate) | a pooled policy (global, or part-kind threshold) against plain within-PR top-k | per-rule calibration kept only if it beats top-k by ≥ 0.10 asked pairs kept | ±0.10 at ~60 pairs |
+| 3′ | val remainder (35 ask PRs + ~16 no-ask PRs), three reps, two blind matchers | the rule below | the rule below | one ask = 0.013 |
+| 3-dev | dev held-out 12, judge v9 | reported only, with unanimity and null pairs beside it | none | ±1 obligation |
+| 6 | 46 probe asks | history coverage with a base rate (a random other declaration in the same file), read blind | ≥ 3 asks neither DX's union nor A's picks reach | – |
+| 5′ | non-probe PRs | facts per PR; yield per fact against census asks | facts per PR ≤ 20 | – |
+
+Every A rep needs ~950 calls a PR, ~100× a solo session's output (7.3k median completion tokens a call; inferred). Report tokens and wall clock beside recall.
+
+**4. The rule for "a better deployable reviewer than solo"** (stated before any run). Set: the validation remainder, three reps per arm, one seal holding every arm, two blind matchers. Candidate C (A∪DX, or B) is better than solo only if all five hold, on both matchers:
+- (a) mean reach over **all** asks ≥ +0.06 above S2 (DX_i∪DX_j, paired by rep) — about 5 of 76, ~2 SE (inferred);
+- (b) C's stable count ≥ S2's;
+- (c) the added findings' yield — (asks C reaches that DX does not) / (C's findings − DX's findings) — ≥ half of DX's asks reached per finding;
+- (d) control emission ≤ 2.0 per no-ask PR;
+- (e) the decoy engine's gain ≤ +0.03; if higher, the reading is suspended as matcher leniency.
+Dev and probe readings are reported, never gating. Precision claims stay unsupported until ~30 human labels on unmatched filings exist (`adjudication-rubric.md`).
+
+**5. Cuts and reorders.** Cut measurement 4 as a design test (B becomes the comparator S2/S3 inside 3′). Cut measurement 5's recall bar (in-sample by construction). Run measurement 2 before measurement 1, with a plain top-k cap; its generation also gives the cap reading at the deployment pool size. Measurement 1 only if top-k fails. Measurement S before any v1 engine run. Measurement P before 3′.
+
+All counts computed from committed files (read-only, no model calls); cost and noise figures marked "inferred" are estimates.

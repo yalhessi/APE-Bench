@@ -1,0 +1,23 @@
+[
+  {
+    "target": "Real.arctan_sqrt_three",
+    "claim": "`Real.arctan_sqrt_three` is proved by `rw [← tan_pi_div_three, arctan_tan]` followed by an `all_goals` block running `field_simp; norm_num` on the two range side goals, in an unusual `all_goals` / bullet layout. The sibling `arctan_one` directly above proves the same kind of fact in one term-mode line with `arctan_eq_of_tan_eq` and `linarith [pi_pos]`.",
+    "requested_change": "Replace the proof with the `arctan_one` pattern:\n```lean\n@[simp]\ntheorem arctan_sqrt_three : arctan (√3) = π / 3 :=\n  arctan_eq_of_tan_eq tan_pi_div_three <| by constructor <;> linarith [pi_pos]\n```",
+    "severity": "advisory",
+    "evidence": "Read Arctan.lean lines 197-220: `arctan_one : arctan 1 = π / 4 := arctan_eq_of_tan_eq tan_pi_div_four <| by constructor <;> linarith [pi_pos]` sits directly above the new lemma. Basic.lean:890 has `tan_pi_div_three : tan (π / 3) = √3`. lean_verify_edit with the replacement above: outcome `compiled`, no errors, no warnings. The file as the PR leaves it also compiles with no warnings, so this is a proof-golf and style request, not a build fix."
+  },
+  {
+    "target": "Real.arctan_inv_sqrt_three",
+    "claim": "`Real.arctan_inv_sqrt_three` repeats the same roundabout proof: `rw [inv_eq_one_div, ← tan_pi_div_six, arctan_tan]` followed by `all_goals` with `field_simp; norm_num` on the side goals. It does not use the `arctan_eq_of_tan_eq` pattern of its sibling `arctan_one`.",
+    "requested_change": "Replace the proof with the `arctan_one` pattern:\n```lean\n@[simp]\ntheorem arctan_inv_sqrt_three : arctan (√3)⁻¹ = π / 6 :=\n  arctan_eq_of_tan_eq (by simp) <| by constructor <;> linarith [pi_pos]\n```\n(`(by rw [tan_pi_div_six, one_div])` also works for the first argument if an explicit rewrite is preferred.)",
+    "severity": "advisory",
+    "evidence": "Basic.lean:885 has `tan_pi_div_six : tan (π / 6) = 1 / √3`, and `one_div` takes it to `(√3)⁻¹`. lean_verify_edit with `(by simp)` as the first argument: `compiled`, no errors or warnings. The variant `(by rw [tan_pi_div_six, one_div])` also compiled cleanly. The `simp?` probes showed that the stated LHS `arctan (√3)⁻¹` is simp-normal (`simp only [arctan_inv_sqrt_three]`) and that `arctan (1 / √3)` reaches it through `one_div`, so the statement form itself is fine."
+  },
+  {
+    "target": "Real.arctan_sqrt_three",
+    "claim": "The file pairs `arctan_one` with the `@[simp]` iff lemma `arctan_eq_pi_div_four : arctan x = π / 4 ↔ x = 1` (and `arctan_eq_neg_pi_div_four`). The new special values `arctan_sqrt_three` and `arctan_inv_sqrt_three` come without the matching iff lemmas, and the PR inserts them between `arctan_one` and its iff partner.",
+    "requested_change": "Add the companions next to `arctan_eq_pi_div_four`, and place the new value lemmas so that `arctan_one` stays next to `arctan_eq_pi_div_four`:\n```lean\n@[simp]\ntheorem arctan_eq_pi_div_three : arctan x = π / 3 ↔ x = √3 :=\n  arctan_injective.eq_iff' arctan_sqrt_three\n\n@[simp]\ntheorem arctan_eq_pi_div_six : arctan x = π / 6 ↔ x = (√3)⁻¹ :=\n  arctan_injective.eq_iff' arctan_inv_sqrt_three\n```",
+    "severity": "advisory",
+    "evidence": "Arctan.lean lines 201-227: `arctan_one` (202) is followed by `arctan_eq_pi_div_four ... := arctan_injective.eq_iff' arctan_one` (220) and `arctan_eq_neg_pi_div_four` (226). The PR's two lemmas sit at 205-217, between them. declaration_search and content_search found no existing `arctan` lemma about `√3` anywhere in Mathlib. lean_verify_edit adding both iff lemmas (with `@[simp]`) after the golfed `arctan_inv_sqrt_three`: `compiled`, no errors or warnings."
+  }
+]

@@ -1,0 +1,248 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (↑(e.submoduleMap p)).toFun`\n\nIssues:\n  No theorems found for `AddHom.toFun` in order to prove `Continuous fun a => (↑(e.submoduleMap p)).toFun a`",
+   "code_line": "  continuous_toFun := by fun_prop",
+   "pos": {
+    "column": 25,
+    "line": 1294
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (e.submoduleMap p).invFun`\n\nIssues:\n  No theorems found for `LinearEquiv.invFun` in order to prove `Continuous fun a => (e.submoduleMap p).invFun a`",
+   "code_line": "  continuous_invFun := by fun_prop",
+   "pos": {
+    "column": 26,
+    "line": 1295
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unknown free variable `_fvar.396978`",
+   "code_line": "def submoduleMap (e : M ≃SL[σ₁₂] M₂) (p : Submodule R M) :",
+   "pos": {
+    "column": 4,
+    "line": 1291
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  (e.submoduleMap p).trans (LinearEquiv.ofEq (Submodule.map (↑e.toLinearEquiv) p) q h)\nhas type\n  ↥p ≃ₛₗ[σ₁₂] ↥q\nbut is expected to have type\n  ↥p ≃SL[σ₁₂] ↥q",
+   "code_line": "  (e.submoduleMap p).trans (.ofEq _ _ h)",
+   "pos": {
+    "column": 2,
+    "line": 1312
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((e.ofSubmodules p q h) x)\nis not definitionally equal to the right-hand side\n  e ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1314
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.73 = ?m.73\nbut is expected to have type\n  ↑((e.ofSubmodules p q h) x) = e ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1318
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((e.ofSubmodules p q h).symm x)\nis not definitionally equal to the right-hand side\n  e.symm ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1320
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.105 = ?m.105\nbut is expected to have type\n  ↑((e.ofSubmodules p q h).symm x) = e.symm ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1323
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Tactic `rfl` failed: The left-hand side\n  ↑(f.ofSubmodule' U)\nis not definitionally equal to the right-hand side\n  ((↑f).comp (Submodule.comap f U).subtypeL).codRestrict U ⋯\n\nR : Type u_1\nR₂ : Type u_2\nM : Type u_3\nM₂ : Type u_4\ninst✝⁵ : Semiring R\ninst✝⁴ : Semiring R₂\ninst✝³ : AddCommMonoid M\ninst✝² : TopologicalSpace M\ninst✝¹ : AddCommMonoid M₂\ninst✝ : TopologicalSpace M₂\nmodule_M : Module R M\nmodule_M₂ : Module R₂ M₂\nσ₁₂ : R →+* R₂\nσ₂₁ : R₂ →+* R\nre₁₂ : RingHomInvPair σ₁₂ σ₂₁\nre₂₁ : RingHomInvPair σ₂₁ σ₁₂\nf : M ≃SL[σ₁₂] M₂\nU : Submodule R₂ M₂\n⊢ ↑(f.ofSubmodule' U) = ((↑f).comp (Submodule.comap f U).subtypeL).codRestrict U ⋯",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1336
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((f.ofSubmodule' U) x)\nis not definitionally equal to the right-hand side\n  f ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1338
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.68 = ?m.68\nbut is expected to have type\n  ↑((f.ofSubmodule' U) x) = f ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1341
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((f.ofSubmodule' U).symm x)\nis not definitionally equal to the right-hand side\n  f.symm ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1343
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.86 = ?m.86\nbut is expected to have type\n  ↑((f.ofSubmodule' U).symm x) = f.symm ↑x",
+   "code_line": "    ((f.ofSubmodule' U).symm x : M) = f.symm (x : M₂) := rfl",
+   "pos": {
+    "column": 57,
+    "line": 1345
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 13 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (↑(e.submoduleMap p)).toFun`\n\nIssues:\n  No theorems found for `AddHom.toFun` in order to prove `Continuous fun a => (↑(e.submoduleMap p)).toFun a`",
+   "code_line": "  continuous_toFun := by fun_prop",
+   "pos": {
+    "column": 25,
+    "line": 1294
+   }
+  },
+  {
+   "severity": "error",
+   "data": "`fun_prop` was unable to prove `Continuous (e.submoduleMap p).invFun`\n\nIssues:\n  No theorems found for `LinearEquiv.invFun` in order to prove `Continuous fun a => (e.submoduleMap p).invFun a`",
+   "code_line": "  continuous_invFun := by fun_prop",
+   "pos": {
+    "column": 26,
+    "line": 1295
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unknown free variable `_fvar.396978`",
+   "code_line": "def submoduleMap (e : M ≃SL[σ₁₂] M₂) (p : Submodule R M) :",
+   "pos": {
+    "column": 4,
+    "line": 1291
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  (e.submoduleMap p).trans (LinearEquiv.ofEq (Submodule.map (↑e.toLinearEquiv) p) q h)\nhas type\n  ↥p ≃ₛₗ[σ₁₂] ↥q\nbut is expected to have type\n  ↥p ≃SL[σ₁₂] ↥q",
+   "code_line": "  (e.submoduleMap p).trans (.ofEq _ _ h)",
+   "pos": {
+    "column": 2,
+    "line": 1312
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((e.ofSubmodules p q h) x)\nis not definitionally equal to the right-hand side\n  e ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1314
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.73 = ?m.73\nbut is expected to have type\n  ↑((e.ofSubmodules p q h) x) = e ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1318
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((e.ofSubmodules p q h).symm x)\nis not definitionally equal to the right-hand side\n  e.symm ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1320
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.105 = ?m.105\nbut is expected to have type\n  ↑((e.ofSubmodules p q h).symm x) = e.symm ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1323
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Tactic `rfl` failed: The left-hand side\n  ↑(f.ofSubmodule' U)\nis not definitionally equal to the right-hand side\n  ((↑f).comp (Submodule.comap f U).subtypeL).codRestrict U ⋯\n\nR : Type u_1\nR₂ : Type u_2\nM : Type u_3\nM₂ : Type u_4\ninst✝⁵ : Semiring R\ninst✝⁴ : Semiring R₂\ninst✝³ : AddCommMonoid M\ninst✝² : TopologicalSpace M\ninst✝¹ : AddCommMonoid M₂\ninst✝ : TopologicalSpace M₂\nmodule_M : Module R M\nmodule_M₂ : Module R₂ M₂\nσ₁₂ : R →+* R₂\nσ₂₁ : R₂ →+* R\nre₁₂ : RingHomInvPair σ₁₂ σ₂₁\nre₂₁ : RingHomInvPair σ₂₁ σ₁₂\nf : M ≃SL[σ₁₂] M₂\nU : Submodule R₂ M₂\n⊢ ↑(f.ofSubmodule' U) = ((↑f).comp (Submodule.comap f U).subtypeL).codRestrict U ⋯",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1336
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((f.ofSubmodule' U) x)\nis not definitionally equal to the right-hand side\n  f ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1338
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.68 = ?m.68\nbut is expected to have type\n  ↑((f.ofSubmodule' U) x) = f ↑x",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 1341
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Not a definitional equality: the left-hand side\n  ↑((f.ofSubmodule' U).symm x)\nis not definitionally equal to the right-hand side\n  f.symm ↑x",
+   "code_line": "@[simp]",
+   "pos": {
+    "column": 0,
+    "line": 1343
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  rfl\nhas type\n  ?m.86 = ?m.86\nbut is expected to have type\n  ↑((f.ofSubmodule' U).symm x) = f.symm ↑x",
+   "code_line": "    ((f.ofSubmodule' U).symm x : M) = f.symm (x : M₂) := rfl",
+   "pos": {
+    "column": 57,
+    "line": 1345
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

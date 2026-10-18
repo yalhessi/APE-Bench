@@ -1,0 +1,318 @@
+{"cid": "v2162", "pr": 36779, "path": "Mathlib/Probability/Kernel/Category/Stoch.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 1}
+{"cid": "v0209", "pr": 26371, "path": "Mathlib/NumberTheory/Niven.lean", "markers": ["reason", "preference"], "ai": true, "rank": 219, "batch": 2}
+{"cid": "v2098", "pr": 36421, "path": "Mathlib/FieldTheory/Minpoly/Basic.lean", "markers": ["reason", "external"], "ai": true, "rank": 4, "batch": 3}
+{"cid": "v1559", "pr": 33583, "path": null, "markers": ["external", "currency"], "ai": true, "rank": 19, "batch": 4}
+{"cid": "v0687", "pr": 28788, "path": null, "markers": ["consistency", "external"], "ai": false, "rank": 143, "batch": 1}
+{"cid": "v0946", "pr": 30119, "path": null, "markers": ["external"], "ai": false, "rank": 106, "batch": 2}
+{"cid": "v1707", "pr": 34393, "path": "Mathlib/Geometry/Polygons/Basic.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 3}
+{"cid": "v1769", "pr": 34660, "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean", "markers": ["consistency"], "ai": false, "rank": 9, "batch": 4}
+{"cid": "v1466", "pr": 32911, "path": null, "markers": ["external"], "ai": false, "rank": 6, "batch": 1}
+{"cid": "v2236", "pr": 37109, "path": "Mathlib/Combinatorics/SimpleGraph/Clique.lean", "markers": ["reason"], "ai": true, "rank": 2, "batch": 2}
+{"cid": "v1935", "pr": 35807, "path": "Mathlib/Topology/LocallyFinsupp.lean", "markers": ["currency"], "ai": false, "rank": 70, "batch": 3}
+{"cid": "v0432", "pr": 27212, "path": null, "markers": ["consistency"], "ai": false, "rank": 228, "batch": 4}
+{"cid": "v2223", "pr": 37036, "path": null, "markers": ["external"], "ai": false, "rank": 212, "batch": 1}
+{"cid": "v1844", "pr": 35188, "path": "Mathlib/CategoryTheory/Yoneda.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 2}
+{"cid": "v1987", "pr": 36067, "path": "Mathlib/NumberTheory/NumberField/FinitePlaces.lean", "markers": ["reason"], "ai": false, "rank": 5, "batch": 3}
+{"cid": "v2303", "pr": 37431, "path": "Mathlib/Algebra/Group/Submonoid/Pointwise.lean", "markers": ["reason"], "ai": false, "rank": 138, "batch": 4}
+{"cid": "v0540", "pr": 27849, "path": "Mathlib/CategoryTheory/Bicategory/Functor/StrictlyUnitary.lean", "markers": ["reason"], "ai": false, "rank": 195, "batch": 1}
+{"cid": "v0053", "pr": 25755, "path": "Mathlib/CategoryTheory/Monoidal/DayConvolution.lean", "markers": ["reason"], "ai": false, "rank": 124, "batch": 2}
+{"cid": "v0550", "pr": 27939, "path": "Mathlib/Topology/Algebra/Valued/ValuativeRel.lean", "markers": ["currency"], "ai": false, "rank": 3, "batch": 3}
+{"cid": "v1549", "pr": 33507, "path": "Mathlib/Analysis/Polynomial/Fourier.lean", "markers": ["reason"], "ai": false, "rank": 390, "batch": 4}
+{"cid": "v1231", "pr": 31760, "path": "Mathlib/Topology/Algebra/Module/StrongTopology.lean", "markers": ["reason"], "ai": false, "rank": 182, "batch": 1}
+{"cid": "v1863", "pr": 35280, "path": "Mathlib/Analysis/Polynomial/MahlerMeasure.lean", "markers": ["reason"], "ai": true, "rank": 121, "batch": 2}
+{"cid": "v1300", "pr": 32145, "path": "Mathlib/Data/Nat/PrimeFin.lean", "markers": ["external"], "ai": false, "rank": 20, "batch": 3}
+{"cid": "v0572", "pr": 27971, "path": "Mathlib/Analysis/Normed/Field/WithAbs.lean", "markers": ["reason", "external"], "ai": false, "rank": 150, "batch": 4}
+{"cid": "v0693", "pr": 28872, "path": "Mathlib/NumberTheory/LSeries/AbstractFuncEq.lean", "markers": ["preference"], "ai": false, "rank": 30, "batch": 1}
+{"cid": "v2295", "pr": 37403, "path": null, "markers": ["preference"], "ai": false, "rank": 30, "batch": 2}
+{"cid": "v1381", "pr": 32600, "path": "Mathlib/Data/Sigma/Basic.lean", "markers": ["reason", "preference"], "ai": false, "rank": 16, "batch": 3}
+{"cid": "v1859", "pr": 35280, "path": "Mathlib/Analysis/Polynomial/MahlerMeasure.lean", "markers": ["consistency"], "ai": true, "rank": 79, "batch": 4}
+{"cid": "v1437", "pr": 32841, "path": "Mathlib/Analysis/Normed/Group/Seminorm.lean", "markers": ["preference"], "ai": false, "rank": 185, "batch": 1}
+{"cid": "v1547", "pr": 33507, "path": "Mathlib/Analysis/Polynomial/Fourier.lean", "markers": ["reason"], "ai": false, "rank": 5, "batch": 2}
+{"cid": "v0370", "pr": 27051, "path": null, "markers": ["external"], "ai": true, "rank": 31, "batch": 3}
+{"cid": "v1284", "pr": 32103, "path": "Mathlib/Algebra/Polynomial/Splits.lean", "markers": ["currency"], "ai": false, "rank": 209, "batch": 4}
+{"cid": "v0475", "pr": 27475, "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Instances.lean", "markers": ["reason"], "ai": false, "rank": 23, "batch": 1}
+{"cid": "v1424", "pr": 32757, "path": null, "markers": ["external"], "ai": false, "rank": 6, "batch": 2}
+{"cid": "v1052", "pr": 30634, "path": "Mathlib/CategoryTheory/Presentable/IsCardinalFiltered.lean", "markers": ["consistency"], "ai": false, "rank": 34, "batch": 3}
+{"cid": "v0620", "pr": 28283, "path": "Mathlib/Algebra/GroupWithZero/WithZero.lean", "markers": ["preference"], "ai": false, "rank": 299, "batch": 4}
+{"cid": "v1175", "pr": 31453, "path": "Mathlib/Topology/Homotopy/LocallyContractible.lean", "markers": ["consistency", "external"], "ai": true, "rank": 334, "batch": 1}
+{"cid": "v0056", "pr": 25767, "path": "Mathlib/CategoryTheory/Monoidal/Opposite.lean", "markers": ["reason"], "ai": false, "rank": 67, "batch": 2}
+{"cid": "v0151", "pr": 26219, "path": "Mathlib/Algebra/Module/Submodule/Lattice.lean", "markers": ["external"], "ai": false, "rank": 16, "batch": 3}
+{"cid": "v1195", "pr": 31575, "path": null, "markers": ["consistency"], "ai": true, "rank": 118, "batch": 4}
+{"cid": "v2181", "pr": 36856, "path": null, "markers": ["reason", "external"], "ai": true, "rank": 98, "batch": 1}
+{"cid": "v0132", "pr": 26108, "path": "Mathlib/NumberTheory/NumberField/CMField.lean", "markers": ["reason"], "ai": false, "rank": 21, "batch": 2}
+{"cid": "v2297", "pr": 37412, "path": "Mathlib/Analysis/ODE/PicardLindelof.lean", "markers": ["reason"], "ai": false, "rank": 46, "batch": 3}
+{"cid": "v0676", "pr": 28738, "path": "Mathlib/Algebra/Ring/NonZeroDivisors.lean", "markers": ["external"], "ai": false, "rank": 369, "batch": 4}
+{"cid": "v0408", "pr": 27212, "path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Cotangent.lean", "markers": ["consistency", "external"], "ai": false, "rank": 3, "batch": 1}
+{"cid": "v1373", "pr": 32598, "path": "Mathlib/LinearAlgebra/PiTensorProduct.lean", "markers": ["consistency", "external"], "ai": false, "rank": 106, "batch": 2}
+{"cid": "v2265", "pr": 37376, "path": "Mathlib/Topology/CantorBendixson.lean", "markers": ["external"], "ai": true, "rank": 6, "batch": 3}
+{"cid": "v0193", "pr": 26309, "path": "Mathlib/Data/Finsupp/Basic.lean", "markers": ["currency"], "ai": false, "rank": 36, "batch": 4}
+{"cid": "v0973", "pr": 30299, "path": null, "markers": ["external"], "ai": false, "rank": 129, "batch": 1}
+{"cid": "v2237", "pr": 37148, "path": null, "markers": ["external", "currency"], "ai": false, "rank": 3, "batch": 2}
+{"cid": "v1016", "pr": 30402, "path": "Mathlib/MeasureTheory/Measure/Portmanteau.lean", "markers": ["reason"], "ai": false, "rank": 46, "batch": 3}
+{"cid": "v1679", "pr": 34278, "path": "Mathlib/Topology/Sets/VietorisTopology.lean", "markers": ["reason", "preference"], "ai": false, "rank": 78, "batch": 4}
+{"cid": "v2173", "pr": 36828, "path": "Mathlib/Algebra/Order/Floor/Defs.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 1}
+{"cid": "v1054", "pr": 30636, "path": "Mathlib/Algebra/Category/ModuleCat/Basic.lean", "markers": ["currency"], "ai": false, "rank": 112, "batch": 2}
+{"cid": "v1114", "pr": 31089, "path": "Mathlib/Topology/ContinuousMap/Bounded/Basic.lean", "markers": ["external"], "ai": false, "rank": 3, "batch": 3}
+{"cid": "v1290", "pr": 32125, "path": "Mathlib/Combinatorics/SimpleGraph/Walks/Subwalks.lean", "markers": ["reason"], "ai": false, "rank": 37, "batch": 4}
+{"cid": "v2204", "pr": 36963, "path": "Mathlib/NumberTheory/ModularForms/Derivative.lean", "markers": ["reason"], "ai": true, "rank": 1, "batch": 1}
+{"cid": "v1484", "pr": 32971, "path": "Mathlib/Data/Finsupp/Pointwise.lean", "markers": ["reason"], "ai": false, "rank": 367, "batch": 2}
+{"cid": "v1176", "pr": 31453, "path": "Mathlib/Topology/Homotopy/LocallyContractible.lean", "markers": ["preference"], "ai": true, "rank": 113, "batch": 3}
+{"cid": "v0867", "pr": 29682, "path": "Mathlib/Analysis/InnerProductSpace/Harmonic/MeanValue.lean", "markers": ["reason"], "ai": false, "rank": 13, "batch": 4}
+{"cid": "v0199", "pr": 26350, "path": "Mathlib/RingTheory/RootsOfUnity/Basic.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 1}
+{"cid": "v1912", "pr": 35632, "path": "Mathlib/Data/List/TakeDrop.lean", "markers": ["reason", "external"], "ai": false, "rank": 215, "batch": 2}
+{"cid": "v2100", "pr": 36421, "path": null, "markers": ["reason", "consistency", "external"], "ai": true, "rank": 10, "batch": 3}
+{"cid": "v1929", "pr": 35787, "path": "Mathlib/Analysis/Distribution/SchwartzSpace/Basic.lean", "markers": ["reason"], "ai": false, "rank": 120, "batch": 4}
+{"cid": "v1564", "pr": 33606, "path": "Mathlib/Algebra/Lie/BaseChange.lean", "markers": ["reason"], "ai": false, "rank": 68, "batch": 1}
+{"cid": "v0081", "pr": 25909, "path": "Mathlib/Order/CompleteBooleanAlgebra.lean", "markers": ["currency"], "ai": false, "rank": 48, "batch": 2}
+{"cid": "v0953", "pr": 30177, "path": "Mathlib/CategoryTheory/Sites/Descent/IsPrestack.lean", "markers": ["consistency"], "ai": false, "rank": 94, "batch": 3}
+{"cid": "v0303", "pr": 26796, "path": "Mathlib/LinearAlgebra/Span/Defs.lean", "markers": ["reason", "currency"], "ai": false, "rank": 166, "batch": 4}
+{"cid": "v0898", "pr": 29896, "path": "Mathlib/Tactic/Linter/DirectoryDependency.lean", "markers": ["reason"], "ai": false, "rank": 79, "batch": 1}
+{"cid": "v1296", "pr": 32141, "path": "Mathlib/Data/Sum/Basic.lean", "markers": ["reason"], "ai": false, "rank": 42, "batch": 2}
+{"cid": "v1482", "pr": 32971, "path": "Mathlib/Data/Finsupp/Pointwise.lean", "markers": ["external"], "ai": false, "rank": 115, "batch": 3}
+{"cid": "v0864", "pr": 29664, "path": null, "markers": ["reason"], "ai": false, "rank": 1, "batch": 4}
+{"cid": "v0395", "pr": 27118, "path": "Mathlib/LinearAlgebra/Matrix/Charpoly/Eigs.lean", "markers": ["external"], "ai": true, "rank": 6, "batch": 1}
+{"cid": "v1123", "pr": 31168, "path": "Mathlib/Data/Sign/Defs.lean", "markers": ["reason"], "ai": false, "rank": 32, "batch": 2}
+{"cid": "v0194", "pr": 26309, "path": "Mathlib/Data/Finsupp/Option.lean", "markers": ["external"], "ai": false, "rank": 97, "batch": 3}
+{"cid": "v1654", "pr": 34204, "path": "Mathlib/LinearAlgebra/QuadraticForm/Signature.lean", "markers": ["preference"], "ai": false, "rank": 204, "batch": 4}
+{"cid": "v1449", "pr": 32851, "path": "Mathlib/MeasureTheory/Measure/Hausdorff.lean", "markers": ["external"], "ai": true, "rank": 10, "batch": 1}
+{"cid": "v0903", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["currency"], "ai": false, "rank": 126, "batch": 2}
+{"cid": "v1706", "pr": 34393, "path": null, "markers": ["reason", "external", "preference"], "ai": false, "rank": 291, "batch": 3}
+{"cid": "v0919", "pr": 29976, "path": "Mathlib/Topology/Semicontinuous.lean", "markers": ["reason"], "ai": false, "rank": 25, "batch": 4}
+{"cid": "v0559", "pr": 27939, "path": "Mathlib/Topology/Algebra/Valued/ValuativeRel.lean", "markers": ["currency"], "ai": false, "rank": 305, "batch": 1}
+{"cid": "v1268", "pr": 31984, "path": "Mathlib/LinearAlgebra/ConvexSpace.lean", "markers": ["external"], "ai": true, "rank": 136, "batch": 2}
+{"cid": "v1464", "pr": 32911, "path": "Mathlib/Topology/Order/IsLUB.lean", "markers": ["reason"], "ai": false, "rank": 25, "batch": 3}
+{"cid": "v1218", "pr": 31644, "path": "Mathlib/RingTheory/Regular/ProjectiveDimension.lean", "markers": ["reason"], "ai": false, "rank": 25, "batch": 4}
+{"cid": "v0356", "pr": 26989, "path": "Mathlib/CategoryTheory/Subobject/ArtinianObject.lean", "markers": ["reason"], "ai": false, "rank": 7, "batch": 1}
+{"cid": "v0192", "pr": 26308, "path": null, "markers": ["external"], "ai": false, "rank": 394, "batch": 2}
+{"cid": "v0883", "pr": 29761, "path": "Mathlib/Data/ZMod/QuotientRing.lean", "markers": ["external"], "ai": false, "rank": 300, "batch": 3}
+{"cid": "v1272", "pr": 31986, "path": "Mathlib/Data/List/Cycle.lean", "markers": ["reason"], "ai": false, "rank": 28, "batch": 4}
+{"cid": "v0063", "pr": 25780, "path": "Mathlib/AlgebraicTopology/SimplicialSet/StdSimplex.lean", "markers": ["reason", "consistency"], "ai": false, "rank": 4, "batch": 1}
+{"cid": "v0902", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["currency"], "ai": false, "rank": 4, "batch": 2}
+{"cid": "v0832", "pr": 29507, "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean", "markers": ["reason"], "ai": false, "rank": 221, "batch": 3}
+{"cid": "v1943", "pr": 35822, "path": "Mathlib/Order/ConditionallyCompleteLattice/Finset.lean", "markers": ["reason"], "ai": false, "rank": 203, "batch": 4}
+{"cid": "v1897", "pr": 35469, "path": "Mathlib/GroupTheory/GroupAction/DomAct/Basic.lean", "markers": ["reason"], "ai": true, "rank": 29, "batch": 1}
+{"cid": "v0100", "pr": 25941, "path": "Mathlib/AlgebraicGeometry/AffineTransitionLimit.lean", "markers": ["external"], "ai": false, "rank": 94, "batch": 2}
+{"cid": "v1038", "pr": 30542, "path": "Mathlib/Data/Sym/Sym2.lean", "markers": ["consistency"], "ai": false, "rank": 75, "batch": 3}
+{"cid": "v1511", "pr": 33060, "path": "Mathlib/RingTheory/Valuation/Basic.lean", "markers": ["preference"], "ai": false, "rank": 15, "batch": 4}
+{"cid": "v0030", "pr": 25447, "path": "Mathlib/Algebra/Ring/Hom/Basic.lean", "markers": ["currency"], "ai": false, "rank": 351, "batch": 1}
+{"cid": "v1505", "pr": 33036, "path": "Mathlib/Order/Hom/Basic.lean", "markers": ["reason"], "ai": false, "rank": 32, "batch": 2}
+{"cid": "v1461", "pr": 32892, "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 3}
+{"cid": "v0382", "pr": 27099, "path": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean", "markers": ["reason"], "ai": false, "rank": 74, "batch": 4}
+{"cid": "v0998", "pr": 30349, "path": "Mathlib/Topology/DiscreteSubset.lean", "markers": ["reason"], "ai": false, "rank": 207, "batch": 1}
+{"cid": "v2272", "pr": 37376, "path": "Mathlib/Topology/CantorBendixson.lean", "markers": ["external"], "ai": true, "rank": 189, "batch": 2}
+{"cid": "v2175", "pr": 36828, "path": "Mathlib/Algebra/Order/Floor/Defs.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 3}
+{"cid": "v2194", "pr": 36914, "path": null, "markers": ["external"], "ai": true, "rank": 212, "batch": 4}
+{"cid": "v1297", "pr": 32141, "path": "Mathlib/Data/Sum/Basic.lean", "markers": ["preference"], "ai": false, "rank": 30, "batch": 1}
+{"cid": "v1067", "pr": 30769, "path": null, "markers": ["reason"], "ai": true, "rank": 1, "batch": 2}
+{"cid": "v1267", "pr": 31984, "path": "Mathlib/LinearAlgebra/ConvexSpace.lean", "markers": ["reason"], "ai": true, "rank": 218, "batch": 3}
+{"cid": "v2089", "pr": 36385, "path": "Mathlib/Topology/Compactness/CountablyCompact.lean", "markers": ["reason", "preference"], "ai": false, "rank": 25, "batch": 4}
+{"cid": "v0868", "pr": 29682, "path": "Mathlib/Analysis/InnerProductSpace/Harmonic/MeanValue.lean", "markers": ["reason"], "ai": false, "rank": 26, "batch": 1}
+{"cid": "v2167", "pr": 36785, "path": null, "markers": ["external"], "ai": true, "rank": 31, "batch": 2}
+{"cid": "v1878", "pr": 35399, "path": "Mathlib/Analysis/Complex/Poisson.lean", "markers": ["reason"], "ai": false, "rank": 264, "batch": 3}
+{"cid": "v1091", "pr": 30983, "path": "Mathlib/RingTheory/Polynomial/Resultant/Basic.lean", "markers": ["reason"], "ai": false, "rank": 3, "batch": 4}
+{"cid": "v1618", "pr": 34029, "path": "Mathlib/Order/PartialSups.lean", "markers": ["reason"], "ai": true, "rank": 265, "batch": 1}
+{"cid": "v1157", "pr": 31399, "path": "Mathlib/MeasureTheory/Function/ConditionalExpectation/Basic.lean", "markers": ["consistency"], "ai": false, "rank": 34, "batch": 2}
+{"cid": "v0811", "pr": 29426, "path": "Mathlib/Data/Finset/Range.lean", "markers": ["external", "currency"], "ai": false, "rank": 17, "batch": 3}
+{"cid": "v0646", "pr": 28484, "path": null, "markers": ["currency"], "ai": false, "rank": 48, "batch": 4}
+{"cid": "v2096", "pr": 36415, "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/RealImaginaryPart.lean", "markers": ["reason"], "ai": false, "rank": 20, "batch": 1}
+{"cid": "v1185", "pr": 31509, "path": null, "markers": ["external"], "ai": false, "rank": 16, "batch": 2}
+{"cid": "v0028", "pr": 25447, "path": "Mathlib/Algebra/Divisibility/Hom.lean", "markers": ["currency"], "ai": false, "rank": 17, "batch": 3}
+{"cid": "v0697", "pr": 28872, "path": null, "markers": ["preference"], "ai": false, "rank": 17, "batch": 4}
+{"cid": "v0142", "pr": 26167, "path": "Mathlib/RingTheory/Valuation/ValuativeDiv.lean", "markers": ["reason"], "ai": false, "rank": 278, "batch": 1}
+{"cid": "v1263", "pr": 31984, "path": "Mathlib/LinearAlgebra/ConvexSpace.lean", "markers": ["reason"], "ai": true, "rank": 136, "batch": 2}
+{"cid": "v2267", "pr": 37376, "path": "Mathlib/Topology/CantorBendixson.lean", "markers": ["external"], "ai": true, "rank": 51, "batch": 3}
+{"cid": "v1702", "pr": 34384, "path": "Mathlib/Util/MemoFix.lean", "markers": ["currency"], "ai": false, "rank": 129, "batch": 4}
+{"cid": "v1000", "pr": 30349, "path": "Mathlib/Topology/Constructions.lean", "markers": ["reason", "preference"], "ai": false, "rank": 26, "batch": 1}
+{"cid": "v0888", "pr": 29821, "path": "Mathlib/Data/Nat/Choose/Bounds.lean", "markers": ["reason"], "ai": false, "rank": 25, "batch": 2}
+{"cid": "v1696", "pr": 34374, "path": "Mathlib/MeasureTheory/Measure/Dirac.lean", "markers": ["preference"], "ai": false, "rank": 64, "batch": 3}
+{"cid": "v0913", "pr": 29941, "path": null, "markers": ["external"], "ai": false, "rank": 87, "batch": 4}
+{"cid": "v0608", "pr": 28206, "path": null, "markers": ["reason"], "ai": false, "rank": 1, "batch": 1}
+{"cid": "v1020", "pr": 30405, "path": null, "markers": ["external"], "ai": false, "rank": 10, "batch": 2}
+{"cid": "v1514", "pr": 33109, "path": "Mathlib/Algebra/Ring/Units.lean", "markers": ["reason"], "ai": false, "rank": 16, "batch": 3}
+{"cid": "v1701", "pr": 34374, "path": "Mathlib/MeasureTheory/Measure/Restrict.lean", "markers": ["external"], "ai": false, "rank": 3, "batch": 4}
+{"cid": "v1616", "pr": 33997, "path": "Mathlib/Tactic/TFAE.lean", "markers": ["reason"], "ai": false, "rank": 36, "batch": 1}
+{"cid": "v1861", "pr": 35280, "path": "Mathlib/Analysis/Polynomial/MahlerMeasure.lean", "markers": ["external"], "ai": true, "rank": 6, "batch": 2}
+{"cid": "v1623", "pr": 34045, "path": null, "markers": ["external", "currency"], "ai": false, "rank": 199, "batch": 3}
+{"cid": "v0899", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["external", "currency"], "ai": false, "rank": 48, "batch": 4}
+{"cid": "v1485", "pr": 32971, "path": "Mathlib/Data/Finsupp/Pointwise.lean", "markers": ["preference"], "ai": false, "rank": 139, "batch": 1}
+{"cid": "v0627", "pr": 28283, "path": "Mathlib/NumberTheory/FunctionField.lean", "markers": ["preference"], "ai": false, "rank": 12, "batch": 2}
+{"cid": "v0444", "pr": 27299, "path": "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Formula.lean", "markers": ["reason"], "ai": false, "rank": 231, "batch": 3}
+{"cid": "v0447", "pr": 27299, "path": null, "markers": ["external"], "ai": false, "rank": 398, "batch": 4}
+{"cid": "v1245", "pr": 31889, "path": "Mathlib/Order/Basic.lean", "markers": ["consistency"], "ai": false, "rank": 34, "batch": 1}
+{"cid": "v1439", "pr": 32841, "path": null, "markers": ["reason"], "ai": false, "rank": 105, "batch": 2}
+{"cid": "v0082", "pr": 25909, "path": "Mathlib/Order/CompleteBooleanAlgebra.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 3}
+{"cid": "v0397", "pr": 27154, "path": "Mathlib/RingTheory/SimpleModule/Basic.lean", "markers": ["external"], "ai": false, "rank": 21, "batch": 4}
+{"cid": "v2094", "pr": 36385, "path": "Mathlib/Topology/Compactness/CountablyCompact.lean", "markers": ["reason"], "ai": false, "rank": 382, "batch": 1}
+{"cid": "v0916", "pr": 29976, "path": "Mathlib/Topology/Semicontinuous.lean", "markers": ["external"], "ai": false, "rank": 169, "batch": 2}
+{"cid": "v0478", "pr": 27475, "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Instances.lean", "markers": ["preference"], "ai": false, "rank": 23, "batch": 3}
+{"cid": "v1523", "pr": 33221, "path": null, "markers": ["external"], "ai": false, "rank": 144, "batch": 4}
+{"cid": "v0972", "pr": 30299, "path": null, "markers": ["external"], "ai": false, "rank": 10, "batch": 1}
+{"cid": "v1273", "pr": 31986, "path": "Mathlib/Data/List/Cycle.lean", "markers": ["reason"], "ai": false, "rank": 25, "batch": 2}
+{"cid": "v1162", "pr": 31431, "path": "Mathlib/Data/ENNReal/Real.lean", "markers": ["consistency"], "ai": true, "rank": 175, "batch": 3}
+{"cid": "v1612", "pr": 33939, "path": "Mathlib/Topology/Instances/Real/Lemmas.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 4}
+{"cid": "v0901", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["currency"], "ai": false, "rank": 126, "batch": 1}
+{"cid": "v2220", "pr": 37009, "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/ConjSqrt.lean", "markers": ["reason"], "ai": false, "rank": 130, "batch": 2}
+{"cid": "v0320", "pr": 26875, "path": null, "markers": ["external"], "ai": false, "rank": 4, "batch": 3}
+{"cid": "v1458", "pr": 32892, "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 4}
+{"cid": "v1617", "pr": 34014, "path": null, "markers": ["external"], "ai": false, "rank": 1, "batch": 1}
+{"cid": "v1560", "pr": 33583, "path": "Mathlib/Computability/Primrec.lean", "markers": ["currency"], "ai": true, "rank": 192, "batch": 2}
+{"cid": "v0983", "pr": 30348, "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean", "markers": ["preference"], "ai": false, "rank": 5, "batch": 3}
+{"cid": "v1823", "pr": 35044, "path": "Mathlib/RingTheory/Radical.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 4}
+{"cid": "v1173", "pr": 31451, "path": "Mathlib/Analysis/Convex/Combination.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 1}
+{"cid": "v1874", "pr": 35399, "path": "Mathlib/Analysis/Complex/Poisson.lean", "markers": ["reason"], "ai": false, "rank": 164, "batch": 2}
+{"cid": "v0609", "pr": 28206, "path": null, "markers": ["reason"], "ai": false, "rank": 132, "batch": 3}
+{"cid": "v0029", "pr": 25447, "path": "Mathlib/RingTheory/Polynomial/Basic.lean", "markers": ["reason", "preference"], "ai": false, "rank": 22, "batch": 4}
+{"cid": "v0204", "pr": 26364, "path": "Mathlib/Analysis/SpecialFunctions/Pow/Real.lean", "markers": ["currency"], "ai": false, "rank": 36, "batch": 1}
+{"cid": "v1460", "pr": 32892, "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean", "markers": ["reason"], "ai": false, "rank": 101, "batch": 2}
+{"cid": "v1282", "pr": 32103, "path": "Mathlib/Algebra/Polynomial/Splits.lean", "markers": ["reason"], "ai": false, "rank": 3, "batch": 3}
+{"cid": "v0179", "pr": 26297, "path": "Mathlib/LinearAlgebra/TensorProduct/Basic.lean", "markers": ["reason"], "ai": false, "rank": 46, "batch": 4}
+{"cid": "v1036", "pr": 30540, "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean", "markers": ["reason"], "ai": false, "rank": 303, "batch": 1}
+{"cid": "v0487", "pr": 27596, "path": null, "markers": ["reason", "consistency", "external"], "ai": false, "rank": 115, "batch": 2}
+{"cid": "v0798", "pr": 29314, "path": "Mathlib/Algebra/SkewMonoidAlgebra/Lift.lean", "markers": ["currency"], "ai": false, "rank": 113, "batch": 3}
+{"cid": "v1288", "pr": 32106, "path": "Mathlib/Data/List/Zip.lean", "markers": ["external"], "ai": false, "rank": 62, "batch": 4}
+{"cid": "v0979", "pr": 30344, "path": null, "markers": ["external"], "ai": false, "rank": 1, "batch": 1}
+{"cid": "v1768", "pr": 34660, "path": "Mathlib/Analysis/InnerProductSpace/Spectrum.lean", "markers": ["preference"], "ai": false, "rank": 158, "batch": 2}
+{"cid": "v1168", "pr": 31446, "path": null, "markers": ["preference"], "ai": true, "rank": 98, "batch": 3}
+{"cid": "v0558", "pr": 27939, "path": null, "markers": ["currency"], "ai": false, "rank": 66, "batch": 4}
+{"cid": "v1193", "pr": 31563, "path": "Mathlib/Analysis/InnerProductSpace/Dual.lean", "markers": ["reason"], "ai": false, "rank": 172, "batch": 1}
+{"cid": "v1257", "pr": 31968, "path": "Mathlib/CategoryTheory/Shift/Twist.lean", "markers": ["reason"], "ai": false, "rank": 218, "batch": 2}
+{"cid": "v1624", "pr": 34045, "path": null, "markers": ["currency"], "ai": false, "rank": 199, "batch": 3}
+{"cid": "v1208", "pr": 31644, "path": "Mathlib/RingTheory/Regular/ProjectiveDimension.lean", "markers": ["reason"], "ai": false, "rank": 32, "batch": 4}
+{"cid": "v2169", "pr": 36786, "path": null, "markers": ["reason"], "ai": true, "rank": 337, "batch": 1}
+{"cid": "v1953", "pr": 35914, "path": "Mathlib/Analysis/Complex/BorelCaratheodory.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 2}
+{"cid": "v1144", "pr": 31336, "path": "Mathlib/CategoryTheory/Sites/Hypercover/Zero.lean", "markers": ["reason"], "ai": false, "rank": 377, "batch": 3}
+{"cid": "v0538", "pr": 27841, "path": null, "markers": ["reason"], "ai": false, "rank": 16, "batch": 4}
+{"cid": "v0117", "pr": 26052, "path": "Mathlib/Algebra/Star/StarProjection.lean", "markers": ["external"], "ai": false, "rank": 229, "batch": 1}
+{"cid": "v2224", "pr": 37067, "path": "MathlibTest/AddGroup.lean", "markers": ["external"], "ai": true, "rank": 248, "batch": 2}
+{"cid": "v0033", "pr": 25565, "path": null, "markers": ["currency"], "ai": false, "rank": 24, "batch": 3}
+{"cid": "v0002", "pr": 25383, "path": "Mathlib/Topology/VectorBundle/Hom.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 4}
+{"cid": "v2256", "pr": 37304, "path": "Mathlib/Order/Directed.lean", "markers": ["reason"], "ai": false, "rank": 35, "batch": 1}
+{"cid": "v0900", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["currency"], "ai": false, "rank": 209, "batch": 2}
+{"cid": "v0494", "pr": 27599, "path": null, "markers": ["reason"], "ai": false, "rank": 279, "batch": 3}
+{"cid": "v1926", "pr": 35705, "path": "Mathlib/Data/ENNReal/Inv.lean", "markers": ["consistency", "external"], "ai": true, "rank": 108, "batch": 4}
+{"cid": "v1583", "pr": 33757, "path": "Mathlib/Logic/Basic.lean", "markers": ["reason"], "ai": false, "rank": 197, "batch": 1}
+{"cid": "v2244", "pr": 37216, "path": "Mathlib/Algebra/Module/StablyFree/FreeOfLocalizedEq.lean", "markers": ["external", "preference"], "ai": false, "rank": 5, "batch": 2}
+{"cid": "v1457", "pr": 32892, "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean", "markers": ["external", "preference"], "ai": false, "rank": 312, "batch": 3}
+{"cid": "v0825", "pr": 29476, "path": "Mathlib/LinearAlgebra/Matrix/Spectrum.lean", "markers": ["reason"], "ai": true, "rank": 28, "batch": 4}
+{"cid": "v1147", "pr": 31362, "path": null, "markers": ["external"], "ai": false, "rank": 1, "batch": 1}
+{"cid": "v1592", "pr": 33812, "path": "Mathlib/Data/Finset/Prod.lean", "markers": ["reason"], "ai": false, "rank": 198, "batch": 2}
+{"cid": "v1148", "pr": 31362, "path": "Mathlib/Combinatorics/Enumerative/PentagonalNumbers.lean", "markers": ["reason"], "ai": false, "rank": 80, "batch": 3}
+{"cid": "v1488", "pr": 32992, "path": "Mathlib/Analysis/Fourier/Convolution.lean", "markers": ["reason"], "ai": false, "rank": 82, "batch": 4}
+{"cid": "v0921", "pr": 29976, "path": "Mathlib/Topology/Semicontinuous.lean", "markers": ["reason", "external"], "ai": false, "rank": 169, "batch": 1}
+{"cid": "v1445", "pr": 32851, "path": "Mathlib/MeasureTheory/Measure/Hausdorff.lean", "markers": ["external"], "ai": true, "rank": 6, "batch": 2}
+{"cid": "v1035", "pr": 30540, "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean", "markers": ["reason"], "ai": false, "rank": 232, "batch": 3}
+{"cid": "v0185", "pr": 26308, "path": "Mathlib/Analysis/NormedSpace/Normalized.lean", "markers": ["reason"], "ai": false, "rank": 21, "batch": 4}
+{"cid": "v0965", "pr": 30235, "path": "Mathlib/Geometry/Euclidean/Sphere/Tangent.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 1}
+{"cid": "v1283", "pr": 32103, "path": "Mathlib/Algebra/Polynomial/Factors.lean", "markers": ["currency"], "ai": false, "rank": 26, "batch": 2}
+{"cid": "v1894", "pr": 35464, "path": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean", "markers": ["external"], "ai": false, "rank": 25, "batch": 3}
+{"cid": "v1703", "pr": 34384, "path": "Mathlib/Lean/Expr/ReplaceRec.lean", "markers": ["currency"], "ai": false, "rank": 129, "batch": 4}
+{"cid": "v1311", "pr": 32229, "path": null, "markers": ["reason"], "ai": false, "rank": 58, "batch": 1}
+{"cid": "v1801", "pr": 34868, "path": "Mathlib/Analysis/Polynomial/Basic.lean", "markers": ["preference"], "ai": false, "rank": 18, "batch": 2}
+{"cid": "v0072", "pr": 25837, "path": "Mathlib/Combinatorics/SimpleGraph/ConcreteColorings.lean", "markers": ["preference"], "ai": false, "rank": 5, "batch": 3}
+{"cid": "v0974", "pr": 30299, "path": null, "markers": ["currency"], "ai": false, "rank": 17, "batch": 4}
+{"cid": "v1490", "pr": 32992, "path": "Mathlib/Analysis/Fourier/Convolution.lean", "markers": ["reason"], "ai": false, "rank": 70, "batch": 1}
+{"cid": "v0914", "pr": 29955, "path": "Mathlib/Data/Set/Subsingleton.lean", "markers": ["reason"], "ai": false, "rank": 204, "batch": 2}
+{"cid": "v1659", "pr": 34241, "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean", "markers": ["currency"], "ai": false, "rank": 302, "batch": 3}
+{"cid": "v1044", "pr": 30570, "path": null, "markers": ["reason"], "ai": false, "rank": 51, "batch": 4}
+{"cid": "v0996", "pr": 30348, "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean", "markers": ["external"], "ai": false, "rank": 6, "batch": 1}
+{"cid": "v0034", "pr": 25565, "path": "Mathlib/CategoryTheory/Bicategory/NaturalTransformation/Lax.lean", "markers": ["reason"], "ai": false, "rank": 67, "batch": 2}
+{"cid": "v1875", "pr": 35399, "path": "Mathlib/Analysis/Complex/Poisson.lean", "markers": ["reason", "preference"], "ai": false, "rank": 392, "batch": 3}
+{"cid": "v1024", "pr": 30494, "path": "Mathlib/Analysis/Complex/ValueDistribution/CharacteristicFunction.lean", "markers": ["external"], "ai": false, "rank": 356, "batch": 4}
+{"cid": "v2176", "pr": 36830, "path": "Mathlib/Data/Nat/Digits/Lemmas.lean", "markers": ["reason"], "ai": true, "rank": 18, "batch": 1}
+{"cid": "v0513", "pr": 27720, "path": "Mathlib/CategoryTheory/Adjunction/Quadruple.lean", "markers": ["external"], "ai": false, "rank": 84, "batch": 2}
+{"cid": "v0839", "pr": 29513, "path": null, "markers": ["reason"], "ai": false, "rank": 58, "batch": 3}
+{"cid": "v1249", "pr": 31936, "path": null, "markers": ["reason"], "ai": false, "rank": 143, "batch": 4}
+{"cid": "v1677", "pr": 34278, "path": "Mathlib/Topology/Sets/VietorisTopology.lean", "markers": ["preference"], "ai": false, "rank": 374, "batch": 1}
+{"cid": "v1225", "pr": 31737, "path": null, "markers": ["reason", "preference"], "ai": true, "rank": 32, "batch": 2}
+{"cid": "v2289", "pr": 37403, "path": "Mathlib/Analysis/Calculus/Monotone.lean", "markers": ["preference"], "ai": false, "rank": 42, "batch": 3}
+{"cid": "v1440", "pr": 32841, "path": "Mathlib/Analysis/Normed/Group/Seminorm.lean", "markers": ["reason", "preference"], "ai": false, "rank": 113, "batch": 4}
+{"cid": "v1087", "pr": 30933, "path": null, "markers": ["external"], "ai": false, "rank": 51, "batch": 1}
+{"cid": "v2097", "pr": 36421, "path": null, "markers": ["reason", "external"], "ai": true, "rank": 31, "batch": 2}
+{"cid": "v1771", "pr": 34675, "path": "Mathlib/RingTheory/Bialgebra/TensorProduct.lean", "markers": ["reason"], "ai": false, "rank": 46, "batch": 3}
+{"cid": "v0980", "pr": 30344, "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/MeanValue.lean", "markers": ["reason"], "ai": false, "rank": 3, "batch": 4}
+{"cid": "v0831", "pr": 29507, "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean", "markers": ["consistency"], "ai": false, "rank": 18, "batch": 1}
+{"cid": "v2037", "pr": 36262, "path": "Mathlib/NumberTheory/ModularForms/Discriminant.lean", "markers": ["reason"], "ai": true, "rank": 155, "batch": 2}
+{"cid": "v0603", "pr": 28179, "path": "Mathlib/Algebra/Order/Ring/Archimedean.lean", "markers": ["reason", "external"], "ai": false, "rank": 298, "batch": 3}
+{"cid": "v1254", "pr": 31961, "path": "Mathlib/Topology/DiscreteSubset.lean", "markers": ["reason"], "ai": false, "rank": 26, "batch": 4}
+{"cid": "v0814", "pr": 29464, "path": null, "markers": ["consistency"], "ai": false, "rank": 40, "batch": 1}
+{"cid": "v1978", "pr": 36048, "path": "Mathlib/Tactic/DefEqAbuse.lean", "markers": ["consistency", "preference"], "ai": true, "rank": 240, "batch": 2}
+{"cid": "v1382", "pr": 32600, "path": "Mathlib/LinearAlgebra/Multilinear/Basic.lean", "markers": ["reason", "currency"], "ai": false, "rank": 306, "batch": 3}
+{"cid": "v0212", "pr": 26371, "path": "Mathlib/NumberTheory/Niven.lean", "markers": ["consistency"], "ai": true, "rank": 9, "batch": 4}
+{"cid": "v2042", "pr": 36262, "path": "Mathlib/NumberTheory/ModularForms/LevelOne.lean", "markers": ["preference"], "ai": true, "rank": 83, "batch": 1}
+{"cid": "v1704", "pr": 34384, "path": null, "markers": ["currency"], "ai": false, "rank": 117, "batch": 2}
+{"cid": "v0926", "pr": 29979, "path": "Mathlib/Algebra/Lie/Weights/InvariantSubmoduleLieIdeal.lean", "markers": ["preference"], "ai": false, "rank": 53, "batch": 3}
+{"cid": "v1867", "pr": 35381, "path": "Mathlib/CategoryTheory/Abelian/Basic.lean", "markers": ["preference"], "ai": false, "rank": 195, "batch": 4}
+{"cid": "v2199", "pr": 36925, "path": "Mathlib/SetTheory/Ordinal/Basic.lean", "markers": ["consistency"], "ai": false, "rank": 161, "batch": 1}
+{"cid": "v1491", "pr": 33000, "path": "Mathlib/Analysis/Analytic/Order.lean", "markers": ["external"], "ai": false, "rank": 4, "batch": 2}
+{"cid": "v1852", "pr": 35208, "path": "Mathlib/Order/Bounds/Basic.lean", "markers": ["reason"], "ai": true, "rank": 41, "batch": 3}
+{"cid": "v2149", "pr": 36730, "path": null, "markers": ["reason"], "ai": true, "rank": 103, "batch": 4}
+{"cid": "v1908", "pr": 35607, "path": null, "markers": ["reason"], "ai": false, "rank": 6, "batch": 1}
+{"cid": "v1387", "pr": 32632, "path": "Mathlib/FieldTheory/IsAlgClosed/Basic.lean", "markers": ["reason", "currency"], "ai": false, "rank": 192, "batch": 2}
+{"cid": "v0907", "pr": 29896, "path": "Mathlib/LinearAlgebra/Matrix/PosDef.lean", "markers": ["consistency"], "ai": false, "rank": 309, "batch": 3}
+{"cid": "v0126", "pr": 26060, "path": "Mathlib/AlgebraicGeometry/Grassmannian.lean", "markers": ["reason"], "ai": false, "rank": 144, "batch": 4}
+{"cid": "v1596", "pr": 33838, "path": "Mathlib/NumberTheory/UnitaryDivisor.lean", "markers": ["external"], "ai": false, "rank": 314, "batch": 1}
+{"cid": "v1777", "pr": 34705, "path": "Mathlib/RingTheory/Grassmannian.lean", "markers": ["preference"], "ai": true, "rank": 127, "batch": 2}
+{"cid": "v1163", "pr": 31431, "path": "Mathlib/Data/Nat/Fib/Basic.lean", "markers": ["consistency"], "ai": true, "rank": 175, "batch": 3}
+{"cid": "v0248", "pr": 26543, "path": "Mathlib/SetTheory/ZFC/Neumann.lean", "markers": ["external"], "ai": false, "rank": 74, "batch": 4}
+{"cid": "v1352", "pr": 32454, "path": "Mathlib/Analysis/Normed/Field/Basic.lean", "markers": ["consistency"], "ai": false, "rank": 9, "batch": 1}
+{"cid": "v0458", "pr": 27407, "path": null, "markers": ["external"], "ai": false, "rank": 19, "batch": 2}
+{"cid": "v1277", "pr": 32062, "path": null, "markers": ["currency"], "ai": false, "rank": 48, "batch": 3}
+{"cid": "v0258", "pr": 26649, "path": "Mathlib/Data/Sym/Sym2.lean", "markers": ["reason"], "ai": false, "rank": 343, "batch": 4}
+{"cid": "v2222", "pr": 37009, "path": "Mathlib/Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow/RingInverseOrder.lean", "markers": ["external"], "ai": false, "rank": 6, "batch": 1}
+{"cid": "v1329", "pr": 32315, "path": null, "markers": ["reason"], "ai": false, "rank": 290, "batch": 2}
+{"cid": "v2170", "pr": 36810, "path": "Mathlib/CategoryTheory/Adjunction/FullyFaithfulLimits.lean", "markers": ["reason", "external"], "ai": false, "rank": 245, "batch": 3}
+{"cid": "v0542", "pr": 27912, "path": "Mathlib/Analysis/NormedSpace/OperatorNorm/NNNorm.lean", "markers": ["reason", "preference"], "ai": false, "rank": 121, "batch": 4}
+{"cid": "v1326", "pr": 32251, "path": "Mathlib/AlgebraicTopology/SimplicialSet/FiniteProd.lean", "markers": ["reason"], "ai": false, "rank": 85, "batch": 1}
+{"cid": "v1253", "pr": 31961, "path": "Mathlib/Topology/DiscreteSubset.lean", "markers": ["reason"], "ai": false, "rank": 3, "batch": 2}
+{"cid": "v0829", "pr": 29507, "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean", "markers": ["consistency"], "ai": false, "rank": 34, "batch": 3}
+{"cid": "v0588", "pr": 28106, "path": null, "markers": ["reason"], "ai": false, "rank": 19, "batch": 4}
+{"cid": "v2050", "pr": 36275, "path": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean", "markers": ["reason"], "ai": false, "rank": 53, "batch": 1}
+{"cid": "v1178", "pr": 31453, "path": "Mathlib/Topology/Homotopy/LocallyContractible.lean", "markers": ["reason"], "ai": true, "rank": 60, "batch": 2}
+{"cid": "v0394", "pr": 27118, "path": "Mathlib/LinearAlgebra/Matrix/Charpoly/Eigs.lean", "markers": ["external"], "ai": true, "rank": 25, "batch": 3}
+{"cid": "v1716", "pr": 34442, "path": null, "markers": ["external"], "ai": true, "rank": 31, "batch": 4}
+{"cid": "v1647", "pr": 34178, "path": "Mathlib/RingTheory/Spectrum/Prime/Noetherian.lean", "markers": ["reason", "external"], "ai": false, "rank": 62, "batch": 1}
+{"cid": "v1512", "pr": 33060, "path": "Mathlib/RingTheory/Valuation/Discrete/Basic.lean", "markers": ["external"], "ai": false, "rank": 6, "batch": 2}
+{"cid": "v0470", "pr": 27464, "path": "Mathlib/Combinatorics/SimpleGraph/Paths.lean", "markers": ["reason"], "ai": false, "rank": 5, "batch": 3}
+{"cid": "v0771", "pr": 29275, "path": "Mathlib/GroupTheory/DivisibleHull.lean", "markers": ["preference"], "ai": false, "rank": 339, "batch": 4}
+{"cid": "v2006", "pr": 36174, "path": "Mathlib/Topology/Compactness/CountablyCompact.lean", "markers": ["consistency"], "ai": false, "rank": 180, "batch": 1}
+{"cid": "v1913", "pr": 35632, "path": "Mathlib/Data/List/TakeDrop.lean", "markers": ["external"], "ai": false, "rank": 215, "batch": 2}
+{"cid": "v1076", "pr": 30799, "path": "Mathlib/Algebra/Order/Monoid/Unbundled/Pow.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 3}
+{"cid": "v0661", "pr": 28648, "path": "Mathlib/RepresentationTheory/Homological/GroupCohomology/Basic.lean", "markers": ["preference"], "ai": false, "rank": 1, "batch": 4}
+{"cid": "v0747", "pr": 29128, "path": "Mathlib/LinearAlgebra/AffineSpace/Independent.lean", "markers": ["reason"], "ai": false, "rank": 5, "batch": 1}
+{"cid": "v1266", "pr": 31984, "path": "Mathlib/LinearAlgebra/ConvexSpace.lean", "markers": ["external"], "ai": true, "rank": 122, "batch": 2}
+{"cid": "v1888", "pr": 35436, "path": "Mathlib/CategoryTheory/Monoidal/Closed/InternalCurrying.lean", "markers": ["reason", "external"], "ai": false, "rank": 41, "batch": 3}
+{"cid": "v0984", "pr": 30348, "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean", "markers": ["preference"], "ai": false, "rank": 140, "batch": 4}
+{"cid": "v1764", "pr": 34660, "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean", "markers": ["reason"], "ai": false, "rank": 2, "batch": 1}
+{"cid": "v0110", "pr": 26000, "path": "Mathlib/RingTheory/MvPolynomial/MonomialOrder.lean", "markers": ["consistency"], "ai": false, "rank": 108, "batch": 2}
+{"cid": "v2226", "pr": 37072, "path": "Mathlib/Algebra/Algebra/Unitization.lean", "markers": ["reason"], "ai": true, "rank": 92, "batch": 3}
+{"cid": "v1870", "pr": 35399, "path": "Mathlib/Analysis/Complex/Poisson.lean", "markers": ["preference"], "ai": false, "rank": 226, "batch": 4}
+{"cid": "v0225", "pr": 26502, "path": "Mathlib/LinearAlgebra/AffineSpace/AffineMap.lean", "markers": ["consistency"], "ai": false, "rank": 200, "batch": 1}
+{"cid": "v1334", "pr": 32372, "path": "Mathlib/FieldTheory/Galois/Infinite.lean", "markers": ["preference"], "ai": false, "rank": 128, "batch": 2}
+{"cid": "v1563", "pr": 33595, "path": "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean", "markers": ["preference"], "ai": false, "rank": 116, "batch": 3}
+{"cid": "v1597", "pr": 33838, "path": "Mathlib/NumberTheory/UnitaryDivisor.lean", "markers": ["external"], "ai": false, "rank": 5, "batch": 4}
+{"cid": "v0576", "pr": 28000, "path": "Mathlib/Dynamics/Flow.lean", "markers": ["reason"], "ai": false, "rank": 26, "batch": 1}
+{"cid": "v1705", "pr": 34393, "path": "Mathlib/Geometry/Polygons/Basic.lean", "markers": ["external"], "ai": false, "rank": 51, "batch": 2}
+{"cid": "v1489", "pr": 32992, "path": "Mathlib/Analysis/Fourier/Convolution.lean", "markers": ["reason"], "ai": false, "rank": 386, "batch": 3}
+{"cid": "v1419", "pr": 32732, "path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Angle.lean", "markers": ["reason"], "ai": false, "rank": 2, "batch": 4}
+{"cid": "v1538", "pr": 33364, "path": null, "markers": ["external"], "ai": true, "rank": 17, "batch": 1}
+{"cid": "v2131", "pr": 36641, "path": null, "markers": ["external"], "ai": true, "rank": 31, "batch": 2}
+{"cid": "v1389", "pr": 32673, "path": "Mathlib/Topology/Baire/Lemmas.lean", "markers": ["reason"], "ai": true, "rank": 4, "batch": 3}
+{"cid": "v1712", "pr": 34393, "path": null, "markers": ["reason"], "ai": false, "rank": 241, "batch": 4}
+{"cid": "v0026", "pr": 25447, "path": "Mathlib/Algebra/Ring/Hom/Basic.lean", "markers": ["currency"], "ai": false, "rank": 50, "batch": 1}
+{"cid": "v0231", "pr": 26518, "path": "Mathlib/SetTheory/ZFC/VonNeumann.lean", "markers": ["reason"], "ai": false, "rank": 120, "batch": 2}
+{"cid": "v0845", "pr": 29530, "path": "Mathlib/Dynamics/PeriodicPts/Lemmas.lean", "markers": ["preference"], "ai": false, "rank": 106, "batch": 3}
+{"cid": "v0206", "pr": 26366, "path": "Mathlib/CategoryTheory/Limits/Shapes/Pullback/Categorical/Basic.lean", "markers": ["reason"], "ai": false, "rank": 237, "batch": 4}
+{"cid": "v1149", "pr": 31362, "path": "Mathlib/Combinatorics/Enumerative/PentagonalNumbers.lean", "markers": ["external"], "ai": false, "rank": 86, "batch": 1}
+{"cid": "v1936", "pr": 35820, "path": "Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean", "markers": ["reason"], "ai": false, "rank": 1, "batch": 2}
+{"cid": "v1006", "pr": 30350, "path": "Mathlib/AlgebraicGeometry/Modules/Sheaf.lean", "markers": ["reason"], "ai": false, "rank": 32, "batch": 3}
+{"cid": "v1931", "pr": 35795, "path": "Mathlib/GroupTheory/GroupAction/Defs.lean", "markers": ["preference"], "ai": false, "rank": 280, "batch": 4}
+{"cid": "v2202", "pr": 36963, "path": null, "markers": ["reason"], "ai": true, "rank": 80, "batch": 1}
+{"cid": "v0484", "pr": 27520, "path": "Mathlib/Algebra/Module/SpanRank.lean", "markers": ["reason"], "ai": false, "rank": 4, "batch": 2}
+{"cid": "v0879", "pr": 29734, "path": "Mathlib/Probability/Kernel/Irreducible.lean", "markers": ["reason"], "ai": false, "rank": 52, "batch": 3}
+{"cid": "v1644", "pr": 34135, "path": "Mathlib/RingTheory/Lasker.lean", "markers": ["preference"], "ai": false, "rank": 65, "batch": 4}
+{"cid": "v1221", "pr": 31709, "path": null, "markers": ["reason"], "ai": false, "rank": 92, "batch": 1}
+{"cid": "v2083", "pr": 36355, "path": null, "markers": ["currency"], "ai": false, "rank": 50, "batch": 2}
+{"cid": "v1544", "pr": 33486, "path": "Mathlib/Topology/Order/Basic.lean", "markers": ["reason"], "ai": false, "rank": 34, "batch": 3}
+{"cid": "v1898", "pr": 35469, "path": null, "markers": ["reason"], "ai": true, "rank": 270, "batch": 4}
+{"cid": "v2127", "pr": 36603, "path": "Mathlib/Analysis/Normed/Group/Real.lean", "markers": ["external"], "ai": false, "rank": 68, "batch": 1}
+{"cid": "v0645", "pr": 28484, "path": null, "markers": ["currency"], "ai": false, "rank": 48, "batch": 2}

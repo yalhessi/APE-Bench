@@ -1,0 +1,590 @@
+{
+ "41930": {
+  "GPT1": {
+   "findings": 0,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 4
+   }
+  },
+  "T1": {
+   "findings": 0,
+   "compiles": 1,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "AP3": {
+   "findings": 1,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "AP2": {
+   "findings": 2,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 0
+   }
+  },
+  "TA1": {
+   "findings": 12,
+   "compiles": 8,
+   "cut_to_budget": 0,
+   "targets_unresolved": 2
+  },
+  "DX1": {
+   "findings": 1,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 5
+   }
+  },
+  "X2": {
+   "findings": 0,
+   "compiles": 1,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT3": {
+   "findings": 0,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 4
+   }
+  },
+  "AP1": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 0
+   }
+  },
+  "X1": {
+   "findings": 0,
+   "compiles": 1,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "DX2": {
+   "findings": 2,
+   "compiles": 13,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 5
+   }
+  },
+  "GPT2": {
+   "findings": 0,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 3
+   }
+  },
+  "DX3": {
+   "findings": 2,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 1
+   }
+  }
+ },
+ "42184": {
+  "DX3": {
+   "findings": 2,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 0
+   }
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 3,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "AP1": {
+   "findings": 4,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "AP2": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 3
+   }
+  },
+  "AP3": {
+   "findings": 3,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 2
+   }
+  },
+  "T1": {
+   "findings": 4,
+   "compiles": 5,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT3": {
+   "findings": 1,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 2
+   }
+  },
+  "TA1": {
+   "findings": 5,
+   "compiles": 6,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT1": {
+   "findings": 1,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 4
+   }
+  },
+  "X2": {
+   "findings": 2,
+   "compiles": 3,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT2": {
+   "findings": 1,
+   "compiles": 18,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 14
+   }
+  },
+  "DX1": {
+   "findings": 2,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "DX2": {
+   "findings": 2,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 0
+   }
+  }
+ },
+ "42814": {
+  "GPT3": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 1
+   }
+  },
+  "DX3": {
+   "findings": 3,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 0
+   }
+  },
+  "GPT1": {
+   "findings": 2,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 1
+   }
+  },
+  "DX1": {
+   "findings": 3,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 2
+   }
+  },
+  "X1": {
+   "findings": 7,
+   "compiles": 18,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "DX2": {
+   "findings": 3,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 2
+   }
+  },
+  "AP1": {
+   "findings": 10,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 1
+   }
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 11,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "T1": {
+   "findings": 6,
+   "compiles": 9,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "AP3": {
+   "findings": 7,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 1
+   }
+  },
+  "TA1": {
+   "findings": 20,
+   "compiles": 19,
+   "cut_to_budget": 5,
+   "targets_unresolved": 0
+  },
+  "GPT2": {
+   "findings": 1,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 4
+   }
+  },
+  "AP2": {
+   "findings": 7,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 3
+   }
+  }
+ },
+ "43024": {
+  "T1": {
+   "findings": 1,
+   "compiles": 2,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT3": {
+   "findings": 0,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 2
+   }
+  },
+  "X1": {
+   "findings": 1,
+   "compiles": 4,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "DX2": {
+   "findings": 1,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "TA1": {
+   "findings": 6,
+   "compiles": 5,
+   "cut_to_budget": 0,
+   "targets_unresolved": 2
+  },
+  "DX3": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  },
+  "GPT2": {
+   "findings": 1,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 1
+   }
+  },
+  "AP3": {
+   "findings": 2,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 1
+   }
+  },
+  "DX1": {
+   "findings": 1,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "AP1": {
+   "findings": 2,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 1
+   }
+  },
+  "AP2": {
+   "findings": 2,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 1,
+   "compiles": 3,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT1": {
+   "findings": 0,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  }
+ },
+ "43167": {
+  "AP2": {
+   "findings": 5,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 1
+   }
+  },
+  "GPT3": {
+   "findings": 2,
+   "compiles": 11,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 3
+   }
+  },
+  "T1": {
+   "findings": 7,
+   "compiles": 8,
+   "cut_to_budget": 0,
+   "targets_unresolved": 1
+  },
+  "AP1": {
+   "findings": 7,
+   "compiles": 12,
+   "compile_split": {
+    "lean_verify_edit": 11,
+    "lean_verify": 1
+   }
+  },
+  "DX3": {
+   "findings": 2,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 0
+   }
+  },
+  "DX2": {
+   "findings": 2,
+   "compiles": 5,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 0
+   }
+  },
+  "DX1": {
+   "findings": 2,
+   "compiles": 15,
+   "compile_split": {
+    "lean_verify_edit": 11,
+    "lean_verify": 4
+   }
+  },
+  "TA1": {
+   "findings": 20,
+   "compiles": 11,
+   "cut_to_budget": 0,
+   "targets_unresolved": 2
+  },
+  "GPT2": {
+   "findings": 3,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 4
+   }
+  },
+  "AP3": {
+   "findings": 6,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 2
+   }
+  },
+  "X1": {
+   "findings": 6,
+   "compiles": 15,
+   "cut_to_budget": 0,
+   "targets_unresolved": 1
+  },
+  "GPT1": {
+   "findings": 3,
+   "compiles": 16,
+   "compile_split": {
+    "lean_verify_edit": 10,
+    "lean_verify": 6
+   }
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 10,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  }
+ },
+ "43192": {
+  "GPT1": {
+   "findings": 1,
+   "compiles": 10,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 5
+   }
+  },
+  "AP3": {
+   "findings": 6,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 1
+   }
+  },
+  "DX3": {
+   "findings": 4,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 4
+   }
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 13,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "DX1": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 2
+   }
+  },
+  "AP2": {
+   "findings": 9,
+   "compiles": 13,
+   "compile_split": {
+    "lean_verify_edit": 12,
+    "lean_verify": 1
+   }
+  },
+  "X1": {
+   "findings": 8,
+   "compiles": 15,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "DX2": {
+   "findings": 3,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 3
+   }
+  },
+  "TA1": {
+   "findings": 20,
+   "compiles": 21,
+   "cut_to_budget": 9,
+   "targets_unresolved": 0
+  },
+  "AP1": {
+   "findings": 6,
+   "compiles": 11,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 5
+   }
+  },
+  "GPT3": {
+   "findings": 3,
+   "compiles": 13,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 7
+   }
+  },
+  "T1": {
+   "findings": 7,
+   "compiles": 13,
+   "cut_to_budget": 0,
+   "targets_unresolved": 0
+  },
+  "GPT2": {
+   "findings": 3,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 3
+   }
+  }
+ }
+}

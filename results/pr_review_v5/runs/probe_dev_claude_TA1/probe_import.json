@@ -1,0 +1,55 @@
+{
+ "source": "probe session",
+ "set": "dev_medium_0_3_0",
+ "session": "TA1",
+ "packets_findings_sha256": {
+  "33066": "7dd8fea8ba879b81d8989c32ab6c58b2021ad8f434adc3482083bafacb18d352",
+  "33098": "8baf071215f6cb234fdd99b69af73985dd1a9df89a1ab81d8ec4386c3c01d42c",
+  "33117": "84fd93d4cc1a94a1a533a30ca0a4b3cf82a5674e29ad37b5241ca4abc809e749",
+  "33145": "665233db0d89ded85b4101541ece7f91c5508b3a00b59c4f3601c9891adb3ed4",
+  "33149": "3280fa7716aaf73f9dc0cd8bddd83d4a3566af236118ddb8fabe2fe6010610a3",
+  "33285": "e225065731a2aa750d9405b5df6600a17c0f21a57a3bb3ecabaeb4c34faea11b",
+  "33294": "11ba00eede6d3f6a9f5c747bcdf83fb9488cb8f038165e17063f7d68c74d02ae",
+  "33304": "5ed494e68dd5ac9689701922b7c8eb196438981993ce3cd286859d556c9538f4",
+  "33305": "d39c44f4884864e66ec30bec95e4421b7ffcf7a09973ba8d0ef324ac77eb7baf",
+  "33315": "c7f398b04e138af263ee939126c167eaae17171f0bcacd7b51d1995e3d19098e",
+  "33321": "f0d843a0dde05b11960b70b65354d1d18474ef9aca3270c9a652c1440f7a5380",
+  "33337": "ee7d808b0ad8a7685f48adcfb1f05eba4bb255f506f6bd9665e398a63dab5cf2",
+  "33362": "4c081a2fddb55c7c44cd85d3ce804ca59790d7433bfd6bfbb3101ed1b2be6c76",
+  "33421": "4fe35c6eb180450f3b3c1db60e2df3f02e4d544265d1d62359550c23ca9d6dad",
+  "33438": "a15e8aa789901e063b7d828e409d8b46b58061e9aed8d304cf301b2651d2a1ce"
+ },
+ "target_resolution": {
+  "file": 74,
+  "fullname": 147,
+  "unresolved": 16
+ },
+ "findings_past_the_budget": {
+  "33066": 15,
+  "33098": 10,
+  "33117": 2,
+  "33145": 11,
+  "33149": 32,
+  "33294": 8,
+  "33321": 18,
+  "33421": 1
+ },
+ "anchoring": {
+  "findings_in": 237,
+  "anchored": 221,
+  "unanchored": 16,
+  "unanchored_rate": 0.0675,
+  "work_units_reached": 76,
+  "by_method": {
+   "review_line_entity": 204,
+   "review_line_range": 17
+  },
+  "by_failure": {
+   "no_location": 16
+  }
+ },
+ "concern_family": "other",
+ "issue_kind_placeholder": "style_norm_violation",
+ "evidence_chain": "not run: the gate is closed, so admission and publication are not comparable to a solo run's; the judge's issue recall reads every finding",
+ "run_manifest": "not written: the judge reads this source as unchecked"
+}

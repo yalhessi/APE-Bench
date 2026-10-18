@@ -1,0 +1,1646 @@
+{
+ "asks": [
+  {
+   "id": "v0090",
+   "pr": 32875,
+   "family": "F3",
+   "in_census": true,
+   "entries": [
+    "P315"
+   ],
+   "text": "Both of these should probably be tagged with `grind`.",
+   "path": "Mathlib/Data/Finset/Image.lean",
+   "line": 75,
+   "author": "vihdzp",
+   "at": "2025-12-14T16:32:03Z",
+   "matcher_text": {
+    "ask_id": "v0090",
+    "path": "Mathlib/Data/Finset/Image.lean",
+    "code_at_comment": "@@ -72,11 +72,8 @@ theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=\n -- Higher priority to apply before `mem_map`.\n @[simp 1100]\n theorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n-  rw [mem_map]\n-  exact\n-    ⟨by\n-      rintro ⟨a, H, rfl⟩\n-      simpa, fun h => ⟨_, h, by simp⟩⟩\n+  simp only [mem_map, Equiv.coe_toEmbedding]",
+    "comment": "Both of these should probably be tagged with `grind`.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Data/Finset/Image.lean:73",
+      "claim": "The new proof of `Finset.mem_map_equiv` (`simp only [mem_map, Equiv.coe_toEmbedding]` then `grind`) is a golf that makes this basic `@[simp 1100]` lemma slower: the PR's own profile reports <10 ms before and 25 ms after. It also still needs the `simp only` step, because `grind` alone fails here. A one-line `simp` proof exists that uses no `grind`.",
+      "requested_change": "Replace the proof body of `Finset.mem_map_equiv` with `by simp [Equiv.apply_eq_iff_eq_symm_apply]`, or revert this declaration to its previous proof. Do not keep a change that regresses the timing.",
+      "severity": "advisory"
+     },
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag mem_map/coe_toEmbedding @[grind]. Most findings drop grind for speed; R10 notes grind alone fails (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind attribute. All findings instead drop the grind tactic; none proposes a grind tag."
+    }
+   },
+   "entries_text": {
+    "P315": "A characterisation lemma (`foo_iff`, an equation) that `grind` can use as a rewrite rule is tagged `@[grind =]`."
+   }
+  },
+  {
+   "id": "v0091",
+   "pr": 32875,
+   "family": "F3",
+   "in_census": false,
+   "entries": [],
+   "text": "Same here.",
+   "path": "Mathlib/Data/Rat/Lemmas.lean",
+   "line": 303,
+   "author": "vihdzp",
+   "at": "2025-12-14T16:32:22Z",
+   "matcher_text": {
+    "ask_id": "v0091",
+    "path": "Mathlib/Data/Rat/Lemmas.lean",
+    "code_at_comment": "@@ -300,10 +300,8 @@ theorem inv_natCast_num_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.num = 1\n   inv_intCast_num_of_pos (mod_cast ha0 : 0 < (a : ℤ))\n \n theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n-  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one]\n-  apply den_div_eq_of_coprime ha0\n-  rw [Int.natAbs_one]\n-  exact Nat.coprime_one_left _\n+  simp only [den_inv, num_intCast]",
+    "comment": "Same here.",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+      "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) is slower than the proof it replaces: the PR's own profile reports <10 ms before and 17 ms after. It does not follow its sibling `inv_intCast_num_of_pos`, which is a plain `simp [*]`. A plain `simp` call with the positivity facts closes the goal.",
+      "requested_change": "Replace the proof body of `Rat.inv_intCast_den_of_pos` with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or revert it to the previous proof. If `grind` is kept, fold the preprocessing into it as `grind [den_inv, num_intCast]` rather than `simp only [...]` followed by `grind`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+      "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) is slower than the proof it replaces: the PR's own profile reports <10 ms before and 17 ms after. It does not follow its sibling `inv_intCast_num_of_pos`, which is a plain `simp [*]`. A plain `simp` call with the positivity facts closes the goal.",
+      "requested_change": "Replace the proof body of `Rat.inv_intCast_den_of_pos` with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or revert it to the previous proof. If `grind` is kept, fold the preprocessing into it as `grind [den_inv, num_intCast]` rather than `simp only [...]` followed by `grind`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial."
+    }
+   },
+   "entries_text": {}
+  },
+  {
+   "id": "v0092",
+   "pr": 32875,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P018",
+    "P401"
+   ],
+   "text": "`simpa using`?",
+   "path": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+   "line": 462,
+   "author": "artie2000",
+   "at": "2025-12-16T00:22:39Z",
+   "matcher_text": {
+    "ask_id": "v0092",
+    "path": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+    "code_at_comment": "@@ -458,12 +458,8 @@ lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Typ\n     refine (e.forall_congr ?_).symm\n     intro i\n     rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n-  rw [this, pi_pi, Finset.prod_equiv e.symm]\n-  · simp only [Finset.mem_univ, implies_true]\n-  intro i _\n-  simp only [s']\n-  congr\n-  all_goals rw [e.apply_symm_apply]\n+  simp only [pi_pi, this]\n+  exact Fintype.prod_equiv _ _ _ (congrFun rfl)",
+    "comment": "`simpa using`?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "partial",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:462",
+      "claim": "`MeasureTheory.Measure.pi_map_piCongrLeft` finishes with `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, while the goal left after `simp only [pi_pi, this]` is exactly `∏ i, (μ (e i)) (s' i) = ∏ i, (μ i) (s i)`, i.e. the more direct lemma `Equiv.prod_comp e g` (`∏ i, g (e i) = ∏ i, g i`); the generic `Fintype.prod_equiv` forces three `_` placeholders and a `congrFun rfl` witness.",
+      "requested_change": "Use the direct lemma: `exact Equiv.prod_comp e (fun i ↦ μ i (s i))`.",
+      "severity": "advisory"
+     },
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "partial",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:462",
+      "claim": "`MeasureTheory.Measure.pi_map_piCongrLeft` finishes with `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, while the goal left after `simp only [pi_pi, this]` is exactly `∏ i, (μ (e i)) (s' i) = ∏ i, (μ i) (s i)`, i.e. the more direct lemma `Equiv.prod_comp e g` (`∏ i, g (e i) = ∏ i, g i`); the generic `Fintype.prod_equiv` forces three `_` placeholders and a `congrFun rfl` witness.",
+      "requested_change": "Use the direct lemma: `exact Equiv.prod_comp e (fun i ↦ μ i (s i))`.",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "The new closing step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` in `pi_map_piCongrLeft` is an opaque spelling. `congrFun rfl` is a roundabout `fun _ ↦ rfl`, and all three explicit arguments are left to unification, so the reader cannot see which equivalence reindexes the product. The preceding `simp only [pi_pi, this]` uses `simp` just to rewrite with a local equation.",
+      "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. At minimum, write `fun _ ↦ rfl` instead of `congrFun rfl`.",
+      "severity": "advisory"
+     },
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "The new closing step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` in `pi_map_piCongrLeft` is an opaque spelling. `congrFun rfl` is a roundabout `fun _ ↦ rfl`, and all three explicit arguments are left to unification, so the reader cannot see which equivalence reindexes the product. The preceding `simp only [pi_pi, this]` uses `simp` just to rewrite with a local equation.",
+      "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. At minimum, write `fun _ ↦ rfl` instead of `congrFun rfl`.",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "`pi_map_piCongrLeft` still rebuilds the preimage computation by hand (`e_meas`, `s'` and the `have : e_meas ⁻¹' pi univ s = pi univ s'` block) and closes with `Fintype.prod_equiv _ _ _ (congrFun rfl)`. The library already has both steps: `Equiv.piCongrLeft_preimage_univ_pi` (Mathlib/Data/Set/Prod.lean:922) and `Equiv.prod_comp`. The same file's `measurePreserving_piCongrLeft` (Pi.lean:720-727) proves the same `map_eq` with exactly that rewrite chain.",
+      "requested_change": "Replace the proof body with the chain `measurePreserving_piCongrLeft` uses:\n```\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n```\nThis removes `e_meas`, `s'`, the `have` and the `congrFun rfl` step.",
+      "severity": "advisory"
+     },
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "partial",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "The new last step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` builds the pointwise hypothesis by converting `rfl : f = f` with `congrFun`, and leaves the equivalence for unification to find, instead of giving the direct term `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` only rewrites with a local equation and `pi_pi`, which a plain `rw` does.",
+      "requested_change": "If the proof keeps its current structure (see the other finding on this declaration for the shorter proof), write the last two lines as\n```\n  rw [this, pi_pi]\n  exact Fintype.prod_equiv e _ _ fun _ ↦ rfl\n```",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "`pi_map_piCongrLeft` still proves the preimage of a box by hand (the `e_meas`/`s'` lets and the 6-line `have`), which re-derives the existing `Equiv.piCongrLeft_preimage_univ_pi`. The new ending `simp only [pi_pi, this]; exact Fintype.prod_equiv _ _ _ (congrFun rfl)` also uses `congrFun rfl` where `fun _ ↦ rfl` is meant. The same file already proves the identical statement in `measurePreserving_piCongrLeft` (map_eq) with a two-line rewrite chain.",
+      "requested_change": "Replace the proof body with the chain used in `measurePreserving_piCongrLeft`:\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n(If the long proof is kept, at least write `rw [this, pi_pi]` and `Fintype.prod_equiv e _ _ fun _ ↦ rfl` instead of `simp only [pi_pi, this]` and `(congrFun rfl)`.)",
+      "severity": "advisory"
+     },
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "`pi_map_piCongrLeft` still proves the preimage of a box by hand (the `e_meas`/`s'` lets and the 6-line `have`), which re-derives the existing `Equiv.piCongrLeft_preimage_univ_pi`. The new ending `simp only [pi_pi, this]; exact Fintype.prod_equiv _ _ _ (congrFun rfl)` also uses `congrFun rfl` where `fun _ ↦ rfl` is meant. The same file already proves the identical statement in `measurePreserving_piCongrLeft` (map_eq) with a two-line rewrite chain.",
+      "requested_change": "Replace the proof body with the chain used in `measurePreserving_piCongrLeft`:\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n(If the long proof is kept, at least write `rw [this, pi_pi]` and `Fintype.prod_equiv e _ _ fun _ ↦ rfl` instead of `simp only [pi_pi, this]` and `(congrFun rfl)`.)",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "The new closing step of `MeasureTheory.Measure.pi_map_piCongrLeft`, `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, leaves the reindexing equivalence to unification. It writes the pointwise hypothesis as `congrFun rfl`, a roundabout spelling of `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` is only a rewrite with a local hypothesis and a lemma.",
+      "requested_change": "Replace the last two lines of `MeasureTheory.Measure.pi_map_piCongrLeft` with `rw [this, pi_pi]` followed by `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`.",
+      "severity": "advisory"
+     },
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+      "claim": "The new closing step of `MeasureTheory.Measure.pi_map_piCongrLeft`, `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, leaves the reindexing equivalence to unification. It writes the pointwise hypothesis as `congrFun rfl`, a roundabout spelling of `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` is only a rewrite with a local hypothesis and a lemma.",
+      "requested_change": "Replace the last two lines of `MeasureTheory.Measure.pi_map_piCongrLeft` with `rw [this, pi_pi]` followed by `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`.",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "simpa using for simp only+exact. Single rw-chain rewrites reached; rw+exact or prod_comp swaps keep two steps (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using. Findings rework the same simp only/exact tail differently (rw+exact, prod_comp): partial."
+    }
+   },
+   "entries_text": {
+    "P018": "Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.",
+    "P401": "A goal that is a lemma's conclusion up to simp-normalisation is closed by `simpa using` the lemma applied to explicit arguments, not by rewriting the goal backwards with `←` simp lemmas into the lemma's form."
+   }
+  },
+  {
+   "id": "v0093",
+   "pr": 32875,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P018",
+    "P040"
+   ],
+   "text": "````suggestion\nTendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le (by simpa using h)\n````",
+   "path": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+   "line": 650,
+   "author": "artie2000",
+   "at": "2025-12-16T00:23:31Z",
+   "matcher_text": {
+    "ask_id": "v0093",
+    "path": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+    "code_at_comment": "ndsto_of_forall_isClosed_limsup_le' fun F hF ↦ ?_\n-  rcases L.eq_or_neBot with rfl | hne\n-  · simp\n-  specialize h F hF\n-  simp only [Measure.real_def] at h\n-  rwa [ENNReal.limsup_toReal_eq (b := 1) (by simp) (.of_forall fun i ↦ prob_le_one),\n-    ENNReal.toReal_le_toReal _ (by finiteness)] at h\n-  refine ne_top_of_le_ne_top (b := 1) (by simp) ?_\n-  refine limsup_le_of_le ?_ (.of_forall fun i ↦ prob_le_one)\n-  exact isCoboundedUnder_le_of_le L (x := 0) (by simp)\n+  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h\n+  exact tendsto_of_forall_isClosed_limsup_le h",
+    "comment": "````suggestion\nTendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le (by simpa using h)\n````",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "partial",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+      "claim": "In `tendsto_of_forall_isClosed_limsup_real_le'`, `exact tendsto_of_forall_isClosed_limsup_le h` only checks by definitional unfolding. After the PR's `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` states `↑(limsup (fun i ↦ μs i F) L) ≤ ↑(μ F)` in ℝ. `tendsto_of_forall_isClosed_limsup_le` expects `limsup (fun i ↦ μs i F) L ≤ μ F` in ℝ≥0, so the `exact` relies on NNReal's `≤` unfolding to the coerced real `≤`.",
+      "requested_change": "Add `NNReal.coe_le_coe` to the `simp only` so that `h` has the lemma's hypothesis form syntactically: `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup, NNReal.coe_le_coe] at h`, keeping `exact tendsto_of_forall_isClosed_limsup_le h`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "partial",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+      "claim": "In `tendsto_of_forall_isClosed_limsup_real_le'`, `exact tendsto_of_forall_isClosed_limsup_le h` only checks by definitional unfolding. After the PR's `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` states `↑(limsup (fun i ↦ μs i F) L) ≤ ↑(μ F)` in ℝ. `tendsto_of_forall_isClosed_limsup_le` expects `limsup (fun i ↦ μs i F) L ≤ μ F` in ℝ≥0, so the `exact` relies on NNReal's `≤` unfolding to the coerced real `≤`.",
+      "requested_change": "Add `NNReal.coe_le_coe` to the `simp only` so that `h` has the lemma's hypothesis form syntactically: `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup, NNReal.coe_le_coe] at h`, keeping `exact tendsto_of_forall_isClosed_limsup_le h`.",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "partial",
+     "m1_finding": 6,
+     "m1_finding_text": {
+      "i": 6,
+      "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+      "claim": "After `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` reads `↑(limsup (fun i => (μs i) F) L) ≤ ↑(μ F)` in `ℝ`. `exact tendsto_of_forall_isClosed_limsup_le h` passes it where an `ℝ≥0` inequality is expected, so it relies on `NNReal.coe_le_coe` holding by `rfl`. The cast is moved out of the `limsup` by naming `NNReal.toReal_limsup` by hand in `simp only`.",
+      "requested_change": "Bridge the casts with the cast tactic:\n```\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn] at h\n  exact tendsto_of_forall_isClosed_limsup_le fun F hF ↦ mod_cast h F hF\n```\nAt the least, add `NNReal.coe_le_coe` to the `simp only` so `h` matches syntactically.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "partial",
+     "m2_finding": 6,
+     "m2_finding_text": {
+      "i": 6,
+      "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+      "claim": "After `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` reads `↑(limsup (fun i => (μs i) F) L) ≤ ↑(μ F)` in `ℝ`. `exact tendsto_of_forall_isClosed_limsup_le h` passes it where an `ℝ≥0` inequality is expected, so it relies on `NNReal.coe_le_coe` holding by `rfl`. The cast is moved out of the `limsup` by naming `NNReal.toReal_limsup` by hand in `simp only`.",
+      "requested_change": "Bridge the casts with the cast tactic:\n```\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn] at h\n  exact tendsto_of_forall_isClosed_limsup_le fun F hF ↦ mod_cast h F hF\n```\nAt the least, add `NNReal.coe_le_coe` to the `simp only` so `h` matches syntactically.",
+      "severity": "advisory"
+     },
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse to by simpa using h. R2/R5 keep simp-at-h plus exact, changing casts only (partial).",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "simpa using h. Findings fix the same simp-at-h/exact step with coe_le_coe or mod_cast: partial."
+    }
+   },
+   "entries_text": {
+    "P018": "Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.",
+    "P040": "A short tactic block that a single term proves is written as that term."
+   }
+  },
+  {
+   "id": "v0094",
+   "pr": 32875,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P018",
+    "P401"
+   ],
+   "text": "````suggestion\nsimpa [this] using (Kernel.compProd_apply_prod hs ht).symm\n````",
+   "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+   "line": 55,
+   "author": "artie2000",
+   "at": "2025-12-16T00:24:29Z",
+   "matcher_text": {
+    "ask_id": "v0094",
+    "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "code_at_comment": " β} (hs : Measur\n     ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n   have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n     congr; exact (κ.disintegrate _).symm\n-  rw [this, Kernel.compProd_apply (hs.prod ht)]\n-  classical\n-  have : ∀ b, Kernel.condKernel κ (a, b) {c | (b, c) ∈ s ×ˢ t}\n-      = s.indicator (fun b ↦ Kernel.condKernel κ (a, b) t) b := by\n-    intro b\n-    by_cases hb : b ∈ s <;> simp [hb]\n-  simp_rw [Set.preimage, this]\n-  rw [lintegral_indicator hs]\n+  simp only [this]\n+  exact (Kernel.compProd_apply_prod hs ht).symm",
+    "comment": "````suggestion\nsimpa [this] using (Kernel.compProd_apply_prod hs ht).symm\n````",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` (and its twin `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` at line 141) the proof ends with two tactic calls, `simp only [this]` (a single local equation) and `exact (...).symm`, where one `rw` would both rewrite and close; the neighbouring lemmas in this file rewrite the disintegrate identity with `rw` (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`).",
+      "requested_change": "Replace the last two lines of each of the two lemmas by a single rewrite: `rw [this, Kernel.compProd_apply_prod hs ht]` in the `ProbabilityTheory` version and `rw [this, compProd_apply_prod hs ht]` in the `MeasureTheory.Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` (and its twin `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` at line 141) the proof ends with two tactic calls, `simp only [this]` (a single local equation) and `exact (...).symm`, where one `rw` would both rewrite and close; the neighbouring lemmas in this file rewrite the disintegrate identity with `rw` (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`).",
+      "requested_change": "Replace the last two lines of each of the two lemmas by a single rewrite: `rw [this, Kernel.compProd_apply_prod hs ht]` in the `ProbabilityTheory` version and `rw [this, compProd_apply_prod hs ht]` in the `MeasureTheory.Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The kernel version `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` has the same leftover scaffolding as its measure sibling. The `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm` is followed by `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`, where a single rewrite chain suffices.",
+      "requested_change": "Replace the whole proof with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Keep it parallel with the `Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The kernel version `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` has the same leftover scaffolding as its measure sibling. The `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm` is followed by `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`, where a single rewrite chain suffices.",
+      "requested_change": "Replace the whole proof with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Keep it parallel with the `Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` (and its `Kernel` twin `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, lines 49-55) spends two calls on what one rewrite does: after `have this : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, the proof rewrites with `simp only [this]` and then closes by converting `compProd_apply_prod` with `.symm`, whereas rewriting the goal's right-hand side into the integral with `compProd_apply_prod` itself finishes the goal; and the local `have` is the roundabout way of the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom used by the neighbouring `lintegral_condKernel` (line 149) and `lintegral_condKernel_mem` (line 44).",
+      "requested_change": "Use a single `rw [this, compProd_apply_prod hs ht]` (verified to compile in place); preferably drop the local `have` as well and write `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]` (verified). The `Kernel` twin takes `rw [this, Kernel.compProd_apply_prod hs ht]`, or `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]` (verified).",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` (and its `Kernel` twin `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, lines 49-55) spends two calls on what one rewrite does: after `have this : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, the proof rewrites with `simp only [this]` and then closes by converting `compProd_apply_prod` with `.symm`, whereas rewriting the goal's right-hand side into the integral with `compProd_apply_prod` itself finishes the goal; and the local `have` is the roundabout way of the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom used by the neighbouring `lintegral_condKernel` (line 149) and `lintegral_condKernel_mem` (line 44).",
+      "requested_change": "Use a single `rw [this, compProd_apply_prod hs ht]` (verified to compile in place); preferably drop the local `have` as well and write `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]` (verified). The `Kernel` twin takes `rw [this, Kernel.compProd_apply_prod hs ht]`, or `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]` (verified).",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 5,
+     "m1_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "As in the measure version, the kernel lemma keeps the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`, then `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`. A direct rewrite with the two library lemmas does all of this.",
+      "requested_change": "Replace the whole proof with\n```\n  rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]\n```\nOr: `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, matching `lintegral_condKernel` and `setLIntegral_condKernel` in the same file.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 5,
+     "m2_finding_text": {
+      "i": 5,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "As in the measure version, the kernel lemma keeps the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`, then `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`. A direct rewrite with the two library lemmas does all of this.",
+      "requested_change": "Replace the whole proof with\n```\n  rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]\n```\nOr: `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, matching `lintegral_condKernel` and `setLIntegral_condKernel` in the same file.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The golfed proof keeps a three-line `have … := by congr; exact (κ.disintegrate _).symm`, uses it through `simp only [this]` (a plain rewrite by a local equation), and then closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. This is a roundabout form of a single rewrite.",
+      "requested_change": "Replace the whole proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, use the file's own idiom `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, which `lintegral_condKernel` and `setLIntegral_condKernel` use.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The golfed proof keeps a three-line `have … := by congr; exact (κ.disintegrate _).symm`, uses it through `simp only [this]` (a plain rewrite by a local equation), and then closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. This is a roundabout form of a single rewrite.",
+      "requested_change": "Replace the whole proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, use the file's own idiom `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, which `lintegral_condKernel` and `setLIntegral_condKernel` use.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The golfed `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` still carries the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The adjacent lemmas in the same file (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) do this step with `conv_rhs => rw [← κ.disintegrate κ.condKernel]`. With the new `Kernel.compProd_apply_prod`, the `have` is unnecessary.",
+      "requested_change": "Replace the proof body of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]`, matching the sibling lemmas. The one-liner `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "The golfed `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` still carries the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The adjacent lemmas in the same file (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) do this step with `conv_rhs => rw [← κ.disintegrate κ.condKernel]`. With the new `Kernel.compProd_apply_prod`, the `have` is unnecessary.",
+      "requested_change": "Replace the proof body of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]`, matching the sibling lemmas. The one-liner `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "At the end of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` the local equation is consumed by `simp only [this]` and the result finished with `exact (Kernel.compProd_apply_prod hs ht).symm`; a single `rw` with the same two facts closes the goal, so the two-line tail is an unnecessary detour (and the pre-PR proof of this lemma was a plain `rw`, so the file's own style is `rw` here).",
+      "requested_change": "Replace lines 54-55 with `rw [this, Kernel.compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "At the end of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` the local equation is consumed by `simp only [this]` and the result finished with `exact (Kernel.compProd_apply_prod hs ht).symm`; a single `rw` with the same two facts closes the goal, so the two-line tail is an unnecessary detour (and the pre-PR proof of this lemma was a plain `rw`, so the file's own style is `rw` here).",
+      "requested_change": "Replace lines 54-55 with `rw [this, Kernel.compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached."
+    }
+   },
+   "entries_text": {
+    "P018": "Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.",
+    "P401": "A goal that is a lemma's conclusion up to simp-normalisation is closed by `simpa using` the lemma applied to explicit arguments, not by rewriting the goal backwards with `←` simp lemmas into the lemma's form."
+   }
+  },
+  {
+   "id": "v0095",
+   "pr": 32875,
+   "family": "F1",
+   "in_census": true,
+   "entries": [
+    "P018",
+    "P401"
+   ],
+   "text": "simpa",
+   "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+   "line": 147,
+   "author": "artie2000",
+   "at": "2025-12-16T00:24:39Z",
+   "matcher_text": {
+    "ask_id": "v0095",
+    "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+    "code_at_comment": "@@ -149,14 +143,8 @@ lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s\n     ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n   have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by\n     congr; exact (ρ.disintegrate _).symm\n-  rw [this, compProd_apply (hs.prod ht)]\n-  classical\n-  have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t)\n-      = s.indicator (fun b ↦ ρ.condKernel b t) b := by\n-    intro b\n-    by_cases hb : b ∈ s <;> simp [hb]\n-  simp_rw [this]\n-  rw [lintegral_indicator hs]\n+  simp only [this]\n+  exact (compProd_apply_prod hs ht).symm",
+    "comment": "simpa",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP2": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` (and its twin `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` at line 141) the proof ends with two tactic calls, `simp only [this]` (a single local equation) and `exact (...).symm`, where one `rw` would both rewrite and close; the neighbouring lemmas in this file rewrite the disintegrate identity with `rw` (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`).",
+      "requested_change": "Replace the last two lines of each of the two lemmas by a single rewrite: `rw [this, Kernel.compProd_apply_prod hs ht]` in the `ProbabilityTheory` version and `rw [this, compProd_apply_prod hs ht]` in the `MeasureTheory.Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+      "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` (and its twin `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` at line 141) the proof ends with two tactic calls, `simp only [this]` (a single local equation) and `exact (...).symm`, where one `rw` would both rewrite and close; the neighbouring lemmas in this file rewrite the disintegrate identity with `rw` (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`).",
+      "requested_change": "Replace the last two lines of each of the two lemmas by a single rewrite: `rw [this, Kernel.compProd_apply_prod hs ht]` in the `ProbabilityTheory` version and `rw [this, compProd_apply_prod hs ht]` in the `MeasureTheory.Measure` version.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "X2": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The golfed proof of `Measure.setLIntegral_condKernel_eq_measure_prod` still carries a `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then rewrites with it through `simp only [this]` before `exact (compProd_apply_prod hs ht).symm`. The `have` and the `simp` step are unnecessary: the statement is `compProd_apply_prod` read backwards followed by `disintegrate`.",
+      "requested_change": "Replace the whole proof with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The golfed proof of `Measure.setLIntegral_condKernel_eq_measure_prod` still carries a `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then rewrites with it through `simp only [this]` before `exact (compProd_apply_prod hs ht).symm`. The `have` and the `simp` step are unnecessary: the statement is `compProd_apply_prod` read backwards followed by `disintegrate`.",
+      "requested_change": "Replace the whole proof with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` (and its `Kernel` twin `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, lines 49-55) spends two calls on what one rewrite does: after `have this : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, the proof rewrites with `simp only [this]` and then closes by converting `compProd_apply_prod` with `.symm`, whereas rewriting the goal's right-hand side into the integral with `compProd_apply_prod` itself finishes the goal; and the local `have` is the roundabout way of the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom used by the neighbouring `lintegral_condKernel` (line 149) and `lintegral_condKernel_mem` (line 44).",
+      "requested_change": "Use a single `rw [this, compProd_apply_prod hs ht]` (verified to compile in place); preferably drop the local `have` as well and write `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]` (verified). The `Kernel` twin takes `rw [this, Kernel.compProd_apply_prod hs ht]`, or `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]` (verified).",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` (and its `Kernel` twin `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, lines 49-55) spends two calls on what one rewrite does: after `have this : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, the proof rewrites with `simp only [this]` and then closes by converting `compProd_apply_prod` with `.symm`, whereas rewriting the goal's right-hand side into the integral with `compProd_apply_prod` itself finishes the goal; and the local `have` is the roundabout way of the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom used by the neighbouring `lintegral_condKernel` (line 149) and `lintegral_condKernel_mem` (line 44).",
+      "requested_change": "Use a single `rw [this, compProd_apply_prod hs ht]` (verified to compile in place); preferably drop the local `have` as well and write `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]` (verified). The `Kernel` twin takes `rw [this, Kernel.compProd_apply_prod hs ht]`, or `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]` (verified).",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The new proof still states an auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`, rewrites with it via `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`. The two library lemmas rewrite the goal directly, and the file's other lemmas already open with `rw [← ρ.disintegrate ρ.condKernel]`.",
+      "requested_change": "Replace the whole proof with\n```\n  rw [← compProd_apply_prod hs ht, ρ.disintegrate]\n```\nOr, in the form the file's siblings use: `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The new proof still states an auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`, rewrites with it via `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`. The two library lemmas rewrite the goal directly, and the file's other lemmas already open with `rw [← ρ.disintegrate ρ.condKernel]`.",
+      "requested_change": "Replace the whole proof with\n```\n  rw [← compProd_apply_prod hs ht, ρ.disintegrate]\n```\nOr, in the form the file's siblings use: `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "DX3": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "T1": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "As in the kernel version, the golfed proof keeps the `have … := by congr; exact (ρ.disintegrate _).symm`, rewrites with it through `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`, where one `rw` suffices.",
+      "requested_change": "Replace the whole proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`, as the neighbouring `lintegral_condKernel` does.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "As in the kernel version, the golfed proof keeps the `have … := by congr; exact (ρ.disintegrate _).symm`, rewrites with it through `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`, where one `rw` suffices.",
+      "requested_change": "Replace the whole proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`, as the neighbouring `lintegral_condKernel` does.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "GPT1": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The golfed `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` keeps the auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The neighbouring lemmas in the same section (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]`. With `Measure.compProd_apply_prod`, the `have` is unnecessary.",
+      "requested_change": "Replace the proof body of `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]`. The one-liner `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The golfed `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` keeps the auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The neighbouring lemmas in the same section (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]`. With `Measure.compProd_apply_prod`, the `have` is unnecessary.",
+      "requested_change": "Replace the proof body of `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]`. The one-liner `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The sibling `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` has the same two-line tail, `simp only [this]` followed by `exact (compProd_apply_prod hs ht).symm`, which collapses into one `rw`; the PR changed both proofs identically, so leaving one collapsed and the other not would be inconsistent.",
+      "requested_change": "Replace lines 146-147 with `rw [this, compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+      "claim": "The sibling `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` has the same two-line tail, `simp only [this]` followed by `exact (compProd_apply_prod hs ht).symm`, which collapses into one `rw`; the PR changed both proofs identically, so leaving one collapsed and the other not would be inconsistent.",
+      "requested_change": "Replace lines 146-147 with `rw [this, compProd_apply_prod hs ht]`.",
+      "severity": "advisory"
+     },
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "GPT3": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    },
+    "GPT2": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Measure twin of v0094; same rw one-liners reach it.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached."
+    }
+   },
+   "entries_text": {
+    "P018": "Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.",
+    "P401": "A goal that is a lemma's conclusion up to simp-normalisation is closed by `simpa using` the lemma applied to explicit arguments, not by rewriting the goal backwards with `←` simp lemmas into the lemma's form."
+   }
+  }
+ ],
+ "pr": 32875,
+ "sessions": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:73",
+     "claim": "The new proof of `Finset.mem_map_equiv` (`simp only [mem_map, Equiv.coe_toEmbedding]` then `grind`) is a golf that makes this basic `@[simp 1100]` lemma slower: the PR's own profile reports <10 ms before and 25 ms after. It also still needs the `simp only` step, because `grind` alone fails here. A one-line `simp` proof exists that uses no `grind`.",
+     "requested_change": "Replace the proof body of `Finset.mem_map_equiv` with `by simp [Equiv.apply_eq_iff_eq_symm_apply]`, or revert this declaration to its previous proof. Do not keep a change that regresses the timing.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) is slower than the proof it replaces: the PR's own profile reports <10 ms before and 17 ms after. It does not follow its sibling `inv_intCast_num_of_pos`, which is a plain `simp [*]`. A plain `simp` call with the positivity facts closes the goal.",
+     "requested_change": "Replace the proof body of `Rat.inv_intCast_den_of_pos` with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or revert it to the previous proof. If `grind` is kept, fold the preprocessing into it as `grind [den_inv, num_intCast]` rather than `simp only [...]` followed by `grind`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "The new closing step of `MeasureTheory.Measure.pi_map_piCongrLeft`, `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, leaves the reindexing equivalence to unification. It writes the pointwise hypothesis as `congrFun rfl`, a roundabout spelling of `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` is only a rewrite with a local hypothesis and a lemma.",
+     "requested_change": "Replace the last two lines of `MeasureTheory.Measure.pi_map_piCongrLeft` with `rw [this, pi_pi]` followed by `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "The golfed `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` still carries the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The adjacent lemmas in the same file (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) do this step with `conv_rhs => rw [← κ.disintegrate κ.condKernel]`. With the new `Kernel.compProd_apply_prod`, the `have` is unnecessary.",
+     "requested_change": "Replace the proof body of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]`, matching the sibling lemmas. The one-liner `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "The golfed `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` keeps the auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The neighbouring lemmas in the same section (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]`. With `Measure.compProd_apply_prod`, the `have` is unnecessary.",
+     "requested_change": "Replace the proof body of `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]`. The one-liner `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) slows the lemma down: the PR's own table reports <10 ms before and 17 ms after. After the `simp only` the goal is `↑(if a = 0 then 1 else a.natAbs) = a`, which a short rewrite chain closes directly, so `grind` costs time and buys nothing.",
+     "requested_change": "Replace the two-line proof with the single line `rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Finset/Image.lean:73",
+     "claim": "Replacing the old proof of `Finset.mem_map_equiv` with `simp only [mem_map, Equiv.coe_toEmbedding]` plus `grind` makes this basic `@[simp]` lemma slower (the PR's own table: <10 ms before, 25 ms after). The residual goal `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s` closes with `simp` lemmas alone.",
+     "requested_change": "Replace the two-line proof with `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`. The shorter `simp [Equiv.apply_eq_iff_eq_symm_apply]` also works.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "The new closing step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` in `pi_map_piCongrLeft` is an opaque spelling. `congrFun rfl` is a roundabout `fun _ ↦ rfl`, and all three explicit arguments are left to unification, so the reader cannot see which equivalence reindexes the product. The preceding `simp only [pi_pi, this]` uses `simp` just to rewrite with a local equation.",
+     "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. At minimum, write `fun _ ↦ rfl` instead of `congrFun rfl`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "The `have : e_meas ⁻¹' pi univ s = pi univ s'` block in `pi_map_piCongrLeft`, with its `e_meas` and `s'` `let`s, re-proves the existing library lemma `Equiv.piCongrLeft_preimage_univ_pi`. The PR golfs only the tail of this proof and keeps the manual block.",
+     "requested_change": "Replace the proof after the statement with: `refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm`, then `rw [(MeasurableEquiv.piCongrLeft (fun i ↦ β i) e).measurableEmbedding.map_apply, MeasurableEquiv.coe_piCongrLeft, Equiv.piCongrLeft_preimage_univ_pi, pi_pi]`, then `exact e.prod_comp fun i ↦ μ i (s i)`. This drops both `let`s and the `have`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "The golfed proof of `Measure.setLIntegral_condKernel_eq_measure_prod` still carries a `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then rewrites with it through `simp only [this]` before `exact (compProd_apply_prod hs ht).symm`. The `have` and the `simp` step are unnecessary: the statement is `compProd_apply_prod` read backwards followed by `disintegrate`.",
+     "requested_change": "Replace the whole proof with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "The kernel version `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` has the same leftover scaffolding as its measure sibling. The `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm` is followed by `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`, where a single rewrite chain suffices.",
+     "requested_change": "Replace the whole proof with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Keep it parallel with the `Measure` version.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+     "claim": "In `tendsto_of_forall_isClosed_limsup_real_le'`, `exact tendsto_of_forall_isClosed_limsup_le h` only checks by definitional unfolding. After the PR's `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` states `↑(limsup (fun i ↦ μs i F) L) ≤ ↑(μ F)` in ℝ. `tendsto_of_forall_isClosed_limsup_le` expects `limsup (fun i ↦ μs i F) L ≤ μ F` in ℝ≥0, so the `exact` relies on NNReal's `≤` unfolding to the coerced real `≤`.",
+     "requested_change": "Add `NNReal.coe_le_coe` to the `simp only` so that `h` has the lemma's hypothesis form syntactically: `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup, NNReal.coe_le_coe] at h`, keeping `exact tendsto_of_forall_isClosed_limsup_le h`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R8",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "`pi_map_piCongrLeft` still proves the preimage of a box by hand (the `e_meas`/`s'` lets and the 6-line `have`), which re-derives the existing `Equiv.piCongrLeft_preimage_univ_pi`. The new ending `simp only [pi_pi, this]; exact Fintype.prod_equiv _ _ _ (congrFun rfl)` also uses `congrFun rfl` where `fun _ ↦ rfl` is meant. The same file already proves the identical statement in `measurePreserving_piCongrLeft` (map_eq) with a two-line rewrite chain.",
+     "requested_change": "Replace the proof body with the chain used in `measurePreserving_piCongrLeft`:\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n(If the long proof is kept, at least write `rw [this, pi_pi]` and `Fintype.prod_equiv e _ _ fun _ ↦ rfl` instead of `simp only [pi_pi, this]` and `(congrFun rfl)`.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "The golf `simp only [den_inv, num_intCast]; grind` makes `inv_intCast_den_of_pos` slower: the PR's own profile reports <10 ms before and 17 ms after, and I measured 0.042 s here. A one-line `simp` closes the goal in under 10 ms and matches the sibling `inv_intCast_num_of_pos := by simp [*]`.",
+     "requested_change": "Replace the proof with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or keep the original proof, rather than adding a slower `grind`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Data/Finset/Image.lean:73",
+     "claim": "`Finset.mem_map_equiv` is a low-level `@[simp 1100]` lemma, and its golf to `simp only [mem_map, Equiv.coe_toEmbedding]; grind` makes it slower: the PR's own profile says <10 ms before and 25 ms after, and I measured grind alone at 0.020 s of 0.025 s. A single `simp only` call proves it with no slowdown.",
+     "requested_change": "Replace the proof with `by simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`, or `by simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]`, instead of the `simp only …; grind` pair.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "The golfed proof keeps a three-line `have … := by congr; exact (κ.disintegrate _).symm`, uses it through `simp only [this]` (a plain rewrite by a local equation), and then closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. This is a roundabout form of a single rewrite.",
+     "requested_change": "Replace the whole proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, use the file's own idiom `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, which `lintegral_condKernel` and `setLIntegral_condKernel` use.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "As in the kernel version, the golfed proof keeps the `have … := by congr; exact (ρ.disintegrate _).symm`, rewrites with it through `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`, where one `rw` suffices.",
+     "requested_change": "Replace the whole proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`, as the neighbouring `lintegral_condKernel` does.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "`pi_map_piCongrLeft` still rebuilds the preimage computation by hand (`e_meas`, `s'` and the `have : e_meas ⁻¹' pi univ s = pi univ s'` block) and closes with `Fintype.prod_equiv _ _ _ (congrFun rfl)`. The library already has both steps: `Equiv.piCongrLeft_preimage_univ_pi` (Mathlib/Data/Set/Prod.lean:922) and `Equiv.prod_comp`. The same file's `measurePreserving_piCongrLeft` (Pi.lean:720-727) proves the same `map_eq` with exactly that rewrite chain.",
+     "requested_change": "Replace the proof body with the chain `measurePreserving_piCongrLeft` uses:\n```\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n```\nThis removes `e_meas`, `s'`, the `have` and the `congrFun rfl` step.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "The new last step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` builds the pointwise hypothesis by converting `rfl : f = f` with `congrFun`, and leaves the equivalence for unification to find, instead of giving the direct term `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` only rewrites with a local equation and `pi_pi`, which a plain `rw` does.",
+     "requested_change": "If the proof keeps its current structure (see the other finding on this declaration for the shorter proof), write the last two lines as\n```\n  rw [this, pi_pi]\n  exact Fintype.prod_equiv e _ _ fun _ ↦ rfl\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Data/Finset/Image.lean:73",
+     "claim": "`mem_map_equiv` swaps a short explicit proof for `simp only [mem_map, Equiv.coe_toEmbedding]` followed by `grind`. `grind` is heavier automation than this goal needs, and the `simp only` is squeezed even though only a flexible finisher consumes it. The PR's own trace shows the declaration getting slower (<10 ms before, 25 ms after).",
+     "requested_change": "Replace the two lines with one plain `simp` call:\n```\n  simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]\n```\nOtherwise drop this hunk and keep the original proof.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`inv_intCast_den_of_pos` closes `(if a = 0 then 1 else ↑a.natAbs) = a` with `grind` after a squeezed `simp only [den_inv, num_intCast]`. A single `simp` with the two facts closes the goal, and the PR's trace reports a slowdown (<10 ms before, 17 ms after). The sibling `inv_intCast_num_of_pos` directly above is proved by a single `simp [*]`.",
+     "requested_change": "Replace the two lines with\n```\n  simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]\n```\nIf the two-step form is kept, use `lia` instead of `grind`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "The new proof still states an auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`, rewrites with it via `simp only [this]`, and closes with `exact (compProd_apply_prod hs ht).symm`. The two library lemmas rewrite the goal directly, and the file's other lemmas already open with `rw [← ρ.disintegrate ρ.condKernel]`.",
+     "requested_change": "Replace the whole proof with\n```\n  rw [← compProd_apply_prod hs ht, ρ.disintegrate]\n```\nOr, in the form the file's siblings use: `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "As in the measure version, the kernel lemma keeps the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`, then `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`. A direct rewrite with the two library lemmas does all of this.",
+     "requested_change": "Replace the whole proof with\n```\n  rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]\n```\nOr: `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`, matching `lintegral_condKernel` and `setLIntegral_condKernel` in the same file.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/MeasureTheory/Measure/Portmanteau.lean:645",
+     "claim": "After `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` reads `↑(limsup (fun i => (μs i) F) L) ≤ ↑(μ F)` in `ℝ`. `exact tendsto_of_forall_isClosed_limsup_le h` passes it where an `ℝ≥0` inequality is expected, so it relies on `NNReal.coe_le_coe` holding by `rfl`. The cast is moved out of the `limsup` by naming `NNReal.toReal_limsup` by hand in `simp only`.",
+     "requested_change": "Bridge the casts with the cast tactic:\n```\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn] at h\n  exact tendsto_of_forall_isClosed_limsup_le fun F hF ↦ mod_cast h F hF\n```\nAt the least, add `NNReal.coe_le_coe` to the `simp only` so `h` matches syntactically.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Order/LiminfLimsup.lean:1142",
+     "claim": "In the new `simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢`, the `gt_iff_lt` entry is not needed. The call does the same job without it.",
+     "requested_change": "Drop `gt_iff_lt`: `simp only [sup'_lt_iff, eventually_all_finset] at hb ⊢`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Topology/MetricSpace/Pseudo/Defs.lean:377",
+     "claim": "The new term `exists_between' h` passes `h : x ∈ ball y ε` where `exists_between'` expects `dist x y < ε`, and produces `x ∈ ball y ε'` from `dist x y < ε'`. Both rely on unfolding `Metric.ball` by `rfl`; the PR also removed the old proof's explicit `simp only [mem_ball] at h ⊢`, which made that step visible.",
+     "requested_change": "Keep the `mem_ball` rewrite and use the new lemma only for the witness:\n```\ntheorem exists_lt_mem_ball_of_mem_ball (h : x ∈ ball y ε) : ∃ ε' < ε, x ∈ ball y ε' := by\n  simp only [mem_ball] at h ⊢\n  exact exists_between' h\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "PR #32875 (title)",
+     "claim": "The title \"chore: golf using `grind` and `simp`\" does not describe the change. Only two of the eight golfed proofs (`mem_map_equiv`, `inv_intCast_den_of_pos`) use `grind`. The rest replace proofs with existing library lemmas: `exists_between'`, `compProd_apply_prod`/`Kernel.compProd_apply_prod`, `Fintype.prod_equiv`, `tendsto_of_forall_isClosed_limsup_le` and `eventually_all_finset`.",
+     "requested_change": "Retitle to describe what is done, e.g. \"chore: golf proofs using existing lemmas and `grind`\". If the two `grind` hunks are dropped, retitle to \"chore: golf proofs using existing lemmas\".",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "PR #32875 (description)",
+     "claim": "The description ends with a boilerplate section, \"This golfing PR is batched under the following guidelines: Up to ~5 changed files per PR; Up to ~25 changed declarations per PR; Up to ~100 changed lines per PR\". It describes the author's batching process, not this change, and the PR does not meet it: it touches 7 files.",
+     "requested_change": "Remove the batching-guidelines paragraph and keep only the per-declaration profiling results.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` now uses `grind` for an elementary witness conversion in a low-level simp lemma, and the PR trace reports this proof regressing from <10 ms to 25 ms.",
+     "requested_change": "Replace the `grind` proof with a direct non-`grind` proof, for example:\n```lean\n  simp only [mem_map, Equiv.coe_toEmbedding]\n  exact ⟨fun ⟨a, ha, h⟩ ↦ by rwa [← h, Equiv.symm_apply_apply],\n    fun h ↦ ⟨_, h, f.apply_symm_apply b⟩⟩\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` invokes `grind` after simplifying to a simple positive `Int.natAbs`/`if` case, and the PR trace reports a timing regression from <10 ms to 17 ms.",
+     "requested_change": "Use `simp` with the positivity facts instead of `grind`:\n```lean\n  simp [den_inv, num_intCast, ha0.ne', Int.natAbs_of_nonneg ha0.le]\n```",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` replaces an explicit `rw [mem_map]` + `exact` proof with `simp only [mem_map, Equiv.coe_toEmbedding]; grind`, and this golf is a compile-time regression: the PR's own trace profiling reports `<10 ms before, 25 ms after` (the only entry in this file, and one of only two entries in the whole PR shown without a 🎉). The change also hides which lemmas do the work (`mem_map` plus the two `Equiv` cancellation lemmas), so the shorter proof buys nothing.",
+     "requested_change": "Revert this proof to the previous explicit one:\n```lean\n  rw [mem_map]\n  exact\n    ⟨by\n      rintro ⟨a, H, rfl⟩\n      simpa, fun h => ⟨_, h, by simp⟩⟩\n```\n(an equivalent `grind`-free form that I verified compiles is `simp only [mem_map, Equiv.coe_toEmbedding]` followed by `exact ⟨fun ⟨a, H, h⟩ ↦ by rwa [← h, Equiv.symm_apply_apply], fun h => ⟨_, h, by simp⟩⟩`). Keep `grind` only if the replacement is not slower than what it replaces.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` replaces a five-line proof with `simp only [den_inv, num_intCast]; grind` (3 lines), but this is also a compile-time regression: the PR's trace profiling reports `<10 ms before, 17 ms after`. It is the second of the two entries the PR lists without a 🎉, i.e. the golf costs build time instead of saving it.",
+     "requested_change": "Revert to the previous proof:\n```lean\n  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one]\n  apply den_div_eq_of_coprime ha0\n  rw [Int.natAbs_one]\n  exact Nat.coprime_one_left _\n```\n(There is no equal-length `grind`-free substitute available here: `simp [*]`, the style used by the sibling `inv_intCast_num_of_pos` two lines above, leaves `(if a = 0 then 1 else ↑a.natAbs) = a` unsolved, and the one-line route through `Rat.inv_intCast_den` is unusable because that lemma is declared later in the same file.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/693691a6437e37c20b51db25c6a53fef860b9881ddb1ac038c23b66bc0144d51/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__13793702-e56c-4d61-951e-24bfee60baf6.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` is now finished by `grind`, replacing a short, readable explicit two-direction proof — and the PR's own trace profiling records this very declaration as slower afterwards (`<10 ms before, 25 ms after`). The practice for replacing an explicit proof by automation (`grind`) applies only when the explicit proof is not short and readable *and* the automation is not markedly slower; both halves fail here (`grind` is also not needed: the goal is closed by an explicit term, see below). The same review decision was asked for on a comparable two-direction proof elsewhere ('I'd argue this previous proof was better, since it makes it clear what the lemma names of the separate directions are').",
+     "requested_change": "Restore the explicit proof:\n```lean\ntheorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n  rw [mem_map]\n  exact\n    ⟨by\n      rintro ⟨a, H, rfl⟩\n      simpa, fun h => ⟨_, h, by simp⟩⟩\n```\n(verified to compile against the reviewed file). If the two-line shape is preferred, keep the explicit directions instead of `grind`:\n```lean\n  simp only [mem_map, Equiv.coe_toEmbedding]\n  exact ⟨fun ⟨a, ha, hab⟩ ↦ by simpa [← hab] using ha,\n    fun h ↦ ⟨f.symm b, h, f.apply_symm_apply b⟩⟩\n```\n(also verified).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` is now closed by `grind` (after `simp only [den_inv, num_intCast]`), again replacing a short explicit proof while the PR's own profiling shows the declaration got slower (`<10 ms before, 17 ms after`). The residual goal `↑(if a = 0 then 1 else a.natAbs) = a` is a two-lemma arithmetic fact, so heavy general automation is the wrong tool here: a single flexible `simp` with the relevant lemmas closes it (verified), and the neighbouring lemma `Rat.inv_intCast_num_of_pos` is likewise proved by `simp`.",
+     "requested_change": "Drop `grind` in favour of the lighter finishing tactic:\n```lean\ntheorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [Rat.den_inv, Rat.num_intCast, ha0.ne', Int.natAbs_of_nonneg ha0.le]\n```\n(verified to compile against the reviewed file) — or keep the previous `rw`-chain / `den_div_eq_of_coprime` proof, which the profiling shows is not slower.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep1/tasks/e274aab9a037d5b8e216ce04915df028d075f7bae7f98c6b43b136e377d342cd/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__a852a7ab-4f34-4364-98b9-ca112ef815c4.jsonl"
+  },
+  "GPT2": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` now invokes `grind` for a goal that is just reindexing an existential along the equivalence `f`; the existing `Equiv.exists_congr_left` lemma proves this directly and avoids the PR-listed timing regression for this theorem.",
+     "requested_change": "Replace the proof body with:\n```lean\nby\n  simpa [mem_map] using (f.exists_congr_left (p := fun a ↦ a ∈ s ∧ f a = b))\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` uses `grind` only to resolve the nonzero/`natAbs` consequences of `0 < a`; a direct `simp` proof closes the normalized goal without the extra solver call and avoids the PR-listed timing regression.",
+     "requested_change": "Replace the proof body with:\n```lean\nby\n  simp [ne_of_gt ha0, Int.natAbs_of_nonneg (le_of_lt ha0)]\n```",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` is now closed by `grind`, and the PR's own profile records this as a regression (25 ms after, <10 ms before). The tactic is also unnecessary: after `simp only [mem_map, Equiv.coe_toEmbedding]` the goal is `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s`, which is a two-step rewrite away, so the heavyweight tactic buys nothing on a `@[simp]` lemma that sits on a very hot code path.",
+     "requested_change": "Drop `grind` and give the explicit proof, e.g. `exact ⟨fun ⟨a, ha, h⟩ ↦ by rwa [← h, Equiv.symm_apply_apply], fun h ↦ ⟨_, h, f.apply_symm_apply b⟩⟩` (keeping the `simp only [mem_map, Equiv.coe_toEmbedding]` line), or restore the previous proof; both avoid `grind`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` now ends with `grind`, which the PR's own profile records as a regression (17 ms after, <10 ms before), although the tactic is doing nothing that needs it: `get_lean_goal` at the `grind` line shows the residual goal `↑(if a = 0 then 1 else a.natAbs) = a` with `ha0 : 0 < a` in context, i.e. one conditional rewrite plus `Int.natAbs_of_nonneg`.",
+     "requested_change": "Replace the two-line body with `rw [den_inv, num_intCast, if_neg (ne_of_gt ha0), Int.natAbs_of_nonneg ha0.le]` (or keep `simp only [den_inv, num_intCast]` and finish with `rw [if_neg (ne_of_gt ha0), Int.natAbs_of_nonneg ha0.le]`), or restore the previous `den_div_eq_of_coprime` proof, which timed at <10 ms.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "At the end of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` the local equation is consumed by `simp only [this]` and the result finished with `exact (Kernel.compProd_apply_prod hs ht).symm`; a single `rw` with the same two facts closes the goal, so the two-line tail is an unnecessary detour (and the pre-PR proof of this lemma was a plain `rw`, so the file's own style is `rw` here).",
+     "requested_change": "Replace lines 54-55 with `rw [this, Kernel.compProd_apply_prod hs ht]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "The sibling `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` has the same two-line tail, `simp only [this]` followed by `exact (compProd_apply_prod hs ht).symm`, which collapses into one `rw`; the PR changed both proofs identically, so leaving one collapsed and the other not would be inconsistent.",
+     "requested_change": "Replace lines 146-147 with `rw [this, compProd_apply_prod hs ht]`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/3513f27bbbb36ae3baa4b4fd91652e8f4b2a317f86acd6ba029e7433648dca10/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__d188a43d-09cc-411e-b2e2-019923b6fb34.jsonl"
+  },
+  "AP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` now ends with `grind`, and the profiling in the PR description reports this proof got clearly slower (`<10 ms before, 25 ms after`); the proof it replaced (`rw [mem_map]` plus the explicit `⟨_, _⟩` term) is short and readable, so replacing it with heavy automation is a net loss.",
+     "requested_change": "Revert this declaration's proof to the previous explicit one. If the golf is kept, drop `grind` for the lighter `simp` route, which I verified compiles in this file: `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply]` followed by `simp`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` now closes with `grind`, which the PR's own profiling reports as slower than the proof it replaced (`<10 ms before, 17 ms after`), and the remaining goal after `simp only [den_inv, num_intCast]` is `↑(if a = 0 then 1 else a.natAbs) = a` — linear integer arithmetic, for which heavy general automation is not appropriate.",
+     "requested_change": "Revert to the previous explicit proof, or keep the golf with the lighter tactic I verified: `simp only [den_inv, num_intCast]`, then `rw [if_neg ha0.ne']`, then `omega` (the `if_neg` rewrite is needed; `omega` alone after the `simp only` does not close the goal).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:49",
+     "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` (and its twin `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` at line 141) the proof ends with two tactic calls, `simp only [this]` (a single local equation) and `exact (...).symm`, where one `rw` would both rewrite and close; the neighbouring lemmas in this file rewrite the disintegrate identity with `rw` (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`).",
+     "requested_change": "Replace the last two lines of each of the two lemmas by a single rewrite: `rw [this, Kernel.compProd_apply_prod hs ht]` in the `ProbabilityTheory` version and `rw [this, compProd_apply_prod hs ht]` in the `MeasureTheory.Measure` version.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:462",
+     "claim": "`MeasureTheory.Measure.pi_map_piCongrLeft` finishes with `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, while the goal left after `simp only [pi_pi, this]` is exactly `∏ i, (μ (e i)) (s' i) = ∏ i, (μ i) (s i)`, i.e. the more direct lemma `Equiv.prod_comp e g` (`∏ i, g (e i) = ∏ i, g i`); the generic `Fintype.prod_equiv` forces three `_` placeholders and a `congrFun rfl` witness.",
+     "requested_change": "Use the direct lemma: `exact Equiv.prod_comp e (fun i ↦ μ i (s i))`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep2/tasks/bf030d510a08503661f8a84f8ba42a4ffb03b2b9c1a447a58e6ba366e0068f12/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115712__b4e9e251-9eaf-4ee9-91db-e6812978eead.jsonl"
+  },
+  "GPT3": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` now invokes `grind` even though the equivalence is closed directly by the existing simp lemmas for `Equiv.apply_eq_iff_eq_symm_apply` and `exists_eq_right`; this adds an unnecessary black-box step to a low-level simp theorem, and the PR profile shows this proof got slower.",
+     "requested_change": "Replace the proof with a simp-only proof, e.g.\n```lean\n  simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply,\n    exists_eq_right]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` uses `grind` only to discharge the `if a = 0` branch and the `natAbs` rewrite coming from `0 < a`; these are explicit consequences of `ha0`, so the new grind step is unnecessary here.",
+     "requested_change": "Replace the proof with explicit rewrites, e.g.\n```lean\n  rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg (le_of_lt ha0)]\n```",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv`: the new proof `simp only [mem_map, Equiv.coe_toEmbedding]; grind` makes this declaration's elaboration slower than the proof it replaces (the PR's own profiling table records `<10 ms` before and `25 ms` after -- the only change in the PR that is both a regression and not a simplification of the reader's view of the argument). The `grind` call is also unnecessary here: the goal after `simp only [mem_map, Equiv.coe_toEmbedding]` is `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s`, which the two `simp` lemmas `Equiv.apply_eq_iff_eq_symm_apply` and `exists_eq_right` close directly (verified to compile). In a golf PR whose stated point is to speed these declarations up, this change is strictly worse than what it replaces, and it hides which lemma justifies each direction.",
+     "requested_change": "Revert to the previous proof (`rw [mem_map]; exact ⟨by rintro ⟨a, H, rfl⟩; simpa, fun h => ⟨_, h, by simp⟩⟩`), or, if `grind` is to be kept out, use the verified `simp`-only proof: `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos`: the new `simp only [den_inv, num_intCast]; grind` also regresses elaboration (`<10 ms` before, `17 ms` after, per the PR's profiling table), and `grind` is not needed to finish the proof. After `simp only [den_inv, num_intCast]` the goal is `↑(if a = 0 then 1 else a.natAbs) = a` with `ha0 : 0 < a`; the sibling lemma `inv_ofNat_den` two dozen lines below proves the analogous fact with a plain `simp`, so calling the general-purpose solver here is out of keeping with the surrounding code as well as slower.",
+     "requested_change": "Revert to the previous proof (`rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one]; apply den_div_eq_of_coprime ha0; rw [Int.natAbs_one]; exact Nat.coprime_one_left _`), or drop `grind` in favour of the verified `simp`-only step: `simp only [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:446",
+     "claim": "`MeasureTheory.Measure.pi_map_piCongrLeft` still proves the set-preimage identity `e_meas ⁻¹' pi univ s = pi univ s'` by hand (`ext x` / `e.forall_congr` / `MeasurableEquiv.piCongrLeft_apply_apply`, lines 455-460), but this is exactly the existing library lemma `Equiv.piCongrLeft_preimage_univ_pi` (`Mathlib/Data/Set/Prod.lean:922`) after unfolding the measurable equivalence with `MeasurableEquiv.coe_piCongrLeft`. This is the same proof the PR is golfing, and the hand-rolled version is the only part of it the PR left un-golfed, so the duplication is worth removing while the declaration is being touched.",
+     "requested_change": "Replace the body of the `have` with `rw [MeasurableEquiv.coe_piCongrLeft, Equiv.piCongrLeft_preimage_univ_pi]`. This was verified: the whole declaration with that replacement compiles with no errors or warnings.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/399ab577d3465b122970536740b0dc2939d8a2256347361698fbd5453e36e5a3/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063824__aa00fcda-24d0-473e-97ce-bd021fb0c39e.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Data/Finset/Image.lean:74",
+     "claim": "`Finset.mem_map_equiv` is now closed by `simp only [mem_map, Equiv.coe_toEmbedding]` followed by `grind`. The goal left by the squeeze, `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s`, is closed by one lightweight `simp` with `Equiv.apply_eq_iff_eq_symm_apply`; `grind` is heavy automation for a plain `Finset` membership goal in a foundational file, and the PR's own profiling records this declaration as *slower* than before (<10 ms → 25 ms), so this hunk does not buy speed either.",
+     "requested_change": "Replace the two proof lines with `simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]` (verified to compile in place). If a squeezed call is preferred, `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]` also compiles.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Data/Rat/Lemmas.lean:302",
+     "claim": "`Rat.inv_intCast_den_of_pos` now closes with `grind`. After `simp only [den_inv, num_intCast]` the goal is `↑(if a = 0 then 1 else a.natAbs) = a` with `ha0 : 0 < a`, which existing lemmas close directly (a one-line `rw`); the PR's own profiling records this declaration as slower than before (<10 ms → 17 ms), so the heavy automation is not needed and is not buying time.",
+     "requested_change": "Use `rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]` (verified to compile in place), or alternatively `simp only [den_inv, num_intCast]` followed by `split_ifs with h <;> omega`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Probability/Kernel/Disintegration/Integral.lean:141",
+     "claim": "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` (and its `Kernel` twin `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, lines 49-55) spends two calls on what one rewrite does: after `have this : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, the proof rewrites with `simp only [this]` and then closes by converting `compProd_apply_prod` with `.symm`, whereas rewriting the goal's right-hand side into the integral with `compProd_apply_prod` itself finishes the goal; and the local `have` is the roundabout way of the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom used by the neighbouring `lintegral_condKernel` (line 149) and `lintegral_condKernel_mem` (line 44).",
+     "requested_change": "Use a single `rw [this, compProd_apply_prod hs ht]` (verified to compile in place); preferably drop the local `have` as well and write `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]` (verified). The `Kernel` twin takes `rw [this, Kernel.compProd_apply_prod hs ht]`, or `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]` (verified).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_ap_rep3/tasks/a55ceeb7248f9cf22872433cae008af1daf7d3812475879cb59d372542a17cd2/samples/0/attempts/attempt_1_20261009115712/ape_agent_session_20261009_115713__dae02de0-bd1c-4c4a-b1df-110a63656908.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_32875.md"
+}

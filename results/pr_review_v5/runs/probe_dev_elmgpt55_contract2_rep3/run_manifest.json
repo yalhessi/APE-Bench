@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 35,
+  "completion_status": "complete",
+  "context_calls_total": 117,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 85.05448,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 34,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 1605,
+  "pruned": 1605,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_dev_elmgpt55_contract2_rep3",
+  "run_name": "probe_dev_elmgpt55_contract2_rep3",
+  "run_plan_sha256": "53604e2f8342c2fdd6b0d5d46ecf8297e2f2ed9da9e916357cb0a37c7f9c953b",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "8f2d78de884d77cc0b4848fb3a72cb9361baa25700f343759d413a81dfc87a46",
+  "succeeded": 0,
+  "total_cost": 85.05448,
+  "usage": {
+    "billed": 17.215504,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 85.05448,
+    "self_billed": 17.215504,
+    "self_nominal": 85.05448,
+    "self_tokens": 16047101.0,
+    "tokens": 16047101.0
+  },
+  "wall_seconds": 1184.126396
+}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/Exponential.lean", "line_start": 528, "line_end": 529, "replacement": "@[deprecated (since := \"2025-12-25\")]\nalias iSup_pow := iSup_pow_natCast\n\nexample {o : Ordinal} (ho : 0 < o) : ⨆ n : ℕ, Monoid.npow n o = o ^ ω := iSup_pow_natCast ho\n\nexample {o : Ordinal} (ho : 0 < o) : ⨆ n : ℕ, o ^ (n : Ordinal) = o ^ ω := iSup_pow_natCast ho"}

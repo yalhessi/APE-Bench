@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Set/Semiring.lean", "line_start": 174, "line_end": 174, "replacement": "instance [MulOneClass \u03b1] : NonAssocSemiring (SetSemiring \u03b1) :="}

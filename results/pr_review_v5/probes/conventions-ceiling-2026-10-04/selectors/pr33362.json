@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P010",
+  "where": "all h_maps hypotheses (ball -> closedBall); hc : f c = c dropped in norm_deriv_le_one_of_mapsTo_ball, dist_le_dist_of_mapsTo_ball_self",
+  "why": "The PR's purpose is weakening hypotheses: open-ball MapsTo becomes closed-ball, fixed-point hypothesis removed."
+ },
+ {
+  "id": "P419",
+  "where": "norm_deriv_le_one_of_mapsTo_ball, dist_le_dist_of_mapsTo_ball_self, norm_le_norm_of_mapsTo_ball_self (h₀ : f 0 = 0)",
+  "why": "Fixed-point hypothesis `hc` replaced by writing `f c` in statements; `h₀ : f 0 = 0` remains in one sibling."
+ },
+ {
+  "id": "P063",
+  "where": "norm_deriv_le_one_of_mapsTo_ball, dist_le_dist_of_mapsTo_ball_self, norm_le_norm_of_mapsTo_ball_self",
+  "why": "Same-radius versions generalised from codomain ℂ to any complex normed space E."
+ },
+ {
+  "id": "P139",
+  "where": "module docstring TODO; docstrings of norm_deriv_le_div_of_mapsTo_ball, norm_deriv_le_one_of_mapsTo_ball, dist_le_dist_of_mapsTo_ball_self",
+  "why": "TODO removed; several docstrings still describe open-ball or self-map hypotheses the statements no longer have."
+ },
+ {
+  "id": "P045",
+  "where": "module docstring (Schwarz.lean), entries for norm_le_norm_of_mapsTo_ball_self, dist_le_dist_of_mapsTo_ball_self, abs_* names",
+  "why": "Module docstring list edited; must match changed statements, codomains, conclusions and actual declaration names."
+ },
+ {
+  "id": "P222",
+  "where": "module docstring and declaration docstrings of the same-radius lemmas",
+  "why": "Docstrings say f : ℂ → ℂ, open ball, abs while statements now cover E and closed balls."
+ },
+ {
+  "id": "P019",
+  "where": "names *_of_mapsTo_ball, *_mapsTo_ball_self for lemmas whose hypothesis is now MapsTo ... closedBall",
+  "why": "Lemma names spell `ball`/`_self` while the statement now uses closedBall (f c) R."
+ },
+ {
+  "id": "P271",
+  "where": "Complex.schwarz_aux",
+  "why": "Auxiliary _aux lemma, modified and made private, used only in norm_dslope_le_div_of_mapsTo_ball."
+ },
+ {
+  "id": "P261",
+  "where": "Complex.schwarz_aux",
+  "why": "Modified private auxiliary lemma keeps placeholder name `schwarz_aux`."
+ },
+ {
+  "id": "P358",
+  "where": "private theorem Complex.schwarz_aux",
+  "why": "PR makes schwarz_aux private; its Schwarz-lemma statement for ℂ → ℂ may be of independent use."
+ },
+ {
+  "id": "P362",
+  "where": "Complex.schwarz_aux moved before `@[expose] public section`",
+  "why": "Module file: declaration moved out of the public section, becoming invisible to importers."
+ },
+ {
+  "id": "P431",
+  "where": "`@[expose] public section` moved below schwarz_aux",
+  "why": "PR repositions a whole-section @[expose] in a file containing only theorems."
+ },
+ {
+  "id": "P050",
+  "where": "open scoped Topology ComplexConjugate",
+  "why": "ComplexConjugate newly opened; nothing in the changed file appears to use conj notation."
+ },
+ {
+  "id": "P001",
+  "where": "private theorem Complex.schwarz_aux (outside namespace); Set.MapsTo, Set.EqOn under `open Set` in affine_of_* lemmas",
+  "why": "Namespace prefixes written explicitly where open/namespace supply them, or declaration placed outside namespace."
+ },
+ {
+  "id": "P329",
+  "where": "section/namespace restructuring, schwarz_aux `exact ... <|` rewrite, norm_le_norm_of_mapsTo_ball_self proof, open scoped",
+  "why": "Several incidental rewrites beyond weakening hypotheses: proof restyling, section removal, extra open."
+ },
+ {
+  "id": "P119",
+  "where": "norm_dslope_le_div_of_mapsTo_ball (hg₀ removed), affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div (by_cases removed)",
+  "why": "PR removes unused have and unneeded case split; remaining proof steps are the situation."
+ },
+ {
+  "id": "P218",
+  "where": "norm_dslope_le_div_of_mapsTo_ball (nonempty_closedBall.mp), dist_le_dist_of_mapsTo_ball_self (nonempty_ball.1), schwarz_aux (mem_ball.2)",
+  "why": "Changed lines take iff directions with both .mp/.mpr and .1/.2."
+ },
+ {
+  "id": "P126",
+  "where": "Schwarz.lean: .1/.2 vs .mp/.mpr; MapsTo vs Set.MapsTo across changed signatures",
+  "why": "Same constructs spelled differently within the file in the PR's changed lines."
+ },
+ {
+  "id": "P097",
+  "where": "schwarz_aux (`by rw [mem_sphere.1 hz]; exact hr.2`), norm_dslope_le_div_of_mapsTo_ball (`rw [hc, norm_zero]; exact ...`)",
+  "why": "Changed tactic lines join several tactics with `;` on one line."
+ },
+ {
+  "id": "P423",
+  "where": "h_maps hypotheses of all Schwarz lemmas",
+  "why": "Hypothesis restated as MapsTo into closedBall, the weaker form easier for callers to supply."
+ },
+ {
+  "id": "P072",
+  "where": "Complex.schwarz_aux made private; signatures of norm_deriv_le_one_of_mapsTo_ball, dist_le_dist_of_mapsTo_ball_self changed",
+  "why": "Public declaration withdrawn and argument removed without deprecation, breaking downstream uses."
+ },
+ {
+  "id": "P156",
+  "where": "PR description",
+  "why": "Description omits dropped fixed-point hypothesis, changed conclusion, privatised schwarz_aux and removed TODO."
+ },
+ {
+  "id": "P084",
+  "where": "norm_deriv_le_div_of_mapsTo_ball, affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div signatures; norm_le_norm_of_mapsTo_ball_self docstring",
+  "why": "Signatures reflowed and new docstring broken into short lines well under 100 characters."
+ },
+ {
+  "id": "P014",
+  "where": "dist_le_dist_of_mapsTo_ball_self, norm_le_norm_of_mapsTo_ball_self",
+  "why": "New terminal `simpa [...] using` calls replace a squeezed `simpa only`."
+ },
+ {
+  "id": "P243",
+  "where": "removed `section Space` / `end Space`; file-level variable block",
+  "why": "PR removes a section and moves its variables to file level."
+ }
+]

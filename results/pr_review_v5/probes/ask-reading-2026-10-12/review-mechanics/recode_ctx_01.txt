@@ -1,0 +1,171 @@
+=== P14_val 29842 v0053 DX2 [P14val_b]  family F12  None:None
+ASK: How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition. If you've changed your mind, could you explain why in the PR description?
+MATCHER: m1 no (No finding raises #24163 or changing the definition; R9-R11 ask for a PR description listing lemmas only.) | m2 no (Nobody raises #24163/#21065 or changing the definition; generic PR-description asks are partial.)
+READER: K l.7 ap=n/a/None know=pr_context
+  quote: The PR description is empty. A maintainer might ask for a description? The brief says don't report general risks... no description isn't a finding per se.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.7 (+-1):
+[6] RESULT file_read: {"success": true, "content": "   398|\n   399|@[deprecated (since := \"2025-04-27\")] alias tangentCone_eq_univ := tangentConeAt_eq_univ\n   400|\n   401|end Normed\n   402|\n   403|end TangentCone\n 
+[7] REASONING: Now let me understand the change. The PR moves `tangentConeAt_closure` and `uniqueDiffWithinAt_closure` / `mono_closure` between sections, generalizing the section variables.
+
+Key things to check:
+1. Is `tangentConeAt_closure` actually generalizable to TVS? The PR keeps it in the `Normed` section — wait, no. Let me check: the PR moved it from section `Normed` into a new position... Actually, look at the diff: `tangentConeAt_closure` is moved from line 106ish (in Normed) to line 144ish (Normed section still). Hmm.
+
+Actually the diff indicates the section boundaries were changed: the old `section Normed` (with `NormedAddCommGroup E`... ) was replaced by `section TVS` extending with `ContinuousSMul 𝕜 E`. Then `tangentConeAt_closure` is moved *after* `end TVS` (line 147) into a new `section Normed` at line 149.
+
+So the net effect: homogenizes so that tangentConeAt_closure stays Normed (since it needs closure and metric) and uniqueDiffWithinAt_closure stays Normed (needs closure).
+
+Wait but `tangentConeAt_closure` requires `NormedAddCommGroup`... but the `Normed` section lacks `Continuous
+[7] TOOL file_read: {"file_path": "target/Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 100, "line_end": 150, "omit_details": false}
+[7] TOOL file_read: {"file_path": "target/Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 410, "line_end": 500, "omit_details": false}
+[8] RESULT file_read: {"success": true, "content": "    97|  eq_univ_of_forall fun _ ↦ mem_tangentConeAt_of_pow_smul (norm_pos_iff.1 hr₀) hr <|\n    98|    Eventually.of_forall fun _ ↦ mem_univ _\n    99|\n   100|@[depreca
+
+GREP 'description':
+--- line 3 TEXT[user] (match 'description')
+# Pull request #29842  **Title:** feat(TangentCone): generalize some lemmas to TVS  **Description:** (no description provided)  **Changed files:**   - `Mathlib/Analysis/Calculus/TangentCone.lean`  **Tools available:** read files, grep the repo (content_search), find files by name (file_search), compile a snippet aga
+
+--- line 7 REASONING (match 'description')
+oneAt_closure` is declared in the earlier Normed section (line 156) with `@[simp]`. Yes.  Hmm, but now consider: does `uniqueDiffWithinAt_closure` still work with the same proof? Yes, unchanged.  Now what else... The PR description is empty. A maintainer might ask for a description? The brief says don't report general risks... Documentation concern: no description isn't a finding per se.  Let's think about duplication: `variable [ContinuousAdd E] 
+
+--- line 40 TOOL_RESULT precedent_search (match 'description')
+_eq_primeage_image`, it's enough to study the subset\n+  `normAtAllPlaces '' (normLeOne K)` of `realSpace K`.\n+\n+2. A description of `normAtAllPlaces '' (normLeOne K)` is given by `normAtAllPlaces_normLeOne`, it\n+  is the set of `x : realSpace K`, 
+
+--- line 55 REASONING (match 'description')
+w I'm leaning towards: the actual review comments may be about things like "please add a `@[simp]`/`[gcongr]`-style attribute" or "docstring" on... hmm, no new declarations. OR the review comments might be about the *PR description* (empty!) — hmm! The PR has no description. A maintainer might ask for a description... but the brief says findings must be actionable code changes; "add a PR description" is a "documentation" ask, arguably. Hmm, that's
+
+--- line 61 REASONING (match 'description')
+ze `tangentConeAt_subset_zero` / `UniqueDiffWithinAt.accPt` / `zero_mem_tangentCone`..." — plausible.  3. "The `have` in `lim_zero`: use X." — unlikely (already implemented).  4. "Add a note to the module docstring / no description." — hmm.  5. "`tangentConeAt.lim_zero`'s statement: prefer `Tendsto c l (cobounded 𝕜)`" — hmm! Hmm, actually, hmm: this is interesting. The PR *rewrites* `hc` to the cobounded form inside the proof, which suggests the c
+
+--- line 67 REASONING (match 'description')
+ Hold on. Let me reconsider something! I've been assuming the PR's generalization *of the section structure* is the point. But let me re-read the PR title: "feat(TangentCone): generalize some lemmas to TVS". And the PR *description is empty*. Hmm.  Hmm, let me think about which lemmas the PR *failed* to generalize that are *closest* to the changed ones — because a maintainer reviewing the diff would see the pattern and immediately check the *adjac
+
+--- line 77 REASONING (match 'description')
+ings. Since CI linters passed (no warnings from my compile check) ✓ nothing to ask.  OK, so: given that everything checks out, maybe the ground truth comment is about **scope: "please split this PR"** or **"please add a description"**... Hmm! Hold on: "no description provided" — hmm, for a Mathlib PR, the description matters; a maintainer might comment "Please fill in the PR description" — but that's not a code finding.  Hmm, hmm, hmm. Let me try 
+
+[stopped at --max 7 blocks]
+
+=== D12 33145 d0027 DX2 [D12a]  family F8  Mathlib/Topology/Order/IsLUB.lean:243
+ASK: ```suggestion theorem Dense.ciInf' {α : Type*} [TopologicalSpace α] ```
+CODE AT COMMENT: range_coe_subtype, setOf_mem_eq] | +      have := h.closure.mono (image_closure_subset_closure_image hf) | +      simp only [hS.closure_eq, image_univ] at this | +      exact h1 this | +    simp [csSup_of_not_bddAbove h1, csSup_of_not_bddAbove h2] | + | +/-- This is an analogue of `Dense.continuous_inf` for functions taking values in a conditionally | +complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/ | +theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]
+MATCHER: m1 no (ciInf' names from four; R5, R13 want a descriptive name instead of the prime.) | m2 no (Rename to Dense.ciInf'; same findings as the other ciSup/ciInf renames.)
+READER: K l.46 ap=n/a/None know=none
+  quote: `continuous_sup` sounds like 'continuity of sup' which is misleading-ish ... for naming_norm, `Dense.continuous_sup` came back subject_unresolved, so unmeasured.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_upperBounds` proves `upperBounds (f '' S) ⊆ upperBounds (range f)` by hand: `mem_closure_iff_frequently` + `mem_of_closed isClosed_Iic` re-derives `upperBounds s ⊆ upperBounds (closure s)`, which is the
+  [1] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_sup'` opens with the `isEmpty_or_nonempty γ` split and then re-proves the bounded case by the verbatim body of `Dense.continuous_sup` (lines 199-204), so the two declarations carry the same argument twi
+  [2] Mathlib/Topology/Order/IsLUB.lean: The `have h2 : ¬ BddAbove (range (fun s : S => f (Subtype.val s)))` in `Dense.continuous_sup'` is proved with an eight-line `range_comp'` + `simp_all only [Subtype.range_coe_subtype, setOf_mem_eq]` detour, although `¬ Bd
+  [3] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_lowerBounds` (and likewise `Dense.continuous_inf`, line 208, and `Dense.continuous_inf'`, line 243) repeats the whole proof of its order-dual (`continuous_upperBounds`, `continuous_sup`, `continuous_sup
+  [4] Mathlib/Topology/Order/IsLUB.lean: The docstrings of the new `upperBounds`/`lowerBounds` lemmas misdescribe the statements: “the upper bounds of the range of the universe” — the right-hand side is `range f`, and there is no “range of the universe” — and “
+  [5] Mathlib/Topology/Order/IsLUB.lean: `Dense.continuous_upperBounds` (and `Dense.continuous_lowerBounds`, line 183) lead with `continuous_`, whereas every base-snapshot declaration whose conclusion subject is `upperBounds` is named with that subject first —
+TRANSCRIPT around l.46 (+-1):
+[45] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Topology/Order/MonotoneConvergence.lean", "matches": [{"line_number": 37, "content": "    34|\n    35|variable {α β : Type*}\n    36|\n    37|/--
+[46] REASONING: `SupConvergenceClass` exists in `Mathlib/Topology/Order/MonotoneConvergence.lean` (my `#check` failed because it wasn't imported by IsLUB.lean — indeed `Mathlib.Topology.Order.IsLUB` doesn't import MonotoneConvergence, and `#check @SupConvergenceClass` needs the name to be in scope... the class is not imported).
+
+Aaron Liu's suggestion "Probably the assumption here is docs#SupConvergenceClass" was about what generalizes the "reaches its supremum" story? Hmm, actually the thread's topic title is "Continuous function reaches its supremum on a dense set" and the discussion was about `⨆ i, f i = ⨆ s : S, f s` generalized to *any* ordered codomain with order topology. Kevin's remark was about `⨆ s ∈ S`. Hmm, Aaron's "Probably the assumption here is SupConvergenceClass" might be about a different lemma (maybe another version of the statement where you want `sSup` over a directed set...). Hard to know.
+
+Hmm — maybe the Zulip context is about whether the assumption on α should be `OrderClosedTopology`... Let me not chase this further.
+
+Now, let me consider the "generalization" concern in our
+[46] TOOL lean_verify_edit: {"path": "Mathlib/Topology/Order/IsLUB.lean", "declaration_name": "Dense.continuous_sup", "new_declaration": "theorem Dense.continuous_sup {\u03b1 : Type*} [TopologicalSpace \u03b1]\n    [ConditionallyCompleteLattice \u03b1] [ClosedIicTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u0
+[46] TOOL lean_verify_edit: {"path": "Mathlib/Topology/Order/IsLUB.lean", "declaration_name": "Dense.continuous_lowerBounds", "new_declaration": "theorem Dense.continuous_lowerBounds {\u03b1 : Type*} [TopologicalSpace \u03b1] [Preorder \u03b1]\n    [ClosedIciTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u03b3]
+[47] RESULT lean_verify_edit: {"success": false, "errors": [{"severity": "error", "data": "failed to synthesize instance of type class\n  Nonempty γ\n\nHint: Type class instance resolution failures can be inspected with the `set_o
+
+GREP "continuous_inf'|subject_unresolved":
+--- line 3 TEXT[user] (match "continuous_inf'|subject_unresolved")
+.lean`; changed: value_or_body:added - as the PR leaves it: ```lean /-- The lower bounds of the image of a continuous function on a dense set is equal to the lower bounds of the range of the universe. -/ ```  ### `Dense.continuous_inf'` (theorem, added) [d060e494ca] - file: `Mathlib/Topology/Order/IsLUB.lean`; changed: name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean theorem Dense.continuous_inf' {α : Type*} [Topological
+
+--- line 5 TOOL_RESULT file_read (match "continuous_inf'|subject_unresolved")
+2|complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/\n   243|theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]\n   244|    [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] {f : γ → α} [To
+
+--- line 9 TOOL_RESULT file_read (match "continuous_inf'|subject_unresolved")
+2|complete linear order. The assumption of `BddBelow (range f)` is not needed in this theorem. -/\n   243|theorem Dense.continuous_inf' {α : Type*} [TopologicalSpace α]\n   244|    [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] {f : γ → α} [To
+
+--- line 15 TOOL_RESULT naming_norm (match "continuous_inf'|subject_unresolved")
+{"success": true, "verdict": "insufficient_evidence", "subject": null, "empty_because": "subject_unresolved", "results": "This tool could not work out what this declaration is ABOUT from its conclusion, so it never asked the co
+
+--- line 19 REASONING (match "continuous_inf'|subject_unresolved")
+ense.exists_lt ... := hs.orderDual.exists_gt x`. So the local file convention (OrderClosed.lean and IsLUB.lean) is to derive dual statements by `αᵒᵈ`/`orderDual`. This supports a finding: `Dense.continuous_inf` / `Dense.continuous_inf'` / `Dense.continuous_lowerBounds` duplicate the proof of their `sup` counterparts instead of being derived by order duality (as `Dense.isGLB_inter_iff`, `Dense.exists_lt`, `isGLB_iff_of_subset_of_subset_closure` do in t
+
+--- line 28 REASONING (match "continuous_inf'|subject_unresolved")
+uality derivations for sup/inf: ``` example [ConditionallyCompleteLattice α] [ClosedIciTopology α] ... (h : BddBelow (range f)) :     ⨅ i, f i = ⨅ s : S, f s :=   hS.continuous_sup (α := αᵒᵈ) hf h ``` and similarly for `continuous_inf'`: ``` example [ConditionallyCompleteLinearOrder α] [ClosedIciTopology α] :     ⨅ i, f i = ⨅ s : S, f s := hS.continuous_sup' (α := αᵒᵈ) hf ``` Let's test.  Also test whether `continuous_sup'` could be derived from `cont
+
+--- line 31 REASONING (match "continuous_inf'|subject_unresolved")
+k. So:  1. `Dense.continuous_lowerBounds` can be `:= hS.continuous_upperBounds (α := αᵒᵈ) hf` — duality (one line, no duplicated proof). 2. `Dense.continuous_inf` can be `:= hS.continuous_sup (α := αᵒᵈ) hf h`. 3. `Dense.continuous_inf'` can be `:= hS.continuous_sup' (α := αᵒᵈ) hf`.  That's a strong duplication finding: three declarations duplicate the proofs of their order-duals when the file's convention is to derive the dual (`Dense.isGLB_inter_iff`
+
+[stopped at --max 7 blocks]
+
+=== D12 33294 d0038 AP2 [D12b]  family F8  Mathlib/SetTheory/Cardinal/Cofinality.lean:535
+ASK: ```suggestion theorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f) ```
+CODE AT COMMENT: @@ -532,7 +532,7 @@ theorem cof_cof (a : Ordinal.{u}) : cof (cof a).ord = cof a := by |    obtain ⟨g, hg⟩ := exists_fundamental_sequence a.cof.ord |    exact ord_injective (hf.trans hg).cof_eq.symm |   | -protected theorem IsNormal.isFundamentalSequence {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f) | +theorem isFundamentalSequence_of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)
+MATCHER: m1 no (No reviewer proposes renaming isFundamentalSequence_of_isNormal to dotted IsFundamentalSequence.of_isNormal.) | m2 no (No reviewer questions the name isFundamentalSequence_of_isNormal.)
+READER: K l.35 ap=held/considered_dropped know=none
+  quote: 'Hmm — the opposite convention! The change moved `IsNormal.isFundamentalSequence` OUT of the `IsNormal` namespace ... Given `Ordinal.IsNormal` is deprecated, they can't put things in its namespace. Fine. So `isFundamentalSequence_of_isNormal` is consistent.' (l.35)
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.35 (+-1):
+[34] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/SetTheory/Ordinal/Arithmetic.lean", "matches": [{"line_number": 55, "content": "    53|noncomputable section\n    54|\n    55|open Function Cardi
+[35] REASONING: The file has `open Function ...`. So `Injective.eq_iff` resolves to `Function.Injective.eq_iff`. But wait, does the deprecation attribute in Arithmetic.lean use the resolution? It must, given my earlier standalone test needed `open Function`. Hmm, but actually maybe in my first test, the file `import Mathlib.SetTheory.Ordinal.Arithmetic` doesn't re-open. Right.
+
+OK so `@[deprecated Injective.eq_iff]` is fine (resolves to Function.Injective.eq_iff). Hmm but is the stored name the resolved one? Probably yes (Lean elaborates the ident). Actually hmm, I'm not 100% sure. Let me test what the deprecation message shows.
+
+Actually, this is a minor point. Let me not chase it. But note: Mathlib convention is deprecations should name the full name; using `Injective.eq_iff` relies on `open` and the printed name may be `Injective.eq_iff`. Hmm. Actually many Mathlib deprecations use short names that resolve via open. E.g. `@[deprecated IsNormal.ext (since := ...)]` — full name `Order.IsNormal.ext` but written as `IsNormal.ext` (relies on `open Order`). That's used in this PR too (Family.lean line 
+[35] TOOL file_read: {"file_path": "target/Mathlib/SetTheory/Ordinal/FixedPoint.lean", "line_start": 280, "line_end": 400, "omit_details": false}
+[36] RESULT file_read: {"success": true, "content": "   277|@[simp]\n   278|theorem nfp_id : nfp id = id := by\n   279|  ext\n   280|  simp_rw [← iSup_iterate_eq_nfp, iterate_id]\n   281|  exact ciSup_const\n   282|\n   283
+
+GREP 'IsFundamentalSequence\\.|of_isNormal':
+--- line 3 TEXT[user] (match 'IsFundamentalSequence\\.|of_isNormal')
+ga0 : preOmega ω = ω := by   simp_rw [← isNormal_preOmega.apply_omega0, preOmega_natCast, iSup_natCast] ``` - as the PR leaves it: ```lean @[simp] theorem preOmega_omega0 : preOmega ω = ω := by   simp_rw [← apply_omega0_of_isNormal isNormal_preOmega, preOmega_natCast, iSup_natCast] ```  ### `Ordinal.isFundamentalSequence_of_isNormal` (theorem, modified) [2642023d5d] - file: `Mathlib/SetTheory/Cardinal/Cofinality.lean`; changed: attributes:removed,
+
+--- line 9 TOOL_RESULT file_read (match 'IsFundamentalSequence\\.|of_isNormal')
+|@[simp]\n   862|theorem iSup_natCast : iSup Nat.cast = ω :=/- ... omitted ... -/\n   864|\n   865|theorem apply_omega0_of_isNormal {f : Ordinal.{u} → Ordinal.{v}} (hf : IsNormal f) :\n   866|    ⨆ n : ℕ, f n = f ω :=/- ... omitted ... -/\n   868|\n  
+
+--- line 35 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+:= H₁.comp H₂` → `comp (hg := H₁) (hf := H₂)`. So identical. Good.  Hmm wait, actually is `omega o = preOmega (o + ω)`? Let me check the definition. Whatever, it matches.  12. **Cofinality.lean**: `isFundamentalSequence_of_isNormal` name. It was `IsNormal.isFundamentalSequence`. Renamed to `isFundamentalSequence_of_isNormal`. The convention: "A declaration whose main argument is a term of type `T` or a hypothesis `P x` ... is placed in `T`'s or `P
+
+--- line 40 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+ `Order.IsNormal` lemma? `bsup` is Ordinal-specific (blsub/bsup). Hmm, so it's not superseded — it stays. But its name remains `IsNormal.bsup` in the (deprecated) `IsNormal` namespace. Hmm. Should it be renamed to `bsup_of_isNormal`? Hmm, that's a question of consistency. Actually maybe it should be `Ordinal.IsNormal.bsup` kept? Since `IsNormal` is deprecated, `IsNormal.bsup` resides in the `Ordinal.IsNormal` namespace which is deprecated-ish. Hmm
+
+--- line 41 TOOL_RESULT content_search (match 'IsFundamentalSequence\\.|of_isNormal')
+"content": "   868|\n   869|@[deprecated (since := \"2025-12-25\")]\n   870|alias IsNormal.apply_omega0 := apply_omega0_of_isNormal\n   871|\n   872|@[simp]"}]}, {"path": "target/Mathlib/SetTheory/Ordinal/Arithmetic.lean", "matches": [{"line_number": 
+
+--- line 42 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+esting. These are Ordinal-specific (blsub/bsup), so they aren't superseded by `Order.IsNormal` lemmas. But the naming convention question: since the PR is deprecating `Ordinal.IsNormal`, should these be renamed to `bsup_of_isNormal` etc.? Hmm. But wait, `IsNormal.blsub_eq` is *used* by `isFundamentalSequence_of_isNormal` in Cofinality and elsewhere. If they're not deprecated, they stay. Hmm, but their names live in the `Ordinal.IsNormal` namespace
+
+--- line 46 REASONING (match 'IsFundamentalSequence\\.|of_isNormal')
+, with each convention applied. Let me enumerate conventions and check:  1. Lemma name built from names of declarations in its statement. → Check `iSup_pow_natCast`, `iSup_add_natCast`, `iSup_mul_natCast`, `apply_omega0_of_isNormal`, `cof_eq_of_isNormal`, `cof_le_of_isNormal`, `isFundamentalSequence_of_isNormal`, `isNormal_veblenWith_zero`, `mem_range_deriv`, `le_iff_deriv`, `nfp_fp`, `deriv_fp`, `fp_iff_deriv`, `apply_le_nfp`, `nfp_le_apply`, `ap
+
+[stopped at --max 7 blocks]
+
+=== P14_val 34091 v0107 DX1 [P14val_a]  family F2  Mathlib/SetTheory/Cardinal/Pigeonhole.lean:97
+ASK: ```suggestion theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] : ```
+CODE AT COMMENT: ` that requires codomain to be infinite. -/ | +theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) : | +    ∃ a : α, Infinite (f ⁻¹' {a}) := | +  exists_infinite_fiber f h (by | +    rw [Cardinal.infinite_iff] at hα ⊢ | +    exact hα.trans h.le) | + | +/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's | +has an uncountable fiber. -/ | +theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :
+MATCHER: m1 no ([Uncountable β] on exists_uncountable_fiber; instance-implicit findings reach.) | m2 no ([Uncountable beta] instance binder on exists_uncountable_fiber.)
+READER: K l.24 ap=held/None know=demand
+  quote: since `Uncountable` is a class, could be `[Uncountable β]`? But it's a hypothesis; using it as an explicit argument is fine. Similarly `Infinite β` is a class but used explicitly. Fine.
+SUBMITTED FINDINGS at that file:
+  [0] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: The rewritten docstring of `Cardinal.infinite_pigeonhole_card_lt` (and the same edit applied to `Cardinal.exists_infinite_fiber` at lines 78-79 and to the new `Cardinal.exists_uncountable_fiber` at lines 95-96) is self-c
+  [1] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: This PR deletes the `have k` block from `Cardinal.le_range_of_union_finset_eq_univ`, and that block contained the only use in the file of `Set.union_finset_finite_of_range_finite`, the only declaration this file took fro
+  [2] Mathlib/SetTheory/Cardinal/Pigeonhole.lean: `Cardinal.exists_infinite_fiber'` is a strict special case of the declaration immediately above it, not an independent result: its hypotheses `#α < #β` and `Infinite α` imply `Infinite β` via `h.le`, so the general `exis
+TRANSCRIPT around l.24 (+-1):
+[23] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/SetTheory/Cardinal/Pigeonhole.lean", "matches": [{"line_number": 98, "content": "    96|has an uncountable fiber. -/\n    97|theorem exists_uncou
+[24] REASONING: So `exists_uncountable_fiber` is new and unique. `aleph0_lt_mk_iff : ℵ₀ < #α ↔ Uncountable α` — so an alternative statement form for the goal in the proof: goal `Uncountable (f ⁻¹' {a})` ↔ `ℵ₀ < #(fiber)`. The proof rewrote `Uncountable` to `ℵ₁ ≤ #·` via succ. Hmm, would it be simpler to use `aleph0_lt_mk_iff` in the forward direction on the goal, keeping `ℵ₀ < #fiber` as goal? Let's think: after `simp_rw [← aleph0_lt_mk_iff] at hβ ⊢`, hβ : `ℵ₀ < #β`, goal `∃ a, ℵ₀ < #(fiber)`.
+
+Branch 1 (`#α < ℵ₀`): use `infinite_pigeonhole_card f ℵ₀ hβ.le le_rfl (by rwa [isRegular_aleph0.cof_eq])` → gives `∃ a, ℵ₀ ≤ #(fiber)`, which yields `ℵ₀ < #(fiber)`? NO — `ℵ₀ ≤ #fiber` gives `fiber` infinite, not uncountable. Hmm right, in branch 1 of `exists_uncountable_fiber` they used θ = ℵ₁ to get an uncountable fiber. So they need θ = ℵ₁. With goal form `ℵ₀ < #fiber`, using θ=ℵ₁ gives `ℵ₁ ≤ #fiber`, and then `aleph0_lt_aleph_one.trans_le`? `ℵ₀ < ℵ₁ ≤ #fiber` → `ℵ₀ < #fiber` ✓. So it's possible, slightly more steps. The `succ`-form for Uncountable is arguably natural since `Uncountable` is `ℵ₀ < #·` and `
+[24] TOOL lean_verify_edit: {"path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean"}
+[24] TOOL file_read: {"file_path": "target/Mathlib/SetTheory/Cardinal/Regular.lean", "line_start": 1, "line_end": 105, "omit_details": false}
+[25] RESULT lean_verify_edit: {"mode": "as_is_compile_check", "outcome": "compiled", "compiles": true, "errors_already_in_the_file": [], "errors_introduced_by_your_edit": [], "warnings": [], "environment": "Verified against the re
+
+GREP '\\[Uncountable':
+--- line 10 TOOL_RESULT content_search (match '\\[Uncountable')
+not_iff_not, mk_le_aleph0_iff]\n   441|"}, {"line_number": 444, "content": "   442|@[simp]\n   443|theorem aleph0_lt_mk [Uncountable α] : ℵ₀ < #α :=\n   444|  aleph0_lt_mk_iff.mpr ‹_›\n   445|\n   446|instance canLiftCardinalNat : CanLift Cardinal ℕ (↑
+
+--- line 22 TOOL_RESULT content_search (match '\\[Uncountable')
+not_iff_not, mk_le_aleph0_iff]\n   441|"}, {"line_number": 444, "content": "   442|@[simp]\n   443|theorem aleph0_lt_mk [Uncountable α] : ℵ₀ < #α :=\n   444|  aleph0_lt_mk_iff.mpr ‹_›\n   445|\n   446|instance canLiftCardinalNat : CanLift Cardinal ℕ (↑
+
+--- line 24 REASONING (match '\\[Uncountable')
+#fiber` ✓. So it's possible, slightly more steps. The `succ`-form for Uncountable is arguably natural since `Uncountable` is `ℵ₀ < #·` and `succ ℵ₀ = ℵ₁`. Fine either way. Not a finding.  Now, is `Uncountable` a class? `[Uncountable ℝ]` is used as an instance in Analysis/Real/Cardinality.lean (`instance : Uncountable ℝ`), so `Uncountable` is a class (or at least used as an instance). Interesting: `aleph0_lt_mk [Uncountable α]` — yes it's a class.  
+
+--- line 55 REASONING (match '\\[Uncountable')
+ntable` of a set, to check for duplication: e.g. `Uncountable.preimage`? Hmm. Let's search `Uncountable` declarations.  Actually, here's another thought about `exists_uncountable_fiber`: since `Uncountable` is a class (`[Uncountable β]`), and `Cardinal.aleph0_lt_mk [Uncountable α] : ℵ₀ < #α`, the hypothesis could be given as an instance `[Uncountable β]`? Not necessary.  Hmm, what about the statement's *hypothesis on β*: `h : #α < #β` and `hβ : Unc
+
+[4 matching blocks]
+

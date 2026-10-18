@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Set/Semiring.lean", "line_start": 34, "line_end": 34, "replacement": "instance (\u03b1 : Type*) : Inhabited (SetSemiring \u03b1) :="}

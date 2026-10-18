@@ -1,0 +1,48 @@
+{
+ "source": "probe session",
+ "set": "dev_medium_0_3_0",
+ "session": "T1",
+ "packets_findings_sha256": {
+  "33066": "2c11f0f99d6806d564b7628178d6e86c33a079e26c94e2eed83b8a86887249fe",
+  "33098": "aa903277cf7bbb2c645017000c6ec4ec8fcdfd4fe793413cd0d2e917253fad98",
+  "33117": "80921df833a84f66b7f9b698f2ebcb74d0362fb329f94128c652fbf358a0fccc",
+  "33145": "bffb0f71b884829a8d0b39bc35aace6427366ddb1845bf42ad0dfe64d57f4482",
+  "33149": "a7f905d4d76aa28fc113ef826969ec4b0b9d2ebce562535ec27cd593fbbda9cd",
+  "33285": "7cf7522ea0c033492c358c2e6134469d8833ae4328b6ed000e7e6606c1b5b503",
+  "33294": "c34d9ec3c1bd4035f47b4711976b11bac0908fc448956e2f1774a0deacad0437",
+  "33304": "a7966a05bd1411586e7a7830e87cf6f32d2d9440469e75b31d521219437882fc",
+  "33305": "2cca6d8a6a88d335ba7a9c13849bec0a74957ce51e900453f1880391da36a8f8",
+  "33315": "7c386ede7548041399195e2f161ce5995df14f08f6de1cdc93b9fe17646d7c5b",
+  "33321": "8f524d042e1c889e714f01196c1cea0122aceb476690cf4ae28416f4a5c0ca72",
+  "33337": "74a439a679f117bf36b9c3cd91d70bc3678da27033a0f5f7122129f42ca7ea52",
+  "33362": "dd442b4ae84a365029faf21b88332ebef5bf9e204be2df7e7fb1fd4c6702ebe4",
+  "33421": "f5b467f9a62d30f4be8f6dcf69c18c200ea1f3e02b2cdce499bce6a141fcfb76",
+  "33438": "ae40fe5255c95b4c2f7266f0a4fb3baf3d4e8b5267473578b8407390942051a8"
+ },
+ "target_resolution": {
+  "fullname": 93,
+  "file": 31,
+  "unresolved": 2
+ },
+ "findings_past_the_budget": {
+  "33149": 9
+ },
+ "anchoring": {
+  "findings_in": 126,
+  "anchored": 124,
+  "unanchored": 2,
+  "unanchored_rate": 0.0159,
+  "work_units_reached": 63,
+  "by_method": {
+   "review_line_entity": 109,
+   "review_line_range": 15
+  },
+  "by_failure": {
+   "no_location": 2
+  }
+ },
+ "concern_family": "other",
+ "issue_kind_placeholder": "style_norm_violation",
+ "evidence_chain": "not run: the gate is closed, so admission and publication are not comparable to a solo run's; the judge's issue recall reads every finding",
+ "run_manifest": "not written: the judge reads this source as unchecked"
+}

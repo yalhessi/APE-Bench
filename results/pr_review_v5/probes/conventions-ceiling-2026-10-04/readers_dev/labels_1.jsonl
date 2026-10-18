@@ -1,0 +1,47 @@
+{"cid": "d0019", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0032", "principle_id": "P038", "second_principle_id": "P103", "none_reason": "", "confidence": "sure", "note": "Also asks no new axioms, which no entry covers."}
+{"cid": "d0012", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0047", "principle_id": "P001", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Asks to put the declaration inside a namespace Complex block rather than prefix Complex."}
+{"cid": "d0044", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Word-order fix in a docstring sentence."}
+{"cid": "d0029", "principle_id": "P157", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0039", "principle_id": "P057", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0024", "principle_id": "P340", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0013", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Proof golf whose main point is using an existing library lemma instead of proving the step by hand."}
+{"cid": "d0021", "principle_id": "P340", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0051", "principle_id": "P063", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0026", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Case split chosen so the first branch is the sibling lemma rather than a re-proof; nearest alternative P216."}
+{"cid": "d0048", "principle_id": "P113", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0036", "principle_id": "P018", "second_principle_id": "P040", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0046", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0002", "principle_id": "P086", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0035", "principle_id": "P040", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0010", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0018", "principle_id": "P201", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0015", "principle_id": "P347", "second_principle_id": "P216", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0045", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0008", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The added grind attribute on a basic lemma has no entry; P315 covers only characterisation lemmas."}
+{"cid": "d0043", "principle_id": "P199", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Set defined as a bare predicate across the Set/predicate defeq; asks for set-builder notation."}
+{"cid": "d0014", "principle_id": "P018", "second_principle_id": "P011", "none_reason": "", "confidence": "unsure", "note": "by_cases! replaces by_cases plus a negation-pushing simp; the second request uses an existing lemma."}
+{"cid": "d0004", "principle_id": "P181", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Asks to spread the strategy comment through the proof steps as comments."}
+{"cid": "d0016", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "sure", "note": "Calc placement and indentation convention; nearest P137 or P412."}
+{"cid": "d0038", "principle_id": "P108", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Suggests the .of_h form in the conclusion's namespace; lowercase namespace looks like a typo."}
+{"cid": "d0003", "principle_id": "P007", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0034", "principle_id": "P086", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Also asks no axioms (no entry) and flags vacuous definitions (specific); P086 covers inlining the renamed library definitions."}
+{"cid": "d0031", "principle_id": "P086", "second_principle_id": "P259", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0030", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "sure", "note": "No entry on introducing axioms; P061 and P291 concern structure axiom fields."}
+{"cid": "d0001", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Grammar fix in a docstring: isometry to isometric."}
+{"cid": "d0011", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0022", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0033", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "sure", "note": "Closing a PR that would need a complete rewrite; nearest P333, which is about the submitter not understanding LLM code."}
+{"cid": "d0028", "principle_id": "P340", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0042", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Spelling typo in a docstring."}
+{"cid": "d0027", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0005", "principle_id": "P012", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0020", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0006", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "sure", "note": "Descriptive names for local have hypotheses; nearest P261, which covers declarations."}
+{"cid": "d0041", "principle_id": "P084", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "CI lint failure for a line over the length limit; could also be read as specific (broken build)."}
+{"cid": "d0009", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The added grind attribute on a basic lemma has no entry; P315 covers only characterisation lemmas."}
+{"cid": "d0049", "principle_id": "P165", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0023", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "d0007", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "unsure", "note": "Question about the author's argument for an import increase; nearest P074."}
+{"cid": "d0025", "principle_id": "P130", "second_principle_id": "P019", "none_reason": "", "confidence": "sure", "note": ""}

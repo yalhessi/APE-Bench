@@ -1,0 +1,72 @@
+[
+  {
+    "target": "Dense.continuous_upperBounds",
+    "claim": "The name `Dense.continuous_upperBounds` does not describe the conclusion `upperBounds (f '' S) = upperBounds (range f)`: the `continuous_` token reads as if continuity were being concluded, while the library names lemmas about `upperBounds` with a leading `upperBounds_` (the dual `Dense.continuous_lowerBounds` has the same problem).",
+    "requested_change": "Rename `Dense.continuous_upperBounds` to `Dense.upperBounds_image` (and, as the same decision, `Dense.continuous_lowerBounds` to `Dense.lowerBounds_image`), updating the uses in the sup/inf lemmas.",
+    "severity": "blocking",
+    "evidence": "naming_norm on `Dense.continuous_upperBounds`: subject `upperBounds`, 27/27 base declarations with that subject use the `upperBounds_` prefix, verdict `established`, candidate `Dense.upperBounds_image`. The name is used by `Dense.continuous_sup` and `Dense.continuous_sup'` (model.md relations)."
+  },
+  {
+    "target": "Dense.continuous_sup",
+    "claim": "`Dense.continuous_sup` concludes an equality of indexed suprema `⨆ i, f i = ⨆ s : S, f s` in a conditionally complete lattice, but `sup` in Mathlib names means binary `⊔`, and indexed suprema in conditionally complete lattices are named `ciSup` (`ciSup_subtype`, `ciSup_image`, `isLUB_ciSup_set`); `continuous_` again names a hypothesis, not the conclusion. The same applies to `Dense.continuous_inf`, `Dense.continuous_sup'` and `Dense.continuous_inf'`.",
+    "requested_change": "Rename `Dense.continuous_sup` to a `ciSup` name describing the conclusion, e.g. `Dense.ciSup_subtype` (and `Dense.continuous_inf` -> `Dense.ciInf_subtype`, `Dense.continuous_sup'` -> `Dense.ciSup_subtype'`, `Dense.continuous_inf'` -> `Dense.ciInf_subtype'`), and update the cross-references in the docstrings of the primed lemmas.",
+    "severity": "blocking",
+    "evidence": "content_search over target/Mathlib/Order: conditionally complete indexed-sup lemmas are named `ciSup_subtype`, `ciSup_subtype'`, `ciSup_subtype''`, `ciSup_image`, `ciSup_of_not_bddAbove`; complete-lattice ones `iSup_subtype`, `iSup_ne_bot_subtype` (`⨆ i : {i // f i ≠ ⊥}, f i = ⨆ i, f i`). No existing `Dense.*sup*` declaration in the base. naming_norm could not resolve the subject for this declaration (insufficient_evidence), so this is judged from the sibling names above."
+  },
+  {
+    "target": "Dense.continuous_sup'",
+    "claim": "The proof of `Dense.continuous_sup'` repeats the whole proof of `Dense.continuous_sup` in its bounded branch, and proves the unboundedness of the restricted range with a fragile `have := range_comp' ...; simp_all only [...]; ... image_closure_subset_closure_image ...` detour, although `Dense.continuous_upperBounds` already gives that `f '' S` and `range f` have the same upper bounds.",
+    "requested_change": "Replace the proof by:\n```lean\n  by_cases h : BddAbove (range f)\n  · exact hS.continuous_sup hf h\n  have h' : ¬BddAbove (range fun s : S ↦ f s) := by\n    rwa [← image_eq_range, BddAbove, hS.continuous_upperBounds hf]\n  rw [ciSup_of_not_bddAbove h, ciSup_of_not_bddAbove h']\n```",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing `Dense.continuous_sup'` with exactly this proof: outcome `compiled`, no errors, no warnings. `Set.image_eq_range` and `ciSup_of_not_bddAbove` exist at the base (declaration_search)."
+  },
+  {
+    "target": "Dense.continuous_inf'",
+    "claim": "`Dense.continuous_inf'` copies the 15-line proof of `Dense.continuous_sup'` with `Iic/Ici` swapped, whereas the rest of this file (e.g. `isGLB_iff_of_subset_of_subset_closure`, `Dense.isGLB_inter_iff`) derives every GLB/inf statement from its LUB/sup counterpart by order duality.",
+    "requested_change": "Prove it by duality: `hS.continuous_sup' (α := αᵒᵈ) hf` (term-mode, replacing the whole tactic block).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with `Dense.continuous_inf' ... := hS.continuous_sup' (α := αᵒᵈ) hf`: outcome `compiled`, no errors or warnings. File lines 154-167 show the existing dual-derivation convention."
+  },
+  {
+    "target": "Dense.continuous_inf",
+    "claim": "`Dense.continuous_inf` duplicates the proof of `Dense.continuous_sup` line for line instead of deriving it by order duality as the file's other GLB lemmas do.",
+    "requested_change": "Replace the proof by `hS.continuous_sup (α := αᵒᵈ) hf h`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with `Dense.continuous_inf ... := hS.continuous_sup (α := αᵒᵈ) hf h`: outcome `compiled`, no errors or warnings."
+  },
+  {
+    "target": "Dense.continuous_lowerBounds",
+    "claim": "`Dense.continuous_lowerBounds` duplicates the proof of `Dense.continuous_upperBounds` instead of deriving it by order duality as the file's other lower-bound/GLB lemmas do.",
+    "requested_change": "Replace the proof by `hS.continuous_upperBounds (α := αᵒᵈ) hf`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with `Dense.continuous_lowerBounds ... := hS.continuous_upperBounds (α := αᵒᵈ) hf`: outcome `compiled`, no errors or warnings."
+  },
+  {
+    "target": "Dense.continuous_upperBounds",
+    "claim": "The proof of `Dense.continuous_upperBounds` re-proves `upperBounds (closure t) = upperBounds t` by hand (`mem_closure_iff_frequently`, `Frequently.mem_of_closed isClosed_Iic`), although the simp lemma `upperBounds_closure` in `Mathlib/Topology/Order/OrderClosed.lean` states exactly that under `ClosedIicTopology`.",
+    "requested_change": "Replace the proof by the term\n```lean\n  subset_antisymm (by simpa using upperBounds_mono_set (hf.range_subset_closure_image_dense hS))\n    (upperBounds_mono_set (image_subset_range f S))\n```",
+    "severity": "advisory",
+    "evidence": "declaration_search: `upperBounds_closure` declared at Mathlib/Topology/Order/OrderClosed.lean:135 as `@[simp] lemma upperBounds_closure (s : Set α) : upperBounds (closure s) = upperBounds s` in the `ClosedIicTopology`/`Preorder` section. lean_verify_edit with the replacement proof: outcome `compiled`, no errors or warnings. The neighbouring `isLUB_iff_of_subset_of_subset_closure` (line 148) already uses `upperBounds_closure` + `upperBounds_mono_set` this way."
+  },
+  {
+    "target": "Dense.continuous_upperBounds",
+    "claim": "The docstring of `Dense.continuous_upperBounds` is ungrammatical and wrong: \"The upper bounds ... is equal to the upper bounds of the range of the universe\" -- upper bounds is plural, and the universe has no range; the statement compares with the range of `f`.",
+    "requested_change": "Replace the docstring by: \"If `f` is continuous and `S` is dense, then the upper bounds of `f '' S` are the upper bounds of the range of `f`.\"",
+    "severity": "advisory",
+    "evidence": "Read file lines 169-170. lean_verify_edit (line mode, lines 169-179) with the corrected docstring: outcome `compiled`."
+  },
+  {
+    "target": "Dense.continuous_lowerBounds",
+    "claim": "The docstring of `Dense.continuous_lowerBounds` has the same errors as its dual: \"The lower bounds ... is equal to the lower bounds of the range of the universe\".",
+    "requested_change": "Replace the docstring by: \"If `f` is continuous and `S` is dense, then the lower bounds of `f '' S` are the lower bounds of the range of `f`.\"",
+    "severity": "advisory",
+    "evidence": "Read file lines 181-182."
+  },
+  {
+    "target": "Dense.continuous_upperBounds",
+    "claim": "The new lemmas name the set `S` (capital) and place `[TopologicalSpace γ]` after `{f : γ → α}`, unlike the neighbouring `Dense.isLUB_inter_iff` (`{s t : Set α} (hs : Dense s)`) and Mathlib's convention of lowercase set variables with instance binders before the terms that use the type.",
+    "requested_change": "In all six new lemmas, rename `S`/`hS` to `s`/`hs` (bound variable in `⨆ x : s, f x`) and move `[TopologicalSpace γ]` before `{f : γ → α}`.",
+    "severity": "advisory",
+    "evidence": "File lines 159-167 (sibling binder style) and 171-261 (new lemmas). lean_verify_edit of `Dense.continuous_upperBounds` with `[TopologicalSpace γ] {f : γ → α} {s : Set γ} (hs : Dense s)`: outcome `compiled`."
+  }
+]

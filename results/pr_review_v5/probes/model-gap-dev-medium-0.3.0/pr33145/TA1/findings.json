@@ -1,0 +1,219 @@
+[
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "`Dense.continuous_sup` (and its dual `Dense.continuous_inf`) is misnamed: the conclusion is about the indexed supremum `⨆` in a conditionally complete lattice (`ciSup`), not the binary `sup` (`⊔`), and the name leads with the hypothesis `continuous_`. The root names `continuous_sup`/`continuous_inf` already exist and mean continuity of `⊔`/`⊓`, so `Dense.continuous_sup` reads as a continuity statement.",
+  "requested_change": "Rename after the conclusion, spelling the `⨆` as `ciSup`, e.g. `Dense.ciSup_eq_ciSup_subtype_of_bddAbove` for this lemma and `Dense.ciInf_eq_ciInf_subtype_of_bddBelow` for `Dense.continuous_inf` (dropping `continuous_`), and update the PR description.",
+  "severity": "blocking",
+  "evidence": "declaration_search `continuous_sup`: root `continuous_sup` declared at Mathlib/Topology/Order/Lattice.lean:87 (and `continuous_inf` at :78) before this PR. Statement concludes `⨆ i, f i = ⨆ s : S, f s` with `[ConditionallyCompleteLattice α]`; library uses `ciSup` for this (`isLUB_ciSup`, `isLUB_ciSup_set`, `ciSup_of_not_bddAbove`). naming_norm returned subject_unresolved for this decl, so judged directly. The renamed block compiled with lean_verify_edit (outcome compiled)."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "`Dense.continuous_sup'` (and `Dense.continuous_inf'`) is distinguished from `Dense.continuous_sup` only by a prime, although what differs is a named term of the statement: the linear-order version drops the `BddAbove (range f)` hypothesis.",
+  "requested_change": "Give the hypothesis-free linear-order version the plain name (e.g. `Dense.ciSup_eq_ciSup_subtype`, dual `Dense.ciInf_eq_ciInf_subtype`) and name the bounded lattice version by its extra hypothesis (`..._of_bddAbove` / `..._of_bddBelow`), instead of priming.",
+  "severity": "advisory",
+  "evidence": "Statements read in diff.patch: `Dense.continuous_sup` has `(h : BddAbove (range f))` and `[ConditionallyCompleteLattice α]`; `Dense.continuous_sup'` has neither, with `[ConditionallyCompleteLinearOrder α]`. Combined renamed block (ciSup_eq_ciSup_subtype / ciSup_eq_ciSup_subtype_of_bddAbove and ciInf duals) compiled with lean_verify_edit."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "`Dense.continuous_upperBounds` (and `Dense.continuous_lowerBounds`) is named for the hypothesis `Continuous f` rather than its conclusion `upperBounds (f '' S) = upperBounds (range f)`; the library's lemmas about `upperBounds` all lead with `upperBounds_`.",
+  "requested_change": "Rename to `Dense.upperBounds_image` (and `Dense.lowerBounds_image`), named for the left-hand side `upperBounds (f '' S)`.",
+  "severity": "blocking",
+  "evidence": "naming_norm Dense.continuous_upperBounds: verdict established, subject `upperBounds`, `upperBounds_` 27/27 in the base, this name uses `continuous_` (0); candidate `Dense.upperBounds_image`. The renamed block (`Dense.upperBounds_image`, `Dense.lowerBounds_image`, used as `hS.upperBounds_image hf`) compiled with lean_verify_edit."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "`Dense.continuous_sup` and `Dense.continuous_inf` share their short names with the root lemmas `continuous_sup` and `continuous_inf`, so with `open Dense` the short name is ambiguous, and neither is `protected`.",
+  "requested_change": "If these names are kept, declare them `protected theorem Dense.continuous_sup` / `protected theorem Dense.continuous_inf` (a rename as in the naming request removes the clash instead).",
+  "severity": "advisory",
+  "evidence": "declaration_search: `continuous_sup` at Mathlib/Topology/Order/Lattice.lean:87 and `continuous_inf` at :78 before this PR. lean_verify_edit with `protected theorem Dense.continuous_sup ...` (rest unchanged): compiled; `hS.continuous_sup` dot-notation callers unaffected."
+ },
+ {
+  "target": "Dense.continuous_lowerBounds",
+  "claim": "`Dense.continuous_lowerBounds` repeats the proof of `Dense.continuous_upperBounds` line for line with `lower`/`Ici` swapped instead of instantiating it at the order dual, as the neighbouring `Dense.isGLB_inter_iff` and `isGLB_iff_of_subset_of_subset_closure` do.",
+  "requested_change": "Replace the proof by `hS.continuous_upperBounds (α := αᵒᵈ) hf`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing the body with `hS.continuous_upperBounds (α := αᵒᵈ) hf`: outcome compiled. File precedent: `Dense.isGLB_inter_iff ... := hs.isLUB_inter_iff (α := αᵒᵈ) ht` (line 164-167)."
+ },
+ {
+  "target": "Dense.continuous_inf",
+  "claim": "`Dense.continuous_inf` repeats the proof of `Dense.continuous_sup` with `sInf`/`GLB` names swapped instead of deriving it from the order dual.",
+  "requested_change": "Replace the proof by `hS.continuous_sup (α := αᵒᵈ) hf h`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with body `hS.continuous_sup (α := αᵒᵈ) hf h`: outcome compiled."
+ },
+ {
+  "target": "Dense.continuous_inf'",
+  "claim": "`Dense.continuous_inf'` repeats the 15-line proof of `Dense.continuous_sup'` with `Inf`/`Below` swapped instead of deriving it from the order dual.",
+  "requested_change": "Replace the proof by `hS.continuous_sup' (α := αᵒᵈ) hf`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with body `hS.continuous_sup' (α := αᵒᵈ) hf`: outcome compiled."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "The proof of `Dense.continuous_upperBounds` re-derives by hand (`mem_closure_iff_frequently`, `Frequently.mem_of_closed isClosed_Iic`) that a closure has the same upper bounds as the set, which is the existing simp lemma `upperBounds_closure`.",
+  "requested_change": "Replace the tactic proof with the term `subset_antisymm (upperBounds_closure (f '' S) ▸ upperBounds_mono_set (hf.range_subset_closure_image_dense hS)) (upperBounds_mono_set (image_subset_range f S))`.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `upperBounds_closure` at Mathlib/Topology/Order/OrderClosed.lean:135 (`@[simp] lemma upperBounds_closure (s : Set α) : upperBounds (closure s) = upperBounds s`, needs only ClosedIicTopology). lean_verify_edit with the term proof: compiled (also a `simpa using upperBounds_mono_set ...` variant compiled)."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "The fact behind `Dense.continuous_upperBounds` does not use continuity or density: for `s ⊆ t ⊆ closure s`, `upperBounds s = upperBounds t`. The existing `isLUB_iff_of_subset_of_subset_closure` proves exactly that inline, and this PR proves a special case again.",
+  "requested_change": "Add the general lemma `upperBounds_eq_of_subset_of_subset_closure (hst : s ⊆ t) (hts : t ⊆ closure s) : upperBounds s = upperBounds t := (upperBounds_closure s ▸ upperBounds_mono_set hts).antisymm (upperBounds_mono_set hst)`, prove `Dense.continuous_upperBounds` as `upperBounds_eq_of_subset_of_subset_closure (image_subset_range f S) (hf.range_subset_closure_image_dense hS)`, and have `isLUB_iff_of_subset_of_subset_closure` use it.",
+  "severity": "advisory",
+  "evidence": "content_search for `(theorem|lemma) upperBounds_*(closure|eq)` over Mathlib: only `upperBounds_closure` exists. `isLUB_iff_of_subset_of_subset_closure` (IsLUB.lean:148-152) is `isLUB_congr <| (upperBounds_closure ▸ upperBounds_mono_set hts).antisymm <| upperBounds_mono_set hst`. Zulip (Jireh Loreaux, 2025-11-17) suggested building this from `isLUB_iff_of_subset_of_subset_closure` and `Continuous.range_subset_closure_image_dense`. The block with the general lemma and the derived `Dense.upperBounds_image` compiled with lean_verify_edit."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "In `Dense.continuous_sup'` the `BddAbove` branch copies the whole proof of `Dense.continuous_sup`, and the unbounded branch re-derives through `range_comp'`, `simp_all` and `image_closure_subset_closure_image` what `Dense.continuous_upperBounds` already gives (the two sets have the same upper bounds, so are bounded together). The `IsEmpty γ` case is also unnecessary, since an empty range is bounded.",
+  "requested_change": "Replace the proof by:\n```\n  by_cases h : BddAbove (range f)\n  · exact hS.continuous_sup hf h\n  have h' : ¬BddAbove (f '' S) := by rwa [BddAbove, hS.continuous_upperBounds hf]\n  rw [ciSup_of_not_bddAbove h, ciSup_of_not_bddAbove (by rwa [← image_eq_range])]\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing `Dense.continuous_sup'` with this 4-line proof: outcome compiled. Lemmas: `ciSup_of_not_bddAbove` (Order/ConditionallyCompleteLattice/Basic.lean:474), `Set.image_eq_range` (Data/Set/Image.lean:881)."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "In `Dense.continuous_sup` the side goal `f '' S ⊆ range f` is closed by `by grind` (in `h.mono (by grind)`), and likewise in `Dense.continuous_inf`, `Dense.continuous_sup'` and `Dense.continuous_inf'`, although it is exactly the library lemma `Set.image_subset_range f S`, which the PR itself already uses in `Dense.continuous_upperBounds`.",
+  "requested_change": "Replace `h.mono (by grind)` by `h.mono (image_subset_range f S)` in all four lemmas.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `Set.image_subset_range` at Data/Set/Image.lean:599. lean_verify_edit of `Dense.continuous_sup` with `h.mono (image_subset_range f S)`: compiled; same in the `Dense.continuous_sup'` variant (compiled)."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "In `Dense.continuous_sup` the side goal of `isLUB_ciSup_set` is left as `?_` in a `refine` and closed afterwards by `exact h.mono (by grind)`, although it is a one-term argument.",
+  "requested_change": "Pass the side goal inline and finish with `exact`: `exact (isLUB_congr (hS.continuous_upperBounds hf)).mp (isLUB_ciSup_set (h.mono (image_subset_range f S)) hS.nonempty)` (same in `Dense.continuous_inf`/`Dense.continuous_sup'`/`Dense.continuous_inf'`, or remove those through the dual/golf requests).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit of `Dense.continuous_sup` with the inline argument: outcome compiled."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` write `Set.image_subset_range` although `open Set` is in force for the whole file (line 16).",
+  "requested_change": "Write `image_subset_range` without the `Set.` prefix.",
+  "severity": "advisory",
+  "evidence": "file_read line 16: `open Set Filter TopologicalSpace Topology Function`. lean_verify_edit with `image_subset_range f S` unprefixed: compiled."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "`Dense.continuous_sup`, `Dense.continuous_inf`, `Dense.continuous_sup'` and `Dense.continuous_inf'` write `simp [Set.range_eq_empty]` although `Set` is opened at the top of the file.",
+  "requested_change": "Write `simp [range_eq_empty]`.",
+  "severity": "advisory",
+  "evidence": "file_read line 16 (`open Set ...`). lean_verify_edit of `Dense.continuous_sup` with `simp [range_eq_empty]`: compiled."
+ },
+ {
+  "target": "Mathlib/Topology/Order/IsLUB.lean",
+  "claim": "The six new declarations all carry the `Dense.` prefix and sit as loose top-level declarations in `section OrderTopology`, whose variables `[LinearOrder α] [OrderTopology α]` they do not use.",
+  "requested_change": "Put them in their own block `namespace Dense ... end Dense` and drop the `Dense.` prefix from each declaration name and from the cross-references inside the block.",
+  "severity": "advisory",
+  "evidence": "file_read: `section OrderTopology` at line 22 with `variable [TopologicalSpace α] [LinearOrder α] [OrderTopology α]`, ends at line 446; new lemmas at 169-261 each rebind `{α : Type*}`. The `namespace Dense` + `variable` block replacing lines 169-261 compiled with lean_verify_edit."
+ },
+ {
+  "target": "Mathlib/Topology/Order/IsLUB.lean",
+  "claim": "The binders `{α : Type*} [TopologicalSpace α] {f : γ → α} [TopologicalSpace γ] {S : Set γ}` and the hypotheses `(hS : Dense S) (hf : Continuous f)` are repeated verbatim in all six new declarations.",
+  "requested_change": "Declare the shared arguments once, e.g. `variable {α : Type*} [TopologicalSpace α] [TopologicalSpace γ] {f : γ → α} {S : Set γ}`, and keep only the order class, the closedness class and the hypotheses in each signature.",
+  "severity": "advisory",
+  "evidence": "diff.patch: all six signatures repeat these binders. A replacement of lines 169-261 with one `variable` line and short signatures compiled with lean_verify_edit (outcome compiled)."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "In every new signature (starting with `Dense.continuous_upperBounds`) the ambient instance `[TopologicalSpace γ]` comes after the data `{f : γ → α}`.",
+  "requested_change": "Order the arguments ambient-first: `[TopologicalSpace γ]` before `{f : γ → α}` (e.g. `{α : Type*} [TopologicalSpace α] [Preorder α] [ClosedIicTopology α] [TopologicalSpace γ] {f : γ → α} {S : Set γ}`), in all six lemmas.",
+  "severity": "advisory",
+  "evidence": "diff.patch line `[ClosedIicTopology α] {f : γ → α} [TopologicalSpace γ] {S : Set γ} (hS : Dense S)`. The reordered variable block compiled with lean_verify_edit."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` write lambdas as `fun _ => ...`.",
+  "requested_change": "Write `fun _ ↦ ...`.",
+  "severity": "advisory",
+  "evidence": "diff.patch: `refine subset_antisymm ?_ fun _ => upperBounds_mono ...` and `fun _ => upperBounds_mono (hf.range_subset_closure_image_dense hS) le_rfl`. lean_verify_edit with `↦`: compiled."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "`Dense.continuous_sup'` (and `Dense.continuous_inf'`) writes the lambda `fun s : S => f (Subtype.val s)` with `=>`.",
+  "requested_change": "Write `fun s : S ↦ f s` (or better, `f '' S`, see the related request).",
+  "severity": "advisory",
+  "evidence": "diff.patch: `have h2 : ¬ BddAbove (range (fun s : S => f (Subtype.val s)))`."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "`Dense.continuous_sup'` (and `Dense.continuous_inf'`) accesses the subtype element through the raw projection `Subtype.val s` (`f (Subtype.val s)`, `(Subtype.val : S → γ)`), not through the coercion.",
+  "requested_change": "Use the coercion: `f s` / `f ↑s`, and `((↑) : S → γ)` where the map itself is needed.",
+  "severity": "advisory",
+  "evidence": "diff.patch lines `range (fun s : S => f (Subtype.val s))` and `range_comp' f (Subtype.val : S → γ)`. The rewritten proof without `Subtype.val` compiled (lean_verify_edit)."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "In `Dense.continuous_sup'` (and `Dense.continuous_inf'`) the set `range (fun s : S => f (Subtype.val s))` is the library's image `f '' S` written out through a lambda over the subtype.",
+  "requested_change": "State the auxiliary fact as `¬BddAbove (f '' S)` (using `Set.image_eq_range` where the `⨆ s : S` form is needed), so it matches `Dense.continuous_upperBounds` directly.",
+  "severity": "advisory",
+  "evidence": "declaration_search: `Set.image_eq_range` (Data/Set/Image.lean:881) gives `f '' s = range fun x : s ↦ f x`. lean_verify_edit with `have h' : ¬BddAbove (f '' S) := by rwa [BddAbove, hS.continuous_upperBounds hf]`: compiled."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "In `Dense.continuous_sup'` (and `Dense.continuous_inf'`) the anonymous `have := range_comp' f (Subtype.val : S → γ)` and `have := h.closure.mono (image_closure_subset_closure_image hf)` state no type, and are then consumed by `simp_all only` / `simp only ... at this`, so the reader cannot see what is being proved.",
+  "requested_change": "Give these steps explicit statements, e.g. `have h3 : range f ⊆ closure (f '' S) := by simpa [hS.closure_eq] using image_closure_subset_closure_image (s := S) hf` followed by `exact h1 (h.closure.mono h3)` (or remove the block with the golf request).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit of `Dense.continuous_sup'` with `have h2 : ¬ BddAbove (f '' S)` and the typed `have h3 : range f ⊆ closure (f '' S) := ...`: compiled."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "In `Dense.continuous_upperBounds` (and `Dense.continuous_lowerBounds`) `refine subset_antisymm ?_ ...` and `refine subset_trans ?_ ...` leave `∀`-goals that the following `intro x hx i hi` opens.",
+  "requested_change": "Introduce the binders in the terms: `refine subset_antisymm (fun x hx ↦ ?_) fun _ ↦ upperBounds_mono (image_subset_range f S) le_rfl` then `refine upperBounds_mono (hf.range_subset_closure_image_dense hS) le_rfl fun i hi ↦ ?_` (or use the term proof from the golf request).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with these two `refine`s followed by the original `rw [mem_closure_iff_frequently] at hi; exact (hi.mono hx).mem_of_closed isClosed_Iic`: compiled. (A first attempt `subset_trans (fun x hx i hi ↦ ?_)` failed to elaborate, so the binders go on `upperBounds_mono`.)"
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "The docstrings of `Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` are ungrammatical (\"The upper bounds ... is equal\") and wrong in content: \"the upper bounds of the range of the universe\" means nothing; the statement is about the upper bounds of `range f`.",
+  "requested_change": "Rewrite, e.g. \"If `f` is continuous and `S` is dense, then `f '' S` has the same upper bounds as `range f`.\" (and the lower-bounds analogue).",
+  "severity": "advisory",
+  "evidence": "diff.patch docstring: `The upper bounds of the image of a continuous function on a dense set is equal to the upper bounds of the range of the universe.`; statement `upperBounds (f '' S) = upperBounds (range f)`. The rewritten docstrings compiled in the replacement block."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "The docstrings of `Dense.continuous_sup` and `Dense.continuous_inf` say \"a bounded above, continuous function on a dense set ... the supremum on the universe\": `f` is defined on the whole space, and the statement compares `⨆ i, f i` with the supremum over `S`, not a supremum \"on the universe\".",
+  "requested_change": "Rewrite, e.g. \"If `f` is continuous and bounded above and `S` is dense, then the supremum of `f` over `S` equals the supremum of `f`.\" (and dually for `inf`).",
+  "severity": "advisory",
+  "evidence": "diff.patch docstring vs statement `(h : BddAbove (range f)) : ⨆ i, f i = ⨆ s : S, f s`."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "The docstring of `Dense.continuous_sup'` explains the lemma only by contrast (\"This is an analogue of `Dense.continuous_sup` for ... The assumption of `BddAbove (range f)` is not needed\") and records its relation to another declaration, instead of stating what it says.",
+  "requested_change": "Replace with a standalone statement, e.g. \"In a conditionally complete linear order, the supremum of a continuous function `f` over a dense set `S` equals the supremum of `f`; if `f` is not bounded above, both sides are `sSup ∅`.\"",
+  "severity": "advisory",
+  "evidence": "diff.patch docstring lines 219-220. The rewritten docstring compiled in the replacement block (lean_verify_edit, compiled)."
+ },
+ {
+  "target": "Dense.continuous_inf'",
+  "claim": "The docstring of `Dense.continuous_inf'` is likewise written only as \"an analogue of `Dense.continuous_inf`\" with \"The assumption of `BddBelow (range f)` is not needed\", not as a standalone description.",
+  "requested_change": "Replace with, e.g. \"In a conditionally complete linear order, the infimum of a continuous function `f` over a dense set `S` equals the infimum of `f`; if `f` is not bounded below, both sides are `sInf ∅`.\"",
+  "severity": "advisory",
+  "evidence": "diff.patch docstring lines 241-242."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "Question to the author, under the bounded-binder convention: the conclusions of `Dense.continuous_sup`/`inf`/`sup'`/`inf'` range over the subtype (`⨆ s : S, f s`). The bounded form `⨆ s ∈ S, f s` is not a valid replacement here, because in a conditionally complete lattice the inner `⨆ _ : s ∈ S` is `sSup ∅` off `S`.",
+  "requested_change": "Consider stating the result without the subtype binder, as `sSup (f '' S) = sSup (range f)` (which is what the proof reduces to via `sSup_range`/`isLUB_ciSup_set`), or say in the docstring why the subtype form is used.",
+  "severity": "advisory",
+  "evidence": "Library precedent: `isLUB_ciSup_set : IsLUB (f '' s) (⨆ i : s, f i)` and `ciSup_subtype''` needs an extra `sSup ∅ ≤ ...` hypothesis to pass to `⨆ t ∈ s`. Zulip (Kevin Buzzard, 2025-11-17): \"I would have thought that `⨆ s ∈ S, f s` was more idiomatic\", then \"aah yes apologies, this is a gotcha\". Not compiled; filed as a question."
+ },
+ {
+  "target": "PR #33145",
+  "claim": "The PR title `feat: supremum of a continuous function on a dense set is equal to the supremum on the univ` has no area in the `type(Area): description` commit convention.",
+  "requested_change": "Retitle to e.g. `feat(Topology/Order/IsLUB): supremum of a continuous function over a dense set`.",
+  "severity": "advisory",
+  "evidence": "pr.md title."
+ },
+ {
+  "target": "PR #33145",
+  "claim": "The PR description lists only `Dense.continuous_upperBounds`, `Dense.continuous_sup` and `Dense.continuous_sup'`, but the diff adds six declarations: `Dense.continuous_lowerBounds`, `Dense.continuous_inf` and `Dense.continuous_inf'` are not mentioned.",
+  "requested_change": "List all six added declarations (under their final names) in the description.",
+  "severity": "advisory",
+  "evidence": "pr.md description vs model.md objects (six theorems added)."
+ },
+ {
+  "target": "PR #33145",
+  "claim": "The description says some of the code was written by @plp127 and @j-loreaux (in the Zulip thread), but the PR does not credit them as co-authors.",
+  "requested_change": "Add `Co-authored-by:` lines for Aaron Liu (@plp127) and Jireh Loreaux (@j-loreaux) to the PR description so that the squashed commit credits them.",
+  "severity": "advisory",
+  "evidence": "pr.md: \"Some of the codes in this PR are created by @plp127 and @j-loreaux\". Zulip: Jireh Loreaux suggested the `isLUB_iff_of_subset_of_subset_closure` + `Continuous.range_subset_closure_image_dense` approach; the author thanked him for the code (2025-11-18)."
+ }
+]

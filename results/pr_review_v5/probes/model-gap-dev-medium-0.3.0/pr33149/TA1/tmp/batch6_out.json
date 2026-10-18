@@ -1,0 +1,33 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  propext eq_comm\nhas type\n  (?m.421 = ?m.422) = (?m.422 = ?m.421)\nbut is expected to have type\n  (fun x => star ((fourier m) x) * (fourier n) x) = fun x => (fourier n) x * (starRingEnd ℂ) ((fourier m) x)",
+   "code_line": "  exact propext eq_comm",
+   "pos": {
+    "column": 2,
+    "line": 475
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 1 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "warnings_introduced_by_your_edit": [],
+ "warnings_already_in_the_file": 17,
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  propext eq_comm\nhas type\n  (?m.421 = ?m.422) = (?m.422 = ?m.421)\nbut is expected to have type\n  (fun x => star ((fourier m) x) * (fourier n) x) = fun x => (fourier n) x * (starRingEnd ℂ) ((fourier m) x)",
+   "code_line": "  exact propext eq_comm",
+   "pos": {
+    "column": 2,
+    "line": 475
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

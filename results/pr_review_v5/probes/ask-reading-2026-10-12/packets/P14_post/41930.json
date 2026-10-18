@@ -1,0 +1,431 @@
+{
+ "asks": [
+  {
+   "id": "p0000",
+   "pr": 41930,
+   "family": "F12",
+   "in_census": true,
+   "entries": [
+    "P041"
+   ],
+   "text": "Can you explain why the old names are bad / wrong?",
+   "path": null,
+   "line": null,
+   "author": "ocfnash",
+   "at": "2026-07-22T16:28:24Z",
+   "matcher_text": {
+    "ask_id": "p0000",
+    "path": null,
+    "code_at_comment": "",
+    "comment": "Can you explain why the old names are bad / wrong?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "GPT1": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "T1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "AP3": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "PR #41930 (title and description)",
+      "claim": "The description says the PR will \"name the minor premises according to their contents\", but the diff renames no minor premise: `one`, `inl_mul`, `inr_mul` (in `Monoid.Coprod.induction_on'`) and `inl`, `inr`, `mul` (in `Monoid.Coprod.induction_on`) are unchanged, and the only rename is the motive `C` -> `motive`. The title also calls these `theorem`s \"recursors\" (they are `elab_as_elim` induction principles), says \"name\" for a rename in two declarations, and uses the `fix` type for a bound-variable rename that fixes no bug.",
+      "requested_change": "Retitle to say exactly what changes, e.g. `chore(GroupTheory/Coprod): rename the motive of Coprod.induction_on and induction_on' to motive`, and replace the description with one accurate sentence, e.g. \"Rename the motive `C` of `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` (and their additive versions) to `motive`, as the naming practice for induction principles asks.\" Drop the clause about minor premises, or else actually rename some.",
+      "severity": "blocking"
+     },
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "PR #41930 (title and description)",
+      "claim": "The description says the PR will \"name the minor premises according to their contents\", but the diff renames no minor premise: `one`, `inl_mul`, `inr_mul` (in `Monoid.Coprod.induction_on'`) and `inl`, `inr`, `mul` (in `Monoid.Coprod.induction_on`) are unchanged, and the only rename is the motive `C` -> `motive`. The title also calls these `theorem`s \"recursors\" (they are `elab_as_elim` induction principles), says \"name\" for a rename in two declarations, and uses the `fix` type for a bound-variable rename that fixes no bug.",
+      "requested_change": "Retitle to say exactly what changes, e.g. `chore(GroupTheory/Coprod): rename the motive of Coprod.induction_on and induction_on' to motive`, and replace the description with one accurate sentence, e.g. \"Rename the motive `C` of `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` (and their additive versions) to `motive`, as the naming practice for induction principles asks.\" Drop the clause about minor premises, or else actually rename some.",
+      "severity": "blocking"
+     },
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "DX1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "AP1": {
+     "R": "R9",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Coprod/Basic.lean:210",
+      "claim": "The PR description asserts that the minor premises are named according to their contents, but the diff renames no minor premise of either recursor: the argument names are still `one`, `inl_mul`, `inr_mul` for `induction_on'` and `inl`, `inr`, `mul` for `induction_on` (lines 210-211), so the only name changed by the PR is the motive `C` -> `motive`. The description therefore claims a rename that the diff does not contain.",
+      "requested_change": "Either narrow the description to the motive rename ('name the motive `motive`'), or actually rename the minor premises as promised; if the latter, note that `Mathlib/GroupTheory/PushoutI.lean:179-181` matches on the `inl` case tag of `Coprod.induction_on` and must be updated in the same PR.",
+      "severity": "advisory"
+     },
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/GroupTheory/Coprod/Basic.lean:210",
+      "claim": "The PR description asserts that the minor premises are named according to their contents, but the diff renames no minor premise of either recursor: the argument names are still `one`, `inl_mul`, `inr_mul` for `induction_on'` and `inl`, `inr`, `mul` for `induction_on` (lines 210-211), so the only name changed by the PR is the motive `C` -> `motive`. The description therefore claims a rename that the diff does not contain.",
+      "requested_change": "Either narrow the description to the motive rename ('name the motive `motive`'), or actually rename the minor premises as promised; if the latter, note that `Mathlib/GroupTheory/PushoutI.lean:179-181` matches on the `inl` case tag of `Coprod.induction_on` and must be updated in the same PR.",
+      "severity": "advisory"
+     },
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "X1": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "DX2": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "GPT2": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    },
+    "DX3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Ask wants the rename justified. R5/R9 flag the description overclaiming premise renames; R5's suggested text only incidentally cites naming practice.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "R5 rewrites description citing the induction-principle naming practice for motive; R9 only narrows description, no reason."
+    }
+   },
+   "entries_text": {
+    "P041": "A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module docstring or PR description, saying why it is useful and how it will be used."
+   }
+  }
+ ],
+ "pr": 41930,
+ "sessions": {
+  "X1": {
+   "R": "R10",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": []
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": []
+  },
+  "T1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": []
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "PR #41930 (title and description)",
+     "claim": "The description says the PR will \"name the minor premises according to their contents\", but the diff renames no minor premise: `one`, `inl_mul`, `inr_mul` (in `Monoid.Coprod.induction_on'`) and `inl`, `inr`, `mul` (in `Monoid.Coprod.induction_on`) are unchanged, and the only rename is the motive `C` -> `motive`. The title also calls these `theorem`s \"recursors\" (they are `elab_as_elim` induction principles), says \"name\" for a rename in two declarations, and uses the `fix` type for a bound-variable rename that fixes no bug.",
+     "requested_change": "Retitle to say exactly what changes, e.g. `chore(GroupTheory/Coprod): rename the motive of Coprod.induction_on and induction_on' to motive`, and replace the description with one accurate sentence, e.g. \"Rename the motive `C` of `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` (and their additive versions) to `motive`, as the naming practice for induction principles asks.\" Drop the clause about minor premises, or else actually rename some.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "`Monoid.Coprod.induction_on'` is a `theorem` (an induction principle) with no docstring, and its `@[to_additive (attr := elab_as_elim)]` passes no additive docstring. So neither it nor the generated `AddMonoid.Coprod.induction_on'` says what it proves, or how it differs from the unprimed `induction_on` (it is induction by left multiplication, starting from `1`).",
+     "requested_change": "Add a docstring and pass one to `to_additive`:\n```lean\n/-- Induction principle for `M ∗ N` by left multiplication: if `motive` holds for `1` and is\npreserved by left multiplication by `inl m` and by `inr n`, then it holds for every element. -/\n@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N` by left\naddition: if `motive` holds for `0` and is preserved by left addition of `inl m` and of `inr n`,\nthen it holds for every element. -/]\ntheorem induction_on' ...\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:208",
+     "claim": "`Monoid.Coprod.induction_on` is a `theorem` (the main induction principle for `M ∗ N`, used by `PushoutI.induction_on` through `induction x using Coprod.induction_on with | inl | inr | mul`) with no docstring. Its `@[to_additive (attr := elab_as_elim)]` passes no additive docstring either, so `AddMonoid.Coprod.induction_on` is undocumented too.",
+     "requested_change": "Add a docstring and pass one to `to_additive`:\n```lean\n/-- Induction principle for `M ∗ N`: if `motive` holds for every `inl m` and every `inr n` and is\nclosed under multiplication, then it holds for every element. -/\n@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N`: if\n`motive` holds for every `inl m` and every `inr n` and is closed under addition, then it holds for\nevery element. -/]\ntheorem induction_on ...\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "`Monoid.Coprod.induction_on'` is told apart from `Monoid.Coprod.induction_on` only by a prime, although it is a different principle: induction by left multiplication from `1`, with cases `one`, `inl_mul` and `inr_mul`. The indexed coproduct names the same principle descriptively: `Monoid.CoprodI.induction_left {motive : CoprodI M → Prop} (m : CoprodI M) (one : motive 1) (mul : ∀ {i} (m : M i) x, motive x → motive (of m * x))` (`CoprodI.lean:202`).",
+     "requested_change": "Rename `Monoid.Coprod.induction_on'` to `Monoid.Coprod.induction_left` (additive: `AddMonoid.Coprod.induction_left`), matching `Monoid.CoprodI.induction_left`. Keep `@[deprecated (since := ...)] alias induction_on' := induction_left` and `@[deprecated (since := ...)] alias _root_.AddMonoid.Coprod.induction_on' := AddMonoid.Coprod.induction_left`, and call `induction_left` in `induction_on`'s proof. This PR already rewrites the signature, so it can make the rename too, or leave it to a stated follow-up.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "The statement of `Monoid.Coprod.induction_on'` breaks its first line after `(m : M ∗ N)` (57 characters), although `(one : motive 1)` fits there: `theorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N) (one : motive 1)` is 74 characters. So the signature takes four lines where three suffice. This PR rewrites all four lines.",
+     "requested_change": "Join `(one : motive 1)` onto the first line:\n```lean\ntheorem induction_on' {motive : M ∗ N → Prop} (m : M ∗ N) (one : motive 1)\n    (inl_mul : ∀ m x, motive x → motive (inl m * x))\n    (inr_mul : ∀ n x, motive x → motive (inr n * x)) : motive m := by\n```\n(`inl_mul` and `inr_mul` together would be 101 characters, so they keep separate lines.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:208",
+     "claim": "The PR re-wraps `Monoid.Coprod.induction_on`'s statement onto three lines, breaking after `(m : M ∗ N)` at column 56 and after `(inr : ∀ n, motive (inr n))`. Neither break is forced by the 100-character limit: the statement fits on two lines of 84 and 97 characters.",
+     "requested_change": "Fill the lines and break only at the limit:\n```lean\ntheorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N) (inl : ∀ m, motive (inl m))\n    (inr : ∀ n, motive (inr n)) (mul : ∀ x y, motive x → motive y → motive (x * y)) : motive m :=\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "In `Monoid.Coprod.induction_on'` the bound variables of the minor premises `inl_mul : ∀ m x, ...` and `inr_mul : ∀ n x, ...` have no type ascriptions. That `m : M`, `n : N` and `x : M ∗ N` is left to elaboration from `inl m * x`, and the reader has to reconstruct it too. This matters more because `m` is also the name of the major premise, of type `M ∗ N`.",
+     "requested_change": "Ascribe the types:\n```lean\n    (inl_mul : ∀ (m : M) (x : M ∗ N), motive x → motive (inl m * x))\n    (inr_mul : ∀ (n : N) (x : M ∗ N), motive x → motive (inr n * x)) : motive m := by\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:208",
+     "claim": "In `Monoid.Coprod.induction_on` the bound variables of the minor premises `inl : ∀ m, ...`, `inr : ∀ n, ...` and `mul : ∀ x y, ...` have no type ascriptions, so their types (`M`, `N`, `M ∗ N`) must be inferred from `inl m`, `inr n` and `x * y`.",
+     "requested_change": "Ascribe the types:\n```lean\ntheorem induction_on {motive : M ∗ N → Prop} (m : M ∗ N) (inl : ∀ m : M, motive (inl m))\n    (inr : ∀ n : N, motive (inr n)) (mul : ∀ x y : M ∗ N, motive x → motive y → motive (x * y)) :\n    motive m :=\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "`Monoid.Coprod.induction_on'` names its major premise `(m : M ∗ N)`, but in the same signature `m` is the letter for an element of `M` (`inl_mul : ∀ m x, motive x → motive (inl m * x)`, with `m` rebound at type `M`), and `x` is the letter for an element of `M ∗ N`. The conclusion `motive m` and the premise `inl m * x` use `m` with two different types.",
+     "requested_change": "Name the major premise with the signature's letter for `M ∗ N`: `(x : M ∗ N)`, conclusion `motive x`, and `rcases mk_surjective x with ⟨x, rfl⟩` in the proof.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:208",
+     "claim": "`Monoid.Coprod.induction_on` names its major premise `(m : M ∗ N)`, while the same signature uses `m` for an element of `M` (`inl : ∀ m, motive (inl m)`) and `x`, `y` for elements of `M ∗ N` (`mul : ∀ x y, ...`). The conclusion `motive m` uses the letter with its other meaning.",
+     "requested_change": "Rename the major premise to `x`: `theorem induction_on {motive : M ∗ N → Prop} (x : M ∗ N) ... : motive x := induction_on' x ...`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:208",
+     "claim": "`Monoid.Coprod.induction_on` repeats verbatim the leading binders `{motive : M ∗ N → Prop} (m : M ∗ N)` of the consecutive declaration `Monoid.Coprod.induction_on'`, rather than declaring them once.",
+     "requested_change": "Declare the shared binders once around the pair:\n```lean\nsection induction\n\nvariable {motive : M ∗ N → Prop} (m : M ∗ N)\n\n@[to_additive (attr := elab_as_elim)]\ntheorem induction_on' (one : motive 1) ... : motive m := by ...\n\n@[to_additive (attr := elab_as_elim)]\ntheorem induction_on (inl : ∀ m, motive (inl m)) (inr : ∀ n, motive (inr n))\n    (mul : ∀ x y, motive x → motive y → motive (x * y)) : motive m := ...\n\nend induction\n```\nThe argument order (`motive`, major premise, minor premises) is unchanged.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "PR #41930 (scope: sibling eliminators)",
+     "claim": "The PR renames the motive `C` -> `motive` only for `Monoid.Coprod`. The eliminators of the neighbouring free constructions in GroupTheory still use `C`: `FreeGroup.induction_on {C : FreeGroup α → Prop} (z : FreeGroup α) (C1 : C 1) ...` (`FreeGroup/Basic.lean:626`), whose minor premise `C1` is exactly the kind the description promises to rename by content, and `PresentedGroup.induction_on {rels} {C : PresentedGroup rels → Prop}` (`PresentedGroup.lean:98`). Its indexed and pushout siblings `Monoid.CoprodI.induction_on`, `Monoid.PushoutI.induction_on` and `HNNExtension.induction_on` already use `motive`.",
+     "requested_change": "Apply the same rename (`C` -> `motive`, and `C1` -> `one`) to `FreeGroup.induction_on` and `PresentedGroup.induction_on`, or say in the description that these are left to a named follow-up PR.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": []
+  },
+  "DX1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "`Monoid.Coprod.induction_on'` — the declaration this PR edits — still has no docstring, and its `docPrime` check is therefore silenced by the *temporary* exemption list `scripts/nolints_prime_decls.txt` (line 2842 `Monoid.Coprod.induction_on'`). `Mathlib/Tactic/Linter/DocPrime.lean` requires declarations whose name ends in `'` to carry a docstring explaining the prime, and `scripts/README.md` states that this list is meant to shrink and that \"PRs removing (the need for) entries are welcome\". Since this PR is already touching exactly this declaration (and is a naming/argument-name cleanup of the coproduct recursors), the missing documentation should be supplied here rather than left grandfathered.",
+     "requested_change": "Add a docstring to `Monoid.Coprod.induction_on'` that explains the `'`, e.g. that its minor premises close `motive` under *left multiplication* by elements of the ranges of `inl`/`inr`, in contrast to the unprimed `Monoid.Coprod.induction_on` (which asks for `motive` on the ranges and closure under multiplication), and delete line 2842 (`Monoid.Coprod.induction_on'`) from `scripts/nolints_prime_decls.txt`. Example docstring:\n\n/-- Induction principle on `M ∗ N` whose minor premises close the motive under left multiplication\nby `inl m` and `inr n`; the primed name distinguishes it from `Monoid.Coprod.induction_on`, which\ntakes the motive on the ranges of `inl`/`inr` and requires closure under multiplication. -/\n\n(Optionally give `Monoid.Coprod.induction_on` a one-sentence docstring saying it is the \"case for the generators\" version, so the cross-reference is meaningful.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/976672d8703e7ff23e2325bd78617b416c112e2dd11b42ee22f84fb37cb07f90/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__f6064e3b-3c84-4dc2-903f-d20c7e99a7f8.jsonl"
+  },
+  "AP1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "`Monoid.Coprod.induction_on'` carries a prime that its statement does not explain: the declaration has no docstring, and it is one of the leftover entries in the temporary exemption list `scripts/nolints_prime_decls.txt` (line 2842) for the `docPrime` linter, which exists precisely to demand an explanation of the `'` (rename after what differs, or a docstring saying why the prime is needed). This PR rewrites the arguments of exactly this recursor and leaves the prime undocumented, so the exemption stays in a list the linter's own documentation says \"should not be appended to, and become emptied over time\".",
+     "requested_change": "Add a docstring to `induction_on'` explaining how it differs from the unprimed `Monoid.Coprod.induction_on` (base case `motive 1` plus the two left-multiplication steps), and give the additive version its docstring through the attribute, i.e. `@[to_additive (attr := elab_as_elim) /-- ... -/]`; then delete the line `Monoid.Coprod.induction_on'` from `scripts/nolints_prime_decls.txt`. (The alternative the same practice allows is to drop the prime and name the declaration after the term of its statement that differs from `induction_on`.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:209",
+     "claim": "`Monoid.Coprod.induction_on` is stated with `theorem` (not `lemma`) but has no docstring, and no docstring is supplied to `to_additive`, so neither it nor the generated `AddMonoid.Coprod.induction_on` says what the recursor does — an undocumented `theorem` is what the style rule 'a `theorem` is important enough to carry a docstring' forbids.",
+     "requested_change": "Put a `/-- ... -/` docstring in front of `theorem induction_on` and pass the additive version's docstring to the generator, i.e. `@[to_additive (attr := elab_as_elim) /-- ... -/]` (the same applies to `induction_on'`, see the finding above); if the declaration is considered auxiliary, make it a `lemma` instead.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:210",
+     "claim": "The PR description asserts that the minor premises are named according to their contents, but the diff renames no minor premise of either recursor: the argument names are still `one`, `inl_mul`, `inr_mul` for `induction_on'` and `inl`, `inr`, `mul` for `induction_on` (lines 210-211), so the only name changed by the PR is the motive `C` -> `motive`. The description therefore claims a rename that the diff does not contain.",
+     "requested_change": "Either narrow the description to the motive rename ('name the motive `motive`'), or actually rename the minor premises as promised; if the latter, note that `Mathlib/GroupTheory/PushoutI.lean:179-181` matches on the `inl` case tag of `Coprod.induction_on` and must be updated in the same PR.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep1/tasks/f3dd2f35e1a0bfd05841c7cb6b548d951f88e02485c2c29a03d6a6c7e53181f6/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__4abb550b-384b-4e97-a02c-6e963698dfdd.jsonl"
+  },
+  "GPT2": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": []
+  },
+  "DX2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:198",
+     "claim": "`Monoid.Coprod.induction_on'` still names its two left-multiplication minor premises `inl_mul`/`inr_mul`, although this PR's stated purpose is to name the minor premises after their contents. The library spells this exact premise shape (“motive x → motive (generator * x)”) operation-first: `FreeMonoid.inductionOn'` uses `mul_of`, `MvPolynomial.induction_on`/`induction_on''`/`monomial_add_induction_on` use `mul_X`, and the sibling `Monoid.CoprodI.induction_left` calls its single such premise `mul`; `inl_mul`/`inr_mul` invert that order, which is also what the description promises to fix.",
+     "requested_change": "Rename the two premises to `mul_inl` and `mul_inr` and update their two uses in the proof: `| inl m => simpa using mul_inl m _ ih` / `| inr n => simpa using mul_inr n _ ih`. (Verified: this edit compiles, and the derived additive declaration then reads `zero`/`add_inl`/`add_inr`.) If instead the names are meant to stay, the description's second sentence should be dropped.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "`Monoid.Coprod.induction_on'` is a primed declaration with no docstring. The repo's `docPrime` linter expects such declarations to explain the `'` in a docstring (`Mathlib/Tactic/Linter/DocPrime.lean`), and `induction_on'` survives only through the temporary exception list `scripts/nolints_prime_decls.txt:2842`, which `scripts/README.md` says should shrink and which the repo explicitly invites PRs to remove the need for; this PR already edits exactly this declaration.",
+     "requested_change": "Add a docstring to `induction_on'` (stating the left-multiplication induction and its relation to the unprimed `Monoid.Coprod.induction_on`, which explains the prime), writing the additive version in the `to_additive` attribute as every other documented `to_additive` declaration in this file does, and delete the `Monoid.Coprod.induction_on'` line from `scripts/nolints_prime_decls.txt`. (Verified: the docstring edit compiles.)",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/197fdcb10de8bb6c24926c05822bca583c00707c02b7ba4375696cc2bead0dc3/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051547__e8e2a569-2e71-4df6-949c-a01b98c920da.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "`Monoid.Coprod.induction_on'` is declared with no docstring, which is exactly why it sits on the *temporary* exception list `scripts/nolints_prime_decls.txt` (line 2842) for the `docPrime` linter: that linter's contract (`Mathlib/Tactic/Linter/DocPrime.lean`, lines 17-21 and 30-36) is that a declaration whose name ends in `'` must explain in its docstring why it is primed, and `scripts/README.md` (lines 302-307) records that these exception files \"should tend to zero over time\". This PR rewrites the signature of that very declaration, i.e. it is the natural place to satisfy the linter rather than leave the prime unexplained on the exception list.",
+     "requested_change": "Give `induction_on'` a docstring that explains the prime (how it differs from `Monoid.Coprod.induction_on`), and delete the `Monoid.Coprod.induction_on'` line from `scripts/nolints_prime_decls.txt`. For example, immediately above the existing `@[to_additive (attr := elab_as_elim)]` on line 195:\n\n/-- An induction principle for the coproduct `M ∗ N`, with cases for `1`, for left multiplication by\nan element of `M` (`inl m * x`) and for left multiplication by an element of `N` (`inr n * x`).\n\nThis is a variant of `Monoid.Coprod.induction_on` whose step is left multiplication by a single\ngenerator, instead of a product step. -/\n\n(The `@[to_additive (attr := elab_as_elim)]` attribute then propagates the docstring to `AddMonoid.Coprod.induction_on'`.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:209",
+     "claim": "`Monoid.Coprod.induction_on` is a `theorem` with no docstring, and because it is only `@[to_additive (attr := elab_as_elim)]` (no explicit additive docstring), its generated image `AddMonoid.Coprod.induction_on` is left undocumented as well. Every other public item around it in this file documents both directions (`hom_ext` at lines 276-282, `clift` at 214-227, `inl` at 175-176, `mk` at 159-160), and the PR is already rewriting this declaration's signature.",
+     "requested_change": "Add a docstring to `induction_on` describing its cases; `to_additive` then translates it into the docstring of `AddMonoid.Coprod.induction_on`, so no separate additive docstring is needed. For example, immediately above the existing attribute line 208:\n\n/-- An induction principle for the coproduct `M ∗ N`, with cases for elements of the range of\n`Monoid.Coprod.inl`, elements of the range of `Monoid.Coprod.inr`, and products; the case for `1` is\ncovered by the `inl` case, since `inl 1 = 1`. -/",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep2/tasks/75f338b5e782a6e222bf597d049684d292b987a5605530846f4ea692296cffce/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__c09ad8a3-2dd8-47c8-8503-a54921cc6fb1.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": []
+  },
+  "DX3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "`Monoid.Coprod.induction_on'` is a primed declaration with no docstring at all, and it is kept only as a temporary `docPrime` exception (`scripts/nolints_prime_decls.txt:2842`). The `docPrime` linter requires a primed declaration to explain in its docstring 'the difference relative to an unprimed version … or … why no better naming scheme is possible', and `scripts/README.md` states the exception list should tend to zero and that PRs removing entries are welcome. This PR is precisely the one reworking this declaration's signature, so the debt should be paid here rather than left behind; comparable primed induction principles in the library do carry such a docstring (`DirectSum.induction_on'`, `PiTensorProduct.induction_on'`, `MvPolynomial.induction_on''`, `Submodule.iSup_induction'`).",
+     "requested_change": "Add a docstring to `Monoid.Coprod.induction_on'` stating what it proves and why it is primed, e.g. `/-- Induction principle for `M ∗ N` whose inductive steps only need to cover left multiplication by a generator: `motive x → motive (inl m * x)` and `motive x → motive (inr n * x)`. This is the form from which `Monoid.Coprod.induction_on` is derived; the prime distinguishes it from that version, whose cases are the two generating inclusions and multiplication. -/`, and delete the line `Monoid.Coprod.induction_on'` from `scripts/nolints_prime_decls.txt`. (If the name is changed as suggested in the accompanying naming finding, the docstring should instead relate the principle to `induction_on` without justifying a prime.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:196",
+     "claim": "The prime in `Monoid.Coprod.induction_on'` is not needed and contradicts the local sibling practice: the identical induction principle for the indexed coproduct is named `Monoid.CoprodI.induction_left` (`Mathlib/GroupTheory/CoprodI.lean:202`, which already uses `motive`), so the Coprod analogue has a descriptive unprimed name available. Because the sum over the two generators is orthogonal to the statement, `induction_left` transfers verbatim, whereas `induction_on'` shadows nothing and requires the `scripts/nolints_prime_decls.txt` exception. Since this PR is the one fixing this declaration's arguments, the name should be fixed here too, with the old name kept as a deprecation for downstream users.",
+     "requested_change": "Rename the declaration to `Monoid.Coprod.induction_left` (same statement and proof), update the one internal use in `induction_on` to call `induction_left`, and keep the old name via `@[to_additive (attr := deprecated (since := \"2026-07-19\"))] alias induction_on' := induction_left`; then delete the `Monoid.Coprod.induction_on'` line from `scripts/nolints_prime_decls.txt`. A bare rename without the alias is not enough: `to_additive` on `induction_on` then fails ('the translated value is not type correct'), which I reproduced.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/38d79a9d6ef13ff68280f9c54d16e562d2112674a36b0a4f38e54dc50a3b7490/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__3984c14b-2e4c-47f2-a6a4-a76d277f6a7c.jsonl"
+  },
+  "AP3": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_ap_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/GroupTheory/Coprod/Basic.lean:195",
+     "claim": "`Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` are undocumented: both are `theorem`s whose whole point is the (non-obvious) premise set — `motive 1` plus closure under left multiplication by `inl`/`inr` for the primed one — and the `@[to_additive (attr := elab_as_elim)]` attribute supplies no docstring for the generated `AddMonoid.Coprod.induction_on`/`induction_on'` either. This PR rewrites exactly these two signatures (and, for `induction_on`, the line layout) without documenting them, so it is the occasion to add the docstrings; Mathlib expects a `theorem` to carry one, and a `to_additive` declaration to carry one for the generated version.",
+     "requested_change": "Document both recursors and pass the additive docstring through the attribute, as this file already does for `Coprod.clift`, `Coprod.lift` and `Coprod.hom_ext`:\n\n```lean\n/-- The induction principle `Monoid.Coprod.induction_on'` for the free product of two monoids: to\nprove a proposition about every element of `M ∗ N`, it suffices to prove it for `1` and to show that\nit is preserved under multiplication on the left by an element of `M` or of `N`.\n\nSee also `Monoid.Coprod.induction_on` for a version that assumes preservation under multiplication.\n-/\n@[to_additive (attr := elab_as_elim)\n  /-- The induction principle `AddMonoid.Coprod.induction_on'` for the free product of two additive\nmonoids: ... -/]\ntheorem induction_on' ...\n```\nand analogously a docstring plus `@[to_additive (attr := elab_as_elim) /-- ... -/]` for `induction_on` (the file already uses the `to_additive (attr := ...) /-- ... -/` spelling, e.g. `Mathlib/GroupTheory/Congruence/Defs.lean:260`).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_ap_rep3/tasks/00840733b36020b20785bbf2d6810c01fcd22ddd6eb3dbfa41fd1157e0d930fa/samples/0/attempts/attempt_1_20261009115703/ape_agent_session_20261009_115704__1752caca-4da7-4dbd-9d0a-c4669d2c211b.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_41930.md"
+}

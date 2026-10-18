@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "line_start": 146, "line_end": 146, "replacement": "    (hst : s ⊆ {i | IsMulIndecomposable v t i})"}

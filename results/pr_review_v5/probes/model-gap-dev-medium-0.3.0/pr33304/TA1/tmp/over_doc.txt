@@ -1,0 +1,7 @@
+/-!
+
+# Forgetful functor from `Over X` preserves cofiltered limits
+
+Note that `Over.forget X : Over X ⥤ C` already creates all colimits, see
+`Over.createsColimitsOfSize` in `Mathlib/CategoryTheory/Limits/Over.lean`.
+-/

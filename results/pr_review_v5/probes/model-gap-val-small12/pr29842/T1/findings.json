@@ -1,0 +1,16 @@
+[
+  {
+    "target": "UniqueDiffWithinAt.mono",
+    "claim": "After the move into the TVS section, `UniqueDiffWithinAt.mono` sits below `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and so carries both assumptions. It needs neither: monotonicity in the set follows from `tangentConeAt_mono` and `closure_mono`, which hold in any `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]`. The PR therefore states it more narrowly than it holds, in a PR whose purpose is to generalize these lemmas to TVS.",
+    "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (after `UniqueDiffWithinAt.congr_pt`) and prove it directly: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (line mode, lines 433-443 replaced by the direct-proof `mono` followed by the `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` line and the unchanged `mono_nhds`): outcome `compiled`, no errors, no warnings. Every later use (`mono_closure`, the `uniqueDiffWithinAt_Ici`/`Iic` lemmas) still compiles. The as-is check of the PR file also compiled cleanly."
+  },
+  {
+    "target": "tangentConeAt_subset_zero",
+    "claim": "`tangentConeAt_subset_zero` and its consumer `UniqueDiffWithinAt.accPt` stay in the `Normed` section, but their proofs use only `tangentConeAt.lim_zero`, `Tendsto.add` and `tendsto_nhds_unique`. These are the same ingredients the PR now provides in the TVS section, plus Hausdorffness. The PR's generalization stops short at lemmas it has just made generalizable.",
+    "requested_change": "Move `tangentConeAt_subset_zero` and `UniqueDiffWithinAt.accPt` into the TVS section after `tangentConeAt_inter_nhds`, where `[ContinuousSMul 𝕜 E] [ContinuousAdd E]` are in scope. Add `[T2Space E]` to both, keep the proofs unchanged, and break `accPt`'s signature after the `h` binder to stay under 100 characters.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (line mode, lines 146-312 respliced so the two lemmas sit before `end TVS` with `[T2Space E]` added, signature wrapped): outcome `compiled`, no errors, no warnings. The downstream user `uniqueDiffWithinAt_iff_accPt` (on `𝕜`, which is T2) still elaborates. A first attempt without wrapping compiled with only a longLine warning."
+  }
+]

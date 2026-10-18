@@ -43,6 +43,10 @@ inputs/pr_review_v2/precedent_bench/*.jsonl
 # the rendered overlay bundles.
 results/*/runs/*/arm_pool.jsonl
 results/overlays
+# The filing contract's ledgers: a `convention` evidence item quotes the conventions section verbatim,
+# and in five of them that is a census comment body, which is never committed (2026-10-13,
+# filing-contract-2026-10-12/README.md). The ledgers stay on disk; counts.py and read_g.py read them there.
+results/pr_review_v5/runs/filing_g_*/ledgers.jsonl
 
 # The publishing clone used to restage this history. Redundant now that development
 # happens on this branch directly; kept out of the tree if it is ever recreated.

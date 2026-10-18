@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Order/Round.lean","declaration_name":"round_eq_iff","new_declaration":"theorem round_eq_iff {x : α} {n : ℤ} : round x = n ↔ n - 1 / 2 ≤ x ∧ x < n + 1 / 2 := by\n  norm_num [round_eq, floor_eq_iff, ← lt_sub_iff_add_lt, add_sub_assoc]"}

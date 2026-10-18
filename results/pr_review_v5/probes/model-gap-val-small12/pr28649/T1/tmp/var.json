@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Moments/Variance.lean", "line_start": 34, "line_end": 34, "replacement": "  `a \u2264 X \u2264 b` almost everywhere is at most `((b - a) / 2) ^ 2`."}

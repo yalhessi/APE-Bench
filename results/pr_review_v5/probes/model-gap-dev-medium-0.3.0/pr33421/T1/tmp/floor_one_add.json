@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Order/Floor/Ring.lean", "line_start": 224, "line_end": 224, "replacement": "  rw [\u2190 Int.cast_natCast, floor_intCast_add]\n\n@[simp]\ntheorem floor_one_add (a : R) : \u230a1 + a\u230b = 1 + \u230aa\u230b :=\n  mod_cast floor_natCast_add 1 a"}

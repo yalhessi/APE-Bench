@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Module/Submodule/Map.lean", "declaration_name": "Submodule.inf_comap_le_comap_add", "new_declaration": "theorem inf_comap_le_comap_add (f\u2081 f\u2082 : M \u2192\u209b\u2097[\u03c4\u2081\u2082] M\u2082) :\n    comap f\u2081 q \u2293 comap f\u2082 q \u2264 comap (f\u2081 + f\u2082) q :=\n  fun _ h \u21a6 add_mem h.1 h.2\n"}

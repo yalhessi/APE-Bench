@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P230",
+  "where": "all eleven files: module docstrings, Complex instance docstring, Nat/Init library note, Vector3 comments",
+  "why": "Every hunk rewrites a cross-reference to another module in documentation as a file path."
+ },
+ {
+  "id": "P139",
+  "where": "all changed docstrings and comments; NatAntidiagonal future-work note",
+  "why": "Stale comments updated to the code as it stands; NatAntidiagonal generalisation note may already be done."
+ },
+ {
+  "id": "P382",
+  "where": "Mathlib/Data/Vector3.lean, comments above unexpandNil and unexpandCons",
+  "why": "Edited comments record that the unexpanders are copied from Init/NotationExtra.lean."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Description says only 'fix file refs' but PR also changes a heading and drops a clause."
+ },
+ {
+  "id": "P329",
+  "where": "Array/Defs heading level, removed clause; Set/Basic rewording; NatAntidiagonal replaced example",
+  "why": "Some edits go beyond fixing file references; incidental rewrites are the convention's situation."
+ },
+ {
+  "id": "P025",
+  "where": "Mathlib/Data/Array/Defs.lean module docstring",
+  "why": "Module docstring title changed from `##` to `#` heading 'Definitions on Arrays'."
+ },
+ {
+  "id": "P135",
+  "where": "Array/Defs module docstring heading; List/Lex 'See also' section; MonomialOrder 'Examples'",
+  "why": "Changed module docstrings carry section headings, one heading level edited by the PR."
+ },
+ {
+  "id": "P232",
+  "where": "PR title 'doc(Data): fix file refs'",
+  "why": "PR title in commit-convention form type(Area): description."
+ },
+ {
+  "id": "P053",
+  "where": "the whole PR, a cleanup across eleven files",
+  "why": "Cleanup PR; each hunk's readability gain weighed against its cost (e.g. Set/Basic rewrap)."
+ },
+ {
+  "id": "P138",
+  "where": "the whole PR, documentation polish only",
+  "why": "Docstring-only polish of marginal benefit; review cost against gain is the situation."
+ },
+ {
+  "id": "P185",
+  "where": "Set/Basic 'file'->'directory' rewording; Vector3 '(Lean core)'; Array/Defs dropped clause",
+  "why": "Third-party stylistic rewording of existing prose beyond strictly broken references."
+ },
+ {
+  "id": "P255",
+  "where": "NatAntidiagonal module docstring (`Finset.finsuppAntidiag`); paths throughout",
+  "why": "Declaration name and file paths mentioned in docstrings, written in backticks."
+ },
+ {
+  "id": "P203",
+  "where": "List/Lex 'See also' list; Set/Basic 'See also'; Matrix/Mul, MonomialOrder, Finset/Defs pointers",
+  "why": "Changed lines are cross-references to related files and declarations."
+ },
+ {
+  "id": "P314",
+  "where": "Set/Basic module docstring rewrap; long backticked paths in Complex/Basic, NatAntidiagonal",
+  "why": "Long backticked path fragments in docstrings, with line breaks placed around them."
+ },
+ {
+  "id": "P084",
+  "where": "Set/Basic module docstring; Complex/Basic instance docstring",
+  "why": "Edited docstring lines rewrapped or lengthened near the 100-character limit."
+ },
+ {
+  "id": "P125",
+  "where": "Mathlib/Data/Finsupp/MonomialOrder.lean module docstring, DegLex sentence",
+  "why": "Edited docstring sentence 'For the graded lexicographic ordering, see ...' ends without a period."
+ },
+ {
+  "id": "P045",
+  "where": "the nine edited module docstrings",
+  "why": "Module docstrings edited to keep them in step with the library as it stands."
+ },
+ {
+  "id": "P289",
+  "where": "Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean implementation notes",
+  "why": "Edited 'In the future, we could consider generalizing...' note flags work to do without TODO."
+ },
+ {
+  "id": "P257",
+  "where": "Option/Defs 'other files under Mathlib/Data/Option/'; Array/Defs dropped pointer",
+  "why": "Docstrings refer to where proofs or lemmas live, generically or not at all."
+ },
+ {
+  "id": "P256",
+  "where": "Mathlib/Data/Vector3.lean `--` comments above unexpandNil and unexpandCons",
+  "why": "Edited `--` comments describe the declaration below, which already has its own docstring."
+ },
+ {
+  "id": "P059",
+  "where": "Mathlib/Data/Array/Defs.lean module docstring heading",
+  "why": "Edited markdown heading marker in a docstring; spacing after the marker and trailing spaces."
+ },
+ {
+  "id": "P209",
+  "where": "PR description",
+  "why": "One-line PR description; its concision and stated change are the situation."
+ },
+ {
+  "id": "P126",
+  "where": "Set/Basic ('module' vs 'directory' references); Vector3 two identical comments",
+  "why": "File references in one docstring spelled in different styles; same construct spelled consistently."
+ },
+ {
+  "id": "P337",
+  "where": "List/Lex 'Related files are:' list; Nat/Init 'The relevant files are:' list",
+  "why": "Edited items sit in docstring bulleted lists following a paragraph line directly."
+ },
+ {
+  "id": "P321",
+  "where": "Complex/Basic instSMulRealComplex docstring; Nat/Init library note docstring",
+  "why": "Edited declaration docstrings; where their text begins relative to `/--`."
+ }
+]

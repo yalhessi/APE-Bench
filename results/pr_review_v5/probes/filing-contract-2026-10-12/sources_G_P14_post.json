@@ -1,0 +1,25 @@
+{
+ "G1": {
+  "kind": "solo",
+  "run": "filing_g_post_rep1"
+ },
+ "G2": {
+  "kind": "solo",
+  "run": "filing_g_post_rep2"
+ },
+ "G3": {
+  "kind": "solo",
+  "run": "filing_g_post_rep3"
+ },
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_post_base_rep1"
+ },
+ "AP1": {
+  "kind": "solo",
+  "run": [
+   "iter_ds41_conv_post_ap_rep1",
+   "iter_ds41_conv_post_apt_rep1"
+  ]
+ }
+}

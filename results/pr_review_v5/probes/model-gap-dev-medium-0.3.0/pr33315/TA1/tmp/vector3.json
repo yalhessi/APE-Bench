@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Vector3.lean", "line_start": 55, "line_end": 61, "replacement": "/-- Unexpander for `Vector3.nil` -/\n@[app_unexpander Vector3.nil] meta def unexpandNil : Lean.PrettyPrinter.Unexpander\n  | `($(_)) => `([])\n\n/-- Unexpander for `Vector3.cons` -/"}

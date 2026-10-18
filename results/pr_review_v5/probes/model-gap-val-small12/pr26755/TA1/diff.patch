@@ -1,0 +1,113 @@
+diff --git a/Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean b/Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean
+--- a/Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean
++++ b/Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean
+@@ -799,15 +799,9 @@ theorem coe_pow (s : Finset α) (n : ℕ) : ↑(s ^ n) = (s : Set α) ^ n := by
+   · rw [npowRec, pow_zero, coe_one]
+   · rw [npowRec, pow_succ, coe_mul, ih]
+ 
+-#adaptation_note /-- nightly-2025-04-07
+-This now needs to be marked as noncomputable because of its dependence on `Set.monoid`.
+-We should either find a way to rewrite this definition to avoid this,
+-or request via @kim-em and @zwarich that changes in https://github.com/leanprover/lean4/pull/7824
+-be revisited to avoid needing as many `noncomputable`s.
+--/
+ /-- `Finset α` is a `Monoid` under pointwise operations if `α` is. -/
+ @[to_additive "`Finset α` is an `AddMonoid` under pointwise operations if `α` is. "]
+-protected noncomputable def monoid : Monoid (Finset α) :=
++protected def monoid : Monoid (Finset α) :=
+   coe_injective.monoid _ coe_one coe_mul coe_pow
+ 
+ scoped[Pointwise] attribute [instance] Finset.monoid Finset.addMonoid
+diff --git a/Mathlib/Algebra/Group/Pointwise/Set/Basic.lean b/Mathlib/Algebra/Group/Pointwise/Set/Basic.lean
+--- a/Mathlib/Algebra/Group/Pointwise/Set/Basic.lean
++++ b/Mathlib/Algebra/Group/Pointwise/Set/Basic.lean
+@@ -75,7 +75,7 @@ variable [One α] {s : Set α} {a : α}
+ 
+ /-- The set `1 : Set α` is defined as `{1}` in locale `Pointwise`. -/
+ @[to_additive "The set `0 : Set α` is defined as `{0}` in locale `Pointwise`."]
+-protected noncomputable def one : One (Set α) :=
++protected def one : One (Set α) :=
+   ⟨{1}⟩
+ 
+ scoped[Pointwise] attribute [instance] Set.one Set.zero
+@@ -118,7 +118,7 @@ theorem Nonempty.subset_one_iff (h : s.Nonempty) : s ⊆ 1 ↔ s = 1 :=
+ 
+ /-- The singleton operation as a `OneHom`. -/
+ @[to_additive "The singleton operation as a `ZeroHom`."]
+-noncomputable def singletonOneHom : OneHom α (Set α) where
++def singletonOneHom : OneHom α (Set α) where
+   toFun := singleton; map_one' := singleton_one
+ 
+ @[to_additive (attr := simp)]
+@@ -216,7 +216,7 @@ theorem inv_eq_empty : s⁻¹ = ∅ ↔ s = ∅ := by
+   rw [← image_inv_eq_inv, image_eq_empty]
+ 
+ @[to_additive (attr := simp)]
+-noncomputable instance involutiveInv : InvolutiveInv (Set α) where
++instance involutiveInv : InvolutiveInv (Set α) where
+   inv := Inv.inv
+   inv_inv s := by simp only [← inv_preimage, preimage_preimage, inv_inv, preimage_id']
+ 
+@@ -370,7 +370,7 @@ theorem union_mul_inter_subset_union : (s₁ ∪ s₂) * (t₁ ∩ t₂) ⊆ s
+ 
+ /-- The singleton operation as a `MulHom`. -/
+ @[to_additive "The singleton operation as an `AddHom`."]
+-noncomputable def singletonMulHom : α →ₙ* Set α where
++def singletonMulHom : α →ₙ* Set α where
+   toFun := singleton
+   map_mul' _ _ := singleton_mul_singleton.symm
+ 
+@@ -566,7 +566,7 @@ variable [MulOneClass α]
+ 
+ /-- `Set α` is a `MulOneClass` under pointwise operations if `α` is. -/
+ @[to_additive "`Set α` is an `AddZeroClass` under pointwise operations if `α` is."]
+-protected noncomputable def mulOneClass : MulOneClass (Set α) :=
++protected def mulOneClass : MulOneClass (Set α) :=
+   { Set.one, Set.mul with
+     mul_one := image2_right_identity mul_one
+     one_mul := image2_left_identity one_mul }
+@@ -586,7 +586,7 @@ theorem subset_mul_right {s : Set α} (t : Set α) (hs : (1 : α) ∈ s) : t ⊆
+ 
+ /-- The singleton operation as a `MonoidHom`. -/
+ @[to_additive "The singleton operation as an `AddMonoidHom`."]
+-noncomputable def singletonMonoidHom : α →* Set α :=
++def singletonMonoidHom : α →* Set α :=
+   { singletonMulHom, singletonOneHom with }
+ 
+ @[to_additive (attr := simp)]
+@@ -605,7 +605,7 @@ variable [Monoid α] {s t : Set α} {a : α} {m n : ℕ}
+ 
+ /-- `Set α` is a `Monoid` under pointwise operations if `α` is. -/
+ @[to_additive "`Set α` is an `AddMonoid` under pointwise operations if `α` is."]
+-protected noncomputable def monoid : Monoid (Set α) :=
++protected def monoid : Monoid (Set α) :=
+   { Set.semigroup, Set.mulOneClass, @Set.NPow α _ _ with }
+ 
+ scoped[Pointwise] attribute [instance] Set.monoid Set.addMonoid
+@@ -739,7 +739,7 @@ end CancelMonoid
+ 
+ /-- `Set α` is a `CommMonoid` under pointwise operations if `α` is. -/
+ @[to_additive "`Set α` is an `AddCommMonoid` under pointwise operations if `α` is."]
+-protected noncomputable def commMonoid [CommMonoid α] : CommMonoid (Set α) :=
++protected def commMonoid [CommMonoid α] : CommMonoid (Set α) :=
+   { Set.monoid, Set.commSemigroup with }
+ 
+ scoped[Pointwise] attribute [instance] Set.commMonoid Set.addCommMonoid
+@@ -767,7 +767,7 @@ protected theorem mul_eq_one_iff : s * t = 1 ↔ ∃ a b, s = {a} ∧ t = {b} 
+ /-- `Set α` is a division monoid under pointwise operations if `α` is. -/
+ @[to_additive
+     "`Set α` is a subtraction monoid under pointwise operations if `α` is."]
+-protected noncomputable def divisionMonoid : DivisionMonoid (Set α) :=
++protected def divisionMonoid : DivisionMonoid (Set α) :=
+   { Set.monoid, Set.involutiveInv, Set.div, @Set.ZPow α _ _ _ with
+     mul_inv_rev := fun s t => by
+       simp_rw [← image_inv_eq_inv]
+@@ -827,7 +827,7 @@ end DivisionMonoid
+ /-- `Set α` is a commutative division monoid under pointwise operations if `α` is. -/
+ @[to_additive subtractionCommMonoid
+       "`Set α` is a commutative subtraction monoid under pointwise operations if `α` is."]
+-protected noncomputable def divisionCommMonoid [DivisionCommMonoid α] :
++protected def divisionCommMonoid [DivisionCommMonoid α] :
+     DivisionCommMonoid (Set α) :=
+   { Set.divisionMonoid, Set.commSemigroup with }
+ 

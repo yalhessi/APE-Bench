@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Normed/Operator/LinearIsometry.lean", "declaration_name": "LinearIsometry.nnnorm_map", "new_declaration": "theorem nnnorm_map (x : E) : ‖f x‖₊ = ‖x‖₊ := by\n  simp only [SemilinearIsometryClass.nnnorm_map]"}

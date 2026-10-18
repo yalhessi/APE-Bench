@@ -1,0 +1,68 @@
+reader A val1000: 1669 principled asks over 398 used entries
+  top 10: 0.220
+  top 25: 0.391
+  top 50: 0.546
+  top 100: 0.703
+  top 200: 0.862
+
+in-census probe asks: cid pr set entry rank n | X1 X2 DX1 DE1 DP1 (matcher 1) | sentence
+v0067 30641 val P005 rank=1 n=56 | X1=part X2=part DX1=no DE1=no DP1=no | A goal that a standard finishing tactic (`simp`, `rfl`, `trivial`, `omega`, `positivity`, `grind`, `grw`, ...)
+v0105 34091 val P011 rank=5 n=37 | X1=no X2=no DX1=no DE1=no DP1=no | A result or construction that existing library lemmas or API yield directly (a composition of library equivale
+v0093 32875 val P018 rank=6 n=37 | X1=no X2=no DX1=no DE1=no DP1=no | Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.
+v0055 29842 val P018 rank=6 n=37 | X1=reac X2=no DX1=reac DE1=reac DP1=reac | Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.
+v0094 32875 val P018 rank=6 n=37 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.
+v0092 32875 val P018 rank=6 n=37 | X1=part X2=part DX1=no DE1=no DP1=no | Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.
+v0095 32875 val P018 rank=6 n=37 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | Consecutive tactic calls or `calc` steps that a single call can perform are merged into that one call.
+p0005 42814 post P063 rank=9 n=25 | X1=no X2=no DX1=no DE1=no DP1=no | A result stated for a concrete type, object or value (a specific filter, a default element) but using only an 
+v0016 26755 val P100 rank=18 n=20 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A variant or improvement introduced for one member of a family of siblings (left/right or primed lemma variant
+p0003 42184 post P100 rank=18 n=20 | X1=no X2=no DX1=no DE1=no DP1=no | A variant or improvement introduced for one member of a family of siblings (left/right or primed lemma variant
+p0002 42184 post P010 rank=19 n=18 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A hypothesis that the definition or proof does not need is dropped, or weakened to what it does need, so that 
+v0056 29842 val P041 rank=23 n=16 | X1=no X2=no DX1=no DE1=part DP1=part | A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module d
+p0000 41930 post P041 rank=23 n=16 | X1=no X2=no DX1=no DE1=no DP1=reac | A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module d
+v0053 29842 val P041 rank=23 n=16 | X1=no X2=no DX1=no DE1=part DP1=part | A new concept, a new lemma whose use is not evident, or a design change comes with motivation, in the module d
+p0007 42814 post P048 rank=36 n=10 | X1=no X2=no DX1=no DE1=no DP1=reac | Arguments shared by consecutive declarations are declared once with `variable`, not repeated in each signature
+v0029 28649 val P185 rank=39 n=10 | X1=no X2=no DX1=no DE1=no DP1=reac | A purely stylistic change to existing code or prose that the style guide does not mandate is left to the origi
+p0006 42814 post P201 rank=40 n=10 | X1=no X2=no DX1=no DE1=no DP1=reac | A dual, additive twin, projection or characterisation lemma that a generator (`to_dual`, `to_additive`, `simps
+p0009 43167 post P030 rank=43 n=9 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A file does not import a module it does not need or that another of its imports already provides.
+v0066 30641 val P060 rank=53 n=8 | X1=reac X2=reac DX1=reac DE1=reac DP1=no | The direct lemma for a goal is used rather than one obtained by converting another (`le_rfl`, not `rfl.le`).
+v0132 36822 val P098 rank=55 n=7 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A declaration that is moved, generalised or deduplicated keeps exactly the attributes of the original, transfe
+v0131 36822 val P098 rank=55 n=7 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A declaration that is moved, generalised or deduplicated keeps exactly the attributes of the original, transfe
+v0064 30641 val P105 rank=64 n=6 | X1=reac X2=no DX1=no DE1=no DP1=no | A variable is named with the letter the file's area uses for its kind (`X`, `Y` for measurable spaces), not wi
+p0012 43167 post P113 rank=69 n=5 | X1=no X2=no DX1=no DE1=reac DP1=reac | A lemma variant is distinguished from its siblings by naming the term of its statement that differs, not by ap
+p0016 43192 post P254 rank=107 n=4 | X1=reac X2=reac DX1=no DE1=no DP1=no | A declaration's name and namespace follow the pattern of its siblings' and analogues' names (the same abbrevia
+p0010 43167 post P254 rank=107 n=4 | X1=no X2=no DX1=no DE1=part DP1=no | A declaration's name and namespace follow the pattern of its siblings' and analogues' names (the same abbrevia
+p0011 43167 post P263 rank=108 n=4 | X1=reac X2=reac DX1=reac DE1=reac DP1=reac | A declaration about a multiplicative structure comes with its additive counterpart, and one about an additive 
+v0030 28649 val P278 rank=109 n=4 | X1=no X2=no DX1=part DE1=reac DP1=reac | A docstring describes in full mathematical words (`homomorphism`, `multiplicative monoid`), not with the abbre
+v0063 30458 val P329 rank=110 n=4 | X1=reac X2=reac DX1=no DE1=no DP1=reac | A PR changes existing code only where its purpose requires; incidental rewrites of proofs or renames of declar
+v0062 30458 val P329 rank=110 n=4 | X1=reac X2=reac DX1=no DE1=no DP1=reac | A PR changes existing code only where its purpose requires; incidental rewrites of proofs or renames of declar
+v0068 30641 val P094 rank=120 n=3 | X1=part X2=part DX1=no DE1=no DP1=no | A monotonicity or congruence step in an inequality is discharged by `gcongr`, not by applying the specific nam
+p0004 42814 post P153 rank=130 n=3 | X1=no X2=no DX1=no DE1=no DP1=no | An iff lemma whose directions are used separately comes with `alias ⟨_, _⟩` names for each direction, so both 
+p0015 43192 post P276 rank=209 n=2 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | A hypothesis that a decision procedure discharges in typical uses is given as an auto-param (`:= by lia`, `:= 
+p0014 43192 post P276 rank=209 n=2 | X1=reac X2=reac DX1=no DE1=reac DP1=no | A hypothesis that a decision procedure discharges in typical uses is given as an auto-param (`:= by lia`, `:= 
+v0061 30458 val P369 rank=230 n=2 | X1=part X2=part DX1=part DE1=part DP1=reac | A `variable` command, and a section around it, serves an argument shared by many declarations; an argument use
+v0060 30458 val P369 rank=230 n=2 | X1=part X2=part DX1=part DE1=part DP1=reac | A `variable` command, and a section around it, serves an argument shared by many declarations; an argument use
+v0090 32875 val P315 rank=322 n=1 | X1=no X2=no DX1=no DE1=no DP1=reac | A characterisation lemma (`foo_iff`, an equation) that `grind` can use as a rewrite rule is tagged `@[grind =]
+v0108 34091 val P392 rank=unused n=0 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `
+v0107 34091 val P392 rank=unused n=0 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `
+v0106 34091 val P392 rank=unused n=0 | X1=reac X2=reac DX1=no DE1=reac DP1=reac | A hypothesis whose type is a class (`IsEmpty`, `Nonempty`, `Fact`) is taken as an instance-implicit argument `
+
+probe in-census asks by entry rank: {'51-100': 5, '>100': 16, 'top10': 8, '11-50': 10}
+
+suggestion blocks: 856 of 1917 asks with a reader-A entry
+  top 10: 228 of 399 (0.57)
+  top 50: 482 of 1015 (0.47)
+  P019 64 asks, 45 with a block
+  P005 59 asks, 45 with a block
+  P004 43 asks, 2 with a block
+  P018 41 asks, 31 with a block
+  P011 39 asks, 21 with a block
+  P007 37 asks, 16 with a block
+  P017 32 asks, 30 with a block
+  P059 30 asks, 27 with a block
+  P063 27 asks, 3 with a block
+  P010 27 asks, 8 with a block
+  P057 26 asks, 25 with a block
+  P003 26 asks, 14 with a block
+  P070 24 asks, 16 with a block
+  P100 24 asks, 2 with a block
+  P154 23 asks, 4 with a block

@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 11,
+  "completion_status": "complete",
+  "context_calls_total": 16,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 11,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 35,
+  "pruned": 35,
+  "routing_mode": "solo",
+  "run_id": "v5run:iter_ds41_conv_post_apt_rep2",
+  "run_name": "iter_ds41_conv_post_apt_rep2",
+  "run_plan_sha256": "247dcca73d3a297525d75d6d90b6bf0b184766e022c811ee69603aea367f4b4a",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "4c550d1becebb58ba44784707b29e82852320812196cfb55c016616bfdb2823e",
+  "succeeded": 0,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 2964040.0,
+    "tokens": 2964040.0
+  },
+  "wall_seconds": 1568.450612
+}

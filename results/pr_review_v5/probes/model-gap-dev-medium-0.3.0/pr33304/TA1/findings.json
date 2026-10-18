@@ -1,0 +1,121 @@
+[
+ {
+  "target": "Mathlib/CategoryTheory/Localization/Equivalence.lean (module docstring)",
+  "claim": "The module docstring, whose first paragraph this PR rewraps, cites `Localization.of_equivalence_target`, `Localization.of_equivalence_source` and `Localization.of_equivalences`. No declarations with those names exist. The lemmas are `CategoryTheory.Functor.IsLocalization.of_equivalence_target` (Predicate.lean:393), `...of_equivalence_source` (this file, l.73) and `...of_equivalences` (l.105), so in a PR that fixes references these three still point at nothing and do not link.",
+  "requested_change": "Write the names as `Functor.IsLocalization.of_equivalence_target`, `Functor.IsLocalization.of_equivalence_source` and `Functor.IsLocalization.of_equivalences`, and rewrap, e.g.:\nIn `Mathlib/CategoryTheory/Localization/Predicate.lean`, the lemma\n`Functor.IsLocalization.of_equivalence_target` already showed that the predicate of localized\ncategories is unchanged when we replace the target category (i.e. the candidate localized category)\nby an equivalent category.\nIn this file, we show the same for the source category\n(`Functor.IsLocalization.of_equivalence_source`).\nMore generally, `Functor.IsLocalization.of_equivalences` shows that ...",
+  "severity": "advisory",
+  "evidence": "declaration_search: 'Localization.of_equivalence_target', 'Localization.of_equivalence_source' and 'Localization.of_equivalences' each return count 0. 'of_equivalence_target' resolves to CategoryTheory.Functor.IsLocalization.of_equivalence_target (Predicate.lean:393); of_equivalence_source and of_equivalences resolve to Functor.IsLocalization.* in Equivalence.lean:73/105. lean_verify_edit on lines 11-24 with the rewritten docstring: outcome compiled, no errors or warnings, every line <=100 chars."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Localization/Equivalence.lean (module docstring)",
+  "claim": "The module docstring this PR edits ends with a blank line before the closing `-/` (`that a functor between localized categories is an equivalence.` / `` / `-/`).",
+  "requested_change": "Delete the blank line so that `-/` follows the last line of text directly.",
+  "severity": "advisory",
+  "evidence": "file_read of Equivalence.lean: l.22 is the last text line, l.23 is empty, l.24 is `-/`. The lean_verify_edit replacement of lines 11-24 above had no blank line there and compiled."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Limits/Preserves/Limits.lean (module docstring)",
+  "claim": "The module docstring, which this PR edits for its file reference, cites `preservesLimitsIso : G.obj (Limit F) ≅ Limit (F ⋙ G)` and `(PreservesLimit.preserves t).lift (G.mapCone c₂) = G.map (t.lift c₂)`. Neither matches the code. The declaration is `preservesLimitIso : G.obj (limit F) ≅ limit (F ⋙ G)` (l.53). `PreservesLimit.preserves t` is a field of type `Nonempty (IsLimit _)` and has no `.lift`; the stated lemma is `preserves_lift_mapCone`, about `(isLimitOfPreserves G t).lift`.",
+  "requested_change": "Update the two formulas to `preservesLimitIso : G.obj (limit F) ≅ limit (F ⋙ G)` and `(isLimitOfPreserves G t).lift (G.mapCone c₂) = G.map (t.lift c₂)` (`preserves_lift_mapCone`).",
+  "severity": "advisory",
+  "evidence": "declaration_search: 'preservesLimitsIso' count 0; 'preservesLimitIso' = CategoryTheory.preservesLimitIso at Preserves/Limits.lean:53 with type `G.obj (limit F) ≅ limit (F ⋙ G)`. file_read Preserves/Basic.lean:56-57: `class PreservesLimit ... where preserves {c} (hc : IsLimit c) : Nonempty (IsLimit (F.mapCone c))`. Preserves/Limits.lean:44-45: `preserves_lift_mapCone ... : (isLimitOfPreserves G t).lift (G.mapCone c₂) = G.map (t.lift c₂)`. lean_verify_edit on lines 10-20 with the corrected docstring: compiled, no errors or warnings."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Limits/Preserves/Over.lean (module docstring)",
+  "claim": "The line this PR changes, `See `Mathlib/CategoryTheory/Comma/Over/Pullback.lean``, is a sentence without a closing period.",
+  "requested_change": "End the sentence with a period, e.g. `` See `Mathlib/CategoryTheory/Comma/Over/Pullback.lean`. `` (or join it to the previous sentence; see the next finding for the content).",
+  "severity": "advisory",
+  "evidence": "diff.patch hunk for Preserves/Over.lean: `+See `Mathlib/CategoryTheory/Comma/Over/Pullback.lean`` with no period. file_read l.15 confirms it."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Limits/Preserves/Over.lean (module docstring)",
+  "claim": "The module docstring this PR edits has a blank line before its closing `-/` (l.15 text, l.16 empty, l.17 `-/`).",
+  "requested_change": "Delete the blank line so that `-/` follows the last line of text directly.",
+  "severity": "advisory",
+  "evidence": "file_read Preserves/Over.lean lines 10-17. The lean_verify_edit replacement of lines 10-17 without the blank line compiled with no errors or warnings."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Limits/Preserves/Over.lean (module docstring)",
+  "claim": "The docstring says `Over.forget X` 'already preserves all colimits because it is a left adjoint' and now points to `Comma/Over/Pullback.lean`. There `forgetAdjStar`/`(forget X).IsLeftAdjoint` sit in `section HasBinaryProducts`, and its own docstring says the binary-products assumption is necessary. So the stated reason does not hold in general. The unconditional fact is `Over.createsColimitsOfSize` in `Mathlib/CategoryTheory/Limits/Over.lean`.",
+  "requested_change": "Point the note at the unconditional result, e.g. `Note that `Over.forget X : Over X ⥤ C` already creates all colimits, see `Over.createsColimitsOfSize` in `Mathlib/CategoryTheory/Limits/Over.lean`.` Alternatively keep the adjoint argument but qualify it with 'in a category with binary products' and name `Over.forgetAdjStar`.",
+  "severity": "advisory",
+  "evidence": "file_read Comma/Over/Pullback.lean:135-157: `section HasBinaryProducts / variable [HasBinaryProducts C]`, `def forgetAdjStar : forget X ⊣ star X`, docstring 'Note that the binary products assumption is necessary'. content_search: Limits/Over.lean:54 `instance createsColimitsOfSize : CreatesColimitsOfSize.{w, w'} (forget X)` with no extra hypotheses. lean_verify_edit (lines 10-17 replaced by the suggested docstring): compiled, no errors or warnings."
+ },
+ {
+  "target": "CategoryTheory.Limits.colimit.ι_desc (docstring, Mathlib/CategoryTheory/Limits/HasLimits.lean)",
+  "claim": "The line this PR changes, `(see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`)`, is a parenthetical fragment after a finished sentence, not a sentence ending in a period.",
+  "requested_change": "Fold it into the preceding sentence: `We thus use `reassoc` to define additional `@[simp]` lemmas, with an arbitrary extra morphism (see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`).`",
+  "severity": "advisory",
+  "evidence": "diff.patch: `+(see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`)` after a line ending in `morphism.`. lean_verify_edit on HasLimits.lean lines 702-710 with the folded sentence: compiled, no errors or warnings."
+ },
+ {
+  "target": "CategoryTheory.Limits.colimit.ι_desc (docstring, Mathlib/CategoryTheory/Limits/HasLimits.lean)",
+  "claim": "The declaration docstring this PR edits closes with `-/` on a line of its own after `(see ...)`.",
+  "requested_change": "Put `-/` at the end of the last text line: `...(see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`). -/`.",
+  "severity": "advisory",
+  "evidence": "file_read HasLimits.lean l.709 `(see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`)`, l.710 `-/`. The edit with `-/` on the text line (lines 702-710) compiled."
+ },
+ {
+  "target": "CategoryTheory.Limits.colimit.ι_desc (docstring, Mathlib/CategoryTheory/Limits/HasLimits.lean)",
+  "claim": "The docstring the PR edits cites `colimit.ext`, which does not exist. The extensionality lemma is `colimit.hom_ext` (l.778).",
+  "requested_change": "Replace `colimit.ext` with `colimit.hom_ext`.",
+  "severity": "advisory",
+  "evidence": "declaration_search 'CategoryTheory.Limits.colimit.ext': count 0. 'colimit.hom_ext' = CategoryTheory.Limits.colimit.hom_ext at HasLimits.lean:778 (`@[ext] theorem colimit.hom_ext`). The edit with `colimit.hom_ext` compiled (lines 702-710 and 702-714 variants)."
+ },
+ {
+  "target": "CategoryTheory.Limits.colimit.ι_desc (docstring, Mathlib/CategoryTheory/Limits/HasLimits.lean)",
+  "claim": "The docstring attached to `colimit.ι_desc` does not describe that lemma. It is overview text about how all the `colimit.ι F j ≫ _` simp lemmas are made `reassoc`. The dual `limit.lift_π` (l.179) carries no such docstring.",
+  "requested_change": "Turn the overview into a `/-! ... -/` section comment placed before `colimit.ι_desc`. Either leave the lemma undocumented, as its dual is, or give it a one-line docstring of its own, e.g. `/-- The coprojection `colimit.ι F j` followed by `colimit.desc F c` is `c.ι.app j`. -/`.",
+  "severity": "advisory",
+  "evidence": "file_read HasLimits.lean 702-714. content_search: `theorem limit.lift_π` at l.179 has no docstring. lean_verify_edit replacing lines 702-714 with the `/-! -/` note, the new docstring and the unchanged theorem: compiled, no errors or warnings."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Bicategory/Functor/StrictPseudofunctor.lean (module docstring)",
+  "claim": "The module docstring this PR edits ends with a blank line between the changed TODO text and the closing `-/`.",
+  "requested_change": "Delete the blank line so that `-/` follows `rename this file to `Mathlib/CategoryTheory/Bicategory/Functor/Strict.lean`.` directly.",
+  "severity": "advisory",
+  "evidence": "diff.patch context after the changed lines: ` ` (blank) then ` -/`. model.md 'as the PR leaves it' shows the same."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Monoidal/Mon_.lean (section docstring before `one_associator`)",
+  "claim": "The `/-! -/` section docstring this PR edits ends with a blank line between the changed line `which have also been proved in `Mathlib/CategoryTheory/Monoidal/Braided/Basic.lean`.` and the closing `-/`.",
+  "requested_change": "Delete the blank line so that `-/` follows the last line of text directly.",
+  "severity": "advisory",
+  "evidence": "file_read Mon_.lean l.283 text, l.284 empty, l.285 `-/`."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Groupoid/Subgroupoid.lean (module docstring)",
+  "claim": "The section holding the line this PR changes is headed `## Implementation details`. That is not a standard module-doc heading; the standard one is `## Implementation notes`.",
+  "requested_change": "Rename the heading to `## Implementation notes`, unless the section is removed per the next finding.",
+  "severity": "advisory",
+  "evidence": "file_read via model.md: `## Implementation details` directly above the changed line. content_search over Mathlib/CategoryTheory: `^## Implementation notes` in 37 files against `^## Implementation details` in 12."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Groupoid/Subgroupoid.lean (module docstring)",
+  "claim": "The sentence this PR updates, `The structure of this file is copied from/inspired by `Mathlib/Algebra/Group/Subgroup/Basic.lean` and `Mathlib/Combinatorics/SimpleGraph/Subgraph.lean`.`, only records that the code was adapted from other in-library files. That kind of note is not kept in Mathlib.",
+  "requested_change": "Remove the sentence, and with it the now-empty `## Implementation details` section.",
+  "severity": "advisory",
+  "evidence": "diff.patch Subgroupoid hunk: `-...`Mathlib/GroupTheory/Subgroup/Basic.lean`` / `+...`Mathlib/Algebra/Group/Subgroup/Basic.lean``. It is the only content of that section (model.md shows `## TODO` next). Both cited files exist (file_read OK)."
+ },
+ {
+  "target": "Mathlib/CategoryTheory/Functor/Basic.lean (comment above `Functor.comp_id`, l.130)",
+  "claim": "This PR fixes the file reference at l.65 of this file but leaves `-- Natural isomorphisms are also provided in `Whiskering.lean`.` (l.130). That is a bare file name, and an ambiguous one (four `Whiskering.lean` files exist). It is also stale: the natural isomorphisms `F ⋙ 𝟭 D ≅ F` and `𝟭 C ⋙ F ≅ F` are `Functor.rightUnitor`/`Functor.leftUnitor` in `Mathlib/CategoryTheory/Functor/Category.lean`.",
+  "requested_change": "Replace the line with `-- The natural isomorphisms `Functor.rightUnitor` and `Functor.leftUnitor` are provided in` / `-- `Mathlib/CategoryTheory/Functor/Category.lean`.`",
+  "severity": "advisory",
+  "evidence": "content_search for short `.lean` refs in the changed files hits Functor/Basic.lean:130. file_search 'Whiskering.lean' returns 4 files (CategoryTheory/, Sites/, Adjunction/, MathlibTest). declaration_search: CategoryTheory.Functor.leftUnitor at Functor/Category.lean:158, rightUnitor at :166. lean_verify_edit replacing l.130 with the two-line comment: compiled, no errors or warnings."
+ },
+ {
+  "target": "CategoryTheory.Functor.map_comp_assoc (comment, Mathlib/CategoryTheory/Functor/Basic.lean)",
+  "claim": "The note this PR edits says `since we will import this file into `Mathlib/Tactic/CategoryTheory/Reassoc.lean``. That file already imports `Mathlib.CategoryTheory.Functor.Basic`, so the future tense no longer matches the code. The note is also a run of `--` lines rather than a `/- -/` block.",
+  "requested_change": "Rewrite it as `/- Note: We manually add this lemma which could be generated by `reassoc`,` / `since `Mathlib/Tactic/CategoryTheory/Reassoc.lean` imports this file. -/`.",
+  "severity": "advisory",
+  "evidence": "file_read Mathlib/Tactic/CategoryTheory/Reassoc.lean l.8-9: `public import Mathlib.CategoryTheory.Functor.Basic` / `public meta import Mathlib.CategoryTheory.Functor.Basic`. lean_verify_edit replacing Functor/Basic.lean l.64-65 with the block comment: compiled, no errors or warnings."
+ },
+ {
+  "target": "PR #33304 (as a whole)",
+  "claim": "The PR fixes file references across CategoryTheory but misses several other broken ones of the same kind. `Mathlib/CategoryTheory/Limits/Cones.lean:35` says `see `cone_category.lean``, a Lean 3 name like the `Tactic/reassoc_axiom.lean` this PR fixes. `Mathlib/CategoryTheory/MorphismProperty/TransfiniteComposition.lean:20` cites `CategoryTheory.Limits.Shape.Preorder.TransfiniteCompositionOfShape`, which misspells `Shapes` and uses dotted form. `Mathlib/CategoryTheory/Limits/Over.lean:18` cites the folder `CategoryTheory.Limits.Shapes.Constructions.Over`, which does not exist; the folder is `Limits/Constructions/Over`.",
+  "requested_change": "Fix these in the same PR as `Mathlib/CategoryTheory/Limits/ConeCategory.lean`, `Mathlib/CategoryTheory/Limits/Shapes/Preorder/TransfiniteCompositionOfShape.lean` and `Mathlib/CategoryTheory/Limits/Constructions/Over/`, or say in the description that the PR covers only the listed files.",
+  "severity": "advisory",
+  "evidence": "content_search over Mathlib/CategoryTheory for backticked non-`Mathlib/` `.lean` refs and for dotted folder/file refs. file_read: Limits/ConeCategory.lean exists. file_search: Limits/Shapes/Preorder/TransfiniteCompositionOfShape.lean exists. content_search: Limits/Constructions/Over/{Basic,Connected,Products}.lean exist, and target/Mathlib/CategoryTheory/Limits/Shapes/Constructions does not exist."
+ }
+]

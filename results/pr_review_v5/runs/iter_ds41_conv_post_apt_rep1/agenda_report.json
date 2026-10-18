@@ -1,0 +1,118 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "correctness": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "docs": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 28
+    },
+    "duplication": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "family_design": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "generalist": {
+      "cost_hint": 0.2,
+      "eligible": 4,
+      "enumerated": 4,
+      "sites": 41
+    },
+    "generality": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "naming": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "proof_golf": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 1,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "proof_idiom": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 1,
+      "enumerated": 3,
+      "sites": 14
+    },
+    "style": {
+      "cost_hint": 0.2,
+      "eligible": 4,
+      "enumerated": 4,
+      "sites": 41
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 2,
+      "recommended": 20,
+      "required": 13
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 2,
+      "docs": 1,
+      "duplication": 2,
+      "family_design": 1,
+      "generalist": 4,
+      "generality": 0,
+      "naming": 1,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 2
+    },
+    "required_by_pr": {
+      "43024": 4,
+      "43192": 9
+    },
+    "required_reasons": {
+      "namespace placement and module docs are properties of the file (file)": 2,
+      "the per-unit broad pass, which no specialist replaces": 4,
+      "these declarations are one API family (family)": 2,
+      "this PR changes module documentation (site)": 1,
+      "this PR introduces declarations that did not exist before (introduction)": 4
+    }
+  },
+  "mandatory_floor_cost": 0.65,
+  "mandatory_floor_tokens": 780000,
+  "pr_numbers": [
+    43024,
+    43192
+  ],
+  "projected_cost_fanout": 1.75,
+  "projected_cost_rules": 1.55,
+  "proposals_eligible": 31,
+  "proposals_enumerated": 35,
+  "renderer_version": "candidate-prompt/14+focused-prompt/4",
+  "routing_mode": "solo",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 4
+}

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Order/Floor/Ring.lean","line_start":225,"line_end":225,"replacement":"\nexample (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := by simp\n"}

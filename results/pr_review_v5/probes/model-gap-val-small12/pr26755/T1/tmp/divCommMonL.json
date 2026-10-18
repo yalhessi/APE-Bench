@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean", "line_start": 1020, "line_end": 1020, "replacement": "protected def divisionCommMonoid [DivisionCommMonoid \u03b1] :"}

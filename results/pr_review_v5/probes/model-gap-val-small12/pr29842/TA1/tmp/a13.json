@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 147, "line_end": 153, "replacement": "end TVS\n\nsection Normed\n\nvariable [NormedAddCommGroup E] [NormedSpace 𝕜 E]\nvariable [NormedAddCommGroup F] [NormedSpace 𝕜 F]\nvariable [NormedAddCommGroup G] [NormedSpace ℝ G]\nvariable {x y : E} {s t : Set E}"}

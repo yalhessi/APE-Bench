@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Real.posLog_pow",
+    "claim": "The proof of `Real.posLog_pow` is a six-line case split (`n = 0`, `|a| ≤ 1`, then `1 < |a ^ n|`) for what is a one-step consequence of `Real.log_pow` and `mul_max_of_nonneg`: `log⁺ (a ^ n) = max 0 (n * log a) = n * max 0 (log a)` because `0 ≤ (n : ℝ)`.",
+    "requested_change": "Replace the proof with `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]` (or equivalently `simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]`).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Real.posLog_pow with the body `rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`: outcome `compiled`, no errors, no warnings. The `simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]` variant also compiled. `Real.log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x` is @[simp] at Mathlib/Analysis/SpecialFunctions/Log/Basic.lean:267; `mul_max_of_nonneg (b c : R) (ha : 0 ≤ a) : a * max b c = max (a * b) (a * c)` at Mathlib/Algebra/Order/Ring/Unbundled/Basic.lean:525."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "`Real.posLog_pow` is an unconditional equation lemma but takes its variables as implicit `{n : ℕ} {a : ℝ}`, unlike its model `Real.log_pow (x : ℝ) (n : ℕ)` and the file's other simp equations `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)`, so it cannot be instantiated as `posLog_pow n x` in `rw`/`simp` or term mode.",
+    "requested_change": "Make the variables explicit, e.g. `@[simp] lemma posLog_pow (n : ℕ) (x : ℝ) : log⁺ (x ^ n) = n * log⁺ x`.",
+    "severity": "advisory",
+    "evidence": "Read the file as the PR leaves it: `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` (the other @[simp] equations) use explicit binders; `Real.log_pow (x : ℝ) (n : ℕ)` in Log/Basic.lean:267 is explicit. lean_verify_edit with `lemma posLog_pow (n : ℕ) (x : ℝ) : log⁺ (x ^ n) = n * log⁺ x := by simp [posLog, mul_max_of_nonneg _ _ n.cast_nonneg]`: outcome `compiled` (no other use of the lemma in the file or in Mathlib, per content_search for `posLog_pow`)."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "The docstring of `Real.posLog_pow` says \"`log⁺` commutes with taking powers\", which is false as stated: commuting would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺ (a ^ n) = n * log⁺ a`.",
+    "requested_change": "Reword the docstring to state what the lemma says, e.g. `/-- The positive part of the logarithm of a power: `log⁺ (x ^ n) = n * log⁺ x`. -/`.",
+    "severity": "advisory",
+    "evidence": "Read the statement `log⁺ (a ^ n) = n * log⁺ a` at PosLog.lean:101-103 against its docstring at line 101."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_nonneg` and `norm_sum_le`, which hold in any seminormed additive commutative group.",
+    "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]` (and do the same for the neighbouring `posLog_norm_add_le` if touched).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing the declaration with the `[SeminormedAddCommGroup E]` version (term proof below): outcome `compiled`, no errors or warnings. precedent_search on this code returned a maintainer asking \"Is this true in a seminormed ring?\" on a `NormedRing` lemma (eric-wieser, PR #18027)."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "The two-step `calc` in `Real.posLog_norm_sum_le` (an `apply` that leaves a `_` side goal closed by `simp [Finset.sum_nonneg ...]`, then `posLog_sum`) is a single transitivity of the monotonicity step with `posLog_sum`.",
+    "requested_change": "Replace the proof by the term `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Real.posLog_norm_sum_le with `:=\\n  (monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _)\\n    (norm_sum_le s f)).trans (posLog_sum s _)` (together with `[SeminormedAddCommGroup E]`): outcome `compiled`, no errors, no warnings."
+  }
+]

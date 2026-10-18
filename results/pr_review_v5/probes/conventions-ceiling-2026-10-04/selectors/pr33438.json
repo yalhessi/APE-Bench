@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P003",
+  "where": "Real.arctan_sqrt_three, Real.arctan_inv_sqrt_three",
+  "why": "Both tagged @[simp]: arctan applied to a canonical argument, right-hand side a simpler multiple of pi."
+ },
+ {
+  "id": "P077",
+  "where": "both proofs, `all_goals · field_simp; norm_num`",
+  "why": "Side goals closed by a chain of flexible normalisers, field_simp followed by norm_num."
+ },
+ {
+  "id": "P424",
+  "where": "Real.arctan_sqrt_three, Real.arctan_inv_sqrt_three",
+  "why": "Specific values of arctan added as lemmas value by value."
+ },
+ {
+  "id": "P109",
+  "where": "both proofs, side goals of `arctan_tan`",
+  "why": "Side conditions left by rw with arctan_tan are handled afterwards with an all_goals combinator."
+ },
+ {
+  "id": "P184",
+  "where": "both proofs, `all_goals` block",
+  "why": "Sibling goals from arctan_tan dispatched together with all_goals and one script."
+ },
+ {
+  "id": "P040",
+  "where": "both proofs",
+  "why": "Short tactic blocks where a term like arctan_one's `arctan_eq_of_tan_eq tan_pi_div_four <| ...` could serve."
+ },
+ {
+  "id": "P011",
+  "where": "both theorems, compare arctan_one",
+  "why": "Results follow directly from library lemmas arctan_eq_of_tan_eq / arctan_tan with tan_pi_div_three/six."
+ },
+ {
+  "id": "P005",
+  "where": "both proofs, range side goals",
+  "why": "Bounds like -(pi/2) < pi/3 may be closed by a standard finisher (linarith, positivity)."
+ },
+ {
+  "id": "P341",
+  "where": "Real.arctan_sqrt_three, Real.arctan_inv_sqrt_three",
+  "why": "Declared with `theorem` and carry no docstring."
+ },
+ {
+  "id": "P019",
+  "where": "names arctan_sqrt_three, arctan_inv_sqrt_three",
+  "why": "New lemma names built from arctan, inv, sqrt and the numeral in the statement."
+ },
+ {
+  "id": "P432",
+  "where": "names arctan_sqrt_three, arctan_inv_sqrt_three",
+  "why": "Equation lemmas named for their left-hand side only."
+ },
+ {
+  "id": "P363",
+  "where": "Real.arctan_inv_sqrt_three statement",
+  "why": "Argument spelled (√3)⁻¹ while tan_pi_div_six uses 1 / √3; proof bridges with inv_eq_one_div."
+ },
+ {
+  "id": "P191",
+  "where": "both @[simp] statements",
+  "why": "Simp lemma statements, e.g. (√3)⁻¹ and π / 3, must be in simp-normal form."
+ },
+ {
+  "id": "P100",
+  "where": "family arctan_one / arctan_eq_pi_div_four and the new lemmas",
+  "why": "arctan_one has an iff companion arctan_eq_pi_div_four; new values lack analogous variants."
+ },
+ {
+  "id": "P259",
+  "where": "Arctan.lean, inserted after arctan_one",
+  "why": "New arctan value lemmas placed beside existing arctan_one."
+ },
+ {
+  "id": "P086",
+  "where": "both theorems",
+  "why": "New lemmas for arctan values; a library declaration may already state them."
+ },
+ {
+  "id": "P154",
+  "where": "both theorems",
+  "why": "Lemmas combine tan_pi_div_three/six with arctan_tan, instantiating existing lemmas."
+ },
+ {
+  "id": "P133",
+  "where": "both proofs, `field_simp` before `norm_num`",
+  "why": "Non-terminal field_simp whose output is consumed by norm_num."
+ },
+ {
+  "id": "P018",
+  "where": "both proofs, `field_simp` then `norm_num`",
+  "why": "Two consecutive tactic calls that a single call might perform."
+ },
+ {
+  "id": "P119",
+  "where": "both proofs",
+  "why": "Steps such as field_simp or inv_eq_one_div rewrite may be unneeded."
+ },
+ {
+  "id": "P070",
+  "where": "name arctan_inv_sqrt_three",
+  "why": "Name must spell arctan, inv, sqrt, three in head-first order of the statement."
+ },
+ {
+  "id": "P254",
+  "where": "names of both theorems, siblings arctan_one, tan_pi_div_six",
+  "why": "New names should follow the pattern of sibling value lemmas' names."
+ },
+ {
+  "id": "P157",
+  "where": "both equations",
+  "why": "Equations orient compound arctan side left, simpler pi multiple right."
+ },
+ {
+  "id": "P024",
+  "where": "both proofs",
+  "why": "Flexible field_simp/norm_num used where a short explicit proof (linarith [pi_pos]) exists."
+ },
+ {
+  "id": "P028",
+  "where": "Real.arctan_inv_sqrt_three",
+  "why": "Value for 1/√3 stated in one argument form; variants √3/3 or 1/√3 users may apply."
+ }
+]

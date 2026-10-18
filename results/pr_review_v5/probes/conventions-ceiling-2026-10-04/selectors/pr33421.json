@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P081",
+  "where": "Topology/Algebra/Order/Floor.lean: continuousAt_floor, continuousOn_floor_compl_range, continuousOn_ceil_compl_range vs continuousAt_ceil, continuousAt_round, continuousOn_round",
+  "why": "@[fun_prop] is put on some sibling continuity lemmas (floor, compl_range) but not on continuousAt_ceil or the round ones."
+ },
+ {
+  "id": "P323",
+  "where": "continuousAt_floor, continuousAt_ceil, continuousAt_round, continuousOn_round, continuousOn_*_compl_range",
+  "why": "New lemmas stating continuity of floor, ceil, round; whether each is tagged @[fun_prop]."
+ },
+ {
+  "id": "P048",
+  "where": "tendsto_round_nhdsGE_pure, tendsto_round_nhdsLT_pure_half_ceil, continuousAt_round, continuousOn_round",
+  "why": "Four consecutive theorems each repeat [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α] in their signatures."
+ },
+ {
+  "id": "P332",
+  "where": "Topology/Algebra/Order/Floor.lean section OrderClosedTopology / section Ring",
+  "why": "PR reorganises sections, removes an omit, adds mid-section variable; declarations need different typeclass assumptions."
+ },
+ {
+  "id": "P113",
+  "where": "round_eq' (Algebra/Order/Round.lean)",
+  "why": "New variant of round_eq distinguished from its sibling only by a prime."
+ },
+ {
+  "id": "P211",
+  "where": "round_eq'",
+  "why": "Primed name round_eq' added beside unprimed round_eq, which lives in a narrower (field) section."
+ },
+ {
+  "id": "P432",
+  "where": "round_eq', round_eq",
+  "why": "Equation lemma named with bare _eq suffix, not naming its right-hand side (2 * x floor formula)."
+ },
+ {
+  "id": "P254",
+  "where": "tendsto_round_nhdsGE_pure, tendsto_round_nhdsLT_pure_half_ceil vs tendsto_floor_right_pure_floor; Int.ceil_intCast_add family",
+  "why": "New names must follow siblings' patterns; existing floor tendsto lemmas use right/left, new ones nhdsGE/nhdsLT."
+ },
+ {
+  "id": "P117",
+  "where": "tendsto_round_nhdsGE_pure, tendsto_round_nhdsLT_pure_half_ceil",
+  "why": "Filter-valued Tendsto statements about round with pure/nhdsWithin, added without a docstring stating their meaning."
+ },
+ {
+  "id": "P165",
+  "where": "tendsto_round_nhdsGE_pure, tendsto_round_nhdsLT_pure_half_ceil",
+  "why": "Each proof builds an inner have Tendsto (2 * ·) on one-sided neighbourhoods, a fact of independent use, duplicated."
+ },
+ {
+  "id": "P078",
+  "where": "Round.lean (public import -> import) and the private imports added in eleven other files",
+  "why": "Non-public imports added and a public import demoted, with no comment justifying them."
+ },
+ {
+  "id": "P030",
+  "where": "imports of Round.lean, Topology/Algebra/Order/Floor.lean, and eleven downstream files",
+  "why": "PR adds and changes imports across many files; each must be needed and not already provided."
+ },
+ {
+  "id": "P003",
+  "where": "Int.ceil_intCast_add, Int.ceil_natCast_add, Int.ceil_one_add, Int.ceil_ofNat_add",
+  "why": "New lemmas pushing ceil through left addition of a cast or numeral, tagged @[simp]."
+ },
+ {
+  "id": "P100",
+  "where": "Int.ceil_*_add (counterparts of ceil_add_*), continuousAt_floor/continuousAt_ceil, tendsto_round_nhdsGE/LT",
+  "why": "Variants added for one member of sibling families (left/right addition, floor/ceil); counterparts must match."
+ },
+ {
+  "id": "P387",
+  "where": "continuousAt_fract, continuousOn_fract",
+  "why": "Continuity goals proved by hand-applying .sub and .comp with continuous_of_discreteTopology rather than fun_prop."
+ },
+ {
+  "id": "P301",
+  "where": "continuousOn_floor, continuousOn_ceil (modified statements)",
+  "why": "Statement keeps lambda fun x => floor x, a single application, while new lemmas write floor directly."
+ },
+ {
+  "id": "P019",
+  "where": "two_mul_fract_eq_one_iff_exists_int, round_eq_half_ceil_two_mul, continuousOn_floor_compl_range, tendsto_round_nhdsLT_pure_half_ceil",
+  "why": "New lemma names must be built from the declarations in their statements (half for / 2, compl_range)."
+ },
+ {
+  "id": "P070",
+  "where": "round_eq_half_ceil_two_mul, tendsto_round_nhdsLT_pure_half_ceil",
+  "why": "Name spells ⌈2 * x⌉ / 2 as half_ceil_two_mul; order of terms in name versus statement."
+ },
+ {
+  "id": "P363",
+  "where": "continuousAt_round, continuousOn_round, round_eq_half_ceil_two_mul (2 * fract x ≠ 1); continuousAt_floor (x ≠ ⌊x⌋); (range Int.cast)ᶜ",
+  "why": "New hypotheses and sets are spelled in chosen forms; must match the library's most used spelling."
+ },
+ {
+  "id": "P329",
+  "where": "proofs of round_eq, round_two_inv, round_neg_two_inv, round_eq_zero_iff, continuousOn_fract, continuousAt_fract",
+  "why": "PR rewrites proofs of existing declarations alongside adding API; incidental rewrites are the situation."
+ },
+ {
+  "id": "P043",
+  "where": "whole PR: ceil lemmas, round formulas, continuity of floor/ceil/round, import reshuffle in 15 files",
+  "why": "One PR combines several separable parts across 15 files."
+ },
+ {
+  "id": "P024",
+  "where": "round_two_inv, round_neg_two_inv, round_eq_zero_iff",
+  "why": "Explicit simp only / rw proofs replaced by flexible norm_num or simp [round_eq_iff] automation."
+ },
+ {
+  "id": "P322",
+  "where": "Int.two_mul_fract_eq_one_iff_exists_int",
+  "why": "refine ⟨fun hx ↦ _, ?_⟩ leaves a ∀-goal then handled by a following rintro."
+ },
+ {
+  "id": "P094",
+  "where": "tendsto_round_nhdsGE_pure, tendsto_round_nhdsLT_pure_half_ceil",
+  "why": "Monotonicity step discharged by named lemmas add_le_add ha ha and add_lt_add ha ha."
+ },
+ {
+  "id": "P072",
+  "where": "continuousOn_floor, continuousOn_ceil",
+  "why": "Existing lemmas' statements change codomain from α to ℤ; the α-valued versions are removed without deprecation."
+ }
+]

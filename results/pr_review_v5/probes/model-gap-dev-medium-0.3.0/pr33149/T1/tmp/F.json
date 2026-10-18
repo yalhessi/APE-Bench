@@ -1,0 +1,1 @@
+{"line_start": 99, "line_end": 101, "replacement": "open scoped ContDiff in\n/-- Smooth function of time -/\ndef smoothInTime (f : \u211d \u2192 \u211d) : Prop :=\n  ContDiff \u211d \u221e f"}

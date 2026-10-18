@@ -1,0 +1,377 @@
+{
+ "seed": "stage-g-2026-10-05",
+ "per_entry": 2,
+ "sets": [
+  "val1000",
+  "outside_years"
+ ],
+ "entries": {
+  "P005": [
+   {
+    "cid": "v0173",
+    "pr": 26293,
+    "event_id": "event:f3c00031a74b3429f200ce66",
+    "path": "Mathlib/MeasureTheory/Measure/LevyConvergence.lean"
+   },
+   {
+    "cid": "v1469",
+    "pr": 32911,
+    "event_id": "event:a53b4840757856d1135384ae",
+    "path": "Mathlib/Analysis/SpecialFunctions/Elliptic/Weierstrass.lean"
+   }
+  ],
+  "P010": [
+   {
+    "cid": "w0239",
+    "pr": 38114,
+    "event_id": "event:14dc09de66ca655826f942fb",
+    "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean"
+   },
+   {
+    "cid": "w0153",
+    "pr": 42048,
+    "event_id": "event:0183cc2a99a05833131daa6e",
+    "path": "Mathlib/RingTheory/Ideal/Norm/AbsNorm.lean"
+   }
+  ],
+  "P011": [
+   {
+    "cid": "v1908",
+    "pr": 35607,
+    "event_id": "event:b62fb8641f1c88a71bc134bf",
+    "path": null
+   },
+   {
+    "cid": "v1512",
+    "pr": 33060,
+    "event_id": "event:710f393e244f9ff47ba916c7",
+    "path": "Mathlib/RingTheory/Valuation/Discrete/Basic.lean"
+   }
+  ],
+  "P018": [
+   {
+    "cid": "w0344",
+    "pr": 40188,
+    "event_id": "event:eb637f576a75f6ec8c35bba6",
+    "path": "Mathlib/MeasureTheory/VectorMeasure/Variation/Basic.lean"
+   },
+   {
+    "cid": "v1058",
+    "pr": 30645,
+    "event_id": "event:0da67ab283f197963247a77b",
+    "path": "Mathlib/RingTheory/Localization/FractionRing.lean"
+   }
+  ],
+  "P030": [
+   {
+    "cid": "v0870",
+    "pr": 29694,
+    "event_id": "event:9ae8763cc8020e2ae6dfab5f",
+    "path": "Mathlib/Tactic/TacticAnalysis/Declarations.lean"
+   },
+   {
+    "cid": "v1745",
+    "pr": 34534,
+    "event_id": "event:1cec4a4824060b3276dd61ed",
+    "path": "Mathlib/NumberTheory/Height/Basic.lean"
+   }
+  ],
+  "P040": [
+   {
+    "cid": "v0010",
+    "pr": 25383,
+    "event_id": "event:00f755b3260e6e788b951f14",
+    "path": "Mathlib/Topology/VectorBundle/Hom.lean"
+   },
+   {
+    "cid": "v1835",
+    "pr": 35124,
+    "event_id": "event:eafe137b65bcff206269da53",
+    "path": "Mathlib/CategoryTheory/Functor/Flat.lean"
+   }
+  ],
+  "P041": [
+   {
+    "cid": "v0446",
+    "pr": 27299,
+    "event_id": "event:cc6644023341ed54696db21b",
+    "path": null
+   },
+   {
+    "cid": "v0536",
+    "pr": 27841,
+    "event_id": "event:0e943b1f895330fcaeb27684",
+    "path": null
+   }
+  ],
+  "P048": [
+   {
+    "cid": "v2080",
+    "pr": 36353,
+    "event_id": "event:23c940ecf447ddac4328ca40",
+    "path": "Mathlib/NumberTheory/NumberField/InfinitePlace/Ramification.lean"
+   },
+   {
+    "cid": "v1928",
+    "pr": 35768,
+    "event_id": "event:dbef2e8c93be5a71c5461ce0",
+    "path": "Mathlib/RingTheory/DividedPowers/Basic.lean"
+   }
+  ],
+  "P060": [
+   {
+    "cid": "v0991",
+    "pr": 30348,
+    "event_id": "event:795c3132b3541eacd9b030c8",
+    "path": "Mathlib/MeasureTheory/Function/ConvergenceInDistribution.lean"
+   },
+   {
+    "cid": "v0865",
+    "pr": 29682,
+    "event_id": "event:523d10b60d3dc74ab02be7c6",
+    "path": "Mathlib/Analysis/InnerProductSpace/Harmonic/Analytic.lean"
+   }
+  ],
+  "P063": [
+   {
+    "cid": "v1918",
+    "pr": 35640,
+    "event_id": "event:47c9efea077942255ae916dd",
+    "path": "Mathlib/Analysis/Complex/Harmonic/Liouville.lean"
+   },
+   {
+    "cid": "w0208",
+    "pr": 19955,
+    "event_id": "event:ac2d6f0035f19e752107cc96",
+    "path": "Mathlib/CategoryTheory/Presentable/Limits.lean"
+   }
+  ],
+  "P086": [
+   {
+    "cid": "w0062",
+    "pr": 42545,
+    "event_id": "event:c9cd596b2fe1ecac3322f402",
+    "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean"
+   },
+   {
+    "cid": "w0003",
+    "pr": 20182,
+    "event_id": "event:0be3f57f23b4e1f23b115027",
+    "path": "Mathlib/CategoryTheory/Distributive/Monoidal.lean"
+   }
+  ],
+  "P094": [
+   {
+    "cid": "v1864",
+    "pr": 35280,
+    "event_id": "event:c52678334690f2662fbe4a65",
+    "path": "Mathlib/Analysis/Polynomial/MahlerMeasure.lean"
+   },
+   {
+    "cid": "v0542",
+    "pr": 27912,
+    "event_id": "event:b4d7e212721d5c487f60521b",
+    "path": "Mathlib/Analysis/NormedSpace/OperatorNorm/NNNorm.lean"
+   }
+  ],
+  "P098": [
+   {
+    "cid": "v0669",
+    "pr": 28702,
+    "event_id": "event:63cc0b341794a763e54616e1",
+    "path": "Mathlib/Algebra/Group/Defs.lean"
+   },
+   {
+    "cid": "v1127",
+    "pr": 31169,
+    "event_id": "event:02a7709883d11b11eda7c256",
+    "path": "Mathlib/CategoryTheory/Products/Basic.lean"
+   }
+  ],
+  "P100": [
+   {
+    "cid": "w0174",
+    "pr": 24712,
+    "event_id": "event:bfeedc86c8dbcf3c3c204a3a",
+    "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean"
+   },
+   {
+    "cid": "v0588",
+    "pr": 28106,
+    "event_id": "event:bf3aba0cb14910e3cbd069bb",
+    "path": null
+   }
+  ],
+  "P105": [
+   {
+    "cid": "v0232",
+    "pr": 26526,
+    "event_id": "event:719c0a06dc527f9370a631c1",
+    "path": "Mathlib/RingTheory/Valuation/IntegrallyClosed.lean"
+   },
+   {
+    "cid": "v0468",
+    "pr": 27457,
+    "event_id": "event:45458da8a5d4227bc14ee3e3",
+    "path": "Mathlib/MeasureTheory/Function/LocallyIntegrable.lean"
+   }
+  ],
+  "P113": [
+   {
+    "cid": "v1096",
+    "pr": 31007,
+    "event_id": "event:3e6c1c3a06d71b22da720f44",
+    "path": "Mathlib/RingTheory/Perfection.lean"
+   },
+   {
+    "cid": "v1490",
+    "pr": 32992,
+    "event_id": "event:890428fc888a21850a50a3a2",
+    "path": "Mathlib/Analysis/Fourier/Convolution.lean"
+   }
+  ],
+  "P153": [
+   {
+    "cid": "v0234",
+    "pr": 26528,
+    "event_id": "event:369ba2f34c6e2ed9e04225c4",
+    "path": "Mathlib/Geometry/Euclidean/Sphere/Tangent.lean"
+   },
+   {
+    "cid": "v1362",
+    "pr": 32537,
+    "event_id": "event:a4863ca125dd21f091df926c",
+    "path": "Mathlib/RingTheory/Algebraic/StronglyTranscendental.lean"
+   }
+  ],
+  "P185": [
+   {
+    "cid": "v1172",
+    "pr": 31447,
+    "event_id": "event:ace00206cab1993affa54e49",
+    "path": "Mathlib/Lean/Meta/RefinedDiscrTree/Initialize.lean"
+   },
+   {
+    "cid": "v0816",
+    "pr": 29464,
+    "event_id": "event:9906a9982e4ea3030e57a0e7",
+    "path": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean"
+   }
+  ],
+  "P201": [
+   {
+    "cid": "v1852",
+    "pr": 35208,
+    "event_id": "event:d5ea90d9ed5e3c90fc95cd55",
+    "path": "Mathlib/Order/Bounds/Basic.lean"
+   },
+   {
+    "cid": "v1630",
+    "pr": 34075,
+    "event_id": "event:323a399c285ab7f572476fba",
+    "path": "Mathlib/SetTheory/Cardinal/ContinuumHypothesis.lean"
+   }
+  ],
+  "P254": [
+   {
+    "cid": "v0110",
+    "pr": 26000,
+    "event_id": "event:bbb4649069464e65e91a91ba",
+    "path": "Mathlib/RingTheory/MvPolynomial/MonomialOrder.lean"
+   },
+   {
+    "cid": "w0084",
+    "pr": 40492,
+    "event_id": "event:99048c4eecf718797f0cb08e",
+    "path": "Mathlib/Algebra/Order/Module/PositiveLinearMap.lean"
+   }
+  ],
+  "P263": [
+   {
+    "cid": "v1815",
+    "pr": 34908,
+    "event_id": "event:facca148a39ed85f2610657f",
+    "path": "Mathlib/Algebra/Group/Subgroup/Basic.lean"
+   },
+   {
+    "cid": "v1069",
+    "pr": 30774,
+    "event_id": "event:a919aac321caad2e794acf10",
+    "path": "Mathlib/Algebra/Order/WithTop/Untop0.lean"
+   }
+  ],
+  "P276": [
+   {
+    "cid": "v2123",
+    "pr": 36593,
+    "event_id": "event:f3547506877a27f0bfb7e617",
+    "path": "Mathlib/Algebra/Homology/Factorizations/CM5a.lean"
+   },
+   {
+    "cid": "v2124",
+    "pr": 36593,
+    "event_id": "event:bc465cd4b8891e73faf9f007",
+    "path": "Mathlib/Algebra/Homology/Factorizations/CM5a.lean"
+   }
+  ],
+  "P278": [
+   {
+    "cid": "v0492",
+    "pr": 27599,
+    "event_id": "event:4fccff7ebf25004897b34350",
+    "path": "Mathlib/Combinatorics/SimpleGraph/CompleteMultipartite.lean"
+   },
+   {
+    "cid": "v0512",
+    "pr": 27720,
+    "event_id": "event:b83917886b432e8508457b7f",
+    "path": "Mathlib/CategoryTheory/Adjunction/Quadruple.lean"
+   }
+  ],
+  "P315": [
+   {
+    "cid": "v0560",
+    "pr": 27942,
+    "event_id": "event:a7ac27d4e24311c7965c28f7",
+    "path": "Mathlib/Topology/Algebra/Module/LinearMap.lean"
+   }
+  ],
+  "P329": [
+   {
+    "cid": "v1604",
+    "pr": 33885,
+    "event_id": "event:0f38c85ab13fa66dcb2fb35b",
+    "path": "Mathlib/RingTheory/MvPowerSeries/Expand.lean"
+   },
+   {
+    "cid": "v1012",
+    "pr": 30398,
+    "event_id": "event:1350ab9cd41bcf99362487e6",
+    "path": "Mathlib/Algebra/Category/ModuleCat/Sheaf/Free.lean"
+   }
+  ],
+  "P369": [
+   {
+    "cid": "w0303",
+    "pr": 38105,
+    "event_id": "event:3dc3e1843b68e37b607b1cdb",
+    "path": "Mathlib/Topology/EMetricSpace/Defs.lean"
+   },
+   {
+    "cid": "w0302",
+    "pr": 38105,
+    "event_id": "event:876c1467283473af80bc93b6",
+    "path": "Mathlib/Topology/EMetricSpace/Defs.lean"
+   }
+  ],
+  "P392": [],
+  "P401": [
+   {
+    "cid": "v1875",
+    "pr": 35399,
+    "event_id": "event:0ad71bcfd254c2076e6472a4",
+    "path": "Mathlib/Analysis/Complex/Poisson.lean"
+   }
+  ]
+ }
+}

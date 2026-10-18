@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean", "line_start": 176, "line_end": 176, "replacement": "\ndef controlNoncomp : \u2115 := Classical.choice \u27e80\u27e9\n"}

@@ -5,7 +5,12 @@ Writes `selectors/pr<N>.json` (each selection as written) and `briefs_applicable
 (`{"prs": {pr: [ids]}}`, what `cli probe packets --conventions` reads). Then, with the asks, which the
 selectors never saw: for each in-census ask on these PRs, whether an entry behind it is in the brief.
 
-usage (repo root): python3 <this file> <selector scratch dir>
+With `--table` (the one reviewer table, 2026-10-10) it writes `briefs_applicable_t.json` instead:
+stage F's ten briefs as they are, plus the folders in the scratch dir, which may not name a PR
+already selected; `selectors/` gains only the new files, and the retrieval reading covers the new
+PRs that have exact briefs (`applicable_retrieval_t.json`).
+
+usage (repo root): python3 <this file> <selector scratch dir> [--table]
 """
 import json
 import sys
@@ -15,7 +20,11 @@ HERE = Path(__file__).parent
 CODEBOOK = Path("results/pr_review_v5/adjudications/conventions-census-v1/reader_A/codebook.json")
 ids = {e["id"] for e in json.loads(CODEBOOK.read_text())}
 exact = json.loads((HERE / "briefs_exact.json").read_text())
+table = sys.argv[2:3] == ["--table"]
 briefs, held = {}, {}
+if table:
+    briefs = json.loads((HERE / "briefs_applicable.json").read_text())["prs"]
+    kept = set(briefs)
 (HERE / "selectors").mkdir(exist_ok=True)
 for folder in sorted(Path(sys.argv[1]).glob("pr*")):
     rows = json.loads((folder / "selected.json").read_text())
@@ -23,9 +32,13 @@ for folder in sorted(Path(sys.argv[1]).glob("pr*")):
     assert all(set(r) == {"id", "where", "why"} for r in rows), f"{folder.name}: keys"
     assert set(picked) <= ids and len(set(picked)) == len(picked) <= 25, f"{folder.name}: ids"
     pr = folder.name[2:]
+    if table:
+        assert pr not in kept and not (HERE / "selectors" / f"{folder.name}.json").exists(), f"{pr} was selected already"
     briefs[pr] = picked
     (HERE / "selectors" / f"{folder.name}.json").write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n")
-(HERE / "briefs_applicable.json").write_text(json.dumps({"prs": briefs}, indent=1) + "\n")
+(HERE / ("briefs_applicable_t.json" if table else "briefs_applicable.json")).write_text(json.dumps({"prs": briefs}, indent=1) + "\n")
+if table:
+    briefs = {pr: v for pr, v in briefs.items() if pr not in kept and pr in exact["prs"]}
 
 asks = {c: a for c, a in exact["asks"].items() if a["in_census"] and str(a["pr"]) in briefs}
 for cid, a in asks.items():
@@ -37,4 +50,4 @@ for pr in briefs:
     wanted = sorted(set(exact["prs"][pr]))
     print(f"  {pr}: asks {sum(held[c] for c in mine)}/{len(mine)} | exact entries selected "
           f"{sorted(set(wanted) & set(briefs[pr]))} of {wanted}")
-(HERE / "applicable_retrieval.json").write_text(json.dumps(held, indent=1) + "\n")
+(HERE / ("applicable_retrieval_t.json" if table else "applicable_retrieval.json")).write_text(json.dumps(held, indent=1) + "\n")

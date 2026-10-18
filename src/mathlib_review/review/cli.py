@@ -220,6 +220,13 @@ def build_parser() -> argparse.ArgumentParser:
     parsers["packets"].add_argument("--candidates", type=Path, metavar="BRIEFS",
                                     help='end each brief with its PR\'s pinpointed candidates instead: a JSON '
                                          '{"prs": {pr: [items]}} (probes.load_candidates; needs --prs)')
+    parsers["packets"].add_argument("--conventions-from", type=Path,
+                                   help="end each brief with the conventions section of its PR's row in a "
+                                        "solo context file, byte for byte (probes.context_sections)")
+    parsers["packets"].add_argument("--candidates-lead", default="verify",
+                                    choices=["verify", "disposition", "ledger"],
+                                    help="the candidates section's lead (probes.CANDIDATES_LEADS); "
+                                         "verify is stage G's")
     parsers["feedback"].add_argument("--write", action="store_true")
     for name in ("readers", "match-inputs"):
         parsers[name].add_argument("--out", required=True, type=Path)
@@ -232,6 +239,12 @@ def build_parser() -> argparse.ArgumentParser:
         parsers[name].add_argument("--seal", required=True, type=Path)
     parsers["match-inputs"].add_argument("--sources", required=True, type=Path,
                                          help='JSON {session: {"kind": "claude|solo|lead", "run": ...}}')
+    parsers["match-inputs"].add_argument("--question-form", action="store_true",
+                                         help="the rubric that judges a question to the author like any "
+                                              "finding (probes.MATCHER_RUBRIC_QUESTIONS)")
+    parsers["match-inputs"].add_argument("--harness-blind", action="store_true",
+                                         help="cut Claude sessions to the solo budget, locate their targets "
+                                              "as path:line, and redact the conventions cues (probes.match_inputs)")
     parsers["unblind"].add_argument("--matches", required=True, type=Path,
                                     help="a directory with matches.1.json, matches.2.json, session_stats.json")
     parsers["unblind"].add_argument("--scope", nargs="+", help="families to restrict to")
@@ -703,7 +716,9 @@ def _probe(args, logger) -> int:
         written = probes.write_packets(
             spec, args.sessions, args.scratch.resolve(), prs=args.prs,
             conventions=probes.load_conventions(args.conventions, args.codebook) if args.conventions else None,
-            candidates=probes.load_candidates(args.candidates) if args.candidates else None)
+            candidates=probes.load_candidates(args.candidates) if args.candidates else None,
+            candidates_lead=args.candidates_lead,
+            sections=probes.context_sections(args.conventions_from) if args.conventions_from else None)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "prompts":
         for pr in args.prs or spec.pr_numbers:
@@ -746,13 +761,15 @@ def _probe(args, logger) -> int:
         inputs = args.out / "inputs"
         stats = probes.match_inputs(spec, json.loads(spec.feedback_file.read_text()),
                                     json.loads(spec.asks_file.read_text()),
-                                    json.loads(args.seal.read_text()), sources, inputs)
+                                    json.loads(args.seal.read_text()), sources, inputs,
+                                    harness_blind=args.harness_blind)
         files = sorted(p for p in inputs.iterdir() if p.name != "session_stats.json")
         seal = json.loads(args.seal.read_text())
         reviewers = {len(labels) for labels in seal.values()}
         if len(reviewers) != 1:
             raise SystemExit(f"every sealed PR needs the same number of reviewers, got {sorted(reviewers)}")
-        rubric = probes.matcher_rubric(reviewers.pop(), len(seal))
+        rubric = probes.matcher_rubric(reviewers.pop(), len(seal), probes.MATCHER_RUBRIC_QUESTIONS
+                                       if args.question_form else probes.MATCHER_RUBRIC)
         for d in probes.judge_folders(args.out, 2, files, probes.MATCHER_RUBRIC, rubric_text=rubric):
             print(json.dumps({"folder": str(d.resolve()),
                               "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))

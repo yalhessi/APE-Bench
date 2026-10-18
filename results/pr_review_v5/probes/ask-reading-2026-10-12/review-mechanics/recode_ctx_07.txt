@@ -1,0 +1,88 @@
+=== P14_val 32875 v0091 AP1 [P14val_a]  family F3  Mathlib/Data/Rat/Lemmas.lean:303
+ASK: Same here.
+CODE AT COMMENT: @@ -300,10 +300,8 @@ theorem inv_natCast_num_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.num = 1 |    inv_intCast_num_of_pos (mod_cast ha0 : 0 < (a : ℤ)) |   |  theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by | -  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one] | -  apply den_div_eq_of_coprime ha0 | -  rw [Int.natAbs_one] | -  exact Nat.coprime_one_left _ | +  simp only [den_inv, num_intCast]
+MATCHER: m1 no (Tag den_inv/num_intCast @[grind]. R10 suggests grind [den_inv, num_intCast] (partial); others drop grind.) | m2 no (Tag with grind. R10's fallback feeds den_inv, num_intCast to grind as arguments: partial.)
+READER: O l.40 ap=n/a/None know=direction
+  quote: there's a lighter route, but it's not obviously shorter/better than grind. (filed: revert, slower per the PR's profile)
+SUBMITTED FINDINGS at that file:
+  [1] Mathlib/Data/Rat/Lemmas.lean: `Rat.inv_intCast_den_of_pos` is now closed by `grind` (after `simp only [den_inv, num_intCast]`), again replacing a short explicit proof while the PR's own profiling shows the declaration got slower (`<10 ms before, 17 m
+TRANSCRIPT around l.40 (+-1):
+[39] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[40] REASONING: Interesting results:
+
+1. For `Finset.mem_map_equiv`, `mem_map_of_injective` is a `Multiset` lemma and the goal state shows `f.symm (f (f.symm b)) ∈ s` — wait, the expected type shows LHS `f (f.symm b) ∈ map f.toEmbedding s` and RHS `f.symm (f (f.symm b)) ∈ s`. Hmm, so `rw [← f.apply_symm_apply b]` rewrote both occurrences of `b`. Need `simp` afterwards. So it needs `simpa using mem_map_of_injective ...`. Not clean.
+
+2. For `Rat.inv_intCast_den_of_pos`, my alternative `simp only [den_inv, num_intCast]; simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` compiles! Hmm, so there's a lighter route, but it's not obviously shorter/better than grind. Hmm. Wait — did the second `simp` need explicit args? It compiled. Hmm, interesting. But is that a *better* proof than `grind`? It's two `simp`s... Actually maybe simpler: `simp only [den_inv, num_intCast, ha0.ne', ite_false, Int.natAbs_of_nonneg ha0.le, Int.toNat_of_nonneg ha0.le, Int.cast_natCast]`? Let me test a single `simp only` without grind.
+
+Hmm, what would the maintainer want? For `Rat.inv_intCast_den_of_pos`, the neighbouring style is `simp 
+[40] TOOL file_read: {"file_path": "target/Mathlib/MeasureTheory/Constructions/Pi.lean", "line_start": 440, "line_end": 475, "omit_details": false}
+[40] TOOL file_read: {"file_path": "target/Mathlib/Order/LiminfLimsup.lean", "line_start": 1135, "line_end": 1165, "omit_details": false}
+[41] RESULT file_read: {"success": true, "content": "   437|theorem ae_le_set_pi {I : Set ι} {s t : ∀ i, Set (α i)} (h : ∀ i ∈ I, s i ≤ᵐ[μ i] t i) :\n   438|    Set.pi I s ≤ᵐ[Measure.pi μ] Set.pi I t :=\n   439|  ((eventual
+
+GREP 'den_inv|grind =':
+--- line 3 TEXT[user] (match 'den_inv|grind =')
+  apply den_div_eq_of_coprime ha0   rw [Int.natAbs_one]   exact Nat.coprime_one_left _ ``` - as the PR leaves it: ```lean theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by   simp only [den_inv, num_intCast]   grind ```  ### `MeasureTheory.Measure.pi_map_piCongrLeft` (lemma, modified) [d11aac133e] - file: `Mathlib/MeasureTheory/Constructions/Pi.lean`; changed: proof:modified - before the PR: ```lean lemma pi_m
+
+--- line 6 TOOL_RESULT file_read (match 'den_inv|grind =')
+nset α).map f = ∅ :=/- ... omitted ... -/\n    65|\n    66|variable {f : α ↪ β} {s : Finset α}\n    67|\n    68|@[simp, grind =]\n    69|theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=/- ... omitted ... -/\n    73|@[simp 1100]\n    74|
+
+--- line 11 TOOL_RESULT file_read (match 'den_inv|grind =')
+(∅ : Finset α).map f = ∅ :=\n    64|  rfl\n    65|\n    66|variable {f : α ↪ β} {s : Finset α}\n    67|\n    68|@[simp, grind =]\n    69|theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=\n    70|  Multiset.mem_map\n    71|\n    72|-- Hig
+
+--- line 12 TOOL_RESULT file_read (match 'den_inv|grind =')
+ 301|\n   302|theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n   303|  simp only [den_inv, num_intCast]\n   304|  grind\n   305|\n   306|theorem inv_natCast_den_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.den = a
+
+--- line 13 REASONING (match 'den_inv|grind =')
+ult is consumed by another tactic is squeezed to `simp only [...]`" — in `Finset.mem_map_equiv`, `simp only [mem_map, Equiv.coe_toEmbedding]` then `grind`. Squeezed already.  In `Rat.inv_intCast_den_of_pos`: `simp only [den_inv, num_intCast]` then grind. Squeezed. Hmm but is `den_inv`/`num_intCast` needed? Whatever.  Portmanteau: new proof is ``` simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h exact tendsto_o
+
+--- line 16 REASONING (match 'den_inv|grind =')
+lication closes is not closed by heavy general automation (grind, aesop)". The old proof is a 4-line explicit `rw`+`exact ⟨...⟩`. Hmm. This is a legit advisory finding.  Actually wait. There's a subtlety: `mem_map` has `grind =` attribute, so `grind` can use it. And `simp only [mem_map, Equiv.coe_toEmbedding]` then `grind` — but could `simp` alone close it? Let's test: `simp [Finset.mem_map, Equiv.coe_toEmbedding]`? The goal after simp only is
+
+--- line 28 REASONING (match 'den_inv|grind =')
+ `by simpa using Multiset.mem_map_equiv ...`? Let me check if `Multiset` version exists.  Let me check `declaration_search` for `Multiset.mem_map_equiv` and `mem_map_equiv`.  2. `Rat.inv_intCast_den_of_pos`: `simp only [den_inv, num_intCast]; grind`. 17ms after vs <10ms before. Original short. Hmm. Note adjacent lemma `inv_intCast_num_of_pos` is `by simp [*]`. So the area uses `simp`. Could this be `by simp [*, den_inv, num_intCast]`? Let's te
+
+[stopped at --max 7 blocks]
+
+=== D12 33421 d0051 AP1 [D12c]  family F7  Mathlib/Algebra/Order/Floor/Ring.lean:277
+ASK: Better I think as ```suggestion theorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) : k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by rw [fract, mul_sub, sub_eq_iff_eq_add'] refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩ rintro ⟨n, hn⟩ convert hn have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn] simp [mul_add, hk] ```
+CODE AT COMMENT:  |  theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by |    simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a |   | +theorem two_mul_fract_eq_one_iff_exists_int {x : R} : | +    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by | +  rw [fract, mul_sub, sub_eq_iff_eq_add'] | +  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩ | +  rintro ⟨n, hn⟩ | +  convert hn | +  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn] | +  simp [mul_add]
+MATCHER: m1 no (No finding generalizes the lemma to k * fract x; several only move it to the fract section.) | m2 no (Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k.)
+READER: O l.19 ap=absent/None know=construction
+  quote: filed 'Move the lemma into the `#### Fractional part` section'; 'Its statement mentions `fract`. Hmm, the file is Floor/Ring … This is fine. Name check'
+SUBMITTED FINDINGS at that file:
+  [7] Mathlib/Algebra/Order/Floor/Ring.lean: `Int.two_mul_fract_eq_one_iff_exists_int` is a lemma about `Int.fract` placed in the `#### Floor` section, immediately after the floor-division lemmas `mul_cast_floor_div_cancel_of_pos`/`mul_natCast_floor_div_cancel`, wh
+TRANSCRIPT around l.19 (+-1):
+[18] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Algebra/Order/Floor/Ring.lean", "matches": [{"line_number": 8, "content": "     6|module\n     7|\n     8|public import Mathlib.Algebra.Order.Fie
+[19] REASONING: `add_mem_Ico_iff_left` is in `Interval.Set.Group`. The old proof of `round_eq_zero_iff` used it. The new proof uses `round_eq_iff` and `simp`. Does it still need the import? `round_eq_iff`'s proof uses `Ico` and `Set` membership, which may need `Interval.Set.Basic` (imported by Group). Hmm, `Set.Ico` is defined in `Mathlib.Order.Interval.Set.Defs` presumably. To use `x ∈ Ico a b` as a proposition you need the definition. The `Ico` notation is likely available via `Order.Interval.Set.Basic`? Round.lean had the import so it works. But is it necessary now?
+
+This is the "shake"-style question. Actually the pattern: they changed `public import` → `import` in Round.lean but kept the import. So Round.lean still imports it. If it's needed for `round_eq_iff`, the import must stay. Fine.
+
+Hmm, but wait: maybe the whole set of import changes is actually the reverse: perhaps the intent is `Round.lean` should now be importable without pulling in interval-set algebra, and the downstream files that need it now import it directly. `import` (private) vs `public import` — for the *file's own* use, `im
+[19] TOOL content_search: {"content_pattern": "floor_eq_on_Ico|ceil_eq_on_Ioc", "path": "target/Mathlib", "recursive": true, "limit": 20}
+[19] TOOL content_search: {"content_pattern": "cast_mul_floor_div_cancel_of_pos|mul_cast_floor_div_cancel_of_pos", "path": "target/Mathlib", "recursive": true, "limit": 20}
+[20] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Algebra/Order/Floor/Ring.lean", "matches": [{"line_number": 155, "content": "   153|theorem floor_eq_zero_iff : ⌊a⌋ = 0 ↔ a ∈ Ico (0 : R) 1 := by
+
+GREP 'two_mul_fract|generali':
+--- line 1 TEXT[system] (match 'two_mul_fract|generali')
+n the PR model (every changed object, its kind and what changed, with the families and relations the change graph finds), then the diff. Read all three.  Examine every target across all concern families: - proof-golf; - generalization; - duplication; - naming; - documentation; - style; - scope; - correctness.  There is no quota. Submit only actionable requests supported by the reviewed code, and submit none when no request is warranted.  Each f
+
+--- line 3 TEXT[user] (match 'two_mul_fract|generali')
+lean`; changed: attributes:added, name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean @[simp] theorem ceil_one_add (a : R) : ⌈1 + a⌉ = 1 + ⌈a⌉ :=   mod_cast ceil_natCast_add 1 a ```  ### `Int.two_mul_fract_eq_one_iff_exists_int` (theorem, added) [01e92e863a] - file: `Mathlib/Algebra/Order/Floor/Ring.lean`; changed: name:added, proof:added, statement_or_type:added - as the PR leaves it: ```lean theorem two_mul_fract_eq_one
+
+--- line 9 TOOL_RESULT file_read (match 'two_mul_fract|generali')
+round_intCast, ← two_mul, Int.mul_ediv_cancel_left _ two_ne_zero]\n    91|    · refine absurd ?_ hx\n    92|      exact two_mul_fract_eq_one_iff_exists_int.mpr ⟨m, mod_cast hm.symm⟩\n    93|  · rw [round_eq', (ceil_eq_floor_add_one_iff_notMem _).mpr hx'
+
+--- line 19 REASONING (match 'two_mul_fract|generali')
+l. Mathlib policy: type changes need to be reviewed and possibly noted in the PR description. Hmm.  Also `continuousOn_ceil` lost its `[IsStrictOrderedRing α]` requirement (now in the Ring section it's general) — that's generalization, good.  (c) `Int.two_mul_fract_eq_one_iff_exists_int` is placed in `Mathlib/Algebra/Order/Floor/Ring.lean` in the `LinearOrderedRing` section? Let me check placement: it's added right after `mul_natCast_floor_div_
+
+--- line 21 TOOL_RESULT content_search (match 'two_mul_fract|generali')
+ = ⌊a⌋ := by\n   268|  simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n   269|\n   270|theorem two_mul_fract_eq_one_iff_exists_int {x : R} :"}, {"line_number": 284, "content": "   282|variable {R : Type*} [CommRing R] [LinearOrd
+
+--- line 25 REASONING (match 'two_mul_fract|generali')
+inside `section round`, no namespace. So name is `round_eq'`. Let me call naming_norm with `round_eq'`. Hmm, the tool takes the full name of a declaration this PR adds or renames. `round_eq'` — maybe it resolves.  Also `two_mul_fract_eq_one_iff_exists_int`, `round_eq_half_ceil_two_mul`, `round_eq_iff`, `ceil_intCast_add`, etc.  Let's do a batch of tool calls: naming_norm for several names.
+
+--- line 25 TOOL_USE naming_norm (match 'two_mul_fract|generali')
+{"declaration": "Int.two_mul_fract_eq_one_iff_exists_int"}
+
+[stopped at --max 7 blocks]
+

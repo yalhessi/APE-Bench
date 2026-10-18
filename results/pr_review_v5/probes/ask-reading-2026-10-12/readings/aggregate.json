@@ -1,0 +1,632 @@
+{
+ "behaviour": {
+  "DX/D12": {
+   "O": 8,
+   "K": 22,
+   "V": 9,
+   "reached": 56,
+   "P": 12,
+   "E": 1,
+   "C": 32,
+   "A": 1
+  },
+  "DX/P14": {
+   "V": 8,
+   "C": 33,
+   "K": 42,
+   "reached": 39,
+   "O": 9,
+   "P": 7
+  },
+  "DX/all": {
+   "O": 17,
+   "K": 64,
+   "V": 17,
+   "reached": 95,
+   "P": 19,
+   "E": 1,
+   "C": 65,
+   "A": 1
+  },
+  "AP/D12": {
+   "O": 25,
+   "K": 16,
+   "V": 8,
+   "reached": 55,
+   "P": 18,
+   "C": 19
+  },
+  "AP/P14": {
+   "P": 14,
+   "V": 10,
+   "C": 18,
+   "O": 14,
+   "K": 25,
+   "reached": 57
+  },
+  "AP/all": {
+   "O": 39,
+   "K": 41,
+   "V": 18,
+   "reached": 112,
+   "P": 32,
+   "C": 37
+  }
+ },
+ "knowledge": {
+  "D12/d0018/DX": "mechanism",
+  "D12/d0018/AP": "mechanism",
+  "D12/d0029/DX": "demand",
+  "D12/d0029/AP": "demand",
+  "D12/d0045/DX": "direction",
+  "D12/d0045/AP": "direction",
+  "D12/d0046/DX": "direction",
+  "D12/d0046/AP": "direction",
+  "D12/d0026/DX": "none",
+  "D12/d0026/AP": "none",
+  "D12/d0041/DX": "none",
+  "D12/d0041/AP": "none",
+  "D12/d0047/DX": "none",
+  "D12/d0047/AP": "none",
+  "D12/d0022/DX": "none",
+  "D12/d0022/AP": "none",
+  "D12/d0023/DX": "none",
+  "D12/d0023/AP": "none",
+  "D12/d0025/DX": "none",
+  "D12/d0025/AP": "none",
+  "D12/d0027/DX": "none",
+  "D12/d0027/AP": "none",
+  "D12/d0008/DX": "mechanism",
+  "D12/d0008/AP": "mechanism",
+  "D12/d0009/DX": "mechanism",
+  "D12/d0009/AP": "mechanism",
+  "D12/d0038/DX": "demand",
+  "D12/d0038/AP": "none",
+  "D12/d0015/AP": "none",
+  "D12/d0044/AP": "none",
+  "D12/d0013/DX": "api",
+  "D12/d0013/AP": "api",
+  "D12/d0016/DX": "demand",
+  "D12/d0016/AP": "demand",
+  "D12/d0035/DX": "none",
+  "D12/d0035/AP": "none",
+  "D12/d0036/DX": "none",
+  "D12/d0036/AP": "none",
+  "D12/d0039/DX": "none",
+  "D12/d0039/AP": "none",
+  "D12/d0043/DX": "demand",
+  "D12/d0043/AP": "demand",
+  "D12/d0002/DX": "mechanism",
+  "D12/d0002/AP": "mechanism",
+  "D12/d0003/DX": "direction",
+  "D12/d0003/AP": "direction",
+  "D12/d0004/DX": "none",
+  "D12/d0004/AP": "none",
+  "D12/d0048/DX": "none",
+  "D12/d0048/AP": "none",
+  "D12/d0051/DX": "construction",
+  "D12/d0051/AP": "construction",
+  "D12/d0049/DX": "none",
+  "D12/d0049/AP": "demand",
+  "D12/d0001/DX": "none",
+  "D12/d0001/AP": "none",
+  "D12/d0005/DX": "none",
+  "D12/d0005/AP": "none",
+  "D12/d0006/DX": "none",
+  "D12/d0006/AP": "none",
+  "D12/d0007/DX": "none",
+  "D12/d0007/AP": "demand",
+  "D12/d0032/DX": "demand",
+  "D12/d0033/AP": "none",
+  "P14_post/p0000/DX": "demand",
+  "P14_post/p0000/AP": "demand",
+  "P14_post/p0004/DX": "none",
+  "P14_post/p0004/AP": "none",
+  "P14_post/p0005/DX": "none",
+  "P14_post/p0005/AP": "none",
+  "P14_post/p0006/DX": "direction",
+  "P14_post/p0006/AP": "direction",
+  "P14_post/p0010/DX": "api",
+  "P14_post/p0010/AP": "api",
+  "P14_post/p0012/DX": "none",
+  "P14_post/p0012/AP": "demand",
+  "P14_post/p0008/AP": "none",
+  "P14_post/p0007/DX": "none",
+  "P14_post/p0007/AP": "none",
+  "P14_post/p0014/DX": "none",
+  "P14_post/p0014/AP": "none",
+  "P14_post/p0015/DX": "none",
+  "P14_post/p0015/AP": "none",
+  "P14_post/p0016/DX": "none",
+  "P14_post/p0016/AP": "none",
+  "P14_post/p0003/DX": "none",
+  "P14_post/p0003/AP": "none",
+  "P14_val/v0090/DX": "direction",
+  "P14_val/v0090/AP": "direction",
+  "P14_val/v0091/DX": "direction",
+  "P14_val/v0091/AP": "direction",
+  "P14_val/v0093/DX": "none",
+  "P14_val/v0093/AP": "mechanism",
+  "P14_val/v0094/DX": "none",
+  "P14_val/v0094/AP": "none",
+  "P14_val/v0095/DX": "none",
+  "P14_val/v0095/AP": "none",
+  "P14_val/v0106/DX": "demand",
+  "P14_val/v0107/DX": "demand",
+  "P14_val/v0108/DX": "demand",
+  "P14_val/v0092/DX": "none",
+  "P14_val/v0092/AP": "none",
+  "P14_val/v0105/DX": "unclear",
+  "P14_val/v0105/AP": "unclear",
+  "P14_val/v0053/DX": "pr_context",
+  "P14_val/v0053/AP": "pr_context",
+  "P14_val/v0056/DX": "pr_context",
+  "P14_val/v0056/AP": "pr_context",
+  "P14_val/v0029/DX": "demand",
+  "P14_val/v0030/DX": "demand",
+  "P14_val/v0030/AP": "none",
+  "P14_val/v0031/DX": "none",
+  "P14_val/v0031/AP": "none",
+  "P14_val/v0062/DX": "demand",
+  "P14_val/v0062/AP": "none",
+  "P14_val/v0063/DX": "demand",
+  "P14_val/v0063/AP": "none",
+  "P14_val/v0060/DX": "mechanism",
+  "P14_val/v0060/AP": "none",
+  "P14_val/v0061/DX": "mechanism",
+  "P14_val/v0061/AP": "none",
+  "P14_val/v0064/DX": "none",
+  "P14_val/v0064/AP": "none",
+  "P14_val/v0065/DX": "none",
+  "P14_val/v0065/AP": "none",
+  "P14_val/v0066/AP": "none",
+  "P14_val/v0067/DX": "demand",
+  "P14_val/v0067/AP": "none",
+  "P14_val/v0068/DX": "none",
+  "P14_val/v0068/AP": "none",
+  "P14_val/v0055/DX": "none",
+  "P14_val/v0055/AP": "construction"
+ },
+ "held": {
+  "D12/d0045": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 3
+   }
+  },
+  "D12/d0046": {
+   "DX": 2,
+   "AP": 1,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0041": {
+   "DX": 0,
+   "AP": 1,
+   "use": {
+    "ignored": 2,
+    "used": 1
+   }
+  },
+  "D12/d0047": {
+   "DX": 2,
+   "AP": 2,
+   "use": {
+    "used": 2,
+    "considered_dropped": 1
+   }
+  },
+  "D12/d0022": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 1,
+    "ignored": 2
+   }
+  },
+  "D12/d0023": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 1,
+    "ignored": 2
+   }
+  },
+  "D12/d0025": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 1,
+    "ignored": 2
+   }
+  },
+  "D12/d0027": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 1,
+    "ignored": 2
+   }
+  },
+  "D12/d0019": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0020": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0021": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0024": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0028": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0038": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 3
+   }
+  },
+  "D12/d0015": {
+   "DX": 3,
+   "AP": 2,
+   "use": {
+    "ignored": 3
+   }
+  },
+  "D12/d0010": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0011": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0012": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0013": {
+   "DX": 1,
+   "AP": 1,
+   "use": {
+    "used": 1,
+    "ignored": 2
+   }
+  },
+  "D12/d0014": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0035": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 3
+   }
+  },
+  "D12/d0036": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 3
+   }
+  },
+  "D12/d0039": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 2,
+    "considered_dropped": 1
+   }
+  },
+  "D12/d0048": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0049": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 3
+   }
+  },
+  "D12/d0005": {
+   "DX": 0,
+   "AP": 1,
+   "use": {
+    "ignored": 2,
+    "used": 1
+   }
+  },
+  "D12/d0032": {
+   "DX": 0,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0033": {
+   "DX": 3,
+   "AP": 2,
+   "use": {
+    "used": 2,
+    "considered_dropped": 1
+   }
+  },
+  "D12/d0031": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "D12/d0034": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_post/p0005": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 2,
+    "considered_dropped": 1
+   }
+  },
+  "P14_post/p0010": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 1,
+    "considered_dropped": 2
+   }
+  },
+  "P14_post/p0007": {
+   "DX": 0,
+   "AP": 1,
+   "use": {
+    "used": 1,
+    "considered_dropped": 1,
+    "ignored": 1
+   }
+  },
+  "P14_post/p0014": {
+   "DX": 0,
+   "AP": 1,
+   "use": {
+    "used": 1,
+    "ignored": 2
+   }
+  },
+  "P14_post/p0015": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 2,
+    "considered_dropped": 1
+   }
+  },
+  "P14_post/p0016": {
+   "DX": 1,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 2,
+    "ignored": 1
+   }
+  },
+  "P14_post/p0002": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_post/p0003": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 3
+   }
+  },
+  "P14_post/p0009": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_post/p0011": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0093": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 1,
+    "considered_dropped": 2
+   }
+  },
+  "P14_val/v0094": {
+   "DX": 1,
+   "AP": 2,
+   "use": {
+    "considered_dropped": 1,
+    "used": 2
+   }
+  },
+  "P14_val/v0095": {
+   "DX": 1,
+   "AP": 2,
+   "use": {
+    "considered_dropped": 1,
+    "used": 2
+   }
+  },
+  "P14_val/v0016": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0131": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0132": {
+   "DX": 3,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0106": {
+   "DX": 0,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0107": {
+   "DX": 0,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0108": {
+   "DX": 0,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0092": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 1,
+    "ignored": 2
+   }
+  },
+  "P14_val/v0105": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 3
+   }
+  },
+  "P14_val/v0029": {
+   "DX": 0,
+   "AP": 3,
+   "use": {
+    "used": 3
+   }
+  },
+  "P14_val/v0030": {
+   "DX": 0,
+   "AP": 1,
+   "use": {
+    "considered_dropped": 2,
+    "used": 1
+   }
+  },
+  "P14_val/v0062": {
+   "DX": 0,
+   "AP": 2,
+   "use": {
+    "ignored": 1,
+    "used": 2
+   }
+  },
+  "P14_val/v0063": {
+   "DX": 0,
+   "AP": 2,
+   "use": {
+    "ignored": 1,
+    "used": 2
+   }
+  },
+  "P14_val/v0060": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 2,
+    "considered_dropped": 1
+   }
+  },
+  "P14_val/v0061": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "ignored": 2,
+    "considered_dropped": 1
+   }
+  },
+  "P14_val/v0068": {
+   "DX": 0,
+   "AP": 0,
+   "use": {
+    "considered_dropped": 3
+   }
+  },
+  "P14_val/v0055": {
+   "DX": 2,
+   "AP": 2,
+   "use": {
+    "used": 2,
+    "considered_dropped": 1
+   }
+  }
+ }
+}

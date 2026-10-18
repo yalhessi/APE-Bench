@@ -1,0 +1,53 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "cannot use `#print axioms` in a `module`; consider temporarily removing the `module` header or placing the command in a separate file",
+   "code_line": "#print axioms GalerkinLimit.smooth",
+   "pos": {
+    "column": 0,
+    "line": 472
+   }
+  }
+ ],
+ "infos": [
+  {
+   "severity": "information",
+   "data": "GalerkinLimit.smooth (ν : ℝ) (hν : 0 < ν) (u₀ : T3 → Fin 3 → ℝ) (h_smooth : SmoothInitial u₀)\n  (h_divfree : DivergenceFree u₀) : ∃ u p, SmoothSpacetime u ∧ SolvesNavierStokes ν u p ∧ ∀ (x : T3), u x 0 = u₀ x",
+   "code_line": "#check GalerkinLimit.smooth",
+   "pos": {
+    "column": 0,
+    "line": 470
+   }
+  }
+ ],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 1 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "warnings_introduced_by_your_edit": [
+  {
+   "severity": "warning",
+   "data": "The current module only contains private declarations.\n\nConsider adding `@[expose] public section` at the beginning of the module, or selectively marking declarations as `public`.\n\nNote: This linter can be disabled with `set_option linter.privateModule false`",
+   "code_line": "/-",
+   "pos": {
+    "column": 0,
+    "line": 1
+   }
+  }
+ ],
+ "warnings_already_in_the_file": 17,
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "cannot use `#print axioms` in a `module`; consider temporarily removing the `module` header or placing the command in a separate file",
+   "code_line": "#print axioms GalerkinLimit.smooth",
+   "pos": {
+    "column": 0,
+    "line": 472
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

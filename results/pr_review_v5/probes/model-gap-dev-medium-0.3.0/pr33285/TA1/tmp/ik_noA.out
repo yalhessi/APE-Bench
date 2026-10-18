@@ -1,0 +1,32 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Application type mismatch: The argument\n  continuous_subtype_val\nhas type\n  Continuous Subtype.val\nbut is expected to have type\n  Continuous (↑(LinearMap.iInfKerProjEquiv R φ hd hu)).toFun\nin the application\n  Continuous.comp (continuous_apply i) continuous_subtype_val",
+   "code_line": "      Continuous.comp (continuous_apply i) <| continuous_subtype_val",
+   "pos": {
+    "column": 46,
+    "line": 111
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compile_errors",
+ "message": "Lean ran: the code has 1 error(s), listed in `errors`. This is Lean's answer about the code, not a tool failure.",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Application type mismatch: The argument\n  continuous_subtype_val\nhas type\n  Continuous Subtype.val\nbut is expected to have type\n  Continuous (↑(LinearMap.iInfKerProjEquiv R φ hd hu)).toFun\nin the application\n  Continuous.comp (continuous_apply i) continuous_subtype_val",
+   "code_line": "      Continuous.comp (continuous_apply i) <| continuous_subtype_val",
+   "pos": {
+    "column": 46,
+    "line": 111
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P340",
+  "where": "Dense.continuous_lowerBounds, Dense.continuous_inf, Dense.continuous_inf'",
+  "why": "Order-dual lemmas repeat the upper/sup proofs verbatim instead of instantiating them at the order dual."
+ },
+ {
+  "id": "P019",
+  "where": "Dense.continuous_sup, Dense.continuous_inf, Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Names say sup/inf while statements use indexed suprema ⨆/⨅ (iSup, ciSup) on both sides."
+ },
+ {
+  "id": "P113",
+  "where": "Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Variants for conditionally complete linear orders are distinguished from siblings only by a prime."
+ },
+ {
+  "id": "P048",
+  "where": "all six new theorems",
+  "why": "Each signature repeats α, its instances, f, TopologicalSpace γ, S, hS and hf."
+ },
+ {
+  "id": "P277",
+  "where": "Dense.continuous_sup, Dense.continuous_inf, Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Right-hand sides take supremum/infimum over the subtype, ⨆ s : S, f s, with coercion."
+ },
+ {
+  "id": "P037",
+  "where": "Dense.continuous_sup, Dense.continuous_inf",
+  "why": "Short names continuous_sup/continuous_inf would clash with root-namespace lemmas when Dense is opened."
+ },
+ {
+  "id": "P024",
+  "where": "Dense.continuous_sup, Dense.continuous_inf, primed variants: `h.mono (by grind)`",
+  "why": "grind used for a range-subset goal that a short explicit lemma could prove."
+ },
+ {
+  "id": "P208",
+  "where": "Dense.continuous_sup and siblings: `by grind`",
+  "why": "Heavy grind closes a range inclusion that a direct library lemma application closes."
+ },
+ {
+  "id": "P165",
+  "where": "Dense.continuous_sup', Dense.continuous_inf': `have h2`",
+  "why": "In-proof fact that boundedness on the dense image matches boundedness of range is independently useful."
+ },
+ {
+  "id": "P007",
+  "where": "Dense.continuous_sup', Dense.continuous_inf': `range (fun s : S => f (Subtype.val s))`",
+  "why": "Expression is the image f '' S written as a range of a lambda."
+ },
+ {
+  "id": "P409",
+  "where": "all six new theorems' signatures",
+  "why": "TopologicalSpace γ instance comes after the data argument f rather than with ambient assumptions."
+ },
+ {
+  "id": "P029",
+  "where": "docstrings of Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Docstrings explain the lemma as an analogue of another declaration instead of on its own terms."
+ },
+ {
+  "id": "P382",
+  "where": "docstrings of Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Docstrings record that the declaration is an analogue of an in-library declaration."
+ },
+ {
+  "id": "P156",
+  "where": "PR description",
+  "why": "Description lists three theorems while the PR adds six, omitting the lower-bound and infimum duals."
+ },
+ {
+  "id": "P232",
+  "where": "PR title",
+  "why": "Title is `feat: ...` without an area in parentheses."
+ },
+ {
+  "id": "P047",
+  "where": "all new proofs: `fun _ =>`, `fun s : S =>`",
+  "why": "Lambdas written with `=>` arrows in new code."
+ },
+ {
+  "id": "P322",
+  "where": "Dense.continuous_upperBounds, Dense.continuous_lowerBounds",
+  "why": "`refine subset_trans ?_ ...` leaves a ∀-goal then handled by a following `intro x hx i hi`."
+ },
+ {
+  "id": "P109",
+  "where": "Dense.continuous_sup, Dense.continuous_inf and primed variants",
+  "why": "`?_` side goal of isLUB_ciSup_set closed afterwards by `exact h.mono (by grind)` instead of inline."
+ },
+ {
+  "id": "P127",
+  "where": "Dense.continuous_sup', Dense.continuous_inf': `have := range_comp' ...`, `have := h.closure.mono ...`",
+  "why": "Anonymous `have :=` with non-evident statements left to inference."
+ },
+ {
+  "id": "P201",
+  "where": "Dense.continuous_lowerBounds, Dense.continuous_inf, Dense.continuous_inf'",
+  "why": "Order-dual twins written by hand where a dual generator could produce them."
+ },
+ {
+  "id": "P130",
+  "where": "all six new theorem names",
+  "why": "Names `Dense.continuous_*` spell the hypotheses Dense and Continuous rather than stating the conclusion."
+ },
+ {
+  "id": "P432",
+  "where": "Dense.continuous_sup, Dense.continuous_inf, primed variants, upperBounds/lowerBounds lemmas",
+  "why": "Equation lemmas whose names name neither side of the equation as lhs_eq_rhs."
+ },
+ {
+  "id": "P122",
+  "where": "Dense.continuous_sup', Dense.continuous_inf'",
+  "why": "Subtype element accessed through raw `Subtype.val` instead of the coercion."
+ },
+ {
+  "id": "P001",
+  "where": "Dense.continuous_upperBounds/lowerBounds and sup/inf proofs: `Set.image_subset_range`, `Set.range_eq_empty`",
+  "why": "Set prefix written although Set is open (range, image_univ used unqualified)."
+ },
+ {
+  "id": "P136",
+  "where": "PR description",
+  "why": "Code partly written by @plp127 and @j-loreaux; co-author credits must record them."
+ }
+]

@@ -1,0 +1,560 @@
+{
+ "source": "readers_dev/labels_{1,2}.jsonl, assign-only, either reader",
+ "asks": {
+  "d0001": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0002": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F5",
+   "r1": [
+    "P086"
+   ],
+   "r2": [
+    "P086"
+   ],
+   "in_census": true
+  },
+  "d0003": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F6",
+   "r1": [
+    "P007"
+   ],
+   "r2": [
+    "P007"
+   ],
+   "in_census": true
+  },
+  "d0004": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F10",
+   "r1": [
+    "P181"
+   ],
+   "r2": [
+    "P181"
+   ],
+   "in_census": true
+  },
+  "d0005": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F9",
+   "r1": [
+    "P012"
+   ],
+   "r2": [
+    "P012"
+   ],
+   "in_census": true
+  },
+  "d0006": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F8",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0007": {
+   "pr": 33066,
+   "set": "dev",
+   "family": "F9",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0008": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P005"
+   ],
+   "r2": [
+    "P005"
+   ],
+   "in_census": true
+  },
+  "d0009": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P005"
+   ],
+   "r2": [
+    "P005"
+   ],
+   "in_census": true
+  },
+  "d0010": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P019"
+   ],
+   "r2": [
+    "P019"
+   ],
+   "in_census": true
+  },
+  "d0011": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P019"
+   ],
+   "r2": [
+    "P019"
+   ],
+   "in_census": true
+  },
+  "d0012": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P019"
+   ],
+   "r2": [
+    "P019"
+   ],
+   "in_census": true
+  },
+  "d0013": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P011"
+   ],
+   "r2": [
+    "P011"
+   ],
+   "in_census": true
+  },
+  "d0014": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P011"
+   ],
+   "r2": [
+    "P011",
+    "P018"
+   ],
+   "in_census": true
+  },
+  "d0015": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P347",
+    "P216"
+   ],
+   "r2": [
+    "P216",
+    "P347"
+   ],
+   "in_census": true
+  },
+  "d0016": {
+   "pr": 33098,
+   "set": "dev",
+   "family": "F9",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0018": {
+   "pr": 33117,
+   "set": "dev",
+   "family": "F4",
+   "r1": [
+    "P201"
+   ],
+   "r2": [
+    "P201"
+   ],
+   "in_census": true
+  },
+  "d0019": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P432",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0020": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P432",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0021": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F4",
+   "r1": [
+    "P340"
+   ],
+   "r2": [
+    "P340"
+   ],
+   "in_census": true
+  },
+  "d0022": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P019",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0023": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P019",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0024": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F4",
+   "r1": [
+    "P340"
+   ],
+   "r2": [
+    "P340"
+   ],
+   "in_census": true
+  },
+  "d0025": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P019",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0026": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P011"
+   ],
+   "r2": [],
+   "in_census": true
+  },
+  "d0027": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P130",
+    "P019"
+   ],
+   "r2": [
+    "P019",
+    "P130"
+   ],
+   "in_census": true
+  },
+  "d0028": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F4",
+   "r1": [
+    "P340"
+   ],
+   "r2": [
+    "P340"
+   ],
+   "in_census": true
+  },
+  "d0029": {
+   "pr": 33145,
+   "set": "dev",
+   "family": "F6",
+   "r1": [
+    "P157"
+   ],
+   "r2": [
+    "P157"
+   ],
+   "in_census": true
+  },
+  "d0030": {
+   "pr": 33149,
+   "set": "dev",
+   "family": "CORR",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0031": {
+   "pr": 33149,
+   "set": "dev",
+   "family": "F5",
+   "r1": [
+    "P086",
+    "P259"
+   ],
+   "r2": [
+    "P086",
+    "P074"
+   ],
+   "in_census": true
+  },
+  "d0032": {
+   "pr": 33149,
+   "set": "dev",
+   "family": "F12",
+   "r1": [
+    "P038",
+    "P103"
+   ],
+   "r2": [
+    "P038",
+    "P103"
+   ],
+   "in_census": true
+  },
+  "d0033": {
+   "pr": 33149,
+   "set": "dev",
+   "family": "F12",
+   "r1": [],
+   "r2": [
+    "P333"
+   ],
+   "in_census": true
+  },
+  "d0034": {
+   "pr": 33149,
+   "set": "dev",
+   "family": "CORR",
+   "r1": [
+    "P086"
+   ],
+   "r2": [
+    "P086"
+   ],
+   "in_census": true
+  },
+  "d0035": {
+   "pr": 33285,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P040"
+   ],
+   "r2": [
+    "P040"
+   ],
+   "in_census": true
+  },
+  "d0036": {
+   "pr": 33285,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P040"
+   ],
+   "r2": [
+    "P018",
+    "P040"
+   ],
+   "in_census": true
+  },
+  "d0038": {
+   "pr": 33294,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P108"
+   ],
+   "r2": [
+    "P108"
+   ],
+   "in_census": true
+  },
+  "d0039": {
+   "pr": 33294,
+   "set": "dev",
+   "family": "F1",
+   "r1": [
+    "P057"
+   ],
+   "r2": [
+    "P057"
+   ],
+   "in_census": true
+  },
+  "d0041": {
+   "pr": 33305,
+   "set": "dev",
+   "family": "F9",
+   "r1": [
+    "P084"
+   ],
+   "r2": [
+    "P084"
+   ],
+   "in_census": true
+  },
+  "d0042": {
+   "pr": 33321,
+   "set": "dev",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0043": {
+   "pr": 33321,
+   "set": "dev",
+   "family": "F6",
+   "r1": [
+    "P199"
+   ],
+   "r2": [
+    "P199"
+   ],
+   "in_census": true
+  },
+  "d0044": {
+   "pr": 33321,
+   "set": "dev",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "in_census": false
+  },
+  "d0045": {
+   "pr": 33337,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P019"
+   ],
+   "r2": [
+    "P019"
+   ],
+   "in_census": true
+  },
+  "d0046": {
+   "pr": 33337,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P019"
+   ],
+   "r2": [
+    "P019"
+   ],
+   "in_census": true
+  },
+  "d0047": {
+   "pr": 33362,
+   "set": "dev",
+   "family": "F9",
+   "r1": [
+    "P001"
+   ],
+   "r2": [
+    "P001"
+   ],
+   "in_census": true
+  },
+  "d0048": {
+   "pr": 33421,
+   "set": "dev",
+   "family": "F8",
+   "r1": [
+    "P113"
+   ],
+   "r2": [
+    "P113",
+    "P432"
+   ],
+   "in_census": true
+  },
+  "d0049": {
+   "pr": 33421,
+   "set": "dev",
+   "family": "F6",
+   "r1": [
+    "P165"
+   ],
+   "r2": [
+    "P165"
+   ],
+   "in_census": true
+  },
+  "d0051": {
+   "pr": 33421,
+   "set": "dev",
+   "family": "F7",
+   "r1": [
+    "P063"
+   ],
+   "r2": [
+    "P063"
+   ],
+   "in_census": true
+  }
+ }
+}

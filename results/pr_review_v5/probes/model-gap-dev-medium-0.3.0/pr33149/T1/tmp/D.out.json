@@ -1,0 +1,50 @@
+{
+ "success": true,
+ "errors": [],
+ "infos": [],
+ "axioms": [],
+ "messages_truncated": true,
+ "total_messages_before_truncation": 23,
+ "outcome": "compiled",
+ "message": "Lean ran: the code compiles with no errors.",
+ "warnings_introduced_by_your_edit": [
+  {
+   "severity": "warning",
+   "data": "missing space in the source\n\nThis part of the code\n  'k‖^2)) :'\nshould be written as\n  'k‖ ^ 2))'\n\n\nNote: This linter can be disabled with `set_option linter.style.commandStart false`",
+   "code_line": "axiom parseval_orthonormal (c : (Fin 3 → ℤ) → ℂ) (hc : Summable (fun k => ‖c k‖^2)) :",
+   "pos": {
+    "column": 79,
+    "line": 188
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "missing space in the source\n\nThis part of the code\n  '3/2) (u'\nshould be written as\n  '3 / 2)'\n\n\nNote: This linter can be disabled with `set_option linter.style.commandStart false`",
+   "code_line": "axiom moser_estimate (s : ℝ) (hs : s > 3/2) (u : T3 → Fin 3 → ℝ) :",
+   "pos": {
+    "column": 40,
+    "line": 238
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "missing space in the source\n\nThis part of the code\n  '5/2) (u₀'\nshould be written as\n  '5 / 2)'\n\n\nNote: This linter can be disabled with `set_option linter.style.commandStart false`",
+   "code_line": "axiom hs_gronwall_bound (s : ℝ) (hs : s > 5/2) (u₀ : T3 → Fin 3 → ℝ) (hu₀ : SmoothInitial u₀)",
+   "pos": {
+    "column": 43,
+    "line": 242
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "missing space in the source\n\nThis part of the code\n  '5/2) (f'\nshould be written as\n  '5 / 2)'\n\n\nNote: This linter can be disabled with `set_option linter.style.commandStart false`",
+   "code_line": "axiom sobolev_embedding (s : ℝ) (hs : s > 5/2) (f : T3 → Fin 3 → ℝ) :",
+   "pos": {
+    "column": 43,
+    "line": 247
+   }
+  }
+ ],
+ "warnings_already_in_the_file": 16,
+ "mode": "verified_edit"
+}

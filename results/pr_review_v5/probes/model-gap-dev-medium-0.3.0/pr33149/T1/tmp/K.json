@@ -1,0 +1,1 @@
+{"line_start": 467, "line_end": 469, "replacement": "example : (3 : Fin 3) = 0 := by decide\nexample : \u2200 j : Fin 3, (j + 1) % 3 = j + 1 \u2227 (j + 2) % 3 = j + 2 := by decide\n"}

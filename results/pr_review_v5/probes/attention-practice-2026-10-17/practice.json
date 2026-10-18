@@ -1,0 +1,143 @@
+{
+ "suggestion_blocks": 1991,
+ "rules": {
+  "P084J": {
+   "reviewer": [
+    176,
+    760
+   ],
+   "other": [
+    115,
+    767
+   ],
+   "ai": [
+    66,
+    227
+   ],
+   "suggestions": [
+    22,
+    108
+   ],
+   "base": [
+    3239,
+    31784
+   ],
+   "reading": "not their practice"
+  },
+  "P097": {
+   "reviewer": [
+    121,
+    2699
+   ],
+   "other": [
+    146,
+    2708
+   ],
+   "ai": [
+    47,
+    523
+   ],
+   "suggestions": [
+    34,
+    1240
+   ],
+   "base": [
+    4059,
+    83201
+   ],
+   "reading": "their practice"
+  },
+  "P341": {
+   "reviewer": [
+    706,
+    817
+   ],
+   "other": [
+    1073,
+    1430
+   ],
+   "ai": [
+    250,
+    336
+   ],
+   "suggestions": [
+    0,
+    0
+   ],
+   "base": [
+    53254,
+    62529
+   ],
+   "reading": "not their practice"
+  },
+  "P012": {
+   "reviewer": [
+    196,
+    1327
+   ],
+   "other": [
+    173,
+    1087
+   ],
+   "ai": [
+    50,
+    263
+   ],
+   "suggestions": [
+    0,
+    0
+   ],
+   "base": [
+    7152,
+    40962
+   ],
+   "reading": "mixed"
+  },
+  "P240": {
+   "reviewer": [
+    137,
+    522
+   ],
+   "other": [
+    133,
+    462
+   ],
+   "ai": [
+    24,
+    87
+   ],
+   "suggestions": [
+    8,
+    36
+   ],
+   "base": [
+    3044,
+    19465
+   ],
+   "reading": "not their practice"
+  },
+  "P392": {
+   "reviewer": [
+    19,
+    2352
+   ],
+   "other": [
+    37,
+    2030
+   ],
+   "ai": [
+    1,
+    374
+   ],
+   "suggestions": [
+    0,
+    230
+   ],
+   "base": [
+    753,
+    66486
+   ],
+   "reading": "their practice"
+  }
+ }
+}

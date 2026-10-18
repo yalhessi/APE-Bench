@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P072",
+  "where": "Submonoid.closure_image_one_lt_and_isMulIndecomposable, renamed to Submonoid.closure_image_isMulIndecomposable_baseOf (Indecomposable.lean)",
+  "why": "An existing lemma is renamed with no deprecated alias left for the old name."
+ },
+ {
+  "id": "P025",
+  "where": "module docstring of Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+  "why": "Title 'Existence of bases' while the file proves only linear independence; existence is listed as TODO."
+ },
+ {
+  "id": "P113",
+  "where": "RootPairing.linearIndepOn_root_baseOf', IsMulIndecomposable.pairwise_div_notMem_range', RootPairing.algebraMap_pairingIn'",
+  "why": "Three new lemma variants are distinguished from siblings by appending primes."
+ },
+ {
+  "id": "P029",
+  "where": "docstring of RootPairing.linearIndepOn_root_baseOf'",
+  "why": "Docstring describes the lemma as a stepping stone, by contrast with linearIndepOn_root_baseOf."
+ },
+ {
+  "id": "P135",
+  "where": "module docstring of BaseExists.lean",
+  "why": "Uses headings 'Implementation details' and 'TODO' rather than the standard section headings."
+ },
+ {
+  "id": "P048",
+  "where": "Indecomposable.lean: image_baseOf_inv_comp_eq, Subgroup.closure_image_..., pairwise_div_notMem_range', pairwise_baseOf_div_notMem, mem_or_inv_mem_closure_baseOf",
+  "why": "Same InvolutiveInv, CommGroup S, IsOrderedMonoid S, v, hv_inv, f, hf repeated in consecutive signatures."
+ },
+ {
+  "id": "P006",
+  "where": "RootPairing.linearIndepOn_root_baseOf' (BaseExists.lean); IsMulIndecomposable.baseOf [Monoid S]",
+  "why": "Re-binds {S : Type*} [LinearOrder S] already declared by the section variable."
+ },
+ {
+  "id": "P019",
+  "where": "baseOf_pairwise_pairing_le_zero, pairwise_baseOf_div_notMem, image_baseOf_inv_comp_eq, posForm_apply_root_root_le_zero_iff, etc.",
+  "why": "Twelve new names must spell their statement's declarations, e.g. 'pairing' for pairingIn, omitted 'range'."
+ },
+ {
+  "id": "P254",
+  "where": "pairwise_div_notMem_range / pairwise_baseOf_div_notMem / RootPairing.baseOf_pairwise_pairing_le_zero",
+  "why": "Sibling pairwise lemmas order 'baseOf' and 'pairwise' differently in their names."
+ },
+ {
+  "id": "P070",
+  "where": "new lemma names in Indecomposable.lean and BaseExists.lean",
+  "why": "Many new names must read their statements head-first, e.g. (baseOf v f).Pairwise ... ∉ range v."
+ },
+ {
+  "id": "P432",
+  "where": "IsMulIndecomposable.image_baseOf_inv_comp_eq",
+  "why": "An equation lemma named with a bare _eq suffix that names no right-hand side."
+ },
+ {
+  "id": "P001",
+  "where": "IsMulIndecomposable.subset, .baseOf, .baseOf_subset_one_lt, .image_baseOf_inv_comp_eq outside the later namespace IsMulIndecomposable block",
+  "why": "Same-namespace declarations written with explicit prefix outside the namespace block opened later in the file."
+ },
+ {
+  "id": "P008",
+  "where": "IsMulIndecomposable.baseOf; uses in Submonoid.closure_image_... (let t) and linearIndepOn_root_baseOf' (obtain ⟨i, -, hi⟩)",
+  "why": "New definition baseOf has no membership lemma; use sites unfold or destructure it by hand."
+ },
+ {
+  "id": "P154",
+  "where": "IsMulIndecomposable.pairwise_baseOf_div_notMem, pairwise_div_notMem_range', baseOf_subset_one_lt",
+  "why": "Lemmas that only instantiate or reshape another new lemma (s := baseOf, .refl _)."
+ },
+ {
+  "id": "P030",
+  "where": "imports of Mathlib/Algebra/Group/Irreducible/Indecomposable.lean and BaseExists.lean",
+  "why": "Adds four imports, including Order.Group.Defs alongside Order.Group.Basic, whose need must be checked."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Description is a single issue link; the rename, invMonoidHom to_additive and IsValuedIn refactor are unmentioned."
+ },
+ {
+  "id": "P059",
+  "where": "mem_or_inv_mem_closure_baseOf ('     v i    ∈'); set-builders {i | 1 < f (v i)} throughout",
+  "why": "Doubled alignment spaces and set-builder braces without inner spaces in new statements."
+ },
+ {
+  "id": "P084",
+  "where": "IsMulIndecomposable.pairwise_div_notMem_range signature; image_baseOf_inv_comp_eq signature",
+  "why": "Signatures broken one argument per line where the lines would fit within 100 characters."
+ },
+ {
+  "id": "P097",
+  "where": "invMonoidHom_comp_invMonoidHom (ext; simp), Subgroup.closure_image_... (ext i; simp), pairwise_div_notMem_range' (contrapose! hf; exact)",
+  "why": "Several tactics put on one line with ';'."
+ },
+ {
+  "id": "P236",
+  "where": "RootPairing.linearIndepOn_root_baseOf' and linearIndepOn_root_baseOf",
+  "why": "Fintype instances (data) introduced with have := Fintype.ofFinite inside proofs."
+ },
+ {
+  "id": "P144",
+  "where": "pairwise_div_notMem_range' (apply ... fun i ↦ ?_); linearIndepOn_root_baseOf (apply le_antisymm ... ?_)",
+  "why": "Terms with ?_ holes are applied with apply rather than refine."
+ },
+ {
+  "id": "P208",
+  "where": "IsMulIndecomposable.subset (by aesop), image_baseOf_inv_comp_eq, linearIndepOn_root_baseOf' (by aesop : i ≠ j), linearIndepOn_root_baseOf",
+  "why": "Five new goals closed by aesop, including a membership projection and an inequality."
+ },
+ {
+  "id": "P319",
+  "where": "import block of Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+  "why": "New imports added: Order.Group.Defs placed before Order.Group.Basic, so order needs checking."
+ },
+ {
+  "id": "P346",
+  "where": "IsMulIndecomposable.pairwise_div_notMem_range",
+  "why": "Goal v i / v j ∉ range v is proved by by_contra! rather than introducing the hypothesis."
+ },
+ {
+  "id": "P370",
+  "where": "IsMulIndecomposable.pairwise_div_notMem_range, both rcases branches",
+  "why": "Both branches repeat the identical simp only [IsMulIndecomposable, hv_one, ...] step."
+ }
+]

@@ -1,0 +1,21 @@
+{
+ "success": true,
+ "errors": [],
+ "infos": [],
+ "axioms": [],
+ "outcome": "compiled",
+ "message": "Lean ran: the code compiles with no errors.",
+ "warnings_introduced_by_your_edit": [
+  {
+   "severity": "warning",
+   "data": "This line exceeds the 100 character limit, please shorten it!\n\nNote: This linter can be disabled with `set_option linter.style.longLine false`",
+   "code_line": "  continuous_toFun := continuous_pi fun i => (continuous_apply (A := φ) i).comp continuous_subtype_val",
+   "pos": {
+    "column": 0,
+    "line": 109
+   }
+  }
+ ],
+ "warnings_already_in_the_file": 0,
+ "mode": "verified_edit"
+}

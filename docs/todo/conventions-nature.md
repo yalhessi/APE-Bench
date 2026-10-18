@@ -91,6 +91,16 @@ verdict, since the rule is over all 1,070 outside asks). So the answer to "how
 many" is a floor: more than four hundred at this grain, still rising at about one per ten asks, with
 the written guidance covering the head and not the tail.
 
+**A sub-hypothesis for study 4, surfaced 2026-10-12 and not pursued** (`docs/research/conventions-assessment-2026-10-12.md` §6).
+Stage H found maintainers raise a settled convention at 5% or fewer of the places it applies, which is
+why "apply strictly" is a volume lever. A migration in progress may be the exception: the `grind` asks
+(32875 v0090 and v0091, 33098 d0008 and d0009, from different maintainers) are raised at every new
+lemma of the kind, and no ask-free reviewer reaches any of them. If demand at applicable places is
+near 1 for an emerging convention and near 0.05 for a settled one, maturity is the one field that
+would license strict application, and the census has no such field. Test on the record first: for the
+migration entries (`grind`, `to_dual`, `fun_prop`, `to_fun`) against stage H's ten rules, the ask
+rate at applicable places on census PRs in the same window.
+
 **Start here** (studies 2-4, or extending the census).
 - read: `results.md` in the census directory; `reader_rubric_census_v1.md` (what a principle is, the
   grain rule, the thresholds); `reader_A/codebook.json` and `reader_B/codebook.json` (the census
@@ -112,3 +122,17 @@ the written guidance covering the head and not the tail.
 - study 3 (conflict): start from the entries the readers kept apart as opposite rules (A: P014 and
   P133; B: P015/P025 and P392), the cross-map's near-misses (`crossmap.json` against the label
   co-assignments, listed in the cross-map commit `998840d1`), and rows with a `second_principle_id`.
+
+## Update 2026-10-17: what the 5% thread leaves for studies 4 and the head entries
+
+- **Study 4 (maturity), narrowed to the never-reached asks.** Motivating example: 9 of the 24 asks on the evaluation
+  sets that no condition reaches need a newer form (four are the `grind` roll-out on two PRs); `grind`-attribute
+  commits ran 10-24 a month from 2025-07, about five months before both PRs
+  (`docs/plans/2026-10-16-principles-scope-currency/review4-direction.md` §3, rank 1). Closes when the 9 are traced:
+  under 5 with a preceding adoption signal, it is not currency.
+- **Is the text the practice, for the compile-checkable head entries.** Motivating example: stage H's step 4 found a
+  finishing tactic closing 7 of 7 sampled places, two by a hinted `aesop` twice the proof's length
+  (`probes/stage-h-departures-2026-10-16`), and for rules of form two of six texts are broken by everyone
+  (`probes/attention-practice-2026-10-17`). Closes with a Lean battery on maintainers' merged code (plan amendment 3,
+  item 2).
+

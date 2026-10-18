@@ -1,0 +1,127 @@
+[
+ {
+  "id": "P076",
+  "where": "LinearIsometry.isComplete_image_iff('); Ideal.cotangentEquivIdeal_symm_apply",
+  "why": "Removes workarounds: lean4#3107 primed simp lemma, `by exact` timeout fix, explicit `(R := R)` pins."
+ },
+ {
+  "id": "P139",
+  "where": "LinearIsometry.lean, Cotangent.lean, Banach.lean equivRange_symm_apply",
+  "why": "Deletes comments about lean4#3107, a heartbeat timeout, PR #8386 and a missing API lemma."
+ },
+ {
+  "id": "P024",
+  "where": "Submodule.IsOrtho.map; ContinuousLinearMap.equivRange_symm_apply; implicitFunctionData",
+  "why": "Explicit rewrite proofs replaced by `aesop` and flexible `simp` calls."
+ },
+ {
+  "id": "P208",
+  "where": "Submodule.IsOrtho.map",
+  "why": "Proof replaced by heavy automation `aesop (add simp [isOrtho_iff_inner_eq])`."
+ },
+ {
+  "id": "P005",
+  "where": "equivRange_symm_apply; cotangentEquivIdeal_symm_apply; implicitFunctionData isCompl_ker",
+  "why": "Hand-written rewrite chains and `rfl` replaced by closing `simp` calls."
+ },
+ {
+  "id": "P053",
+  "where": "whole PR (chore golf across nine files)",
+  "why": "Cleanup PR golfing many proofs; each hunk trades readability against brevity."
+ },
+ {
+  "id": "P089",
+  "where": "cotangentEquivIdeal_symm_apply; iInfKerProjEquiv; submoduleMap",
+  "why": "Drops `(F := ..)`, `(f := ..)`, `(R := R)`, `@continuous_subtype_val _ _ ...`; uses `codRestrict _ _`."
+ },
+ {
+  "id": "P121",
+  "where": "LinearIsometry.isComplete_image_iff'",
+  "why": "LinearIsometry-specific lemma deprecated to the general SemilinearIsometryClass lemma."
+ },
+ {
+  "id": "P273",
+  "where": "LinearIsometry.isComplete_image_iff'",
+  "why": "Formerly `@[simp]` lemma becomes `@[deprecated]`; simp attribute removed from it."
+ },
+ {
+  "id": "P098",
+  "where": "LinearIsometry.isComplete_image_iff, isComplete_image_iff'",
+  "why": "Deduplication moves `@[simp]` from the primed lemma to its replacement."
+ },
+ {
+  "id": "P434",
+  "where": "LinearIsometry.isComplete_image_iff'",
+  "why": "New deprecation attribute with `since := \"2025-12-25\"` field."
+ },
+ {
+  "id": "P082",
+  "where": "LinearIsometry.isComplete_image_iff'",
+  "why": "Deprecated declaration kept, body a one-line derivation from its replacement."
+ },
+ {
+  "id": "P254",
+  "where": "LinearEquiv.symm_prodComm (LinearAlgebra/Prod.lean)",
+  "why": "New lemma name for `(prodComm ..).symm`; must match sibling and Equiv naming patterns."
+ },
+ {
+  "id": "P167",
+  "where": "ContinuousLinearEquiv.submoduleMap",
+  "why": "Structure instance now inherits fields via `__ := LinearEquiv.submoduleMap ...`."
+ },
+ {
+  "id": "P011",
+  "where": "antilipschitz_of_injective_of_isClosed_range; ContinuousLinearEquiv.submoduleMap",
+  "why": "Rebuilt proofs replaced by derivation from existing equivRange.antilipschitz and LinearEquiv.submoduleMap."
+ },
+ {
+  "id": "P040",
+  "where": "ContinuousLinearMap.antilipschitz_of_injective_of_isClosed_range",
+  "why": "Tactic block with calc replaced by a single anonymous-constructor term."
+ },
+ {
+  "id": "P013",
+  "where": "Matrix.rank_eq_finrank_range_toLin",
+  "why": "Auxiliary `have range_e₂` removed, replaced inline by `e₂.range`."
+ },
+ {
+  "id": "P065",
+  "where": "Submodule.inf_comap_le_comap_add; equivRange_symm_apply; cotangentEquivIdeal_symm_apply",
+  "why": "`change` steps and `rfl` across definitional equality replaced by simp/rewriting."
+ },
+ {
+  "id": "P054",
+  "where": "Ideal.cotangentEquivIdeal_symm_apply statement",
+  "why": "`by exact Submodule.mem_map_of_mem ...` wrapper replaced by the bare term."
+ },
+ {
+  "id": "P168",
+  "where": "antilipschitz_of_injective_of_isClosed_range; submoduleMap continuous fields; IsOrtho.map",
+  "why": "Multi-step proofs compressed into dense one-line terms or single automation calls."
+ },
+ {
+  "id": "P014",
+  "where": "equivRange_symm_apply; implicitFunctionData; cotangentEquivIdeal_symm_apply",
+  "why": "New terminal `simp [...]` and `simp +contextual [...]` calls left unsqueezed."
+ },
+ {
+  "id": "P133",
+  "where": "Submodule.inf_comap_le_comap_add",
+  "why": "`simp only [...] at h ⊢` output consumed by following `exact add_mem h.1 h.2`."
+ },
+ {
+  "id": "P017",
+  "where": "ContinuousLinearEquiv.submoduleMap type",
+  "why": "Type changed to add explicit coercion `(e : M →ₛₗ[σ₁₂] M₂)` inside `Submodule.map`."
+ },
+ {
+  "id": "P279",
+  "where": "PR description",
+  "why": "PR is cherry-picked parts of open PR #33241, overlapping its work."
+ },
+ {
+  "id": "P156",
+  "where": "PR title and description",
+  "why": "Title says golf and missing lemmas; description only cites #33241, deprecation unmentioned."
+ }
+]

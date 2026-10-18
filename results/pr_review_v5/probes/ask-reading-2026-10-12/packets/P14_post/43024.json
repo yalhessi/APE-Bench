@@ -1,0 +1,529 @@
+{
+ "asks": [
+  {
+   "id": "p0008",
+   "pr": 43024,
+   "family": "F8",
+   "in_census": false,
+   "entries": [],
+   "text": "```suggestion\r\nlemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]\r\n```",
+   "path": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean",
+   "line": 352,
+   "author": "SnirBroshi",
+   "at": "2026-08-21T23:10:49Z",
+   "matcher_text": {
+    "ask_id": "p0008",
+    "path": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean",
+    "code_at_comment": "@@ -346,3 +346,11 @@ lemma setLike_mul_comm {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]\n     {s : S} [IsMulCommutative s] ⦃a b : M⦄ (ha : a ∈ s) (hb : b ∈ s) :\n     a * b = b * a :=\n   isMulCommutative_iff_of_setLike.mp ‹_› a ha b hb\n+\n+/-- Commutativity of multiplication passes to smaller subobjects. -/\n+@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/ ]\n+lemma isMulCommutative_mono {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]",
+    "comment": "```suggestion\r\nlemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]\r\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "T1": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` says that `IsMulCommutative` is antitone in the subobject (it passes DOWN to smaller subobjects), but the `_mono` suffix in Mathlib's naming practice means monotone. The PR's own title calls the lemma `isMulCommutative_anti`, so the code and the title disagree.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (to_additive then generates `isAddCommutative_anti`), keeping the statement, docstrings and proof unchanged.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` says that `IsMulCommutative` is antitone in the subobject (it passes DOWN to smaller subobjects), but the `_mono` suffix in Mathlib's naming practice means monotone. The PR's own title calls the lemma `isMulCommutative_anti`, so the code and the title disagree.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (to_additive then generates `isAddCommutative_anti`), keeping the statement, docstrings and proof unchanged.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "GPT3": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "X1": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed. It proves `s ≤ t → IsMulCommutative t → IsMulCommutative s`, so commutativity passes from the larger subobject down to the smaller one. As a function of the subobject, `IsMulCommutative` is antitone, not monotone. Mathlib's `_mono`/`_anti` practice, and the sibling lemmas for predicates inherited by smaller objects (`Set.Subsingleton.anti`, `SimpleGraph.IsAcyclic.anti`, `SimpleGraph.CliqueFree.anti`, `Graph.Loopless.anti`, `Graph.Simple.anti`, `ConvexCone.Salient.anti`, `ConvexCone.Blunt.anti`, `Filter.Subsingleton.anti`, versus `ConvexCone.Pointed.mono` for the upward direction), call this `_anti`. The PR's own title already announces `isMulCommutative_anti`, so the code and the title disagree. The generated additive name `isAddCommutative_mono` has the same problem.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti`, which through `to_additive` also renames `isAddCommutative_mono` to `isAddCommutative_anti`. Keep the statement, docstrings and proof unchanged.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed. It proves `s ≤ t → IsMulCommutative t → IsMulCommutative s`, so commutativity passes from the larger subobject down to the smaller one. As a function of the subobject, `IsMulCommutative` is antitone, not monotone. Mathlib's `_mono`/`_anti` practice, and the sibling lemmas for predicates inherited by smaller objects (`Set.Subsingleton.anti`, `SimpleGraph.IsAcyclic.anti`, `SimpleGraph.CliqueFree.anti`, `Graph.Loopless.anti`, `Graph.Simple.anti`, `ConvexCone.Salient.anti`, `ConvexCone.Blunt.anti`, `Filter.Subsingleton.anti`, versus `ConvexCone.Pointed.mono` for the upward direction), call this `_anti`. The PR's own title already announces `isMulCommutative_anti`, so the code and the title disagree. The generated additive name `isAddCommutative_mono` has the same problem.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti`, which through `to_additive` also renames `isAddCommutative_mono` to `isAddCommutative_anti`. Keep the statement, docstrings and proof unchanged.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "DX2": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong variance: its statement is contravariant in the subobject order (`s ≤ t` and `[IsMulCommutative t]` give `IsMulCommutative s`), i.e. commutativity passes *down* to smaller subobjects, so this is an `anti` lemma, not a `mono` one. Mathlib reserves `mono` for the covariant direction (e.g. `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed`) and names predicate transfer in this direction `anti` throughout the library: `SimpleGraph.CliqueFree.anti`, `CliqueFreeOn.anti`, `IsAcyclic.anti`, `IsBridge.anti`, `Loopless.anti`, `Simple.anti`, `Cone.Blunt.anti`, `Cone.Salient.anti`, `SetFamily.IsIntersectingOf.anti`, `Subgraph.Compatible.anti_left/anti_right`. The name is also inconsistent with this PR's own title, `feat: isMulCommutative_anti for subobjects`, and no declaration called `isMulCommutative_anti` exists in the library, so the mismatch is unambiguous.",
+      "requested_change": "Rename the new lemma to `isMulCommutative_anti` (the `to_additive` version then becomes `isAddCommutative_anti`); the statement, proof, docstring and `@[to_additive]` attribute are unchanged. I verified this rename compiles in the reviewed file.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong variance: its statement is contravariant in the subobject order (`s ≤ t` and `[IsMulCommutative t]` give `IsMulCommutative s`), i.e. commutativity passes *down* to smaller subobjects, so this is an `anti` lemma, not a `mono` one. Mathlib reserves `mono` for the covariant direction (e.g. `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed`) and names predicate transfer in this direction `anti` throughout the library: `SimpleGraph.CliqueFree.anti`, `CliqueFreeOn.anti`, `IsAcyclic.anti`, `IsBridge.anti`, `Loopless.anti`, `Simple.anti`, `Cone.Blunt.anti`, `Cone.Salient.anti`, `SetFamily.IsIntersectingOf.anti`, `Subgraph.Compatible.anti_left/anti_right`. The name is also inconsistent with this PR's own title, `feat: isMulCommutative_anti for subobjects`, and no declaration called `isMulCommutative_anti` exists in the library, so the mismatch is unambiguous.",
+      "requested_change": "Rename the new lemma to `isMulCommutative_anti` (the `to_additive` version then becomes `isAddCommutative_anti`); the statement, proof, docstring and `@[to_additive]` attribute are unchanged. I verified this rename compiles in the reviewed file.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "TA1": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` (Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352) states an antitone fact -- `s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, commutativity passes DOWN to smaller subobjects -- but is named `_mono`. Mathlib names this exact shape `anti` (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `Simple.anti`, `SimpleGraph.IsAcyclic.anti`, `CliqueFree.anti`, `Set.Subsingleton.anti`, `Filter.Subsingleton.anti`), and the PR's own title announces the lemma as `isMulCommutative_anti`.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (the `to_additive` image becomes `isAddCommutative_anti`), so the name says the property is antitone in the subobject and matches the PR title.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` (Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352) states an antitone fact -- `s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, commutativity passes DOWN to smaller subobjects -- but is named `_mono`. Mathlib names this exact shape `anti` (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `Simple.anti`, `SimpleGraph.IsAcyclic.anti`, `CliqueFree.anti`, `Set.Subsingleton.anti`, `Filter.Subsingleton.anti`), and the PR's own title announces the lemma as `isMulCommutative_anti`.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (the `to_additive` image becomes `isAddCommutative_anti`), so the name says the property is antitone in the subobject and matches the PR title.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "DX3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is contravariant in the subobject order (`h : s ≤ t` gives `IsMulCommutative t → IsMulCommutative s`, i.e. the property passes from the larger to the smaller subobject), which is exactly what Mathlib calls the `_anti` direction. The library reserves `_mono` for the covariant direction that goes from the smaller object to the larger one, and names this direction `_anti`/`.anti` throughout: `Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `IsAcyclic.anti (hsub : G ≤ G') (h : G'.IsAcyclic) : G.IsAcyclic`, `CliqueFree.anti (h : G ≤ H) : H.CliqueFree n → G.CliqueFree n`, `CliqueFreeOn.anti`, `Cone.Blunt.anti (h : C₂ ≤ C₁) : C₁.Blunt → C₂.Blunt`, `Cone.Salient.anti`, `IsCover.anti (hst : s ⊆ t) (ht : IsCover ε t N) : IsCover ε s N`, `IsIntersectingOf.anti (h : ℬ ⊆ 𝒜) (h𝒜 : IsIntersectingOf L 𝒜) : IsIntersectingOf L ℬ` — contrasted in the same files with the genuinely monotone `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed` and `IsCover.mono`. The PR title also advertises `isMulCommutative_anti`, so the declaration name contradicts the change's own intent. Merging as is would ship a name that the naming practice and the PR title both reject, and later renames of a public lemma are costly.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the additive counterpart becomes `isAddCommutative_anti` automatically); the docstring \"Commutativity of multiplication passes to smaller subobjects\" already describes the `anti` direction and needs no change. Verified: replacing the declaration by `lemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M] [LE S] [IsConcreteLE S M] {s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s := .of_setLike_mul_comm fun _ ha _ hb ↦ setLike_mul_comm (mem_of_le_of_mem h ha) (mem_of_le_of_mem h hb)` compiles with no errors and no linter warnings.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is contravariant in the subobject order (`h : s ≤ t` gives `IsMulCommutative t → IsMulCommutative s`, i.e. the property passes from the larger to the smaller subobject), which is exactly what Mathlib calls the `_anti` direction. The library reserves `_mono` for the covariant direction that goes from the smaller object to the larger one, and names this direction `_anti`/`.anti` throughout: `Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `IsAcyclic.anti (hsub : G ≤ G') (h : G'.IsAcyclic) : G.IsAcyclic`, `CliqueFree.anti (h : G ≤ H) : H.CliqueFree n → G.CliqueFree n`, `CliqueFreeOn.anti`, `Cone.Blunt.anti (h : C₂ ≤ C₁) : C₁.Blunt → C₂.Blunt`, `Cone.Salient.anti`, `IsCover.anti (hst : s ⊆ t) (ht : IsCover ε t N) : IsCover ε s N`, `IsIntersectingOf.anti (h : ℬ ⊆ 𝒜) (h𝒜 : IsIntersectingOf L 𝒜) : IsIntersectingOf L ℬ` — contrasted in the same files with the genuinely monotone `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed` and `IsCover.mono`. The PR title also advertises `isMulCommutative_anti`, so the declaration name contradicts the change's own intent. Merging as is would ship a name that the naming practice and the PR title both reject, and later renames of a public lemma are costly.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the additive counterpart becomes `isAddCommutative_anti` automatically); the docstring \"Commutativity of multiplication passes to smaller subobjects\" already describes the `anti` direction and needs no change. Verified: replacing the declaration by `lemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M] [LE S] [IsConcreteLE S M] {s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s := .of_setLike_mul_comm fun _ ha _ hb ↦ setLike_mul_comm (mem_of_le_of_mem h ha) (mem_of_le_of_mem h hb)` compiles with no errors and no linter warnings.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "GPT2": {
+     "R": "R7",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is misnamed: the lemma takes `s ≤ t` and an `IsMulCommutative t` instance to prove `IsMulCommutative s`, so the predicate is antitone in the subobject, not monotone.",
+      "requested_change": "Rename the declaration to `isMulCommutative_antitone` and let `to_additive` generate `isAddCommutative_antitone`; keep the statement and proof otherwise unchanged.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is misnamed: the lemma takes `s ≤ t` and an `IsMulCommutative t` instance to prove `IsMulCommutative s`, so the predicate is antitone in the subobject, not monotone.",
+      "requested_change": "Rename the declaration to `isMulCommutative_antitone` and let `to_additive` generate `isAddCommutative_antitone`; keep the statement and proof otherwise unchanged.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "AP3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named with the monotonicity suffix `_mono`, but its statement is antitone: `{s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s` says commutativity is *lost* going up, i.e. passes from a larger subobject to a smaller one — which is exactly what its own docstring above (line 350, \"passes to smaller subobjects\") says, and what the PR title announces (`isMulCommutative_anti`). In Mathlib the down-direction of such a transfer is spelled `_anti`, not `_mono` (`nth_eq_zero_mono` vs `nth_ne_zero_anti` in Data/Nat/Nth.lean, `dual_anti`, `generateFrom_anti`, `deleteEdges_anti`), so the current name misstates the direction and contradicts the PR title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (this also makes the PR title accurate and gives `isAddCommutative_anti` through `to_additive`); if you prefer the `X_of_le` spelling used for the analogous downward transfer `LieModule.isNilpotent_of_le` (Mathlib/Algebra/Lie/Nilpotent.lean:706), name it `isMulCommutative_of_le` instead, but do not keep `_mono` for an antitone statement.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named with the monotonicity suffix `_mono`, but its statement is antitone: `{s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s` says commutativity is *lost* going up, i.e. passes from a larger subobject to a smaller one — which is exactly what its own docstring above (line 350, \"passes to smaller subobjects\") says, and what the PR title announces (`isMulCommutative_anti`). In Mathlib the down-direction of such a transfer is spelled `_anti`, not `_mono` (`nth_eq_zero_mono` vs `nth_ne_zero_anti` in Data/Nat/Nth.lean, `dual_anti`, `generateFrom_anti`, `deleteEdges_anti`), so the current name misstates the direction and contradicts the PR title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (this also makes the PR title accurate and gives `isAddCommutative_anti` through `to_additive`); if you prefer the `X_of_le` spelling used for the analogous downward transfer `LieModule.isNilpotent_of_le` (Mathlib/Algebra/Lie/Nilpotent.lean:706), name it `isMulCommutative_of_le` instead, but do not keep `_mono` for an antitone statement.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "DX1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is order-*reversing* in the subobject order (`s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, i.e. the property is inherited by the *smaller* object), whereas the `_mono` suffix in Mathlib is for the covariant direction (`s ≤ t → IsMulCommutative s → IsMulCommutative t`). The library names exactly this reversed shape with `anti` (`Set.Subsingleton.anti (ht : t.Subsingleton) (hst : s ⊆ t) : s.Subsingleton`, `Filter.Subsingleton.anti (hl : l.Subsingleton) (hl' : l' ≤ l) : l'.Subsingleton`), and the PR's own title advertises `isMulCommutative_anti`, so the declaration name contradicts both the practice and the PR title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the generated additive twin becomes `isAddCommutative_anti`); update the PR title/description accordingly. Keep the docstring as is.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is order-*reversing* in the subobject order (`s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, i.e. the property is inherited by the *smaller* object), whereas the `_mono` suffix in Mathlib is for the covariant direction (`s ≤ t → IsMulCommutative s → IsMulCommutative t`). The library names exactly this reversed shape with `anti` (`Set.Subsingleton.anti (ht : t.Subsingleton) (hst : s ⊆ t) : s.Subsingleton`, `Filter.Subsingleton.anti (hl : l.Subsingleton) (hl' : l' ≤ l) : l'.Subsingleton`), and the PR's own title advertises `isMulCommutative_anti`, so the declaration name contradicts both the practice and the PR title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the generated additive twin becomes `isAddCommutative_anti`); update the PR title/description accordingly. Keep the docstring as is.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "AP1": {
+     "R": "R10",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "The PR title announces `isMulCommutative_anti` (`feat: `isMulCommutative_anti` for subobjects`) but this PR adds `isMulCommutative_mono`, and no declaration `isMulCommutative_anti` exists anywhere in the tree (`content_search` for `isMulCommutative_anti|IsMulCommutative.anti|Antitone.*IsMulCommutative`: 0 matches). The description is empty, so nothing in the PR metadata says what the change actually is, which is the declaration added here.",
+      "requested_change": "Make the title (and description) name the declaration the PR adds, e.g. `feat: isMulCommutative_mono for subobjects`, adding in the description where the lemma is intended to be used; if `_anti` really is the intended name, rename the declaration (and its `to_additive` counterpart `isAddCommutative_mono` → `isAddCommutative_anti`) instead, so that title and code agree. Do not leave the title naming a declaration that does not exist.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "The PR title announces `isMulCommutative_anti` (`feat: `isMulCommutative_anti` for subobjects`) but this PR adds `isMulCommutative_mono`, and no declaration `isMulCommutative_anti` exists anywhere in the tree (`content_search` for `isMulCommutative_anti|IsMulCommutative.anti|Antitone.*IsMulCommutative`: 0 matches). The description is empty, so nothing in the PR metadata says what the change actually is, which is the declaration added here.",
+      "requested_change": "Make the title (and description) name the declaration the PR adds, e.g. `feat: isMulCommutative_mono for subobjects`, adding in the description where the lemma is intended to be used; if `_anti` really is the intended name, rename the declaration (and its `to_additive` counterpart `isAddCommutative_mono` → `isAddCommutative_anti`) instead, so that title and code agree. Do not leave the title naming a declaration that does not exist.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "AP2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for monotonicity, but its statement is antitone: it transfers `IsMulCommutative` from the larger subobject `t` (`h : s ≤ t`, `[IsMulCommutative t]`) down to the smaller `s`, exactly as its docstring says (\"passes to smaller subobjects\"). Mathlib spells the covariant implication `_mono` (`Subgroup.closure_mono`, `Subgroup.map_mono`) and the pointwise antitone form `_anti` (e.g. `Subgroup.closure_pow_anti`), and the PR title already advertises this declaration as `isMulCommutative_anti` — so the declaration name contradicts both its own statement and the title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the `to_additive` copy then becomes `isAddCommutative_anti`); drop the docstring's `_mono`-style claim if the wording is adjusted, and retitle only if the opposite resolution is chosen. I verified by compile-checking the edit that renaming the declaration in place compiles with the existing attribute, proof and docstring. If `_mono` is truly intended (as in `IsOpen.mono`), then instead retitle the PR to `feat: isMulCommutative_mono for subobjects` so title and code agree.",
+      "severity": "blocking"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+      "claim": "`isMulCommutative_mono` is named for monotonicity, but its statement is antitone: it transfers `IsMulCommutative` from the larger subobject `t` (`h : s ≤ t`, `[IsMulCommutative t]`) down to the smaller `s`, exactly as its docstring says (\"passes to smaller subobjects\"). Mathlib spells the covariant implication `_mono` (`Subgroup.closure_mono`, `Subgroup.map_mono`) and the pointwise antitone form `_anti` (e.g. `Subgroup.closure_pow_anti`), and the PR title already advertises this declaration as `isMulCommutative_anti` — so the declaration name contradicts both its own statement and the title.",
+      "requested_change": "Rename the declaration to `isMulCommutative_anti` (the `to_additive` copy then becomes `isAddCommutative_anti`); drop the docstring's `_mono`-style claim if the wording is adjusted, and retitle only if the opposite resolution is chosen. I verified by compile-checking the edit that renaming the declaration in place compiles with the existing attribute, proof and docstring. If `_mono` is truly intended (as in `IsOpen.mono`), then instead retitle the PR to `feat: isMulCommutative_mono for subobjects` so title and code agree.",
+      "severity": "blocking"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "X2": {
+     "R": "R12",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` is antitone in the subobject (commutativity passes DOWN to smaller subobjects), so the `_mono` suffix describes the wrong direction. It also disagrees with the PR's own title (`isMulCommutative_anti`) and with the library's name for exactly this shape of lemma, `Subgroup.isCyclic_of_le (h : H ≤ H') [IsCyclic H'] : IsCyclic H` and `LieSubmodule.isNilpotent_of_le (h₁ : M₁ ≤ M₂) [IsNilpotent L M₂] : IsNilpotent L M₁`.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le` (its `to_additive` twin becomes `isAddCommutative_of_le`), keeping the statement and proof unchanged, and make the PR title match the final name.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+      "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` is antitone in the subobject (commutativity passes DOWN to smaller subobjects), so the `_mono` suffix describes the wrong direction. It also disagrees with the PR's own title (`isMulCommutative_anti`) and with the library's name for exactly this shape of lemma, `Subgroup.isCyclic_of_le (h : H ≤ H') [IsCyclic H'] : IsCyclic H` and `LieSubmodule.isNilpotent_of_le (h₁ : M₁ ≤ M₂) [IsNilpotent L M₂] : IsNilpotent L M₁`.",
+      "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le` (its `to_additive` twin becomes `isAddCommutative_of_le`), keeping the statement and proof unchanged, and make the PR title match the final name.",
+      "severity": "advisory"
+     },
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    },
+    "GPT1": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename to _anti. R7 proposes _antitone, R12 _of_le; R10 leads with retitling the PR, rename only as fallback.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Rename to _anti. R7 proposes _antitone, R12 _of_le, R10 defaults to retitling (rename only as alternative): partial."
+    }
+   },
+   "entries_text": {}
+  }
+ ],
+ "pr": 43024,
+ "sessions": {
+  "X1": {
+   "R": "R3",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` is misnamed. It proves `s ≤ t → IsMulCommutative t → IsMulCommutative s`, so commutativity passes from the larger subobject down to the smaller one. As a function of the subobject, `IsMulCommutative` is antitone, not monotone. Mathlib's `_mono`/`_anti` practice, and the sibling lemmas for predicates inherited by smaller objects (`Set.Subsingleton.anti`, `SimpleGraph.IsAcyclic.anti`, `SimpleGraph.CliqueFree.anti`, `Graph.Loopless.anti`, `Graph.Simple.anti`, `ConvexCone.Salient.anti`, `ConvexCone.Blunt.anti`, `Filter.Subsingleton.anti`, versus `ConvexCone.Pointed.mono` for the upward direction), call this `_anti`. The PR's own title already announces `isMulCommutative_anti`, so the code and the title disagree. The generated additive name `isAddCommutative_mono` has the same problem.",
+     "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti`, which through `to_additive` also renames `isAddCommutative_mono` to `isAddCommutative_anti`. Keep the statement, docstrings and proof unchanged.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R12",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` is antitone in the subobject (commutativity passes DOWN to smaller subobjects), so the `_mono` suffix describes the wrong direction. It also disagrees with the PR's own title (`isMulCommutative_anti`) and with the library's name for exactly this shape of lemma, `Subgroup.isCyclic_of_le (h : H ≤ H') [IsCyclic H'] : IsCyclic H` and `LieSubmodule.isNilpotent_of_le (h₁ : M₁ ≤ M₂) [IsNilpotent L M₂] : IsNilpotent L M₁`.",
+     "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le` (its `to_additive` twin becomes `isAddCommutative_of_le`), keeping the statement and proof unchanged, and make the PR title match the final name.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R1",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` says that `IsMulCommutative` is antitone in the subobject (it passes DOWN to smaller subobjects), but the `_mono` suffix in Mathlib's naming practice means monotone. The PR's own title calls the lemma `isMulCommutative_anti`, so the code and the title disagree.",
+     "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (to_additive then generates `isAddCommutative_anti`), keeping the statement, docstrings and proof unchanged.",
+     "severity": "blocking"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R5",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` (Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352) states an antitone fact -- `s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, commutativity passes DOWN to smaller subobjects -- but is named `_mono`. Mathlib names this exact shape `anti` (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `Simple.anti`, `SimpleGraph.IsAcyclic.anti`, `CliqueFree.anti`, `Set.Subsingleton.anti`, `Filter.Subsingleton.anti`), and the PR's own title announces the lemma as `isMulCommutative_anti`.",
+     "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_anti` (the `to_additive` image becomes `isAddCommutative_anti`), so the name says the property is antitone in the subobject and matches the PR title.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` is declared at the root although its conclusion is `IsMulCommutative s` and its sibling constructor already lives in that namespace (`IsMulCommutative.of_setLike_mul_comm`, Defs.lean:341; `IsMulCommutative.of_comm`, Semigroup.lean:185); the analogous antitonicity lemmas for class-valued predicates are namespaced (`Graph.Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`).",
+     "requested_change": "Declare the lemma as `IsMulCommutative.anti` (additive image `IsAddCommutative.anti`), keeping the statement, so it is found next to `IsMulCommutative.of_setLike_mul_comm` and can be called as `IsMulCommutative.anti h` / `.anti h` where the expected type is `IsMulCommutative s`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "The `to_additive` docstring of `isMulCommutative_mono` closes with `-/ ]` (Defs.lean:351), a space before the closing bracket, while every other `to_additive` docstring in this file closes `-/]` (lines 286, 292, 299, 305, 310, 315) and the form is overwhelmingly `-/]` in the area.",
+     "requested_change": "Write the attribute as `@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/]`, dropping the space before `]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "`isMulCommutative_mono` repeats the binder block `{S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` that the two declarations directly before it (`isMulCommutative_iff_of_setLike`, Defs.lean:336, and `setLike_mul_comm`, Defs.lean:345) also spell out, so three consecutive declarations restate the same arguments (and shadow the file-level `variable {M : Type*}`).",
+     "requested_change": "Wrap the three lemmas in a `section` with `variable {S : Type*} [SetLike S M] [Mul M] [MulMemClass S M] {s t : S}` (reusing the file's `M`) and drop those binders from the signatures, leaving `isMulCommutative_mono` as `lemma isMulCommutative_mono [LE S] [IsConcreteLE S M] (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "PR #43024 (title)",
+     "claim": "The PR title `feat: \\`isMulCommutative_anti\\` for subobjects` names a declaration the diff does not add: the only new lemma is `isMulCommutative_mono`, and `isMulCommutative_anti` is declared nowhere.",
+     "requested_change": "Make the title and the code agree: rename the lemma to `isMulCommutative_anti` (see the naming finding), or, if the `_mono` name is kept, retitle the PR to name `isMulCommutative_mono`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "PR #43024 (title)",
+     "claim": "The PR title `feat: \\`isMulCommutative_anti\\` for subobjects` omits the area scope required by the `type(Area): description` commit practice.",
+     "requested_change": "Retitle to `feat(Algebra/Group/Subsemigroup): \\`isMulCommutative_anti\\` for subobjects` (with the lemma name matching the code).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep1",
+   "findings_as_matched": []
+  },
+  "DX1": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is order-*reversing* in the subobject order (`s ≤ t → [IsMulCommutative t] → IsMulCommutative s`, i.e. the property is inherited by the *smaller* object), whereas the `_mono` suffix in Mathlib is for the covariant direction (`s ≤ t → IsMulCommutative s → IsMulCommutative t`). The library names exactly this reversed shape with `anti` (`Set.Subsingleton.anti (ht : t.Subsingleton) (hst : s ⊆ t) : s.Subsingleton`, `Filter.Subsingleton.anti (hl : l.Subsingleton) (hl' : l' ≤ l) : l'.Subsingleton`), and the PR's own title advertises `isMulCommutative_anti`, so the declaration name contradicts both the practice and the PR title.",
+     "requested_change": "Rename the declaration to `isMulCommutative_anti` (the generated additive twin becomes `isAddCommutative_anti`); update the PR title/description accordingly. Keep the docstring as is.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep1/tasks/cdb017f913e4d78bf10be4d194f2ff4361602d439591be49a44363be584c3a48/samples/0/attempts/attempt_1_20261008040053/ape_agent_session_20261008_040053__5b400078-aaf2-42cd-8a73-22452cbc9688.jsonl"
+  },
+  "AP1": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "The PR title announces `isMulCommutative_anti` (`feat: `isMulCommutative_anti` for subobjects`) but this PR adds `isMulCommutative_mono`, and no declaration `isMulCommutative_anti` exists anywhere in the tree (`content_search` for `isMulCommutative_anti|IsMulCommutative.anti|Antitone.*IsMulCommutative`: 0 matches). The description is empty, so nothing in the PR metadata says what the change actually is, which is the declaration added here.",
+     "requested_change": "Make the title (and description) name the declaration the PR adds, e.g. `feat: isMulCommutative_mono for subobjects`, adding in the description where the lemma is intended to be used; if `_anti` really is the intended name, rename the declaration (and its `to_additive` counterpart `isAddCommutative_mono` → `isAddCommutative_anti`) instead, so that title and code agree. Do not leave the title naming a declaration that does not exist.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` repeats the binders `{S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` in its own signature, although the two consecutive declarations immediately above it (`isMulCommutative_iff_of_setLike` at line 336 and `setLike_mul_comm` at line 345) spell exactly the same binders. Arguments shared by consecutive declarations are declared once with `variable`, not repeated in each signature.",
+     "requested_change": "Declare the shared binders once, e.g. add `variable {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` above line 335 (inside a `section`) and drop them from the three signatures, leaving `isMulCommutative_mono [LE S] [IsConcreteLE S M] {s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s`. Verified: this restructured block (lines 335–356) compiles with no errors and no linter warnings (`lean_verify_edit`, lines 335–356).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep1/tasks/cf8f586f8ea137dd76b29b545c0e743527d1899a0433117d80db45644c35373e/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__f045d2cd-c142-409a-97ad-d3b8b3fb978e.jsonl"
+  },
+  "GPT2": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is misnamed: the lemma takes `s ≤ t` and an `IsMulCommutative t` instance to prove `IsMulCommutative s`, so the predicate is antitone in the subobject, not monotone.",
+     "requested_change": "Rename the declaration to `isMulCommutative_antitone` and let `to_additive` generate `isAddCommutative_antitone`; keep the statement and proof otherwise unchanged.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is named for the wrong variance: its statement is contravariant in the subobject order (`s ≤ t` and `[IsMulCommutative t]` give `IsMulCommutative s`), i.e. commutativity passes *down* to smaller subobjects, so this is an `anti` lemma, not a `mono` one. Mathlib reserves `mono` for the covariant direction (e.g. `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed`) and names predicate transfer in this direction `anti` throughout the library: `SimpleGraph.CliqueFree.anti`, `CliqueFreeOn.anti`, `IsAcyclic.anti`, `IsBridge.anti`, `Loopless.anti`, `Simple.anti`, `Cone.Blunt.anti`, `Cone.Salient.anti`, `SetFamily.IsIntersectingOf.anti`, `Subgraph.Compatible.anti_left/anti_right`. The name is also inconsistent with this PR's own title, `feat: isMulCommutative_anti for subobjects`, and no declaration called `isMulCommutative_anti` exists in the library, so the mismatch is unambiguous.",
+     "requested_change": "Rename the new lemma to `isMulCommutative_anti` (the `to_additive` version then becomes `isAddCommutative_anti`); the statement, proof, docstring and `@[to_additive]` attribute are unchanged. I verified this rename compiles in the reviewed file.",
+     "severity": "blocking"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep2/tasks/883d6ea24cc908e018341d959bad8b4a7fb0fdb516ce10eaa749e64f7a303715/samples/0/attempts/attempt_1_20261008051547/ape_agent_session_20261008_051549__327fd8d1-bcda-4f2a-880e-e1f8b4d19c86.jsonl"
+  },
+  "AP2": {
+   "R": "R11",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is named for monotonicity, but its statement is antitone: it transfers `IsMulCommutative` from the larger subobject `t` (`h : s ≤ t`, `[IsMulCommutative t]`) down to the smaller `s`, exactly as its docstring says (\"passes to smaller subobjects\"). Mathlib spells the covariant implication `_mono` (`Subgroup.closure_mono`, `Subgroup.map_mono`) and the pointwise antitone form `_anti` (e.g. `Subgroup.closure_pow_anti`), and the PR title already advertises this declaration as `isMulCommutative_anti` — so the declaration name contradicts both its own statement and the title.",
+     "requested_change": "Rename the declaration to `isMulCommutative_anti` (the `to_additive` copy then becomes `isAddCommutative_anti`); drop the docstring's `_mono`-style claim if the wording is adjusted, and retitle only if the opposite resolution is chosen. I verified by compile-checking the edit that renaming the declaration in place compiles with the existing attribute, proof and docstring. If `_mono` is truly intended (as in `IsOpen.mono`), then instead retitle the PR to `feat: isMulCommutative_mono for subobjects` so title and code agree.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:351",
+     "claim": "The added attribute line `@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/ ]` has a stray space between the docstring terminator `-/` and the closing `]`. This is not the house spelling: a census of the reviewed tree finds exactly two occurrences of `@[to_additive /-- … -/ ]` in all of Mathlib (this line and line 344 of the same file), while the standard form `@[to_additive /-- … -/]` is used throughout, including line 292 of this very file and `Mathlib/Algebra/Group/Semigroup.lean:75`.",
+     "requested_change": "Write `@[to_additive /-- Commutativity of addition passes to smaller subobjects. -/]` (no space before `]`); while there, line 344 of the same file has the same glitch.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep2/tasks/6b12c09a9bf1c60cc53c9a4971f71fcc3fb87c2ece302052a5568001aa330c4c/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__dbec595a-cc17-44fe-8a22-6fca4bbe8c61.jsonl"
+  },
+  "GPT3": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_postcutoff_elmgpt55_contract2_rep3",
+   "findings_as_matched": []
+  },
+  "DX3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is named for the wrong direction: its statement is contravariant in the subobject order (`h : s ≤ t` gives `IsMulCommutative t → IsMulCommutative s`, i.e. the property passes from the larger to the smaller subobject), which is exactly what Mathlib calls the `_anti` direction. The library reserves `_mono` for the covariant direction that goes from the smaller object to the larger one, and names this direction `_anti`/`.anti` throughout: `Loopless.anti [hG : G.Loopless] (hle : H ≤ G) : H.Loopless`, `IsAcyclic.anti (hsub : G ≤ G') (h : G'.IsAcyclic) : G.IsAcyclic`, `CliqueFree.anti (h : G ≤ H) : H.CliqueFree n → G.CliqueFree n`, `CliqueFreeOn.anti`, `Cone.Blunt.anti (h : C₂ ≤ C₁) : C₁.Blunt → C₂.Blunt`, `Cone.Salient.anti`, `IsCover.anti (hst : s ⊆ t) (ht : IsCover ε t N) : IsCover ε s N`, `IsIntersectingOf.anti (h : ℬ ⊆ 𝒜) (h𝒜 : IsIntersectingOf L 𝒜) : IsIntersectingOf L ℬ` — contrasted in the same files with the genuinely monotone `Cone.Pointed.mono (h : C₁ ≤ C₂) : C₁.Pointed → C₂.Pointed` and `IsCover.mono`. The PR title also advertises `isMulCommutative_anti`, so the declaration name contradicts the change's own intent. Merging as is would ship a name that the naming practice and the PR title both reject, and later renames of a public lemma are costly.",
+     "requested_change": "Rename the declaration to `isMulCommutative_anti` (the additive counterpart becomes `isAddCommutative_anti` automatically); the docstring \"Commutativity of multiplication passes to smaller subobjects\" already describes the `anti` direction and needs no change. Verified: replacing the declaration by `lemma isMulCommutative_anti {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M] [LE S] [IsConcreteLE S M] {s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s := .of_setLike_mul_comm fun _ ha _ hb ↦ setLike_mul_comm (mem_of_le_of_mem h ha) (mem_of_le_of_mem h hb)` compiles with no errors and no linter warnings.",
+     "severity": "blocking"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_post_base_rep3/tasks/7f6a9025d1202c6c903088ff485b6dcab09affcfb93d9906a662912f85150094/samples/0/attempts/attempt_1_20261008064012/ape_agent_session_20261008_064013__1b9347fa-f90b-4cad-8e0c-aeec9c2d4ea9.jsonl"
+  },
+  "AP3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "iter_ds41_conv_post_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:352",
+     "claim": "`isMulCommutative_mono` is named with the monotonicity suffix `_mono`, but its statement is antitone: `{s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s` says commutativity is *lost* going up, i.e. passes from a larger subobject to a smaller one — which is exactly what its own docstring above (line 350, \"passes to smaller subobjects\") says, and what the PR title announces (`isMulCommutative_anti`). In Mathlib the down-direction of such a transfer is spelled `_anti`, not `_mono` (`nth_eq_zero_mono` vs `nth_ne_zero_anti` in Data/Nat/Nth.lean, `dual_anti`, `generateFrom_anti`, `deleteEdges_anti`), so the current name misstates the direction and contradicts the PR title.",
+     "requested_change": "Rename the declaration to `isMulCommutative_anti` (this also makes the PR title accurate and gives `isAddCommutative_anti` through `to_additive`); if you prefer the `X_of_le` spelling used for the analogous downward transfer `LieModule.isNilpotent_of_le` (Mathlib/Algebra/Lie/Nilpotent.lean:706), name it `isMulCommutative_of_le` instead, but do not keep `_mono` for an antitone statement.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Subsemigroup/Defs.lean:335",
+     "claim": "The new declaration `isMulCommutative_mono` (line 352) repeats the binder list `{S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` verbatim, as do the two consecutive declarations just above it, `isMulCommutative_iff_of_setLike` (line 336) and `setLike_mul_comm` (line 345); three consecutive declarations in a row share these four binders, whereas the practice is to declare arguments shared by consecutive declarations once with `variable` (this file itself does so everywhere else, e.g. `namespace MulMemClass` / `variable {A : Type*} [Mul M] [SetLike A M] [hA : MulMemClass A M] (S' : A)` at line 261).",
+     "requested_change": "Insert `variable {S M : Type*} [SetLike S M] [Mul M] [MulMemClass S M]` before `isMulCommutative_iff_of_setLike` and drop the repeated binders from the three signatures, leaving `lemma isMulCommutative_iff_of_setLike {s : S} : ...`, `lemma setLike_mul_comm {s : S} [IsMulCommutative s] ...` and `lemma isMulCommutative_anti [LE S] [IsConcreteLE S M] {s t : S} (h : s ≤ t) [IsMulCommutative t] : IsMulCommutative s`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_post_apt_rep3/tasks/21a2463caff3c26f82f286e3d1690158ae7b6b690d5d0ee7ecfb20cdc732acd7/samples/0/attempts/attempt_1_20261010111919/ape_agent_session_20261010_111919__b5f3636f-1a26-4f20-8a10-7c32e83b1300.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_post_43024.md"
+}

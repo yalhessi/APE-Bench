@@ -1,0 +1,878 @@
+{
+ "asks": [
+  {
+   "id": "v0016",
+   "pr": 26755,
+   "family": "F12",
+   "in_census": true,
+   "entries": [
+    "P100"
+   ],
+   "text": "How many `noncomputable`s from this file are still necessary? `coeMonoidHom` looks like it can be computable too?",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "line": 1,
+   "author": "b-mehta",
+   "at": "2025-07-04T16:05:52Z",
+   "matcher_text": {
+    "ask_id": "v0016",
+    "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+    "code_at_comment": "",
+    "comment": "How many `noncomputable`s from this file are still necessary? `coeMonoidHom` looks like it can be computable too?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "AP1": {
+     "R": "R1",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "The PR removes `noncomputable` from `Finset.monoid` but leaves the same modifier on its sibling instances in the very same file: `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964) and `Finset.divisionCommMonoid` (line 1020), as well as on `Finset.coeMonoidHom` (line 770). I verified each one is no longer needed: replacing the modifier-carrying line by the same line without `noncomputable` makes the file compile with no errors (Lean reports `axiom ... not supported by code generator; consider marking definition as 'noncomputable'` for a genuinely noncomputable `def`, so a clean compile does prove the definition is computable). This is exactly the inconsistency the modification was meant to fix: on the `Set` side `Set.commMonoid`, `Set.divisionMonoid` and `Set.divisionCommMonoid` were all de-`noncomputable`d, while their `Finset` counterparts were not.",
+      "requested_change": "Also drop `noncomputable` from `protected def commMonoid` (939), `protected def divisionMonoid` (964), `protected def divisionCommMonoid` (1020) and `def coeMonoidHom` (770), so that the modifier is applied uniformly to the family (or record in a comment why these specific ones must keep it).",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "The PR removes `noncomputable` from `Finset.monoid` but leaves the same modifier on its sibling instances in the very same file: `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964) and `Finset.divisionCommMonoid` (line 1020), as well as on `Finset.coeMonoidHom` (line 770). I verified each one is no longer needed: replacing the modifier-carrying line by the same line without `noncomputable` makes the file compile with no errors (Lean reports `axiom ... not supported by code generator; consider marking definition as 'noncomputable'` for a genuinely noncomputable `def`, so a clean compile does prove the definition is computable). This is exactly the inconsistency the modification was meant to fix: on the `Set` side `Set.commMonoid`, `Set.divisionMonoid` and `Set.divisionCommMonoid` were all de-`noncomputable`d, while their `Finset` counterparts were not.",
+      "requested_change": "Also drop `noncomputable` from `protected def commMonoid` (939), `protected def divisionMonoid` (964), `protected def divisionCommMonoid` (1020) and `def coeMonoidHom` (770), so that the modifier is applied uniformly to the family (or record in a comment why these specific ones must keep it).",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "X1": {
+     "R": "R2",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+      "claim": "The PR makes `Finset.monoid` computable but leaves `noncomputable` on the sibling pointwise structures in the same file: `Finset.commMonoid` (l. 939), `Finset.divisionMonoid` (l. 964), `Finset.divisionCommMonoid` (l. 1020) and `Finset.coeMonoidHom` (l. 770). Those modifiers existed only because `Set.monoid`/`Set.divisionMonoid` were noncomputable. With the PR's changes they are no longer needed, so the PR is incomplete against its own title (\"remove `noncomputable` from Set/Finset Monoid instances\").",
+      "requested_change": "Remove `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid`, `Finset.divisionCommMonoid` and `Finset.coeMonoidHom` in this file (e.g. `protected def commMonoid : CommMonoid (Finset α) :=`, `protected def divisionMonoid : DivisionMonoid (Finset α) :=`, `protected def divisionCommMonoid [DivisionCommMonoid α] :`, `def coeMonoidHom : Finset α →* Set α where`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+      "claim": "The PR makes `Finset.monoid` computable but leaves `noncomputable` on the sibling pointwise structures in the same file: `Finset.commMonoid` (l. 939), `Finset.divisionMonoid` (l. 964), `Finset.divisionCommMonoid` (l. 1020) and `Finset.coeMonoidHom` (l. 770). Those modifiers existed only because `Set.monoid`/`Set.divisionMonoid` were noncomputable. With the PR's changes they are no longer needed, so the PR is incomplete against its own title (\"remove `noncomputable` from Set/Finset Monoid instances\").",
+      "requested_change": "Remove `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid`, `Finset.divisionCommMonoid` and `Finset.coeMonoidHom` in this file (e.g. `protected def commMonoid : CommMonoid (Finset α) :=`, `protected def divisionMonoid : DivisionMonoid (Finset α) :=`, `protected def divisionCommMonoid [DivisionCommMonoid α] :`, `def coeMonoidHom : Finset α →* Set α where`).",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "DX2": {
+     "R": "R3",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "The cleanup in this changed file is incomplete: the PR strips `noncomputable` from `Finset.monoid` but leaves the very same lean4#7824 workaround on the sibling pointwise instances declared a few lines below it in the same file — `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) — and on the hom `Finset.coeMonoidHom` (line 770), which exists precisely to land in `Set α`. All four depended on the now-computable `Set.monoid`/`Set.mulOneClass`/`Set.one`, so the file is left internally inconsistent: `Finset.monoid` computable but its immediate extensions noncomputable.",
+      "requested_change": "In this PR, additionally delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, so the whole pointwise instance chain in the file is computable again.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "The cleanup in this changed file is incomplete: the PR strips `noncomputable` from `Finset.monoid` but leaves the very same lean4#7824 workaround on the sibling pointwise instances declared a few lines below it in the same file — `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) — and on the hom `Finset.coeMonoidHom` (line 770), which exists precisely to land in `Set α`. All four depended on the now-computable `Set.monoid`/`Set.mulOneClass`/`Set.one`, so the file is left internally inconsistent: `Finset.monoid` computable but its immediate extensions noncomputable.",
+      "requested_change": "In this PR, additionally delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, so the whole pointwise instance chain in the file is computable again.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "AP3": {
+     "R": "R4",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "`Finset.commMonoid` keeps `noncomputable` while its neighbour `Finset.monoid` (line 804) loses it in this PR, and nothing records why. The same leftovers — all built from the corresponding `Set` instances that this PR makes computable — are `Finset.coeMonoidHom` (770), `Finset.divisionMonoid` (964) and `Finset.divisionCommMonoid` (1020). Each of the four compiles with `noncomputable` dropped in this PR's state, so the modifier is now applied to some members of the family and not others without a stated reason.",
+      "requested_change": "Drop `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`; if any of them must keep it, add a one-line comment saying what still forces it.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+      "claim": "`Finset.commMonoid` keeps `noncomputable` while its neighbour `Finset.monoid` (line 804) loses it in this PR, and nothing records why. The same leftovers — all built from the corresponding `Set` instances that this PR makes computable — are `Finset.coeMonoidHom` (770), `Finset.divisionMonoid` (964) and `Finset.divisionCommMonoid` (1020). Each of the four compiles with `noncomputable` dropped in this PR's state, so the modifier is now applied to some members of the family and not others without a stated reason.",
+      "requested_change": "Drop `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`; if any of them must keep it, add a one-line comment saying what still forces it.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "GPT2": {
+     "R": "R5",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom` is still marked `noncomputable` even though the definition is accepted as computable after this PR's `Set`/`Finset` pointwise instance cleanup, leaving a stale annotation in the same section.",
+      "requested_change": "Change `noncomputable def coeMonoidHom` to `def coeMonoidHom`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom` is still marked `noncomputable` even though the definition is accepted as computable after this PR's `Set`/`Finset` pointwise instance cleanup, leaving a stale annotation in the same section.",
+      "requested_change": "Change `noncomputable def coeMonoidHom` to `def coeMonoidHom`.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "DX3": {
+     "R": "R6",
+     "m1": "reached",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom`, immediately above `Finset.monoid` in the same section, is still `noncomputable def`; its target `Finset α →* Set α` requires `Monoid (Set α)`, i.e. the `Set.monoid` instance this PR has just made computable, so the marker is now redundant. Leaving one `noncomputable` directly above the de-`noncomputable`d `Finset.monoid` is inconsistent within the file.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α` to `def coeMonoidHom : Finset α →* Set α`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom`, immediately above `Finset.monoid` in the same section, is still `noncomputable def`; its target `Finset α →* Set α` requires `Monoid (Set α)`, i.e. the `Set.monoid` instance this PR has just made computable, so the marker is now redundant. Leaving one `noncomputable` directly above the de-`noncomputable`d `Finset.monoid` is inconsistent within the file.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α` to `def coeMonoidHom : Finset α →* Set α`.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "GPT1": {
+     "R": "R7",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "The Finset pointwise file still contains stale `noncomputable` modifiers on the remaining monoid-family API (`Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid`) even though they now compile computably after this PR's Set changes.",
+      "requested_change": "Remove `noncomputable` from those four declarations: make line 770 `def coeMonoidHom ...`, line 939 `protected def commMonoid ...`, line 964 `protected def divisionMonoid ...`, and line 1020 `protected def divisionCommMonoid ...`; let `to_additive` update the additive counterparts as well.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "The Finset pointwise file still contains stale `noncomputable` modifiers on the remaining monoid-family API (`Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid`) even though they now compile computably after this PR's Set changes.",
+      "requested_change": "Remove `noncomputable` from those four declarations: make line 770 `def coeMonoidHom ...`, line 939 `protected def commMonoid ...`, line 964 `protected def divisionMonoid ...`, and line 1020 `protected def divisionCommMonoid ...`; let `to_additive` update the additive counterparts as well.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "The Finset pointwise monoid API is still only partially cleaned up: `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` retain obsolete `noncomputable` markers even though the Set-side dependencies changed by this PR now make them computable.",
+      "requested_change": "Delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` as part of this cleanup.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "The Finset pointwise monoid API is still only partially cleaned up: `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` retain obsolete `noncomputable` markers even though the Set-side dependencies changed by this PR now make them computable.",
+      "requested_change": "Delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` as part of this cleanup.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "T1": {
+     "R": "R9",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Finset.coeMonoidHom",
+      "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable def`; its target monoid structure on `Set α` (`Set.mulOneClass`/`Set.one`) is made computable by this PR, alongside `Set.singletonMonoidHom`, so the modifier is now unnecessary and inconsistent with the Set-side homs the PR fixes.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 770).",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Finset.coeMonoidHom",
+      "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable def`; its target monoid structure on `Set α` (`Set.mulOneClass`/`Set.one`) is made computable by this PR, alongside `Set.singletonMonoidHom`, so the modifier is now unnecessary and inconsistent with the Set-side homs the PR fixes.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 770).",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "AP2": {
+     "R": "R10",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom` is still `noncomputable`, but its noncomputability came from the same source as `Finset.monoid`'s: it is a `Finset α →* Set α`, so it uses `Monoid (Finset α)` and the `Set.monoid` instance that this PR just made computable. I compiled the file with `noncomputable` removed from this declaration and it builds with no errors, so the modifier is unnecessary and is now inconsistent with the rest of the PR.",
+      "requested_change": "Write `def coeMonoidHom : Finset α →* Set α where` (drop `noncomputable`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom` is still `noncomputable`, but its noncomputability came from the same source as `Finset.monoid`'s: it is a `Finset α →* Set α`, so it uses `Monoid (Finset α)` and the `Set.monoid` instance that this PR just made computable. I compiled the file with `noncomputable` removed from this declaration and it builds with no errors, so the modifier is unnecessary and is now inconsistent with the rest of the PR.",
+      "requested_change": "Write `def coeMonoidHom : Finset α →* Set α where` (drop `noncomputable`).",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "X2": {
+     "R": "R11",
+     "m1": "reached",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Finset.commMonoid",
+      "claim": "In `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`, the file this PR edits, the PR removes `noncomputable` from `Finset.monoid` but leaves it on `Finset.commMonoid` (line 939) and on its siblings `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) and `Finset.coeMonoidHom` (line 770). None of the four needs it. So the PR's stated goal, removing `noncomputable` from the Set/Finset Monoid instances, is only half done in this file, and the Finset monoid family is now inconsistent: `Finset.monoid` is computable, but the `CommMonoid`, `DivisionMonoid` and `DivisionCommMonoid` built on the same `coe_injective` pattern are not.",
+      "requested_change": "Change `protected noncomputable def commMonoid` to `protected def commMonoid`. Make the same change to `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, and change `noncomputable def coeMonoidHom` to `def coeMonoidHom`, so the file has no `noncomputable` left.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Finset.commMonoid",
+      "claim": "In `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`, the file this PR edits, the PR removes `noncomputable` from `Finset.monoid` but leaves it on `Finset.commMonoid` (line 939) and on its siblings `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) and `Finset.coeMonoidHom` (line 770). None of the four needs it. So the PR's stated goal, removing `noncomputable` from the Set/Finset Monoid instances, is only half done in this file, and the Finset monoid family is now inconsistent: `Finset.monoid` is computable, but the `CommMonoid`, `DivisionMonoid` and `DivisionCommMonoid` built on the same `coe_injective` pattern are not.",
+      "requested_change": "Change `protected noncomputable def commMonoid` to `protected def commMonoid`. Make the same change to `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, and change `noncomputable def coeMonoidHom` to `def coeMonoidHom`, so the file has no `noncomputable` left.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "reached",
+     "m1_finding": 1,
+     "m1_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable`, precisely because its `MonoidHom` data is stated through the `Set α` monoid data (`Set.one`, `Set.mul`, and hence `Set.monoid`) that this PR makes computable. That marker is now unnecessary, and it is the Finset mirror of the `Set.singletonOneHom` / `Set.singletonMulHom` / `Set.singletonMonoidHom` definitions the PR already de-`noncomputable`-ised.",
+      "requested_change": "Change line 770 to `def coeMonoidHom : Finset α →* Set α where` (dropping `noncomputable`).",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 1,
+     "m2_finding_text": {
+      "i": 1,
+      "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+      "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable`, precisely because its `MonoidHom` data is stated through the `Set α` monoid data (`Set.one`, `Set.mul`, and hence `Set.monoid`) that this PR makes computable. That marker is now unnecessary, and it is the Finset mirror of the `Set.singletonOneHom` / `Set.singletonMulHom` / `Set.singletonMonoidHom` definitions the PR already de-`noncomputable`-ised.",
+      "requested_change": "Change line 770 to `def coeMonoidHom : Finset α →* Set α where` (dropping `noncomputable`).",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    },
+    "TA1": {
+     "R": "R13",
+     "m1": "reached",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Finset.coeMonoidHom",
+      "claim": "`Finset.coeMonoidHom` (Finset/Basic.lean line 770) is still `noncomputable def`, but it compiles without the modifier once `Set.one`/`Set.monoid` are computable, so it is left over from the same nightly-2025-04-07 churn this PR cleans up.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where`.",
+      "severity": "advisory"
+     },
+     "note_m1": "Most reviewers ask to drop noncomputable from coeMonoidHom and the Finset monoid siblings in this file.",
+     "m2": "reached",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Finset.coeMonoidHom",
+      "claim": "`Finset.coeMonoidHom` (Finset/Basic.lean line 770) is still `noncomputable def`, but it compiles without the modifier once `Set.one`/`Set.monoid` are computable, so it is left over from the same nightly-2025-04-07 churn this PR cleans up.",
+      "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where`.",
+      "severity": "advisory"
+     },
+     "note_m2": "All reviewers ask to drop the remaining noncomputable on coeMonoidHom and siblings in Finset/Basic.lean."
+    }
+   },
+   "entries_text": {
+    "P100": "A variant or improvement introduced for one member of a family of siblings (left/right or primed lemma variants, analogous tactics or attributes, parallel code paths in meta-code) is also provided for the other members."
+   }
+  }
+ ],
+ "pr": 26755,
+ "sessions": {
+  "X1": {
+   "R": "R2",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+     "claim": "The PR makes `Finset.monoid` computable but leaves `noncomputable` on the sibling pointwise structures in the same file: `Finset.commMonoid` (l. 939), `Finset.divisionMonoid` (l. 964), `Finset.divisionCommMonoid` (l. 1020) and `Finset.coeMonoidHom` (l. 770). Those modifiers existed only because `Set.monoid`/`Set.divisionMonoid` were noncomputable. With the PR's changes they are no longer needed, so the PR is incomplete against its own title (\"remove `noncomputable` from Set/Finset Monoid instances\").",
+     "requested_change": "Remove `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid`, `Finset.divisionCommMonoid` and `Finset.coeMonoidHom` in this file (e.g. `protected def commMonoid : CommMonoid (Finset α) :=`, `protected def divisionMonoid : DivisionMonoid (Finset α) :=`, `protected def divisionCommMonoid [DivisionCommMonoid α] :`, `def coeMonoidHom : Finset α →* Set α where`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Finset.mulAction",
+     "claim": "`Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` (l. 76-87) still carries the same `#adaptation_note /-- nightly-2025-04-07 ... because of its dependence on Set.monoid ... -/` that this PR deletes from `Finset.monoid`, and is still `protected noncomputable def`. After this PR the note is false, since `Set.monoid` and `Finset.monoid` are computable. It is the only remaining copy of this lean4#7824 adaptation note in Mathlib.",
+     "requested_change": "In `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean`, delete the `#adaptation_note /-- nightly-2025-04-07 ... -/` block above `Finset.mulAction` and change `protected noncomputable def mulAction` to `protected def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Set.mulAction",
+     "claim": "Downstream pointwise structures that were noncomputable only because of the declarations this PR fixes are still marked `noncomputable`: `Set.mulAction` (Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean l. 173, depends on `Set.monoid`), `Set.hasDistribNeg` (Mathlib/Algebra/Ring/Pointwise/Set.lean l. 30, built from `Set.involutiveNeg`) and `Finset.distribNeg` (Mathlib/Algebra/Ring/Pointwise/Finset.lean l. 29). Each compiles without the modifier once this PR is applied.",
+     "requested_change": "Drop `noncomputable` from `Set.mulAction` (`protected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where`), `Set.hasDistribNeg` and `Finset.distribNeg`, either in this PR or in an immediate follow-up that the PR description names.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Finset.commMonoid",
+     "claim": "In `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`, the file this PR edits, the PR removes `noncomputable` from `Finset.monoid` but leaves it on `Finset.commMonoid` (line 939) and on its siblings `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) and `Finset.coeMonoidHom` (line 770). None of the four needs it. So the PR's stated goal, removing `noncomputable` from the Set/Finset Monoid instances, is only half done in this file, and the Finset monoid family is now inconsistent: `Finset.monoid` is computable, but the `CommMonoid`, `DivisionMonoid` and `DivisionCommMonoid` built on the same `coe_injective` pattern are not.",
+     "requested_change": "Change `protected noncomputable def commMonoid` to `protected def commMonoid`. Make the same change to `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, and change `noncomputable def coeMonoidHom` to `def coeMonoidHom`, so the file has no `noncomputable` left.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Finset.mulAction",
+     "claim": "`Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` (lines 76-87) still carries the same `#adaptation_note /-- nightly-2025-04-07 ... needs to be marked as noncomputable because of its dependence on Set.monoid ... -/` that this PR deletes above `Finset.monoid`, and it is still `protected noncomputable def`. This PR makes `Set.monoid` computable, so the note's stated reason is now false, and the declaration compiles without `noncomputable`. The two notes were added together for the same cause (Zulip, #23806 thread: \"I've added adaptation notes to the two `noncomputable`s that were flagged ... in review\"). Removing one and leaving the other leaves a stale adaptation note in the library.",
+     "requested_change": "In `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean`, delete the `#adaptation_note /-- nightly-2025-04-07 ... -/` block (lines 76-81) above `Finset.mulAction`. Change `protected noncomputable def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :` to `protected def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Set.mulAction",
+     "claim": "`Set.mulAction : MulAction (Set α) (Set β)` in `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean` (line 173) is the `Set` twin of `Finset.mulAction`. It sits directly on the `Set.monoid` that this PR makes computable, yet it is still `protected noncomputable def`, and it compiles without the keyword. The same holds for the other pointwise `Set`/`Finset` structures built on the instances this PR touches: `Set.hasDistribNeg` (which uses `Set.involutiveNeg`, made computable here), `Set.distribSMulSet`, `Set.distribMulActionSet`, `Set.mulDistribMulActionSet`, `Finset.distribNeg`, `Finset.distribSMul`, `Finset.distribMulAction`, `Finset.mulDistribMulAction` and `Submodule.pointwiseSetMulAction`. With these left in place, the cleanup of the pointwise `noncomputable`s is incomplete.",
+     "requested_change": "Change `protected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where` to `protected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where`. Drop `noncomputable` the same way from the pointwise declarations listed in the claim. If the PR is to stay two-file, open a follow-up that does this instead.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "T1": {
+   "R": "R9",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Finset.mulAction",
+     "claim": "`Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` still carries the `#adaptation_note /-- nightly-2025-04-07` saying it must be `noncomputable` \"because of its dependence on `Set.monoid`\". This PR makes `Set.monoid` (and `Finset.monoid`) computable and deletes the identical note from `Finset.monoid`, so this twin note is now false and the `noncomputable` is no longer needed.",
+     "requested_change": "Delete the `#adaptation_note` block (lines 76-81) above `Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` and change `protected noncomputable def mulAction` to `protected def mulAction`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Finset.commMonoid",
+     "claim": "`Finset.commMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` is still `protected noncomputable def` although the PR removes `noncomputable` from `Finset.monoid` in the same file and from its Set counterpart `Set.commMonoid`; the PR (titled 'remove noncomputable from Set/Finset Monoid instances') leaves the Finset monoid-family instances inconsistent.",
+     "requested_change": "Change `protected noncomputable def commMonoid` to `protected def commMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 939).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Finset.divisionMonoid",
+     "claim": "`Finset.divisionMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` is still `protected noncomputable def` although the PR removes `noncomputable` from `Finset.monoid` in the same file and from its Set counterpart `Set.divisionMonoid`; the PR (titled 'remove noncomputable from Set/Finset Monoid instances') leaves the Finset monoid-family instances inconsistent.",
+     "requested_change": "Change `protected noncomputable def divisionMonoid` to `protected def divisionMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 964).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Finset.divisionCommMonoid",
+     "claim": "`Finset.divisionCommMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` is still `protected noncomputable def` although the PR removes `noncomputable` from `Finset.monoid` in the same file and from its Set counterpart `Set.divisionCommMonoid`; the PR (titled 'remove noncomputable from Set/Finset Monoid instances') leaves the Finset monoid-family instances inconsistent.",
+     "requested_change": "Change `protected noncomputable def divisionCommMonoid` to `protected def divisionCommMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 1020).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Finset.coeMonoidHom",
+     "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable def`; its target monoid structure on `Set α` (`Set.mulOneClass`/`Set.one`) is made computable by this PR, alongside `Set.singletonMonoidHom`, so the modifier is now unnecessary and inconsistent with the Set-side homs the PR fixes.",
+     "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (line 770).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Set.mulAction",
+     "claim": "`Set.mulAction : MulAction (Set α) (Set β)` in `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean` is still `protected noncomputable def`; its `Monoid (Set α)` argument is `Set.monoid`, which this PR makes computable, so the modifier is now unnecessary (it is the Set twin of `Finset.mulAction`, whose adaptation note blames `Set.monoid`).",
+     "requested_change": "Change `protected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where` to `protected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where` (line 173).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Set.hasDistribNeg",
+     "claim": "`Set.hasDistribNeg` in `Mathlib/Algebra/Ring/Pointwise/Set.lean` is still `protected noncomputable def`; its data is `__ := Set.involutiveNeg`, the additive form of `Set.involutiveInv`, which this PR makes computable, so the modifier is now unnecessary.",
+     "requested_change": "Change `protected noncomputable def hasDistribNeg` to `protected def hasDistribNeg` in `Mathlib/Algebra/Ring/Pointwise/Set.lean` (line 30).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/GroupWithZero/Action/Pointwise/Set.lean",
+     "claim": "`Set.distribSMulSet`, `Set.distribMulActionSet` and `Set.mulDistribMulActionSet` are still `protected noncomputable def`; they build on the pointwise `AddMonoid (Set β)` / `Monoid (Set β)` structures (`Set.addMonoid`, `Set.monoid`) that this PR makes computable, so the modifiers are now unnecessary.",
+     "requested_change": "Remove `noncomputable` from `Set.distribSMulSet` (line 107), `Set.distribMulActionSet` (line 115) and `Set.mulDistribMulActionSet` (line 121).",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/GroupWithZero/Action/Pointwise/Finset.lean",
+     "claim": "`Finset.distribSMul`, `Finset.distribMulAction` and `Finset.mulDistribMulAction` are still `protected noncomputable def`, built from `coeAddMonoidHom`/`coeMonoidHom` into the Set pointwise monoids this PR makes computable; the modifiers are no longer needed.",
+     "requested_change": "Remove `noncomputable` from `Finset.distribSMul` (line 32), `Finset.distribMulAction` (line 38) and `Finset.mulDistribMulAction` (line 43).",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Finset.distribNeg",
+     "claim": "`Finset.distribNeg` in `Mathlib/Algebra/Ring/Pointwise/Finset.lean` is still `protected noncomputable def`, the Finset twin of `Set.hasDistribNeg`; the modifier is unneeded in the reviewed workspace and is the same cleanup the PR performs on `Finset.monoid`.",
+     "requested_change": "Change `protected noncomputable def distribNeg` to `protected def distribNeg` (line 29).",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Mathlib/Data/Set/Semiring.lean",
+     "claim": "The `SetSemiring` instances `NonAssocSemiring` (built from `Set.mulOneClass`), `IdemSemiring`, `IdemCommSemiring` (from `CommMonoid (Set α)`), `CommMonoid`, `IsOrderedRing` and `SetSemiring.imageHom` are still `noncomputable`, though the Set pointwise structures they are assembled from are made computable by this PR; all of them now compile without the modifier.",
+     "requested_change": "Remove `noncomputable` from the instances at lines 174, 181, 189, 193, 200 and from `imageHom` at line 205 of `Mathlib/Data/Set/Semiring.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "Mathlib/Algebra/Module/Submodule/Pointwise.lean",
+     "claim": "`Submodule.pointwiseSetMulAction : MulAction (Set R) (Submodule R M)` and `Submodule.pointwiseSetDistribMulAction` are still `protected noncomputable def`; their `Monoid (Set R)` is `Set.monoid`, which this PR makes computable, so both modifiers are now unnecessary.",
+     "requested_change": "Remove `noncomputable` from `Submodule.pointwiseSetMulAction` (line 506) and `Submodule.pointwiseSetDistribMulAction` (line 525).",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Filter.mulDistribMulActionFilter",
+     "claim": "`Filter.mulDistribMulActionFilter` (whose type is `MulDistribMulAction α (Set β)`, needing `Set.monoid`) is still `protected noncomputable def`; with `Set.monoid` computable after this PR the modifier is unnecessary.",
+     "requested_change": "Change `protected noncomputable def mulDistribMulActionFilter` to `protected def mulDistribMulActionFilter` in `Mathlib/Order/Filter/Pointwise.lean` (line 1053).",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "TA1": {
+   "R": "R13",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Finset.mulAction",
+     "claim": "The PR removes the nightly-2025-04-07 `#adaptation_note` from `Finset.monoid` but leaves its identical twin above `Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` (lines 76-81), which says the definition \"now needs to be marked as noncomputable because of its dependence on `Set.monoid`\". After this PR `Set.monoid` is computable, so that note is false, and the `protected noncomputable def mulAction` it justifies is no longer needed.",
+     "requested_change": "In `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean`, delete the `#adaptation_note /-- nightly-2025-04-07 ... -/` block before `Finset.mulAction` and change `protected noncomputable def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :` to `protected def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :`.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Finset.commMonoid",
+     "claim": "The PR's title is about the Set/Finset monoid instances, but in the changed file `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` it removes `noncomputable` only from `Finset.monoid`; `Finset.commMonoid` (line 939) is still `protected noncomputable def`, although it is built the same way (`coe_injective.commMonoid _ coe_one coe_mul coe_pow`) and compiles without the modifier now that `Set.commMonoid` is computable.",
+     "requested_change": "Change `protected noncomputable def commMonoid : CommMonoid (Finset α) :=` to `protected def commMonoid : CommMonoid (Finset α) :=`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Finset.divisionMonoid",
+     "claim": "`Finset.divisionMonoid` (Finset/Basic.lean line 964) is still `protected noncomputable def` while its sibling `Finset.monoid` loses the modifier in this PR; the modifier is no longer needed now that `Set.divisionMonoid` is computable.",
+     "requested_change": "Change `protected noncomputable def divisionMonoid : DivisionMonoid (Finset α) :=` to `protected def divisionMonoid : DivisionMonoid (Finset α) :=`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Finset.divisionCommMonoid",
+     "claim": "`Finset.divisionCommMonoid` (Finset/Basic.lean lines 1020-1021) is still `protected noncomputable def`, unlike `Set.divisionCommMonoid`, which this PR makes computable; and once the modifier goes, the signature fits on one line (90 characters) and should not be broken.",
+     "requested_change": "Replace the two-line header `protected noncomputable def divisionCommMonoid [DivisionCommMonoid α] :` / `DivisionCommMonoid (Finset α) :=` with the single line `protected def divisionCommMonoid [DivisionCommMonoid α] : DivisionCommMonoid (Finset α) :=`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Finset.coeMonoidHom",
+     "claim": "`Finset.coeMonoidHom` (Finset/Basic.lean line 770) is still `noncomputable def`, but it compiles without the modifier once `Set.one`/`Set.monoid` are computable, so it is left over from the same nightly-2025-04-07 churn this PR cleans up.",
+     "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α where` to `def coeMonoidHom : Finset α →* Set α where`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:828",
+     "claim": "The signature of `Set.divisionCommMonoid` was split across two lines only because `noncomputable` pushed it to 101 characters; with the modifier removed by this PR it is 87 characters and fits on one line, so the break is no longer warranted.",
+     "requested_change": "Write the header on one line: `protected def divisionCommMonoid [DivisionCommMonoid α] : DivisionCommMonoid (Set α) :=`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Set.mulAction",
+     "claim": "`Set.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean` (line 173) is still `protected noncomputable def`; it is the Set counterpart of `Finset.mulAction`, whose adaptation note attributes the modifier to `Set.monoid`, and it compiles without it after this PR.",
+     "requested_change": "Change `protected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where` to `protected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where` (here or in an immediate follow-up).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Set.hasDistribNeg",
+     "claim": "`Set.hasDistribNeg` in `Mathlib/Algebra/Ring/Pointwise/Set.lean` (line 30) is still `protected noncomputable def`; it is built from `Set.involutiveNeg`, which this PR makes computable (to_additive of `Set.involutiveInv`), and it compiles without the modifier.",
+     "requested_change": "Change `protected noncomputable def hasDistribNeg [Mul α] [HasDistribNeg α] : HasDistribNeg (Set α) where` to `protected def hasDistribNeg [Mul α] [HasDistribNeg α] : HasDistribNeg (Set α) where`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Finset.distribNeg",
+     "claim": "`Finset.distribNeg` in `Mathlib/Algebra/Ring/Pointwise/Finset.lean` (line 29) is still `protected noncomputable def`, although it compiles without the modifier after this PR.",
+     "requested_change": "Change `protected noncomputable def distribNeg [DecidableEq α] [Mul α] [HasDistribNeg α] :` to `protected def distribNeg [DecidableEq α] [Mul α] [HasDistribNeg α] :`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Data/Set/Semiring.lean",
+     "claim": "The `SetSemiring` instances built from the pointwise Set structures this PR makes computable (`NonAssocSemiring` from `Set.mulOneClass`, `IdemSemiring`, `IdemCommSemiring`, `CommMonoid`, `IsOrderedRing`, and `SetSemiring.imageHom`, lines 174-205) are still marked `noncomputable`, and all of them compile without it.",
+     "requested_change": "Remove `noncomputable` from the five instances at lines 174, 181, 189, 193 and 200 and from `def imageHom` at line 205 of `Mathlib/Data/Set/Semiring.lean`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 10,
+     "target": "Filter.mulDistribMulActionFilter",
+     "claim": "`Filter.mulDistribMulActionFilter` in `Mathlib/Order/Filter/Pointwise.lean` (line 1053), a `MulDistribMulAction α (Set β)` that needs the `Set.monoid` structure, is still `protected noncomputable def`, though it compiles without the modifier after this PR.",
+     "requested_change": "Change `protected noncomputable def mulDistribMulActionFilter` to `protected def mulDistribMulActionFilter`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 11,
+     "target": "convexAddSubmonoid",
+     "claim": "`convexAddSubmonoid : AddSubmonoid (Set E)` in `Mathlib/Analysis/Convex/Basic.lean` (line 198), which depends on the pointwise `AddZeroClass (Set E)` this PR makes computable, is still `noncomputable def`, though it compiles without it.",
+     "requested_change": "Change `noncomputable def convexAddSubmonoid : AddSubmonoid (Set E) where` to `def convexAddSubmonoid : AddSubmonoid (Set E) where`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 12,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:803",
+     "claim": "The additive docstring of `Finset.monoid` ends in a trailing space inside the string: `@[to_additive \"`Finset α` is an `AddMonoid` under pointwise operations if `α` is. \"]` (line 803); `Finset.commMonoid` (line 938) has the same `is. \"`.",
+     "requested_change": "Drop the trailing space: `@[to_additive \"`Finset α` is an `AddMonoid` under pointwise operations if `α` is.\"]`, and the same in `Finset.commMonoid`'s `to_additive` string.",
+     "severity": "advisory"
+    },
+    {
+     "i": 13,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:77",
+     "claim": "`Set.one` builds its `One (Set α)` structure with the anonymous constructor `⟨{1}⟩`, on a line of its own although the whole declaration fits on one line (40 characters).",
+     "requested_change": "Write it with `where` on one line: `protected def one : One (Set α) where one := {1}` (as `SetSemiring`'s `instance : One (SetSemiring α) where one := (1 : Set α).up` does).",
+     "severity": "advisory"
+    },
+    {
+     "i": 14,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:120",
+     "claim": "`Set.singletonOneHom` packs its two `where` fields on one line (`toFun := singleton; map_one' := singleton_one`), while its sibling `Set.singletonMulHom`, touched in the same PR, puts one field per line.",
+     "requested_change": "Put one field per line:\n```\ndef singletonOneHom : OneHom α (Set α) where\n  toFun := singleton\n  map_one' := singleton_one\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 15,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:568",
+     "claim": "`Set.mulOneClass` is written as a `{ Set.one, Set.mul with ... }` structure instance after `:=` rather than with `where`.",
+     "requested_change": "Rewrite as\n```\nprotected def mulOneClass : MulOneClass (Set α) where\n  __ := Set.one\n  __ := Set.mul\n  mul_one := image2_right_identity mul_one\n  one_mul := image2_left_identity one_mul\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 16,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:768",
+     "claim": "`Set.divisionMonoid` is written as a `{ Set.monoid, Set.involutiveInv, Set.div, @Set.ZPow α _ _ _ with ... }` structure instance with `fun s t => by` fields rather than with `where`.",
+     "requested_change": "Rewrite with `where`: `protected def divisionMonoid : DivisionMonoid (Set α) where`, then `__ := Set.monoid`, `__ := Set.involutiveInv`, `__ := Set.div`, `__ := @Set.ZPow α _ _ _`, and the fields as `mul_inv_rev s t := by ...`, `inv_eq_of_mul s t h := by ...`, `div_eq_mul_inv s t := by ...`, each one level less indented.",
+     "severity": "advisory"
+    },
+    {
+     "i": 17,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:768",
+     "claim": "The `to_additive` attribute of `Set.divisionMonoid` is broken over two lines although `@[to_additive \"`Set α` is a subtraction monoid under pointwise operations if `α` is.\"]` fits on one line (86 characters).",
+     "requested_change": "Put the attribute on one line: `@[to_additive \"`Set α` is a subtraction monoid under pointwise operations if `α` is.\"]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 18,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:607",
+     "claim": "`Set.monoid` is written as `{ Set.semigroup, Set.mulOneClass, @Set.NPow α _ _ with }` after `:=` rather than with `where`.",
+     "requested_change": "Rewrite as `protected def monoid : Monoid (Set α) where` followed by `__ := Set.semigroup`, `__ := Set.mulOneClass`, `__ := @Set.NPow α _ _`, one per line.",
+     "severity": "advisory"
+    },
+    {
+     "i": 19,
+     "target": "Mathlib/Algebra/Group/Pointwise/Set/Basic.lean:741",
+     "claim": "`Set.commMonoid` is written as `{ Set.monoid, Set.commSemigroup with }` after `:=` rather than with `where`.",
+     "requested_change": "Rewrite as `protected def commMonoid [CommMonoid α] : CommMonoid (Set α) where` followed by `__ := Set.monoid` and `__ := Set.commSemigroup`, one per line.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R7",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "The Finset pointwise file still contains stale `noncomputable` modifiers on the remaining monoid-family API (`Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid`) even though they now compile computably after this PR's Set changes.",
+     "requested_change": "Remove `noncomputable` from those four declarations: make line 770 `def coeMonoidHom ...`, line 939 `protected def commMonoid ...`, line 964 `protected def divisionMonoid ...`, and line 1020 `protected def divisionCommMonoid ...`; let `to_additive` update the additive counterparts as well.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "`Finset.commMonoid` still carries `noncomputable`, but the dependency on the noncomputable `Set` pointwise instances that this PR removes was the only reason for it: with the PR's state of `Mathlib/Algebra/Group/Pointwise/Set/Basic.lean`, `protected def commMonoid : CommMonoid (Finset α) := coe_injective.commMonoid _ coe_one coe_mul coe_pow` compiles with no `noncomputable`. The same holds for its changed-file siblings `Finset.divisionMonoid` (line 964) and `Finset.divisionCommMonoid` (line 1020). Since the PR already makes the exact `Set` counterparts (`Set.commMonoid`, `Set.divisionMonoid`, `Set.divisionCommMonoid`) computable, leaving the `Finset` ones marked `noncomputable` is an inconsistency the PR is positioned to fix.",
+     "requested_change": "Drop `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid` in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` (i.e. `protected def commMonoid : CommMonoid (Finset α) := …`, etc.).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "`Finset.coeMonoidHom : Finset α →* Set α` is still `noncomputable`, precisely because its `MonoidHom` data is stated through the `Set α` monoid data (`Set.one`, `Set.mul`, and hence `Set.monoid`) that this PR makes computable. That marker is now unnecessary, and it is the Finset mirror of the `Set.singletonOneHom` / `Set.singletonMulHom` / `Set.singletonMonoidHom` definitions the PR already de-`noncomputable`-ised.",
+     "requested_change": "Change line 770 to `def coeMonoidHom : Finset α →* Set α where` (dropping `noncomputable`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:76",
+     "claim": "This `#adaptation_note` is the identical text (same nightly date, same `https://github.com/leanprover/lean4/pull/7824` link) as the note the PR deletes in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`, and it attributes the `noncomputable` on `Finset.mulAction` (line 87) to \"its dependence on `Set.monoid`\". Since the PR makes `Set.monoid` (and the rest of the `Set` pointwise monoid instances) computable, the note's premise is now false and `Finset.mulAction` no longer needs its marker, so the note is left stale by this PR.",
+     "requested_change": "Remove the `#adaptation_note` at lines 76–81 and drop `noncomputable` from `protected def mulAction` (line 87) in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean`, so this file gets the same cleanup as `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep1/tasks/bd30d4ed1823eea7089358491c162c72a4bd040692da1a5626fbcd5960c76719/samples/0/attempts/attempt_1_20261008040012/ape_agent_session_20261008_040013__bbc29e47-187e-4249-b979-4c59ae95dcca.jsonl"
+  },
+  "AP1": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "The PR removes `noncomputable` from `Finset.monoid` but leaves the same modifier on its sibling instances in the very same file: `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964) and `Finset.divisionCommMonoid` (line 1020), as well as on `Finset.coeMonoidHom` (line 770). I verified each one is no longer needed: replacing the modifier-carrying line by the same line without `noncomputable` makes the file compile with no errors (Lean reports `axiom ... not supported by code generator; consider marking definition as 'noncomputable'` for a genuinely noncomputable `def`, so a clean compile does prove the definition is computable). This is exactly the inconsistency the modification was meant to fix: on the `Set` side `Set.commMonoid`, `Set.divisionMonoid` and `Set.divisionCommMonoid` were all de-`noncomputable`d, while their `Finset` counterparts were not.",
+     "requested_change": "Also drop `noncomputable` from `protected def commMonoid` (939), `protected def divisionMonoid` (964), `protected def divisionCommMonoid` (1020) and `def coeMonoidHom` (770), so that the modifier is applied uniformly to the family (or record in a comment why these specific ones must keep it).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:76",
+     "claim": "The `#adaptation_note` above `Finset.mulAction` states that the definition “now needs to be marked as noncomputable because of its dependence on `Set.monoid`”. This PR removes `noncomputable` from `Set.monoid`, so the note no longer describes the code: the stated reason is gone and, as I verified, the `noncomputable` on `Finset.mulAction` (line 87) is unnecessary — the file compiles with the modifier removed from that line. The PR deleted the identical note from `Finset/Basic.lean` but left this copy behind, so the same workaround now survives only here.",
+     "requested_change": "Delete the stale `#adaptation_note` and the `noncomputable` modifier from `protected def mulAction` (or, if some reason still requires it, rewrite the note to state that reason). The analogous `Set.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean:173` is in the same situation and also compiles without `noncomputable`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep1/tasks/a2870b253e1f40ee45df5aabfc57e631dfc5db9074187830c38b752a5e1d4ac3/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__af6d14d8-2f23-422a-af28-1d14c7d4f7d3.jsonl"
+  },
+  "GPT2": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "`Finset.coeMonoidHom` is still marked `noncomputable` even though the definition is accepted as computable after this PR's `Set`/`Finset` pointwise instance cleanup, leaving a stale annotation in the same section.",
+     "requested_change": "Change `noncomputable def coeMonoidHom` to `def coeMonoidHom`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "`Finset.commMonoid` is still marked `noncomputable`, but the pointwise commutative monoid instance now compiles as a computable definition, so the cleanup is incomplete for the Finset monoid hierarchy.",
+     "requested_change": "Change `protected noncomputable def commMonoid` to `protected def commMonoid`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:964",
+     "claim": "`Finset.divisionMonoid` is still marked `noncomputable`, but the declaration is accepted as computable, leaving the corresponding Finset division-monoid instance out of this cleanup.",
+     "requested_change": "Change `protected noncomputable def divisionMonoid` to `protected def divisionMonoid`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:1020",
+     "claim": "`Finset.divisionCommMonoid` is still marked `noncomputable`, but the declaration is accepted as computable, leaving a stale annotation on the commutative division-monoid instance.",
+     "requested_change": "Change `protected noncomputable def divisionCommMonoid` to `protected def divisionCommMonoid`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "The cleanup in this changed file is incomplete: the PR strips `noncomputable` from `Finset.monoid` but leaves the very same lean4#7824 workaround on the sibling pointwise instances declared a few lines below it in the same file — `Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964), `Finset.divisionCommMonoid` (line 1020) — and on the hom `Finset.coeMonoidHom` (line 770), which exists precisely to land in `Set α`. All four depended on the now-computable `Set.monoid`/`Set.mulOneClass`/`Set.one`, so the file is left internally inconsistent: `Finset.monoid` computable but its immediate extensions noncomputable.",
+     "requested_change": "In this PR, additionally delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`, so the whole pointwise instance chain in the file is computable again.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:87",
+     "claim": "The adaptation this PR reverts is not confined to the two files it edits: the identical `#adaptation_note /-- nightly-2025-04-07 ... because of its dependence on `Set.monoid` ... -/` that this PR deletes from `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean` is still present at lines 76-81 of this file, directly above `protected noncomputable def mulAction` (line 87). That note states the *same* cause this PR fixes, so it is now obsolete and the marker is no longer needed.",
+     "requested_change": "Extend the chore to the remaining occurrences: delete the `#adaptation_note` at lines 76-81 and drop `noncomputable` from `Finset.mulAction` here, and drop `noncomputable` from `Set.mulAction` (`Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean`, line 173), which is also a `Set` pointwise instance left behind.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep2/tasks/ca38b2618788d72985d6350d9404a9aa49b49589810f79b0c671db566dc4e49c/samples/0/attempts/attempt_1_20261008051523/ape_agent_session_20261008_051524__25d3108c-d4f6-4f8e-bdb3-70d2c2a0f609.jsonl"
+  },
+  "AP2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "`Finset.commMonoid` (line 939), `Finset.divisionMonoid` (line 964) and `Finset.divisionCommMonoid` (line 1020) still carry `noncomputable`, although this PR removes it from their sibling `Finset.monoid` (line 804) for exactly the reason that also applies to them: they are built by the same `coe_injective.<class> _ coe_one coe_mul ...` pattern out of the `Set` instances (`Set.commMonoid`, `Set.divisionMonoid`, `Set.divisionCommMonoid`) that this PR makes computable. I compiled the file with `noncomputable` deleted from each of them in turn and the file builds with no errors, so the modifier is no longer needed on any of them. A `noncomputable` applied to some members of a family of sibling declarations and not others is a maintainer ask (apply to all, or record why not).",
+     "requested_change": "Delete `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid` (leaving `protected def ...`), or add a comment next to `Finset.monoid` saying why these siblings keep it.",
+     "severity": "blocking"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "`Finset.coeMonoidHom` is still `noncomputable`, but its noncomputability came from the same source as `Finset.monoid`'s: it is a `Finset α →* Set α`, so it uses `Monoid (Finset α)` and the `Set.monoid` instance that this PR just made computable. I compiled the file with `noncomputable` removed from this declaration and it builds with no errors, so the modifier is unnecessary and is now inconsistent with the rest of the PR.",
+     "requested_change": "Write `def coeMonoidHom : Finset α →* Set α where` (drop `noncomputable`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:76",
+     "claim": "`Finset.mulAction` still carries the verbatim twin of the `#adaptation_note` this PR deletes in `Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean`: “This now needs to be marked as noncomputable because of its dependence on `Set.monoid`” (nightly-2025-04-07, leaning on leanprover/lean4#7824). Since this PR makes `Set.monoid` computable, that note no longer holds for this declaration either, so it is a stale workaround/comment of exactly the kind the PR is cleaning up; I compiled the file with `noncomputable` removed from `Finset.mulAction` and it builds with no errors.",
+     "requested_change": "Delete the `#adaptation_note` at lines 76–81 and the `noncomputable` on `Finset.mulAction` (line 87), or, if it must stay for a different reason, replace the note with the reason that still applies.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "PR level (no file or line)",
+     "claim": "The PR has no description and its title (“remove `noncomputable` from Set/Finset Monoid instances”) understates the change: the diff removes `noncomputable` from 11 declarations, including `Set.one`, `Set.involutiveInv`, `Set.mulOneClass`, `Set.singletonOneHom`, `Set.singletonMulHom` and `Set.singletonMonoidHom`, which are not Monoid instances. Nothing in the title, description or code says why `noncomputable` is no longer needed — and making these instances computable is a design change (the definitions now get compiled), so it comes with motivation under the maintainers' practices.",
+     "requested_change": "Add a PR description listing the declarations that lose `noncomputable` and stating the reason it is no longer required (e.g. that the regression from leanprover/lean4#7824 referenced by the removed `#adaptation_note` no longer applies), and make the title cover the full scope rather than only the Monoid instances.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep2/tasks/08eb26f3618e8f104f81e5afb5556786b9ea29d737e7c194cb3af0e3ac86cfb8/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__8c61bfd3-144e-4efc-9b6d-00d17e38099a.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_val_small12_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "The Finset pointwise monoid API is still only partially cleaned up: `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` retain obsolete `noncomputable` markers even though the Set-side dependencies changed by this PR now make them computable.",
+     "requested_change": "Delete `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid`, and `Finset.divisionCommMonoid` as part of this cleanup.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "`Finset.commMonoid` is still declared `protected noncomputable def`, but the only reason for that marker was its dependence on `Set.commMonoid`/`Set.monoid`, which this PR makes computable (its body `coe_injective.commMonoid _ coe_one coe_mul coe_pow` needs a `CommMonoid (Set α)` argument, cf. `Function.Injective.commMonoid`). The PR removed the adaptation note and `noncomputable` from `Finset.monoid` in this very file but left its sibling instance stale.",
+     "requested_change": "Change `protected noncomputable def commMonoid : CommMonoid (Finset α)` to `protected def commMonoid : CommMonoid (Finset α)` (the additive copy `Finset.addCommMonoid` is generated by `to_additive` and needs no separate edit).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:964",
+     "claim": "`Finset.divisionMonoid` is still `protected noncomputable def`, but its body `coe_injective.divisionMonoid _ coe_one coe_mul coe_inv coe_div coe_pow coe_zpow` gets its `DivisionMonoid (Set α)` argument from `Set.divisionMonoid`, which this PR makes computable (and that in turn now rests on the computable `Set.monoid`/`Set.involutiveInv`). The marker is no longer needed and the cleanup is incomplete.",
+     "requested_change": "Drop `noncomputable` from `Finset.divisionMonoid` in Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean (keeping the `@[to_additive ...]` attribute as is).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:1020",
+     "claim": "`Finset.divisionCommMonoid` is still `protected noncomputable def` for the same now-obsolete reason: it is built from `Set.divisionCommMonoid`/`Set.divisionMonoid`, both of which this PR makes computable. The PR's stated cleanup of `noncomputable` was not carried through to this instance.",
+     "requested_change": "Drop `noncomputable` from `Finset.divisionCommMonoid` in Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:770",
+     "claim": "`Finset.coeMonoidHom`, immediately above `Finset.monoid` in the same section, is still `noncomputable def`; its target `Finset α →* Set α` requires `Monoid (Set α)`, i.e. the `Set.monoid` instance this PR has just made computable, so the marker is now redundant. Leaving one `noncomputable` directly above the de-`noncomputable`d `Finset.monoid` is inconsistent within the file.",
+     "requested_change": "Change `noncomputable def coeMonoidHom : Finset α →* Set α` to `def coeMonoidHom : Finset α →* Set α`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:76",
+     "claim": "The `#adaptation_note /-- nightly-2025-04-07 ... -/` above `Finset.mulAction` says the declaration \"now needs to be marked as noncomputable because of its dependence on `Set.monoid`\" and asks for lean4#7824 to be revisited. This PR is precisely such a revisit, and with `Set.monoid` computable the declaration no longer needs `noncomputable`, so the note is now false and the marker redundant. The PR deletes the identical note in Finset/Basic.lean but leaves this one behind.",
+     "requested_change": "Delete the adaptation note (lines 76–81) and replace `protected noncomputable def mulAction [DecidableEq α] [Monoid α] [MulAction α β]` with `protected def mulAction [DecidableEq α] [Monoid α] [MulAction α β]`, so the file matches the `Set.mulActionSet`/`Finset.mulActionFinset` siblings that are already computable.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-ds41/.ape/runs/iter_ds41_conv_val_base_rep3/tasks/d1dd8ba8a62b006489eaab7d3a36ac3ad70c67303b411338c363cc1771438c5e/samples/0/attempts/attempt_1_20261008063824/ape_agent_session_20261008_063826__e9fc29d0-afc1-4dff-bfaf-5a6c15db0185.jsonl"
+  },
+  "AP3": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_val_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Group/Action/Pointwise/Finset.lean:76",
+     "claim": "`Finset.mulAction` still carries the same workaround this PR is removing elsewhere: the `#adaptation_note` on lines 76–81 says the mark is needed \"because of its dependence on `Set.monoid`\", and the `noncomputable` on line 87 was added by that workaround. This PR makes `Set.monoid` (and `Finset.monoid`) computable, so the note no longer holds for the code, and the keyword is no longer needed: removing `noncomputable` from `Finset.mulAction` compiles in this PR's state. The same is true of the sibling `Set.mulAction` at `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean:173`.",
+     "requested_change": "Delete the `#adaptation_note` on lines 76–81 and the `noncomputable` keyword on `Finset.mulAction`, and remove the `noncomputable` on `Set.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean:173` as well (or, if either is deliberately kept, replace the note with what still forces it).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:939",
+     "claim": "`Finset.commMonoid` keeps `noncomputable` while its neighbour `Finset.monoid` (line 804) loses it in this PR, and nothing records why. The same leftovers — all built from the corresponding `Set` instances that this PR makes computable — are `Finset.coeMonoidHom` (770), `Finset.divisionMonoid` (964) and `Finset.divisionCommMonoid` (1020). Each of the four compiles with `noncomputable` dropped in this PR's state, so the modifier is now applied to some members of the family and not others without a stated reason.",
+     "requested_change": "Drop `noncomputable` from `Finset.coeMonoidHom`, `Finset.commMonoid`, `Finset.divisionMonoid` and `Finset.divisionCommMonoid`; if any of them must keep it, add a one-line comment saying what still forces it.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:802",
+     "claim": "The PR deletes the `#adaptation_note` that was the only in-tree record of why `Set`/`Finset` pointwise monoid data were marked `noncomputable`, and the PR description is empty, so nothing states what made them computable again (whether lean4#7824 was reverted/adapted or the workaround became unnecessary). The title — \"remove `noncomputable` from Set/Finset Monoid instances\" — also does not cover the other declarations the diff changes: `Set.one`, `Set.singletonOneHom`, `Set.singletonMulHom`, `Set.singletonMonoidHom` and `Set.involutiveInv`.",
+     "requested_change": "Add a PR description saying why the marks are no longer needed (which Lean change/toolchain made these definitions computable again), and retitle the PR so it names the full set of declarations it changes.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_val_apt_rep3/tasks/99ef91034623533a7bd43d4f58af52dc294344946c32bdfcfe10dbd92984fb1f/samples/0/attempts/attempt_1_20261010111912/ape_agent_session_20261010_111913__2f8c27a4-1212-4c33-8897-17b961c14f47.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/P14_val_26755.md"
+}

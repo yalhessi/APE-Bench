@@ -1,0 +1,188 @@
+=== D12 33145 d0029 DX3 [D12a]  family F6  None:None
+ASK: I suggest turning the declarations involving `iSup` and `iInf` around so that they read: ```lean ⨆ s : S, f s = ⨆ i, f i := by ``` instead.
+MATCHER: m1 no (No finding asks to flip the equations to put the subtype supremum on the left.) | m2 no (Flip equations to iSup over S = iSup over all; no reviewer asks to flip the Dense statements.)
+READER: K l.34 ap=n/a/None know=demand
+  quote: should the equality be oriented `⨆ s : S, f s = ⨆ i, f i`? ... Orientation convention: Mathlib often states `sSup` over a smaller set = over a bigger... no convention. Skip.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.34 (+-1):
+[33] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[34] REASONING: All four edits compile:
+- `continuous_sup'` with `exact hS.continuous_sup hf h1` ✓
+- `continuous_inf'` with `exact hS.continuous_inf hf h1` ✓
+- `continuous_lowerBounds` golf ✓
+- `continuous_inf` with `h.mono (Set.image_subset_range f S)` ✓ (implied by the inf declaration compiling — yes it compiled)
+
+And earlier:
+- `continuous_upperBounds` golf ✓
+- `continuous_sup` `grind` → `Set.image_subset_range f S` ✓
+
+Also types confirmed: no stray section variables (only `[TopologicalSpace α] [Preorder α] [ClosedIicTopology α]` etc.). Good — no scope/variable-leak issue.
+
+Interesting: `BddAbove.mono Dense.continuous_sup._proof_1_1✝ h` — the `by grind` became a `_proof` term. Note the `#print` shows the elaborated proof, showing `by grind` produced an auxiliary proof. Fine.
+
+Now, `Subtype.range_coe : Set.range Subtype.val = s` exists! So the `h2` block could be:
+```lean
+    have h2 : ¬ BddAbove (f '' S) := fun h =>
+      h1 (BddAbove.mono (hf.range_subset_closure_image_dense hS) h.closure)
+    rw [← Subtype.range_coe (s := S), ← image_univ]  -- hmm
+```
+Hmm, we need to rewrite RHS `sSup (range fu
+[34] TEXT(assistant): Let me verify the combined rewrite of `continuous_sup'`, and check for any pre-existing duplicates of these bounds lemmas.
+
+
+[34] TOOL lean_verify_edit: {"declaration_name": "Dense.continuous_sup'", "new_declaration": "theorem Dense.continuous_sup' {\u03b1 : Type*} [TopologicalSpace \u03b1]\n    [ConditionallyCompleteLinearOrder \u03b1] [ClosedIicTopology \u03b1] {f : \u03b3 \u2192 \u03b1} [TopologicalSpace \u03b3]\n    {S : Set \u03b3} (hS : Dense 
+[34] TOOL declaration_search: {"identifier": "Dense.continuous_upperBounds"}
+[34] TOOL declaration_search: {"identifier": "Continuous.range_subset_closure_image_dense"}
+[34] TOOL content_search: {"content_pattern": "range_subset_closure_image_dense", "path": "target/Mathlib", "max_matches_per_file": 8, "limit": 10}
+[35] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+
+GREP 'orient':
+--- line 34 REASONING (match 'orient')
+e.continuous_sup` itself could be stated more usefully, e.g. `BddAbove (range f)` hypothesis vs `BddAbove (f '' S)`? Since S is dense and closure... they're equivalent here. Not an ask.  One more: should the equality be oriented `⨆ s : S, f s = ⨆ i, f i`? The `rw [← sSup_range, ← sSup_range]`... Orientation convention: Mathlib often states `sSup` over a smaller set = over a bigger... no convention. Skip.  Another: `Dense.continuous_sup` uses 
+
+--- line 49 REASONING (match 'orient')
+d* notation `⨆ s ∈ S`, which is `iSup` over `S` with a proof — the subtype version is generally preferred in Mathlib for `ciSup`. I'll not file this.  OK, let me also double check the statement `⨆ i, f i = ⨆ s : S, f s` orientation: LHS = sup over all, RHS = sup over dense subset. Both fine.  Now let me reconsider one thing: since the maintainer thread mentioned "both sides should be equal to zero if `f` is unbounded" (in ℝ), which is exactly
+
+[2 matching blocks]
+
+=== P14_post 42814 p0005 DX2 [P14post]  family F7  Mathlib/Data/Nat/Squarefree.lean:395
+ASK: Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating this in any normalization monoid something.
+CODE AT COMMENT: @@ -387,6 +387,19 @@ theorem prod_primeFactors_sdiff_of_squarefree {n : ℕ} (hn : Squarefree n) {t : |   |  end Nat |   | +namespace Int | + | +/-- An integer is squarefree iff no prime square divides it. -/ | +theorem squarefree_iff_prime_sq_not_dvd {n : ℤ} :
+MATCHER: m1 no (No finding asks to generalize to UFDs/normalization monoids; only proof golfs and R7's file-placement move.) | m2 no (No finding raises UFD/normalization-monoid generality; R7 only moves the lemma, others golf the proof.)
+READER: K l.26 ap=n/a/None know=none
+  quote: So for ℤ the general lemma already applies ... a real maintainer might ask: state this in Algebra/Squarefree/Basic.lean as a general UFD-style lemma ... or keep in Data/Nat/Squarefree. Hmm.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.26 (+-1):
+[25] RESULT file_read: {"success": true, "content": "   297|theorem isCoprime_mul_units_right (hu : IsUnit u) (hv : IsUnit v) (y z : R) :\n   298|    IsCoprime (y * u) (z * v) ↔ IsCoprime y z :=/- ... omitted ... -/\n   302
+[26] REASONING: So there's `namespace IsCoprime` at line 313 with `section CommRing` [CommRing R]. So `Odd.isCoprime_two` is defined inside `namespace IsCoprime`, hence the `_root_.` prefix — correct and needed. Good.
+
+And indeed `Odd.isCoprime_two` generalizes `Int.isCoprime_two_right`. Hmm — could a maintainer say: this generalizes the existing `Int.isCoprime_two_right`/`isCoprime_two_left`, so the ℤ versions should be derived from it (or deprecated)? That's more of a follow-up; not necessarily in-scope.
+
+Wait, more importantly: `Odd.isCoprime_two` is stated as `IsCoprime x 2` from `Odd x` — but the natural Mathlib convention here is a `simp`-able iff or a `theorem` with a "two" name. Hmm; but the bigger question is whether the statement should be `IsCoprime x 2` (which direction?). Hmm.
+
+Now, potential issue: `Odd.isCoprime_two` name. In Mathlib conventions, for `Odd.isCoprime_two`, there's the analogous `Int.isCoprime_two_left`/`right`. Hmm, but `Odd.isCoprime_two` is fine.
+
+Hmm. Is `Odd.isCoprime_two` even needed? In FundamentalDiscriminant, `hp.isCoprime_two` for `hp : Odd p` with p : ℤ. There
+[26] TOOL content_search: {"path": "target/Mathlib", "content_pattern": "[Ff]undamental.{0,20}[Dd]iscr", "limit": 20}
+[26] TOOL declaration_search: {"identifier": "Int.IsFundamentalDiscr"}
+[27] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/AlgebraicTopology/FundamentalGroupoid/SimplyConnected.lean", "matches": [{"line_number": 41, "content": "    39|@[mk_iff]\n    40|class SimplyCon
+
+GREP 'UFD|squarefree_iff_irreducible':
+--- line 11 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|"}, {"line_number": 48, "content": "    46|\n    47|theorem squ
+
+--- line 15 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|"}, {"line_number": 148, "content": "   146|    (coprime_mul_if
+
+--- line 16 REASONING (match 'UFD|squarefree_iff_irreducible')
+ natural home is `Mathlib/Algebra/Squarefree/Basic.lean` (or `Mathlib/RingTheory/...`). Actually, there is also `Mathlib/Algebra/Squarefree/Basic.lean` which has general squarefree facts. Also there's the generic lemma `squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible` in RingTheory/UniqueFactorizationDomain probably, which gives: for a UFD with at least one irreducible... Actually maybe the ℤ statement can be derived from a general lemma about UFDs /
+
+--- line 16 TOOL_USE content_search (match 'UFD|squarefree_iff_irreducible')
+{"path": "target/Mathlib", "content_pattern": "squarefree_iff_irreducible_sq_not_dvd", "limit": 20}
+
+--- line 17 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+    46|\n    47|theorem squarefree_iff_prime_squarefree {n : ℕ} : Squarefree n ↔ ∀ x, Prime x → ¬x * x ∣ n :=\n    48|  squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible ⟨_, prime_two⟩\n    49|\n    50|theorem _root_.Squarefree.natFactorization_le_one {n :
+
+--- line 18 TOOL_RESULT content_search (match 'UFD|squarefree_iff_irreducible')
+ne ⟨fun h ↦ ?_, ?_⟩"}, {"line_number": 147, "content": "   145|    exact hx.not_isUnit (h x t)\n   146|\n   147|theorem squarefree_iff_irreducible_sq_not_dvd_of_ne_zero {r : R} (hr : r ≠ 0) :\n   148|    Squarefree r ↔ ∀ x : R, Irreducible x → ¬x * x ∣ r := by\n   1
+
+--- line 19 REASONING (match 'UFD|squarefree_iff_irreducible')
+Interesting. So there's a generic lemma `squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible` for `CommMonoidWithZero` + `WfDvdMonoid`? Actually `irreducible_sq_not_dvd_iff_eq_zero_and_no_irreducibles_or_squarefree` requires `[CommMonoidWithZero R] [WfDvdMonoid R]`. For ℤ that h
+
+[stopped at --max 7 blocks]
+
+=== P14_val 32875 v0094 DX3 [P14val_a]  family F1  Mathlib/Probability/Kernel/Disintegration/Integral.lean:55
+ASK: ````suggestion simpa [this] using (Kernel.compProd_apply_prod hs ht).symm ````
+CODE AT COMMENT:  |    have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by |      congr; exact (κ.disintegrate _).symm | -  rw [this, Kernel.compProd_apply (hs.prod ht)] | -  classical | -  have : ∀ b, Kernel.condKernel κ (a, b) {c | (b, c) ∈ s ×ˢ t} | -      = s.indicator (fun b ↦ Kernel.condKernel κ (a, b) t) b := by | -    intro b | -    by_cases hb : b ∈ s <;> simp [hb] | -  simp_rw [Set.preimage, this] | -  rw [lintegral_indicator hs] | +  simp only [this] | +  exact (Kernel.compProd_apply_prod hs ht).symm
+MATCHER: m1 no (Collapse simp only [this]+exact into one call; rw [this, compProd_apply_prod] or full rw one-liner satisfies.) | m2 no (Collapse simp only [this]+exact. Findings collapse it into one rw (some also drop have): reached.)
+READER: K l.11 ap=held/None know=none
+  quote: `simp only [this]` ... `rw [this]` would be more idiomatic. ... this is a real style point but minor.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.11 (+-1):
+[10] RESULT content_search: {"success": true, "results": [{"path": "target/Mathlib/Data/EReal/Basic.lean", "matches": [{"line_number": 435, "content": "   429|  · contrapose!\n   430|    intro h\n   431|    exact ⟨x.toReal, coe_
+[11] REASONING: So `exists_between'` is the to_dual of `exists_between`:
+
+```
+@[to_dual exists_between']
+theorem exists_between [LT α] [DenselyOrdered α] {a₁ a₂ : α} : a₁ < a₂ → ∃ a, a₁ < a ∧ a < a₂
+```
+
+So `exists_between' : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`. Wait, `to_dual` swaps the dual order. Hmm, `to_dual` on `exists_between`... The dual statement is: `a₂ < a₁ → ∃ a, a < a₂ ∧ a₁ < a`? Let me be careful.
+
+Actually `@[to_dual]` generates the dual version in the dual order type. The generated lemma `exists_between'` would have type something like `{a₁ a₂ : α} : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`. Hmm.
+
+Actually for `OrderDual`, `a₁ < a₂` in the dual means `a₂ < a₁` in original, and the witness `a` satisfies (in dual) `a₁ < a < a₂` meaning in original `a₂ < a < a₁`. So the dual statement is: from `a₂ < a₁` (original, i.e., `a₁ < a₂` in dual) get `∃ a, a₁ < a ∧ a < a₂` in dual, i.e., original `a₂ < a < a₁`.
+
+Anyway, `exists_between' h` where `h : dist x y < ε` gives `∃ ε', dist x y < ε' ∧ ε' < ε`? Hmm wait with `a₁ = dist x y`, `a₂ = ε`: `exists_between' : a₁ < a₂ → ∃ a, a < a₂ ∧ a₁ < a`? Let's compute:
+[11] TOOL file_read: {"file_path": "target/Mathlib/Data/Finset/Image.lean", "line_start": 60, "line_end": 95, "omit_details": false}
+[11] TOOL file_read: {"file_path": "target/Mathlib/Data/Rat/Lemmas.lean", "line_start": 280, "line_end": 320, "omit_details": false}
+[12] RESULT file_read: {"success": true, "content": "    57|\n    58|@[simp]\n    59|theorem map_val (f : α ↪ β) (s : Finset α) : (map f s).1 = s.1.map f :=\n    60|  rfl\n    61|\n    62|@[simp]\n    63|theorem map_empty (
+
+GREP 'rw \\[this\\]|simp only \\[this\\]':
+--- line 3 TEXT[user] (match 'rw \\[this\\]|simp only \\[this\\]')
+mm   rw [this, compProd_apply (hs.prod ht)]   classical   have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t)       = s.indicator (fun b ↦ ρ.condKernel b t) b := by     intro b     by_cases hb : b ∈ s <;> simp [hb]   simp_rw [this]   rw [lintegral_indicator hs] ``` - as the PR leaves it: ```lean lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s) {t : Set Ω}     (ht : MeasurableSet t) :     ∫⁻ b in s, ρ.condKernel b t 
+
+--- line 4 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+ap_equiv` went from <10ms to 25ms, `Rat.inv_intCast_den_of_pos` from <10ms to 17ms. These are regressions. Note the PR description only lists declarations with ≥10ms before or after, and these show increases. 3. Global `simp only [this]` patterns — using `simp only [this]` where `this` is a hypothesis. Actually in `setLIntegral_condKernel_eq_measure_prod`, `simp only [this]` uses a local hypothesis; this works but may be considered fragile. Actually `r
+
+--- line 11 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+nd simp". The maintainer concern with `grind` is that it's a heavyweight tactic that can be slow and non-obvious; Mathlib policy: `grind` is allowed but... Let me search Zulip for guidance on `grind` in Mathlib.  (b) **`simp only [this]`** in the two `setLIntegral_condKernel_eq_measure_prod` lemmas: using a local hypothesis in `simp only` is non-idiomatic; `rw [this]` is the standard. Actually `simp only [this]` when `this` is a hypothesis... Hmm, this
+
+--- line 20 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+sk. The PR is a golf PR. Common maintainer asks on golf PRs in Mathlib:  1. Don't use `grind` when a direct `simp`/`rw` is available and faster. If `grind` makes it slower, prefer the original or a simp-based proof. 2. `simp only [this]` style: prefer `rw`.  Hmm, but let me look at the actual diff again for anomalies:  - `pi_map_piCongrLeft`: new last two lines `simp only [pi_pi, this]` then `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`. Note the *or
+
+--- line 22 TOOL_RESULT content_search (match 'rw \\[this\\]|simp only \\[this\\]')
+x xs : _ → ℕ) (Fin.castLE (Nat.succ_le_succ (Fin.is_lt _).le) j))\n   660|            fun j => rfl\n   661|        simp_rw [this]"}]}, {"path": "target/Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean", "matches": [{"line_number": 514, "content":
+
+--- line 23 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+sup_finset_sup'`: `simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢`. Then `exact fun i i_s ↦ eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)`. Fine.  6. Two `setLIntegral_condKernel_eq_measure_prod`: `simp only [this]` then `exact (...).symm`.  7. `exists_lt_mem_ball_of_mem_ball`: `exists_between' h`.  Hmm, now let me reconsider #7: `exists_between' h` — is `exists_between'` really the lemma a maintainer would want? The statement pro
+
+--- line 37 REASONING (match 'rw \\[this\\]|simp only \\[this\\]')
+oves the eventually inside: `∀ᶠ a, ∀ i ∈ s, F i a < b ↔ ∀ i ∈ s, ∀ᶠ a, F i a < b`. Then `exact fun i i_s => eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)`. Yes. Reasonable and matches.  OK. Now let me reconsider the `simp only [this]` in the two disintegration lemmas. Using `simp only [this]` with a local hypothesis: Mathlib style. Actually many proofs do `simp only [this]`? Hmm, more common is `rw [this]`. But `simp only [this]` is used in Mathlib 
+
+[stopped at --max 7 blocks]
+
+=== P14_val 32875 v0095 AP1 [P14val_a]  family F1  Mathlib/Probability/Kernel/Disintegration/Integral.lean:147
+ASK: simpa
+CODE AT COMMENT: rableSet s |      ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by |    have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by |      congr; exact (ρ.disintegrate _).symm | -  rw [this, compProd_apply (hs.prod ht)] | -  classical | -  have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t) | -      = s.indicator (fun b ↦ ρ.condKernel b t) b := by | -    intro b | -    by_cases hb : b ∈ s <;> simp [hb] | -  simp_rw [this] | -  rw [lintegral_indicator hs] | +  simp only [this] | +  exact (compProd_apply_prod hs ht).symm
+MATCHER: m1 no (Measure twin of v0094; same rw one-liners reach it.) | m2 no (Measure twin of v0094; same findings' sibling entries collapse the tail into one rw: reached.)
+READER: K l.40 ap=held/considered_dropped know=none
+  quote: `simpa only [this] using (compProd_apply_prod hs ht).symm` would be a single tactic. Is that better? Marginally. ... Marginal. I'd rather not file that.
+SUBMITTED FINDINGS at that file:
+TRANSCRIPT around l.40 (+-1):
+[39] RESULT lean_verify_edit: {"success": true, "errors": [], "warnings": [], "infos": [], "axioms": [], "outcome": "compiled", "message": "Lean ran: the code compiles with no errors.", "mode": "verified_edit"}
+[40] REASONING: Interesting results:
+
+1. For `Finset.mem_map_equiv`, `mem_map_of_injective` is a `Multiset` lemma and the goal state shows `f.symm (f (f.symm b)) ∈ s` — wait, the expected type shows LHS `f (f.symm b) ∈ map f.toEmbedding s` and RHS `f.symm (f (f.symm b)) ∈ s`. Hmm, so `rw [← f.apply_symm_apply b]` rewrote both occurrences of `b`. Need `simp` afterwards. So it needs `simpa using mem_map_of_injective ...`. Not clean.
+
+2. For `Rat.inv_intCast_den_of_pos`, my alternative `simp only [den_inv, num_intCast]; simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` compiles! Hmm, so there's a lighter route, but it's not obviously shorter/better than grind. Hmm. Wait — did the second `simp` need explicit args? It compiled. Hmm, interesting. But is that a *better* proof than `grind`? It's two `simp`s... Actually maybe simpler: `simp only [den_inv, num_intCast, ha0.ne', ite_false, Int.natAbs_of_nonneg ha0.le, Int.toNat_of_nonneg ha0.le, Int.cast_natCast]`? Let me test a single `simp only` without grind.
+
+Hmm, what would the maintainer want? For `Rat.inv_intCast_den_of_pos`, the neighbouring style is `simp 
+[40] TOOL file_read: {"file_path": "target/Mathlib/MeasureTheory/Constructions/Pi.lean", "line_start": 440, "line_end": 475, "omit_details": false}
+[40] TOOL file_read: {"file_path": "target/Mathlib/Order/LiminfLimsup.lean", "line_start": 1135, "line_end": 1165, "omit_details": false}
+[41] RESULT file_read: {"success": true, "content": "   437|theorem ae_le_set_pi {I : Set ι} {s t : ∀ i, Set (α i)} (h : ∀ i ∈ I, s i ≤ᵐ[μ i] t i) :\n   438|    Set.pi I s ≤ᵐ[Measure.pi μ] Set.pi I t :=\n   439|  ((eventual
+
+GREP 'Marginal|simpa only \\[this\\]':
+--- line 3 TEXT[user] (match 'Marginal|simpa only \\[this\\]')
+ · exact hl2 _ _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))   +    · exact .symm <| hl2 _ _ (Finset.mem_image_of_mem _ (by simp))   +  simp [-Finset.mem_union, Finset.forall_mem_union, O] at hl2   ``` - A change of marginal benefit (cosmetic spacing, docstring polish) is not made, or not merged, when its review cost exceeds the gain.    Example 1, asked on another PR on the PR as a whole. The maintainer's comment:    > I'm afraid I'm going
+
+--- line 28 REASONING (match 'Marginal|simpa only \\[this\\]')
+vention says correct/complete docstrings... but adding a docstring to a lemma whose proof changed isn't required. Hmm. But now that the proof is one line showing it's a corollary, maybe it should get a docstring. That's marginal.  Note: now `_real_le'` is a trivial consequence of `_le` (non-prime). And similarly, is there a `tendsto_of_forall_isClosed_limsup_real_le` (non-prime)? Let me grep. If the non-prime real version exists and is also pro
+
+--- line 37 REASONING (match 'Marginal|simpa only \\[this\\]')
+rging: "Consecutive tactic calls or calc steps that a single call can perform are merged into that one call." Here `simp only [this]` then `exact (...).symm` — could be merged: `rw [this]; exact ...` hmm same. Could be `simpa only [this] using (compProd_apply_prod hs ht).symm`. Hmm! Interesting: `simpa only [this] using (compProd_apply_prod hs ht).symm` would be a single tactic. Is that better? Marginally.  Hmm, mid-strength finding. Note the convention
+
+--- line 40 REASONING (match 'Marginal|simpa only \\[this\\]')
+ (both): `simp only [this]` — style: `rw [this]` would be more idiomatic for rewriting with a hypothesis, and then the two tactics could not merge anyway. Hmm. Actually could the whole proof be shortened to one tactic: `simpa only [this] using (compProd_apply_prod hs ht).symm`? Let's test. If that works, the convention on merging ("Consecutive tactic calls ... that a single call can perform are merged") might justify it... but that convention's examples
+
+--- line 43 REASONING (match 'Marginal|simpa only \\[this\\]')
+ype.prod_equiv`. The `congrFun rfl` is weird but works.  Let me test `Fintype.prod_equiv _ _ _ (fun _ ↦ rfl)` via lean_verify_edit. If it compiles, then suggest that (more readable). Hmm, is `fun _ ↦ rfl` more readable? Marginally. Perhaps the maintainer's ask is different: maybe `Finset.prod_bij`? Hmm.  Hmm, alternatively maybe the intended cleaner proof: `simpa only [pi_pi, this] using Fintype.prod_equiv e.symm _ _ (congrFun rfl)`? no.  Let's
+
+--- line 46 REASONING (match 'Marginal|simpa only \\[this\\]')
+onventions don't demand `rw` here. Hmm.  Hmm, let me check: does the `simp only [this]` need to be `simp only` rather than `rw`? If `rw [this]` works, the convention "Consecutive tactic calls ... merged" maybe suggests `simpa only [this] using (compProd_apply_prod hs ht).symm`. Hmm, would that work? Let's test on one of them. If it works, is it a request I'd make? It merges two tactics into one, which the conventions do call for ("Consecutive tactic cal
+
+--- line 49 REASONING (match 'Marginal|simpa only \\[this\\]')
+ons don't cover `simp only` vs `rw` for a hypothesis rewrite... except maybe "Consecutive tactic calls or calc steps that a single call can perform are merged into that one call": `simp only [this]; exact (...).symm` → `simpa only [this] using (...).symm` — a single call. Hmm! That convention's example is exactly about merging `rw [X]` + `exact h` into `rwa [X]`. Here the analogous merge is `simpa only [this] using ...`. Hmm, so under that convention, a
+
+[stopped at --max 7 blocks]
+

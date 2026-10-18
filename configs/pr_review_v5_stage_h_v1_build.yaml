@@ -1,0 +1,9 @@
+# The stage-H census PRs (results/pr_review_v5/probes/stage-h-departures-2026-10-16/): their base snapshots
+# and reviewed workspaces, for running each rule's own check at the flagged places (step 4). Build and
+# tool use only; no review run is planned on this config.
+extends: pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml
+
+dataset:
+  release: inputs/probes/stage-h-v1
+  modification_inventory: inputs/probes/stage-h-v1/derived/modification_inventory.jsonl
+  pr_numbers: [26301, 26979, 27054, 28678, 30652, 31081, 32598, 33879, 35140, 36430, 36577, 37052, 37190, 37341]

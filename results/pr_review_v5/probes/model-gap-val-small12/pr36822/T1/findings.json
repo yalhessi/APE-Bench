@@ -1,0 +1,23 @@
+[
+  {
+    "target": "Set.Ioi_disjoint_Iio_same",
+    "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_same` with a bare `@[to_dual Iio_disjoint_Ioi_same]`. Both `Ioi_disjoint_Iio_same` and the removed `Iio_disjoint_Ioi_same` were `@[simp]` before. Now neither is a simp lemma, so a refactor that should change nothing silently drops two simp lemmas.",
+    "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, so both `Ioi_disjoint_Iio_same` and its generated dual `Iio_disjoint_Ioi_same` stay simp lemmas.",
+    "severity": "blocking",
+    "evidence": "diff.patch: `-@[simp]` / `+@[to_dual Iio_disjoint_Ioi_same]` on Ioi_disjoint_Iio_same, and the removed `Iio_disjoint_Ioi_same` carried `@[simp]`. lean_verify_edit (line mode, after line 86 of the PR's file): `example : Disjoint (Iio a) (Ioi a) := by simp` and `example : Disjoint (Ioi a) (Iio a) := by simp` both fail with '`simp` made no progress' on the PR as it stands. With the attribute changed to `@[to_dual (attr := simp) Iio_disjoint_Ioi_same]`, the same examples compile and the file reports no errors and no warnings."
+  },
+  {
+    "target": "Set.Ioi_disjoint_Iio_iff",
+    "claim": "The PR replaces `@[simp]` on `Set.Ioi_disjoint_Iio_iff` with a bare `@[to_dual Iio_disjoint_Ioi_iff]`. Both `Ioi_disjoint_Iio_iff` and the removed `Iio_disjoint_Ioi_iff` were `@[simp]` before. Now neither is a simp lemma, so `simp` no longer rewrites `Disjoint (Ioi a) (Iio b)` or `Disjoint (Iio a) (Ioi b)` in densely ordered types.",
+    "requested_change": "Write the attribute as `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]`, restoring `@[simp]` on both `Ioi_disjoint_Iio_iff` and the generated `Iio_disjoint_Ioi_iff`.",
+    "severity": "blocking",
+    "evidence": "diff.patch: `-@[simp]` / `+@[to_dual Iio_disjoint_Ioi_iff]` on Ioi_disjoint_Iio_iff, and the removed `Iio_disjoint_Ioi_iff` was `@[simp]`. lean_verify_edit: on the PR as it stands, `example [DenselyOrdered α] : Disjoint (Ioi a) (Iio b) ↔ ¬a < b := by simp` and the `Iio`/`Ioi` version both fail with '`simp` made no progress'. With `@[to_dual (attr := simp) Iio_disjoint_Ioi_iff]` both compile, and the file reports no errors and no warnings."
+  },
+  {
+    "target": "Mathlib/Order/Interval/Set/Disjoint.lean",
+    "claim": "The PR uses `to_dual` only in the `Preorder` section of `Mathlib/Order/Interval/Set/Disjoint.lean`. Further down, the same file still states six order-dual lemmas by hand: `Set.iUnion_Ioc_eq_Ioi_self_iff` and `Set.biUnion_Ioc_eq_Ioi_self_iff` restate their `Ico`/`Iio` twins, and `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic` are proved through `h.dual`. `to_dual` can generate all six with their existing names.",
+    "requested_change": "Tag `Set.iUnion_Ico_eq_Iio_self_iff` and `Set.biUnion_Ico_eq_Iio_self_iff` with `@[to_dual (attr := simp)]`, and tag `IsGLB.biUnion_Ioi_eq`, `IsGLB.iUnion_Ioi_eq`, `IsGLB.biUnion_Ici_eq_Ioi` and `IsGLB.biUnion_Ici_eq_Ici` with `@[to_dual]`. Then delete the hand-written duals `Set.iUnion_Ioc_eq_Ioi_self_iff`, `Set.biUnion_Ioc_eq_Ioi_self_iff`, `IsLUB.biUnion_Iio_eq`, `IsLUB.iUnion_Iio_eq`, `IsLUB.biUnion_Iic_eq_Iio` and `IsLUB.biUnion_Iic_eq_Iic`. The generated names match the deleted ones, so no deprecations are needed.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit, replacing lines 140-202 with the tagged versions and deleting the six hand-written duals: compiled, with no errors and no warnings. A separate check with examples stating each old statement (`⋃ i, Ioc a (f i) = Ioi a ↔ ∀ x, a < x → ∃ i, x ≤ f i := iUnion_Ioc_eq_Ioi_self_iff`, `IsLUB.biUnion_Iio_eq h`, `IsLUB.biUnion_Iic_eq_Iio a_lub a_notMem`, ...) also compiled. Not included: `Ioc_disjoint_Ioc` (to_dual on `Ico_disjoint_Ico` fails because `Ico_inter_Ico` is not tagged) and `iUnion_Iic_eq_Iio_iSup` / `iUnion_Iic_eq_Iic_iSup` (fail because `isGLB_iInf` is not tagged). Those need upstream tags first."
+  }
+]

@@ -1,0 +1,55 @@
+cid    pr     in  entry      rank  | unbriefed reached | ceiling reached (any session, either matcher)
+v0016   26755 in  P100       18    |  6 DX1,DX2,DX3,GB1,X1,X2                    |  9 DE1,DE2,DE3,DP1,DP2,DP3,GD1,GE1,GE1@match_M_val
+v0029   28649 in  P185       39    |  0                                          |  5 DE2,DP1,DP2,DP3,GD2@match_28649
+v0030   28649 in  P278       109   |  0                                          | 12 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1@match_28649,GD2@match_28649,G
+v0031   28649 OUT -          -     |  0                                          |  6 DE1,DE3,DP1,DP2,LE1,LE2
+v0053   29842 in  P041       23    |  0                                          |  0   <== RESIDUAL
+v0055   29842 in  P018       6     |  4 DX1,DX3,X1,XR1                           |  8 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1
+v0056   29842 in  P041       23    |  0                                          |  2 DE3,DP2
+v0060   30458 in  P369       230   |  0                                          |  4 DE2,DP1,DP2,E1
+v0061   30458 in  P369       230   |  0                                          |  4 DE2,DP1,DP2,E1
+v0062   30458 in  P329       110   |  2 X1,X2                                    |  4 DP1,DP2,DP3,E1
+v0063   30458 in  P329       110   |  2 X1,X2                                    |  4 DP1,DP2,DP3,E1
+v0064   30641 in  P105       64    |  1 X1                                       |  1 E1
+v0065   30641 OUT -          -     |  5 DX2,GB1,X1,X2,XR1                        |  5 DP1,E1,GD1,GE1,GE1@match_M_val
+v0066   30641 in  P060       53    |  7 DX1,DX2,DX3,GB1,X1,X2,XR1                |  8 DE1,DE3,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0067   30641 in  P005       1     |  2 X1,X2                                    |  1 E1
+v0068   30641 in  P094       120   |  0                                          |  4 DP2,DP3,E1,GD1
+v0090   32875 in  P315       322   |  0                                          |  4 DP1,DP3,E1,GD1
+v0091   32875 OUT -          -     |  0                                          |  0   <== RESIDUAL
+v0092   32875 in  P018       6     |  0                                          |  2 E1,GD1
+v0093   32875 in  P018       6     |  0                                          |  1 GD1
+v0094   32875 in  P018       6     |  3 DX2,X1,X2                                |  9 DE1,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0095   32875 in  P018       6     |  3 DX2,X1,X2                                |  9 DE1,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0105   34091 in  P011       5     |  0                                          |  0   <== RESIDUAL
+v0106   34091 in  P392       -     |  2 X1,X2                                    | 10 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0107   34091 in  P392       -     |  2 X1,X2                                    | 10 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0108   34091 in  P392       -     |  2 X1,X2                                    | 10 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val
+v0109   34091 OUT -          -     |  9 DX1,DX2,DX3,GB1,LB1,LB2,LB3,X1,X2        | 13 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val,LE1,LE2,L
+v0110   34091 OUT -          -     |  9 DX1,DX2,DX3,GB1,LB1,LB2,LB3,X1,X2        | 13 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_val,LE1,LE2,L
+v0131   36822 in  P098       55    |  7 DX1,DX2,DX3,GB1,LB1,X1,X2                | 12 DE1,DE2,DE3,DP1,DP2,DP3,GD1,GE1,GE1@match_M_val,LE1,LE2,LE3
+v0132   36822 in  P098       55    |  7 DX1,DX2,DX3,GB1,LB1,X1,X2                | 12 DE1,DE2,DE3,DP1,DP2,DP3,GD1,GE1,GE1@match_M_val,LE1,LE2,LE3
+p0000   41930 in  P041       23    |  0                                          |  2 DP1,DP2
+p0002   42184 in  P010       19    |  7 DX1,DX2,DX3,GB1,GB2,X1,X2                | 15 D1,D2,D3,DE1,DE2,DE3,DP1,DP2,DP3,E1,G2,G3,GD1,GE1,GE1@match_
+p0003   42184 in  P100       18    |  0                                          |  8 D1,D2,D3,DP2,E1,G2,G3,GD1
+p0004   42814 in  P153       130   |  0                                          |  0   <== RESIDUAL
+p0005   42814 in  P063       9     |  0                                          |  0   <== RESIDUAL
+p0006   42814 in  P201       40    |  0                                          |  4 DE2,DP1,DP3,E1
+p0007   42814 in  P048       36    |  0                                          |  8 DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_post
+p0008   43024 OUT -          -     |  6 DX1,DX2,DX3,GB2,X1,X2                    |  6 DE1,DE2,DE3,DP1,DP2,DP3
+p0009   43167 in  P030       43    |  9 DX1,DX2,DX3,GB1,GB2,LB2,LB3,X1,X2        | 13 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_post,LE1,LE2,
+p0010   43167 in  P254       107   |  0                                          |  0   <== RESIDUAL
+p0011   43167 in  P263       108   |  7 DX1,DX2,DX3,GB1,GB2,X1,X2                | 10 DE1,DE2,DE3,DP1,DP2,DP3,E1,GD1,GE1,GE1@match_M_post
+p0012   43167 in  P113       69    |  0                                          |  7 DE1,DE3,DP1,DP2,DP3,E1,GD1
+p0013   43192 OUT -          -     | 10 DX1,DX2,DX3,GB1,GB2,LB1,LB2,LB3,X1,X2    | 12 DE1,DE2,DE3,DP1,DP2,DP3,GD1,GE1,GE1@match_M_post,LE1,LE2,LE3
+p0014   43192 in  P276       209   |  2 X1,X2                                    |  8 DE1,DE2,DE3,DP2,DP3,GD1,GE1,GE1@match_M_post
+p0015   43192 in  P276       209   |  2 X1,X2                                    |  9 DE1,DE2,DE3,DP1,DP2,DP3,GD1,GE1,GE1@match_M_post
+p0016   43192 in  P254       107   |  3 DX3,X1,X2                                |  3 GD1,GE1,GE1@match_M_post
+
+RESIDUAL (no ceiling session reached it on either matcher): 6
+  v0053 pr29842: "How does this interact with #24163? When I tried something similar to this 8 months ago in #21065, I thought the consensus was to change the definition.\r\n\r\nIf you've changed your mind, could you expla"
+  v0091 pr32875: 'Same here.'
+  v0105 pr34091: 'Surely this is a one-liner using `infinite_pigeonhole_card_lt`?'
+  p0004 pr42814: "Can you add an alias for the right to left implication? Or maybe even removing the other one (I don't see any reasonable application)."
+  p0005 pr42814: 'Do we have the same theorem in any UFD (I see that here the pint is Nat vs Int, but it is worth to check). Even better, maybe there is a uniform way of stating this in any normalization monoid somethi'
+  p0010 pr43167: ':robot: says: `left`/`right` look swapped: `inf_sup_left : a ⊓ (b ⊔ c)`, `Submodule.mul_sup : M * (N ⊔ P)`, `sup_le_sup_left (h) (c) : c ⊔ a ≤ c ⊔ b` all put the sup in the *second* argument for `_lef'

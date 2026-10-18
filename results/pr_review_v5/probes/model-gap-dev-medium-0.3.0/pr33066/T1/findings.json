@@ -1,0 +1,65 @@
+[
+ {
+  "target": "auxContinuousLinearEquiv",
+  "claim": "`auxContinuousLinearEquiv` hand-builds the scalar multiple `α' • e` and takes its inverse to be `α' • adjoint e`. That choice is why the section needs the extra hypothesis `he'` (and `he` inside the inverse proofs), why `coe_symm_auxIsometry` needs a proof by injectivity plus `grind`, and why the main proof has to establish `thisU : y ∘L adjoint y = α • id` at all. The inverse of a nonzero multiple of `e` is just `α'⁻¹ • e.symm`, and the library already provides this equivalence as `e.trans (ContinuousLinearEquiv.smulLeft (Units.mk0 α' _))`.",
+  "requested_change": "Delete `auxContinuousLinearEquiv` and `coe_auxContinuousLinearEquiv` (and the now-unused `coe_auxIsometry` and `coe_symm_auxIsometry`) and the `he'` variable, and build `auxIsometry` on the existing equivalence:\n```lean\nvariable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0)\n  (hα2 : α' * α' = α⁻¹) (he : e.toContinuousLinearMap.adjoint ∘L e = α • .id 𝕜 V)\n\nnoncomputable abbrev auxIsometry (hαa : starRingEnd 𝕜 α' = α') : V ≃ₗᵢ[𝕜] W :=\n  let U := e.trans (.smulLeft (Units.mk0 α' (by rintro rfl; simp [eq_comm, hα] at hα2)))\n  { U.toLinearEquiv with\n    norm_map' := by\n      have : (U : V →L[𝕜] W) = α' • (e : V →L[𝕜] W) := rfl\n      rw [ContinuousLinearEquiv.coe_toLinearEquiv, ← ContinuousLinearEquiv.coe_coe,\n        norm_map_iff_adjoint_comp_self, this, MulActionSemiHomClass.map_smulₛₗ]\n      simp only [hαa, comp_smulₛₗ, RingHom.id_apply, smul_comp, smul_smul, hα2]\n      simp [he, smul_smul, hα, one_def] }\n```\nThen delete `thisU` from `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, call `auxIsometry y thisα' αa2 hα.symm (by simp [αa])`, and close the proof through `U.surjective` (see the companion finding on the main theorem).",
+  "severity": "advisory",
+  "evidence": "declaration_search: `ContinuousLinearEquiv.smulLeft` is declared before this PR (Mathlib/Topology/Algebra/Module/Equiv.lean:777, `def smulLeft : G →* M₁ ≃L[R₁] M₁`, scalar multiplication by a group element). lean_verify_edit, line mode over lines 92-217 of Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean, replacing the auxiliaryDefs section with the code above and the main theorem with `thisU` and `la` removed and the surjectivity ending: outcome `compiled`, no errors, no warnings. The section goes from 47 lines and 5 declarations to 13 lines and 1 declaration. On its own, swapping in `smulLeft` while keeping the PR's `ext; simp [..., la, ...]` ending fails with an unsolved goal mentioning `(auxIsometry ...).symm x`. So this change was verified together with the surjectivity ending, which needs no `symm` lemma."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The closing step computes `U.symm` explicitly. That needs the five-line `have la : αa⁻¹ * αa = 1` and the auxiliary simp lemma `coe_symm_auxIsometry`, itself proved by injectivity and `grind`. If the point of `W` is written as `U v`, `U.symm` cancels by `symm_apply_apply` and neither is needed.",
+  "requested_change": "Replace everything from `use U` to the end of the proof with\n```lean\n  refine ⟨U, ext fun A ↦ ContinuousLinearMap.ext fun w ↦ ?_⟩\n  obtain ⟨v, rfl⟩ := U.surjective w\n  rw [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, U.symm_apply_apply,\n    show f A = _ from congr_fun hy A]\n  simp [U]\n```\nand delete `la` and the auxiliary lemma `coe_symm_auxIsometry`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (declaration mode, `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`) with this ending and everything else unchanged: outcome `compiled`, no errors. lean_verify_edit, line mode over lines 132-217, which also deletes `coe_symm_auxIsometry`: outcome `compiled`, no errors, no warnings. A first try with a bare `simp [U, ← hy]` left `αa • f A (y v) = αa • αa • y (A ((auxIsometry ..).symm (y v)))`, so the explicit `rw` with `symm_apply_apply` and `congr_fun hy A` is what makes it work."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The normalising scalar is written as `re α ^ (-(1 / 2 : ℝ))` with `Real.rpow`. That makes `αa2` go through `Real.rpow_add` and `Real.rpow_neg_one`, and `la` through `Real.rpow_eq_zero` in four lines, and it is the only reason the file has `import Mathlib.Analysis.SpecialFunctions.Pow.Real`. The idiomatic scalar is `(√(re α))⁻¹`.",
+  "requested_change": "Use `Real.sqrt`:\n```lean\n  set αa := (((√(RCLike.re α))⁻¹ : ℝ) : 𝕜)\n  have αa2 : αa * αa = α⁻¹ := by\n    rw [thisα]\n    simp [αa, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt this2.le]\n  ...\n  have la : αa⁻¹ * αa = 1 := inv_mul_cancel₀ (by simp [αa, Real.sqrt_eq_zero', this2])\n```\n(`la` disappears entirely if the surjectivity ending is adopted.) Then remove `import Mathlib.Analysis.SpecialFunctions.Pow.Real`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (declaration mode) with the sqrt version: outcome `compiled`, no errors. The first try at `la`, `by simp [αa, this2]`, left `¬√(re α) = 0`; adding `Real.sqrt_eq_zero'` closes it. lean_verify_edit, line mode over lines 14-217, deleting the `Pow.Real` import together with the sqrt version: outcome `compiled`, no errors, no warnings. (Deleting line 15 alone, keeping rpow, also compiles, because `Pow.Real` arrives transitively, so the explicit import is unnecessary either way.)"
+ },
+ {
+  "target": "module_doc in ContinuousAlgEquiv.lean",
+  "claim": "The PR changes the module docstring's TODO heading from `# TODO:` to `### TODO:`. Mathlib module docs use a single `#` title with `##` section headings, and the library spells this one `## TODO`.",
+  "requested_change": "Change `### TODO:` to `## TODO` in the module docstring of Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean.",
+  "severity": "advisory",
+  "evidence": "content_search over target/Mathlib (all 7455 files scanned, not truncated): `^## TODO` in 641 files, `^## TODO:` in 4, `^### TODO` in 3, `^### TODO:` in 1 (this file), `^# TODO` in 0."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The `simp_rw ... at this` call has a double space: `conjContinuousAlgEquiv_apply,  adjoint_comp] at this` (line 173).",
+  "requested_change": "Use a single space: `conjContinuousAlgEquiv_apply, adjoint_comp] at this`.",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean line 173. The single-space version compiles as part of the verified polished proof (lean_verify_edit declaration mode, outcome `compiled`)."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The proof-sketch comment has errors. It says `f = y.conjAlgEquiv`, but `y : V ≃L[𝕜] W` and the fact used (`hy`) is about `y.conjContinuousAlgEquiv`. It misspells \"endormorphisms\". It says \"the algebra of endomorphisms are central\".",
+  "requested_change": "In the comment, write `f = y.conjContinuousAlgEquiv`, \"endomorphisms\", and \"the algebra of endomorphisms is central\".",
+  "severity": "advisory",
+  "evidence": "file_read lines 151-162 of ContinuousAlgEquiv.lean. `ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv` concludes `∃ U : V ≃L[𝕜] W, f = U.conjContinuousAlgEquiv` (line 39), and `hy` is rewritten with `conjContinuousAlgEquiv_apply`. The corrected comment compiles in the polished proof (lean_verify_edit, outcome `compiled`)."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The proof's hypotheses are named `this`, `this10`, `this1`, `this2`, `thisα`, `thisα'`, `thisU` and `la`. `this` is rebound with `replace` and `have` to several unrelated facts, including `IsUnit (adjoint y ∘L y)`. `this2` first means `0 ≤ α` and is then replaced by `0 < re α`. This makes a long proof that invites golfing hard to follow.",
+  "requested_change": "Give the persistent facts descriptive names, e.g. `hunit : IsUnit (adjoint y ∘L y)`, `hα_re : α = re α`, `hα_ne : α ≠ 0`, `hα_pos` (`0 ≤ α`, then `0 < re α`), `hy_adj : y ∘L adjoint y = α • id`, and use `h` for the one-shot `this10`/`this1`.",
+  "severity": "advisory",
+  "evidence": "file_read lines 163-217. A version of the whole proof using exactly these names (plus the sqrt, surjectivity, comment and double-space fixes) passed lean_verify_edit in declaration mode: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+  "claim": "The star-algebra half of the PR (the `RCLike`/`InnerProductSpace`/`CompleteSpace` variables, the `auxiliaryDefs` section, `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` and the `OrderIsoClass` instance) is Hilbert-space material. Putting it here makes a file under `Mathlib/Analysis/Normed/` publicly import `Mathlib.Analysis.InnerProductSpace.Adjoint` and `.Positive`, which reverses the usual direction: before this PR, no file under `Mathlib/Analysis/Normed/` imports anything from `Mathlib/Analysis/InnerProductSpace/`.",
+  "requested_change": "Move the star-algebra part (from the `RCLike` variable block through the `OrderIsoClass` instance) to a new file under `Mathlib/Analysis/InnerProductSpace/` that imports `Mathlib.Analysis.Normed.Operator.ContinuousAlgEquiv`, `InnerProductSpace.Positive` and `Algebra.Central.Basic`. Restore the original imports and module docstring of `ContinuousAlgEquiv.lean`, and add a cross-reference between the two files.",
+  "severity": "advisory",
+  "evidence": "content_search `import Mathlib.Analysis.InnerProductSpace` in target/Mathlib/Analysis/Normed: the only match is ContinuousAlgEquiv.lean lines 8-9, which this PR adds. content_search for importers of `Mathlib.Analysis.Normed.Operator.ContinuousAlgEquiv`: 0 files, so a downstream file could import it without a cycle. The new imports are needed only by the star-algebra half: the first theorem uses only `SeparatingDual`/`Banach`, which the file imported before."
+ },
+ {
+  "target": "ContinuousAlgEquiv.ofAlgEquiv",
+  "claim": "The docstring says \"Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous\", but the definition also requires `he' : Continuous e.symm`.",
+  "requested_change": "Reword to \"Interpret an algebra equivalence as a continuous algebra equivalence when it and its inverse are continuous.\"",
+  "severity": "advisory",
+  "evidence": "file_read target/Mathlib/Topology/Algebra/Algebra/Equiv.lean lines 305-307: `def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm) : A ≃A[R] B`."
+ }
+]

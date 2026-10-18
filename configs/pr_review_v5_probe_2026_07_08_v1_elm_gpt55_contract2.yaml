@@ -1,0 +1,15 @@
+# gpt-5.5 under contract v2 on ELM, the post-cutoff probe's 6 PRs with asks: the gpt row of the one
+# reviewer table (docs/plans/2026-10-10-one-reviewer-table.md). As the validation config beside it.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_contract2.yaml
+
+llm_config:
+  model_name: elm_gpt_5.5
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+
+dataset:
+  pr_numbers: [41930, 42184, 42814, 43024, 43167, 43192]
+  solo_cost_cap: 20.00
+  solo_token_cap: 24000000
+  run_total_cost_cap: 120.50
+  run_total_token_cap: 144600000

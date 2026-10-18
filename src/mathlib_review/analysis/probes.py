@@ -20,7 +20,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import yaml
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -416,16 +416,81 @@ CONVENTIONS_LEAD = (
     "the change that convention calls for, as a finding at the place it applies.")
 
 
-def conventions_section(principles: List[str]) -> str:
-    return CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
+#: Generation without suppression's closing paragraph for this section (the gpt-5.5 conditions;
+#: docs/plans/2026-10-06-generation-without-suppression.md). Stage M's gpt-5.5 weighed the exact
+#: section's full-words convention against `MGFs` on 28649 and filed nothing: "I doubt that
+#: maintainers would request changes for commonly used acronyms". The section names no place, so the
+#: disposition is per place the convention's situation occurs, with `departs` and `conforms` only.
+CONVENTIONS_DISPOSITION = (
+    "Give every convention above a disposition at each place in the changed code where its "
+    "situation occurs, and say in your submission's `message` which you gave and on what ground. "
+    "`departs`: file the change the convention calls for, as a finding at that place. `conforms`: "
+    "only if a check you ran, or a line of the code you quote, shows the required form already "
+    "holds there. What Mathlib usually requires, accepts or enforces, how minor the change is, and "
+    "whether a maintainer would insist on it are not grounds for either disposition. For these "
+    "conventions this replaces the brief's instruction to emit only what you would actually request.")
 
 
-def load_conventions(briefs: Path, codebook: Path) -> Dict[int, List[str]]:
+#: Stage D's closing paragraph (DeepSeek-V4.1-Flash; the probe README's stage D): the conventions, and
+#: maintainers' asks for them on other PRs, outrank the reviewer's own judgement of the code. With the
+#: exact section the reviewers weighed a convention and passed the code on its merits: Claude "also
+#: compiles as a term. That is a matter of taste, not an ask", "does not apply, since this is a
+#: generalization"; the local Qwen "`gcongr` doesn't apply here as verified". The disposition paragraph
+#: above rules out guesses about maintainers; this one rules out the reviewer's view of the code as
+#: well, lets the examples decide where a convention applies, and turns a change it cannot make into
+#: a question. Each sentence carries its examples (`exemplified`).
+CONVENTIONS_PRECEDENCE = (
+    "Under each convention are up to two comments in which a maintainer asked for it on another PR, "
+    "each with the code it was on. Take the conventions and these examples as the standard for this "
+    "review: they show what maintainers ask for, and they outrank your own judgement of this code. "
+    "Where the changed code is in a situation like an example's, file the change its convention calls "
+    "for, as a finding at that place. None of these is a reason to leave it out: that the code is "
+    "correct, clear or idiomatic as it stands; that the change is minor or a matter of taste; that "
+    "this file, its author or its neighbours do it differently; that Mathlib does not require it or a "
+    "maintainer might not insist on it; that the convention's wording does not quite fit, where the "
+    "code is like an example's. Where you cannot make or check the change, file it as a question to "
+    "the author that names the convention and the change. Leave a place unfiled only where a line of "
+    "the code you quote, or a check you ran, shows it already has the form the convention calls for. "
+    "In your submission's `message`, list each convention with the places you filed and any place "
+    "you left, with that line or check. For these conventions this replaces the brief's instructions "
+    "to emit only what you would actually request and not to raise questions.")
+
+
+def exemplified(principle: str, examples: List[Dict[str, str]]) -> str:
+    """A convention's sentence with maintainers' asks for it on other PRs beneath it, each a comment
+    (`comment`), the file it was on (`path`, None for a comment on the PR as a whole) and the code
+    (`code`), indented to sit inside the sentence's list item in `conventions_section`."""
+
+    def indented(text: str, prefix: str) -> str:
+        return "\n".join(prefix + line if line.strip() else prefix.rstrip() for line in text.splitlines())
+
+    parts = [principle]
+    for n, ex in enumerate(examples, 1):
+        where = f"at `{ex['path']}`" if ex.get("path") else "on the PR as a whole"
+        parts.append(f"\n\n  Example {n}, asked on another PR {where}. The maintainer's comment:\n\n"
+                     + indented(ex["comment"], "  > "))
+        if ex.get("code"):
+            parts.append("\n\n  The code it was on:\n\n  ```\n" + indented(ex["code"], "  ") + "\n  ```")
+    return "".join(parts)
+
+
+def conventions_section(principles: List[str], closing: str = "") -> str:
+    """The section's text; `closing`, when given, is a paragraph after the sentences."""
+    return (CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
+            + (f"\n{closing}\n" if closing else ""))
+
+
+def load_conventions(briefs: Path, codebook: Path,
+                     examples: Optional[Dict[str, List[Dict[str, str]]]] = None) -> Dict[int, List[str]]:
     """A level's briefs as sentences: `briefs` is `{"prs": {pr: [entry ids]}}`, `codebook` a census
-    codebook. Sentences come in codebook order whatever order the brief lists its ids in."""
+    codebook. Sentences come in codebook order whatever order the brief lists its ids in. With
+    `examples` (entry id -> its examples), each sentence carries its own (`exemplified`); an entry
+    with none reads as its sentence."""
 
     principle = {entry["id"]: entry["principle"] for entry in json.loads(Path(codebook).read_text())}
-    return {int(pr): [principle[i] for i in sorted(set(ids))]
+    text = ((lambda i: exemplified(principle[i], examples.get(i, []))) if examples is not None
+            else (lambda i: principle[i]))
+    return {int(pr): [text(i) for i in sorted(set(ids))]
             for pr, ids in json.loads(Path(briefs).read_text())["prs"].items()}
 
 
@@ -454,8 +519,48 @@ def candidate_line(item: Dict[str, str]) -> str:
             f"Convention: {item['convention']} {decided}{exception}")
 
 
-def candidates_section(items: List[Dict[str, str]]) -> str:
-    return CANDIDATES_LEAD + "\n\n" + "\n".join(candidate_line(i) for i in items) + "\n"
+#: Generation without suppression (docs/plans/2026-10-06-generation-without-suppression.md): the
+#: same items under leads that take the guess about maintainers out of the decision to file. Stage
+#: G's sessions read the items, verified them and dropped some on "Mathlib does not require these".
+#: "disposition" gives every item a disposition whose ground is the code, never uptake; "ledger"
+#: keeps generation apart from assessment, so every change considered is an entry and the
+#: reviewer's own judgement is a mark on it. Both say what is true of the items' source (asked for
+#: on other PRs), not that maintainers raise them here, which stage H measured at 5% or less.
+CANDIDATES_SOURCE = (
+    "A separate pass compared this PR's changed code with conventions Mathlib's maintainers have "
+    "asked for on other PRs. Each item below names a place where one convention's situation occurs, "
+    "the convention, and how to tell whether the code departs from it. The pass read the diff only "
+    "and ran nothing.")
+DISPOSITION_LEAD = CANDIDATES_SOURCE + (
+    "\n\nGive every item exactly one disposition, and list them in `notes.md`, one line an item: its "
+    "place, its convention, the disposition and its ground.\n"
+    "- `departs`: file the change the convention calls for, as a finding at that place. An item "
+    "marked \"Decided by reading: the code departs\" is `departs` unless a line you quote shows the "
+    "required form is already there.\n"
+    "- `conforms`: only if a check you ran, or a line of the code you quote, shows the required form "
+    "already holds, or the item's \"Not when\" applies. Name the check or quote the line.\n"
+    "- `ask_author`: the check could not be run, or it failed for want of a piece the author could "
+    "add (a missing lemma, attribute or import). File a question to the author that names the piece."
+    "\n\nWhat Mathlib usually requires, accepts or enforces, how minor the change is, and whether a "
+    "maintainer would insist on it are not grounds for any disposition. For these items this "
+    "replaces the brief's instruction to emit only what you would actually request. Review the rest "
+    "of the PR as the brief says.")
+LEDGER_LEAD = CANDIDATES_SOURCE + (
+    "\n\nIn this review, keep generation apart from assessment, for these items and for the rest of "
+    "the PR.\n"
+    "- Generation: every change you consider making at a place goes into `findings.json` as an entry "
+    "with the brief's keys: each item whose check you run or whose departure you read, each edit you "
+    "compile, each change you think of while reading. Leave none out, whatever you conclude about it.\n"
+    "- Assessment: give every entry two more keys. `file`: true if you would put it to the author as "
+    "a review comment, false if not. `assessment`: one sentence saying why. An item whose check shows "
+    "the code already conforms is an entry with `file: false` that says so.\n\n"
+    "The brief's instructions to emit only what you would actually request, and not to report what "
+    "you checked, decide `file`; they do not decide whether an entry exists.")
+CANDIDATES_LEADS = {"verify": CANDIDATES_LEAD, "disposition": DISPOSITION_LEAD, "ledger": LEDGER_LEAD}
+
+
+def candidates_section(items: List[Dict[str, str]], lead: str = CANDIDATES_LEAD) -> str:
+    return lead + "\n\n" + "\n".join(candidate_line(i) for i in items) + "\n"
 
 
 def load_candidates(briefs: Path) -> Dict[int, List[Dict[str, str]]]:
@@ -475,14 +580,21 @@ def pr_markdown(episode: Dict[str, Any]) -> str:
 def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optional[List[int]] = None,
                   brief: Path = BRIEF_X, root: Optional[Path] = None,
                   conventions: Optional[Dict[int, List[str]]] = None,
-                  candidates: Optional[Dict[int, List[Dict[str, str]]]] = None) -> List[Path]:
+                  candidates: Optional[Dict[int, List[Dict[str, str]]]] = None,
+                  candidates_lead: str = "verify",
+                  sections: Optional[Dict[int, str]] = None) -> List[Path]:
     """One packet per (PR, session): brief, PR text, diff, pass-0 model and the logging `ptool`.
+
+    `sections` (from `context_sections`) ends each brief with a conventions section already rendered
+    for a solo run's context file, byte for byte, so a Claude session reads what the solo session read
+    (the one reviewer table's Claude + AP, 2026-10-10). It takes the place of `conventions`.
 
     A packet that already holds findings is refused: it is a finished session, and rewriting its
     inputs would detach them from what it read. With `conventions`, each PR's brief ends with its
     conventions section; every PR must be named, and an empty list leaves the brief as it is.
     With `candidates` it ends with the pinpointed section instead, under the same two rules; a
-    packet takes one or the other.
+    packet takes one or the other. `candidates_lead` names the section's lead in
+    `CANDIDATES_LEADS`; the default is stage G's.
 
     A packet goes where `session_dir` will look for it, so a PR whose earlier sessions live under
     `sessions_from` gets its new ones beside them (until 2026-10-04 they were written under
@@ -491,12 +603,15 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
 
     root = Path(root or Path.cwd())
     prs = list(prs or spec.pr_numbers)
-    if conventions is not None and candidates is not None:
-        raise ValueError("a packet's brief ends with conventions or with candidates, not both")
+    if sum(x is not None for x in (conventions, candidates, sections)) > 1:
+        raise ValueError("a packet's brief ends with one section (conventions, candidates or sections), not both")
+    if sections is not None and set(prs) - set(sections):
+        raise KeyError(f"no section for PRs {sorted(set(prs) - set(sections))}")
     if conventions is not None and set(prs) - set(conventions):
         raise KeyError(f"no conventions listed for PRs {sorted(set(prs) - set(conventions))}")
     if candidates is not None and set(prs) - set(candidates):
         raise KeyError(f"no candidates listed for PRs {sorted(set(prs) - set(candidates))}")
+    lead = CANDIDATES_LEADS[candidates_lead]
     models = render_models(spec.release, prs, spec.inventory)
     episodes = {json.loads(l)["pr_number"]: json.loads(l)
                 for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()}
@@ -510,7 +625,9 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
             held = conventions[pr] if conventions else []
             found = candidates[pr] if candidates else []
             section = (f"\n## {CONVENTIONS_TITLE}\n\n{conventions_section(held)}" if held else
-                       f"\n## {CANDIDATES_TITLE}\n\n{candidates_section(found)}" if found else "")
+                       f"\n## {CANDIDATES_TITLE}\n\n{candidates_section(found, lead)}" if found else "")
+            if sections is not None:
+                section = f"\n## {CONVENTIONS_TITLE}\n\n{sections[pr]}"
             (d / "brief.md").write_bytes(brief.read_bytes() + section.encode())
             (d / "model.md").write_text(models[pr])
             (d / "pr.md").write_text(pr_markdown(episodes[pr]))
@@ -518,6 +635,20 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
             _write_ptool(spec, d, pr, session, scratch, root)
             written.append(d)
     return written
+
+
+def context_sections(path: Path) -> Dict[int, str]:
+    """Each PR's conventions section text from a solo run's context file (`model_context`'s JSON
+    lines); a PR whose row holds no such section is left out."""
+
+    from src.mathlib_review.io import jsonl_rows
+
+    out = {}
+    for row in jsonl_rows(Path(path)):
+        texts = [s["text"] for s in row["sections"] if s["title"] == CONVENTIONS_TITLE]
+        if texts:
+            out[int(row["pr_number"])] = texts[0]
+    return out
 
 
 def _write_ptool(spec: ProbeSet, d: Path, pr: int, session: str, scratch: Path, root: Path) -> None:
@@ -649,13 +780,25 @@ def log_call(log: Path, stamp: str, tool: str, args: str, out: Path, status: int
 KEEP = ("target", "claim", "requested_change", "severity")
 _REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"), "a compiled check")]
 MATCHER_RUBRIC = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/matcher_rubric.md")
+#: The same rubric with one paragraph more: a finding may be a question to the author (the filing
+#: contract's pre-registration, 2026-10-12). A separate file, so every earlier seal stays reproducible.
+MATCHER_RUBRIC_QUESTIONS = MATCHER_RUBRIC.with_name("matcher_rubric_questions.md")
 
 
-def redact(text):
-    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text."""
+#: With `harness_blind`, also the cues a conventions condition leaves in its own words: a codebook
+#: id, and "convention" itself (7 of 25 AP findings against 2 of 28 solo ones on validation,
+#: 2026-10-10). Applied to every session alike, so it is not itself a cue.
+_REDACT_CONVENTIONS = [(re.compile(r"\bP\d{3}\b"), "a practice"), (re.compile(r"\bconventions\b"), "practices"),
+                       (re.compile(r"\bconvention\b"), "practice"), (re.compile(r"\bConventions\b"), "Practices"),
+                       (re.compile(r"\bConvention\b"), "Practice")]
+
+
+def redact(text, conventions: bool = False):
+    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text, and with
+    `conventions` the conventions conditions' (`_REDACT_CONVENTIONS`)."""
     if not isinstance(text, str):
         return text
-    for pattern, repl in _REDACT:
+    for pattern, repl in _REDACT + (_REDACT_CONVENTIONS if conventions else []):
         text = pattern.sub(repl, text)
     return text
 
@@ -683,11 +826,13 @@ class Source(BaseModel):
 
     `claude`: a packet's `findings.json` (the label is the session directory's name);
     `solo`: a `cli run` solo run's task results; `lead`: a lead run's `findings.jsonl`, all channels.
+    A solo source may name several runs that hold disjoint PRs, one session a PR (the one reviewer
+    table's AP: stage AP's ten PRs and the apt run's four).
     """
 
     model_config = ConfigDict(extra="forbid")
     kind: Literal["claude", "solo", "lead"]
-    run: Optional[str] = None
+    run: Optional[Union[str, List[str]]] = None
 
 
 def _claude(spec: ProbeSet, pr: int, session: str):
@@ -713,6 +858,31 @@ def _solo_compiles(run: str) -> Dict[int, Dict[str, int]]:
     return calls
 
 
+def _solo_runs(runs) -> Dict[int, tuple]:
+    """`_solo` over one run or several that hold disjoint PRs; a PR in two of them is refused."""
+
+    out: Dict[int, tuple] = {}
+    for run in ([runs] if isinstance(runs, str) else runs):
+        got = _solo(run)
+        twice = set(got) & set(out)
+        if twice:
+            raise ValueError(f"PRs {sorted(twice)} are in two of the runs {runs}")
+        out.update(got)
+    return out
+
+
+#: The target of a solo finding submitted with no anchor: a PR-level ask (the description, the
+#: title, the PR's scope), which the solo contract allows. Before 2026-10-10 such a finding rendered
+#: `None:None` and was refused; the refusal stays for a target that is missing or rendered broken.
+PR_LEVEL_TARGET = "PR level (no file or line)"
+
+
+def _solo_target(anchor) -> str:
+    if not anchor or not anchor.get("path"):
+        return PR_LEVEL_TARGET
+    return f"{anchor['path']}:{anchor.get('line_start')}" if anchor.get("line_start") is not None else anchor["path"]
+
+
 def _solo(run: str) -> Dict[int, tuple]:
     import asyncio
 
@@ -731,7 +901,7 @@ def _solo(run: str) -> Dict[int, tuple]:
                 if sample.successful_attempt is None or not result or not result.get("success"):
                     continue
                 pr = int(result["pr_number"])
-                found = [{"target": f"{(f.get('anchor') or {}).get('path')}:{(f.get('anchor') or {}).get('line_start')}",
+                found = [{"target": _solo_target(f.get("anchor")),
                           "claim": f.get("claim"), "requested_change": f.get("suggested_fix"),
                           "severity": f.get("severity")} for f in result.get("findings") or []]
                 split = compiles.get(pr, {"lean_verify_edit": -1, "lean_verify": -1})
@@ -817,12 +987,19 @@ def seal_labels(prs: List[int], sessions: List[str]) -> Dict[str, Dict[str, str]
 
 
 def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
-                 seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path) -> Dict[str, Any]:
+                 seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path,
+                 harness_blind: bool = False) -> Dict[str, Any]:
     """Blind inputs: per sealed PR, its asks and every session's findings under its shuffled label.
 
     Findings are stripped to `KEEP` with cues redacted. A finding without a target is refused, since
     a matcher would judge it without a location (test (b)'s solo findings reached the matchers as
     `None:None` until 2026-09-29).
+
+    `harness_blind` (the one reviewer table's seals, 2026-10-10) removes what still says which harness
+    wrote a finding when Claude sessions sit beside solo runs in one seal: a Claude session is cut to
+    the solo budget (its first 20, as `import_probe_session` cuts it), its prose target is located by
+    `resolve_target` and written `path:line` as a solo finding's is (an unresolved one keeps its text),
+    and every session's text loses the conventions cues. The counts go into `session_stats.json`.
     """
 
     out.mkdir(parents=True, exist_ok=True)
@@ -830,20 +1007,23 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
     missing = used - set(sources)
     if missing:
         raise ValueError(f"no source for sessions {sorted(missing)}")
-    loaded = {s: (_solo(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
+    loaded = {s: (_solo_runs(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
               for s in used if sources[s].kind != "claude"}
     stats: Dict[str, Dict[str, Any]] = {}
+    graph_by_pr = _graphs(spec) if harness_blind and any(sources[s].kind == "claude" for s in used) else {}
     for pr, labels in seal.items():
         write_json(out / f"asks_pr{pr}.json", ask_packet(feedback, asks["asks"][pr]))
         for label, session in labels.items():
             if sources[session].kind == "claude":
                 found, st = _claude(spec, int(pr), session)
+                if harness_blind:
+                    found, st = _claude_as_solo(found, st, graph_by_pr[int(pr)])
             else:
                 if int(pr) not in loaded[session]:
                     raise ValueError(f"{session} has no successful session for PR {pr}")
                 found, st = loaded[session][int(pr)]
             stats.setdefault(pr, {})[session] = st
-            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k))
+            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k), harness_blind)
                                     for k in KEEP}} for n, f in enumerate(found)]
             lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
             if lost:
@@ -851,6 +1031,36 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
             write_json(out / f"{label}_pr{pr}.json", stripped)
     write_json(out / "session_stats.json", stats)
     return stats
+
+
+def _graphs(spec: ProbeSet) -> Dict[int, Any]:
+    """The set's round-1 change graphs by PR, as `import_probe_session` reads them."""
+
+    from src.mathlib_review.review.runner import load_release, load_run
+
+    dataset, _scaffold, _ = load_run(Path(spec.dataset_config),
+                                     overrides={"dataset": {"pr_numbers": list(spec.pr_numbers)}})
+    return {g.pr_number: g for g in load_release(dataset)["graphs"] if ":round1:" in g.episode_id}
+
+
+#: SoloReviewConfig.finding_budget, the cap a solo submission is cut to.
+SOLO_FINDING_BUDGET = 20
+
+
+def _claude_as_solo(found: List[Dict[str, Any]], st: Dict[str, Any], graph) -> tuple:
+    """A Claude session's findings as a solo submission reaches a matcher: its first
+    `SOLO_FINDING_BUDGET`, each prose target located as `path:line` where `resolve_target` can."""
+
+    kept, unresolved = [], 0
+    for f in found[:SOLO_FINDING_BUDGET]:
+        path, line, method = resolve_target(f.get("target"), graph)
+        if path:
+            f = {**f, "target": f"{path}:{line}" if line is not None else path}
+        else:
+            unresolved += 1
+        kept.append(f)
+    return kept, {**st, "findings": len(kept), "cut_to_budget": max(0, len(found) - SOLO_FINDING_BUDGET),
+                  "targets_unresolved": unresolved}
 
 
 def condition(session: str) -> str:
@@ -923,11 +1133,12 @@ _NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "
             9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
 
 
-def matcher_rubric(reviewers: int, prs: int) -> str:
+def matcher_rubric(reviewers: int, prs: int, source: Path = MATCHER_RUBRIC) -> str:
     """The matcher rubric for this many reviewers and PRs. It was written for six and six, and
-    for those it is returned unchanged."""
+    for those it is returned unchanged. `source` is `MATCHER_RUBRIC` or `MATCHER_RUBRIC_QUESTIONS`;
+    either reaches the matcher as `matcher_rubric.md`, the name its prompt reads."""
 
-    text = MATCHER_RUBRIC.read_text()
+    text = source.read_text()
     word = lambda n: _NUMBERS.get(n, str(n))
     pr_phrase = "one Mathlib pull request" if prs == 1 else f"{word(prs)} Mathlib pull requests"
     text = text.replace("on six Mathlib pull requests. Six anonymous reviewers, `R1` to `R6`",
@@ -1052,12 +1263,13 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
 
 
 def model_context(spec: ProbeSet, prs: List[int],
-                  conventions: Optional[Dict[int, List[str]]] = None) -> str:
+                  conventions: Optional[Dict[int, List[str]]] = None, closing: str = "") -> str:
     """The solo task's `context_file`: each PR's pass-0 model as one section, JSON lines, so a
     `gpt_5.2` session reads the same model a Claude session's `model.md` holds.
 
     With `conventions`, each PR's principles follow its model as a second section. Every PR must
     then be named: a PR whose brief is empty says so with `[]`, and reads the model alone.
+    `closing` ends every conventions section (`conventions_section`).
     """
 
     models = render_models(spec.release, prs, spec.inventory)
@@ -1067,7 +1279,7 @@ def model_context(spec: ProbeSet, prs: List[int],
     def sections(pr: int) -> List[Dict[str, str]]:
         held = [{"title": "The PR model (pass 0)", "text": models[pr]}]
         if conventions and conventions[pr]:
-            held.append({"title": CONVENTIONS_TITLE, "text": conventions_section(conventions[pr])})
+            held.append({"title": CONVENTIONS_TITLE, "text": conventions_section(conventions[pr], closing)})
         return held
 
     return "".join(json.dumps({"pr_number": pr, "sections": sections(pr)}, ensure_ascii=False) + "\n"

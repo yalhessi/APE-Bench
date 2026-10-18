@@ -14,6 +14,11 @@ default (user, 2026-09-24).
 - `docs/plans/STATUS.md` — every planned item marked built / partial / not built, checked against the tree.
 - `docs/dead-ends.md` — abandoned threads and retracted conclusions, each with what would reopen it.
   **Check it before starting, or "rediscovering", a direction.** If a proposal is on that list, say so.
+- `docs/questions.md` — **every question an experiment has already answered**, in plain words with
+  its number and its path. Read the relevant section before proposing a probe, a design or a run, and
+  after any compaction; a new probe's `PROTOCOL.md` opens with `## Already answered?`, and the tree
+  lint keeps every probe directory listed. Added 2026-10-13 after a probe was proposed that would have
+  re-run the week-old conventions-ceiling result.
 - `docs/todo/README.md` — the open hypotheses: what is worth doing, the motivating result that made
   it interesting, and what would close it. **Read it with `dead-ends.md` before proposing a
   direction**, and when a session surfaces a hypothesis it will not pursue, write it there before the
@@ -40,6 +45,13 @@ default (user, 2026-09-24).
   2026-09-23 `work-enumeration` and `arms-speak` built per-target verdicts plus ask-without-fix in
   parallel, and the second found the first only when its paid run was already going. The
   `[session]` line counts sessions in *this* tree, so it cannot see one in another worktree.
+- **Before building an experiment, falsify its premise on what is already on disk.** State the
+  diagnosis as a claim about existing transcripts or labels, check it by reading (an hour at most),
+  then test the mechanism on a few sessions by hand or by replay. A design, a pre-registration and a
+  run on the sets come only after that signal. The adversarial round attacks the premise before the
+  design. 2026-10-12/13: two days on a contract that forbids withholding
+  (`results/pr_review_v5/probes/filing-contract-2026-10-12/`), when a half-hour reading of the places
+  it was built from showed the reviewer had the topic and not the fix.
 - **Record a lesson the moment it is learned**, in the strongest place it fits, in this order: a test
   or a refusal in code → a hook → this file → `.claude/rules/<area>.md` → `docs/dead-ends.md`.
   Never only in the conversation: compaction drops it, and the same mistake gets made again.
@@ -227,6 +239,10 @@ reaches 8, 6, 9 of 23 on the dev held-out 12 (Opus 5.5: 7, 7), at about 35 min a
   - It deletes its 476 GB `/tmp` weight copy, which is node RAM, once serving.
 - **Run the harness as a Slurm job on `first`** (`run_ds41_keepthink.sh` is the pattern), not from a
   session: the server binds to localhost.
+- **Never edit a gate script while its job runs.** Bash reads a script as it goes (fd 255 holds the
+  next command's offset), so an edit above that offset reroutes the gate mid-line. On 2026-10-08 a
+  comment edit to `run_stage_d_gate.sh` under job 434256 was caught at offset 5412 and the submitted
+  bytes restored. Edit after the job ends, or submit a copy.
 - **Earlier thinking must reach the server.** A local model takes the plain `MessageFormatter`,
   because `OpenAIMessageFormatter` drops `reasoning_content`
   (`test_a_local_model_gets_its_earlier_thinking_back`). With it dropped, DeepSeek re-derived ~8k
@@ -249,7 +265,7 @@ Claude Code background task dies with that process: stage 5's gpt-5.5 runs did a
 (`/proc/self/cgroup`), and tearing that scope down kills every process in it -- S2 died that way at 10
 of 16. Start it as a user unit, which lives outside the session:
 `systemd-run --user --collect --unit=<name> /bin/bash -c "exec <command> >> <log> 2>&1 < /dev/null"`
-(it survived the next restart; `systemctl --user status <name>` to watch it). Lingering is off, so it
+(it survived the next restart; `systemctl --user status <name>` to watch it). A unit starts without the login `PATH` and `HOME`: pass `--setenv=PATH="$PATH" --setenv=HOME="$HOME"`, or a tool resolved from `PATH` vanishes (2026-10-11: a window check read "unknown, 100%" and stopped a Claude batch). Lingering is off, so it
 lasts while any login session does; a Slurm job outlives even that. **A user unit is still in
 `/user.slice`, and systemd-oomd kills there under memory pressure** (60% for 20 s, `oomctl`): it picks
 the cgroup with the most reclaim, not the biggest, so a 272 MB unit reading files died `oom-kill` at

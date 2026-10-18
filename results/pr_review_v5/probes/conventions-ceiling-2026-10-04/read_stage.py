@@ -6,7 +6,8 @@ matcher) and `match_<stage>_<set>/session_stats.json` (findings per session), an
 cells over (asks x its sessions); a condition is a session label less its digits (LB1 -> LB).
 
 A stage matched in rounds names them together (`C1,C2`): a set's tables are merged per matcher
-number, each PR judged in the one round that held it. `--impute <pr> ...` adds the in-census asks of
+number and per session, so rounds may hold different PRs (stage C) or different sessions on the same
+asks (stage D's rep 1, then reps 2-3). A session in two rounds (the X anchors) reads as the later. `--impute <pr> ...` adds the in-census asks of
 PRs that were not run as reached by every session of both conditions (stage C: the PRs where both
 unbriefed sessions already reach every in-census ask, on both of stage L's matchers).
 
@@ -51,10 +52,13 @@ def merged(tag: str):
             continue
         u = json.loads((folder / "unblinded.json").read_text())
         for m in ("1", "2"):
-            tables.setdefault(m, {"table": {}})["table"].update(u[m]["table"])
+            table = tables.setdefault(m, {"table": {}})["table"]
+            for cid, row in u[m]["table"].items():
+                table.setdefault(cid, {}).update(row)
         for k in agreement:
             agreement[k] += (u.get("agreement") or {}).get(k, 0)
-        stats.update(json.loads((folder / "session_stats.json").read_text()))
+        for pr, per_session in json.loads((folder / "session_stats.json").read_text()).items():
+            stats.setdefault(pr, {}).update(per_session)
     return ({**tables, "agreement": agreement}, stats) if tables else None
 
 

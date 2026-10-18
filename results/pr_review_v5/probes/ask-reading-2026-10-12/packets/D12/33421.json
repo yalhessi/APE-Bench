@@ -1,0 +1,1208 @@
+{
+ "asks": [
+  {
+   "id": "d0048",
+   "pr": 33421,
+   "family": "F8",
+   "in_census": true,
+   "entries": [
+    "P113",
+    "P432"
+   ],
+   "text": "How about `round_eq_div`?",
+   "path": "Mathlib/Algebra/Order/Round.lean",
+   "line": 51,
+   "author": "Ruben-VandeVelde",
+   "at": "2025-12-31T11:04:43Z",
+   "matcher_text": {
+    "ask_id": "d0048",
+    "path": "Mathlib/Algebra/Order/Round.lean",
+    "code_at_comment": "@@ -45,6 +45,26 @@ variable [Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n def round (x : α) : ℤ :=\n   if 2 * fract x < 1 then ⌊x⌋ else ⌈x⌉\n \n+/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n+\n+TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\n+theorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by",
+    "comment": "How about `round_eq_div`?",
+    "replies_to": null
+   },
+   "outcomes": {
+    "OP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "OP1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is a primed name whose prime is not explained and does not say what distinguishes it from `round_eq`: both are equations for `round` with the same left-hand side, differing only in the right-hand side (`⌊x + 1/2⌋` versus `(⌊2 * x⌋ + 1) / 2`), and the docstring does not mention the prime.",
+      "requested_change": "Name the variant for the term of the statement that differs, as the sibling `round_eq_half_ceil_two_mul` does for `⌈2 * x⌉ / 2` (e.g. spell the right-hand side `⌊2 * x⌋ + 1) / 2`, something like `round_eq_half_add_one_floor_two_mul`), or state in the docstring why the prime is kept and what the unprimed lemma is.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is a primed name whose prime is not explained and does not say what distinguishes it from `round_eq`: both are equations for `round` with the same left-hand side, differing only in the right-hand side (`⌊x + 1/2⌋` versus `(⌊2 * x⌋ + 1) / 2`), and the docstring does not mention the prime.",
+      "requested_change": "Name the variant for the term of the statement that differs, as the sibling `round_eq_half_ceil_two_mul` does for `⌈2 * x⌉ / 2` (e.g. spell the right-hand side `⌊2 * x⌋ + 1) / 2`, something like `round_eq_half_add_one_floor_two_mul`), or state in the docstring why the prime is kept and what the unprimed lemma is.",
+      "severity": "advisory"
+     },
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "partial",
+     "m1_finding": 0,
+     "m1_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Order/Round.lean:51",
+      "claim": "`round_eq'` carries a prime while its unprimed sibling `round_eq` (line 173) states a *different* formula (`round x = ⌊x + 1/2⌋`), not a less general form of the same one; the statement is `round x = (⌊2 * x⌋ + 1) / 2`. Mathlib distinguishes such siblings by naming the term of the statement that differs rather than by a prime, and the sibling added in this very PR is named by its formula (`round_eq_half_ceil_two_mul`). A reader of `round_eq'` cannot tell what is `'` about it.",
+      "requested_change": "Rename `round_eq'` to a name built from its right-hand side, in the style of `round_eq_half_ceil_two_mul` — e.g. `round_eq_half_floor_two_mul_add_one` (or `round_eq_floor_two_mul_add_one_div_two`), spelling the formula rather than a prime — and update its three uses (`round_eq`, `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`). If the prime is meant to say \"ring-level version\", say so in the name (`…_of_ring`-style) instead.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "partial",
+     "m2_finding": 0,
+     "m2_finding_text": {
+      "i": 0,
+      "target": "Mathlib/Algebra/Order/Round.lean:51",
+      "claim": "`round_eq'` carries a prime while its unprimed sibling `round_eq` (line 173) states a *different* formula (`round x = ⌊x + 1/2⌋`), not a less general form of the same one; the statement is `round x = (⌊2 * x⌋ + 1) / 2`. Mathlib distinguishes such siblings by naming the term of the statement that differs rather than by a prime, and the sibling added in this very PR is named by its formula (`round_eq_half_ceil_two_mul`). A reader of `round_eq'` cannot tell what is `'` about it.",
+      "requested_change": "Rename `round_eq'` to a name built from its right-hand side, in the style of `round_eq_half_ceil_two_mul` — e.g. `round_eq_half_floor_two_mul_add_one` (or `round_eq_floor_two_mul_add_one_div_two`), spelling the formula rather than a prime — and update its three uses (`round_eq`, `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`). If the prime is meant to say \"ring-level version\", say so in the name (`…_of_ring`-style) instead.",
+      "severity": "advisory"
+     },
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "partial",
+     "m1_finding": 3,
+     "m1_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Order/Round.lean:51",
+      "claim": "`round_eq'` introduces a new primed name for a lemma that is not a variant of a named constructor but simply the ring-level formula for `round` (`round x = (⌊2 * x⌋ + 1) / 2`); new primed declarations are discouraged in Mathlib (the `docPrime` linter and its exception file `scripts/nolints_prime_decls.txt` exist to stop them accumulating), and it sits beside the unprimed field-level `round_eq`.",
+      "requested_change": "Rename it to a descriptive unprimed name such as `round_eq_floor_two_mul_add_one_div` — or, if the docstring's TODO is accepted, adopt the formula as the definition of `round` so that this lemma becomes `rfl` and needs no name at all.",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "partial",
+     "m2_finding": 3,
+     "m2_finding_text": {
+      "i": 3,
+      "target": "Mathlib/Algebra/Order/Round.lean:51",
+      "claim": "`round_eq'` introduces a new primed name for a lemma that is not a variant of a named constructor but simply the ring-level formula for `round` (`round x = (⌊2 * x⌋ + 1) / 2`); new primed declarations are discouraged in Mathlib (the `docPrime` linter and its exception file `scripts/nolints_prime_decls.txt` exist to stop them accumulating), and it sits beside the unprimed field-level `round_eq`.",
+      "requested_change": "Rename it to a descriptive unprimed name such as `round_eq_floor_two_mul_add_one_div` — or, if the docstring's TODO is accepted, adopt the formula as the definition of `round` so that this lemma becomes `rfl` and needs no name at all.",
+      "severity": "advisory"
+     },
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "partial",
+     "m1_finding": 2,
+     "m1_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is named with a bare prime, unlike its sibling `round_eq_half_ceil_two_mul` added by the same PR and unlike `round_eq_iff`; the name does not say which formula it states, even though it is the workhorse of the new API (it is the ring-level form `round x = (⌊2 * x⌋ + 1) / 2`, from which `round_eq` is now derived).",
+      "requested_change": "Rename `round_eq'` to a descriptive name in the style of its siblings, e.g. `round_eq_floor_two_mul`, updating its four uses (`Mathlib/Algebra/Order/Round.lean` lines 93 and 174, `Mathlib/Topology/Algebra/Order/Floor.lean` lines 207 and 217).",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "partial",
+     "m2_finding": 2,
+     "m2_finding_text": {
+      "i": 2,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is named with a bare prime, unlike its sibling `round_eq_half_ceil_two_mul` added by the same PR and unlike `round_eq_iff`; the name does not say which formula it states, even though it is the workhorse of the new API (it is the ring-level form `round x = (⌊2 * x⌋ + 1) / 2`, from which `round_eq` is now derived).",
+      "requested_change": "Rename `round_eq'` to a descriptive name in the style of its siblings, e.g. `round_eq_floor_two_mul`, updating its four uses (`Mathlib/Algebra/Order/Round.lean` lines 93 and 174, `Mathlib/Topology/Algebra/Order/Floor.lean` lines 207 and 217).",
+      "severity": "advisory"
+     },
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "GPT2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    },
+    "AP3": {
+     "R": "R13",
+     "m1": "partial",
+     "m1_finding": 4,
+     "m1_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is named with a bare `_eq` plus a prime and says nothing about its right-hand side `(⌊2 * x⌋ + 1) / 2`; the prime does not make it a variant of the unprimed sibling — `round_eq` (line 173) states a different formula, `round x = ⌊x + 1 / 2⌋` — and the sibling added in this same PR names its differing right-hand side (`round_eq_half_ceil_two_mul`).",
+      "requested_change": "Rename it after its right-hand side, in the style of the sibling added here, e.g. `round_eq_half_floor_two_mul_add_one`, and update the four uses (`round_eq` line 174, `round_eq_half_ceil_two_mul` line 93, `tendsto_round_nhdsGE_pure` line 207, `tendsto_round_nhdsLT_pure_half_ceil` line 217).",
+      "severity": "advisory"
+     },
+     "note_m1": "Rename round_eq'; five reviewers propose other descriptive names, none round_eq_div.",
+     "m2": "partial",
+     "m2_finding": 4,
+     "m2_finding_text": {
+      "i": 4,
+      "target": "Mathlib/Algebra/Order/Round.lean:48",
+      "claim": "`round_eq'` is named with a bare `_eq` plus a prime and says nothing about its right-hand side `(⌊2 * x⌋ + 1) / 2`; the prime does not make it a variant of the unprimed sibling — `round_eq` (line 173) states a different formula, `round x = ⌊x + 1 / 2⌋` — and the sibling added in this same PR names its differing right-hand side (`round_eq_half_ceil_two_mul`).",
+      "requested_change": "Rename it after its right-hand side, in the style of the sibling added here, e.g. `round_eq_half_floor_two_mul_add_one`, and update the four uses (`round_eq` line 174, `round_eq_half_ceil_two_mul` line 93, `tendsto_round_nhdsGE_pure` line 207, `tendsto_round_nhdsLT_pure_half_ceil` line 217).",
+      "severity": "advisory"
+     },
+     "note_m2": "Partial: rename the primed round_eq' to a descriptive name, but not round_eq_div."
+    }
+   },
+   "entries_text": {
+    "P113": "A lemma variant is distinguished from its siblings by naming the term of its statement that differs, not by appending primes.",
+    "P432": "An equation lemma is named for its left-hand side, or as `lhs_eq_rhs` naming both sides; a bare `_eq` suffix naming no right-hand side is not used."
+   }
+  },
+  {
+   "id": "d0049",
+   "pr": 33421,
+   "family": "F6",
+   "in_census": true,
+   "entries": [
+    "P165"
+   ],
+   "text": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+   "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+   "line": 211,
+   "author": "Ruben-VandeVelde",
+   "at": "2025-12-31T11:11:19Z",
+   "matcher_text": {
+    "ask_id": "d0049",
+    "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+    "code_at_comment": "ontinuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha",
+    "comment": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+    "replies_to": null
+   },
+   "outcomes": {
+    "OP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "OP1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "GPT2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    },
+    "AP3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding asks for a general lemma for the Tendsto (2 * .) nhdsWithin step.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "No finding asks to extract the inline Tendsto (2 * .) nhdsGE fact as a general lemma."
+    }
+   },
+   "entries_text": {
+    "P165": "A fact established, or an object constructed, inside a proof that is of independent use, or not about the proof's specific objects, is extracted as its own (possibly `private`) lemma or definition."
+   }
+  },
+  {
+   "id": "d0051",
+   "pr": 33421,
+   "family": "F7",
+   "in_census": true,
+   "entries": [
+    "P063"
+   ],
+   "text": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by\r\n  rw [fract, mul_sub, sub_eq_iff_eq_add']\r\n  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\r\n  rintro ⟨n, hn⟩\r\n  convert hn\r\n  have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk\r\n  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn]\r\n  simp [mul_add, hk]\r\n```",
+   "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+   "line": 277,
+   "author": "eric-wieser",
+   "at": "2025-12-31T11:30:15Z",
+   "matcher_text": {
+    "ask_id": "d0051",
+    "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+    "code_at_comment": "@@ -267,6 +267,15 @@ theorem mul_cast_floor_div_cancel_of_pos {n : ℤ} (hn : 0 < n) (a : R) : ⌊a *\n theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by\n   simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n \n+theorem two_mul_fract_eq_one_iff_exists_int {x : R} :\n+    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by\n+  rw [fract, mul_sub, sub_eq_iff_eq_add']\n+  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\n+  rintro ⟨n, hn⟩\n+  convert hn\n+  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn]\n+  simp [mul_add]",
+    "comment": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by\r\n  rw [fract, mul_sub, sub_eq_iff_eq_add']\r\n  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\r\n  rintro ⟨n, hn⟩\r\n  convert hn\r\n  have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk\r\n  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn]\r\n  simp [mul_add, hk]\r\n```",
+    "replies_to": null
+   },
+   "outcomes": {
+    "OP2": {
+     "R": "R1",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "OP1": {
+     "R": "R2",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "AP1": {
+     "R": "R3",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "AP2": {
+     "R": "R4",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "DX3": {
+     "R": "R5",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "GPT1": {
+     "R": "R6",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "X2": {
+     "R": "R7",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "GPT3": {
+     "R": "R8",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "DX2": {
+     "R": "R9",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "GPT2": {
+     "R": "R10",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "X1": {
+     "R": "R11",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "DX1": {
+     "R": "R12",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    },
+    "AP3": {
+     "R": "R13",
+     "m1": "no",
+     "m1_finding": null,
+     "note_m1": "No finding generalizes the lemma to k * fract x; several only move it to the fract section.",
+     "m2": "no",
+     "m2_finding": null,
+     "note_m2": "Findings only move the lemma to the fract section; none generalise 2 to k with 1 < k."
+    }
+   },
+   "entries_text": {
+    "P063": "A result stated for a concrete type, object or value (a specific filter, a default element) but using only an abstract property of it, or none, is stated for every type, object or value with that property."
+   }
+  }
+ ],
+ "pr": 33421,
+ "sessions": {
+  "X1": {
+   "R": "R11",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "The PR demotes `public import Mathlib.Algebra.Order.Interval.Set.Group` in Round.lean to a private `import`. Nothing in the file uses it any more. The old `round_eq_zero_iff` proof needed `add_mem_Ico_iff_left`; the new one goes through `round_eq_iff`. So the file keeps an import it does not need, and downstream files get no benefit from it because a private import is not re-exported.",
+     "requested_change": "Delete the line `import Mathlib.Algebra.Order.Interval.Set.Group` from Mathlib/Algebra/Order/Round.lean instead of keeping it as a private import. The downstream files already add the import themselves.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` has no `@[fun_prop]`, although its floor twin `continuousAt_floor` and its own consequence `continuousOn_ceil_compl_range` in the same hunk are both tagged `@[fun_prop]`. So `fun_prop` can use the floor pointwise lemma but not the ceil one.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`, matching `continuousAt_floor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` states its non-integrality hypothesis in terms of floor, `hx : x ≠ ⌊x⌋`. For a lemma about `ceil` that is unnatural, and the proof has to convert it back with `fun h ↦ hx <| by rw [h, floor_intCast]`.",
+     "requested_change": "State the hypothesis as `(hx : x ≠ ⌈x⌉)` and shorten the proof to `(continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88",
+     "claim": "The PR changes the codomain of `continuousOn_floor` from `α → α` to `α → ℤ`. The lambda `fun x => floor x` was there only to insert the cast into `α`, so it is now a plain eta-expansion of `floor`. This is inconsistent with the new `continuousOn_floor_compl_range`, which writes `(floor : α → ℤ)`.",
+     "requested_change": "State it as `ContinuousOn (floor : α → ℤ) (Ico n (n + 1) : Set α)`. The proof `(continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const` stays as it is.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:92",
+     "claim": "Same as `continuousOn_floor`: the codomain is now `ℤ`, so `fun x => ceil x : α → ℤ` is an eta-expanded `ceil`, unlike the new `continuousOn_ceil_compl_range`, which writes `(ceil : α → ℤ)`.",
+     "requested_change": "State it as `ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n : Set α)` and keep the proof.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:215",
+     "claim": "The name reads as `pure (⌈x⌉ / 2)`, but the limit is `pure (⌈2 * x⌉ / 2)`. The PR's own companion lemma for the same quantity is named `round_eq_half_ceil_two_mul` and spells out the `two_mul`.",
+     "requested_change": "Rename to `tendsto_round_nhdsLT_pure_half_ceil_two_mul`, or use whatever spelling `round_eq_half_ceil_two_mul` ends up with, so the two names describe `⌈2 * x⌉ / 2` the same way. Update the use in `continuousAt_round`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9",
+     "claim": "The four new `round` lemmas (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) each repeat `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit just above the file's existing `variable [IsStrictOrderedRing α]` line, so the first binder is redundant boilerplate.",
+     "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`, inside a `section` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, and drop the per-lemma instance binders.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9",
+     "claim": "The module docstring was not updated for this PR. It still describes the file as facts about `Int.floor`, `Int.ceil` and `Int.fract`, yet the file now publicly imports `Round` and proves `continuousAt_round`, `continuousOn_round`, `continuousAt_floor` and `continuousAt_ceil`. Its `continuousOn_ceil` bullet also gives the interval as `Ioc n (n + 1)`, while the statement, which this PR edits, is `Ioc (n - 1) n`.",
+     "requested_change": "Update the module docstring: mention `round` in the title and summary, add bullets for `continuousAt_floor` / `continuousAt_ceil` and `continuousAt_round` / `continuousOn_round`, and correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655",
+     "claim": "The PR adds `Int.ceil_one_add : ⌈1 + a⌉ = 1 + ⌈a⌉` to complete the left-addition ceil API, but there is no floor counterpart. `Int.floor_one_add` does not exist, although `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` and `fract_one_add` do. The floor and ceil APIs stay asymmetric.",
+     "requested_change": "Add `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` next to `floor_natCast_add` in Mathlib/Algebra/Order/Floor/Ring.lean.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225",
+     "claim": "`continuousAt_round` leaves two side goals and closes them with tactic blocks, `rw [round_eq_half_ceil_two_mul hx]` and `gcongr; apply Ioi_subset_Ici_self`. Both are single terms.",
+     "requested_change": "Write the proof as `rw [continuousAt_iff_continuous_left'_right']; exact ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right (pure_le_nhds_iff.mpr (round_eq_half_ceil_two_mul hx).symm), (tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self) |>.mono_right (pure_le_nhds _)⟩`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "X2": {
+   "R": "R7",
+   "kind": "claude",
+   "run": null,
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "Round.lean keeps `import Mathlib.Algebra.Order.Interval.Set.Group` (demoted from public to private), but nothing in the file uses it any more: its only use was `add_mem_Ico_iff_left` in the old proof of `round_eq_zero_iff`, which this PR replaced by `simp [round_eq_iff]`. The demotion is also what forced the 11 downstream files to add their own imports.",
+     "requested_change": "Delete line 9, `import Mathlib.Algebra.Order.Interval.Set.Group`, from Mathlib/Algebra/Order/Round.lean. Keep the downstream import additions, since those files no longer get it transitively.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` has no `@[fun_prop]` attribute, but its twin `continuousAt_floor` and both `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` have one. So `fun_prop` can prove continuity of `floor` at a non-integer but not of `ceil`.",
+     "requested_change": "Tag `continuousAt_ceil` with `@[fun_prop]`, matching `continuousAt_floor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` takes the hypothesis `hx : x ≠ ⌊x⌋`, a floor-shaped condition on a ceil lemma. Because of this the proof has to turn `x = ⌈x⌉` into a contradiction with `floor_intCast` inside a lambda. The natural dual of `continuousAt_floor (hx : x ≠ ⌊x⌋)` is `x ≠ ⌈x⌉`, and with it the proof is direct.",
+     "requested_change": "State it as `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) ((le_ceil x).lt_of_ne hx)`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88",
+     "claim": "The PR rewrites the statements of `continuousOn_floor` and `continuousOn_ceil` to be ℤ-valued, but leaves them eta-expanded with redundant ascriptions: `ContinuousOn (fun x => floor x : α → ℤ) (Ico n (n + 1) : Set α)`. Now that the codomain is ℤ, the lambda is just `floor`, and the PR's own new lemmas write `ContinuousOn (floor : α → ℤ) ...` and `ContinuousAt floor x`.",
+     "requested_change": "State them as `theorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1))` and `theorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n)`, keeping the proofs unchanged.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:234",
+     "claim": "The four new round lemmas (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) each repeat `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit two lines above `variable [IsStrictOrderedRing α]` (l.238), which already supplies the first binder.",
+     "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`, in a `section Round` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, and drop the per-lemma instance binders, e.g. `theorem continuousAt_round {x : α} (hx : 2 * fract x ≠ 1) : ContinuousAt round x`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655",
+     "claim": "The PR adds `Int.ceil_one_add` to complete the ceil `*_add` family, but the floor family it mirrors has no `Int.floor_one_add`: `floor_intCast_add`, `floor_natCast_add` and `floor_ofNat_add` exist, and `fract_one_add` exists. After this PR, ceil has a `one_add` simp lemma and floor does not.",
+     "requested_change": "Add the missing counterpart next to `floor_natCast_add` in Mathlib/Algebra/Order/Floor/Ring.lean: `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9",
+     "claim": "The module docstring still says the file is about `Int.floor`, `Int.ceil` and `Int.fract` and lists none of the new results (`continuousAt_floor`, `continuousAt_ceil`, `continuousAt_round`, `continuousOn_round`), though the file now imports `Round` and proves continuity of `round`. Its bullet for `continuousOn_ceil`, whose statement this PR edits, also gives the wrong interval: it says `Ioc n (n + 1)`, but the lemma is about `Ioc (n - 1) n`.",
+     "requested_change": "Retitle the module doc to `Topological facts about Int.floor, Int.ceil, Int.fract and round` and mention `round` in its first sentence. Correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`. Add bullets for `continuousAt_floor`/`continuousAt_ceil` (continuous away from the integers) and `continuousAt_round`/`continuousOn_round` (continuous away from the points with fractional part `1 / 2`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:105",
+     "claim": "`continuousOn_floor_compl_range` (and its twin `continuousOn_ceil_compl_range`) uses a three-line tactic proof with `simp_all [eq_comm]` for a one-line term: the membership hypothesis already gives the needed `x ≠ ⌊x⌋` directly.",
+     "requested_change": "Replace the proof with `fun _x hx ↦ (continuousAt_floor fun h ↦ hx ⟨_, h.symm⟩).continuousWithinAt`, and the same with `continuousAt_ceil` in `continuousOn_ceil_compl_range`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:215",
+     "claim": "The name ends in `half_ceil`, which reads as `⌈x⌉ / 2`, but the limit is `⌈2 * x⌉ / 2`. Its sibling in this PR spells the same expression `half_ceil_two_mul` (`round_eq_half_ceil_two_mul : round x = ⌈2 * x⌉ / 2`), and the file's existing names spell the limit value in full (`tendsto_floor_left_pure_ceil_sub_one`).",
+     "requested_change": "Rename to `tendsto_round_nhdsLT_pure_half_ceil_two_mul` and update its use in `continuousAt_round`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Algebra/Order/Round.lean:51",
+     "claim": "The docstring of `round_eq'` contains a design TODO for maintainers (`TODO: decide if we want to use this as a definition. It may be slightly faster over ℚ.`), which will be rendered in the API documentation users read.",
+     "requested_change": "Take the TODO out of the docstring and put it in a `-- TODO:` comment above the declaration, leaving the docstring as `/-- Formula for round in terms of Int.floor, a version that works over any ring. -/`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP1": {
+   "R": "R2",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "The PR turns `public import Mathlib.Algebra.Order.Interval.Set.Group` in `Round.lean` into a private import. But after the PR nothing in the file uses it: `round_eq_zero_iff`, the only user of `add_mem_Ico_iff_left`, now goes through `round_eq_iff`. The file compiles with the import deleted. The PR already adds the import directly to every downstream file that needs it, so keeping a private copy here only adds a useless dependency.",
+     "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean` and keep only `public import Mathlib.Algebra.Order.Floor.Ring`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` states its hypothesis with floor (`hx : x ≠ ⌊x⌋`) even though the lemma is about `ceil`. The proof then needs an extra `fun h ↦ hx <| by rw [h, floor_intCast]` to turn this into `x ≠ ⌈x⌉`. The natural dual of `continuousAt_floor (hx : x ≠ ⌊x⌋)` is `x ≠ ⌈x⌉`.",
+     "requested_change": "Change the statement to `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`. `continuousOn_ceil_compl_range` still closes with `simp_all [eq_comm]`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` has no `@[fun_prop]` attribute, while its floor counterpart `continuousAt_floor` and the two `ContinuousOn` lemmas `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` are all tagged `@[fun_prop]`. As a result, `fun_prop` can prove `ContinuousAt floor x` but not `ContinuousAt ceil x`.",
+     "requested_change": "Add `@[fun_prop]` above `theorem continuousAt_ceil`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88",
+     "claim": "The PR changes the codomain of `continuousOn_floor` (and of its sibling `continuousOn_ceil`) from `α` to `ℤ`. The lambdas `fun x => floor x : α → ℤ` and `fun x => ceil x : α → ℤ` were only there to insert the cast into `α`. Now they are plain eta-expansions of `floor` and `ceil`, unlike the new lemmas next to them, which write `(floor : α → ℤ)` and `(ceil : α → ℤ)`.",
+     "requested_change": "State them as `theorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1) : Set α)` and `theorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n : Set α)`, keeping the same proofs.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "The four new lemmas `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` each repeat the binders `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit just above the existing `variable [IsStrictOrderedRing α]` at line 238, and the file already uses sections to manage these instances.",
+     "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`. Wrap them in a `section` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, then drop the repeated instance binders from each statement.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13",
+     "claim": "The PR now publicly imports `Round` and adds the main continuity results for `round` (`continuousAt_round`, `continuousOn_round`), plus `continuousAt_floor` and `continuousAt_ceil`. The module docstring was not updated: its title still says \"`Int.floor`, `Int.ceil` and `Int.fract`\", and its list of main declarations mentions none of these lemmas. Its entry for `continuousOn_ceil`, a lemma this PR restates, also gives the wrong interval: `Ioc n (n + 1)` instead of `Ioc (n - 1) n`.",
+     "requested_change": "Add `round` to the module title and summary. Add bullets for `continuousAt_floor`/`continuousAt_ceil` and for `continuousAt_round`/`continuousOn_round` (\"`round` is continuous away from points with `2 * fract x = 1`\"). Fix the `continuousOn_ceil` bullet to say `Ioc (n - 1) n`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655",
+     "claim": "The PR adds `Int.ceil_one_add`, mirroring `fract_one_add`, but the floor counterpart `Int.floor_one_add` (`⌊1 + a⌋ = 1 + ⌊a⌋`) still does not exist. The floor, ceil and fract `_add` API is therefore still asymmetric after this API pass.",
+     "requested_change": "Add `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` right after `floor_natCast_add`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "OP2": {
+   "R": "R1",
+   "kind": "solo",
+   "run": "probe_dev_opus55_contract2_claude_sub_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "`import Mathlib.Algebra.Order.Interval.Set.Group` in Round.lean is now unused. `round_eq_zero_iff` was the only proof that needed it (through `add_mem_Ico_iff_left`), and it now goes through `round_eq_iff`. Making the import private instead of deleting it leaves a dead dependency, and the downstream files already import the module themselves.",
+     "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean`. Keep only `public import Mathlib.Algebra.Order.Floor.Ring`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Order/Round.lean:56",
+     "claim": "In `round_eq'`, the first `split_ifs` branch is a roundabout 6-line proof. It proves the side goal `fract x < 1` by going through `h : 2 * fract x < 1` and `le_mul_of_one_le_left`, even though `simp` already knows `⌊fract x⌋ = 0`. The only fact the branch needs is `⌊2 * fract x⌋ = 0`, which follows directly from `h`.",
+     "requested_change": "Replace the branch with\n```lean\n  · simp [floor_eq_zero_iff.mpr (show 2 * fract x ∈ Ico 0 1 from ⟨by simp, h⟩)]\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270",
+     "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a statement about `fract`, but it sits in the `floor` section's `LinearOrderedRing` subsection. The `fract` section (after `variable [IsStrictOrderedRing R]`, line 335) already has the needed `Ring`/`IsStrictOrderedRing` context and holds all the other `fract` API.",
+     "requested_change": "Move `two_mul_fract_eq_one_iff_exists_int` into `section fract` (for example at the end of that section's ring part, before `section LinearOrderedField`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656",
+     "claim": "The PR adds `Int.ceil_one_add`, which completes the `ceil_intCast_add`/`ceil_natCast_add`/`ceil_ofNat_add` family. The floor side still lacks the matching `Int.floor_one_add`, even though `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` and `fract_one_add` all exist. As a result, `simp` normalises `⌈1 + a⌉` but not `⌊1 + a⌋`.",
+     "requested_change": "Add the floor counterpart next to `floor_natCast_add`:\n```lean\n@[simp]\ntheorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ :=\n  mod_cast floor_natCast_add 1 a\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` has two problems. First, it takes `hx : x ≠ ⌊x⌋` instead of the natural `x ≠ ⌈x⌉`, so its proof has to convert back with `rw [h, floor_intCast]`. Second, it is missing the `@[fun_prop]` attribute that its sibling `continuousAt_floor` has.",
+     "requested_change": "State it as\n```lean\n@[fun_prop]\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x :=\n  (continuousOn_ceil ⌈x⌉).continuousAt <|\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:106",
+     "claim": "`continuousOn_floor_compl_range` (and likewise `continuousOn_ceil_compl_range`) uses a 3-line tactic proof (`intro`/`refine`/`simp_all [eq_comm]`). The same thing is a one-line term, in the same style as `continuousOn_round` just below.",
+     "requested_change": "Use\n```lean\ntheorem continuousOn_floor_compl_range : ContinuousOn (floor : α → ℤ) (range Int.cast)ᶜ :=\n  fun _x hx ↦ (continuousAt_floor fun h ↦ hx ⟨_, h.symm⟩).continuousWithinAt\n```\nand write the `ceil` version the same way.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88",
+     "claim": "`continuousOn_floor` and `continuousOn_ceil` now have `ℤ` as codomain, but they keep the eta-expanded `fun x => floor x : α → ℤ` and the redundant `( … : Set α)` ascription. That is inconsistent with the new `continuousOn_floor_compl_range`/`continuousAt_floor`, which use `(floor : α → ℤ)`.",
+     "requested_change": "Write\n```lean\ntheorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1)) :=\n  (continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const\n\ntheorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n) :=\n  (continuousOn_congr <| ceil_eq_on_Ioc n).mpr continuousOn_const\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` each repeat `[IsStrictOrderedRing α]` as a binder, and the very next line (238) is `variable [IsStrictOrderedRing α]`.",
+     "requested_change": "Move the four round lemmas below `variable [IsStrictOrderedRing α]`, or move that `variable` line above them, and drop the explicit `[IsStrictOrderedRing α]` binders.",
+     "severity": "advisory"
+    },
+    {
+     "i": 8,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225",
+     "claim": "The proof of `continuousAt_round` uses a tactic block with `rw [round_eq_half_ceil_two_mul hx]` and `gcongr; apply Ioi_subset_Ici_self` for side goals that existing lemmas close directly.",
+     "requested_change": "Use the term proof\n```lean\n  continuousAt_iff_continuous_left'_right'.mpr\n    ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right\n      (pure_le_nhds_iff.mpr (round_eq_half_ceil_two_mul hx).symm),\n    ((tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self)).mono_right\n      (pure_le_nhds _)⟩\n```",
+     "severity": "advisory"
+    },
+    {
+     "i": 9,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13",
+     "claim": "The module docstring is now out of date. The title only mentions `Int.floor`, `Int.ceil` and `Int.fract`, and \"Main declarations\" lists none of the new results (`continuousAt_floor`, `continuousAt_ceil`, `continuousAt_round`, `continuousOn_round`), although the file now publicly imports `Round` to prove them. Also, the `continuousOn_ceil` entry gives the interval as `Ioc n (n + 1)`, while the (modified) statement is `Ioc (n - 1) n`.",
+     "requested_change": "Mention `round` in the title and description. Add entries for `continuousAt_floor`/`continuousAt_ceil` and `continuousAt_round`/`continuousOn_round`. Correct the `continuousOn_ceil` line to `Ioc (n - 1) n`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "GPT1": {
+   "R": "R6",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270",
+     "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a fractional-part lemma, but it is currently introduced in the preceding floor section before the `/-! #### Fractional part -/` block, so it is separated from the rest of the `fract` API.",
+     "requested_change": "Move `Int.two_mul_fract_eq_one_iff_exists_int` into `section fract`, for example just after `fract_lt_one` (or near `fract_eq_iff`), leaving its statement and proof unchanged.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14",
+     "claim": "The module documentation for `Topology/Algebra/Order/Floor` is now incomplete: this PR adds the `round` one-sided limit and continuity API, but the title and main-declarations list still say the file is only about `Int.floor`, `Int.ceil`, and `Int.fract` (and the listed interval for `continuousOn_ceil` is not the theorem's `Ioc (n - 1) n`).",
+     "requested_change": "Update the module doc to mention `round`, add `continuousAt_round`/`continuousOn_round` (and optionally the one-sided `tendsto_round...` lemmas) to the main declarations, and correct the `continuousOn_ceil` interval in the list to `Ioc (n - 1) n`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the pointwise analogue of the new `[fun_prop]` theorem `continuousAt_floor`, but it is missing the `[fun_prop]` attribute, so `fun_prop` has no pointwise theorem for `Int.ceil` even when the non-integer side condition is available.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX1": {
+   "R": "R12",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "`import Mathlib.Algebra.Order.Interval.Set.Group` in `Mathlib/Algebra/Order/Round.lean` is no longer used by this file (its only user was the old proof of `round_eq_zero_iff`, which used `add_mem_Ico_iff_left`); the PR demoted it from `public import` to `import` but left the now-dead line in place, and this demotion is what forced the 13 unrelated downstream files to import the module directly.",
+     "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean`. The file compiles unchanged without it.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656",
+     "claim": "The new `Int.ceil_one_add` (`⌈1 + a⌉ = 1 + ⌈a⌉`) completes the “constant first” ceil family, but `Mathlib/Algebra/Order/Floor/Ring.lean` still has no `Int.floor_one_add` although it has `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` (and the fract API has `fract_one_add`). The floor and ceil APIs the PR is aligning are therefore left asymmetric.",
+     "requested_change": "Add the counterpart next to the other `Int.floor_*_add` lemmas, e.g. after `floor_ofNat_add`: `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270",
+     "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a lemma about `Int.fract` but is placed in the middle of the floor-division block (`section LinearOrderedRing`, between `mul_natCast_floor_div_cancel` and `end LinearOrderedRing`), whereas every other `fract` lemma in this file lives in the dedicated `section fract` under `/-! #### Fractional part -/`.",
+     "requested_change": "Move the declaration into `section fract`, after `variable [IsStrictOrderedRing R]` (e.g. next to `fract_lt_one`/`fract_eq_iff`), where the instance context is the same (`[Ring R] [LinearOrder R] [IsStrictOrderedRing R] [FloorRing R]`) and all its dependencies (`fract`, `floor_eq_iff`, `mul_le_mul_iff_right₀`) are available.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "The names `tendsto_round_nhdsGE_pure` and `tendsto_round_nhdsLT_pure_half_ceil` use the `nhdsGE`/`nhdsLT` spelling, which is not the practice of the file they are added to: every neighbouring `Tendsto … (pure …)` lemma on a one-sided filter is named with `_right_`/`_left_` for `𝓝[≥]`/`𝓝[<]` (`tendsto_floor_right_pure_floor`, `tendsto_floor_left_pure_ceil_sub_one`, `tendsto_ceil_right_pure_floor_add_one`, `tendsto_floor_left_pure_sub_one`).",
+     "requested_change": "Rename them to follow the file's spelling, e.g. `tendsto_round_right_pure` for `tendsto_round_nhdsGE_pure` and `tendsto_round_left_pure_half_ceil` for `tendsto_round_nhdsLT_pure_half_ceil` (and update the two uses in `continuousAt_round`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the only one of the four continuity lemmas added by this PR that is not tagged `@[fun_prop]` (`continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` all are), so `fun_prop` cannot prove `ContinuousAt (Int.ceil : α → ℤ) x` even when the side condition `x ≠ ⌊x⌋` is in the context.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`, exactly as was done for `continuousAt_floor`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:158",
+     "claim": "By switching `continuousOn_floor`/`continuousOn_ceil` to the ℤ-valued `floor_eq_on_Ico`/`ceil_eq_on_Ioc`, this PR removes the last in-tree uses of `Int.floor_eq_on_Ico'` (line 158) and `Int.ceil_eq_on_Ioc'` (line 710), which are now dead code — and they are precisely prime-named declarations listed in `scripts/nolints_prime_decls.txt`, a list that is supposed to be emptied over time.",
+     "requested_change": "Delete `Int.floor_eq_on_Ico'` and `Int.ceil_eq_on_Ioc'` from `Mathlib/Algebra/Order/Floor/Ring.lean` (dropping their lines from `scripts/nolints_prime_decls.txt` as well); users who need the coerced form get it by `mod_cast`ing the unprimed lemma, as the two removed proofs did.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep1/tasks/dd7bf3224185759117f95bbf9320aa4dc1ba42cdf53c84eb35e8691a247967e3/samples/0/attempts/attempt_1_20261010112050/ape_agent_session_20261010_112050__1eb21e03-dbaa-4b7a-8108-c4edf6c996ce.jsonl"
+  },
+  "AP1": {
+   "R": "R3",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep1",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "The `import Mathlib.Algebra.Order.Interval.Set.Group` at line 9 is no longer used by this file: after the new `round_eq_zero_iff` proof, nothing in the file refers to it. The PR only downgraded it from `public import` to `import`, which still trips the unused-import/shake check.",
+     "requested_change": "Delete line 9 entirely (`import Mathlib.Algebra.Order.Interval.Set.Group`) rather than keeping it non-public. The 13 downstream files that this PR gave direct `Interval.Set.Group` imports keep working, since they are broken by the same change either way (each was verified to still need the import).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the exact analogue of `continuousAt_floor` (same shape, same section, same kind of hypothesis) but is the only one of the pair this PR did not tag `@[fun_prop]`, so `fun_prop` cannot find it for `ceil` goals even though it finds `continuousAt_floor`.",
+     "requested_change": "Put `@[fun_prop]` on `continuousAt_ceil`, as on `continuousAt_floor` (line 101), or record in a comment why it is excluded.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225",
+     "claim": "The new continuity lemmas about `round` (`continuousAt_round` here and `continuousOn_round` at line 234) are the only continuity declarations added by this PR that lack the `@[fun_prop]` tag, although `continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` all got one; `fun_prop` currently has no `round` theorem to use.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_round` and to `continuousOn_round`, for the same reason the floor/ceil counterparts are tagged.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13",
+     "claim": "The module docstring still says the file is about `Int.floor`, `Int.ceil` and `Int.fract`, but this PR adds `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` (plus `continuousAt_floor`, `continuousAt_ceil`, `continuousOn_*_compl_range`) to the file, none of which are reflected in the `#` title, the one-sentence summary or the `## Main declarations` list.",
+     "requested_change": "Extend the header to `Int.floor`, `Int.ceil`, `Int.round` and `Int.fract` and add the new main declarations (e.g. `continuousOn_round`, `continuousAt_round`) to the `## Main declarations` list.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Order/Round.lean:48",
+     "claim": "`round_eq'` is a primed name whose prime is not explained and does not say what distinguishes it from `round_eq`: both are equations for `round` with the same left-hand side, differing only in the right-hand side (`⌊x + 1/2⌋` versus `(⌊2 * x⌋ + 1) / 2`), and the docstring does not mention the prime.",
+     "requested_change": "Name the variant for the term of the statement that differs, as the sibling `round_eq_half_ceil_two_mul` does for `⌈2 * x⌉ / 2` (e.g. spell the right-hand side `⌊2 * x⌋ + 1) / 2`, something like `round_eq_half_add_one_floor_two_mul`), or state in the docstring why the prime is kept and what the unprimed lemma is.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "`tendsto_round_nhdsGE_pure` and `tendsto_round_nhdsLT_pure_half_ceil` are named with `nhdsGE`/`nhdsLT` for `𝓝[≥]`/`𝓝[<]`, whereas every sibling in this file abbreviates those filters as `_right_`/`_left_` (`tendsto_floor_right_pure_floor`, `tendsto_floor_right_pure`, `tendsto_ceil_left_pure_ceil`, `tendsto_floor_left_pure_ceil_sub_one`).",
+     "requested_change": "Rename along the file's scheme, e.g. `tendsto_round_right_pure_round` and `tendsto_round_left_pure_half_ceil` (the target `pure (round x)` gets the `_pure_round` suffix like `_pure_floor`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "Four consecutive new declarations — `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round` — repeat the same three typeclass binders `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α] in every signature, although the section already declares its shared assumptions with `variable` (line 98 `variable [OrderClosedTopology α]`, line 238 `variable [IsStrictOrderedRing α]`).",
+     "requested_change": "Declare the shared prefix once, e.g. `variable [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]` after `continuousAt_fract`, and drop it from the four signatures (adjusting the later `variable [IsStrictOrderedRing α]` line accordingly).",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270",
+     "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a lemma about `Int.fract` placed in the `#### Floor` section, immediately after the floor-division lemmas `mul_cast_floor_div_cancel_of_pos`/`mul_natCast_floor_div_cancel`, while every other statement about `fract` in this file lives in the `/-! #### Fractional part -/` section (starting line 310, whose `variable [IsStrictOrderedRing R]` at line 335 supplies exactly the assumptions this lemma uses).",
+     "requested_change": "Move the lemma into the `#### Fractional part` section, next to the other fract lemmas (e.g. after `Int.fract_eq_iff`), where its siblings are; no assumption changes are needed.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep1/tasks/fbe17b77c0f829467ed9a5213e89b171ec0f49013ed0bcc3542ec61731f72b65/samples/0/attempts/attempt_1_20261010115510/ape_agent_session_20261010_115510__112161bf-a860-4a4e-8dd0-06dfd33b1252.jsonl"
+  },
+  "GPT2": {
+   "R": "R10",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:48",
+     "claim": "The public docstring for `round_eq'` says that the formula “works over any ring”, but the theorem is only available in the ordered floor-ring context `[Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]`; the docstring also exposes an undecided TODO as part of the rendered API documentation.",
+     "requested_change": "Replace the docstring with a precise description, for example: `/-- Formula for `round` in terms of `Int.floor`, valid for any ordered floor ring (so it does not require a field structure). -/`; move or remove the TODO from the public docstring if you still want to keep it as an implementation note.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is not the parallel API to `continuousAt_floor`: it states the side condition using `floor` rather than the natural `ceil` fixed-point condition, and it lacks the `@[fun_prop]` attribute even though the floor analogue has it. Consequently `fun_prop (disch:=assumption)` finds a theorem for `floor` but reports no theorem for `Int.ceil`.",
+     "requested_change": "State and tag the theorem as the ceil analogue: `@[fun_prop] theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX2": {
+   "R": "R9",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14",
+     "claim": "The module docstring still describes the file as `# Topological facts about `Int.floor`, `Int.ceil` and `Int.fract`` and its `## Main declarations` list ends at `ContinuousOn.comp_fract`, although this PR makes the file prove continuity/limit facts about `round` (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) and adds `continuousAt_floor`/`continuousAt_ceil`; the `continuousOn_ceil` bullet is also wrong on the interval, giving `Ioc n (n + 1)` where the lemma is stated on `Ioc (n - 1) n`.",
+     "requested_change": "Update the header (title and summary sentence) to mention `Int.round`, add the new `round`, `continuousAt_floor` and `continuousAt_ceil` declarations to `## Main declarations`, and correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is missing the `@[fun_prop]` attribute that the exactly parallel new lemma `continuousAt_floor` (line 100) and the two new `continuousOn_*_compl_range` lemmas carry, so `fun_prop` has a floor rule but no ceil rule.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil` (the same inconsistency applies to `continuousAt_fract`, whose proof this PR rewrites, if the attribute is meant to be part of this API).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Order/Round.lean:48",
+     "claim": "`round_eq'` is named with a bare prime, unlike its sibling `round_eq_half_ceil_two_mul` added by the same PR and unlike `round_eq_iff`; the name does not say which formula it states, even though it is the workhorse of the new API (it is the ring-level form `round x = (⌊2 * x⌋ + 1) / 2`, from which `round_eq` is now derived).",
+     "requested_change": "Rename `round_eq'` to a descriptive name in the style of its siblings, e.g. `round_eq_floor_two_mul`, updating its four uses (`Mathlib/Algebra/Order/Round.lean` lines 93 and 174, `Mathlib/Topology/Algebra/Order/Floor.lean` lines 207 and 217).",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:228",
+     "claim": "`continuousAt_round` closes the second goal `𝓝[>] x ≤ 𝓝[≥] x` by `gcongr; apply Ioi_subset_Ici_self`, i.e. it decomposes a monotonicity-of-neighbourhoods goal and then re-assembles it, although the canonical `nhdsWithin_mono` application does it directly.",
+     "requested_change": "Drop the `gcongr` bullet and write `(tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self) |>.mono_right (pure_le_nhds _)`, leaving only the `round_eq_half_ceil_two_mul hx` bullet.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep2/tasks/1b9373ff1f62d6aab293aaf1f5c4929014b6c62ffd5e857ff78e75f0f242e528/samples/0/attempts/attempt_1_20261010121508/ape_agent_session_20261010_121508__1b673a57-75a9-449f-951e-65dfef6256ff.jsonl"
+  },
+  "AP2": {
+   "R": "R4",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep2",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:51",
+     "claim": "`round_eq'` carries a prime while its unprimed sibling `round_eq` (line 173) states a *different* formula (`round x = ⌊x + 1/2⌋`), not a less general form of the same one; the statement is `round x = (⌊2 * x⌋ + 1) / 2`. Mathlib distinguishes such siblings by naming the term of the statement that differs rather than by a prime, and the sibling added in this very PR is named by its formula (`round_eq_half_ceil_two_mul`). A reader of `round_eq'` cannot tell what is `'` about it.",
+     "requested_change": "Rename `round_eq'` to a name built from its right-hand side, in the style of `round_eq_half_ceil_two_mul` — e.g. `round_eq_half_floor_two_mul_add_one` (or `round_eq_floor_two_mul_add_one_div_two`), spelling the formula rather than a prime — and update its three uses (`round_eq`, `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`). If the prime is meant to say \"ring-level version\", say so in the name (`…_of_ring`-style) instead.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the exact mirror of `continuousAt_floor` (line 101), and the PR tags `continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` with `@[fun_prop]` but leaves `continuousAt_ceil` (and `continuousAt_round`, `continuousOn_round`) untagged, with no comment saying why; `fun_prop` therefore cannot use the ceil or round continuity results at all.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil` (and to `continuousAt_round`, `continuousOn_round`), or record in a comment why those three are excluded from the family.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` are four consecutive declarations that each repeat the identical binder list `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]` in their signature; shared assumptions of consecutive declarations belong in a single `variable` line.",
+     "requested_change": "Wrap the four declarations in a section (e.g. `section Round` … `end Round`) with `variable [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]` and drop the repeated binders from the four signatures — exactly the pattern the PR already used for the floor/ceil lemmas with `variable [IsStrictOrderedRing α]` at line 115.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:215",
+     "claim": "`tendsto_round_nhdsLT_pure_half_ceil` (and its partner `tendsto_round_nhdsGE_pure`) spell the neighbourhood filter as `nhdsLT`/`nhdsGE`, while every sibling of the same shape in this file spells it `left`/`right`: `tendsto_floor_right_pure_floor : Tendsto floor (𝓝[≥] x) (pure ⌊x⌋)` and `tendsto_floor_left_pure_ceil_sub_one : Tendsto floor (𝓝[<] x) (pure (⌈x⌉ - 1))` — the latter is the exact analogue of the new lemma. Names should follow their analogues' pattern rather than using a different abbreviation for the same filter.",
+     "requested_change": "Rename to the file's practice: `tendsto_round_right_pure_round` for `𝓝[≥] x` and `tendsto_round_left_pure_half_ceil` for `𝓝[<] x`, and update the two uses inside `continuousAt_round`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656",
+     "claim": "`Int.ceil_one_add` is the only member of the ceil set added here whose floor counterpart does not exist: Mathlib has `Int.floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` (lines 210, 223, 227) and this PR adds `ceil_intCast_add`, `ceil_natCast_add`, `ceil_ofNat_add`, but there is no `Int.floor_one_add` anywhere, so the `floor`/`ceil` API is left asymmetric by the new `⌈1 + a⌉ = 1 + ⌈a⌉`.",
+     "requested_change": "Add the missing sibling `@[simp] theorem Int.floor_one_add (a : R) : ⌊(1 : R) + a⌋ = 1 + ⌊a⌋ := by simpa using floor_natCast_add 1 a` next to `Int.floor_natCast_add` (or drop `Int.ceil_one_add` if the API is meant to stop at `ceil_add_one`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14",
+     "claim": "The module docstring still describes the file as \"# Topological facts about `Int.floor`, `Int.ceil` and `Int.fract`\" with the sentence \"This file proves statements about limits and continuity of functions involving `floor`, `ceil` and `fract`\", and its `## Main declarations` list has no entry for `round`, although the PR imports `Mathlib.Algebra.Order.Round` publicly and adds the `round` results `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round` (as well as `continuousAt_floor`, `continuousOn_floor_compl_range`, `continuousAt_ceil`, `continuousOn_ceil_compl_range`).",
+     "requested_change": "Extend the module docstring: mention `round`/`Int.round` in the title and the summary sentence, and add the new main declarations (at least `continuousAt_floor`, `continuousAt_ceil`, `continuousOn_round`) to `## Main declarations`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Algebra/Order/Round.lean:177",
+     "claim": "`round_eq_iff` is proved by `norm_num [round_eq, floor_eq_iff, ← lt_sub_iff_add_lt, add_sub_assoc]`, i.e. `norm_num` is used as a generic closer on a goal whose only variables are `x` and `n` — it is not normalising numerals but re-writing with the four lemmas handed to it and discharging the `1/2` ordering side conditions. Automation is meant to replace an explicit proof only when that proof is not short and readable, and here it is.",
+     "requested_change": "Replace the proof by the explicit one: `rw [round_eq, floor_eq_iff, mem_Ico]` followed by `constructor <;> intro h <;> constructor <;> linarith` (two lines, no `norm_num`, no hand-assembled simp set).",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep2/tasks/7cb370d57a27ac10d20beea128828497496ab285f75b49ba9a86cb7f0ca928c5/samples/0/attempts/attempt_1_20261010124322/ape_agent_session_20261010_124322__c736e73e-f57a-4c02-93e8-3dc07a2dcf98.jsonl"
+  },
+  "GPT3": {
+   "R": "R8",
+   "kind": "solo",
+   "run": "probe_dev_elmgpt55_contract2_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13",
+     "claim": "The module documentation is stale after this file adds the topological API for `round`: the title and introduction still describe only `Int.floor`, `Int.ceil`, and `Int.fract`, and the main-declarations list omits the new `tendsto_round_*`, `continuousAt_round`, and `continuousOn_round` declarations.",
+     "requested_change": "Update the module docstring to mention `round` in the title/summary and add the new round limit/continuity declarations to the main-declarations list; while there, make the `continuousOn_ceil` bullet match its statement (`Ioc (n - 1) n`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the ceil analogue of the newly tagged `continuousAt_floor`, but it is not registered as a `fun_prop` theorem, so `fun_prop (disch := assumption)` finds no theorem for local continuity of `Int.ceil`.",
+     "requested_change": "Add the `@[fun_prop]` attribute to `continuousAt_ceil`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225",
+     "claim": "The new round continuity API (`continuousAt_round`/`continuousOn_round`) is not registered with `fun_prop`, so the tactic cannot recover even the exact `ContinuousOn round {x | 2 * fract x ≠ 1}` statement introduced here.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_round` and `continuousOn_round`.",
+     "severity": "advisory"
+    }
+   ]
+  },
+  "DX3": {
+   "R": "R5",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_base_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656",
+     "claim": "The new `Int.ceil_one_add` completes only half of the `*_one_add` family that this PR is reviewing: after it, `simp` can simplify `⌈1 + a⌉`, but `⌊1 + a⌋` still cannot be simplified because `Int.floor_one_add` does not exist (`Int.floor_add_one` handles `⌊a + 1⌋`, and `Int.floor_natCast_add` does not fire on the numeral `1`, which is exactly why `ceil_one_add` was needed for `ceil`).",
+     "requested_change": "Add the missing twin in the same position where `Int.ceil_one_add` sits for `ceil` (i.e. in the `*_add` group, after `Int.floor_ofNat_add`): `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Algebra/Order/Round.lean:101",
+     "claim": "The `round` translation API that this PR reviews still has the hole this PR just closed for `ceil`: there is no `round_one_add`, so `simp` cannot simplify `round (1 + a)` (`Int.round_intCast_add`'s left-hand side is `round (↑z + x)`, which does not match the numeral `1`), although `round (2 + a)` and `round (a + 1)` are both handled by `round_ofNat_add`/`round_add_one`.",
+     "requested_change": "Add `@[simp] theorem round_one_add (a : α) : round (1 + a) = 1 + round a` next to `round_add_one` (proof: `simpa using round_intCast_add a 1`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "The change of this line from `public import` to `import` does not achieve anything for this file: `Mathlib.Algebra.Order.Round` does not use `Mathlib.Algebra.Order.Interval.Set.Group` at all (its `Ico` occurrences come from the `public import Mathlib.Algebra.Order.Floor.Ring` above), so a plain `import` here is a dead import, which is what `lake exe shake` reports; the 13 files that use declarations of that module must import it directly anyway (verified for three of them).",
+     "requested_change": "Delete line 9 rather than demoting it (keeping the added direct imports in the 13 files); if instead the re-export is wanted, restore `public import` and drop those additions.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Algebra/Order/Round.lean:51",
+     "claim": "`round_eq'` introduces a new primed name for a lemma that is not a variant of a named constructor but simply the ring-level formula for `round` (`round x = (⌊2 * x⌋ + 1) / 2`); new primed declarations are discouraged in Mathlib (the `docPrime` linter and its exception file `scripts/nolints_prime_decls.txt` exist to stop them accumulating), and it sits beside the unprimed field-level `round_eq`.",
+     "requested_change": "Rename it to a descriptive unprimed name such as `round_eq_floor_two_mul_add_one_div` — or, if the docstring's TODO is accepted, adopt the formula as the definition of `round` so that this lemma becomes `rfl` and needs no name at all.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Order/Round.lean:50",
+     "claim": "The docstring of the new `round_eq'` carries a design TODO ('TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`.') instead of describing the statement, so the rendered documentation of the lemma shows an open question and the formula is nowhere stated.",
+     "requested_change": "State the formula in the docstring (e.g. ``round x = (⌊2 * x⌋ + 1) / 2`` via `Int.floor`, valid over any ring) and move the remark out of the docstring into a `-- TODO: ...` comment above the declaration — or resolve it in this PR.",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:291",
+     "claim": "`ContinuousOn.comp_fract''` is added with a doubly primed name, although its own docstring says it is a special case of the existing `ContinuousOn.comp_fract`, and the neighbouring `ContinuousOn.comp_fract'` is explicitly marked 'Do not use this, use `ContinuousOn.comp_fract` instead' — chaining a second prime onto a name that is not a variant of a named constructor leaves an unreadable name for users.",
+     "requested_change": "Give it an unprimed, descriptive name, e.g. `ContinuousOn.comp_fract_Icc` (the `f : α → β` case of `ContinuousOn.comp_fract` on `Icc 0 1`).",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14",
+     "claim": "The module docstring of this file was not updated although the PR adds an entire `round` section to it: the header still says the file is about `Int.floor`, `Int.ceil` and `Int.fract`, and the '## Main declarations' list does not mention any of the new results (`continuousAt_floor`, `continuousOn_floor_compl_range`, `continuousAt_ceil`, `continuousOn_ceil_compl_range`, `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`).",
+     "requested_change": "Extend the module docstring: mention `round` in the title/description and add the new continuity lemmas (at least `continuousAt_floor`, `continuousOn_round`) to the '## Main declarations' list.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` states its hypothesis in terms of the wrong function for the statement: it takes `x ≠ ⌊x⌋`, while its sibling `continuousAt_floor` states the analogous condition with its own function (`x ≠ ⌊x⌋`), and the mismatch forces the proof to convert `x = ⌈x⌉` into `x = ⌊x⌋` by rewriting.",
+     "requested_change": "State it as `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) ((le_ceil x).lt_of_ne hx)`.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_base_rep3/tasks/0a1ecc3703299eff0e32fc55baa17cfaec141b19cfc38a72428fdb5d0346943e/samples/0/attempts/attempt_1_20261010130619/ape_agent_session_20261010_130619__7849eab1-d4ab-4d1c-a90d-d06dc20eb316.jsonl"
+  },
+  "AP3": {
+   "R": "R13",
+   "kind": "solo",
+   "run": "iter_ds41_conv_dev_apt_rep3",
+   "findings_as_matched": [
+    {
+     "i": 0,
+     "target": "Mathlib/Algebra/Order/Round.lean:9",
+     "claim": "`import Mathlib.Algebra.Order.Interval.Set.Group` is dead: after this PR rewrote `Int.round_eq_zero_iff` to go through the new `round_eq_iff`, no declaration in `Round.lean` uses anything from that module any more (the only interval material left is `Ico` in the *statements* of `round_eq_iff`/`round_eq_zero_iff`, which comes in publicly via `Algebra.Order.Floor.Ring`). Downgrading the line from `public import` to `import` therefore leaves an unused import in the build graph, which `shake` reports.",
+     "requested_change": "Delete the line instead of making it non-public. (Verified: recompiling `Mathlib/Algebra/Order/Round.lean` with line 9 removed gives `outcome: compiled`, no errors, no warnings.)",
+     "severity": "advisory"
+    },
+    {
+     "i": 1,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+     "claim": "`continuousAt_ceil` is the exact dual of the newly added `continuousAt_floor`, but only the floor one is tagged `@[fun_prop]` (lines 100 and 122 tag `continuousAt_floor` and `continuousOn_ceil_compl_range`), so the family is only half tagged; `continuousAt_fract` (line 200, whose proof this PR rewrote to go through `continuousAt_floor`) is likewise left untagged.",
+     "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil` (and to `continuousAt_fract`), or record why these two are excluded. Verified: both tags compile with no errors and no linter warnings.",
+     "severity": "advisory"
+    },
+    {
+     "i": 2,
+     "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655",
+     "claim": "`Int.ceil_one_add` is the only one of the four `ceil_*_add` lemmas added here whose floor counterpart does not exist: the PR keeps `ceil_intCast_add`/`floor_intCast_add`, `ceil_natCast_add`/`floor_natCast_add` and `ceil_ofNat_add`/`floor_ofNat_add` in parallel, but there is no `Int.floor_one_add` anywhere in the library, so the floor and ceil families are left asymmetric (`fract_one_add` does exist).",
+     "requested_change": "Add the missing counterpart, e.g. `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` (mirroring the proof of `ceil_one_add`), or drop `ceil_one_add` if the `_one_add` lemmas are not wanted.",
+     "severity": "advisory"
+    },
+    {
+     "i": 3,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205",
+     "claim": "The four consecutive new round declarations (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) each repeat the same three typeclass assumptions `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α] in their signatures, rather than declaring them once for the block.",
+     "requested_change": "Wrap the block in its own `section`, add `variable [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]` and drop the three binders from the four signatures. Verified: doing exactly this (also wrapping the long signature of `tendsto_round_nhdsLT_pure_half_ceil`) compiles with no errors or warnings.",
+     "severity": "advisory"
+    },
+    {
+     "i": 4,
+     "target": "Mathlib/Algebra/Order/Round.lean:48",
+     "claim": "`round_eq'` is named with a bare `_eq` plus a prime and says nothing about its right-hand side `(⌊2 * x⌋ + 1) / 2`; the prime does not make it a variant of the unprimed sibling — `round_eq` (line 173) states a different formula, `round x = ⌊x + 1 / 2⌋` — and the sibling added in this same PR names its differing right-hand side (`round_eq_half_ceil_two_mul`).",
+     "requested_change": "Rename it after its right-hand side, in the style of the sibling added here, e.g. `round_eq_half_floor_two_mul_add_one`, and update the four uses (`round_eq` line 174, `round_eq_half_ceil_two_mul` line 93, `tendsto_round_nhdsGE_pure` line 207, `tendsto_round_nhdsLT_pure_half_ceil` line 217).",
+     "severity": "advisory"
+    },
+    {
+     "i": 5,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14",
+     "claim": "The module docstring still describes the file as being about `Int.floor`, `Int.ceil` and `Int.fract` and its “Main declarations” list was not extended, although this PR adds a whole round section to this file (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) together with `continuousAt_floor`, `continuousAt_ceil`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range`.",
+     "requested_change": "Mention `round` in the file summary (line 14/16) and add the new declarations to the “Main declarations” list.",
+     "severity": "advisory"
+    },
+    {
+     "i": 6,
+     "target": "Mathlib/Topology/Algebra/Order/Floor.lean:105",
+     "claim": "The proofs of `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` close the side goal `x ≠ ⌊x⌋` from `hx : x ∈ (range Int.cast)ᶜ` with `simp_all [eq_comm]`, a flexible hammer over all hypotheses, where the goal is a one-line explicit consequence of `hx`.",
+     "requested_change": "Replace each body with the explicit term `fun x hx ↦ (continuousAt_floor fun h ↦ hx ⟨⌊x⌋, h.symm⟩).continuousWithinAt` (resp. `continuousAt_ceil` for the ceil lemma). Verified: both replacements compile with no errors and no warnings.",
+     "severity": "advisory"
+    },
+    {
+     "i": 7,
+     "target": "Mathlib/Algebra/Order/Round.lean:177",
+     "claim": "The proof of `round_eq_iff` is `norm_num [round_eq, floor_eq_iff, ← lt_sub_iff_add_lt, add_sub_assoc]`. `norm_num` is not normalizing any numerals here (the arguments `round_eq`, `← lt_sub_iff_add_lt`, `add_sub_assoc` do the work); it drives `simp`/normalization of half-integer arithmetic on this primary API lemma, which makes its proof opaque.",
+     "requested_change": "Use the explicit proof `rw [round_eq, floor_eq_iff, mem_Ico]` followed by `constructor <;> intro h <;> constructor <;> linarith`. Verified to compile.",
+     "severity": "advisory"
+    }
+   ],
+   "transcript": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/conventions-dossiers/.ape/runs/iter_ds41_conv_dev_apt_rep3/tasks/fe22f3aaf9c4d62afa8bc9122535d69902d6d046f20d63998345beb551c7873f/samples/0/attempts/attempt_1_20261010133418/ape_agent_session_20261010_133418__8edcf40c-d1a3-4f4c-8d6d-85c97c3fdea3.jsonl"
+  }
+ },
+ "ap_section": "results/pr_review_v5/probes/ask-reading-2026-10-12/ap_sections/D12_33421.md"
+}

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Module/Submodule/Map.lean","declaration_name":"Submodule.inf_comap_le_comap_add","new_declaration":"theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :\n    comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q :=\n  fun _ h ↦ q.add_mem h.1 h.2"}

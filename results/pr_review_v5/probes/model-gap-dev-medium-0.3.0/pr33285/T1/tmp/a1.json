@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/Normed/Operator/LinearIsometry.lean","declaration_name":"LinearIsometry.isComplete_image_iff'","new_declaration":"theorem isComplete_image_iff' (f : LinearIsometry σ₁₂ E E₂) {s : Set E} :\n    IsComplete (f '' s) ↔ IsComplete s := by\n  simp"}
