@@ -333,3 +333,16 @@ mostly a reviewer's own optional suggestion.
 **Stop:** new 5% probes on rules of form; reading silence or declines for maintainers' reasons on the 973 PRs; Q3 as
 specified; reading "gone by merge" without the 57% rewrite rate beside it; probes with no stated recall ceiling.
 
+## Amendment 4 (2026-10-18, after a manual reading of the free reviewer's transcripts)
+
+Amendment 3's ranking is superseded. The user asked for the most general redesign that captures the heart of
+the problem rather than work fitted to the examples in front of us. Read against the whole record, the heart is
+the reviewer's decision at the place, which carries no information about what maintainers ask; maintainers ask
+when they have the fix in hand. The design, its untried cell among the record's designs, its ceiling on the 93
+asks and its three falsifiers are written as `docs/todo/review-as-demonstrated-change.md`, to be planned in a
+fresh session after an adversarial review of the design. Of amendment 3's items: the calibration of convention
+texts against practice folds in as the targets of construction; the newer-forms item is demoted to a
+corroborating fact (5 asks on 3 PRs; at the `grind` asks the reviewer had the Zulip signal and misread it); the
+finishing-tactic battery is dropped, since the asked line is visible in the asks (three or four lines become
+one strictly shorter call) and maintainers' own merged PRs contain such blocks unasked.
+
