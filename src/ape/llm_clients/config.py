@@ -88,6 +88,19 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.075,
         "cache_creation_per_1M_usd": 0.03
     },
+    "gpt_6_luna": {
+        # Standard tier, <= 272K input, verified 2026-10-20 against
+        # https://developers.openai.com/api/docs/models/gpt-6-luna . No dated snapshot
+        # is listed. Use Responses with reasoning carry-over for review tools.
+        # The fixed-rate accountant does not apply long-context or service-tier
+        # multipliers; reconcile those calls against provider usage before reporting spend.
+        "model_name": "gpt-6-luna",
+        "provider": LLMProvider.OPENAI,
+        "input_per_1M": 0.10,
+        "output_per_1M": 0.50,
+        "cached_input_per_1M_usd": 0.01,
+        "cache_creation_per_1M_usd": 0.125,
+    },
     "gpt_5.4": {
         # The bare alias, which elm_gpt_5.4 shares (test_elm_provider); on 2026-09-30 the
         # account listed one gpt-5.4 snapshot, gpt-5.4-2026-03-05, so the alias resolves to it.
@@ -218,6 +231,25 @@ MODEL_MAPPINGS = {
         "cache_creation_per_1M_usd": None,
         "supports_tools": True,
         # The same forwarded 400, measured through the gateway on 2026-10-05.
+        "openai_responses": True,
+    },
+    "elm_gpt_6_luna": {
+        # `gpt_6_luna`'s rates; the direct key is refused (project archived), so this is the row
+        # that runs. On /v1/responses through the gateway, 2026-10-20, through this repository's
+        # client (`probes/review-reconstruction-2026-10-19/baselines/elm_luna_check.py`): a
+        # function tool at effort high, the encrypted reasoning item returned with the call and
+        # accepted back beside its output, a stream ending `response.completed`, a `final_answer`
+        # phase, and 1,917 of 2,053 input tokens cached. No summary unless asked. The alias returns
+        # as `gpt-6-luna`, no snapshot. A trivial prompt drew 0 reasoning tokens at high, so a
+        # session's reasoning count is the model's choice, not a sign the effort was dropped.
+        # Usage reports `cache_write_tokens`, which the accountant does not read.
+        "model_name": "gpt-6-luna",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.10,
+        "output_per_1M": 0.50,
+        "cached_input_per_1M_usd": 0.01,
+        "cache_creation_per_1M_usd": 0.125,
+        "supports_tools": True,
         "openai_responses": True,
     },
     "elm_gpt_5_mini": {

@@ -1,0 +1,71 @@
+{
+ "model": "elm_gpt_6_luna",
+ "provider_model_name": "gpt-6-luna",
+ "turn1": {
+  "items": [
+   "reasoning",
+   "function_call"
+  ],
+  "model": "gpt-6-luna",
+  "phases": [],
+  "reasoning_encrypted": true,
+  "reasoning_summary": false,
+  "status": "completed",
+  "tool_calls": [
+   {
+    "input": {
+     "city": "Bologna"
+    },
+    "name": "get_weather"
+   }
+  ],
+  "usage": {
+   "cached": 1847,
+   "input": 1920,
+   "output": 112,
+   "reasoning": 91
+  }
+ },
+ "turn2": {
+  "items": [
+   "message"
+  ],
+  "model": "gpt-6-luna",
+  "phases": [
+   "final_answer"
+  ],
+  "reasoning_encrypted": false,
+  "reasoning_summary": false,
+  "status": "completed",
+  "text": "Bologna\u2019s weather is 14\u00b0C with light rain. \\(n=7\\).",
+  "usage": {
+   "cached": 1917,
+   "input": 2053,
+   "output": 22,
+   "reasoning": 0
+  }
+ },
+ "turn2_request": {
+  "echoed_reasoning_config": {
+   "context": "all_turns",
+   "effort": "high",
+   "mode": "standard",
+   "summary": null
+  },
+  "include": [
+   "reasoning.encrypted_content"
+  ],
+  "input_items": [
+   "user",
+   "reasoning",
+   "function_call",
+   "function_call_output"
+  ],
+  "reasoning": {
+   "effort": "high"
+  },
+  "reasoning_item_sent_with_encrypted_content": true,
+  "store": false,
+  "stream": true
+ }
+}
