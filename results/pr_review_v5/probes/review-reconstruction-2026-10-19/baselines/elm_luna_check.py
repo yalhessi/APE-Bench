@@ -64,7 +64,7 @@ async def main(model):
         if body.lstrip().startswith("{"):
             received.append(json.loads(body))
         else:  # a stream: keep the final `response.completed` event's response
-            done = [json.loads(line[5:]) for line in body.splitlines()
+            done = [json.loads(line[5:]) for line in body.split("\n")
                     if line.startswith("data:") and '"response.completed"' in line]
             received.append(done[-1]["response"] if done else {"stream_without_completed": True})
     client.provider._session.event_hooks["request"].append(record)

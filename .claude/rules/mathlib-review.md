@@ -485,3 +485,7 @@ paths:
   hand-launched matching's `matches.json` against the plan's expected cells. Never a probe-local
   matcher, rubric copy or unblinding script; `2-task` is not declared equal to `1-session` until
   calibrated on aligned examples.
+- **The tree lints read tracked files only, so run the suite after `git add`, not before (2026-10-20).** A
+  new probe script that splits JSONL with `splitlines()` passes the suite while untracked and fails it once
+  committed: twice in one day on `review-reconstruction` (Codex's Phase A audit, then `elm_luna_check.py`),
+  each leaving the branch red for several commits. Stage the script, run the suite, then commit.
