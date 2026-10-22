@@ -215,35 +215,31 @@ def executor_of(scaffold) -> Dict[str, str]:
 
 async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequence[Any],
                                 run_name: str, executor: Dict[str, str]) -> List[MatchVerdict]:
-    """Every sample's verdict, read through `TaskStorage`; a sample with no legal result has none."""
+    """Every replicate's verdict, as `sample_products` reads it; a sample with no legal product has
+    none, and is a coverage gap in the report rather than a verdict."""
 
-    from ape.orchestration.persistence import TaskStorage
+    from ape.orchestration.products import sample_products
 
     rows: List[MatchVerdict] = []
     by_batch = {b.batch_id: b for b in plan.batches}
     packets = {p.pr: p for p in plan.packets}
-    for task in tasks:
-        index = task.data.global_index
-        storage = TaskStorage(Path(tasks_dir) / index, index)
-        samples = await storage.load_all_samples(task.task_type)
-        for sample_index, sample in sorted(samples.items()):
-            attempt = sample.successful_attempt
-            result = getattr(attempt, "result", None) if attempt else None
-            if result is None:
-                continue
-            batch = by_batch[task.data.batch_id]
-            problems = verdict_problems([packets[pr] for pr in batch.prs], result.asks,
-                                        result.unmatched)
-            if problems:
-                raise ValueError(f"{run_name} sample {sample_index} of {batch.batch_id}: a "
-                                 f"recorded verdict does not cover its batch: {problems[:3]}")
-            rows.append(MatchVerdict(
-                plan_id=plan.plan_id, batch_id=batch.batch_id, replicate=str(sample_index + 1),
-                origin="task",
-                locator={"run": run_name, "task_dir": str(storage.task_dir),
-                         "sample": str(sample_index), "attempt": str(attempt.path),
-                         "prompt_sha256": str(result.prompt_sha256)},
-                executor=executor, asks=result.asks, unmatched=result.unmatched))
+    for item in await sample_products(tasks_dir, tasks, plan.identity.replicates):
+        if item.product is None:
+            continue
+        verdict = item.product
+        batch = by_batch[verdict["batch_id"]]
+        problems = verdict_problems([packets[pr] for pr in batch.prs], verdict["asks"],
+                                    verdict["unmatched"])
+        if problems:
+            raise ValueError(f"{run_name} sample {item.sample_index} of {batch.batch_id}: a "
+                             f"recorded verdict does not cover its batch: {problems[:3]}")
+        rows.append(MatchVerdict(
+            plan_id=plan.plan_id, batch_id=batch.batch_id, replicate=str(item.sample_index + 1),
+            origin="task",
+            locator={"run": run_name, "task_dir": str(Path(tasks_dir) / item.task_global_index),
+                     "sample": str(item.sample_index), "attempt": str(item.attempt_path),
+                     "prompt_sha256": str(verdict["prompt_sha256"])},
+            executor=executor, asks=verdict["asks"], unmatched=verdict["unmatched"]))
     return rows
 
 

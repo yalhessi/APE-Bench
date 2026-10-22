@@ -129,6 +129,16 @@ class AskMatchingTask(BaseTask):
                     "message": "Verdicts recorded"}
 
     @classmethod
+    def product_of(cls, result) -> Optional[Dict[str, Any]]:
+        """The verdict, as the verdict store holds it."""
+
+        if not getattr(result, "success", False):
+            return None
+        return {"plan_id": result.plan_id, "batch_id": result.batch_id,
+                "prompt_sha256": result.prompt_sha256, "asks": result.asks,
+                "unmatched": result.unmatched}
+
+    @classmethod
     def is_best_result(cls, result) -> bool:
         """Every complete verdict counts; no replicate is better than another."""
 

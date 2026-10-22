@@ -607,6 +607,20 @@ class BaseTask:
         return evaluation_result.score == 1.0
     
     @classmethod
+    def product_of(cls, result: BaseTaskResult) -> Optional[Any]:
+        """The domain product of a legal submission, or None when there is none.
+
+        The output contract of design §5 (`docs/research/task-dataflow-refactor-design-2026-10-22.md`):
+        execution status, a file on disk and a legal product are different facts, and readers ask for
+        the product through `ape.orchestration.products.sample_products`, which calls this only on a
+        result of the task's own class. The default is the result itself when it reports success. A
+        task whose domain output is a part of its result overrides this to return that part; it must
+        never return a default or empty product for a failure.
+        """
+
+        return result if getattr(result, "success", False) else None
+
+    @classmethod
     def _aggregate_resources(cls, results: List[BaseTaskResult]) -> dict:
         """Aggregate resource consumption statistics from multiple results."""
         valid_usages = [r.token_usage for r in results if r.token_usage]
