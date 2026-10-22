@@ -403,6 +403,10 @@ class SessionOutput(StrictModel):
     schema_version: Literal["session-output1"] = "session-output1"
     plan_id: str
     packet_id: str
+    #: The execution or import this observation came from (`task-<run>` or `import-<name>`); its
+    #: stored bytes live under it, so two executions of one plan never overwrite each other
+    #: (implementation review, 2026-10-22, finding 1).
+    producer: str
     replicate: str
     origin: Literal["task", "external_import"]
     locator: Dict[str, str]

@@ -312,6 +312,11 @@ class MatchVerdict(StrictModel):
     schema_version: Literal["match-verdict1"] = "match-verdict1"
     plan_id: str
     batch_id: str
+    #: The execution or import this observation came from: `task-<run name>` or `import-<name>`.
+    #: An observation is `(producer, replicate)`; two runs of one plan both number their samples
+    #: from 1, and without the producer their rows merged into one supposed replicate
+    #: (implementation review, 2026-10-22, finding 2).
+    producer: str
     replicate: str
     origin: Literal["task", "external_import"]
     #: Where the verdict's bytes are: a task directory, sample and attempt; or a file and digest.

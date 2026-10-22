@@ -111,18 +111,36 @@ def session_payloads(plan: SessionPlan) -> List[Dict[str, Any]]:
             for packet in plan.packets]
 
 
-def _store(plan_dir: Path, plan: SessionPlan, packet_id: str, replicate: str, origin: str,
-           locator: Dict[str, str], executor: Dict[str, str],
+def _store(plan_dir: Path, plan: SessionPlan, producer: str, packet_id: str, replicate: str,
+           origin: str, locator: Dict[str, str], executor: Dict[str, str],
            outputs: Dict[str, str]) -> SessionOutput:
+    """Keep one observation's outputs under its producer, so two executions or imports of one plan
+    hold their own bytes: until 2026-10-22 the path was `<packet>/<replicate>/<name>` and a second
+    import replaced the first's files while the first's index still named its old digest
+    (implementation review, finding 1). Re-storing the same bytes is a no-op; different bytes under
+    one observation are refused, never overwritten."""
+
     stored = {}
     for out_name, text in outputs.items():
         data = text.encode("utf-8")
-        target = Path(plan_dir) / OUTPUTS_DIR / packet_id / replicate / out_name
+        target = Path(plan_dir) / OUTPUTS_DIR / producer / packet_id / replicate / out_name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
+        write_once(target, data)
         stored[out_name] = {"sha256": sha256_bytes(data), "path": str(target)}
-    return SessionOutput(plan_id=plan.plan_id, packet_id=packet_id, replicate=replicate,
-                         origin=origin, locator=locator, executor=executor, outputs=stored)
+    return SessionOutput(plan_id=plan.plan_id, packet_id=packet_id, producer=producer,
+                         replicate=replicate, origin=origin, locator=locator, executor=executor,
+                         outputs=stored)
+
+
+def read_output(row: SessionOutput, name: str) -> str:
+    """One stored output's text, refused when its bytes no longer match the index's digest."""
+
+    item = row.outputs[name]
+    data = Path(item["path"]).read_bytes()
+    if sha256_bytes(data) != item["sha256"]:
+        raise ValueError(f"{item['path']} does not match the digest {row.producer} recorded for "
+                         f"{row.packet_id}/{row.replicate}/{name}; it was changed after it was stored")
+    return data.decode("utf-8")
 
 
 def _write_index(plan_dir: Path, name: str, rows: Sequence[SessionOutput]) -> Path:
@@ -148,7 +166,8 @@ async def run_sessions(plan: SessionPlan, plan_dir: Path, scaffold, run_name: st
                          f"plan seals {plan.replicates}; the plan decides")
     from src.mathlib_review.analysis.matching import bind_run_to_plan
 
-    bind_run_to_plan(scaffold.runs_base_dir, run_name, "session", plan.plan_id, plan.source_sha256)
+    binding = bind_run_to_plan(scaffold.runs_base_dir, run_name, "session", plan.plan_id,
+                               plan.source_sha256, scaffold)
     scaffold.execution.sample_count = plan.replicates
     scaffold.execution.early_stop_mode = EarlyStopMode.DISABLED
     tasks = [create_task_from_data(payload, scaffold,
@@ -156,19 +175,18 @@ async def run_sessions(plan: SessionPlan, plan_dir: Path, scaffold, run_name: st
              for payload in session_payloads(plan)]
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=run_name, logger=logger)
     await orchestrator.run(tasks)
-    from src.mathlib_review.analysis.matching import executor_of
-
-    executor = executor_of(scaffold)
+    executor = binding["executor"]          # the run's recorded route, never the invoking config's
+    producer = f"task-{run_name}"
     rows = []
     for item in await sample_products(orchestrator.tasks_dir, tasks, plan.replicates):
         if item.product is None:
             continue
         rows.append(_store(
-            plan_dir, plan, item.product["packet_id"], str(item.sample_index + 1), "task",
+            plan_dir, plan, producer, item.product["packet_id"], str(item.sample_index + 1), "task",
             {"run": run_name, "task_dir": str(orchestrator.tasks_dir / item.task_global_index),
              "sample": str(item.sample_index), "attempt": str(item.attempt_path)},
             executor, {k: v["content"] for k, v in item.product["outputs"].items()}))
-    _write_index(plan_dir, f"task-{run_name}", rows)
+    _write_index(plan_dir, producer, rows)
     return rows
 
 
@@ -192,16 +210,18 @@ def import_session_outputs(plan: SessionPlan, plan_dir: Path, folders: Dict[str,
         found, problems = output_problems(Path(folder), specs)
         if problems:
             raise ValueError(f"{folder}: {problems}")
-        rows.append(_store(plan_dir, plan, packet_id, "1", "external_import",
+        rows.append(_store(plan_dir, plan, f"import-{name}", packet_id, "1", "external_import",
                            {"folder": str(folder)}, executor, found))
     _write_index(plan_dir, f"import-{name}", rows)
     return rows
 
 
-def session_outputs(plan_dir: Path) -> List[SessionOutput]:
-    """Every stored session output beside a plan, from every run and import."""
+def session_outputs(plan_dir: Path, producer: Optional[str] = None) -> List[SessionOutput]:
+    """Every stored session output beside a plan, from every run and import, or one producer's."""
 
     rows = []
     for path in sorted((Path(plan_dir) / OUTPUTS_DIR).glob("*.jsonl")):
+        if producer is not None and path.stem != producer:
+            continue
         rows.extend(SessionOutput.model_validate(row) for row in jsonl_rows(path))
     return rows

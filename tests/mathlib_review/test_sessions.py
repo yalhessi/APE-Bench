@@ -156,7 +156,7 @@ def _context_file(plan_dir: Path, path: Path) -> Path:
     stored extractor outputs, read from the store, never from a scratch folder."""
     rows = []
     for out in S.session_outputs(plan_dir):
-        goal = Path(out.outputs["goal_brief.md"]["path"]).read_text()
+        goal = S.read_output(out, "goal_brief.md")       # verified against the stored digest
         rows.append({"pr_number": int(out.packet_id.removeprefix("pr")),
                      "sections": [{"title": "Design goal", "text": goal}]})
     path.write_text("".join(json.dumps(r) + "\n" for r in sorted(rows, key=lambda r: r["pr_number"])))
@@ -214,3 +214,55 @@ def test_session_without_execute_runs_nothing(monkeypatch, tmp_path, capsys):
                      "configs/session/packet_session_opus55_claude_sub.yaml", "--run-name", "x"]) == 0
     err = capsys.readouterr().err
     assert "NOTHING RAN" in err and "2 session(s) x 2 replicate(s)" in err
+
+
+# --- each execution or import keeps its own bytes (implementation review 2026-10-22, finding 1) --
+
+
+def _finished(folder: Path, goal: str):
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "goal_brief.md").write_text(goal)
+    (folder / "ledger.json").write_text("[]")
+    return folder
+
+
+def test_two_executions_of_one_plan_keep_their_own_outputs(tmp_path):
+    plan = S.plan_sessions(_packets(tmp_path / "packets"), name="p", brief=EXTRACTOR_BRIEF,
+                           outputs=OUTPUTS, out_dir=tmp_path / "plan")
+    (a,) = S.import_session_outputs(plan, tmp_path / "plan", {"pr33066": _finished(tmp_path / "a", "A output")},
+                                    name="run_A")
+    (b,) = S.import_session_outputs(plan, tmp_path / "plan", {"pr33066": _finished(tmp_path / "b", "B output")},
+                                    name="run_B")
+    assert a.producer == "import-run_A" and b.producer == "import-run_B"
+    assert a.outputs["goal_brief.md"]["path"] != b.outputs["goal_brief.md"]["path"]
+    rows = S.session_outputs(tmp_path / "plan")
+    assert [S.read_output(r, "goal_brief.md") for r in rows] == ["A output", "B output"]
+    assert [r.producer for r in S.session_outputs(tmp_path / "plan", producer="import-run_A")] == ["import-run_A"]
+    # Re-exporting the same observation is a no-op; different bytes under it are refused.
+    S.import_session_outputs(plan, tmp_path / "plan", {"pr33066": tmp_path / "a"}, name="run_A")
+    with pytest.raises(FileExistsError):
+        S.import_session_outputs(plan, tmp_path / "plan",
+                                 {"pr33066": _finished(tmp_path / "a2", "A changed")}, name="run_A")
+    # A stored value edited after the fact is refused on read.
+    Path(a.outputs["goal_brief.md"]["path"]).write_text("tampered")
+    with pytest.raises(ValueError, match="changed after it was stored"):
+        S.read_output(a, "goal_brief.md")
+
+
+def test_a_session_resume_on_another_route_is_refused(monkeypatch, tmp_path):
+    from ape.orchestration import orchestrator as orchestrator_module
+
+    plan = S.plan_sessions(_packets(tmp_path / "packets"), name="p", brief=EXTRACTOR_BRIEF,
+                           outputs=OUTPUTS, out_dir=tmp_path / "plan")
+
+    async def fake_run(self, tasks):
+        return SimpleNamespace(task_results=[], total_token_usage=None)
+
+    monkeypatch.setattr(orchestrator_module.TaskOrchestrator, "run", fake_run)
+    first = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+    first.llm_config.model_name = "gpt_5_mini"
+    asyncio.run(S.run_sessions(plan, tmp_path / "plan", first, "r", logger=None))
+    other = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+    other.llm_config.model_name = "gpt_5.2"
+    with pytest.raises(ValueError, match="A run continues on one route"):
+        asyncio.run(S.run_sessions(plan, tmp_path / "plan", other, "r", logger=None))

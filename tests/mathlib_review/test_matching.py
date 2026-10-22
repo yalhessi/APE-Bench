@@ -82,13 +82,13 @@ def test_the_imported_historical_matching_gives_the_committed_numbers(historical
                                   for m in ("1", "2")}, name="g52")
     asks = json.loads(POST.asks_file.read_text())
     report = MA.report_matching(out, families=asks["families"])
-    for rep in ("external_import:1", "external_import:2"):
+    for rep in ("import-g52:1", "import-g52:2"):
         assert report[rep]["condition_reach"] == pytest.approx(
             {"G": 0.125, "K": 0.0625, "X": 0.46875})
     m = report["measurement"]
     assert m["forensic"] is False and m["identity_sha256"] == plan.identity_sha256
     assert all(r["complete"] for r in m["replicates"].values())
-    assert m["replicates"]["external_import:1"]["rows"][0]["locator"]["sha256"]
+    assert m["replicates"]["import-g52:1"]["rows"][0]["locator"]["sha256"]
     scoped = MA.report_matching(out, families=asks["families"],
                                 scope={"F1", "F2", "F3", "F4", "F5", "F6", "F7"}, write=False)
     assert scoped["asks"] == 9
@@ -109,7 +109,7 @@ def test_an_import_that_misses_a_cell_is_refused(historical, tmp_path):
 def test_a_cell_traces_to_its_label_its_shown_findings_and_both_verdicts(historical):
     plan, out = historical
     reached = None
-    table = MA.replicate_tables(plan, MA.verdict_rows(out, plan.plan_id))["external_import:1"]
+    table = MA.replicate_tables(plan, MA.verdict_rows(out, plan.plan_id))["import-g52:1"]
     for row in table["matches"]["asks"]:
         for label, session in plan.seal[str(row["pr"])].items():
             if row.get(label) == "reached" and session.startswith("X"):
@@ -122,7 +122,7 @@ def test_a_cell_traces_to_its_label_its_shown_findings_and_both_verdicts(histori
     assert trace["seal"]["label"] == label
     assert trace["shown"]["findings"] == [
         f.model_dump(mode="json") for p in plan.packets if p.pr == pr for f in p.reviewers[label]]
-    one = next(c for c in trace["cells"] if c["replicate"] == "external_import:1")
+    one = next(c for c in trace["cells"] if c["replicate"] == "import-g52:1")
     assert one["value"] == "reached" and one["shown_finding"] is not None
     assert one["verdict_bytes"]["locator"]["file"].endswith("matches.1.json")
     assert trace["subject"]["channel"] == "packet"
@@ -169,33 +169,45 @@ def test_a_v1_plan_does_not_run(historical):
         MA.task_payloads(plan)
 
 
-def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
+ANSWERS = {("b1", 0): "reached", ("b1", 1): "partial", ("b2", 0): "reached", ("b2", 1): "no"}
+
+
+def _fake_orchestrator(monkeypatch, plan, answers=ANSWERS, succeed=None):
+    """The orchestrator's execution done by persisted samples and no model: a verdict for every
+    batch in `succeed` (all by default), a failed sample with no retries left for the rest. Only
+    `TaskOrchestrator.run` is replaced; binding, collection and reporting are the real paths."""
+
     from ape.orchestration import orchestrator as orchestrator_module
     from ape.orchestration.models import Attempt, ExecutionStatus, Sample
     from ape.orchestration.persistence import TaskStorage
-    from ape.scaffolds.ape_agent.config import ApeAgentConfig
     from ape.tasks.lean_tasks.formal_math.review.ask_matching import AskMatchingResult
-
-    plan = _v2_plan(tmp_path)
-    answers = {("b1", 0): "reached", ("b1", 1): "partial", ("b2", 0): "reached", ("b2", 1): "no"}
 
     async def fake_run(self, tasks):
         for task in tasks:
             index = task.data.global_index
             storage = TaskStorage(self.tasks_dir / index, index)
+            if (storage.task_dir / "task_result.json").exists():
+                continue                      # a resume: the cached task is not run again
             pr = task.data.packets[0].pr
             for n in range(self.config.execution.sample_count):
+                now = datetime.now()
+                if succeed is not None and task.data.batch_id not in succeed:
+                    await storage.save_sample(Sample(
+                        sample_id=f"s{n}", task_global_index=index, sample_index=n,
+                        status=ExecutionStatus.FAILED_MODEL, created_at=now, updated_at=now,
+                        attempts=[Attempt(attempt_id=1, path=storage.task_dir / f"a{n}",
+                                          status=ExecutionStatus.FAILED_MODEL, created_at=now,
+                                          max_turns=5, cost_limit=None)]))
+                    continue
                 value = answers[(task.data.batch_id, n)]
-                rows = [{"pr": pr, "ask_id": f"a{pr}", "R1": value, "R1_finding": 0 if pr == 7 and value != "no" else None,
+                rows = [{"pr": pr, "ask_id": f"a{pr}", "R1": value,
+                         "R1_finding": 0 if value != "no" else None,
                          "R2": "no", "R2_finding": None, "note": ""}]
-                if pr == 8:
-                    rows[0].update(R1=value, R1_finding=0 if value != "no" else None)
                 result = AskMatchingResult(task_id=task.data.task_id, task_type=task.task_type,
                                            global_index=index, success=True, score=1.0,
                                            plan_id=plan.plan_id, batch_id=task.data.batch_id,
                                            prompt_sha256="p", asks=rows,
                                            unmatched={str(pr): {"R1": 0, "R2": 0}})
-                now = datetime.now()
                 await storage.save_sample(Sample(
                     sample_id=f"s{n}", task_global_index=index, sample_index=n,
                     status=ExecutionStatus.SUCCESS, created_at=now, updated_at=now,
@@ -206,6 +218,13 @@ def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
         return SimpleNamespace(task_results=[], total_token_usage=None)
 
     monkeypatch.setattr(orchestrator_module.TaskOrchestrator, "run", fake_run)
+
+
+def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    plan = _v2_plan(tmp_path)
+    _fake_orchestrator(monkeypatch, plan)
     config = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
     rows = asyncio.run(MA.run_matching(plan, tmp_path / "m", config, "v2demo_run", logger=None))
     assert sorted((r.batch_id, r.replicate) for r in rows) == [
@@ -214,12 +233,12 @@ def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
     report = MA.report_matching(tmp_path / "m")
     assert report["measurement"]["forensic"] is False
     # Reach is asks reached over every ask in the seal (two): each session reached its one.
-    assert report["task:1"]["reach"] == {"S1": 0.5, "S2": 0.5}
-    assert report["task:2"]["reach"] == {"S1": 0.0, "S2": 0.0}
+    assert report["task-v2demo_run:1"]["reach"] == {"S1": 0.5, "S2": 0.5}
+    assert report["task-v2demo_run:2"]["reach"] == {"S1": 0.0, "S2": 0.0}
     trace = trace_matching(tmp_path / "m", 8, "a8", "S2")
     assert trace["seal"]["label"] == "R1"
     assert trace["original"]["findings"][0]["claim"] == "golf"
-    task_cell = next(c for c in trace["cells"] if c["replicate"] == "task:1")
+    task_cell = next(c for c in trace["cells"] if c["replicate"] == "task-v2demo_run:1")
     assert task_cell["verdict_bytes"]["locator"]["run"] == "v2demo_run"
 
 
@@ -287,3 +306,72 @@ def test_a_matching_leaves_its_row_in_each_source_runs_ledger(monkeypatch, tmp_p
     assert row["stage"] == "match" and row["identity"]["identity_sha256"] == plan.identity_sha256
     assert row["identity"]["channel"] == "submitted"
     assert not any("comment" in str(v) for v in row["produced"].values())
+
+
+# --- observations belong to their producer (implementation review 2026-10-22, findings 2 and 3) ---
+
+
+def test_two_imports_with_replicate_one_do_not_collide(historical):
+    plan, out = historical
+    MA.import_matches(plan, out, {"1": G52_DIR / "match_rematch" / "matches.1.json"}, name="other")
+    with pytest.raises(ValueError, match="holds verdicts from 2 producers"):
+        MA.report_matching(out, write=False)
+    one = MA.report_matching(out, write=False, producers=["import-g52"])
+    assert set(one["measurement"]["replicates"]) == {"import-g52:1", "import-g52:2"}
+    assert one["measurement"]["forensic"] is False
+    both = MA.report_matching(out, write=False, producers=["import-g52", "import-other"])
+    assert set(both["measurement"]["replicates"]) == {"import-g52:1", "import-g52:2", "import-other:1"}
+    assert both["measurement"]["producers"]["import-other"] == {
+        "replicates": 1, "complete": True, "forensic": True}      # one of two sealed replicates
+    assert both["measurement"]["forensic"] is True
+
+
+def test_complementary_partial_runs_stay_incomplete_separately(monkeypatch, tmp_path):
+    """run_A succeeded on batch b1 only, run_B on b2 only. Before, their rows merged into
+    `task:1` and `task:2`, which read complete; neither run completed the measurement."""
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    plan = _v2_plan(tmp_path)
+    for run, batches in (("run_A", {"b1"}), ("run_B", {"b2"})):
+        _fake_orchestrator(monkeypatch, plan, succeed=batches)
+        config = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+        rows = asyncio.run(MA.run_matching(plan, tmp_path / "m", config, run, logger=None))
+        assert {r.batch_id for r in rows} == batches
+    with pytest.raises(ValueError, match="2 producers"):
+        MA.report_matching(tmp_path / "m", write=False)
+    for run in ("run_A", "run_B"):
+        report = MA.report_matching(tmp_path / "m", write=False, producers=[f"task-{run}"])
+        assert report["measurement"]["forensic"] is True
+        assert not any(t["complete"] for t in report["measurement"]["replicates"].values())
+    combined = MA.report_matching(tmp_path / "m", write=False,
+                                  producers=["task-run_A", "task-run_B"])
+    assert combined["measurement"]["forensic"] is True
+    assert not any(t["complete"] for t in combined["measurement"]["replicates"].values())
+    assert all(p["forensic"] for p in combined["measurement"]["producers"].values())
+
+
+def test_a_resume_on_another_route_is_refused_before_any_cached_verdict_is_read(monkeypatch, tmp_path):
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    plan = _v2_plan(tmp_path)
+    _fake_orchestrator(monkeypatch, plan)
+    first = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+    first.llm_config.model_name = "gpt_5_mini"
+    rows = asyncio.run(MA.run_matching(plan, tmp_path / "m", first, "r", logger=None))
+    assert {r.executor["model"] for r in rows} == {"gpt_5_mini"}
+
+    other = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+    other.llm_config.model_name = "gpt_5.2"
+    with pytest.raises(ValueError, match="differs in \\['model'\\]"):
+        asyncio.run(MA.run_matching(plan, tmp_path / "m", other, "r", logger=None))
+
+    # A budget-only change resumes, and the observations keep the route they ran on.
+    resumed = ApeAgentConfig(runs_base_dir=tmp_path / "runs")
+    resumed.llm_config.model_name = "gpt_5_mini"
+    resumed.execution.max_turns = 99
+    resumed.execution.sample_max_cost = 1.0
+    rows = asyncio.run(MA.run_matching(plan, tmp_path / "m", resumed, "r", logger=None))
+    assert {r.executor["model"] for r in rows} == {"gpt_5_mini"}
+    assert set(MA.report_matching(tmp_path / "m", write=False)["measurement"]["replicates"]) == {
+        "task-r:1", "task-r:2"}

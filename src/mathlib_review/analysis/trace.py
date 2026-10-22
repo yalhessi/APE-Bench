@@ -28,9 +28,11 @@ from src.mathlib_review.io import canonical_json_bytes, jsonl_rows, sha256_bytes
 # --- A matching cell -----------------------------------------------------------------------------
 
 
-def trace_matching(plan_dir: Path, pr: int, ask_id: str, session: str) -> Dict[str, Any]:
-    """One cell, followed to its bytes: the label, what that label showed, each replicate's verdict
-    and where it is, and the reviewer's own finding in its source."""
+def trace_matching(plan_dir: Path, pr: int, ask_id: str, session: str,
+                   producer: Optional[str] = None) -> Dict[str, Any]:
+    """One cell, followed to its bytes: the label, what that label showed, each observation's
+    verdict and where it is, and the reviewer's own finding in its source. `producer` restricts the
+    observations to one execution or import; otherwise every one held is shown, each named."""
 
     from src.mathlib_review.analysis import probes
     from src.mathlib_review.analysis.matching import (
@@ -53,14 +55,18 @@ def trace_matching(plan_dir: Path, pr: int, ask_id: str, session: str) -> Dict[s
     subject = next(s for s in plan.identity.subjects if s.session == session)
     batch_prs = {b.batch_id: b.prs for b in plan.batches}
     cells = []
-    for rep, table in replicate_tables(plan, verdict_rows(plan_dir, plan.plan_id)).items():
+    rows = verdict_rows(plan_dir, plan.plan_id)
+    if producer is not None:
+        rows = [r for r in rows if r.producer == producer]
+    for rep, table in replicate_tables(plan, rows).items():
         row = next((a for a in table["matches"]["asks"]
                     if int(a.get("pr")) == int(pr) and a.get("ask_id") == ask_id), None)
         index = row.get(f"{label}_finding") if row else None
         where = next((r for r in table["rows"]
                       if r["batch_id"] == "*" or int(pr) in batch_prs.get(r["batch_id"], [])), None)
         cells.append({
-            "replicate": rep, "value": row.get(label) if row else "(no verdict)",
+            "replicate": rep, "producer": table["producer"],
+            "value": row.get(label) if row else "(no verdict)",
             "finding": index, "note": row.get("note") if row else None,
             "shown_finding": (shown[index] if isinstance(index, int) and 0 <= index < len(shown)
                               else None),
@@ -352,21 +358,24 @@ RUN_FIELDS = ("model_name", "routing_mode", "release", "agenda_content_sha256", 
 
 
 def _measurement(source: str) -> Dict[str, Any]:
-    """A measurement directory (a matching) or a judged run's name, read as identity and numbers."""
+    """A measurement directory (a matching), optionally `@<producer>` for one of its executions or
+    imports, or a judged run's name, read as identity and numbers."""
 
-    path = Path(source)
+    path_text, _, producer = source.partition("@")
+    path = Path(path_text)
     if path.is_dir() and (path / "matching_plan.json").is_file():
         from src.mathlib_review.analysis.matching import load_plan, report_matching
 
         plan = load_plan(path)
-        report = report_matching(path, write=False)
+        report = report_matching(path, write=False, producers=[producer] if producer else None)
         numbers = {rep: {"condition_reach": report[rep]["condition_reach"],
                          "reach": report[rep]["reach"]}
                    for rep in report["measurement"]["replicates"]}
         numbers["asks"] = report["asks"]
         if "agreement" in report:
             numbers["agreement"] = report["agreement"]
-        return {"kind": "matching", "source": str(path),
+        return {"kind": "matching", "source": source,
+                "producers": report["measurement"]["producers"],
                 "identity": plan.identity.model_dump(mode="json"),
                 "identity_sha256": plan.identity_sha256,
                 "forensic": report["measurement"]["forensic"], "numbers": numbers}

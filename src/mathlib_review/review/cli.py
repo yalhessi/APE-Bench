@@ -408,8 +408,13 @@ def build_parser() -> argparse.ArgumentParser:
     match_report.add_argument("--plan", required=True, type=Path)
     match_report.add_argument("--asks", type=Path, help="the set's asks.json, for --scope families")
     match_report.add_argument("--scope", nargs="+", help="families to restrict to")
+    match_report.add_argument("--producer", help="read one execution or import of the plan "
+                                                 "(task-<run> or import-<name>); required when "
+                                                 "the store holds several")
+    match_report.add_argument("--producers", nargs="+",
+                              help="read several side by side, each judged on its own coverage")
     match_report.add_argument("--replicates", nargs="+",
-                              help="read only these, e.g. task:1 task:2; default every one held")
+                              help="read only these observations, e.g. task-r1:1 task-r1:2")
     trace = report_sub.add_parser(
         "trace", help="one number followed back to its bytes: a matching cell (--plan --pr --ask "
                       "--session) or a judged obligation (--of --obligation)")
@@ -417,6 +422,7 @@ def build_parser() -> argparse.ArgumentParser:
     trace.add_argument("--pr", type=int)
     trace.add_argument("--ask")
     trace.add_argument("--session")
+    trace.add_argument("--producer", help="one execution or import of the matching; default all")
     trace.add_argument("--of", dest="of_run", help="a judged generation run")
     trace.add_argument("--obligation")
     trace.add_argument("--node", default="judge", help="which judgement of the run")
@@ -424,7 +430,8 @@ def build_parser() -> argparse.ArgumentParser:
         "compare", help="why two or more results differ: their measurement identities, their runs' "
                         "sealed plans, and what the difference can support")
     compare.add_argument("sources", nargs="+", metavar="LABEL=SOURCE",
-                         help="a matching's measurement directory or a judged run's name")
+                         help="a matching's measurement directory (optionally @<producer>) or a "
+                              "judged run's name")
     compare.add_argument("--contrast", nargs="+", default=[],
                          help="what is meant to differ (identity or run-plan fields, e.g. "
                               "model_name evaluation_settings.design); the rest is listed as "
@@ -742,14 +749,20 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.matching import report_matching
 
         families = json.loads(args.asks.read_text()).get("families") if args.asks else None
-        print(json.dumps(report_matching(args.plan, families=families,
-                                         scope=set(args.scope) if args.scope else None,
-                                         replicates=args.replicates), indent=1))
+        producers = [args.producer] if args.producer else args.producers
+        try:
+            print(json.dumps(report_matching(args.plan, families=families,
+                                             scope=set(args.scope) if args.scope else None,
+                                             replicates=args.replicates, producers=producers),
+                             indent=1))
+        except ValueError as error:
+            raise SystemExit(str(error))
     elif args.report_command == "trace":
         from src.mathlib_review.analysis.trace import trace_judgment, trace_matching
 
         if args.plan and not args.of_run and None not in (args.pr, args.ask, args.session):
-            print(json.dumps(trace_matching(args.plan, args.pr, args.ask, args.session), indent=1))
+            print(json.dumps(trace_matching(args.plan, args.pr, args.ask, args.session,
+                                            producer=args.producer), indent=1))
         elif args.of_run and args.obligation and not args.plan:
             print(json.dumps(trace_judgment(args.of_run, args.obligation, args.node), indent=1))
         else:

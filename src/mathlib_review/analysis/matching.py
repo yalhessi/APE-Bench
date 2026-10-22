@@ -213,10 +213,35 @@ def executor_of(scaffold) -> Dict[str, str]:
             "cli_version": str(getattr(scaffold, "cli_version", None) or "unknown")}
 
 
+#: Scaffold-config keys a resume may change: ceilings, retries, timeouts, concurrency and where
+#: the run lives. Everything else -- the model, the route, the effort, the tools, the prompt
+#: preamble -- changes what a session is, and a run continues under one of each.
+OPERATIONAL_KEYS = {"execution", "runs_base_dir", "runtime_config", "mcp_server_startup_timeout",
+                    "enable_streaming", "open_in_vscode", "logs_dir_name", "conversations_dir_name",
+                    "conversation_trees_file_name", "workspaces_dir_name"}
+OPERATIONAL_LLM_KEYS = {"timeout", "connect_timeout", "retry_max_attempts", "retry_min_wait",
+                        "retry_max_wait", "streaming"}
+
+
+def route_sha256(scaffold) -> str:
+    """The digest of everything about a scaffold config that is not operational."""
+
+    dumped = scaffold.model_dump(mode="json")
+    semantic = {k: v for k, v in dumped.items() if k not in OPERATIONAL_KEYS}
+    if isinstance(semantic.get("llm_config"), dict):
+        semantic["llm_config"] = {k: v for k, v in semantic["llm_config"].items()
+                                  if k not in OPERATIONAL_LLM_KEYS}
+    return sha256_bytes(canonical_json_bytes(semantic))
+
+
 async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequence[Any],
                                 run_name: str, executor: Dict[str, str]) -> List[MatchVerdict]:
     """Every replicate's verdict, as `sample_products` reads it; a sample with no legal product has
-    none, and is a coverage gap in the report rather than a verdict."""
+    none, and is a coverage gap in the report rather than a verdict.
+
+    `executor` is the run's recorded one (`bind_run_to_plan`), never the invoking config's: a
+    resume with the same binding ran on the same route, and a different route is refused before
+    any cached sample could be read under its name."""
 
     from ape.orchestration.products import sample_products
 
@@ -234,8 +259,8 @@ async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequ
             raise ValueError(f"{run_name} sample {item.sample_index} of {batch.batch_id}: a "
                              f"recorded verdict does not cover its batch: {problems[:3]}")
         rows.append(MatchVerdict(
-            plan_id=plan.plan_id, batch_id=batch.batch_id, replicate=str(item.sample_index + 1),
-            origin="task",
+            plan_id=plan.plan_id, batch_id=batch.batch_id, producer=f"task-{run_name}",
+            replicate=str(item.sample_index + 1), origin="task",
             locator={"run": run_name, "task_dir": str(Path(tasks_dir) / item.task_global_index),
                      "sample": str(item.sample_index), "attempt": str(item.attempt_path),
                      "prompt_sha256": str(verdict["prompt_sha256"])},
@@ -247,28 +272,45 @@ BINDING_FILE = "plan_binding.json"
 
 
 def bind_run_to_plan(runs_root: Path, run_name: str, kind: str, plan_id: str,
-                     plan_sha256: str) -> Path:
-    """Bind an orchestrator run name to the one plan it executes, or refuse a different plan.
+                     plan_sha256: str, scaffold=None) -> Dict[str, Any]:
+    """Bind an orchestrator run name to the one plan and the one route it executes.
 
-    A resumed run continues its plan; a changed plan is a new run. Without this, a second plan run
-    under an old name would share its orchestrator directory and cache, and its tasks would sit
-    beside the first plan's as if one run had executed both.
+    A resumed run continues its plan on its route; a changed plan or a changed route is a new
+    run. Without the plan half, a second plan under an old name shared the first's orchestrator
+    directory and cache. Without the route half, a resume under another model skipped the tasks
+    already done and the collector stamped their cached verdicts with the new model (implementation
+    review, 2026-10-22, finding 3). Operational settings (`OPERATIONAL_KEYS`) may change on a
+    resume. Returns the binding held, whose `executor` is what every observation of this run is
+    attributed to.
     """
 
     path = Path(runs_root) / run_name / BINDING_FILE
-    binding = {"kind": kind, "plan_id": plan_id, "plan_sha256": plan_sha256}
+    binding: Dict[str, Any] = {"kind": kind, "plan_id": plan_id, "plan_sha256": plan_sha256}
+    if scaffold is not None:
+        binding["executor"] = executor_of(scaffold)
+        binding["route_sha256"] = route_sha256(scaffold)
     if path.is_file():
         held = json.loads(path.read_text())
-        if held != binding:
+        if {k: held.get(k) for k in ("kind", "plan_id", "plan_sha256")} != \
+                {k: binding.get(k) for k in ("kind", "plan_id", "plan_sha256")}:
             raise ValueError(
                 f"run {run_name!r} executes {held.get('kind')} plan {held.get('plan_id')} "
                 f"({str(held.get('plan_sha256'))[:12]}); this is {kind} plan {plan_id} "
                 f"({plan_sha256[:12]}). Resume the same plan under this name, or give the new "
                 "plan a new run name.")
-        return path
+        if scaffold is not None and held.get("route_sha256") not in (None, binding["route_sha256"]):
+            differing = sorted(k for k in binding["executor"]
+                               if binding["executor"][k] != (held.get("executor") or {}).get(k))
+            raise ValueError(
+                f"run {run_name!r} ran on {held.get('executor')}; this config is "
+                f"{binding['executor']}" + (f" (differs in {differing})" if differing else
+                                            " (a setting beyond the execution ceilings differs)")
+                + ". A run continues on one route: resume with the route it ran on, or give the "
+                "new route a new run name, so its observations are never attributed to another's.")
+        return held
     path.parent.mkdir(parents=True, exist_ok=True)
     write_once(path, pretty_json_bytes(binding))
-    return path
+    return binding
 
 
 async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: str,
@@ -284,8 +326,8 @@ async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: s
         raise ValueError(f"the config asks for {scaffold.execution.sample_count} samples and the "
                          f"plan seals {replicates} replicates; the plan decides, so drop the "
                          "config's sample_count")
-    bind_run_to_plan(scaffold.runs_base_dir, run_name, "matching", plan.plan_id,
-                     plan.source_sha256)
+    binding = bind_run_to_plan(scaffold.runs_base_dir, run_name, "matching", plan.plan_id,
+                               plan.source_sha256, scaffold)
     scaffold.execution.sample_count = replicates
     # Every replicate is a measurement; stopping early on the first would discard the others.
     scaffold.execution.early_stop_mode = EarlyStopMode.DISABLED
@@ -295,7 +337,7 @@ async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: s
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=run_name, logger=logger)
     await orchestrator.run(tasks)
     rows = await collect_task_verdicts(plan, orchestrator.tasks_dir, tasks, run_name,
-                                       executor_of(scaffold))
+                                       binding["executor"])
     verdicts = _write_verdicts(plan_dir, f"task-{run_name}", rows)
     record_match_stage(plan, Path(plan_dir), run_name, verdicts, logger)
     return rows
@@ -376,7 +418,8 @@ def import_matches(plan: MatchingPlan, plan_dir: Path, files: Dict[str, Path], n
             raise ValueError(f"{path} does not cover plan {plan.plan_id}: {len(problems)} "
                              f"problem(s), first {problems[:3]}")
         rows.append(MatchVerdict(
-            plan_id=plan.plan_id, batch_id="*", replicate=str(replicate), origin="external_import",
+            plan_id=plan.plan_id, batch_id="*", producer=f"import-{name}", replicate=str(replicate),
+            origin="external_import",
             locator={"file": str(path), "sha256": sha256_file(Path(path)),
                      "problems": str(len(problems))},
             executor=executor, asks=data.get("asks") or [], unmatched=data.get("unmatched") or {}))
@@ -398,12 +441,24 @@ def verdict_rows(plan_dir: Path, plan_id: str) -> List[MatchVerdict]:
     return rows
 
 
+def observation_key(producer: str, replicate: str) -> str:
+    """One blind matcher's observation: which execution or import, and which of its replicates."""
+
+    return f"{producer}:{replicate}"
+
+
+def producers_of(rows: Sequence[MatchVerdict]) -> List[str]:
+    return sorted({row.producer for row in rows})
+
+
 def replicate_tables(plan: MatchingPlan, rows: Sequence[MatchVerdict]) -> Dict[str, Dict[str, Any]]:
-    """Per replicate: its merged `matches` table, where its rows came from, and its coverage."""
+    """Per observation (`producer:replicate`): its merged `matches` table over that producer's
+    batches, where its rows came from, and its coverage. Batch rows merge only within one
+    observation; two runs of one plan are two sets of observations, never one."""
 
     by_rep: Dict[str, List[MatchVerdict]] = {}
     for row in rows:
-        by_rep.setdefault(f"{row.origin}:{row.replicate}", []).append(row)
+        by_rep.setdefault(observation_key(row.producer, row.replicate), []).append(row)
     out = {}
     for rep, items in sorted(by_rep.items()):
         asks: List[Dict[str, Any]] = []
@@ -412,7 +467,8 @@ def replicate_tables(plan: MatchingPlan, rows: Sequence[MatchVerdict]) -> Dict[s
             asks.extend(item.asks)
             unmatched.update(item.unmatched)
         problems = verdict_problems(plan.packets, asks, unmatched, require_unmatched=False)
-        out[rep] = {"matches": {"asks": asks, "unmatched": unmatched},
+        out[rep] = {"producer": items[0].producer, "replicate": items[0].replicate,
+                    "matches": {"asks": asks, "unmatched": unmatched},
                     "rows": [{"batch_id": i.batch_id, "origin": i.origin, "locator": i.locator,
                               "executor": i.executor} for i in items],
                     "complete": not problems, "problems": problems[:20],
@@ -422,19 +478,40 @@ def replicate_tables(plan: MatchingPlan, rows: Sequence[MatchVerdict]) -> Dict[s
 
 def report_matching(plan_dir: Path, families: Optional[Dict[str, str]] = None,
                     scope: Optional[set] = None, replicates: Optional[Sequence[str]] = None,
+                    producers: Optional[Sequence[str]] = None,
                     write: bool = True) -> Dict[str, Any]:
-    """`unblind` over the verdict store, with the identity and coverage beside every number."""
+    """`unblind` over one producer's observations, with the identity and coverage beside every number.
+
+    A producer is one execution or import of the plan (`task-<run>`, `import-<name>`). With one
+    in the store it is read; with several, the report refuses until one is named, or several are
+    named explicitly, in which case each producer's coverage is judged on its own and the report
+    says which observations it combined. Partial runs never complete each other.
+    """
 
     plan_dir = plan_dir_of(Path(plan_dir))
     plan = load_plan(plan_dir)
-    tables = replicate_tables(plan, verdict_rows(plan_dir, plan.plan_id))
+    rows = verdict_rows(plan_dir, plan.plan_id)
+    if not rows:
+        raise ValueError(f"plan {plan.plan_id} has no verdicts yet ({plan_dir / VERDICTS_DIR})")
+    held = producers_of(rows)
+    if producers:
+        unknown = sorted(set(producers) - set(held))
+        if unknown:
+            raise ValueError(f"no verdicts from producers {unknown}; held: {held}")
+        chosen = list(producers)
+    elif len(held) == 1:
+        chosen = held
+    else:
+        raise ValueError(
+            f"plan {plan.plan_id} holds verdicts from {len(held)} producers: {held}. Name one "
+            "(--producer), or several to read side by side (--producers), each judged on its own "
+            "coverage; observations from different executions are never merged into one replicate.")
+    tables = replicate_tables(plan, [row for row in rows if row.producer in chosen])
     if replicates:
         missing = sorted(set(replicates) - set(tables))
         if missing:
             raise ValueError(f"no verdicts for replicates {missing}; held: {sorted(tables)}")
         tables = {k: v for k, v in tables.items() if k in replicates}
-    if not tables:
-        raise ValueError(f"plan {plan.plan_id} has no verdicts yet ({plan_dir / VERDICTS_DIR})")
     if scope and families is None:
         raise ValueError("a scoped report needs the asks' families (`--asks <asks.json>`)")
     asks = {"asks": {str(p.pr): [a.ask_id for a in p.asks] for p in plan.packets},
@@ -443,7 +520,15 @@ def report_matching(plan_dir: Path, families: Optional[Dict[str, str]] = None,
              for pr, sessions in plan.session_stats.items()}
     numbers = unblind(asks, plan.seal, {k: v["matches"] for k, v in tables.items()}, stats,
                       scope=scope)
-    complete = all(t["complete"] for t in tables.values())
+    # Coverage is judged producer by producer: each must hold the plan's replicates, complete.
+    by_producer = {name: {k: t for k, t in tables.items() if t["producer"] == name}
+                   for name in chosen}
+    producer_status = {
+        name: {"replicates": len(ts),
+               "complete": all(t["complete"] for t in ts.values()),
+               "forensic": (len(ts) < plan.identity.replicates
+                            or not all(t["complete"] for t in ts.values()))}
+        for name, ts in by_producer.items()}
     report = {
         "measurement": {
             "plan_id": plan.plan_id,
@@ -451,11 +536,13 @@ def report_matching(plan_dir: Path, families: Optional[Dict[str, str]] = None,
             "identity_sha256": plan.identity_sha256,
             "identity": plan.identity.model_dump(mode="json"),
             "scope": sorted(scope) if scope else None,
-            "replicates": {k: {"rows": t["rows"], "complete": t["complete"],
-                               "problem_count": t["problem_count"], "problems": t["problems"]}
+            "producers": producer_status,
+            "replicates": {k: {"producer": t["producer"], "rows": t["rows"],
+                               "complete": t["complete"], "problem_count": t["problem_count"],
+                               "problems": t["problems"]}
                            for k, t in tables.items()},
             "replicates_expected": plan.identity.replicates,
-            "forensic": not complete or len(tables) < plan.identity.replicates,
+            "forensic": any(p["forensic"] for p in producer_status.values()),
         },
         **numbers,
     }
