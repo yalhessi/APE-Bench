@@ -186,26 +186,35 @@ class TaskOrchestrator:
                 continue
             storage = TaskStorage(task_dir, index)
             claim = task_dir / AGGREGATION_CLAIM
-            stale = claim.is_file()
-            if stale:
+            if claim.is_file():
                 claim.unlink()
             result_file, outcome_file = task_dir / "task_result.json", task_dir / "task_outcome.json"
             job = {"task_global_index": index, "task_type": task.task_type}
+            before = (result_file.is_file(),
+                      outcome_file.read_bytes() if outcome_file.is_file() else None)
             if result_file.is_file():
-                if outcome_file.is_file():
+                # A result with no outcome, or with an outcome written before the result (a
+                # pause or failure the task has since been resumed out of), gets its outcome.
+                outcome = (json.loads(before[1]) if before[1] else None)
+                if outcome is None or not outcome.get("has_result"):
+                    raw = await storage.load_task_result()
+                    samples = await storage.load_all_samples(task.task_type)
+                    await worker._write_task_outcome(
+                        job, storage, task.job_data(), task.task_type, samples,
+                        has_result=bool(raw and raw.get("success")))
+            else:
+                # No result: the samples decide. An outcome on disk proves nothing about the
+                # present -- it may describe a pause the task was resumed out of, whose resumed
+                # sample then succeeded in a process killed before it could publish
+                # (implementation review, 2026-10-22, finding 4). `_try_aggregate` reads the
+                # samples as they are: still running, nothing; resumable, a refreshed outcome;
+                # ended, the publication.
+                if not await storage.load_all_samples(task.task_type):
                     continue
-                raw = await storage.load_task_result()
-                samples = await storage.load_all_samples(task.task_type)
-                await worker._write_task_outcome(job, storage, task.job_data(), task.task_type,
-                                                 samples, has_result=bool(raw and raw.get("success")))
-                reconciled.append(index)
-                continue
-            if outcome_file.is_file() and not stale:
-                continue
-            if not await storage.load_all_samples(task.task_type):
-                continue
-            await worker._try_aggregate(job, storage, task.job_data(), task.task_type)
-            if result_file.is_file() or outcome_file.is_file():
+                await worker._try_aggregate(job, storage, task.job_data(), task.task_type)
+            after = (result_file.is_file(),
+                     outcome_file.read_bytes() if outcome_file.is_file() else None)
+            if after != before:
                 reconciled.append(index)
         if reconciled:
             self.logger.warning(

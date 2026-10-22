@@ -130,6 +130,50 @@ def test_two_different_results_for_one_task_are_named_not_silently_chosen(tmp_pa
     assert results.task_results[0].judgment_conclusion == on_file.judgment_conclusion
 
 
+@pytest.mark.parametrize("stale_claim", [False, True])
+def test_a_previous_outcome_does_not_block_a_resumed_samples_publication(tmp_path, stale_claim):
+    """Implementation review 2026-10-22, finding 4. A sample paused at a five-turn ceiling was
+    reconciled into an outcome (failed, nothing resumable) and no result. The ceiling was raised,
+    a resumed worker succeeded and was killed after saving its sample. The old outcome must not
+    stand in for the present."""
+
+    config, task, orchestrator, storage = _setup(tmp_path)
+    config.execution.max_turns = 5
+    paused = _attempt(storage, 1, ExecutionStatus.PAUSED_MAX_TURNS)
+    paused.turns = 5
+    _save(storage, 0, [paused], ExecutionStatus.PAUSED_MAX_TURNS)
+    first = asyncio.run(orchestrator.run([task]))
+    assert first.task_results == [] and (storage.task_dir / "task_outcome.json").is_file()
+    assert not (storage.task_dir / "task_result.json").exists()
+
+    config.execution.max_turns = 10
+    _save(storage, 0, [paused, _attempt(storage, 2, ExecutionStatus.SUCCESS, _result(task))],
+          ExecutionStatus.SUCCESS)
+    if stale_claim:
+        (storage.task_dir / AGGREGATION_CLAIM).write_text("")
+    resumed = TaskOrchestrator(config=config, orchestrator_id="o")
+    results = asyncio.run(resumed.run([task]))
+    assert len(results.task_results) == 1 and results.completed_tasks == 1
+    assert results.failed_tasks == 0 and results.recovered_results == [task.data.global_index]
+    outcome = json.loads((storage.task_dir / "task_outcome.json").read_text())
+    assert outcome["has_result"] is True and outcome["execution_status"] == "completed"
+    assert not (storage.task_dir / AGGREGATION_CLAIM).exists()
+
+
+def test_a_result_beside_an_older_outcome_refreshes_the_outcome(tmp_path):
+    _config, task, orchestrator, storage = _setup(tmp_path)
+    _save(storage, 0, [_attempt(storage, 1, ExecutionStatus.SUCCESS, _result(task))],
+          ExecutionStatus.SUCCESS)
+    asyncio.run(storage.save_task_result(_result(task)))
+    (storage.task_dir / "task_outcome.json").write_text(json.dumps(
+        {"task_id": "j", "task_type": task.task_type, "global_index": task.data.global_index,
+         "execution_status": "paused", "has_result": False}))
+    results = asyncio.run(orchestrator.run([task]))
+    outcome = json.loads((storage.task_dir / "task_outcome.json").read_text())
+    assert outcome["has_result"] is True and outcome["execution_status"] == "completed"
+    assert task.data.global_index in results.recovered_results
+
+
 # --- resume, repetition, failure -----------------------------------------------------------------
 
 
