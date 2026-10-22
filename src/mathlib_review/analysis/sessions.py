@@ -146,6 +146,9 @@ async def run_sessions(plan: SessionPlan, plan_dir: Path, scaffold, run_name: st
     if scaffold.execution.sample_count not in (1, plan.replicates):
         raise ValueError(f"the config asks for {scaffold.execution.sample_count} samples and the "
                          f"plan seals {plan.replicates}; the plan decides")
+    from src.mathlib_review.analysis.matching import bind_run_to_plan
+
+    bind_run_to_plan(scaffold.runs_base_dir, run_name, "session", plan.plan_id, plan.source_sha256)
     scaffold.execution.sample_count = plan.replicates
     scaffold.execution.early_stop_mode = EarlyStopMode.DISABLED
     tasks = [create_task_from_data(payload, scaffold,

@@ -243,6 +243,34 @@ async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequ
     return rows
 
 
+BINDING_FILE = "plan_binding.json"
+
+
+def bind_run_to_plan(runs_root: Path, run_name: str, kind: str, plan_id: str,
+                     plan_sha256: str) -> Path:
+    """Bind an orchestrator run name to the one plan it executes, or refuse a different plan.
+
+    A resumed run continues its plan; a changed plan is a new run. Without this, a second plan run
+    under an old name would share its orchestrator directory and cache, and its tasks would sit
+    beside the first plan's as if one run had executed both.
+    """
+
+    path = Path(runs_root) / run_name / BINDING_FILE
+    binding = {"kind": kind, "plan_id": plan_id, "plan_sha256": plan_sha256}
+    if path.is_file():
+        held = json.loads(path.read_text())
+        if held != binding:
+            raise ValueError(
+                f"run {run_name!r} executes {held.get('kind')} plan {held.get('plan_id')} "
+                f"({str(held.get('plan_sha256'))[:12]}); this is {kind} plan {plan_id} "
+                f"({plan_sha256[:12]}). Resume the same plan under this name, or give the new "
+                "plan a new run name.")
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    write_once(path, pretty_json_bytes(binding))
+    return path
+
+
 async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: str,
                        logger) -> List[MatchVerdict]:
     """Run the plan's batches as Tasks and write the verdict store for this run."""
@@ -256,6 +284,8 @@ async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: s
         raise ValueError(f"the config asks for {scaffold.execution.sample_count} samples and the "
                          f"plan seals {replicates} replicates; the plan decides, so drop the "
                          "config's sample_count")
+    bind_run_to_plan(scaffold.runs_base_dir, run_name, "matching", plan.plan_id,
+                     plan.source_sha256)
     scaffold.execution.sample_count = replicates
     # Every replicate is a measurement; stopping early on the first would discard the others.
     scaffold.execution.early_stop_mode = EarlyStopMode.DISABLED
