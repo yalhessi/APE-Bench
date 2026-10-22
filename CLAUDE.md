@@ -195,6 +195,11 @@ targeted run — worker startup costs more than the file does (`tests/orchestrat
 alone: 0.24s serial, 2.38s under `-n auto`) — and off `--pdb`. A bare `pytest tests -q` still
 passes, just serially, so a checkout without `pytest-xdist` degrades rather than breaks.
 
+**`No space left on device` from the suite while `df -h /tmp` shows space is `/tmp` out of inodes.**
+`/tmp` is a 1M-inode tmpfs that other sessions' scratch fills (2026-10-22: 98% used, 27k free, 502 GB
+of bytes free), and one suite run needs tens of thousands. Check `df -i /tmp`; run with
+`TMPDIR=/dev/shm/<your dir>` (148M inodes), and never delete another session's scratch to make room.
+
 **A slow test is nearly always repeated work, not coverage.** The suite was 350s in 2026-09-22 and
 88% of that sat in 60 of its 2,213 tests; the three worst were 50% between them and none was
 buying anything. They were, in order: a test asserting payload *key spellings* that built the
