@@ -15,8 +15,17 @@ ran that way.
 3. **import** (`import_session_outputs`, `cli probe session-import`): a hand-launched session's
    folder, its declared outputs checked and stored the same way, provenance `unknown` where unknown.
 
-What the outputs mean, and what a study builds from them (a context section, a seal, a reading),
-stays with the study; it reads `outputs/index.jsonl` rather than scratch paths.
+What the outputs mean stays with the study; how they reach the next step does not:
+
+4. **hand off** between sessions (`plan_sessions(inputs_from=...)`): a plan whose input files are
+   upstream sessions' stored outputs, taken from them or, for folders sessions already worked in,
+   checked against them; `lineage.json` beside the plan says which observation each input is.
+5. **hand off** to a reviewer (`derive_context`, `cli probe context-derive`): a solo `context_file`
+   whose per-PR sections are upstream outputs, with `<file>.lineage.json`; the reviewer input
+   resolver (`review/inputs.py`) recomputes it from the observations before a run reads it and
+   refuses a missing or changed one (implementation review follow-up, 2026-10-22, closure item 1).
+
+Every read of an upstream output goes through `read_observation`, never a path.
 """
 
 from __future__ import annotations
@@ -28,13 +37,18 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from src.mathlib_review.io import (
     canonical_json_bytes, jsonl_bytes, jsonl_rows, pretty_json_bytes, sealed_model, sha256_bytes,
-    write_once,
+    sha256_file, write_once,
 )
 from src.mathlib_review.schema import SessionOutput, SessionPacket, SessionPlan
+from src.mathlib_review.schema.runs import ContextLineage, InputLineage, ObservationRef
 
 PLAN_FILE = "session_plan.json"
 OUTPUTS_DIR = "outputs"
 INDEX_FILE = "index.jsonl"
+#: Beside a plan whose inputs are bound to upstream observations.
+LINEAGE_FILE = "lineage.json"
+#: Beside a derived context file: `<file>.lineage.json`.
+CONTEXT_LINEAGE_SUFFIX = ".lineage.json"
 #: Never part of a packet: a session's scratch.
 SKIP_DIRS = {"tmp"}
 
@@ -47,10 +61,17 @@ def _packet_files(folder: Path, outputs: Sequence[str],
 
     files: Dict[str, str] = {}
     if include is not None:
-        missing = sorted(name for name in include if not (folder / name).is_file())
+        # A name with a glob character is a pattern (`base/**/*.lean`) and must match something; any
+        # other name is one file and must exist.
+        missing = sorted(name for name in include
+                         if not (any(ch in name for ch in "*?[") and
+                                 any(p.is_file() for p in folder.glob(name)))
+                         and not (folder / name).is_file())
         if missing:
             raise ValueError(f"{folder} lacks the named input files {missing}")
-        paths = [folder / name for name in include]
+        paths = sorted({p for name in include
+                        for p in (folder.glob(name) if any(ch in name for ch in "*?[")
+                                  else [folder / name]) if p.is_file()})
     else:
         done = [name for name in outputs if (folder / name).exists()]
         if done:
@@ -73,12 +94,22 @@ def _packet_files(folder: Path, outputs: Sequence[str],
 def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Dict[str, Any]],
                   out_dir: Path, replicates: int = 1,
                   packet_ids: Optional[Sequence[str]] = None,
-                  include: Optional[Sequence[str]] = None) -> SessionPlan:
+                  include: Optional[Sequence[str]] = None,
+                  inputs_from: Optional[Dict[str, Dict[str, str]]] = None,
+                  upstream_packets: Optional[Dict[str, str]] = None,
+                  allow_unmatched: bool = False) -> SessionPlan:
     """Seal one session per packet folder under `packets_root` (or the named ones).
 
     `include` names the input files of each folder, for sessions that already ran there
     (`_packet_files`); the plan then holds what those sessions were given, and their outputs are
-    imported against it."""
+    imported against it.
+
+    `inputs_from` is `{input path: {"plan_dir", "producer", "output"?, "replicate"?}}`: those inputs
+    are upstream sessions' outputs, for the same packet id or the one `upstream_packets` maps it to.
+    For a new plan the bytes are taken from the observation (`read_observation`); for a historical
+    one (`include`) the folder's bytes are checked against the producer's observations, and an input
+    no observation holds is refused unless `allow_unmatched`, which lists it with the reason.
+    Either way `lineage.json` records the binding."""
 
     from ape.tasks.packet_session import DIR_TOKEN, OutputSpec
 
@@ -91,17 +122,94 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
         if missing:
             raise ValueError(f"no packet folders {missing} under {packets_root}")
         folders = [p for p in folders if p.name in set(packet_ids)]
-    packets = []
+    packets, bound, unmatched = [], {}, {}
     for folder in folders:
         files = _packet_files(folder, [s["name"] for s in specs], include)
+        if inputs_from:
+            files, bound[folder.name], missed = _bind_inputs(
+                folder.name, files, inputs_from, (upstream_packets or {}).get(folder.name, folder.name),
+                historical=include is not None)
+            if missed:
+                unmatched[folder.name] = missed
         packets.append(SessionPacket(packet_id=folder.name, files=files,
                                      files_sha256=sha256_bytes(canonical_json_bytes(files))))
+    if unmatched and not allow_unmatched:
+        raise ValueError(f"inputs no upstream observation holds: {unmatched}; bind them to the "
+                         "producer that wrote them, or plan with allow_unmatched to record them so")
     plan = sealed_model(SessionPlan, plan_id=name, brief=brief,
                         brief_sha256=sha256_bytes(brief.encode("utf-8")), outputs=specs,
                         packets=packets, replicates=replicates,
                         created_at=datetime.now(timezone.utc).isoformat())
+    if inputs_from:
+        # The lineage first: a plan without its lineage would read as one with no upstream.
+        lineage = sealed_model(InputLineage, plan_id=name, plan_sha256=plan.source_sha256,
+                               bound=bound, unmatched=unmatched, created_at=plan.created_at)
+        write_once(Path(out_dir) / LINEAGE_FILE, pretty_json_bytes(lineage))
     write_once(Path(out_dir) / PLAN_FILE, pretty_json_bytes(plan))
     return plan
+
+
+def _bind_inputs(packet_id: str, files: Dict[str, str], inputs_from: Dict[str, Dict[str, str]],
+                 upstream_packet: str, historical: bool):
+    """`(files, {path: ObservationRef}, {path: reason})` for one packet's bound inputs."""
+
+    files, bound, missed = dict(files), {}, {}
+    for path, spec in sorted(inputs_from.items()):
+        output = spec.get("output") or Path(path).name
+        if not historical:
+            ref = observation(spec["plan_dir"], spec["producer"], upstream_packet, output,
+                              spec.get("replicate", "1"))
+            text = read_observation(ref)
+            if path in files and files[path] != text:
+                raise ValueError(f"{packet_id}: the folder holds a {path} other than "
+                                 f"{spec['producer']}'s {upstream_packet} {output}")
+            files[path], bound[path] = text, ref
+            continue
+        if path not in files:
+            raise ValueError(f"{packet_id}: {path} is named for binding but is not one of its inputs")
+        digest = sha256_bytes(files[path].encode("utf-8"))
+        rows = [row for row in session_outputs(spec["plan_dir"], spec["producer"])
+                if row.packet_id == upstream_packet and output in row.outputs]
+        match = next((row for row in rows if row.outputs[output]["sha256"] == digest), None)
+        if match is None:
+            missed[path] = (f"{spec['producer']} holds no observation of {upstream_packet}"
+                            if not rows else
+                            f"no observation of {spec['producer']} for {upstream_packet} has these bytes")
+            continue
+        bound[path] = observation(spec["plan_dir"], spec["producer"], upstream_packet, output,
+                                  match.replicate)
+    return files, bound, missed
+
+
+def load_input_lineage(plan_dir: Path) -> Optional[InputLineage]:
+    """The plan's input lineage, or None for a plan with no upstream; refused when edited or when it
+    belongs to another seal of the plan."""
+
+    path = Path(plan_dir) / LINEAGE_FILE
+    if not path.is_file():
+        return None
+    lineage = InputLineage.model_validate_json(path.read_text(encoding="utf-8"))
+    _check_seal(lineage, path)
+    plan = load_session_plan(plan_dir)
+    if lineage.plan_sha256 != plan.source_sha256:
+        raise ValueError(f"{path} binds another seal of {plan.plan_id} than the one beside it")
+    return lineage
+
+
+def _check_seal(record, path: Path) -> None:
+    body = record.model_dump(mode="json", exclude={"source_sha256"})
+    if sha256_bytes(canonical_json_bytes(body)) != record.source_sha256:
+        raise ValueError(f"{path} does not match its seal; it was edited")
+
+
+def _repo_path(path: Path) -> str:
+    """A path as the repository names it: relative to the root (the working directory) when inside."""
+
+    path = Path(path)
+    try:
+        return path.resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return str(path)
 
 
 def load_session_plan(path: Path) -> SessionPlan:
@@ -243,3 +351,144 @@ def session_outputs(plan_dir: Path, producer: Optional[str] = None) -> List[Sess
             continue
         rows.extend(SessionOutput.model_validate(row) for row in jsonl_rows(path))
     return rows
+
+
+def observation(plan_dir: Path, producer: str, packet_id: str, output: str,
+                replicate: str = "1") -> ObservationRef:
+    """A reference to one stored output, checked readable now."""
+
+    plan = load_session_plan(plan_dir)
+    row = next((r for r in session_outputs(plan_dir, producer)
+                if r.packet_id == packet_id and r.replicate == str(replicate)), None)
+    if row is None:
+        raise ValueError(f"{producer} holds no observation of {plan.plan_id}/{packet_id}/{replicate}")
+    if output not in row.outputs:
+        raise ValueError(f"{producer}'s {packet_id}/{replicate} has no output {output!r}")
+    read_output(row, output)
+    return ObservationRef(plan_id=plan.plan_id, plan_dir=_repo_path(plan_dir),
+                          plan_sha256=plan.source_sha256, producer=producer, packet_id=packet_id,
+                          replicate=str(replicate), output=output,
+                          sha256=row.outputs[output]["sha256"])
+
+
+def read_observation(ref: ObservationRef) -> str:
+    """The text a reference names, refused when its plan was re-sealed or edited, the observation is
+    gone, its index names other bytes, or the stored bytes changed: a missing or tampered upstream
+    output never reaches the step that consumes it."""
+
+    plan = load_session_plan(ref.plan_dir)
+    if plan.source_sha256 != ref.plan_sha256:
+        raise ValueError(f"{ref.plan_dir} was re-sealed since {ref.producer}'s {ref.packet_id} was "
+                         "consumed; the observation belongs to another plan")
+    row = next((r for r in session_outputs(ref.plan_dir, ref.producer)
+                if r.packet_id == ref.packet_id and r.replicate == ref.replicate), None)
+    if row is None:
+        raise ValueError(f"{ref.producer} no longer holds {ref.plan_id}/{ref.packet_id}/"
+                         f"{ref.replicate}; the consumer's input is missing")
+    item = row.outputs.get(ref.output)
+    if item is None or item["sha256"] != ref.sha256:
+        raise ValueError(f"{ref.producer}'s {ref.packet_id}/{ref.replicate} {ref.output} is not the "
+                         "output that was consumed (its index names other bytes)")
+    return read_output(row, ref.output)
+
+
+def _section_text(lead: str, text: str) -> str:
+    lead = (lead or "").strip()
+    return f"{lead}\n\n{text.strip()}" if lead else text.strip()
+
+
+def context_lineage_path(context_file: Path) -> Path:
+    context_file = Path(context_file)
+    return context_file.with_name(context_file.name + CONTEXT_LINEAGE_SUFFIX)
+
+
+def _compose(base: Path, sections: Sequence[Dict[str, str]],
+             rows: Dict[str, List[ObservationRef]]) -> str:
+    from src.mathlib_review.analysis.probes import context_with_sections
+
+    extra = {int(pr): [{"title": section["title"],
+                        "text": _section_text(section.get("lead", ""), read_observation(ref))}
+                       for section, ref in zip(sections, refs)]
+             for pr, refs in rows.items()}
+    return context_with_sections(Path(base), extra)
+
+
+def derive_context(*, base: Path, sections: Sequence[Dict[str, Any]], prs: Sequence[int],
+                   out: Path) -> ContextLineage:
+    """Write a solo `context_file` whose per-PR sections are upstream session outputs.
+
+    Each PR keeps the base file's row and gains, after its own sections, one section per entry of
+    `sections`: `{"title", "lead", "plan_dir", "producer", "output", "replicate"?, "by_pr"?: {pr:
+    {any of plan_dir, producer, packet_id, output, replicate}}}`; the packet defaults to `pr<N>`.
+    The text is the lead, a blank line and the output verbatim (stripped), which is how the
+    reconstruction probe's Phase A built its strategies. Writes the file and its lineage once;
+    deriving the same file again is a no-op."""
+
+    rows: Dict[str, List[ObservationRef]] = {}
+    for pr in sorted(int(p) for p in prs):
+        refs = []
+        for section in sections:
+            source = {**section, **(section.get("by_pr") or {}).get(str(pr), {})}
+            refs.append(observation(source["plan_dir"], source["producer"],
+                                    source.get("packet_id") or f"pr{pr}", source["output"],
+                                    source.get("replicate", "1")))
+        rows[str(pr)] = refs
+    kept = [{"title": section["title"], "lead": section.get("lead", "")} for section in sections]
+    data = _compose(base, kept, rows).encode("utf-8")
+    out = Path(out)
+    if out.is_file() and out.read_bytes() != data:
+        raise ValueError(f"{out} exists with other bytes; a derived context file is written once")
+    lineage_path = context_lineage_path(out)
+    if lineage_path.is_file():
+        held = load_context_lineage(lineage_path)
+        if (held.context_sha256, held.base_sha256, held.sections, held.rows) == (
+                sha256_bytes(data), sha256_file(Path(base)), kept, rows):
+            write_once(out, data)
+            return held
+    lineage = sealed_model(ContextLineage, context_sha256=sha256_bytes(data),
+                           base_path=_repo_path(base), base_sha256=sha256_file(Path(base)),
+                           sections=kept, rows=rows,
+                           created_at=datetime.now(timezone.utc).isoformat())
+    out.parent.mkdir(parents=True, exist_ok=True)
+    write_once(lineage_path, pretty_json_bytes(lineage))
+    write_once(out, data)
+    return lineage
+
+
+def load_context_lineage(path: Path) -> ContextLineage:
+    lineage = ContextLineage.model_validate_json(Path(path).read_text(encoding="utf-8"))
+    _check_seal(lineage, Path(path))
+    return lineage
+
+
+def verify_context(context_file: Path) -> Optional[ContextLineage]:
+    """The lineage of a derived context file, after recomputing the file from it; None for a file
+    with no lineage. Refused when the file, its base or any upstream output is not what was
+    derived from -- before a reviewer reads it."""
+
+    path = context_lineage_path(context_file)
+    if not path.is_file():
+        return None
+    lineage = load_context_lineage(path)
+    data = Path(context_file).read_bytes()
+    if sha256_bytes(data) != lineage.context_sha256:
+        raise ValueError(f"{context_file} is not the file its lineage derived; it was edited")
+    if sha256_file(Path(lineage.base_path)) != lineage.base_sha256:
+        raise ValueError(f"{context_file}'s base {lineage.base_path} changed since the derivation")
+    if _compose(Path(lineage.base_path), lineage.sections, lineage.rows).encode("utf-8") != data:
+        raise ValueError(f"{context_file} no longer follows from its upstream outputs")
+    return lineage
+
+
+def lineage_chain(ref: ObservationRef, depth: int = 4) -> Dict[str, Any]:
+    """An observation and, through each plan's `lineage.json`, the observations its inputs were,
+    back to a plan with no upstream: what a derived input was made from, step by step."""
+
+    node: Dict[str, Any] = {"observation": ref.model_dump(mode="json")}
+    lineage = load_input_lineage(ref.plan_dir) if depth > 0 else None
+    if lineage is not None:
+        node["inputs"] = {path: lineage_chain(up, depth - 1)
+                          for path, up in (lineage.bound.get(ref.packet_id) or {}).items()}
+        if lineage.unmatched.get(ref.packet_id):
+            node["unmatched_inputs"] = lineage.unmatched[ref.packet_id]
+    return node

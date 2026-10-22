@@ -206,10 +206,12 @@ def build_parser() -> argparse.ArgumentParser:
         "session-plan": "seal model sessions over packet folders: every file, the brief, the "
                         "declared outputs (analysis/sessions.py); calls no model",
         "session-import": "store hand-launched sessions' declared outputs beside a session plan",
+        "context-derive": "write a solo context_file whose per-PR sections are stored session "
+                          "outputs, with its lineage (analysis/sessions.derive_context)",
     }
     parsers = {name: probe_sub.add_parser(name, help=text) for name, text in step.items()}
     for name, sp in parsers.items():
-        if name not in ("audit", "session-plan", "session-import"):
+        if name not in ("audit", "session-plan", "session-import", "context-derive"):
             sp.add_argument("--set", required=True, type=Path, help="configs/probe_sets/<name>.yaml")
     for name in ("packets", "prompts", "feedback"):
         parsers[name].add_argument("--sessions", nargs="+", default=["X1", "X2"])
@@ -307,7 +309,22 @@ def build_parser() -> argparse.ArgumentParser:
     sp_plan.add_argument("--replicates", type=int, default=1)
     sp_plan.add_argument("--include", nargs="+", metavar="FILE",
                          help="plan folders sessions already ran in: exactly these files were "
-                              "their inputs (outputs and audits beside them are not)")
+                              "their inputs (outputs and audits beside them are not); a name "
+                              "with * ? or [ is a glob, e.g. 'base/**/*.lean'")
+    sp_plan.add_argument("--input-from", action="append", default=[],
+                         metavar="FILE=PLAN_DIR@PRODUCER[:OUTPUT]",
+                         help="this input is an upstream session's stored output (taken from it, "
+                              "or with --include checked against it); recorded in lineage.json")
+    sp_plan.add_argument("--upstream-packet", action="append", default=[], metavar="PACKET=UPSTREAM",
+                         help="the upstream packet a packet's bound inputs come from, when the ids differ")
+    sp_plan.add_argument("--allow-unmatched", action="store_true",
+                         help="with --include: plan inputs no upstream observation holds, listed "
+                              "with the reason in lineage.json")
+    sp_derive = parsers["context-derive"]
+    sp_derive.add_argument("--spec", required=True, type=Path,
+                           help='JSON {"base", "prs", "sections": [{"title", "lead", "plan_dir", '
+                                '"producer", "output", "replicate"?, "by_pr"?}]}')
+    sp_derive.add_argument("--out", required=True, type=Path, help="the context file to write")
     sp_import = parsers["session-import"]
     sp_import.add_argument("--plan", required=True, type=Path)
     sp_import.add_argument("--folder", action="append", required=True, metavar="PACKET=FOLDER")
@@ -942,12 +959,36 @@ def _probe(args, logger) -> int:
         for item in args.output:
             out_name, _sep, kind = item.partition(":")
             outputs.append({"name": out_name, "kind": kind or "text"})
+        inputs_from = {}
+        for item in args.input_from:
+            file_name, _sep, source = item.partition("=")
+            plan_dir, _at, rest = source.partition("@")
+            producer, _colon, output = rest.partition(":")
+            if not (file_name and plan_dir and producer):
+                raise SystemExit(f"--input-from {item!r}: FILE=PLAN_DIR@PRODUCER[:OUTPUT]")
+            inputs_from[file_name] = {"plan_dir": plan_dir, "producer": producer,
+                                      **({"output": output} if output else {})}
         plan = plan_sessions(args.packets, name=args.name, brief=args.brief.read_text(),
                              outputs=outputs, out_dir=args.out, replicates=args.replicates,
-                             packet_ids=args.packet_ids, include=args.include)
+                             packet_ids=args.packet_ids, include=args.include,
+                             inputs_from=inputs_from or None,
+                             upstream_packets=dict(i.split("=", 1) for i in args.upstream_packet),
+                             allow_unmatched=args.allow_unmatched)
         print(json.dumps({"plan": str(args.out), "plan_id": plan.plan_id,
                           "packets": len(plan.packets), "replicates": plan.replicates,
                           "brief_sha256": plan.brief_sha256}, indent=1))
+        return 0
+    if args.probe_command == "context-derive":
+        from src.mathlib_review.analysis.sessions import context_lineage_path, derive_context
+
+        spec = json.loads(args.spec.read_text())
+        lineage = derive_context(base=Path(spec["base"]), sections=spec["sections"],
+                                 prs=spec["prs"], out=args.out)
+        print(json.dumps({"context_file": str(args.out),
+                          "lineage": str(context_lineage_path(args.out)),
+                          "context_sha256": lineage.context_sha256,
+                          "prs": sorted(int(p) for p in lineage.rows),
+                          "sections": [s["title"] for s in lineage.sections]}, indent=1))
         return 0
     if args.probe_command == "session-import":
         from src.mathlib_review.analysis.sessions import import_session_outputs, load_session_plan

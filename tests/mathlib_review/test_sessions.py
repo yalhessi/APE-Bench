@@ -178,23 +178,26 @@ def _run(monkeypatch, tmp_path, plan, plan_dir, run_name, goal):
     return asyncio.run(S.run_sessions(plan, plan_dir, config, run_name, logger=None))
 
 
-def _context_file(plan_dir: Path, path: Path) -> Path:
-    """The study's own step (it stays beside the study): a context section per PR from the
-    stored extractor outputs, read from the store, never from a scratch folder."""
-    rows = []
-    for out in S.session_outputs(plan_dir):
-        goal = S.read_output(out, "goal_brief.md")       # verified against the stored digest
-        rows.append({"pr_number": int(out.packet_id.removeprefix("pr")),
-                     "sections": [{"title": "Design goal", "text": goal}]})
-    path.write_text("".join(json.dumps(r) + "\n" for r in sorted(rows, key=lambda r: r["pr_number"])))
+def _base_context(path: Path) -> Path:
+    """The control's rows, as a solo `context_file` holds them: one section a PR."""
+    path.write_text("".join(json.dumps({"pr_number": pr, "sections": [
+        {"title": "The PR model", "text": f"model of {pr}"}]}) + "\n" for pr in (33066, 33117)))
     return path
 
 
+GOAL_SECTION = {"title": "Design goal", "lead": "Another session wrote this goal without the PR.",
+                "output": "goal_brief.md"}
+
+
 def test_the_evidence_assisted_consumer_composes_through_shared_records(monkeypatch, tmp_path):
+    """Acquisition -> derived context -> reviewer prompt, through the shared records: the stored
+    outputs, `derive_context` and its lineage, the input resolver and the solo renderer."""
+
     from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
     from src.mathlib_review.review.inputs import pin_overrides, resolve_input_files
 
     root = _packets(tmp_path / "packets")
+    base = _base_context(tmp_path / "base.jsonl")
     results = {}
     for name, goal in (("extractor_a", lambda pr: f"Goal A for {pr}"),
                        ("extractor_b", lambda pr: f"Goal B for {pr}")):
@@ -204,15 +207,138 @@ def test_the_evidence_assisted_consumer_composes_through_shared_records(monkeypa
         rows = _run(monkeypatch, tmp_path, plan, plan_dir, f"run_{name}", goal)
         assert sorted(r.packet_id for r in rows) == ["pr33066", "pr33117"]
         assert all(r.locator["run"] == f"run_{name}" and r.origin == "task" for r in rows)
-        context = _context_file(plan_dir, tmp_path / f"context_{name}.jsonl")
+        context = tmp_path / f"context_{name}.jsonl"
+        lineage = S.derive_context(base=base, prs=[33066, 33117], out=context, sections=[
+            {**GOAL_SECTION, "plan_dir": str(plan_dir), "producer": f"task-run_{name}"}])
         resolved = resolve_input_files({"context_file": str(context)})
+        assert resolved["context_file"]["lineage_sha256"] == lineage.source_sha256
         config = SoloReviewConfig(context_file=context, **pin_overrides(resolved))
-        results[name] = (resolved["context_file"]["sha256"], solo_context_block(config, 33117))
-    # Replacing the acquisition changed the sealed context and the reviewer's prompt, and nothing
-    # downstream of the session plan was written for it.
-    (sha_a, block_a), (sha_b, block_b) = results["extractor_a"], results["extractor_b"]
-    assert sha_a != sha_b
-    assert "Goal A for pr33117" in block_a and "Goal B for pr33117" in block_b
+        results[name] = (resolved["context_file"]["sha256"], solo_context_block(config, 33117),
+                         lineage.rows["33117"][0])
+    # Swapping the acquisition producer changed the context, its lineage and the reviewer's
+    # prompt, and nothing downstream of the session plan was written for it.
+    (sha_a, block_a, ref_a), (sha_b, block_b, ref_b) = results["extractor_a"], results["extractor_b"]
+    assert sha_a != sha_b and ref_a.producer == "task-run_extractor_a" != ref_b.producer
+    assert "## The PR model" in block_a and block_a.index("The PR model") < block_a.index("Design goal")
+    assert "Another session wrote this goal without the PR.\n\nGoal A for pr33117" in block_a
+    assert "Goal B for pr33117" in block_b
+
+
+def _imported(tmp_path, name="ex", goal=lambda pr: f"goal of {pr}"):
+    """An extraction plan with one imported observation a packet."""
+    root = _packets(tmp_path / f"packets_{name}")
+    plan_dir = tmp_path / name
+    plan = S.plan_sessions(root, name=name, brief=EXTRACTOR_BRIEF, outputs=OUTPUTS, out_dir=plan_dir)
+    folders = {pid: _finished(tmp_path / f"done_{name}" / pid, goal(pid))
+               for pid in ("pr33066", "pr33117")}
+    S.import_session_outputs(plan, plan_dir, folders, name=name)
+    return plan_dir
+
+
+def test_a_missing_or_tampered_upstream_output_never_reaches_a_reviewer(tmp_path):
+    from src.mathlib_review.review.inputs import resolve_input_files
+
+    plan_dir = _imported(tmp_path)
+    context = tmp_path / "ctx.jsonl"
+    S.derive_context(base=_base_context(tmp_path / "base.jsonl"), prs=[33066, 33117], out=context,
+                     sections=[{**GOAL_SECTION, "plan_dir": str(plan_dir), "producer": "import-ex"}])
+    assert S.verify_context(context).rows["33066"][0].packet_id == "pr33066"
+    # Deriving again is a no-op; the file is written once.
+    S.derive_context(base=tmp_path / "base.jsonl", prs=[33066, 33117], out=context,
+                     sections=[{**GOAL_SECTION, "plan_dir": str(plan_dir), "producer": "import-ex"}])
+
+    stored = Path(S.session_outputs(plan_dir)[0].outputs["goal_brief.md"]["path"])
+    original = stored.read_text()
+    stored.write_text("tampered")
+    with pytest.raises(ValueError, match="changed after it was stored"):
+        resolve_input_files({"context_file": str(context)})
+    stored.write_text(original)
+
+    index = plan_dir / S.OUTPUTS_DIR / "import-ex.jsonl"
+    kept = index.read_text()
+    index.write_text(kept.split("\n", 1)[1])            # pr33066's observation is gone
+    with pytest.raises(ValueError, match="no longer holds"):
+        resolve_input_files({"context_file": str(context)})
+    index.write_text(kept)
+
+    context.write_text(context.read_text().replace("goal of", "goal  of"))
+    with pytest.raises(ValueError, match="not the file its lineage derived"):
+        resolve_input_files({"context_file": str(context)})
+
+
+def test_a_session_plan_takes_its_inputs_from_upstream_observations_and_says_which(tmp_path):
+    """Session to session: a sketch plan whose goal brief is the extraction's stored output."""
+
+    extract = _imported(tmp_path)
+    sketch_root = tmp_path / "sketch"
+    for pid in ("pr33066", "pr33117"):
+        (sketch_root / pid).mkdir(parents=True)
+        (sketch_root / pid / "instructions.md").write_text("Sketch the design.\n")
+    sketch_outputs = [{"name": "sketch.md", "kind": "text"}]
+    plan = S.plan_sessions(sketch_root, name="sketch", brief="Folder: {dir}", outputs=sketch_outputs,
+                           out_dir=tmp_path / "sketch_plan",
+                           inputs_from={"goal_brief.md": {"plan_dir": str(extract),
+                                                          "producer": "import-ex"}})
+    assert plan.packets[0].files["goal_brief.md"] == "goal of pr33066"
+    lineage = S.load_input_lineage(tmp_path / "sketch_plan")
+    assert lineage.bound["pr33117"]["goal_brief.md"].producer == "import-ex"
+    assert lineage.unmatched == {}
+
+    # Its output, then a context section from it: the chain walks back to the extraction.
+    S.import_session_outputs(plan, tmp_path / "sketch_plan",
+                             {"pr33066": _sketched(tmp_path / "s1", "sketch one")}, name="sk")
+    ref = S.observation(tmp_path / "sketch_plan", "import-sk", "pr33066", "sketch.md")
+    chain = S.lineage_chain(ref)
+    assert chain["inputs"]["goal_brief.md"]["observation"]["plan_id"] == "ex"
+
+    # A historical folder is checked, not copied: equal bytes bind, other bytes are refused unless
+    # recorded as unmatched.
+    done = tmp_path / "sketch_done"
+    for pid, brief in (("pr33066", "goal of pr33066"), ("pr33117", "a revised goal")):
+        (done / pid).mkdir(parents=True)
+        (done / pid / "instructions.md").write_text("Sketch the design.\n")
+        (done / pid / "goal_brief.md").write_text(brief)
+        (done / pid / "sketch.md").write_text("done")
+    bind = {"goal_brief.md": {"plan_dir": str(extract), "producer": "import-ex"}}
+    with pytest.raises(ValueError, match="no upstream observation holds"):
+        S.plan_sessions(done, name="h", brief="Folder: {dir}", outputs=sketch_outputs,
+                        out_dir=tmp_path / "h1", include=["instructions.md", "goal_brief.md"],
+                        inputs_from=bind)
+    S.plan_sessions(done, name="h", brief="Folder: {dir}", outputs=sketch_outputs,
+                    out_dir=tmp_path / "h2", include=["instructions.md", "goal_brief.md"],
+                    inputs_from=bind, allow_unmatched=True)
+    held = S.load_input_lineage(tmp_path / "h2")
+    assert set(held.bound) == {"pr33066", "pr33117"} and "goal_brief.md" in held.bound["pr33066"]
+    assert "has these bytes" in held.unmatched["pr33117"]["goal_brief.md"]
+
+    # An upstream whose stored bytes changed cannot feed a new plan.
+    Path(S.session_outputs(extract)[1].outputs["goal_brief.md"]["path"]).write_text("tampered")
+    with pytest.raises(ValueError, match="changed after it was stored"):
+        S.plan_sessions(sketch_root, name="sketch2", brief="Folder: {dir}", outputs=sketch_outputs,
+                        out_dir=tmp_path / "sketch_plan2",
+                        inputs_from={"goal_brief.md": {"plan_dir": str(extract),
+                                                       "producer": "import-ex"}})
+
+
+def _sketched(folder: Path, text: str) -> Path:
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "sketch.md").write_text(text)
+    return folder
+
+
+def test_a_glob_include_plans_a_tree_of_inputs(tmp_path):
+    root = _packets(tmp_path / "packets")
+    for pid in ("pr33066", "pr33117"):
+        (root / pid / "goal_brief.md").write_text("done")
+        (root / pid / "ledger.json").write_text("[]")
+    plan = S.plan_sessions(root, name="g", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
+                           out_dir=tmp_path / "plan", include=["instructions.md", "base/**/*.lean"])
+    assert set(plan.packets[0].files) == {"instructions.md", "base/Mathlib/X.lean"}
+    with pytest.raises(ValueError, match="lacks the named input files"):
+        S.plan_sessions(root, name="g2", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
+                        out_dir=tmp_path / "plan2", include=["instructions.md", "nothing/**/*.md"])
+
+
 
 
 def test_a_hand_launched_sessions_outputs_import_against_the_plan(tmp_path):
@@ -313,3 +439,25 @@ def test_a_finished_folder_is_planned_from_its_named_inputs(tmp_path):
     with pytest.raises(ValueError, match="lacks the named input files"):
         S.plan_sessions(root, name="bad", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
                         out_dir=tmp_path / "p2", include=["missing.md"])
+
+
+def test_the_trace_finds_a_reviewers_context_lineage_by_content(tmp_path):
+    """A run made before lineage existed names only a path; the bytes find the derivation."""
+
+    from src.mathlib_review.analysis.trace import context_lineage_of
+    from src.mathlib_review.io import sha256_file
+
+    plan_dir = _imported(tmp_path)
+    context = tmp_path / "ctx.jsonl"
+    S.derive_context(base=_base_context(tmp_path / "base.jsonl"), prs=[33066, 33117], out=context,
+                     sections=[{**GOAL_SECTION, "plan_dir": str(plan_dir), "producer": "import-ex"}])
+    elsewhere = tmp_path / "elsewhere" / "context_ctx_dev.jsonl"   # same bytes, another path
+    elsewhere.parent.mkdir()
+    elsewhere.write_bytes(context.read_bytes())
+    found = context_lineage_of(sha256_file(elsewhere), elsewhere,
+                               {"lineage_snapshot": str(S.context_lineage_path(context))}, pr=33117)
+    assert found["status"].startswith("recomputed") and found["sections"] == ["Design goal"]
+    upstream = found["upstream"]["Design goal"]["observation"]
+    assert (upstream["plan_id"], upstream["producer"], upstream["packet_id"]) == (
+        "ex", "import-ex", "pr33117")
+    assert context_lineage_of("0" * 64, elsewhere, {}, pr=33117) is None

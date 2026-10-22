@@ -18,6 +18,11 @@ Now, one resolver, used by the run and by `cli report inputs`:
   edit between two sessions of one attempt cannot slip in either.
 
 A path is a locator: the same bytes at another path are the same input.
+
+A context file derived from session outputs (`analysis/sessions.derive_context`) carries
+`<file>.lineage.json`. The resolver recomputes the file from it, so a missing or changed upstream
+output is refused before any session, and records the lineage beside the digest; the plan still
+seals the bytes alone, because the same bytes are the same input whatever produced them.
 """
 
 from __future__ import annotations
@@ -45,6 +50,13 @@ def resolve_input_files(task_overrides: Optional[Dict[str, Any]]) -> Dict[str, D
         if not path.is_file():
             raise FileNotFoundError(f"{field} {str(path)!r} is not a file")
         resolved[field] = {"path": str(path), "sha256": sha256_bytes(path.read_bytes())}
+        if field == "context_file":
+            from src.mathlib_review.analysis.sessions import context_lineage_path, verify_context
+
+            lineage = verify_context(path)
+            if lineage is not None:
+                resolved[field]["lineage"] = str(context_lineage_path(path))
+                resolved[field]["lineage_sha256"] = lineage.source_sha256
     return resolved
 
 
@@ -73,6 +85,11 @@ def snapshot_input_files(resolved: Dict[str, Dict[str, str]], run_dir: Path) -> 
         target = Path(run_dir) / SNAPSHOT_DIR / f"{field}-{item['sha256'][:16]}{source.suffix}"
         write_once(target, data)
         out[field] = {**item, "snapshot": str(target)}
+        if item.get("lineage"):
+            lineage = Path(item["lineage"]).read_bytes()
+            kept = target.with_name(target.name + ".lineage.json")
+            write_once(kept, lineage)
+            out[field]["lineage_snapshot"] = str(kept)
     return out
 
 

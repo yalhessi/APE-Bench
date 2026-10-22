@@ -248,6 +248,10 @@ def run_inputs(run_name: str, pr: Optional[int] = None, full: bool = False,
                        "necessarily what the sessions read" if seal is None else
                        "unchanged since sealed" if seal == current else
                        "changed since sealed: read the snapshot, not the path")}
+        if field == "context_file" and (seal or current):
+            lineage = context_lineage_of(seal or current, path, index.get(field) or {}, pr)
+            if lineage is not None:
+                files[field]["lineage"] = lineage
 
     attempts = asyncio.run(_attempts(root / "tasks", pr))
     shown = []
@@ -300,6 +304,47 @@ def _content_text(content) -> str:
     if isinstance(content, list):
         return "".join(block.get("text", "") for block in content if isinstance(block, dict))
     return "" if content is None else str(content)
+
+
+#: Where derived context files and their lineage are kept: a study's measurement directories.
+LINEAGE_GLOB = "results/pr_review_v5/probes/*/measurements/**/*.lineage.json"
+
+
+def context_lineage_of(digest: str, path: Path, snapshot: Dict[str, Any],
+                       pr: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    """How a reviewer's context file was derived, found by its content: the run's snapshot of the
+    lineage, the file's own `<file>.lineage.json`, or a measurement directory's record of the same
+    bytes (a run made before lineage existed names only a path). With `pr`, that PR's sections are
+    followed upstream through each plan's input lineage (`sessions.lineage_chain`)."""
+
+    from src.mathlib_review.analysis.sessions import (
+        CONTEXT_LINEAGE_SUFFIX, context_lineage_path, lineage_chain, load_context_lineage,
+        verify_context,
+    )
+
+    candidates = [Path(p) for p in (snapshot.get("lineage_snapshot"),) if p]
+    candidates.append(context_lineage_path(path))
+    candidates.extend(sorted(Path(".").glob(LINEAGE_GLOB)))
+    for candidate in candidates:
+        if not candidate.is_file():
+            continue
+        lineage = load_context_lineage(candidate)
+        if lineage.context_sha256 != digest:
+            continue
+        derived = candidate.with_name(candidate.name[:-len(CONTEXT_LINEAGE_SUFFIX)])
+        try:
+            verify_context(derived)
+            status = "recomputed from its upstream outputs: identical"
+        except (OSError, ValueError) as error:
+            status = f"does not recompute: {error}"
+        out = {"record": str(candidate), "derived_file": str(derived), "status": status,
+               "base": lineage.base_path, "sections": [s["title"] for s in lineage.sections],
+               "prs": sorted(int(p) for p in lineage.rows)}
+        if pr is not None and str(pr) in lineage.rows:
+            out["upstream"] = {section["title"]: lineage_chain(ref)
+                               for section, ref in zip(lineage.sections, lineage.rows[str(pr)])}
+        return out
+    return None
 
 
 def _first_messages(attempt: Path, scaffold: Optional[str]) -> Dict[str, Any]:

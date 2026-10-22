@@ -413,3 +413,61 @@ class SessionOutput(StrictModel):
     executor: Dict[str, str]
     #: {name: {"sha256", "path"}}: the stored copy beside the plan.
     outputs: Dict[str, Dict[str, str]]
+
+
+class ObservationRef(StrictModel):
+    """One stored session output as a later step consumed it: enough to read it again and to refuse
+    it when anything about it changed (`analysis/sessions.read_observation`)."""
+
+    plan_id: str
+    #: The measurement directory holding the plan, relative to the repository root.
+    plan_dir: str
+    #: The plan's `source_sha256` when it was consumed: a re-sealed plan is another plan.
+    plan_sha256: str
+    producer: str
+    packet_id: str
+    replicate: str
+    output: str
+    sha256: str
+
+
+class InputLineage(StrictModel):
+    """Where a session plan's input files came from: per packet, each named input taken from, or
+    checked against, an upstream session's stored output (`sessions.plan_sessions(inputs_from=...)`).
+
+    Written beside `session_plan.json`, not inside it, so plans sealed before lineage existed keep
+    their digests. An input named for binding that no upstream observation holds is listed in
+    `unmatched` with the reason, never dropped: the reconstruction probe's 33304 decision packet read a
+    revised goal brief that no planned extraction produced.
+    """
+
+    schema_version: Literal["input-lineage1"] = "input-lineage1"
+    plan_id: str
+    plan_sha256: str
+    #: {packet_id: {input path: ObservationRef}}
+    bound: Dict[str, Dict[str, ObservationRef]]
+    #: {packet_id: {input path: reason}}
+    unmatched: Dict[str, Dict[str, str]]
+    created_at: str
+    source_sha256: str
+
+
+class ContextLineage(StrictModel):
+    """How a reviewer `context_file` was derived from session outputs (`sessions.derive_context`).
+
+    The file's bytes are a pure function of the base rows, the section titles and leads, and the
+    observation each section reads for each PR; the reviewer input resolver recomputes them before a
+    run reads the file and refuses it when an upstream output is missing or changed. Kept beside the
+    context file as `<file>.lineage.json`.
+    """
+
+    schema_version: Literal["context-lineage1"] = "context-lineage1"
+    context_sha256: str
+    base_path: str
+    base_sha256: str
+    #: [{"title", "lead"}], in the order they follow the base rows' own sections.
+    sections: List[Dict[str, str]]
+    #: {pr: [the observation each section reads, in section order]}
+    rows: Dict[str, List[ObservationRef]]
+    created_at: str
+    source_sha256: str
