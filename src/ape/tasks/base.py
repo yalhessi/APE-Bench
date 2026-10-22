@@ -698,6 +698,12 @@ def register_task(task_type: str, task_class: type['BaseTask']) -> None:
     _tasks[task_type] = task_class
 
 
+def submission_tools() -> set:
+    """Every registered task's submission tool (`submit_tool`), unprefixed: the calls that end a
+    session rather than ask a tool something."""
+    return {task_class.submit_tool for task_class in _tasks.values()}
+
+
 def get_task_class(task_type: str) -> type['BaseTask']:
     """Get task class from registry.
 

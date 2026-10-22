@@ -26,8 +26,11 @@ Each call is classified by what its result says:
 `attempts_without_transcript` counts attempts whose directory holds neither transcript format, so
 a reading says how much of the run it saw.
 
-`submit_findings` is counted apart: the Claude Code scaffold ends the session at submission, so
-the SDK records that one result as rejected whatever happened; `task_result.json` is its record.
+Every task's submission tool is counted apart (`ape.tasks.base.submission_tools`): the Claude Code
+scaffold ends the session at submission, so the SDK records that one result as rejected ("The user
+doesn't want to proceed with this tool use") whatever happened, and the task's stored result is its
+record. Until 2026-10-22 only `submit_findings` was, so the first Claude Code smoke run of
+`packet_session` reported its `submit_outputs` as an error.
 
 Reads the orchestrator tree (`.ape/runs/<run>/`, gitignored) through `TaskStorage`, every sample
 and every attempt -- a failed attempt's calls are part of what the tools did -- and descends into
@@ -190,13 +193,17 @@ def tool_outcomes(run_name: str, ape_root: Path = DEFAULT_APE_ROOT) -> Dict[str,
     attempts = asyncio.run(_attempt_dirs(root / "tasks", root))
     table: Dict[str, Counter] = defaultdict(Counter)
     details: Dict[Tuple[str, str], Counter] = defaultdict(Counter)
+    import ape.tasks  # noqa: F401 - registers every task, so every submission tool is known
+    from ape.tasks.base import submission_tools
+
+    submits = tuple(submission_tools())
     submissions: Counter = Counter()
     without_transcript = 0
     for attempt in attempts:
         if not any(any(Path(attempt).glob(pattern)) for pattern in TRANSCRIPTS):
             without_transcript += 1
         for call in tool_calls(attempt):
-            if call.name.endswith("submit_findings"):
+            if call.name.endswith(submits):
                 submissions[call.name] += 1
                 continue
             cls, detail = classify(call.name, call.text, call.is_error, call.has_result)

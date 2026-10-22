@@ -143,3 +143,23 @@ def test_an_attempt_with_no_transcript_is_counted(tmp_path):
     out = T.tool_outcomes("r", ape_root=tmp_path / "runs")
     assert out["attempts"] == 2
     assert out["attempts_without_transcript"] == 1
+
+
+def test_every_tasks_submission_is_counted_apart_not_as_an_error(tmp_path):
+    """The Claude Code scaffold interrupts the CLI at submission, which logs the call as rejected.
+    The first smoke run of `packet_session` on that route read its `submit_outputs` as an error."""
+
+    rejected = ("The user doesn't want to proceed with this tool use. The tool use was rejected "
+                "(eg. if it was a file edit, the new_string was NOT written to the file).")
+    root = tmp_path / "runs" / "r"
+    (session,) = _task(root / "tasks", "session", attempts=1)
+    _claude_code(session, [("Read", "1\tthe brief", False),
+                           ("mcp__core__submit_outputs", rejected, True)])
+    (matcher,) = _task(tmp_path / "runs" / "m" / "tasks", "matcher", attempts=1)
+    _claude_code(matcher, [("mcp__core__submit_matches", rejected, True)])
+
+    out = T.tool_outcomes("r", ape_root=tmp_path / "runs")
+    assert out["submissions"] == {"mcp__core__submit_outputs": 1}
+    assert "mcp__core__submit_outputs" not in out["tools"] and out["tools"]["Read"]["answered"] == 1
+    assert T.tool_outcomes("m", ape_root=tmp_path / "runs")["submissions"] == {
+        "mcp__core__submit_matches": 1}
