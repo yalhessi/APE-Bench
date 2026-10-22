@@ -215,12 +215,13 @@ class SubjectBinding(StrictModel):
     `packet`: a probe session's `findings.json`; `solo`: a run's submitted task findings
     (channel `submitted`, before finalization); `lead`: a run's `findings.jsonl` (channel
     `finalized`, with the published ones marked); `findings_file`: findings written to a file
-    per PR and session by the study itself (channel `declared`).
+    per PR and session by the study itself (channel `declared`); `run`: a run the registered judge
+    scored, its finalized findings or its pre-merge candidates.
     """
 
     session: str
-    source: Literal["packet", "solo", "lead", "findings_file"]
-    channel: Literal["packet", "submitted", "finalized", "declared"]
+    source: Literal["packet", "solo", "lead", "findings_file", "run"]
+    channel: Literal["packet", "submitted", "finalized", "declared", "candidates"]
     runs: List[str] = Field(default_factory=list)
     path: Optional[str] = None
 

@@ -794,8 +794,25 @@ class Source(BaseModel):
     """
 
     model_config = ConfigDict(extra="forbid")
-    kind: Literal["claude", "solo", "lead"]
+    kind: Literal["claude", "solo", "lead", "findings_file"]
     run: Optional[Union[str, List[str]]] = None
+    #: `findings_file`: a JSON object {pr: [finding, ...]} the study wrote for this session, each
+    #: finding holding the `KEEP` fields (2026-10-22; `compiled-unfiled-2026-10-18/match.py` built
+    #: such findings by hand and called the matcher's helpers directly).
+    path: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _names_its_findings(self):
+        if (self.kind == "findings_file") != bool(self.path):
+            raise ValueError("a findings_file source names its `path`, and only it does")
+        if self.kind in ("solo", "lead") and not self.run:
+            raise ValueError(f"a {self.kind} source names its `run`")
+        return self
+
+
+def _findings_file(path: str) -> Dict[int, tuple]:
+    rows = json.loads(Path(path).read_text())
+    return {int(pr): (list(found), {"findings": len(found)}) for pr, found in rows.items()}
 
 
 def _claude(spec: ProbeSet, pr: int, session: str):
@@ -925,7 +942,28 @@ def _lead(spec: ProbeSet, run: str) -> Dict[int, tuple]:
 def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
                  seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path,
                  harness_blind: bool = False) -> Dict[str, Any]:
+    """Write `blind_packets` as the v1 matcher's input files; returns the session stats."""
+
+    out.mkdir(parents=True, exist_ok=True)
+    packets, stats = blind_packets(spec, seal, sources, feedback=feedback, asks=asks,
+                                   harness_blind=harness_blind)
+    for pr, packet in packets.items():
+        write_json(out / f"asks_pr{pr}.json", packet["asks"])
+        for label, stripped in packet["reviewers"].items():
+            write_json(out / f"{label}_pr{pr}.json", stripped)
+    write_json(out / "session_stats.json", stats)
+    return stats
+
+
+def blind_packets(spec: ProbeSet, seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], *,
+                  feedback: Optional[Dict[str, Any]] = None, asks: Optional[Dict[str, Any]] = None,
+                  ask_packets: Optional[Dict[str, List[Dict[str, Any]]]] = None,
+                  harness_blind: bool = False) -> tuple:
     """Blind inputs: per sealed PR, its asks and every session's findings under its shuffled label.
+
+    Returns `({pr: {"asks": [...], "reviewers": {label: [...]}}}, stats)`: what `match_inputs`
+    writes as files and what a matching plan holds (`analysis/matching.py`). The asks come from
+    the set's feedback and agreed asks, or, with `ask_packets`, as the study already built them.
 
     Findings are stripped to `KEEP` with cues redacted. A finding without a target is refused, since
     a matcher would judge it without a location (test (b)'s solo findings reached the matchers as
@@ -938,17 +976,23 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
     and every session's text loses the conventions cues. The counts go into `session_stats.json`.
     """
 
-    out.mkdir(parents=True, exist_ok=True)
+    if (ask_packets is None) == (feedback is None or asks is None):
+        raise ValueError("give the set's feedback and asks, or the study's ask_packets, not both")
     used = {s for labels in seal.values() for s in labels.values()}
     missing = used - set(sources)
     if missing:
         raise ValueError(f"no source for sessions {sorted(missing)}")
-    loaded = {s: (_solo_runs(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
-              for s in used if sources[s].kind != "claude"}
+    loaders = {"solo": lambda src: _solo_runs(src.run), "lead": lambda src: _lead(spec, src.run),
+               "findings_file": lambda src: _findings_file(src.path)}
+    loaded = {s: loaders[sources[s].kind](sources[s]) for s in used if sources[s].kind != "claude"}
     stats: Dict[str, Dict[str, Any]] = {}
+    packets: Dict[str, Dict[str, Any]] = {}
     graph_by_pr = _graphs(spec) if harness_blind and any(sources[s].kind == "claude" for s in used) else {}
     for pr, labels in seal.items():
-        write_json(out / f"asks_pr{pr}.json", ask_packet(feedback, asks["asks"][pr]))
+        packet = packets[pr] = {
+            "asks": (list(ask_packets[pr]) if ask_packets is not None
+                     else ask_packet(feedback, asks["asks"][pr])),
+            "reviewers": {}}
         for label, session in labels.items():
             if sources[session].kind == "claude":
                 found, st = _claude(spec, int(pr), session)
@@ -963,9 +1007,8 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
             lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
             if lost:
                 raise ValueError(f"{session} on PR {pr}: findings {lost} have no target")
-            write_json(out / f"{label}_pr{pr}.json", stripped)
-    write_json(out / "session_stats.json", stats)
-    return stats
+            packet["reviewers"][label] = stripped
+    return packets, stats
 
 
 def _graphs(spec: ProbeSet) -> Dict[int, Any]:
