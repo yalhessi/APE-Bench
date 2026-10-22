@@ -211,3 +211,32 @@ demonstrated-change consumer composes through `cli run` and `match-plan` with a 
 9. **Ask readers and matchers as packet sessions.** Both are folder sessions and can run as `packet_session`
    with their v1 prompts unchanged; that would make `ask-match/1-session` re-runnable under the task route.
    Not done: it is a new instrument version and needs its own calibration.
+
+## Slice C: failure and dynamic behaviour (built)
+
+Each property in design §15's slice C, with the test that holds it
+(`tests/orchestration/test_recovery_and_identity.py`, real orchestrator and tasks, no model):
+
+| Property | How it holds now |
+|---|---|
+| **Interrupted output** | Reproduced before fixing: a task whose sample succeeded but whose process died before aggregation, and a task whose result was written but whose log row was not, both reached `task_results` as nothing on resume, so a resumed review lost that PR's findings silently. Now `TaskOrchestrator._reconcile_interrupted` finishes such publications at the start of a run with the worker's own aggregation and outcome writer, and final aggregation reads each task's `task_result.json` when the log lacks it and heals the log. Both are listed in `OrchestratorResults.recovered_results`. |
+| **Conflicting publications** | A worker claims a task's publication atomically (`task_result.claim`, created inside the aggregation lock; the writes cannot be under the lock in async mode). A second publisher backs off; a claim left by a killed process is stale at the next start. Two different log rows for one task are read from the task's file and named in `conflicting_results`, never chosen silently. |
+| **Resumed sample** | One observation with several attempts (`sample_products`: one row, `attempts=2`); resume never mints a repetition. |
+| **Fresh repetition** | Identical products of independent samples stay two rows; nothing deduplicates by content. |
+| **Nested failure** | A failed child's `ChildRun.error` comes from its outcome's attempt errors (slice 0). |
+| **Explicit fallback** | A reviewer whose context file lacks its PR refuses (`KeyError`), so a failed acquisition never becomes an unassisted review without a word. |
+| **External labels** | Imports are validated against the plan (matchings, sessions); a plan with no verdicts yet is "waiting", refused by the report, never scored. |
+| **Unsupported continuation** | A matching or session run name is bound to its plan (`plan_binding.json`): the same plan resumes, another plan is refused with "give the new plan a new run name". A review run's plan already refuses a semantic change (and, since A2, an edited input file). |
+
+### Overhead, measured on real records (design §15's last acceptance check)
+
+| Operation | Size | Time |
+|---|---|---|
+| Build a matching plan | filing-contract dev seal: 12 PRs, 5 sessions, 235 cells; 576 KiB | 1.4 s (loads five runs) |
+| Load and verify a plan / import two replicates / report | same | 6 ms / 3 ms / 7 ms |
+| Trace one cell | same | 0.1 s (reloads the session's run) |
+| `sample_products` | `pr5_F_fanout_heldout12_v2_rep1`, 1,409 tasks on NFS | 1.0 s (about 1 ms a task) |
+| Reconciliation's file checks | same | 0.15 s; tasks without both files then have their samples loaded, as `_prepare_jobs` already does |
+
+Nothing here is a reason to hold back adoption. The plan file grows with the inputs it now keeps,
+which is the point of keeping them.

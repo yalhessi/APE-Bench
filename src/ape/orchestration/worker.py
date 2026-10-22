@@ -5,6 +5,7 @@ import contextvars
 import inspect
 import json
 import multiprocessing as mp
+import os
 import random
 import threading
 import traceback
@@ -24,6 +25,15 @@ from .models import (
     task_execution_limits,
 )
 from .persistence import ProgressManager, TaskStorage, append_to_jsonl, print_progress
+
+#: Created atomically, inside the aggregation lock, by the one worker that publishes a task's result;
+#: removed once `task_result.json`, its `aggregated_results.jsonl` row and `task_outcome.json` are
+#: written. The writes cannot happen under the lock itself -- in single-process async mode another
+#: coroutine waiting on a held thread lock blocks the thread -- so without the claim, two workers
+#: finishing a task's last samples together could both pass the lock's double-check and both
+#: publish. One left behind by a killed process is stale at the next start, and
+#: `TaskOrchestrator._reconcile_interrupted` finishes the publication.
+AGGREGATION_CLAIM = "task_result.claim"
 
 
 class SampleWorker:
@@ -672,10 +682,15 @@ class SampleWorker:
             return
 
         # Now acquire lock for the aggregation
+        claim = storage.task_dir / AGGREGATION_CLAIM
         with self.aggregation_lock:
             # Double-check after acquiring lock
             if (storage.task_dir / "task_result.json").exists():
                 return
+            try:
+                os.close(os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            except FileExistsError:
+                return  # another worker is publishing this task
 
             # Aggregate results
             task_class = get_task_class(task_type)
@@ -698,6 +713,7 @@ class SampleWorker:
         if task_result is None:
             await self._write_task_outcome(
                 job, storage, task_data, task_type, samples, has_result=False)
+            claim.unlink(missing_ok=True)
             global_index = job["task_global_index"]
 
             def record_failure(progress: OrchestratorProgress) -> None:
@@ -716,6 +732,7 @@ class SampleWorker:
         await append_to_jsonl(aggregated_path, task_result.model_dump(mode="json"))
         await self._write_task_outcome(
             job, storage, task_data, task_type, samples, has_result=True)
+        claim.unlink(missing_ok=True)
 
         # Update progress outside of lock
         def updater(progress: OrchestratorProgress) -> None:

@@ -922,4 +922,10 @@ class OrchestratorResults(BaseModel):
     #: Tasks with an attempt whose usage never came back; `outcome_usage` is a lower bound
     #: whenever this is not 0.
     tasks_with_unknown_usage: int = 0
+    #: Tasks whose publication a previous process left unfinished and this run completed:
+    #: a result the log did not hold, or samples that ended without being aggregated.
+    recovered_results: List[str] = Field(default_factory=list)
+    #: Tasks whose log held two different results. The task's own `task_result.json` is read;
+    #: these are listed so the choice is never silent.
+    conflicting_results: List[str] = Field(default_factory=list)
     outcome_usage: UsageBreakdown = Field(default_factory=UsageBreakdown)

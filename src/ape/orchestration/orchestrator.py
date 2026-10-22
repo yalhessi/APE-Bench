@@ -25,6 +25,7 @@ from .models import ExecutionStatus, OrchestratorProgress, OrchestratorResults
 from .persistence import (
     ProgressManager,
     TaskStorage,
+    append_to_jsonl,
     load_jsonl,
     print_progress,
     print_summary,
@@ -129,6 +130,9 @@ class TaskOrchestrator:
             num_processes=self.num_processes,
         )
 
+        # Finish what an interrupted process left half-published, before anything is scheduled.
+        reconciled = await self._reconcile_interrupted(tasks)
+
         # Prepare sample jobs and progress snapshot
         sample_jobs, progress_snapshot, early_stop_ready = await self._prepare_jobs(tasks)
 
@@ -147,8 +151,67 @@ class TaskOrchestrator:
         # Aggregate final results
         self.end_time = datetime.now()
         results = await self._aggregate_final_results(tasks)
+        if reconciled:
+            results.recovered_results = sorted(set(results.recovered_results) | set(reconciled))
         await print_summary(results, self.tasks_dir, self.logger)
         return results
+
+    async def _reconcile_interrupted(self, tasks: List[BaseTask]) -> List[str]:
+        """Complete any task publication a previous process left unfinished.
+
+        A worker publishes a task in steps: the samples, then `task_result.json`, its row in
+        `aggregated_results.jsonl`, and `task_outcome.json`. A process killed between them left
+        a task that `_prepare_jobs` would never schedule again and `_aggregate_final_results`
+        would never report: samples that ended with no result (a resumed review lost the PR's
+        findings without a word), or a result with no outcome. Measured offline 2026-10-22: both
+        shapes reached `task_results` as nothing.
+
+        Uses the worker's own aggregation and outcome writer, so recovery and normal completion
+        cannot disagree. Runs before any job, under the orchestrator lock, so a claim file found
+        here is stale. Returns the tasks it completed.
+        """
+
+        from .worker import AGGREGATION_CLAIM, SampleWorker
+
+        worker = SampleWorker(
+            config=self.config, scaffold_type=self.config.scaffold_type,
+            orchestrator_dir=self.workspace_path, worker_id=-1, early_stop_events={},
+            aggregation_lock=threading.Lock(), execution_mode_name=self.execution_mode,
+            orchestrator_start_time=self.start_time or datetime.now(), logger=self.logger)
+        reconciled: List[str] = []
+        for task in tasks:
+            index = task.data.global_index
+            task_dir = self.tasks_dir / index
+            if not task_dir.is_dir():
+                continue
+            storage = TaskStorage(task_dir, index)
+            claim = task_dir / AGGREGATION_CLAIM
+            stale = claim.is_file()
+            if stale:
+                claim.unlink()
+            result_file, outcome_file = task_dir / "task_result.json", task_dir / "task_outcome.json"
+            job = {"task_global_index": index, "task_type": task.task_type}
+            if result_file.is_file():
+                if outcome_file.is_file():
+                    continue
+                raw = await storage.load_task_result()
+                samples = await storage.load_all_samples(task.task_type)
+                await worker._write_task_outcome(job, storage, task.job_data(), task.task_type,
+                                                 samples, has_result=bool(raw and raw.get("success")))
+                reconciled.append(index)
+                continue
+            if outcome_file.is_file() and not stale:
+                continue
+            if not await storage.load_all_samples(task.task_type):
+                continue
+            await worker._try_aggregate(job, storage, task.job_data(), task.task_type)
+            if result_file.is_file() or outcome_file.is_file():
+                reconciled.append(index)
+        if reconciled:
+            self.logger.warning(
+                "completed %d task publication(s) an interrupted process left unfinished: %s",
+                len(reconciled), [i[:12] for i in reconciled[:8]])
+        return reconciled
 
     async def _prepare_jobs(
         self, tasks: List[BaseTask]
@@ -441,6 +504,7 @@ class TaskOrchestrator:
 
         results_by_index: Dict[str, BaseTaskResult] = {}
         duplicate_records = 0
+        conflicting: Set[str] = set()
         for data in results_data:
             task_type = data.get("task_type")
             global_index = data.get("global_index")
@@ -472,6 +536,9 @@ class TaskOrchestrator:
 
             if global_index in results_by_index:
                 duplicate_records += 1
+                if (results_by_index[global_index].model_dump(mode="json")
+                        != result_obj.model_dump(mode="json")):
+                    conflicting.add(global_index)
             results_by_index[global_index] = result_obj
 
         if duplicate_records:
@@ -479,6 +546,33 @@ class TaskOrchestrator:
                 "Detected %d duplicate aggregated result records; keeping latest per task",
                 duplicate_records,
             )
+
+        # The log is derived; each task's own `task_result.json` is the record. A task the log
+        # lost (a process killed between the two writes) is read from its file and the log
+        # healed; a task the log holds twice with different content is read from its file and
+        # named, so the choice between two results is never silent.
+        recovered: List[str] = []
+        for task in tasks:
+            global_index = task.data.global_index
+            if global_index in results_by_index and global_index not in conflicting:
+                continue
+            storage = TaskStorage(self.tasks_dir / global_index, global_index)
+            data = await storage.load_task_result()
+            if not data:
+                continue
+            task_result_cls = task.task_result_class or BaseTaskResult
+            result_obj = (task_result_cls if data.get("success") else BaseTaskResult).model_validate(data)
+            if global_index not in results_by_index:
+                await append_to_jsonl(self.aggregated_results_file, data)
+                recovered.append(global_index)
+            results_by_index[global_index] = result_obj
+        if recovered:
+            self.logger.warning("recovered %d task result(s) missing from %s",
+                                len(recovered), self.aggregated_results_file.name)
+        if conflicting:
+            self.logger.error("%d task(s) hold two different results in %s; read from their "
+                              "task_result.json: %s", len(conflicting),
+                              self.aggregated_results_file.name, sorted(conflicting)[:8])
 
         task_results: List[BaseTaskResult] = []
         for task in tasks:
@@ -560,6 +654,8 @@ class TaskOrchestrator:
             successful_samples=successful_samples,
             total_cost=total_cost,
             total_cached_cost=total_cached_cost,
+            recovered_results=sorted(recovered),
+            conflicting_results=sorted(conflicting),
             **outcome_counts,
         )
 
