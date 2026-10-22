@@ -266,3 +266,18 @@ def test_a_session_resume_on_another_route_is_refused(monkeypatch, tmp_path):
     other.llm_config.model_name = "gpt_5.2"
     with pytest.raises(ValueError, match="A run continues on one route"):
         asyncio.run(S.run_sessions(plan, tmp_path / "plan", other, "r", logger=None))
+
+
+def test_a_finished_folder_is_planned_from_its_named_inputs(tmp_path):
+    root = _packets(tmp_path / "packets")
+    _finished(root / "pr33066", "done")
+    (root / "pr33066" / "leaks.json").write_text("{}")        # an audit written beside them
+    with pytest.raises(ValueError, match="finished session"):
+        S.plan_sessions(root, name="x", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS, out_dir=tmp_path / "p0")
+    plan = S.plan_sessions(root, name="hist", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
+                           out_dir=tmp_path / "p1", packet_ids=["pr33066"],
+                           include=["instructions.md", "pr.md", "model.md", "diff.patch"])
+    assert set(plan.packets[0].files) == {"instructions.md", "pr.md", "model.md", "diff.patch"}
+    with pytest.raises(ValueError, match="lacks the named input files"):
+        S.plan_sessions(root, name="bad", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
+                        out_dir=tmp_path / "p2", include=["missing.md"])

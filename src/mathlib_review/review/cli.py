@@ -305,6 +305,9 @@ def build_parser() -> argparse.ArgumentParser:
     sp_plan.add_argument("--name", required=True)
     sp_plan.add_argument("--out", required=True, type=Path)
     sp_plan.add_argument("--replicates", type=int, default=1)
+    sp_plan.add_argument("--include", nargs="+", metavar="FILE",
+                         help="plan folders sessions already ran in: exactly these files were "
+                              "their inputs (outputs and audits beside them are not)")
     sp_import = parsers["session-import"]
     sp_import.add_argument("--plan", required=True, type=Path)
     sp_import.add_argument("--folder", action="append", required=True, metavar="PACKET=FOLDER")
@@ -933,7 +936,7 @@ def _probe(args, logger) -> int:
             outputs.append({"name": out_name, "kind": kind or "text"})
         plan = plan_sessions(args.packets, name=args.name, brief=args.brief.read_text(),
                              outputs=outputs, out_dir=args.out, replicates=args.replicates,
-                             packet_ids=args.packet_ids)
+                             packet_ids=args.packet_ids, include=args.include)
         print(json.dumps({"plan": str(args.out), "plan_id": plan.plan_id,
                           "packets": len(plan.packets), "replicates": plan.replicates,
                           "brief_sha256": plan.brief_sha256}, indent=1))

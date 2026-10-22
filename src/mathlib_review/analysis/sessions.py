@@ -39,12 +39,25 @@ INDEX_FILE = "index.jsonl"
 SKIP_DIRS = {"tmp"}
 
 
-def _packet_files(folder: Path, outputs: Sequence[str]) -> Dict[str, str]:
+def _packet_files(folder: Path, outputs: Sequence[str],
+                  include: Optional[Sequence[str]] = None) -> Dict[str, str]:
+    """A folder's files as a packet. `include` names exactly the files that were the session's
+    inputs, for a folder a session has already finished in (its outputs, audits and scratch sit
+    beside them); without it, every file is an input and a folder holding an output is refused."""
+
     files: Dict[str, str] = {}
-    done = [name for name in outputs if (folder / name).exists()]
-    if done:
-        raise ValueError(f"{folder} holds {done}: a finished session's folder is not a packet")
-    for path in sorted(p for p in folder.rglob("*") if p.is_file()):
+    if include is not None:
+        missing = sorted(name for name in include if not (folder / name).is_file())
+        if missing:
+            raise ValueError(f"{folder} lacks the named input files {missing}")
+        paths = [folder / name for name in include]
+    else:
+        done = [name for name in outputs if (folder / name).exists()]
+        if done:
+            raise ValueError(f"{folder} holds {done}: a finished session's folder is not a packet "
+                             "(name its input files with `include` to plan it historically)")
+        paths = sorted(p for p in folder.rglob("*") if p.is_file())
+    for path in paths:
         rel = path.relative_to(folder)
         if rel.parts[0] in SKIP_DIRS:
             continue
@@ -59,8 +72,13 @@ def _packet_files(folder: Path, outputs: Sequence[str]) -> Dict[str, str]:
 
 def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Dict[str, Any]],
                   out_dir: Path, replicates: int = 1,
-                  packet_ids: Optional[Sequence[str]] = None) -> SessionPlan:
-    """Seal one session per packet folder under `packets_root` (or the named ones)."""
+                  packet_ids: Optional[Sequence[str]] = None,
+                  include: Optional[Sequence[str]] = None) -> SessionPlan:
+    """Seal one session per packet folder under `packets_root` (or the named ones).
+
+    `include` names the input files of each folder, for sessions that already ran there
+    (`_packet_files`); the plan then holds what those sessions were given, and their outputs are
+    imported against it."""
 
     from ape.tasks.packet_session import DIR_TOKEN, OutputSpec
 
@@ -75,7 +93,7 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
         folders = [p for p in folders if p.name in set(packet_ids)]
     packets = []
     for folder in folders:
-        files = _packet_files(folder, [s["name"] for s in specs])
+        files = _packet_files(folder, [s["name"] for s in specs], include)
         packets.append(SessionPacket(packet_id=folder.name, files=files,
                                      files_sha256=sha256_bytes(canonical_json_bytes(files))))
     plan = sealed_model(SessionPlan, plan_id=name, brief=brief,

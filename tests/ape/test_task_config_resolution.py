@@ -146,6 +146,12 @@ def test_a_lead_runs_settings_do_not_reach_its_arms(monkeypatch, tmp_path):
     for task in (seen["tasks"][0], _worker_rebuild(child, seen["tasks"][0])):
         assert task.config.task_config.enabled_tools == LeanJudgmentConfig().enabled_tools
     assert ReviewArmConfig().enabled_tools == DEFAULT_REVIEW_TOOLS
+    # And a lead run says so, where a user of `--set task_config.X` will read it.
+    import inspect
+
+    from src.mathlib_review.review import runner
+
+    assert "configures the lead only" in inspect.getsource(runner.run)
 
 
 def test_a_childs_explicit_settings_reach_both_sides(monkeypatch, tmp_path):

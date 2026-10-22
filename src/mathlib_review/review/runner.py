@@ -2136,6 +2136,13 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
             "standard_budget_tokens": dataset.standard_budget_tokens,
             "per_pr_token_cap": dataset.per_pr_token_cap,
         }
+        if task_overrides:
+            # Since 2026-10-22 a child inherits no task settings (`ape.orchestration.subtasks`):
+            # the arms take their class defaults and the agenda's grants, whatever `task_config`
+            # says. Said at every lead run, because `--set task_config.X` used to reach them.
+            logger.info("task_config %s configures the lead only; its arms are configured by "
+                        "their class defaults and the agenda, not by task_config",
+                        sorted(task_overrides))
         scaffold.execution.sample_max_cost = dataset.lead_cost_cap
         scaffold.execution.sample_max_tokens = dataset.lead_token_cap or None
     elif dataset.routing_mode == "solo":
