@@ -322,14 +322,28 @@ def test_a_matching_leaves_its_row_in_each_source_runs_ledger(monkeypatch, tmp_p
     runs = tmp_path / "runs"
     for name in ("probe_postcutoff_gpt52_G_rep1", "probe_postcutoff_gpt52_K_rep2"):
         (runs / name).mkdir(parents=True)
+        (runs / name / "findings.jsonl").write_text("")
     monkeypatch.setattr(paths, "run_dir", lambda name: runs / name)
     verdicts = out / MA.VERDICTS_DIR / "import-g52.jsonl"
     written = MA.record_match_stage(plan, out, "matcher_run_x", verdicts)
     assert sorted(written) == ["probe_postcutoff_gpt52_G_rep1", "probe_postcutoff_gpt52_K_rep2"]
+
     (row,) = jsonl_rows(runs / "probe_postcutoff_gpt52_G_rep1" / "stages.jsonl")
     assert row["stage"] == "match" and row["identity"]["identity_sha256"] == plan.identity_sha256
     assert row["identity"]["channel"] == "submitted"
     assert not any("comment" in str(v) for v in row["produced"].values())
+
+    # A folder with no recorded findings -- the worktree setup's arm-pool link alone, as
+    # `probe_dev_opus55_contract2_claude_sub_rep3/` was on the first live run -- gets no ledger,
+    # and the skip is said.
+    (runs / "probe_postcutoff_gpt52_G_rep1" / "findings.jsonl").unlink()
+    (runs / "probe_postcutoff_gpt52_G_rep1" / "stages.jsonl").unlink()
+    said = []
+    logger = SimpleNamespace(warning=lambda fmt, *a, **k: said.append(fmt % a))
+    assert MA.record_match_stage(plan, out, "matcher_run_y", verdicts, logger) == [
+        "probe_postcutoff_gpt52_K_rep2"]
+    assert not (runs / "probe_postcutoff_gpt52_G_rep1" / "stages.jsonl").exists()
+    assert any("probe_postcutoff_gpt52_G_rep1" in line for line in said)
 
 
 # --- observations belong to their producer (implementation review 2026-10-22, findings 2 and 3) ---

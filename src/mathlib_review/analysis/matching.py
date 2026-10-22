@@ -353,19 +353,26 @@ def record_match_stage(plan: MatchingPlan, plan_dir: Path, run_name: str, verdic
     the run (`judge.runner._record_stage`). Solo and lead sources only: a packet or a findings
     file has no run directory. Digests and identity only -- the asks are gold-side and never enter
     a run directory. Never fatal: the verdicts are paid for and written. Returns the runs written.
+
+    Only into a run whose findings are recorded in this checkout. The first live matching
+    (2026-10-22) wrote a ledger into `probe_dev_opus55_contract2_claude_sub_rep3/`, a folder holding
+    nothing but the worktree setup's link to its arm pool: that run's results were never recorded on
+    any branch, and a lone `stages.jsonl` there would read as a recorded run. Runs recorded on
+    another branch are skipped too, and every skipped run is named in a warning, not passed over.
     """
 
     from src.mathlib_review import paths
-    from src.mathlib_review.run_state import append_stage, digests_of, stage_record
+    from src.mathlib_review.run_state import RUN_ARTIFACTS, append_stage, digests_of, stage_record
 
-    written = []
+    written, skipped = [], []
     for subject in plan.identity.subjects:
         if subject.source not in ("solo", "lead"):
             continue
         for run in subject.runs:
             try:
                 directory = paths.run_dir(run)
-                if not directory.is_dir():
+                if not (directory / RUN_ARTIFACTS["findings"].filename).is_file():
+                    skipped.append(run)
                     continue
                 append_stage(directory, stage_record(
                     "match", run_name=run,
@@ -382,6 +389,10 @@ def record_match_stage(plan: MatchingPlan, plan_dir: Path, run_name: str, verdic
                 if logger is not None:
                     logger.warning("could not record the matching's row in %s's ledger", run,
                                    exc_info=True)
+    if skipped and logger is not None:
+        logger.warning("the matching's row is not in the ledger of %d source run(s) whose findings "
+                       "are not recorded in this checkout (another branch, or never recorded): %s",
+                       len(skipped), ", ".join(skipped))
     return written
 
 

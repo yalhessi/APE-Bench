@@ -107,3 +107,39 @@ def test_a_matching_and_a_judged_run_are_never_pooled(roots, tmp_path):
     MA.import_matches(plan, plan_root / "m", {"1": matches}, name="x")
     out = compare_measurements({"M": str(plan_root / "m"), "J": "a_rep1"}, ape_root=roots / "ape")
     assert out["verdict"].startswith("different instruments")
+
+
+def test_one_plan_matched_by_two_executors_is_side_by_side_unless_that_is_the_contrast(roots):
+    """The first live matching on GPT-6 Luna, compared with the Opus matchers, named only the
+    instrument version and rubric (2026-10-22). Who ran the matchers is part of the measurement."""
+
+    from tests.mathlib_review.test_matching import _v2_plan
+    from src.mathlib_review.analysis import matching as MA
+    from src.mathlib_review.judge.ask_matching import flat_rows, AskVerdict, ReviewerVerdict
+
+    plan_root = roots / "plans"
+    plan_root.mkdir()
+    _v2_plan(plan_root)
+    plan = MA.load_plan(plan_root / "m")
+    rows = flat_rows([AskVerdict(pr=p.pr, ask_id=p.asks[0].ask_id, verdicts=[
+        ReviewerVerdict(reviewer=label, value="no") for label in p.reviewers])
+        for p in plan.packets])
+    matches = plan_root / "matches.json"
+    matches.write_text(json.dumps({"asks": rows, "unmatched": {
+        str(p.pr): {label: len(found) for label, found in p.reviewers.items()} for p in plan.packets}}))
+    files = {"1": matches, "2": matches}
+    MA.import_matches(plan, plan_root / "m", files, name="opus",
+                      executor={"model": "claude-opus-5-5", "effort": "xhigh"})
+    MA.import_matches(plan, plan_root / "m", files, name="luna",
+                      executor={"model": "elm_gpt_6_luna", "effort": "high"})
+    sources = {"O": f"{plan_root / 'm'}@import-opus", "L": f"{plan_root / 'm'}@import-luna"}
+
+    out = compare_measurements(sources, ape_root=roots / "ape")
+    assert out["identity_differences"] == {}
+    assert out["verdict"].startswith("one instrument run by different matchers")
+    assert {e["model"] for e in out["executor_differences"]["executor"]["L"]} == {"elm_gpt_6_luna"}
+    assert "executor" in out["undeclared_differences"]
+
+    declared = compare_measurements(sources, contrast=["executor"], ape_root=roots / "ape")
+    assert declared["verdict"].startswith("one scale")
+    assert "executor" not in declared["undeclared_differences"]

@@ -348,6 +348,8 @@ SCALE_FIELDS = ("instrument", "instrument_version", "rubric_sha256", "question_p
                 "reference_kind", "reference_sha256", "seal_sha256", "population_prs",
                 "projection", "replicates", "aggregation", "denominator")
 INSTRUMENT_FIELDS = ("instrument", "instrument_version", "rubric_sha256", "question_policy")
+#: The contrast name for who ran a matching's matchers (model, effort, scaffold, CLI).
+EXECUTOR = "executor"
 #: Run-plan fields that change what a run measures (the plan's own non-resumable fields).
 #: `agenda_sha256` is not among them: the sealed agenda carries its own run's name, id and
 #: digest, so it differs between any two runs; `agenda_content_sha256` is the agenda without them.
@@ -374,7 +376,13 @@ def _measurement(source: str) -> Dict[str, Any]:
         numbers["asks"] = report["asks"]
         if "agreement" in report:
             numbers["agreement"] = report["agreement"]
+        # Who ran the matchers: not in the identity (one plan may be executed or imported many
+        # times), so read from the observations themselves.
+        executors = sorted({json.dumps(row.get("executor") or {}, sort_keys=True)
+                            for rep in report["measurement"]["replicates"].values()
+                            for row in rep.get("rows") or []})
         return {"kind": "matching", "source": source,
+                "executors": [json.loads(e) for e in executors],
                 "producers": report["measurement"]["producers"],
                 "identity": plan.identity.model_dump(mode="json"),
                 "identity_sha256": plan.identity_sha256,
@@ -460,6 +468,13 @@ def compare_measurements(sources: Dict[str, str],
                           for label, v in values.items()}
             if _differing(values):
                 identity_differences[field] = values
+    # The matcher's executor is part of what was measured: the first live Luna matching
+    # (2026-10-22) compared with the Opus matchers named only the instrument version and rubric,
+    # though a different model at a different effort on another scaffold had run it.
+    matchings = {label: e.get("executors") for label, e in entries.items()
+                 if e["kind"] == "matching"}
+    executor_differences = ({EXECUTOR: matchings}
+                            if len(matchings) > 1 and _differing(matchings) else {})
     instruments = {label: (e["identity"] or {}).get("instrument") if e.get("identity")
                    else ("semantic-judge" if e["kind"] == "judged run" else None)
                    for label, e in entries.items()}
@@ -474,6 +489,9 @@ def compare_measurements(sources: Dict[str, str],
     elif set(identity_differences) - {"subjects"} - contrast:
         verdict = ("one instrument over different references, seals or projections: side by side "
                    "only, never subtracted")
+    elif executor_differences and EXECUTOR not in contrast:
+        verdict = ("one instrument run by different matchers (model, effort or route): side by "
+                   "side only, unless the comparison is the calibration (`--contrast executor`)")
     else:
         verdict = "one scale: the numbers may be read against each other"
 
@@ -497,15 +515,17 @@ def compare_measurements(sources: Dict[str, str],
         sub = {run: v.get(key) for run, v in settings.items()}
         if len(sub) > 1 and _differing(sub):
             run_differences[f"task_config.{key}"] = sub
-    undeclared = sorted((set(identity_differences) - {"subjects"} | set(run_differences))
-                        - contrast)
+    undeclared = sorted((set(identity_differences) - {"subjects"} | set(run_differences)
+                         | set(executor_differences)) - contrast)
     return {
         "measurements": {label: {k: e.get(k) for k in ("kind", "source", "identity_sha256",
-                                                         "forensic", "numbers", "judge_identity")
+                                                         "forensic", "executors", "numbers",
+                                                         "judge_identity")
                                  if k in e}
                          for label, e in entries.items()},
         "verdict": verdict,
         "identity_differences": identity_differences,
+        "executor_differences": executor_differences,
         "run_differences": run_differences,
         "runs_without_a_plan": sorted(run for run, plan in runs.items() if plan is None),
         "contrast": sorted(contrast),
