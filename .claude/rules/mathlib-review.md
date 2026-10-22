@@ -476,4 +476,12 @@ paths:
   Count only a fix in the rule's own form, and compare it with conforming code under the same attention. A practice
   rate's denominator must hold the conforming form too (line joins read "not practice" only because one-line
   signatures were left out), and check one-author concentration before reading a group's rate.
-
+- **A matching's inputs are kept, in the repository, and its numbers carry their identity
+  (2026-10-22).** Matcher inputs used to be written to `table_scratch/`, outside the repository, so
+  the bytes a matcher judged were not in the record; the filing-contract seal's 72 input files
+  survived there by luck, and a rebuilt plan reproduced them byte for byte. `cli probe match-plan`
+  seals them into the measurement directory, `cli match` runs the registered matcher
+  (`lean_pr_review_ask_matching`, `ask-match/2-task`) or `cli probe match-import` stores a
+  hand-launched matching's `matches.json` against the plan's expected cells. Never a probe-local
+  matcher, rubric copy or unblinding script; `2-task` is not declared equal to `1-session` until
+  calibrated on aligned examples.

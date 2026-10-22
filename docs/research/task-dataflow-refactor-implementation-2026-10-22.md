@@ -93,8 +93,51 @@ Departures and flags:
    `cli probe seal|match-inputs|unblind` call the shared implementation and remain for the historical
    shell chains, listed below as a remaining adoption gap.
 
-### Remaining adoption gaps (to be filled in as A1 lands)
+### Built
 
-- The historical shell chain (`run_matching.sh` and its helpers) keeps working through the old CLI
-  verbs; new probes use `cli match`. Owner: whoever writes the next matched probe. Completion: no
-  script under `results/` written after this branch calls `probe match-inputs`.
+| Commit | What |
+|---|---|
+| `a644d4d2` | The instrument (`judge/ask_matching.py`): v1 identified by its files' digests, v2's text with v1's judgment rules byte for byte, projection, seal, verdict validation; the evaluation records in `schema/scoring.py` |
+| `2aec9b04` | The registered Task `lean_pr_review_ask_matching` |
+| `e6de27f3` | The lifecycle (`analysis/matching.py`): plan, run, import, report; `cli probe match-plan`, `cli match`, `cli probe match-import`, `cli report match`; the route config |
+| (this commit) | The judge's report carries the same identity; `report conditions` names each repetition's; `cli report trace` for both instruments; the matcher's stage-ledger row; the reporting rule in `CLAUDE.md` |
+
+Acceptance, checked without calling a model:
+
+- **A row identifies its subject, channel, protocol, population, seal and repetitions:** the
+  `measurement` block of `report match` and of `semantic_report.json`, and the `measurements` row of
+  `report conditions`.
+- **One reader traces it to exact bytes:** `cli report trace`, on a historical matching cell (label,
+  shown findings and their digest, both replicates' verdicts and files, the session's original
+  findings) and on a real judged obligation (its pair, verdict, three issue votes, the finding and the
+  judge task's directory).
+- **Shared execution, sealing and reporting:** the matcher runs through `TaskOrchestrator` with its
+  replicates as samples, its plan is sealed before running, its source runs' ledgers get a row as the
+  judge's do, and both instruments' reports carry one identity record. They keep their own verdict
+  schemas, as the design allows.
+- **No silent change to past numbers:** the post-cutoff seal and the filing-contract dev seal,
+  rebuilt as `1-session` plans and their committed `matches.json` imported, reproduce their committed
+  readings on every field; the filing-contract plan's 72 input files equal the ones its matchers
+  judged, byte for byte.
+
+### Remaining adoption gaps
+
+Named here, each with what completes it, rather than dropped:
+
+1. **The historical shell chain** (`one-reviewer-table-2026-10-10/run_matching.sh`,
+   `conventions-ceiling-2026-10-04/run_claude_batch.sh` and helpers) still runs through `probe seal`,
+   `probe match-inputs` and `probe unblind`, which now call the shared implementation. Complete when no
+   script written after this branch calls `probe match-inputs`; then the verb goes.
+2. **`demonstrated-change`'s `compiled-unfiled-2026-10-18/match.py`** builds matcher folders by hand.
+   Its findings are a `findings_file` source and its asks are `--ask-packets`; it migrates when that
+   branch merges. Owner: that thread.
+3. **The reconstruction branch's sketch matcher** (`sketch_matcher_rubric.md`, on `review-reconstruction`)
+   is a third instrument, unregistered here because its code is not on `develop`. It is registered or
+   retired when that branch merges.
+4. **Calibration of `2-task` against `1-session`** on aligned saved examples (questions, partials,
+   target mismatches) is user-run: it calls the matcher model. Until then a `2-task` number is not
+   compared with a `1-session` number.
+5. **Judge audits written before this branch** carry no identity; `report conditions` and `report trace`
+   say "unrecorded" for them. Re-judging is not required: their meaning is unchanged.
+6. **Choosing the primary instrument per objective** (design §11) is the maintainer's decision; the
+   tooling now lets either be named, run and reported, and refuses neither.

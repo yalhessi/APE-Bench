@@ -128,6 +128,18 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 
 ## Reporting results
 
+- **Every number names its measurement.** Two instruments are live and they answer different
+  questions: the registered judge (`semantic-judge/<JUDGE_VERSION>`: one finding against one atomic
+  gold obligation, hits out of the denominator) and the raw-ask matcher (`ask-match/<version>`: a
+  maintainer's ask against all of a reviewer's findings, reach as a fraction of asks, comparable only
+  within one seal). Quote a number with its instrument and version, reference set, seal, subjects'
+  output channel (submitted, finalized, published), denominator and replicates -- the report's
+  `measurement` block holds all of them (`report match`, the judge's `semantic_report.json`, the
+  `measurements` row of `report conditions`). Never pool or subtract numbers from two instruments or
+  two seals. A matching is planned, run or imported, and read through `analysis/matching.py`
+  (`cli probe match-plan`, `cli match`, `cli probe match-import`, `cli report match`); `cli report
+  trace` follows any one number back to its bytes. (2026-10-22: the user could not tell which results
+  were being reported or how two reports compared.)
 - Report at the altitude the evidence supports. A negative result means *the designs tried so far*
   did not work; enumerate the untried designs before concluding anything, and mark findings
   provisional until replicated. (The user has corrected over-claimed negatives three times.)
