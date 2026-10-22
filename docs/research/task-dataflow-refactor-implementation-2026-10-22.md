@@ -256,14 +256,14 @@ established it; user-run). A row says the strongest that applies.
 | ... and a check of another patch | **not built** (gap 10) | lands with the demonstrated-change branch's construction artifacts |
 | Interrupted publication recovers a consistent binding or stays visibly incomplete; conflicting publications are not silently chosen | offline-verified | `e90b51ef`; review finding 4 (a previous outcome blocked a resumed sample's publication) fixed in `cbb1a9bc` |
 | The same sealed cases and recorded judgments give the same report after the refactor; changed semantics get a different protocol | offline-verified, and integrated for three seals | post-cutoff, filing-contract dev and the reconstruction joint seal reproduce their committed readings; `ask-match/2-task` is its own version, **not calibrated** |
-| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | built; integrated for the reviewer link | `cli run` for both; the acquisition link is integrated on saved data (`extract_r1`), not yet run as tasks |
+| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | built; integrated for the reviewer link | `cli run` for both; the acquisition link is integrated on saved data (`extract_r1`) and run as tasks once on GPT-6 Luna (`extract_r1_luna`, 8 of 8) |
 | A program changes a component and its configuration without editing the common runner's condition branches | offline-verified | `test_sessions.py`: replacing the extractor touches nothing downstream |
 | A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | integrated | `cli report trace` on the joint seal reaches a Sonnet subject's run, route, sealed-input status and stored first message; `report inputs` |
 | Editing one prompt or context byte changes the request or refuses resume; an old run still shows its original bytes and tool interface | offline-verified | slice A2 |
 | Comparing saved runs shows differing channels, protocols, populations, seals and routes, refuses unsupported pooling, permits declared contrasts | offline-verified; integrated across the joint seal's subjects | `cli report compare`; subjects whose run plans are on another branch are named as without a plan, not guessed |
 | The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | offline-verified | slice B's fixtures; the demonstrated-change branch itself has not been migrated |
 | Handoff writes are bounded; overhead measured on realistic outputs before broad adoption | offline-verified | slice C's table |
-| Execution provenance identifies what ran | offline-verified | review finding 3: a run is bound to its route; a resume on another route is refused before any cached observation is read (`58ffe5bc`) |
+| Execution provenance identifies what ran | offline-verified | review finding 3: a run is bound to its route; a resume on another route is refused before any cached observation is read (`58ffe5bc`); on the live Luna runs every observation carries its executor, which `report compare` now reads (`6ddb81b3`) |
 
 10. **A technical check bound to the exact patch across tasks.** Completes with the
     demonstrated-change design's construction artifacts: a check names the patch digest, imports and
@@ -273,9 +273,10 @@ established it; user-run). A row says the strongest that applies.
     `results.task_results` (`_responses_from_results` and siblings) and the probe readers still read
     results their own way. Completes when `report conditions` and the run readers take their rows
     from `sample_products`; owner: the next change to those readers.
-12. **The reconstruction chain's sessions as tasks.** Imported, not re-run. Completes when a
-    session plan is run through `cli session --execute` on the subscription route and its outputs
-    are compared with the imported ones; user-run.
+12. **The reconstruction chain's sessions as tasks.** Run once as tasks, on GPT-6 Luna through ELM
+    (`extract_r1_luna`, `f1c6f692`): 8 of 8 sessions handed in both outputs. Completes when the plan
+    is run through `cli session --execute` on the subscription route, where the imported extractions
+    came from, and the two producers' outputs are compared; user-run.
 
 Retirement, as the design requires it with an owner and a completion point: `probe seal`,
 `probe match-inputs` and `probe unblind` go when no script under `results/` written after this
@@ -338,6 +339,47 @@ interaction with an earlier record. All are on this branch and reversible.
    `match-import`, `session-plan`, `session-import`; `report match`, `trace`, `inputs`, `compare`.
    `probe seal`, `match-inputs` and `unblind` remain for the historical shell chain (gap 1).
 
+## First live runs, on GPT-6 Luna (2026-10-22)
+
+The user chose a cheap model for the first live tests: not the self-hosted DeepSeek (slow to start),
+and GPT-6 Luna over gpt-5-mini. `elm_gpt_6_luna` came from `review-reconstruction` as two
+cherry-picks with `-x` (`819acde3` from 033765c7, `178bafc2` from 8b918cce). Configs:
+`configs/match/ask_match_elm_luna.yaml` and `configs/session/packet_session_elm_luna.yaml`, ape_agent at
+effort high, both halves of the per-session ceiling.
+
+| Run | What | Outcome | Billed |
+|---|---|---|---|
+| `joint_dev_v2_luna` | the joint dev seal as `ask-match/2-task`, one PR per matcher, 2 replicates: 6 sessions | 6 of 6 submitted; 154 of 154 cells a replicate; not forensic | USD 0.0253 |
+| `extract_r1_luna` | the eight extractor sessions as `packet_session` tasks | 8 of 8 handed in both outputs; 98 tool calls, all answered | USD 0.1432 |
+
+What they established, beyond the offline checks:
+- **The task paths complete on a live model.** Both submissions validate at the far end. Two matcher
+  sessions were refused once by `verdict_problems` for finding indices that do not exist (R2 on
+  33066 has 3 findings; the model named 7 and 11), then corrected. The refusal path works live.
+- **Producers stay apart.** The Luna verdicts and outputs sit beside the imported Opus ones, under
+  `task-joint_dev_v2_luna` and `task-extract_r1_luna`. `report match`, `report trace` and
+  `report compare` read them without a per-study reader.
+- **Cross-route agreement is no lower than within-route.** Over 154 cells, three-valued / reached-or-not:
+  Opus replicates 149 / 150, Luna replicates 145 / 149, Opus against Luna 143-151 / 146-153 over the four
+  pairs. This is **not** the calibration of 2-task against 1-session: the model, effort and scaffold
+  differ as well as the version and rubric.
+
+Three defects the live runs found, which no offline test had reached, each fixed with a test:
+1. **An ape_agent session could not open its own folder** (`9d9e593a`). The brief gave the
+   folder's absolute path, and APE's file tools refuse every absolute path. The old test asserted the
+   absolute path under `ApeAgentConfig`, so it pinned the defect. `{dir}` now becomes `scratch/packet`
+   on ape_agent; the new test opens the brief's folder with the real `file_read`.
+2. **A matching wrote a ledger into a folder that is not a recorded run** (`6ddb81b3`). A worktree
+   links each run's untracked arm pool, so `probe_dev_opus55_contract2_claude_sub_rep3/` existed with
+   only that link, and the matching created a lone `stages.jsonl` there. Runs recorded on another
+   branch were skipped in silence. Rows now go only where the run's `findings.jsonl` is recorded, and
+   every skipped run is named in a warning.
+3. **`report compare` did not say who ran the matchers** (`6ddb81b3`). Opus at xhigh on Claude Code
+   against Luna at high on ape_agent showed only the version and rubric. `executor_differences` now
+   reads the executors from the observations, and a plan matched by two executors stays side by side
+   unless `--contrast executor` declares the comparison a calibration. `executor_of` also read effort
+   only from Claude Code's field, so an ape_agent binding would have said `unknown` (`9d9e593a`).
+
 ## Before merging
 
 - Commit the design documents (`task-dataflow-refactor-design`, the systems reading, the adversarial
@@ -346,5 +388,8 @@ interaction with an earlier record. All are on this branch and reversible.
 - Read `.claude/worktrees/dataflow-refactor` against the in-flight branches mapped at the start:
   `review-reconstruction` adds `context_with_sections` and a cap fix beside code this branch touches
   only in `probes.py`'s matcher section; `demonstrated-change` adds a design (gaps 2 and 10).
-- Nothing on this branch called a model. The first paid uses -- a `cli match` or `cli session` run on
-  the subscription route, and the v2-against-v1 calibration -- are the user's call.
+- Two live runs on GPT-6 Luna through ELM are recorded above, USD 0.17 billed. The runs on the
+  subscription route and the v2-against-v1 calibration on the original route remain the user's call.
+- `review-reconstruction`'s `033765c7` and `8b918cce` are on this branch as cherry-picks. Their
+  changes are identical except in `.claude/rules/mathlib-review.md`, where this branch took only
+  8b918cce's new bullet. Expect a conflict there when both merge; keep both sides' bullets.
