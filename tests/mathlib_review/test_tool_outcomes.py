@@ -104,7 +104,8 @@ def test_every_attempt_is_read_and_a_leads_nested_arms_with_it(tmp_path, monkeyp
 
     assert out["attempts"] == 3
     assert out["tools"]["delegate"] == {"calls": 2, "answered": 1, "negative": 0, "refused": 0,
-                                        "error": 1, "env": 0}
+                                        "error": 1, "env": 0, "missing": 0}
+    assert out["attempts_without_transcript"] == 0
     assert out["tools"]["declaration_search"]["negative"] == 1
     assert out["why"]["delegate"]["error"] == [["x", 1]]
 
@@ -112,3 +113,33 @@ def test_every_attempt_is_read_and_a_leads_nested_arms_with_it(tmp_path, monkeyp
 def test_a_run_with_no_orchestrator_tree_says_where_the_transcripts_live(tmp_path):
     with pytest.raises(SystemExit, match="gitignored"):
         T.tool_outcomes("absent", ape_root=tmp_path)
+
+
+def test_a_call_with_no_recorded_result_is_missing_never_answered(tmp_path):
+    """A session cut off after a `lean_verify_edit` call: the transcript has the call and no
+    result. It paired with empty text and `is_error=False`, which classified as answered, so an
+    interrupted check read as one that ran."""
+
+    attempt = tmp_path / "a"
+    _write_jsonl(attempt / "ape_agent_session_1__z.jsonl", [
+        {"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "id": "c0", "name": "lean_verify_edit", "input": {}},
+            {"type": "tool_use", "id": "c1", "name": "file_read", "input": {}}]}},
+        {"type": "user", "message": {"content": [
+            {"type": "tool_result", "tool_use_id": "c1", "result_content": "{}"}]}},
+    ])
+    calls = {c.name: c for c in T.tool_calls(attempt)}
+    assert calls["lean_verify_edit"].has_result is False
+    assert T.classify("lean_verify_edit", calls["lean_verify_edit"].text, False,
+                      calls["lean_verify_edit"].has_result)[0] == "missing"
+    assert T.classify("file_read", calls["file_read"].text, False)[0] == "answered"
+
+
+def test_an_attempt_with_no_transcript_is_counted(tmp_path):
+    root = tmp_path / "runs" / "r"
+    (with_one,) = _task(root / "tasks", "t1", attempts=1)
+    _task(root / "tasks", "t2", attempts=1)          # its directory exists, no transcript
+    _ape_agent(with_one, [("file_read", "{}")])
+    out = T.tool_outcomes("r", ape_root=tmp_path / "runs")
+    assert out["attempts"] == 2
+    assert out["attempts_without_transcript"] == 1
