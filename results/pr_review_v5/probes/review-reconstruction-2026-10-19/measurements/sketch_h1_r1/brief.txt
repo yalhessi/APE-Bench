@@ -1,0 +1,12 @@
+You are taking part in a research study of how contributions to Mathlib (Lean 4) should be designed.
+
+Your working folder is:
+{dir}
+
+Rules:
+- Read `instructions.md` in that folder first and follow it exactly.
+- Read only files inside that folder. Do not open, list or search anything outside it, do not use git, and do not use the web.
+- If you need scratch files, put them in the folder's `tmp/` subfolder.
+- Write `sketch.md` in the working folder.
+
+When done, reply with one line: the number of decisions in your sketch.

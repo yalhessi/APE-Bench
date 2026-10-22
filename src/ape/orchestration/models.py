@@ -90,6 +90,11 @@ class Attempt(BaseModel):
     #: Tokens this attempt's own conversation processed. `cost`/`cached_cost` have always been
     #: here; the token count was reachable only by reloading the result.
     tokens: int = 0
+    #: False when the attempt ran and its usage never came back -- it raised, or was cancelled
+    #: mid-run. `cost`, `cached_cost` and `tokens` are then a lower bound, not its spend.
+    #: True by default, so attempt records written before 2026-10-22 load; for those, an
+    #: exception attempt reads as known at $0, which is how they were booked.
+    usage_known: bool = True
 
 
 class SampleRequeue(BaseModel):
@@ -464,6 +469,8 @@ class AttemptOutcome(BaseModel):
     path: Optional[str] = None
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
+    #: See `Attempt.usage_known`.
+    usage_known: bool = True
 
 
 class SampleOutcome(BaseModel):
@@ -606,6 +613,9 @@ class TaskOutcome(BaseModel):
     usage: UsageBreakdown = Field(default_factory=UsageBreakdown)
     turns: int = 0
     wall_seconds: float = 0.0
+    #: False when any attempt's usage is unknown (`Attempt.usage_known`): the costs and tokens
+    #: above are then a lower bound.
+    usage_known: bool = True
 
     @classmethod
     def from_samples(
@@ -634,7 +644,12 @@ class TaskOutcome(BaseModel):
                     nominal_cost=float(attempt.cost),
                     tokens=int(getattr(attempt, "tokens", 0) or 0),
                     turns=attempt.turns,
-                    error=getattr(attempt, "error", None),
+                    # `Attempt` calls it `error_message`. Read as `getattr(attempt, "error")`
+                    # until 2026-10-22, so every attempt error in every `task_outcome.json`
+                    # was null -- and with the synthetic failure result gone, the outcome is
+                    # where a failed task's account of itself lives.
+                    error=attempt.error_message,
+                    usage_known=attempt.usage_known,
                     path=str(attempt.path) if getattr(attempt, "path", None) else None,
                     started_at=attempt.started_at,
                     completed_at=attempt.completed_at,
@@ -689,7 +704,30 @@ class TaskOutcome(BaseModel):
                 tokens=sum(item.tokens for item in sample_outcomes)),
             turns=sum(a.turns for item in sample_outcomes for a in item.attempts),
             wall_seconds=wall,
+            usage_known=all(a.usage_known for item in sample_outcomes for a in item.attempts),
         )
+
+
+def outcome_failure_summary(outcome: "TaskOutcome") -> Optional[str]:
+    """One sentence for a task that produced no legal submission, read from its outcome.
+
+    The status of each sample and the last error any attempt recorded. This is what the worker's
+    synthetic `All samples failed: [...]` result used to carry, before 2026-10-22, and now comes
+    from the execution record rather than from a fake result.
+    """
+
+    if outcome.has_result:
+        return None
+    statuses = [sample.status.value for sample in outcome.samples]
+    errors = [attempt.error for sample in outcome.samples for attempt in sample.attempts
+              if attempt.error]
+    parts = [f"{outcome.execution_status.value}: samples {statuses}"]
+    if outcome.reason and outcome.reason not in parts[0]:
+        parts.append(outcome.reason)
+    if errors:
+        last = errors[-1].strip().splitlines()[0][:300]
+        parts.append(f"last error: {last}")
+    return "; ".join(parts)
 
 
 class ChildRun(BaseModel):
@@ -720,12 +758,18 @@ class ChildRun(BaseModel):
     #: for the same reason `Attempt.result` is: `ape.tasks.base` imports this module, so naming
     #: `BaseTaskResult` here would be an import cycle.
     result: Optional[Any] = None
-    #: What the failure said, when a result was written and it was not a success. The worker
-    #: does write one for a task whose samples all failed -- a bare `BaseTaskResult` carrying
-    #: `All samples failed: [...]` -- and that sentence is the most specific thing anyone knows
-    #: about the child. It is kept here rather than in `result`, which stays reserved for a
-    #: legal submission so `succeeded` cannot quietly become "something was written".
+    #: Why no legal submission came back: each sample's status and the last attempt error,
+    #: from the outcome (`outcome_failure_summary`). For runs before 2026-10-22, whose worker
+    #: synthesised a bare `BaseTaskResult` carrying `All samples failed: [...]`, that sentence.
+    #: Never in `result`, which stays reserved for a legal submission so `succeeded` cannot
+    #: quietly become "something was written".
     error: Optional[str] = None
+
+    @property
+    def failure_summary(self) -> Optional[str]:
+        """The outcome's own account of why no legal submission came back, or None."""
+
+        return outcome_failure_summary(self.outcome)
 
     @property
     def succeeded(self) -> bool:
@@ -865,3 +909,23 @@ class OrchestratorResults(BaseModel):
     successful_samples: int
     total_cost: float
     total_cached_cost: float
+
+    #: From every scheduled task's `task_outcome.json`, not from `task_results`. A task whose
+    #: samples all failed has no result (2026-10-22), so `completed_tasks` -- tasks with a
+    #: result -- no longer counts it; these do. `outcome_usage` is the self-only spend and
+    #: processed tokens of every scheduled task, the failed and paused included, which
+    #: `total_token_usage` (a sum over results) has never seen
+    #: (`docs/todo/framework-defects-2026-09.md` §4: 27,593 tokens reported against 385,684).
+    failed_tasks: int = 0
+    paused_tasks: int = 0
+    tasks_without_outcome: int = 0
+    #: Tasks with an attempt whose usage never came back; `outcome_usage` is a lower bound
+    #: whenever this is not 0.
+    tasks_with_unknown_usage: int = 0
+    #: Tasks whose publication a previous process left unfinished and this run completed:
+    #: a result the log did not hold, or samples that ended without being aggregated.
+    recovered_results: List[str] = Field(default_factory=list)
+    #: Tasks whose log held two different results. The task's own `task_result.json` is read;
+    #: these are listed so the choice is never silent.
+    conflicting_results: List[str] = Field(default_factory=list)
+    outcome_usage: UsageBreakdown = Field(default_factory=UsageBreakdown)

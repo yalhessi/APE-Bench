@@ -174,21 +174,43 @@ from .runs import (  # noqa: F401
     PairManifest,
     PairingTier,
     RunManifest,
+    SessionOutput,
+    SessionPacket,
+    SessionPlan,
     StageRecord,
     RunPlan,
 )
 
 from .scoring import (  # noqa: F401
     AdjudicationLabel,
+    BlindAsk,
+    BlindFinding,
+    BlindPacket,
+    MatchBatch,
+    MatchVerdict,
+    MatchingPlan,
+    MeasurementIdentity,
     SemanticMatch,
     SemanticPair,
     SilenceLabel,
+    SubjectBinding,
     silence_key,
 )
 
 
 __all__ = [
     "ARMS",
+    "BlindAsk",
+    "BlindFinding",
+    "BlindPacket",
+    "MatchBatch",
+    "MatchVerdict",
+    "MatchingPlan",
+    "MeasurementIdentity",
+    "SubjectBinding",
+    "SessionOutput",
+    "SessionPacket",
+    "SessionPlan",
     "AdjudicationBundle",
     "AdjudicationConsensus",
     "AdjudicationVerificationArtifact",

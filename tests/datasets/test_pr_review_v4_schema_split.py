@@ -43,12 +43,16 @@ def test_the_facade_still_resolves_every_name():
     fails here. It moves only when a record is deliberately added: 129 at the split, 130 with
     `StageRecord` (2026-09-21), which the stage ledger writes, and 133 with `SilenceLabel` and
     `silence_key` -- one record and the single spelling of its key, which both the store and
-    the report call rather than formatting it twice.
+    the report call rather than formatting it twice. 141 with the eight evaluation records of
+    2026-10-22 (`MeasurementIdentity`, `SubjectBinding`, the matcher's plan, packet and verdict):
+    a number now carries what it measures, and the matcher's inputs are retained. 144 with the
+    three session records (`SessionPlan`, `SessionPacket`, `SessionOutput`): a session's folder is
+    kept with what it wrote.
     """
 
     from src.mathlib_review import schema
 
-    assert len(schema.__all__) == 133
+    assert len(schema.__all__) == 144
     for name in schema.__all__:
         assert hasattr(schema, name), name
 
@@ -122,8 +126,6 @@ def test_every_class_landed_in_exactly_one_module():
                 assert node.name not in seen, (
                     f"{node.name} defined in both {seen.get(node.name)} and {module}")
                 seen[node.name] = module
-    # 106 at the split; 111 with what 2026-09-21 added -- `StageRecord`, the three pipeline
-    # records for a declared experiment, and `AdjudicationLabel`; 112 with `SilenceLabel`,
-    # the same record on the other side of the ledger (why an arm said nothing where gold
-    # says a maintainer asked).
-    assert len(seen) == 112
+    # The exact class count that stood here (112) was a pure pin with no lesson behind it
+    # (`docs/research/codebase-redesign-2026-10.md` §10), dropped in the commit that would
+    # otherwise have had to edit it: the duplicate check above is the property it stood for.

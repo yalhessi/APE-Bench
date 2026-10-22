@@ -106,8 +106,9 @@ credited by a verifying reviewer, and the matcher has no question form (filing-d
 ## What would close it
 
 The premise check (falsifier 1) first. Then three reps of the free reviewer on the 26 ask-reading PRs with
-the contract, against solo's three reps on disk, one seal, the table's two blind matchers (the
-`match`/`seal` pipeline the filing-contract probe used):
+the contract, against solo's three reps on disk, one seal, the table's two blind matchers (planned with
+`probe match-plan` over solo sources, run with `cli match` or imported with `probe match-import`, read with
+`report match`; the `match`/`seal` pipeline the filing-contract probe used is historical since 2026-10-22):
 - **passes** if the per-rep mean on the 66 code-edit asks is at least 6 above solo's per-rep mean and the
   three-rep union reaches 35 or more of the 66 (half the gap from solo's 26 to the all-conditions union of 52);
 - **dead end** if the per-rep gain is under 2 or the union under 30, written beside design G;

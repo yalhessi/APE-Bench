@@ -31,6 +31,24 @@ should stop being settable and both callers should pass `task_config_overrides`.
 what a judge run does differently — the defaults may be what everyone has been measuring, in
 which case the fix moves numbers and needs a new run name.
 
+**Closed 2026-10-22** (branch `dataflow-refactor`, Slice 0 of
+`docs/research/task-dataflow-refactor-design-2026-10-22.md`). `ape.tasks.base.resolve_task_config`
+is the one resolution: class defaults, then a concrete `config.task_config` of the task's own class,
+then the record's overrides, then the invocation's. A key that is not a field of the task's config,
+or a concrete config of another task's class, is refused (`TaskConfigError`) instead of dropped. The
+scaffold config now serializes a concrete task config with its class, so it survives the worker
+boundary (pydantic dumps a field by its annotation, which had dropped every subclass field
+silently). Nested children inherit no task settings: `run_subtasks(task_config_overrides=...)` is
+the whole of what they get, and both judges pass `judge_mode` that way.
+What moved: the two nested judges now run in the mode their caller set. The Mathlib review judge is
+not one of them (it is a top-level task with its own config). In `lean_semantic_evaluation` the
+caller's default and the judge's default are both `with_ground_truth`, so only a run that set another
+mode changes. The reviewed-proof-engineering gate does change: its pilot sets `generated_only`, and the
+gate now runs that way (`docs/todo/thesis-pilot-integrity.md`, defects 1-2). v5 lead arms no longer
+receive the lead's run-level settings; on all 17 lead configs on disk the setting they kept was a
+tool list equal to their own default, so no arm on disk receives anything different.
+Tests: `tests/ape/test_task_config_resolution.py`, each asserted on the task the worker rebuilds.
+
 ## 2. `theorem_proving` cannot construct its own result
 
 `tasks/lean_tasks/formal_math/theorem_proving/task.py` calls `create_result(...)` without
@@ -109,6 +127,27 @@ reads `paused: 0` for a job that paused at $0.18 and lost its answer.
 **What would close it:** either stop writing the synthetic result (and let `task_outcome.json`
 carry the failure, which is what it exists for), or amend the rule and the docstring to say a
 failure result is written deliberately. Both are readable; the current state is not.
+
+**Closed 2026-10-22** (branch `dataflow-refactor`, Slice 0). The worker writes no result for a task
+whose samples all failed; `task_outcome.json` records it FAILED with every attempt's status, error and
+spend, and nothing is appended to `aggregated_results.jsonl`. `ChildRun.error` reads the outcome
+(`outcome_failure_summary`), or the old sentence on runs that still hold a synthetic file.
+`OrchestratorResults` now carries `failed_tasks`, `paused_tasks`, `tasks_with_unknown_usage` and
+`outcome_usage` from every scheduled task's outcome, so a failed task no longer vanishes from the batch
+totals; `completed_tasks` counts tasks with a result.
+Two more defects on the same path, found while fixing it:
+- **No attempt error ever survived.** `TaskOutcome.from_samples` read `attempt.error`, a field `Attempt`
+  does not have (it is `error_message`), and the worker overwrote a raised attempt's traceback with None
+  two steps after writing it. Measured on `.ape/runs`: 0 non-null errors in 11,501 attempts across 6,135
+  outcomes, 121 of them failed; 0 of 5,000 sample files carry an `error_message`.
+- **A raised attempt was booked at $0.** Its usage never came back, and the worker zeroed the attempt.
+  It now keeps what the attempt had recorded as a lower bound and sets `usage_known: false`, carried to
+  `AttemptOutcome`, `TaskOutcome` and the batch count. Records written before keep reading as known.
+Still open, a named gap rather than a silent narrowing: `OrchestratorResults.total_token_usage` remains
+a sum over results, and `judgment/task.py` and `review_gate.py` still bubble it as their parents'
+`nested_token_usage`, so a failed or paused judge's spend is missing from its parent's cost. The fix is
+to bubble `subtasks.nested_usage(runs)` as the other families do; it changes the proof-engineering
+family's token accounting (cost only, by `nested_usage`'s design), so it is its own change.
 
 ## 5. A pipeline's rows do not say they came from a pipeline
 

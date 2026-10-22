@@ -1,0 +1,54 @@
+{
+  "bound": {
+    "pr32875": {
+      "decision_context.md": {
+        "output": "decision_context.md",
+        "packet_id": "pr32875",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/decision",
+        "plan_id": "decision",
+        "plan_sha256": "9388bacea8aabc75ef968caf89cdd65f126b754b0fa3c359ce1f3ca8e38883ce",
+        "producer": "import-decision",
+        "replicate": "1",
+        "sha256": "f8105fec025cfb8ecaa3a2cc83cbc26f7553f2e8284b750fd046744ecfec3df7"
+      },
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr32875_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_repair",
+        "plan_id": "extract_repair",
+        "plan_sha256": "60595ae468fd0ea111615e7063e8c2311bd75cf10caf2050afec3e4922e94e47",
+        "producer": "import-extract_repair",
+        "replicate": "1",
+        "sha256": "8010bda728f588b80cb919484e8ba2b44bad293dba623e1f94114093b4f775e4"
+      }
+    },
+    "pr33304": {
+      "decision_context.md": {
+        "output": "decision_context.md",
+        "packet_id": "pr33304_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/decision",
+        "plan_id": "decision",
+        "plan_sha256": "9388bacea8aabc75ef968caf89cdd65f126b754b0fa3c359ce1f3ca8e38883ce",
+        "producer": "import-decision",
+        "replicate": "1",
+        "sha256": "ec9ffbda588c07d5720d48d80fd8efb82aa9a5b456d21f2d61c664ff07404aed"
+      },
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33304_r3",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_repair",
+        "plan_id": "extract_repair",
+        "plan_sha256": "60595ae468fd0ea111615e7063e8c2311bd75cf10caf2050afec3e4922e94e47",
+        "producer": "import-extract_repair",
+        "replicate": "1",
+        "sha256": "41904fd17d2eb85a7032e42ecdadc4609cbc8e61dbe8b324a76b2e84f0769edc"
+      }
+    }
+  },
+  "created_at": "2026-10-22T13:11:16.444561+00:00",
+  "plan_id": "sketch_h1_repair",
+  "plan_sha256": "9b0e0283cc3f8497876dec448c371abc117aa8afe694cfdef0d6868d687723d1",
+  "schema_version": "input-lineage1",
+  "source_sha256": "d83684bad3397132085fc6711b8b83f4d32ff50c533b52f0c9f360aa56e53b5f",
+  "unmatched": {}
+}

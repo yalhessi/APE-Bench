@@ -17,10 +17,20 @@ Each call is classified by what its result says:
   reviewer spent a turn and learned nothing about the code;
 - `error`: the call never ran (malformed input, a tool that does not exist, a containment
   refusal, a parameter the installed CLI lacks);
-- `env`: the tool ran and could not answer (`environment_failure`, `timeout`, a missing store).
+- `env`: the tool ran and could not answer (`environment_failure`, `timeout`, a missing store);
+- `missing`: the transcript records the call and no result for it -- the session was cut off, or
+  the transcript is partial. Unknown, never `answered`: until 2026-10-22 such a call paired with an
+  empty text and `is_error=False`, which classified as answered, so an interrupted
+  `lean_verify_edit` read as a check that ran.
 
-`submit_findings` is counted apart: the Claude Code scaffold ends the session at submission, so
-the SDK records that one result as rejected whatever happened; `task_result.json` is its record.
+`attempts_without_transcript` counts attempts whose directory holds neither transcript format, so
+a reading says how much of the run it saw.
+
+Every task's submission tool is counted apart (`ape.tasks.base.submission_tools`): the Claude Code
+scaffold ends the session at submission, so the SDK records that one result as rejected ("The user
+doesn't want to proceed with this tool use") whatever happened, and the task's stored result is its
+record. Until 2026-10-22 only `submit_findings` was, so the first Claude Code smoke run of
+`packet_session` reported its `submit_outputs` as an error.
 
 Reads the orchestrator tree (`.ape/runs/<run>/`, gitignored) through `TaskStorage`, every sample
 and every attempt -- a failed attempt's calls are part of what the tools did -- and descends into
@@ -44,7 +54,7 @@ from src.mathlib_review.io import jsonl_rows
 #: `ape_agent` writes its session, never the cumulative per-turn files under `conversations/`.
 TRANSCRIPTS = ("claude_code_conversation_*.jsonl", "ape_agent_session_*.jsonl")
 
-CLASSES = ("answered", "negative", "refused", "error", "env")
+CLASSES = ("answered", "negative", "refused", "error", "env", "missing")
 NEGATIVE_OUTCOMES = {"compile_errors", "no_result"}
 REFUSED_OUTCOMES = {"invalid_request", "blocked"}
 ENV_OUTCOMES = {"environment_failure", "timeout"}
@@ -56,6 +66,8 @@ class ToolCall:
     input: Dict[str, Any]
     text: str
     is_error: bool
+    #: False when the transcript holds the call and no result for it.
+    has_result: bool = True
 
 
 def _result_text(block: Dict[str, Any]) -> str:
@@ -91,13 +103,18 @@ def tool_calls(attempt_dir: Path) -> Iterator[ToolCall]:
                         results[block["tool_use_id"]] = (_result_text(block),
                                                          bool(block.get("is_error")))
             for use_id, (name, tool_input) in uses.items():
-                text, is_error = results.get(use_id, ("", False))
+                if use_id not in results:
+                    yield ToolCall(name, tool_input, "", False, has_result=False)
+                    continue
+                text, is_error = results[use_id]
                 yield ToolCall(name, tool_input, text, is_error)
 
 
-def classify(name: str, text: str, is_error: bool) -> Tuple[str, str]:
-    """(class, detail) for one tool result. The rules of the 2026-10-01 probe, unchanged."""
+def classify(name: str, text: str, is_error: bool, has_result: bool = True) -> Tuple[str, str]:
+    """(class, detail) for one tool result. The rules of the 2026-10-01 probe, plus `missing`."""
 
+    if not has_result:
+        return "missing", "no result recorded"
     head = text[:400]
     if "<tool_use_error>" in head or is_error:
         if "No such tool available" in head:
@@ -176,13 +193,20 @@ def tool_outcomes(run_name: str, ape_root: Path = DEFAULT_APE_ROOT) -> Dict[str,
     attempts = asyncio.run(_attempt_dirs(root / "tasks", root))
     table: Dict[str, Counter] = defaultdict(Counter)
     details: Dict[Tuple[str, str], Counter] = defaultdict(Counter)
+    import ape.tasks  # noqa: F401 - registers every task, so every submission tool is known
+    from ape.tasks.base import submission_tools
+
+    submits = tuple(submission_tools())
     submissions: Counter = Counter()
+    without_transcript = 0
     for attempt in attempts:
+        if not any(any(Path(attempt).glob(pattern)) for pattern in TRANSCRIPTS):
+            without_transcript += 1
         for call in tool_calls(attempt):
-            if call.name.endswith("submit_findings"):
+            if call.name.endswith(submits):
                 submissions[call.name] += 1
                 continue
-            cls, detail = classify(call.name, call.text, call.is_error)
+            cls, detail = classify(call.name, call.text, call.is_error, call.has_result)
             table[call.name][cls] += 1
             if cls in ("refused", "error", "env") and detail:
                 details[(call.name, cls)][detail] += 1
@@ -193,5 +217,6 @@ def tool_outcomes(run_name: str, ape_root: Path = DEFAULT_APE_ROOT) -> Dict[str,
     why: Dict[str, Dict[str, List[List[Any]]]] = defaultdict(dict)
     for (name, cls), reasons in sorted(details.items()):
         why[name][cls] = [[reason, count] for reason, count in reasons.most_common(4)]
-    return {"run": run_name, "attempts": len(attempts), "tools": tools,
+    return {"run": run_name, "attempts": len(attempts),
+            "attempts_without_transcript": without_transcript, "tools": tools,
             "why": dict(why), "submissions": dict(submissions)}

@@ -368,3 +368,106 @@ class PipelinePlan(StrictModel):
     stages: Dict[str, Dict[str, Any]]
     git_commit: Optional[str] = None
     git_tree_state: Optional[Literal["clean", "dirty", "unknown"]] = None
+
+
+class SessionPacket(StrictModel):
+    """One folder a session works in: its files, exactly as the session will read them."""
+
+    packet_id: str
+    files: Dict[str, str]
+    files_sha256: str
+
+
+class SessionPlan(StrictModel):
+    """Model sessions over folders, sealed before any runs (`analysis/sessions.py`).
+
+    Holds the brief, every packet's files and the declared outputs, so the bytes a session read are
+    in the repository with what it wrote, not in a scratch directory with only their digests kept.
+    """
+
+    schema_version: Literal["session-plan1"] = "session-plan1"
+    plan_id: str
+    brief: str
+    brief_sha256: str
+    #: [{"name", "kind", "required"}], as `ape.tasks.packet_session.OutputSpec` takes them.
+    outputs: List[Dict[str, Any]]
+    packets: List[SessionPacket]
+    replicates: int
+    created_at: str
+    source_sha256: str
+
+
+class SessionOutput(StrictModel):
+    """What one session left, with where its bytes came from."""
+
+    schema_version: Literal["session-output1"] = "session-output1"
+    plan_id: str
+    packet_id: str
+    #: The execution or import this observation came from (`task-<run>` or `import-<name>`); its
+    #: stored bytes live under it, so two executions of one plan never overwrite each other
+    #: (implementation review, 2026-10-22, finding 1).
+    producer: str
+    replicate: str
+    origin: Literal["task", "external_import"]
+    locator: Dict[str, str]
+    executor: Dict[str, str]
+    #: {name: {"sha256", "path"}}: the stored copy beside the plan.
+    outputs: Dict[str, Dict[str, str]]
+
+
+class ObservationRef(StrictModel):
+    """One stored session output as a later step consumed it: enough to read it again and to refuse
+    it when anything about it changed (`analysis/sessions.read_observation`)."""
+
+    plan_id: str
+    #: The measurement directory holding the plan, relative to the repository root.
+    plan_dir: str
+    #: The plan's `source_sha256` when it was consumed: a re-sealed plan is another plan.
+    plan_sha256: str
+    producer: str
+    packet_id: str
+    replicate: str
+    output: str
+    sha256: str
+
+
+class InputLineage(StrictModel):
+    """Where a session plan's input files came from: per packet, each named input taken from, or
+    checked against, an upstream session's stored output (`sessions.plan_sessions(inputs_from=...)`).
+
+    Written beside `session_plan.json`, not inside it, so plans sealed before lineage existed keep
+    their digests. An input named for binding that no upstream observation holds is listed in
+    `unmatched` with the reason, never dropped: the reconstruction probe's 33304 decision packet read a
+    revised goal brief that no planned extraction produced.
+    """
+
+    schema_version: Literal["input-lineage1"] = "input-lineage1"
+    plan_id: str
+    plan_sha256: str
+    #: {packet_id: {input path: ObservationRef}}
+    bound: Dict[str, Dict[str, ObservationRef]]
+    #: {packet_id: {input path: reason}}
+    unmatched: Dict[str, Dict[str, str]]
+    created_at: str
+    source_sha256: str
+
+
+class ContextLineage(StrictModel):
+    """How a reviewer `context_file` was derived from session outputs (`sessions.derive_context`).
+
+    The file's bytes are a pure function of the base rows, the section titles and leads, and the
+    observation each section reads for each PR; the reviewer input resolver recomputes them before a
+    run reads the file and refuses it when an upstream output is missing or changed. Kept beside the
+    context file as `<file>.lineage.json`.
+    """
+
+    schema_version: Literal["context-lineage1"] = "context-lineage1"
+    context_sha256: str
+    base_path: str
+    base_sha256: str
+    #: [{"title", "lead"}], in the order they follow the base rows' own sections.
+    sections: List[Dict[str, str]]
+    #: {pr: [the observation each section reads, in section order]}
+    rows: Dict[str, List[ObservationRef]]
+    created_at: str
+    source_sha256: str

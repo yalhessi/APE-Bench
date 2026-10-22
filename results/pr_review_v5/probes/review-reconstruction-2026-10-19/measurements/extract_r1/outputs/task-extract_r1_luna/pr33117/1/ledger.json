@@ -1,0 +1,201 @@
+{
+  "pr": 33117,
+  "kinds": ["a new definition or structure", "new results"],
+  "choices": [
+    {
+      "id": "c1", "kind": "name", "where": "whole-domain meromorphy predicate",
+      "pr_choice": "The PR names the new predicate `Meromorphic`.",
+      "excerpt": "feat: introduce predicate `Meromorphic`", "source": "title", "status": "proposed",
+      "status_reason": "The goal requires a whole-domain meromorphy notion, not this particular name.",
+      "visibility": "hidden", "visibility_reason": "The brief describes the notion without giving the new name.",
+      "consequential": "yes", "consequence": "The name affects discoverability, consistency, and downstream references."
+    },
+    {
+      "id": "c2", "kind": "representation", "where": "whole-domain meromorphy predicate",
+      "pr_choice": "The PR encodes the global property as a predicate requiring the existing pointwise meromorphy property at every point.",
+      "excerpt": "def Meromorphic (f : 𝕜 → E) := ∀ x, MeromorphicAt f x", "source": "diff", "status": "proposed",
+      "status_reason": "The goal requires the mathematical whole-domain property, but not this encoding.",
+      "visibility": "hidden", "visibility_reason": "The brief states the mathematical meaning without specifying its encoding.",
+      "consequential": "yes", "consequence": "A different definition or alias could affect reducibility, rewriting, and compatibility."
+    },
+    {
+      "id": "c3", "kind": "documentation", "where": "documentation for the whole-domain predicate",
+      "pr_choice": "The PR adds a short docstring describing meromorphy on the full domain.",
+      "excerpt": "/-- Meromorphy of a function on all of 𝕜. -/", "source": "diff", "status": "proposed",
+      "status_reason": "A docstring is not necessary to state or establish the mathematical goal.",
+      "visibility": "hidden", "visibility_reason": "The brief does not reproduce the PR's documentation text.",
+      "consequential": "no", "consequence": ""
+    },
+    {
+      "id": "c4", "kind": "scope", "where": "whole-domain notion and `MeromorphicOn` on `Set.univ`",
+      "pr_choice": "The global property is characterized by the existing set-based property on the universal set.",
+      "excerpt": "lemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f  := by tauto",
+      "source": "diff", "status": "required",
+      "status_reason": "The brief requires the whole-domain notion to agree with meromorphy on the universal set.",
+      "visibility": "hidden", "visibility_reason": "The brief states the mathematical compatibility without naming or formally phrasing a theorem.",
+      "consequential": "yes", "consequence": "The relation determines whether the global and set-based notions can be used interchangeably."
+    },
+    {
+      "id": "c5", "kind": "name", "where": "compatibility result for `MeromorphicOn` on `Set.univ`",
+      "pr_choice": "The PR names the compatibility result `meromorphicOn_univ`.",
+      "excerpt": "lemma meromorphicOn_univ {f : 𝕜 → E} :", "source": "diff", "status": "proposed",
+      "status_reason": "The compatibility is required, but its name is not.",
+      "visibility": "hidden", "visibility_reason": "No new declaration name appears in the brief.",
+      "consequential": "yes", "consequence": "The name affects discoverability and downstream source references."
+    },
+    {
+      "id": "c6", "kind": "statement_form", "where": "compatibility result for `MeromorphicOn` on `Set.univ`",
+      "pr_choice": "The PR states compatibility as a two-way proposition.",
+      "excerpt": "MeromorphicOn f Set.univ ↔ Meromorphic f", "source": "diff", "status": "proposed",
+      "status_reason": "The brief requires agreement of the notions, not this formal statement shape.",
+      "visibility": "hidden", "visibility_reason": "The brief gives the compatibility in mathematical language only.",
+      "consequential": "yes", "consequence": "Formal shape affects rewriting, automation, and how users invoke the result."
+    },
+    {
+      "id": "c7", "kind": "registration", "where": "compatibility result for `MeromorphicOn` on `Set.univ`",
+      "pr_choice": "The PR registers the compatibility result for simplification.",
+      "excerpt": "@[simp]\nlemma meromorphicOn_univ", "source": "diff", "status": "proposed",
+      "status_reason": "The goal requires compatibility, not simplifier registration.",
+      "visibility": "hidden", "visibility_reason": "The brief omits attributes and automation choices.",
+      "consequential": "yes", "consequence": "Simplification behavior and expression normalization can change."
+    },
+    {
+      "id": "c8", "kind": "documentation", "where": "documentation for the compatibility result",
+      "pr_choice": "The PR adds a short docstring describing the equivalence between whole-domain and universal-set meromorphy.",
+      "excerpt": "/-- A function is meromorphic iff it is meromorphic on Set.univ. -/", "source": "diff", "status": "proposed",
+      "status_reason": "The mathematical compatibility does not require this wording or a docstring.",
+      "visibility": "hidden", "visibility_reason": "The brief does not reproduce the PR's documentation text.",
+      "consequential": "no", "consequence": ""
+    },
+    {
+      "id": "c9", "kind": "scope", "where": "closure under negation, addition, and subtraction",
+      "pr_choice": "The PR supplies global closure results for negation, addition, and subtraction, with the additive results applying to function-valued codomains.",
+      "excerpt": "lemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)",
+      "source": "diff", "status": "required",
+      "status_reason": "The brief expressly includes negation, addition, and subtraction closure.",
+      "visibility": "hidden", "visibility_reason": "The brief states mathematical operations and scope, not formal statements or names.",
+      "consequential": "yes", "consequence": "Operation and value-type scope determine which common constructions users can establish as meromorphic."
+    },
+    {
+      "id": "c10", "kind": "scope", "where": "multiplication, division, and power closure results",
+      "pr_choice": "The PR supplies scalar-valued closure under multiplication, division, natural powers, and integer powers.",
+      "excerpt": "lemma mul {f g : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f * g)",
+      "source": "diff", "status": "required",
+      "status_reason": "The brief expressly includes these scalar-valued operations and both natural and integer powers.",
+      "visibility": "hidden", "visibility_reason": "The brief gives mathematical operations without formal signatures.",
+      "consequential": "yes", "consequence": "The operation and value-type scope determines which expressions the API can handle."
+    },
+    {
+      "id": "c11", "kind": "scope", "where": "finite sum and finite product closure results",
+      "pr_choice": "The PR provides closure for finite sums of function-valued terms and finite products of scalar-valued terms.",
+      "excerpt": "theorem prod (h : ∀ σ, Meromorphic (F σ)) :\n    Meromorphic (∏ n ∈ s, F n) := fun x ↦ MeromorphicAt.prod (h · x)",
+      "source": "diff", "status": "required",
+      "status_reason": "The brief expressly includes finite sums and products.",
+      "visibility": "hidden", "visibility_reason": "The brief describes finite aggregation mathematically, without its formal indexing representation.",
+      "consequential": "yes", "consequence": "The scope and supported types determine which finite aggregations the API handles."
+    },
+    {
+      "id": "c12", "kind": "statement_form", "where": "finite sum and finite product closure results",
+      "pr_choice": "The PR states aggregate closure using nested finite-index notation and a family of functions.",
+      "excerpt": "theorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n)",
+      "source": "diff", "status": "proposed",
+      "status_reason": "Finite sum and product closure is required, but this particular statement form is not.",
+      "visibility": "hidden", "visibility_reason": "The brief does not specify binders or the formal aggregate statement shape.",
+      "consequential": "yes", "consequence": "A different statement form could affect application and compatibility with aggregation APIs."
+    },
+    {
+      "id": "c13", "kind": "scope", "where": "derivative closure results",
+      "pr_choice": "The PR provides closure under first and repeated derivatives for functions with complete codomain.",
+      "excerpt": "lemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n    Meromorphic (_root_.deriv^[n] f)",
+      "source": "diff", "status": "required",
+      "status_reason": "The brief expressly includes first and repeated derivatives and the completeness scope present in the inputs.",
+      "visibility": "hidden", "visibility_reason": "The brief states the mathematical condition without a typeclass binder or declaration names.",
+      "consequential": "yes", "consequence": "Completeness and derivative coverage determine where these results are usable."
+    },
+    {
+      "id": "c14", "kind": "name", "where": "primary global closure declarations",
+      "pr_choice": "The PR uses operation-based names including `neg`, `add`, `sub`, `mul`, `div`, `pow`, `zpow`, `sum`, `prod`, `deriv`, and `iterated_deriv`.",
+      "excerpt": "lemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg", "source": "diff", "status": "proposed",
+      "status_reason": "The mathematical closure results are required, but their names are not.",
+      "visibility": "hidden", "visibility_reason": "The brief withholds all new declaration names.",
+      "consequential": "yes", "consequence": "Names affect discoverability, consistency, and downstream references."
+    },
+    {
+      "id": "c15", "kind": "api_surface", "where": "function-expression variants of global closure results",
+      "pr_choice": "The PR adds parallel declarations for several operations using explicit pointwise function expressions, in addition to declarations using function-level operations.",
+      "excerpt": "lemma fun_neg (hf : Meromorphic f) : Meromorphic (fun x ↦ -f x ) := hf.neg", "source": "diff", "status": "proposed",
+      "status_reason": "The underlying closure facts are required, but this duplicated convenience surface is not.",
+      "visibility": "hidden", "visibility_reason": "The brief does not disclose the parallel declarations or their names.",
+      "consequential": "yes", "consequence": "The extra lemmas can ease theorem application and automation, at the cost of a larger API."
+    },
+    {
+      "id": "c16", "kind": "name", "where": "function-expression variants of global closure results",
+      "pr_choice": "The PR names the parallel variants with operation names prefixed by `fun_`.",
+      "excerpt": "lemma fun_neg (hf : Meromorphic f) :", "source": "diff", "status": "proposed",
+      "status_reason": "The convenience variants are optional, and their names are not required by the goal.",
+      "visibility": "hidden", "visibility_reason": "The brief gives none of the new declaration names.",
+      "consequential": "yes", "consequence": "Names affect discoverability and downstream source references."
+    },
+    {
+      "id": "c17", "kind": "statement_form", "where": "function-expression variants of closure results",
+      "pr_choice": "The PR uses pointwise lambdas for operation variants and applies finite aggregation pointwise in the corresponding variants.",
+      "excerpt": "theorem fun_sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (fun x ↦ ∑ n ∈ s, G n x)",
+      "source": "diff", "status": "proposed",
+      "status_reason": "The required mathematical facts do not prescribe lambda-shaped statements.",
+      "visibility": "hidden", "visibility_reason": "The brief omits formal statement shapes.",
+      "consequential": "yes", "consequence": "Lambda-shaped versions may match common goals more directly and affect rewriting and automation."
+    },
+    {
+      "id": "c18", "kind": "proof_route", "where": "pointwise global closure proofs",
+      "pr_choice": "The PR proves the global closure facts by applying existing pointwise meromorphy results at each point.",
+      "excerpt": "lemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg", "source": "diff", "status": "proposed",
+      "status_reason": "The closure results are required; this proof route is not.",
+      "visibility": "hidden", "visibility_reason": "The brief gives no proof strategy.",
+      "consequential": "no", "consequence": ""
+    },
+    {
+      "id": "c19", "kind": "proof_route", "where": "finite aggregation closure proofs and function-expression variants",
+      "pr_choice": "The PR invokes the existing pointwise finite aggregation results and derives pointwise function-expression variants from function-level results.",
+      "excerpt": "theorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)",
+      "source": "diff", "status": "proposed",
+      "status_reason": "The finite aggregation results are required; this proof route is not.",
+      "visibility": "hidden", "visibility_reason": "The brief does not disclose proof techniques.",
+      "consequential": "no", "consequence": ""
+    },
+    {
+      "id": "c20", "kind": "registration", "where": "global predicate and closure declarations",
+      "pr_choice": "The PR marks the predicate and closure declarations for function-property automation.",
+      "excerpt": "@[fun_prop]\ndef Meromorphic (f : 𝕜 → E)", "source": "diff", "status": "proposed",
+      "status_reason": "The mathematical notion and closure results do not require this automation registration.",
+      "visibility": "hidden", "visibility_reason": "The brief omits attributes and automation choices.",
+      "consequential": "yes", "consequence": "Registration changes which goals automation can recognize and solve."
+    },
+    {
+      "id": "c21", "kind": "placement", "where": "new global notion and associated results",
+      "pr_choice": "The PR adds the material in the existing `Mathlib/Analysis/Meromorphic/Basic.lean` file.",
+      "excerpt": "diff --git a/Mathlib/Analysis/Meromorphic/Basic.lean b/Mathlib/Analysis/Meromorphic/Basic.lean", "source": "diff", "status": "proposed",
+      "status_reason": "The mathematical goal does not require this file choice.",
+      "visibility": "exposed_unavoidable", "visibility_reason": "packet: base files",
+      "consequential": "yes", "consequence": "File placement affects imports, dependency structure, and where users look for the API."
+    },
+    {
+      "id": "c22", "kind": "placement", "where": "new global notion and closure declarations within the file",
+      "pr_choice": "The PR places the additions after the existing set-based meromorphy material.",
+      "excerpt": "@@ -631,3 +631,102 @@ theorem measurable", "source": "diff", "status": "proposed",
+      "status_reason": "The goal does not require a particular position within the file.",
+      "visibility": "hidden", "visibility_reason": "The brief gives no within-file placement information.",
+      "consequential": "no", "consequence": ""
+    },
+    {
+      "id": "c23", "kind": "placement", "where": "global closure declarations",
+      "pr_choice": "The PR groups the closure declarations under a namespace named after the new global notion.",
+      "excerpt": "namespace Meromorphic", "source": "diff", "status": "proposed",
+      "status_reason": "Neither the mathematical results nor the goal requires this namespace organization.",
+      "visibility": "hidden", "visibility_reason": "The brief omits the new namespace and placement decisions.",
+      "consequential": "yes", "consequence": "Namespace organization affects qualification, discoverability, and potential name collisions."
+    }
+  ],
+  "feasibility": "feasible",
+  "feasibility_reason": "The brief can state the whole-domain mathematical notion, compatibility with the set-based notion, and closure results at the scope evidenced by the inputs while withholding the chosen name, encoding, formal statement shapes, proof routes, registrations, documentation, and namespace organization. The changed existing file is the one unavoidable exposed placement choice because the packet makes the changed base file visible; placement within that file remains hidden. No consequential proposed choice has to be revealed to make the task faithful.",
+  "brief_omits": "The brief intentionally omits all new declaration and namespace names, formal binders and statement shapes, the predicate's encoding, the exact finite-indexing representation, the duplicate lambda-form API, attributes, proof details, docstring wording, and within-file ordering. These are design choices rather than mathematical requirements. It also does not impose broader closure results such as composition or infinite sums/products, which the inputs do not require."
+}

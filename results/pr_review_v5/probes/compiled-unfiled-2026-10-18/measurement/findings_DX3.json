@@ -1,0 +1,44 @@
+{
+ "26755": [
+  {
+   "target": "Mathlib/Data/Set/Semiring.lean:174",
+   "claim": "At `<instance>`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\nnoncomputable instance [MulOneClass α] : NonAssocSemiring (SetSemiring α) :=\n```\nwith\n```lean\ninstance [MulOneClass α] : NonAssocSemiring (SetSemiring α) :=\n```",
+   "severity": "advisory",
+   "key": "1ada3c82b22a"
+  },
+  {
+   "target": "Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean:173",
+   "claim": "At `Set.mulAction`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\nprotected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where\n```\nwith\n```lean\nprotected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where\n```",
+   "severity": "advisory",
+   "key": "60cb6e30dd49"
+  }
+ ],
+ "30458": [],
+ "32875": [],
+ "33066": [],
+ "33098": [],
+ "33117": [],
+ "33285": [
+  {
+   "target": "Mathlib/Topology/Algebra/Module/Equiv.lean:1292",
+   "claim": "At `ContinuousLinearEquiv.submoduleMap`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n    p ≃SL[σ₁₂] Submodule.map (e : M →ₛₗ[σ₁₂] M₂) p where\n```\nwith\n```lean\n    p ≃SL[σ₁₂] Submodule.map e p where\n```",
+   "severity": "advisory",
+   "key": "3f55204d19f4"
+  }
+ ],
+ "33294": [
+  {
+   "target": "Mathlib/SetTheory/Ordinal/Family.lean:261",
+   "claim": "At `Ordinal.IsNormal.map_sSup_of_bddAbove`: this edit compiles in the reviewed file.",
+   "requested_change": "Delete\n```lean\nset_option linter.deprecated false in\n```",
+   "severity": "advisory",
+   "key": "c153d42da03e"
+  }
+ ],
+ "33362": [],
+ "33421": [],
+ "34091": []
+}

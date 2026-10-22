@@ -39,6 +39,10 @@ from .judgment import (
     LeanPRReviewV4JudgmentConfig, LeanPRReviewV4JudgmentData,
     LeanPRReviewV4JudgmentResult, LeanPRReviewV4JudgmentTask,
 )
+from .ask_matching import (
+    ASK_MATCHING_TASK_TYPE, AskMatchingConfig, AskMatchingData, AskMatchingResult,
+    AskMatchingTask,
+)
 from .arm import ARM_TASK_TYPE, ReviewArmConfig, ReviewArmData, ReviewArmTask
 from .lead import LEAD_TASK_TYPE, ReviewLeadConfig, ReviewLeadData, ReviewLeadTask
 from .solo import (
@@ -67,6 +71,8 @@ DESIGNS = {
 }
 
 __all__ = [
+    "ASK_MATCHING_TASK_TYPE", "AskMatchingConfig", "AskMatchingData", "AskMatchingResult",
+    "AskMatchingTask",
     "BasePRReviewConfig", "BasePRReviewData", "BasePRReviewResult", "BasePRReviewTask",
     "DEFAULT_REVIEW_TOOLS", "VerifiedPRReviewTask",
     "LeanPRReviewV4CandidateConfig", "LeanPRReviewV4CandidateData",

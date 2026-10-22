@@ -1,0 +1,38 @@
+# Model sessions over folders (`packet_session`, src/ape/tasks/packet_session.py) on GPT-6 Luna
+# through the ELM gateway: `elm_gpt_6_luna` on the ape_agent scaffold, OpenAI Responses with the
+# reasoning carried between turns (CLAUDE.md, "Providers"), at effort high. The cheap route: USD
+# 0.10 in and 0.50 out per million tokens at list price.
+#
+# The session reads and writes with APE's file tools, which resolve a path inside the attempt's
+# workspaces folder and refuse an absolute one or `..`; the brief's `{dir}` becomes `scratch/packet`
+# on this scaffold (`PacketSessionTask.folder_reference`). No shell, no web, no Lean.
+#
+# A different executor from the probes' hand-launched sessions (Opus 5.5 on the subscription), so
+# its outputs are this route's, not a re-run of theirs.
+#
+#   python -m src.mathlib_review.review.cli session --plan <session plan dir> \
+#       --config configs/session/packet_session_elm_luna.yaml --run-name <name> --execute
+#
+# The plan fixes the replicates; early stop is always off.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: elm_gpt_6_luna
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+  reasoning_effort: high
+  max_tokens: 32000
+
+batch_preamble: plain
+workspace_environment: false
+
+task_config:
+  # The task's own default, stated so the grant is read here rather than inferred.
+  enabled_tools: [file_read, file_write, content_search, file_search]
+
+execution:
+  max_turns: 80
+  sample_max_cost: 1.00
+  sample_max_tokens: 6000000
+
+dataset: {}

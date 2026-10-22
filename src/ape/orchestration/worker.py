@@ -5,6 +5,7 @@ import contextvars
 import inspect
 import json
 import multiprocessing as mp
+import os
 import random
 import threading
 import traceback
@@ -24,6 +25,15 @@ from .models import (
     task_execution_limits,
 )
 from .persistence import ProgressManager, TaskStorage, append_to_jsonl, print_progress
+
+#: Created atomically, inside the aggregation lock, by the one worker that publishes a task's result;
+#: removed once `task_result.json`, its `aggregated_results.jsonl` row and `task_outcome.json` are
+#: written. The writes cannot happen under the lock itself -- in single-process async mode another
+#: coroutine waiting on a held thread lock blocks the thread -- so without the claim, two workers
+#: finishing a task's last samples together could both pass the lock's double-check and both
+#: publish. One left behind by a killed process is stale at the next start, and
+#: `TaskOrchestrator._reconcile_interrupted` finishes the publication.
+AGGREGATION_CLAIM = "task_result.claim"
 
 
 class SampleWorker:
@@ -133,6 +143,10 @@ class SampleWorker:
         if job["early_stop_mode"] != EarlyStopMode.DISABLED.value:
             early_stop_event = self.early_stop_events.get(task_id)
 
+        # Whether this pass ran the task at all, and whether it ended by cancellation: an
+        # attempt that ran and came back with no usage spent an amount nobody recorded.
+        executed = cancelled = False
+
         # Check if early stop is already triggered before execution
         if early_stop_event and early_stop_event.is_set():
             self.logger.info("Sample %s: early stop already triggered, skipping execution", sample.sample_id)
@@ -154,6 +168,7 @@ class SampleWorker:
         else:
             # Execute task with early stop monitoring
             # Early stop is handled by concurrent monitoring at orchestration layer
+            executed = True
             try:
                 # Execute with monitoring - can be cancelled if early stop is triggered
                 result, termination = await self._execute_with_early_stop_monitoring(
@@ -166,6 +181,7 @@ class SampleWorker:
             except asyncio.CancelledError:
                 # Task was cancelled due to early stop
                 self.logger.info("Sample %s: cancelled due to early stop", sample.sample_id)
+                cancelled = True
                 result = BaseTaskResult(
                     task_id=task_data.get('task_id', 'unknown'),
                     global_index=task_data.get('global_index', 'unknown'),
@@ -209,9 +225,20 @@ class SampleWorker:
             attempt.completed_at = datetime.now()
 
         attempt.result = result if result and result.success else None
-        attempt.error_message = result.error if result else None
+        # A task that raised has no result, and the except branch above has already written
+        # its traceback here. Until 2026-10-22 this line then set the message to None, so no
+        # attempt error survived: 0 of 11,501 attempts in 6,135 `task_outcome.json` files, and
+        # 0 of 5,000 sample files, carry one, though 121 of those attempts failed.
+        if result is not None:
+            attempt.error_message = result.error
 
-        if result and result.token_usage:
+        if executed and (result is None or cancelled):
+            # It ran, and its usage never came back: it raised, or was cancelled mid-run. What
+            # the attempt had recorded before this pass stands as a lower bound, and the
+            # attempt says its usage is unknown -- it is not $0, which is what it was booked as
+            # until 2026-10-22 (design §9: uncertain usage is unknown, not zero).
+            attempt.usage_known = False
+        elif result and result.token_usage:
             attempt.cost = float(result.token_usage.total_cost or 0.0)
             attempt.cached_cost = float(result.token_usage.cached_total_cost or 0.0)
             # SELF-ONLY, unlike the two costs above, and deliberately so.
@@ -655,10 +682,15 @@ class SampleWorker:
             return
 
         # Now acquire lock for the aggregation
+        claim = storage.task_dir / AGGREGATION_CLAIM
         with self.aggregation_lock:
             # Double-check after acquiring lock
             if (storage.task_dir / "task_result.json").exists():
                 return
+            try:
+                os.close(os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            except FileExistsError:
+                return  # another worker is publishing this task
 
             # Aggregate results
             task_class = get_task_class(task_type)
@@ -668,26 +700,31 @@ class SampleWorker:
                 if s.current_attempt and s.current_attempt.result and s.status == ExecutionStatus.SUCCESS
             ]
 
-            if successful:
-                task_result = task_class.aggregate_results(successful)
-            else:
-                # All samples failed
-                total_time = sum(
-                    (a.completed_at - a.started_at).total_seconds()
-                    for s in samples.values()
-                    for a in s.attempts
-                    if a.started_at and a.completed_at
-                )
-                result_task_id = task_data["task_id"] if "task_id" in task_data else job["task_global_index"]
-                task_result = BaseTaskResult(
-                    task_id=result_task_id,
-                    task_type=task_type,
-                    global_index=job["task_global_index"],
-                    success=False,
-                    score=0.0,
-                    error=f"All samples failed: {[s.status.value for s in samples.values()]}",
-                    execution_time=total_time,
-                )
+            task_result = task_class.aggregate_results(successful) if successful else None
+
+        # Every sample ended and none produced a legal submission. Until 2026-10-22 this wrote a
+        # bare `BaseTaskResult(success=False, error="All samples failed: [...]")` as
+        # `task_result.json` and then an outcome with `has_result=True`, so the task read
+        # `execution_status: completed` having completed nothing, against the rule that a
+        # result is never synthesised for a failure (`docs/todo/framework-defects-2026-09.md`
+        # §4). The failure is the outcome's to record: `task_outcome.json` is FAILED, with each
+        # attempt's status, error and spend. Nothing is appended to `aggregated_results.jsonl`,
+        # which holds submissions; `OrchestratorResults` counts failures from the outcomes.
+        if task_result is None:
+            await self._write_task_outcome(
+                job, storage, task_data, task_type, samples, has_result=False)
+            claim.unlink(missing_ok=True)
+            global_index = job["task_global_index"]
+
+            def record_failure(progress: OrchestratorProgress) -> None:
+                if global_index not in progress.completed_task_indices:
+                    progress.completed_tasks += 1
+                    progress.completed_task_indices.append(global_index)
+
+            await self.progress_manager.update(record_failure)
+            self.logger.info("Task %s: every sample failed (%s); no result written",
+                             global_index, [s.status.value for s in samples.values()])
+            return
 
         # Save results outside of lock
         await storage.save_task_result(task_result)
@@ -695,6 +732,7 @@ class SampleWorker:
         await append_to_jsonl(aggregated_path, task_result.model_dump(mode="json"))
         await self._write_task_outcome(
             job, storage, task_data, task_type, samples, has_result=True)
+        claim.unlink(missing_ok=True)
 
         # Update progress outside of lock
         def updater(progress: OrchestratorProgress) -> None:

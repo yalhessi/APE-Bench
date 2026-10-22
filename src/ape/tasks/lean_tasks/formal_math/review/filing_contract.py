@@ -385,7 +385,8 @@ class FilingContractTask(StructuredReviewTask):
     def _context_text(self) -> str:
         if not hasattr(self, "_context_cache"):
             try:
-                self._context_cache = solo_context_block(self.config.task_config, self.data.pr_number) or ""
+                self._context_cache = solo_context_block(self.config.task_config, self.data.pr_number,
+                                                         **self._context_binding()) or ""
             except Exception:  # noqa: BLE001
                 self._context_cache = ""
         return self._context_cache

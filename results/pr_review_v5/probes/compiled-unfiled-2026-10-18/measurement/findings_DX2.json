@@ -1,0 +1,99 @@
+{
+ "26755": [
+  {
+   "target": "Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean:173",
+   "claim": "At `Set.mulAction`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\nprotected noncomputable def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where\n```\nwith\n```lean\nprotected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where\n```",
+   "severity": "advisory",
+   "key": "39fa9fc77b06"
+  }
+ ],
+ "30458": [
+  {
+   "target": "Mathlib/Algebra/Group/Basic.lean:665",
+   "claim": "At `div_right_injective`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ inv_injective (mul_right_injective b h)\n```\nwith\n```lean\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective\n```",
+   "severity": "advisory",
+   "key": "105efa7690ed"
+  }
+ ],
+ "32875": [
+  {
+   "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:462",
+   "claim": "At `MeasureTheory.Measure.pi_map_piCongrLeft`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  exact Fintype.prod_equiv _ _ _ (congrFun rfl)\n```\nwith\n```lean\n  exact Fintype.prod_equiv e _ _ (congrFun rfl)\n```",
+   "severity": "advisory",
+   "key": "20ef31e0aed3"
+  }
+ ],
+ "33066": [
+  {
+   "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:99",
+   "claim": "At `auxContinuousLinearEquiv`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\nnoncomputable abbrev auxContinuousLinearEquiv :\n@[simp] theorem coe_auxContinuousLinearEquiv :\nnoncomputable abbrev auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n@[simp] theorem coe_auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n@[simp] theorem coe_symm_auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n```\nwith\n```lean\nprivate noncomputable abbrev auxContinuousLinearEquiv :\n@[simp] private theorem coe_auxContinuousLinearEquiv :\nprivate noncomputable abbrev auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n@[simp] private theorem coe_auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n@[simp] private theorem coe_symm_auxIsometry (hαa : starRingEnd 𝕜 α' = α') :\n```",
+   "severity": "advisory",
+   "key": "93241619b17d"
+  }
+ ],
+ "33098": [
+  {
+   "target": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean:307",
+   "claim": "At `Metric.maximalSeparatedSet_subset`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  by_cases h : packingNumber ε A ≠ ⊤\n  · simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n    exact (exists_set_encard_eq_packingNumber h).choose_spec.1\n  · simp only [maximalSeparatedSet, h, dite_false, Set.empty_subset]\n```\nwith\n```lean\n  rw [maximalSeparatedSet]\n  split\n  · exact (exists_set_encard_eq_packingNumber ‹_›).choose_spec.1\n  · exact Set.empty_subset _\n```",
+   "severity": "advisory",
+   "key": "6940ed947240"
+  }
+ ],
+ "33117": [
+  {
+   "target": "Mathlib/Analysis/Meromorphic/Basic.lean:641",
+   "claim": "At `meromorphicOn_univ`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\nlemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f  := by tauto\n```\nwith\n```lean\nlemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f := by\n  simp [MeromorphicOn, Meromorphic]\n```",
+   "severity": "advisory",
+   "key": "bf978dd9e019"
+  }
+ ],
+ "33285": [
+  {
+   "target": "Mathlib/Topology/Algebra/Module/Equiv.lean:1292",
+   "claim": "At `ContinuousLinearEquiv.submoduleMap`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n    p ≃SL[σ₁₂] Submodule.map (e : M →ₛₗ[σ₁₂] M₂) p where\n```\nwith\n```lean\n    p ≃SL[σ₁₂] Submodule.map e p where\n```",
+   "severity": "advisory",
+   "key": "a4e88888896c"
+  },
+  {
+   "target": "Mathlib/LinearAlgebra/Prod.lean:657",
+   "claim": "At `LinearEquiv.symm_prodComm`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\ntheorem symm_prodComm : (prodComm R M M₂).symm = prodComm R M₂ M := rfl\n```\nwith\n```lean\ntheorem prodComm_symm : (prodComm R M M₂).symm = prodComm R M₂ M := rfl\n```",
+   "severity": "advisory",
+   "key": "1ced571a5754"
+  }
+ ],
+ "33294": [],
+ "33362": [
+  {
+   "target": "Mathlib/Analysis/Complex/Schwarz.lean:157",
+   "claim": "At `Complex.norm_deriv_le_one_of_mapsTo_ball`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n    (h_maps : MapsTo f (ball c R) (closedBall (f c) R)) (h₀ : 0 < R) : ‖deriv f c‖ ≤ 1 :=\n  (norm_deriv_le_div_of_mapsTo_ball hd h_maps h₀).trans_eq (div_self h₀.ne')\n```\nwith\n```lean\n    (h_maps : MapsTo f (ball c R) (closedBall (f c) R)) (h₀ : 0 < R) : ‖deriv f c‖ ≤ 1 := by\n  have h_unused : True := trivial\n  exact (norm_deriv_le_div_of_mapsTo_ball hd h_maps h₀).trans_eq (div_self h₀.ne')\n```",
+   "severity": "advisory",
+   "key": "f39ba884976b"
+  }
+ ],
+ "33421": [
+  {
+   "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+   "claim": "At `continuousAt_ceil`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt ceil x :=\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne fun h ↦\n      hx <| by rw [h, floor_intCast]\n```\nwith\n```lean\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x :=\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx\n```",
+   "severity": "advisory",
+   "key": "00b46b38f260"
+  },
+  {
+   "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117",
+   "claim": "At `continuousAt_ceil`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt ceil x :=\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne fun h ↦\n      hx <| by rw [h, floor_intCast]\n```\nwith\n```lean\n@[fun_prop]\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x :=\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx\n```",
+   "severity": "advisory",
+   "key": "aac14340ba8c"
+  }
+ ],
+ "34091": []
+}

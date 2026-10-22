@@ -1,0 +1,603 @@
+{
+  "agreement": {
+    "cells": 126,
+    "reached_or_not": 126,
+    "three_valued": 124
+  },
+  "asks": 42,
+  "import-compiled_unfiled:1": {
+    "condition_reach": {
+      "DX": 0.023809523809523808
+    },
+    "published_reach": {},
+    "reach": {
+      "DX1": 0.07142857142857142,
+      "DX2": 0.0,
+      "DX3": 0.0
+    },
+    "stable": {
+      "DX": []
+    },
+    "table": {
+      "d0001": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0002": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0003": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0004": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0005": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0006": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0007": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0008": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0009": {
+        "DX1": "no",
+        "DX2": "partial",
+        "DX3": "no"
+      },
+      "d0010": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0011": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0012": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0013": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0014": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0015": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0016": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0018": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0035": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0036": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0038": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0039": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0047": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0048": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0049": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0051": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0016": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0060": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0061": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0062": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0063": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0090": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0091": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0092": {
+        "DX1": "partial",
+        "DX2": "partial",
+        "DX3": "no"
+      },
+      "v0093": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0094": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0095": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0105": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0106": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0107": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0108": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0109": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0110": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      }
+    },
+    "union": {
+      "DX": [
+        "d0036",
+        "v0062",
+        "v0063"
+      ]
+    }
+  },
+  "import-compiled_unfiled:2": {
+    "condition_reach": {
+      "DX": 0.023809523809523808
+    },
+    "published_reach": {},
+    "reach": {
+      "DX1": 0.07142857142857142,
+      "DX2": 0.0,
+      "DX3": 0.0
+    },
+    "stable": {
+      "DX": []
+    },
+    "table": {
+      "d0001": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0002": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0003": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0004": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0005": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0006": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0007": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0008": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0009": {
+        "DX1": "no",
+        "DX2": "partial",
+        "DX3": "no"
+      },
+      "d0010": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0011": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0012": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0013": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0014": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0015": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0016": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0018": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0035": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0036": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0038": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0039": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0047": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0048": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0049": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "d0051": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0016": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0060": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0061": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0062": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0063": {
+        "DX1": "reached",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0090": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0091": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0092": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0093": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0094": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0095": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0105": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0106": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0107": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0108": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0109": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "v0110": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      }
+    },
+    "union": {
+      "DX": [
+        "d0036",
+        "v0062",
+        "v0063"
+      ]
+    }
+  },
+  "measurement": {
+    "forensic": false,
+    "identity": {
+      "aggregation": "none: each replicate is read on its own, and two are compared cell by cell",
+      "denominator": "the asks of the sealed PRs (in scope, if scoped); a session's reach is asks it reached over that count, per replicate",
+      "instrument": "ask-match",
+      "instrument_version": "1-session",
+      "missingness": "every expected cell needs a verdict in every replicate; a replicate that does not cover them makes the report forensic, and an absent cell is never read as `no`",
+      "population_prs": [
+        26755,
+        30458,
+        32875,
+        33066,
+        33098,
+        33117,
+        33285,
+        33294,
+        33362,
+        33421,
+        34091
+      ],
+      "projection": {
+        "claude_cut_to": null,
+        "harness_blind": false,
+        "keep": [
+          "target",
+          "claim",
+          "requested_change",
+          "severity"
+        ],
+        "redaction": [
+          "construction cues"
+        ],
+        "target": "repository path"
+      },
+      "question_policy": "questions",
+      "reference_count": 42,
+      "reference_kind": "raw_ask",
+      "reference_sha256": "538c4af1ac0de350dd8b38d1b01d1a94be774745cd1e82ef05f5241764eb09c7",
+      "reference_source": "results/pr_review_v5/probes/compiled-unfiled-2026-10-18/measurement/ask_packets.json",
+      "replicates": 2,
+      "rubric_sha256": "c1094ab650c272edad9c450919802ea49179d96569cc19d5542106624c1f54f8",
+      "schema_version": "measurement-identity1",
+      "seal_path": "results/pr_review_v5/probes/compiled-unfiled-2026-10-18/measurement/seal.json",
+      "seal_sha256": "86115eeb84220867e368806056db92cf018a635242c03c1a12a4143b056da0d3",
+      "source_sha256": "c2d34cdc9d36625806ca518147ec7d0d63e9149ff1b6826714a1d8cfbfebb235",
+      "subjects": [
+        {
+          "channel": "declared",
+          "path": "results/pr_review_v5/probes/compiled-unfiled-2026-10-18/measurement/findings_DX1.json",
+          "runs": [],
+          "session": "DX1",
+          "source": "findings_file"
+        },
+        {
+          "channel": "declared",
+          "path": "results/pr_review_v5/probes/compiled-unfiled-2026-10-18/measurement/findings_DX2.json",
+          "runs": [],
+          "session": "DX2",
+          "source": "findings_file"
+        },
+        {
+          "channel": "declared",
+          "path": "results/pr_review_v5/probes/compiled-unfiled-2026-10-18/measurement/findings_DX3.json",
+          "runs": [],
+          "session": "DX3",
+          "source": "findings_file"
+        }
+      ]
+    },
+    "identity_sha256": "c2d34cdc9d36625806ca518147ec7d0d63e9149ff1b6826714a1d8cfbfebb235",
+    "plan_id": "compiled_unfiled",
+    "plan_sha256": "b8a2c709e1b5396b5cd31f74e9b19862dd38937fd29e138a0e0a3d3d6196f0cd",
+    "producers": {
+      "import-compiled_unfiled": {
+        "complete": true,
+        "forensic": false,
+        "replicates": 2
+      }
+    },
+    "replicates": {
+      "import-compiled_unfiled:1": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-compiled_unfiled",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "kind": "external session",
+              "model": "unknown",
+              "route": "claude-code-subagent (model not recorded)"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/demonstrated-change/results/pr_review_v5/probes/compiled-unfiled-2026-10-18/match/matches.1.json",
+              "problems": "0",
+              "sha256": "9b9fdb5e5c371eed66e3b2a48c67c0290cb214183ff90e879640f17857330d85"
+            },
+            "origin": "external_import"
+          }
+        ]
+      },
+      "import-compiled_unfiled:2": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-compiled_unfiled",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "kind": "external session",
+              "model": "unknown",
+              "route": "claude-code-subagent (model not recorded)"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/demonstrated-change/results/pr_review_v5/probes/compiled-unfiled-2026-10-18/match/matches.2.json",
+              "problems": "0",
+              "sha256": "0576de9b7546f3b19580967c5275a20a260c65cf2eaeb4d44365a7603a3f1ab2"
+            },
+            "origin": "external_import"
+          }
+        ]
+      }
+    },
+    "replicates_expected": 2,
+    "scope": null
+  }
+}

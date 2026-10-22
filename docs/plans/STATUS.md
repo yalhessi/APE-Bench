@@ -271,3 +271,21 @@ names as the new reference baseline.
   items stay unbuilt (`docs/todo/convention-detectors.md`).
 * `docs/research/codebase-redesign-2026-10.md` is a design write-up, not a plan in this directory;
   its own §11 records what is built.
+
+## Added 2026-10-22 (on `dataflow-refactor`)
+
+The task/data refactor (`docs/research/task-dataflow-refactor-design-2026-10-22.md`, v0.3, and its
+plan `docs/plans/2026-10-22-task-native-evaluation-and-exploration.md`; both untracked in the main
+checkout when this was written). Record: `docs/research/task-dataflow-refactor-implementation-2026-10-22.md`.
+
+| Slice | Status |
+|---|---|
+| 0: execution semantics (config resolution, failure records, missing tool results) | **Built** |
+| A1: common evaluation and result inspection (matcher as a versioned instrument and a registered Task; one identity record for both instruments; `report match`, `trace`) | **Built, integrated** on the historical seals (post-cutoff, filing-contract dev, the reconstruction joint seal, Phase A's three, compiled-unfiled); **run live** on GPT-6 Luna (`joint_dev_v2_luna`, 6 of 6); `report compare` names the matchers' executor; v2-against-v1 calibration not run (user-run) |
+| A2: resolved context and run inspection (input files sealed by content; `report inputs`) | **Built** |
+| Comparison path (`report compare`) | **Built** |
+| B: shared composition in two consumers (`sample_products`, `packet_session`, session plans) | **Built, integrated in both consumers.** Run live on GPT-6 Luna (`extract_r1_luna`, 8 of 8). The reconstruction chain end to end on saved data: extraction, revision and repair, decision-context and sketch sessions bound input by input (`lineage.json`), the nine Phase A reviewer contexts derived byte-identical (`context-derive`, verified by the input resolver), found in all 56 of the 21 reviewer runs' first messages, the three Phase A matchings reproduced. The demonstrated-change consumer's matching on the shared path, its reading reproduced line for line from the common report. Claude Code route: smoke run on Sonnet 5.5, one session and one matcher batch, both complete |
+| Prospective cutover (one collector, producer naming and coverage for the shared paths; `report sessions`; historical `unblind` refuses missing cells; instructions mark the old routes historical) | **Built** |
+| Lead runs: `task_config` configures the lead only (children inherit no task settings since slice 0) | **Built**, logged at every lead run |
+| C: failure and dynamic behaviour (interrupted publication, claims, continuation binding) | **Built**; the implementation review's four findings (producer identity, route binding, previous-outcome recovery) fixed `cbb1a9bc`, `58ffe5bc` |
+| A check bound to its exact patch across tasks | **Not built**: lands with the demonstrated-change branch's construction artifacts |

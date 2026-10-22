@@ -16,6 +16,7 @@ Architecture:
 """
 
 from .base import BaseTask, register_task, create_task_from_data, list_task_types
+from . import packet_session  # noqa: F401 - registers `packet_session`
 from .lean_tasks import (
     BaseLeanTask,
     BaseLeanTaskData,

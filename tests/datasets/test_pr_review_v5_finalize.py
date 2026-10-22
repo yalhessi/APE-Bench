@@ -580,8 +580,11 @@ def test_the_setting_is_sealed_in_the_run_plan():
     # settings dict moved out of `_build_plan` into `evaluation_settings` on 2026-09-23.
     assert runner.evaluation_settings(_dataset(apply_lead_synthesis=True))["apply_lead_synthesis"]
     assert not runner.evaluation_settings(_dataset())["apply_lead_synthesis"]
-    assert "evaluation_settings=evaluation_settings(dataset)" in inspect.getsource(
+    # Since 2026-10-22 through the wrapper that also seals the input files' digests.
+    assert "evaluation_settings=_settings_with_inputs(dataset, scaffold)" in inspect.getsource(
         runner._build_plan)
+    assert "settings = evaluation_settings(dataset)" in inspect.getsource(
+        runner._settings_with_inputs)
 
 
 def test_it_is_off_by_default_while_under_investigation():

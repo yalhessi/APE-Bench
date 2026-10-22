@@ -204,7 +204,10 @@ class ApeBenchPipeline:
         total_rejected = sum(1 for r in results.task_results if
                              r.success and isinstance(r, InstructionGenerationTaskResult) and
                              r.exercise_data and r.exercise_data.get('rejected', False))
-        total_failed = sum(1 for r in results.task_results if not r.success)
+        # A task whose samples all failed has no result since 2026-10-22; count it from the
+        # outcomes the orchestrator reads, beside results that concluded unsuccessfully.
+        total_failed = (sum(1 for r in results.task_results if not r.success)
+                        + results.failed_tasks)
 
         self.logger.info(
             f"\nTask generation completed:\n"

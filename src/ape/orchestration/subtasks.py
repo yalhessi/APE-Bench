@@ -34,7 +34,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from .models import ChildRun, TaskExecutionSpec, TaskExecutionStatus, TaskOutcome
+from .models import (
+    ChildRun, TaskExecutionSpec, TaskExecutionStatus, TaskOutcome, outcome_failure_summary,
+)
 
 #: How many children may run at once inside one parent. Deliberately small: each carries its
 #: own multi-gigabyte Lean workspace overlay, and the failure mode of getting this wrong is
@@ -43,7 +45,8 @@ DEFAULT_NESTED_CONCURRENCY = 4
 
 
 def nested_config(attempt_path, config, *, group: str,
-                  concurrency: Optional[int] = None, **overrides):
+                  concurrency: Optional[int] = None,
+                  task_config_overrides: Optional[Dict[str, Any]] = None, **overrides):
     """A scaffold config for one group of children.
 
     Sets one thing and leaves the rest to the caller:
@@ -65,9 +68,17 @@ def nested_config(attempt_path, config, *, group: str,
     Takes the attempt path and a config rather than a parent task, because the two callers that
     are not `BaseTask` subclasses -- `judgment` and `review_gate` -- have a path and a config
     they built themselves and no task object to offer.
+
+    * **No task settings are inherited.** The child's `task_config` and `task_config_overrides`
+      are exactly what the caller passes as `task_config_overrides`, and nothing else. The
+      parent's config carried the parent's own: a lead's budget keys reached its arms and were
+      silently dropped, the run's tool list reached them and was silently kept, and a judge
+      built from a proof-engineering parent received the parent's settings over its own
+      (2026-10-22; `ape.tasks.base.resolve_task_config` now refuses a setting that does not
+      take effect, so the broadcast would be an error rather than a silence).
     """
 
-    config = config.model_copy(deep=True)
+    config = _child_task_settings(config.model_copy(deep=True), task_config_overrides)
     config.execution.num_processes = 0
     if concurrency is not None:
         config.execution.max_concurrency = max(1, int(concurrency))
@@ -80,15 +91,24 @@ def nested_config(attempt_path, config, *, group: str,
     return config
 
 
-def _top_level_config(config, *, concurrency: Optional[int] = None, **overrides):
+def _child_task_settings(config, task_config_overrides: Optional[Dict[str, Any]]):
+    """A child config carries only the task settings its caller passed (see `nested_config`)."""
+
+    config.task_config = None
+    config.task_config_overrides = dict(task_config_overrides) if task_config_overrides else None
+    return config
+
+
+def _top_level_config(config, *, concurrency: Optional[int] = None,
+                      task_config_overrides: Optional[Dict[str, Any]] = None, **overrides):
     """The same overrides without nesting, for a caller that has no parent attempt.
 
     `judgment` and `review_gate` both branch on whether they were given one: a review gate
     invoked outside a task attempt has nowhere to nest, and putting its children in the default
-    runs root is the behaviour it has always had.
+    runs root is the behaviour it has always had. Task settings are not inherited here either.
     """
 
-    config = config.model_copy(deep=True)
+    config = _child_task_settings(config.model_copy(deep=True), task_config_overrides)
     if concurrency is not None:
         config.execution.max_concurrency = max(1, int(concurrency))
     for key, value in overrides.items():
@@ -108,6 +128,7 @@ async def run_subtasks(
     orchestrator_id: Optional[str] = None,
     index_path: Optional[Any] = None,
     parent_id: Optional[str] = None,
+    task_config_overrides: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Dict[str, ChildRun], Any]:
     """Run one group of children and return `({spec_id: ChildRun}, results)`.
 
@@ -127,6 +148,11 @@ async def run_subtasks(
 
     `concurrency=None` leaves `max_concurrency` alone. A caller that has set it deliberately --
     `judgment` runs its judges at its own -- must not have it overwritten by a default.
+
+    `task_config_overrides` are the children's task settings, and the only ones they get: the
+    parent's own `task_config` and overrides never reach them (`nested_config`). The same dict
+    reaches the parent-side task built here and the worker that rebuilds it, because both read it
+    from the child config.
     """
 
     from ape.tasks.base import create_task_from_data
@@ -138,10 +164,11 @@ async def run_subtasks(
 
     overrides = dict(execution_overrides or {})
     if attempt_path is None:
-        config = _top_level_config(config, concurrency=concurrency, **overrides)
+        config = _top_level_config(config, concurrency=concurrency,
+                                   task_config_overrides=task_config_overrides, **overrides)
     else:
-        config = nested_config(attempt_path, config, group=group,
-                               concurrency=concurrency, **overrides)
+        config = nested_config(attempt_path, config, group=group, concurrency=concurrency,
+                               task_config_overrides=task_config_overrides, **overrides)
 
     tasks, spec_by_task_id, spec_by_index = [], {}, {}
     for spec in specs:
@@ -150,7 +177,7 @@ async def run_subtasks(
         # (`scaffolds/runner.py::main_from_params`). Passing them here keeps the parent-side
         # object and the worker-side one the same task.
         task = create_task_from_data(
-            payload, config, task_config_overrides=getattr(config, "task_config_overrides", None))
+            payload, config, task_config_overrides=config.task_config_overrides)
         index = task.data.global_index
         if index in spec_by_index:
             # Identical payloads are one task to the orchestrator, and its resume skips a task
@@ -215,11 +242,12 @@ async def collect_child_runs(
             raw_result = await storage.load_task_result()
             has_result = bool(raw_result and raw_result.get("success"))
             result = None
-            # A task whose samples all failed still gets a `task_result.json` -- a bare
-            # `BaseTaskResult` the worker synthesises with `All samples failed: [...]`. That is
-            # not a submission, so it is not `result`; its sentence is the best account of the
-            # failure anyone has, so it is not discarded either.
-            error = None if has_result else (raw_result or {}).get("error")
+            # A task whose samples all failed has no `task_result.json` since 2026-10-22; before
+            # then the worker synthesised a bare `BaseTaskResult` carrying `All samples failed:
+            # [...]`, and runs on disk still hold those. Neither is a submission, so neither is
+            # `result`. The sentence comes from the old file where one exists and otherwise from
+            # the outcome (below), so a failure is never left without an account.
+            legacy_error = None if has_result else (raw_result or {}).get("error")
             if has_result:
                 try:
                     result = task.task_result_class.model_validate(raw_result)
@@ -239,6 +267,7 @@ async def collect_child_runs(
                 sample_max_tokens=config.execution.sample_max_tokens,
                 has_result=has_result,
             )
+            error = None if has_result else (legacy_error or outcome_failure_summary(outcome))
         except Exception as error:  # noqa: BLE001 - see the docstring
             if logger is not None:
                 logger.warning("child %s: could not read its records (%s)", spec.spec_id, error,

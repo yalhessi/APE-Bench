@@ -784,9 +784,13 @@ async def lean_semantic_evaluation(
 
         judge_mode = semantic_config.judge_mode
 
-        judgment_task_config = LeanJudgmentConfig(
-            judge_mode=judge_mode
-        )
+        # The judge's own settings, passed to `run_subtasks` explicitly. Until 2026-10-22 they
+        # were set as `task_config=LeanJudgmentConfig(...)` on the scaffold config, which no
+        # execution path read: every judge ran under the class default whatever `judge_mode`
+        # said (`docs/todo/framework-defects-2026-09.md` §1). Validated here so a bad value
+        # fails in the parent, before any child is scheduled.
+        judgment_task_overrides = LeanJudgmentConfig(judge_mode=judge_mode).model_dump(
+            mode="json", exclude_unset=True)
 
         from ape.llm_clients.config import LLMConfig
         from ape.runtime.factory import create_runtime_config_for_type
@@ -803,7 +807,6 @@ async def lean_semantic_evaluation(
                 max_turns=semantic_config.max_turns,
                 sample_count=num_judges
             ),
-            task_config=judgment_task_config,
             llm_config=LLMConfig(model_name=semantic_config.model),
             runtime_config=judge_runtime_config  # Use semantic_config's runtime
         )
@@ -831,6 +834,7 @@ async def lean_semantic_evaluation(
             group="subtasks",
             logger=logger,
             concurrency=None,
+            task_config_overrides=judgment_task_overrides,
         )
 
         if judge_results is not None and judge_results.workspace_path:

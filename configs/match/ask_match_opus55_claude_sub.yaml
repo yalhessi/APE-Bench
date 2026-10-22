@@ -1,0 +1,39 @@
+# The raw-ask matcher, ask-match/2-task (src/mathlib_review/judge/ask_matching.py), on the route
+# its 1-session matchers ran: claude-opus-5-5 at effort xhigh through Claude Code 2.1.285 on the
+# subscription login (conventions-ceiling-2026-10-04/run_claude_batch.sh). That is the route, not
+# the instrument: 2-task is not declared equivalent to 1-session until it is calibrated on
+# aligned saved examples.
+#
+#   python -m src.mathlib_review.review.cli match --plan <measurement dir> \
+#       --config configs/match/ask_match_opus55_claude_sub.yaml --run-name <name> --execute
+#
+# The plan fixes the number of blind matchers (sample_count) and early stop is always off.
+# The subscription bills nothing per token and its five-hour window is shared with interactive
+# use (CLAUDE.md, "Claude models run on the Claude Code subscription route"); a run on the
+# primary token is the user's call.
+scaffold_type: claude_code
+
+llm_config:
+  model_name: null
+
+claude_model: claude-opus-5-5
+cli_version: 2.1.285
+effort: xhigh
+
+# Everything the matcher judges is in its first message; it reads nothing and runs nothing.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: []
+disallowed_tools: [Bash, BashOutput, KillShell, Read, Grep, Glob, WebFetch, WebSearch, Task, Write,
+                   Edit, MultiEdit, NotebookEdit, TodoWrite]
+contain_to_workspace: true
+batch_preamble: plain
+workspace_environment: false
+
+execution:
+  max_turns: 20
+  # A zero-priced route needs the token half of the ceiling (CLAUDE.md, "Per-task budget").
+  sample_max_tokens: 3000000
+
+dataset: {}

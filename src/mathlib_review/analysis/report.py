@@ -666,6 +666,12 @@ def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str
         # read at a precision it cannot bear.
         "one_flip_pp": round(100.0 / n, 1) if n else None,
         "judge_identity": next(iter(identities.values())),
+        # Each repetition's full measurement identity (`judge_measurement`), by digest, so a
+        # row of this table leads to what it measured; audits judged before 2026-10-22 carry
+        # none, and say so rather than borrow another's.
+        "measurements": {label: [(p.get("measurement") or {}).get("identity_sha256")
+                                 or "unrecorded (judged before 2026-10-22)" for p in ps]
+                         for label, ps in loaded.items()},
         "repetitions": {label: len(ps) for label, ps in loaded.items()},
         "runs": reps,
         "funnel": funnel,

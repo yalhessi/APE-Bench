@@ -194,3 +194,134 @@ def silence_key(invocation_id: str, obligation_id: str) -> str:
     """The one spelling of a silence's identity. Both readers and the writer call this."""
 
     return f"{invocation_id}|{obligation_id}"
+
+
+# --- Measurement identity and the raw-ask matcher's records (2026-10-22) -----------------------
+#
+# The registered judge scores one finding against one atomic gold obligation; the raw-ask matcher
+# scores a maintainer's first-round ask against every finding of each anonymous reviewer at once.
+# They answer different questions and their numbers are never pooled. What they share is that
+# every number carries the identity below: which instrument, against which references, of which
+# subjects through which output channel, under which seal, with how many replicates. Until this
+# record the matcher's inputs were written to a scratch directory outside the repository and only
+# its verdicts were kept (`docs/research/task-dataflow-refactor-implementation-2026-10-22.md`).
+
+AskMatchValue = Literal["reached", "partial", "no"]
+
+
+class SubjectBinding(StrictModel):
+    """Whose findings a session label stands for, and through which output channel.
+
+    `packet`: a probe session's `findings.json`; `solo`: a run's submitted task findings
+    (channel `submitted`, before finalization); `lead`: a run's `findings.jsonl` (channel
+    `finalized`, with the published ones marked); `findings_file`: findings written to a file
+    per PR and session by the study itself (channel `declared`); `run`: a run the registered judge
+    scored, its finalized findings or its pre-merge candidates.
+    """
+
+    session: str
+    source: Literal["packet", "solo", "lead", "findings_file", "run"]
+    channel: Literal["packet", "submitted", "finalized", "declared", "candidates"]
+    runs: List[str] = Field(default_factory=list)
+    path: Optional[str] = None
+
+
+class MeasurementIdentity(StrictModel):
+    """What a measurement means, fixed before any verdict exists."""
+
+    schema_version: Literal["measurement-identity1"] = "measurement-identity1"
+    instrument: str
+    instrument_version: str
+    #: SHA-256 of the exact rubric text the instrument presents.
+    rubric_sha256: str
+    question_policy: Literal["request_only", "questions"] = "request_only"
+    reference_kind: Literal["raw_ask", "atomic_obligation"]
+    reference_source: str
+    reference_sha256: str
+    reference_count: int
+    population_prs: List[int]
+    seal_path: Optional[str] = None
+    seal_sha256: Optional[str] = None
+    subjects: List[SubjectBinding] = Field(default_factory=list)
+    #: The blind projection: fields kept, redaction, and any cut, as the matcher saw them.
+    projection: Dict[str, object] = Field(default_factory=dict)
+    replicates: int
+    aggregation: str
+    denominator: str
+    missingness: str
+    source_sha256: str
+
+
+class BlindAsk(StrictModel):
+    """One maintainer ask as a matcher sees it."""
+
+    ask_id: str
+    path: Optional[str] = None
+    code_at_comment: Optional[str] = None
+    comment: str
+    replies_to: Optional[str] = None
+
+
+class BlindFinding(StrictModel):
+    """One finding as a matcher sees it: its index and the four kept fields, redacted."""
+
+    i: int
+    target: Optional[str] = None
+    claim: Optional[str] = None
+    requested_change: Optional[str] = None
+    severity: Optional[str] = None
+
+
+class BlindPacket(StrictModel):
+    """Everything a matcher sees of one PR: its asks and each label's findings."""
+
+    pr: int
+    asks: List[BlindAsk]
+    reviewers: Dict[str, List[BlindFinding]]
+
+
+class MatchBatch(StrictModel):
+    batch_id: str
+    prs: List[int]
+
+
+class MatchingPlan(StrictModel):
+    """A raw-ask matching, sealed before any matcher runs. Holds the exact blind inputs."""
+
+    schema_version: Literal["matching-plan1"] = "matching-plan1"
+    plan_id: str
+    identity: MeasurementIdentity
+    identity_sha256: str
+    seal: Dict[str, Dict[str, str]]
+    batches: List[MatchBatch]
+    packets: List[BlindPacket]
+    #: Per PR and session: findings count, compiles, a cut or a cap, as `session_stats.json` held.
+    session_stats: Dict[str, Dict[str, Dict[str, object]]] = Field(default_factory=dict)
+    expected_cells: int
+    created_at: str
+    source_sha256: str
+
+
+class MatchVerdict(StrictModel):
+    """One matcher replicate's verdicts on one batch, from a task sample or an external import.
+
+    `asks` keeps the historical `matches.json` row shape (`"R1": value, "R1_finding": index`) so
+    the reading arithmetic is the one every earlier seal was read with.
+    """
+
+    schema_version: Literal["match-verdict1"] = "match-verdict1"
+    plan_id: str
+    batch_id: str
+    #: The execution or import this observation came from: `task-<run name>` or `import-<name>`.
+    #: An observation is `(producer, replicate)`; two runs of one plan both number their samples
+    #: from 1, and without the producer their rows merged into one supposed replicate
+    #: (implementation review, 2026-10-22, finding 2).
+    producer: str
+    replicate: str
+    origin: Literal["task", "external_import"]
+    #: Where the verdict's bytes are: a task directory, sample and attempt; or a file and digest.
+    locator: Dict[str, str]
+    #: What executed it, where known; an unknown is written as "unknown", never guessed.
+    executor: Dict[str, str]
+    asks: List[Dict[str, object]]
+    unmatched: Dict[str, Dict[str, int]] = Field(default_factory=dict)

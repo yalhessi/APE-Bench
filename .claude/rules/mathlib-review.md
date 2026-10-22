@@ -41,6 +41,13 @@ paths:
   left out of `global_index` until then, so the tasks that do not use it keep their identity and
   the ones that do fork. Never on `task_config`. `test_pr_review_v5_task_data_knobs.py` refuses a
   new review data field that is not a knob, and an old one that becomes one.
+  One exception to "no `__module__` enters an identity" (2026-10-22): a scaffold config holding a
+  *concrete* `task_config` serializes it with its class path, so it survives the worker boundary.
+  Review runs never set one (`load_run` turns `task_config:` into overrides), so no plan digest moves.
+- **A task setting takes effect or is refused (2026-10-22).** `resolve_task_config` refuses an unknown
+  override key and another task's concrete config, and nested children inherit no task settings from
+  their parent: pass them as `run_subtasks(task_config_overrides=...)`. Before this, a typo became the
+  default and a lead's settings were broadcast into its arms.
 - **Concern vocabulary:** arms say `documentation`, gold says `docs`; both spellings are hashed into
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.
@@ -408,7 +415,13 @@ paths:
   Sessions write `calls.jsonl`, `tmp/` and then `findings.json` into their packets as they work, so
   `git add <probe_dir>` mid-run committed 21 half-written session files with the validation
   packets (amended out before any push). Commit a session's outputs only after its transcript is
-  audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
+  audited. Reviewer packets with `ptool` and the transcript audit are `analysis/probes.py` (`cli probe
+  packets`, `cli probe audit`). Sessions over folders and their handoffs are `analysis/sessions.py`
+  (`probe session-plan`, `cli session`, `probe session-import`, `probe context-derive`, `report
+  sessions`), and matchings `analysis/matching.py` (`probe match-plan`, `cli match`, `probe
+  match-import`, `report match`). `probe seal`, `match-inputs`, `unblind` and per-probe launchers
+  such as `run_claude_batch.sh` and `run_matching.sh` are historical (2026-10-22): a new study does
+  not copy them.
 
 - **Count what every tool call came back with before reading a run's tool use as the model's
   (2026-10-01).** The command is `cli report tools --run <run>` (2026-10-06; either scaffold,
@@ -469,4 +482,16 @@ paths:
   Count only a fix in the rule's own form, and compare it with conforming code under the same attention. A practice
   rate's denominator must hold the conforming form too (line joins read "not practice" only because one-line
   signatures were left out), and check one-author concentration before reading a group's rate.
-
+- **A matching's inputs are kept, in the repository, and its numbers carry their identity
+  (2026-10-22).** Matcher inputs used to be written to `table_scratch/`, outside the repository, so
+  the bytes a matcher judged were not in the record; the filing-contract seal's 72 input files
+  survived there by luck, and a rebuilt plan reproduced them byte for byte. `cli probe match-plan`
+  seals them into the measurement directory, `cli match` runs the registered matcher
+  (`lean_pr_review_ask_matching`, `ask-match/2-task`) or `cli probe match-import` stores a
+  hand-launched matching's `matches.json` against the plan's expected cells. Never a probe-local
+  matcher, rubric copy or unblinding script; `2-task` is not declared equal to `1-session` until
+  calibrated on aligned examples.
+- **The tree lints read tracked files only, so run the suite after `git add`, not before (2026-10-20).** A
+  new probe script that splits JSONL with `splitlines()` passes the suite while untracked and fails it once
+  committed: twice in one day on `review-reconstruction` (Codex's Phase A audit, then `elm_luna_check.py`),
+  each leaving the branch red for several commits. Stage the script, run the suite, then commit.

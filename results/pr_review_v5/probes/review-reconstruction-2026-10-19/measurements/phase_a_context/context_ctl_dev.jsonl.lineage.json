@@ -1,0 +1,15 @@
+{
+  "base_path": "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/model_context.jsonl",
+  "base_sha256": "bde0dfd03904140aff4f91cefca26df956730809602e5067cc541ab337642f0b",
+  "context_sha256": "a41d263dabdb93e0958752935ad81c56b31078bc155cc7ca61b1a009011c8918",
+  "created_at": "2026-10-22T13:11:44.786046+00:00",
+  "rows": {
+    "33066": [],
+    "33117": [],
+    "33304": [],
+    "33421": []
+  },
+  "schema_version": "context-lineage1",
+  "sections": [],
+  "source_sha256": "1e6ad90c29820a4b83b401d4e2300e49f95d494b44ecce142961a49db7dcff17"
+}

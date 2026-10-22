@@ -310,3 +310,42 @@ def test_the_cli_accepts_comma_separated_repetitions_and_repeated_labels():
     source = inspect.getsource(cli._report)
     assert 'names.split(",")' in source
     assert "pairs.setdefault(label, [])" in source
+
+
+@pytest.mark.skipif(not REAL_AUDIT.is_file(), reason="needs the rep9 audit on disk")
+def test_each_repetition_names_its_measurement_or_says_it_has_none():
+    """A table row leads to what it measured (2026-10-22); an audit judged before then carries
+    no identity and says so, rather than borrowing another's."""
+
+    out = report_module.conditions({"A": "pr5_smoke4_rep9"})
+    assert out["measurements"] == {"A": ["unrecorded (judged before 2026-10-22)"]}
+
+
+def test_the_judge_writes_its_measurement_identity_into_its_report(tmp_path):
+    import inspect
+
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.judge import runner
+    from src.mathlib_review.judge.protocol import JUDGE_PROMPT, JUDGE_VERSION
+
+    assert '"measurement": measurement' in inspect.getsource(runner.run)
+    (tmp_path / "gold").mkdir()
+    (tmp_path / "gold" / "judgments.jsonl").write_text('{"x": 1}\n')
+    pairs = tmp_path / "semantic_pairs.jsonl"
+    pairs.write_text('{"pr_number": 7}\n{"pr_number": 9}\n')
+    dataset = runner.JudgeDatasetConfig(release=tmp_path, candidates=tmp_path / "findings.jsonl",
+                                        out_dir=tmp_path, input_kind="finding", run_name="r")
+    got = runner.judge_measurement(dataset, identity="judge-id", sample_count=3,
+                                   report={"per_obligation": [{"obligation_id": "o1"},
+                                                              {"obligation_id": "o2"}]},
+                                   sealed_pairs_path=pairs, pr_scope=None)
+    identity = got["identity"]
+    assert identity["instrument"] == "semantic-judge"
+    assert identity["instrument_version"] == JUDGE_VERSION
+    assert identity["rubric_sha256"] == sha256_bytes(JUDGE_PROMPT.encode())
+    assert identity["reference_kind"] == "atomic_obligation" and identity["reference_count"] == 2
+    assert identity["population_prs"] == [7, 9] and identity["replicates"] == 3
+    assert identity["subjects"][0]["channel"] == "finalized"
+    assert identity["projection"]["judge_identity"] == "judge-id"
+    body = {k: v for k, v in identity.items() if k != "source_sha256"}
+    assert got["identity_sha256"] == sha256_bytes(canonical_json_bytes(body))

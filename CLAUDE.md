@@ -128,6 +128,21 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 
 ## Reporting results
 
+- **Every number names its measurement.** Two instruments are live and they answer different
+  questions: the registered judge (`semantic-judge/<JUDGE_VERSION>`: one finding against one atomic
+  gold obligation, hits out of the denominator) and the raw-ask matcher (`ask-match/<version>`: a
+  maintainer's ask against all of a reviewer's findings, reach as a fraction of asks, comparable only
+  within one seal). Quote a number with its instrument and version, reference set, seal, subjects'
+  output channel (submitted, finalized, published), denominator and replicates -- the report's
+  `measurement` block holds all of them (`report match`, the judge's `semantic_report.json`, the
+  `measurements` row of `report conditions`). Never pool or subtract numbers from two instruments or
+  two seals. A matching is planned, run or imported, and read through `analysis/matching.py`
+  (`cli probe match-plan`, `cli match`, `cli probe match-import`, `cli report match`); sessions over
+  folders, and what one session hands the next or a reviewer, through `analysis/sessions.py` (`cli
+  probe session-plan --input-from`, `cli session`, `cli probe session-import`, `cli probe
+  context-derive`, `cli report sessions`); `cli report trace` follows any one number back to its
+  bytes. `probe seal`, `match-inputs`, `unblind` and per-probe launchers are historical. (2026-10-22:
+  the user could not tell which results were being reported or how two reports compared.)
 - Report at the altitude the evidence supports. A negative result means *the designs tried so far*
   did not work; enumerate the untried designs before concluding anything, and mark findings
   provisional until replicated. (The user has corrected over-claimed negatives three times.)
@@ -182,6 +197,11 @@ keeps a file's tests on one worker, which the module-scoped fixtures need. Leave
 targeted run — worker startup costs more than the file does (`tests/orchestration/test_pipeline.py`
 alone: 0.24s serial, 2.38s under `-n auto`) — and off `--pdb`. A bare `pytest tests -q` still
 passes, just serially, so a checkout without `pytest-xdist` degrades rather than breaks.
+
+**`No space left on device` from the suite while `df -h /tmp` shows space is `/tmp` out of inodes.**
+`/tmp` is a 1M-inode tmpfs that other sessions' scratch fills (2026-10-22: 98% used, 27k free, 502 GB
+of bytes free), and one suite run needs tens of thousands. Check `df -i /tmp`; run with
+`TMPDIR=/dev/shm/<your dir>` (148M inodes), and never delete another session's scratch to make room.
 
 **A slow test is nearly always repeated work, not coverage.** The suite was 350s in 2026-09-22 and
 88% of that sat in 60 of its 2,213 tests; the three worst were 50% between them and none was

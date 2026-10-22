@@ -1,0 +1,156 @@
+{
+  "asks": 7,
+  "measurement": {
+    "forensic": false,
+    "identity": {
+      "aggregation": "none: each replicate is read on its own, and two are compared cell by cell",
+      "denominator": "the asks of the sealed PRs (in scope, if scoped); a session's reach is asks it reached over that count, per replicate",
+      "instrument": "ask-match",
+      "instrument_version": "2-task",
+      "missingness": "every expected cell needs a verdict in every replicate; a replicate that does not cover them makes the report forensic, and an absent cell is never read as `no`",
+      "population_prs": [
+        33066
+      ],
+      "projection": {
+        "claude_cut_to": 20,
+        "harness_blind": true,
+        "keep": [
+          "target",
+          "claim",
+          "requested_change",
+          "severity"
+        ],
+        "redaction": [
+          "construction cues",
+          "conventions cues"
+        ],
+        "target": "repository path"
+      },
+      "question_policy": "questions",
+      "reference_count": 7,
+      "reference_kind": "raw_ask",
+      "reference_sha256": "5f33dc743da58667a0ff1dbd11f25c8f32b36f4fdbd0f927255d4d99e3a64be4",
+      "reference_source": "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/feedback.json + results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/asks.json",
+      "replicates": 1,
+      "rubric_sha256": "d1889a8bf62dde43066ee7a290c9389772b08d849bd48d5a67ac4f61e36c324f",
+      "schema_version": "measurement-identity1",
+      "seal_path": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/smoke_claude_code_match/seal.json",
+      "seal_sha256": "37b51f3823af7702c915b1a0abeb8bae83eef5e51fcf4d1b967310722e41e0d0",
+      "source_sha256": "30fde73288a9b62c2c1d5788a7a3c4625f141d4df2fd91fd0be388a14b3c1c10",
+      "subjects": [
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_dev_base_rep1"
+          ],
+          "session": "DX1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "probe_dev_opus55_contract2_claude_sub_rep1"
+          ],
+          "session": "OP1",
+          "source": "solo"
+        }
+      ]
+    },
+    "identity_sha256": "30fde73288a9b62c2c1d5788a7a3c4625f141d4df2fd91fd0be388a14b3c1c10",
+    "plan_id": "smoke_claude_code_match",
+    "plan_sha256": "6745c90eb7f7357b56179d0560a1a7d5e1b7e0ee9c238329234cbc823931a339",
+    "producers": {
+      "task-smoke_sonnet_match": {
+        "complete": true,
+        "forensic": false,
+        "replicates": 1
+      }
+    },
+    "replicates": {
+      "task-smoke_sonnet_match:1": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "task-smoke_sonnet_match",
+        "rows": [
+          {
+            "batch_id": "b1",
+            "executor": {
+              "cli_version": "2.1.285",
+              "effort": "high",
+              "model": "claude-sonnet-5-5",
+              "scaffold": "claude_code"
+            },
+            "locator": {
+              "attempt": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/smoke_sonnet_match/tasks/a5edf574dfd7c363658acde5aac66f633fbb419df47e09592c1d4d02e6891252/samples/0/attempts/attempt_1_20261022093710",
+              "prompt_sha256": "f282330d63b16114835399f0f84d232d81c2ef72caa1436640c7614ed6a8fb16",
+              "run": "smoke_sonnet_match",
+              "sample": "0",
+              "task_dir": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/smoke_sonnet_match/tasks/a5edf574dfd7c363658acde5aac66f633fbb419df47e09592c1d4d02e6891252"
+            },
+            "origin": "task"
+          }
+        ]
+      }
+    },
+    "replicates_expected": 1,
+    "scope": null
+  },
+  "task-smoke_sonnet_match:1": {
+    "condition_reach": {
+      "DX": 0.0,
+      "OP": 0.2857142857142857
+    },
+    "published_reach": {},
+    "reach": {
+      "DX1": 0.0,
+      "OP1": 0.2857142857142857
+    },
+    "stable": {
+      "DX": [],
+      "OP": [
+        "d0001",
+        "d0007"
+      ]
+    },
+    "table": {
+      "d0001": {
+        "DX1": "no",
+        "OP1": "reached"
+      },
+      "d0002": {
+        "DX1": "no",
+        "OP1": "no"
+      },
+      "d0003": {
+        "DX1": "no",
+        "OP1": "no"
+      },
+      "d0004": {
+        "DX1": "no",
+        "OP1": "no"
+      },
+      "d0005": {
+        "DX1": "no",
+        "OP1": "no"
+      },
+      "d0006": {
+        "DX1": "no",
+        "OP1": "no"
+      },
+      "d0007": {
+        "DX1": "no",
+        "OP1": "reached"
+      }
+    },
+    "union": {
+      "DX": [],
+      "OP": [
+        "d0001",
+        "d0007"
+      ]
+    }
+  }
+}

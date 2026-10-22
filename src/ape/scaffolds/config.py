@@ -6,7 +6,9 @@ Provides Pydantic configuration models for all scaffold types.
 
 from typing import Any, Dict, Literal, Optional
 from pathlib import Path
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+import importlib
+
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 from ape.orchestration.config import ExecutionConfig
 from ape.tasks.base import BaseTaskConfig
 from ape.llm_clients.config import LLMConfig
@@ -18,6 +20,10 @@ from ape.runtime.local.runtime import LocalRuntimeConfig
 from ape.runtime.base import RuntimeConfig
 from ape.utils.project import PROJECT_ROOT
 from ape.scaffolds.skills import SkillsConfig
+
+
+#: The key under which a serialized task config names its own class (see `BaseScaffoldConfig`).
+TASK_CONFIG_CLASS_KEY = "__task_config_class__"
 
 
 class BaseToolsConfig(BaseModel):
@@ -67,6 +73,39 @@ class BaseScaffoldConfig(BaseModel):
     task_config: Optional[BaseTaskConfig] = None
     # Task config overrides passed from CLI/YAML (persisted for runtime task rebuild)
     task_config_overrides: Optional[Dict[str, Any]] = None
+
+    @field_serializer("task_config")
+    def _serialize_task_config(self, value: Optional[BaseTaskConfig], info):
+        """A concrete task config crosses the worker boundary as itself, not as its base class.
+
+        The field is annotated `BaseTaskConfig`, and pydantic serializes a field by its
+        annotation: a `LeanJudgmentConfig(judge_mode=...)` dumped as two base fields, the worker
+        validated those back into a bare `BaseTaskConfig`, and every subclass setting was gone
+        with no warning. So the dump names its class, and the validator below restores it.
+        Only explicitly set fields are written, so a field left at its default stays a default.
+        """
+
+        if value is None:
+            return None
+        cls = type(value)
+        payload = value.model_dump(mode=info.mode, exclude_unset=True)
+        return {TASK_CONFIG_CLASS_KEY: f"{cls.__module__}:{cls.__qualname__}", **payload}
+
+    @field_validator("task_config", mode="before")
+    @classmethod
+    def _restore_task_config(cls, value: Any) -> Any:
+        """The inverse of `_serialize_task_config`; an untagged dict validates as before."""
+
+        if isinstance(value, dict) and TASK_CONFIG_CLASS_KEY in value:
+            payload = dict(value)
+            module_name, _, qualname = payload.pop(TASK_CONFIG_CLASS_KEY).partition(":")
+            target: Any = importlib.import_module(module_name)
+            for part in qualname.split("."):
+                target = getattr(target, part)
+            if not (isinstance(target, type) and issubclass(target, BaseTaskConfig)):
+                raise ValueError(f"{module_name}:{qualname} is not a task config class")
+            return target.model_validate(payload)
+        return value
 
     # Managed agent skills
     skills: SkillsConfig = Field(default_factory=SkillsConfig)

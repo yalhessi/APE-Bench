@@ -240,6 +240,16 @@ def assert_ready(scaffold: Any, logger: Any, *, enforce: bool = True) -> None:
     raise PreflightError(report)
 
 
+def assert_credentials(scaffold: Any) -> None:
+    """Only the model credential: for a task that calls a model and compiles nothing (the
+    raw-ask matcher), where `assert_ready`'s toolchain check would refuse for no reason."""
+
+    unmet = _check_model_credential(scaffold)
+    if unmet is not None:
+        raise PreflightError(
+            "the model credential is not available, so nothing has started:\n\n" + unmet.render())
+
+
 def assert_toolchain(scaffold: Any, logger: Any) -> None:
     """The toolchain check alone, for a caller that compiles Lean and calls no model.
 

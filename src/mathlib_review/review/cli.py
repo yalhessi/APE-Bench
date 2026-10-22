@@ -44,7 +44,7 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline"})
+SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match", "session"})
 
 
 def _producer(args) -> int:
@@ -193,16 +193,28 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback": "extract round-1 feedback; --write refuses while a session is unfinished",
         "readers": "reader folders (batch, rubric) and their prompts",
         "asks": "the agreed asks from two readers' labels",
-        "seal": "a fresh blinding of the named sessions",
-        "match-inputs": "blind matcher inputs and matcher folders under a seal",
-        "unblind": "reach per session and condition from the matchers' outputs",
+        "seal": "(historical; new matchings draw it with match-plan --sessions) a fresh blinding of "
+                "the named sessions",
+        "match-inputs": "(historical; new matchings: match-plan, then cli match or match-import) blind "
+                        "matcher inputs and matcher folders under a seal",
+        "unblind": "(historical; new matchings: report match) reach per session and condition from the "
+                   "matchers' outputs; refuses files that miss cells",
         "audit": "check a transcript stayed in its folder",
         "restore-bases": "restore the PRs' built base snapshots, before a reviewed build",
         "import": "write a session's findings as a scoreable run (anchoring + finalize), for the judge",
+        "match-plan": "seal a raw-ask matching: the exact blind inputs, the seal, the batches, the "
+                      "measurement identity (analysis/matching.py); calls no model",
+        "match-import": "store externally produced matches.json files as a plan's verdicts, "
+                        "refused unless they cover every expected cell",
+        "session-plan": "seal model sessions over packet folders: every file, the brief, the "
+                        "declared outputs (analysis/sessions.py); calls no model",
+        "session-import": "store hand-launched sessions' declared outputs beside a session plan",
+        "context-derive": "write a solo context_file whose per-PR sections are stored session "
+                          "outputs, with its lineage (analysis/sessions.derive_context)",
     }
     parsers = {name: probe_sub.add_parser(name, help=text) for name, text in step.items()}
     for name, sp in parsers.items():
-        if name != "audit":
+        if name not in ("audit", "session-plan", "session-import", "context-derive"):
             sp.add_argument("--set", required=True, type=Path, help="configs/probe_sets/<name>.yaml")
     for name in ("packets", "prompts", "feedback"):
         parsers[name].add_argument("--sessions", nargs="+", default=["X1", "X2"])
@@ -248,11 +260,99 @@ def build_parser() -> argparse.ArgumentParser:
     parsers["unblind"].add_argument("--matches", required=True, type=Path,
                                     help="a directory with matches.1.json, matches.2.json, session_stats.json")
     parsers["unblind"].add_argument("--scope", nargs="+", help="families to restrict to")
+    parsers["unblind"].add_argument("--allow-incomplete", action="store_true",
+                                    help="read matchers' files that miss cells, marked forensic")
     parsers["import"].add_argument("--session", required=True)
     parsers["import"].add_argument("--run-name", required=True,
                                    help="the run directory to write under results/pr_review_v5/runs/")
     parsers["audit"].add_argument("--folder", required=True, type=Path)
     parsers["audit"].add_argument("--transcript", required=True, type=Path)
+    mp = parsers["match-plan"]
+    mp.add_argument("--name", required=True, help="the plan's id; also its measurement's name")
+    mp.add_argument("--out", required=True, type=Path,
+                    help="the measurement directory, in the repository: the plan, the verdicts "
+                         "and the report live here")
+    seal_from = mp.add_mutually_exclusive_group(required=True)
+    seal_from.add_argument("--seal", type=Path, help="an existing blinding file")
+    seal_from.add_argument("--sessions", nargs="+", help="draw a fresh blinding of these sessions, "
+                                                          "written to <out>/seal.json")
+    mp.add_argument("--prs", nargs="+", type=int, help="with --sessions: default the set's PRs with asks")
+    mp.add_argument("--sources", required=True, type=Path,
+                    help='JSON {session: {"kind": "claude|solo|lead|findings_file", "run": ..., '
+                         '"path": ...}}')
+    mp.add_argument("--ask-packets", type=Path,
+                    help="the asks as the study built them, {pr: [ask, ...]}, in place of the set's "
+                         "feedback and agreed asks")
+    mp.add_argument("--version", default="2-task", choices=["2-task", "1-session"],
+                    help="2-task: the matching will run as tasks; 1-session: bind an existing "
+                         "hand-launched matching so its matches.json can be imported")
+    mp.add_argument("--question-form", action="store_true",
+                    help="the rules that judge a question to the author like any finding")
+    mp.add_argument("--harness-blind", action="store_true")
+    mp.add_argument("--replicates", type=int, default=2, help="independent blind matchers")
+    mp.add_argument("--batch-size", type=int, help="PRs a matcher session judges; default all")
+    mi = parsers["match-import"]
+    mi.add_argument("--plan", required=True, type=Path)
+    mi.add_argument("--matches", nargs="+", required=True, type=Path,
+                    help="one matches.json per replicate, in replicate order")
+    mi.add_argument("--name", required=True, help="names this import in the verdict store")
+    mi.add_argument("--executor", nargs="*", default=[], metavar="KEY=VALUE",
+                    help="what is known of how they were produced, e.g. model=claude-opus-5-5")
+    mi.add_argument("--allow-incomplete", action="store_true",
+                    help="store an import that misses cells; its report is then forensic")
+
+    sp_plan = parsers["session-plan"]
+    sp_plan.add_argument("--packets", required=True, type=Path,
+                         help="a directory holding one folder per session")
+    sp_plan.add_argument("--packet-ids", nargs="+", help="only these folders")
+    sp_plan.add_argument("--brief", required=True, type=Path,
+                         help="the session prompt; {dir} stands for the folder")
+    sp_plan.add_argument("--output", action="append", required=True, metavar="NAME[:KIND]",
+                         help="a file each session must leave, kind json|jsonl|text. Repeatable")
+    sp_plan.add_argument("--name", required=True)
+    sp_plan.add_argument("--out", required=True, type=Path)
+    sp_plan.add_argument("--replicates", type=int, default=1)
+    sp_plan.add_argument("--include", nargs="+", metavar="FILE",
+                         help="plan folders sessions already ran in: exactly these files were "
+                              "their inputs (outputs and audits beside them are not); a name "
+                              "with * ? or [ is a glob, e.g. 'base/**/*.lean'")
+    sp_plan.add_argument("--input-from", action="append", default=[],
+                         metavar="FILE=PLAN_DIR@PRODUCER[:OUTPUT]",
+                         help="this input is an upstream session's stored output (taken from it, "
+                              "or with --include checked against it); recorded in lineage.json. "
+                              "Repeat a FILE with --include to bind it to whichever of several "
+                              "producers holds its bytes")
+    sp_plan.add_argument("--upstream-packet", action="append", default=[], metavar="PACKET=UPSTREAM",
+                         help="the upstream packet a packet's bound inputs come from, when the ids differ")
+    sp_plan.add_argument("--allow-unmatched", action="store_true",
+                         help="with --include: plan inputs no upstream observation holds, listed "
+                              "with the reason in lineage.json")
+    sp_derive = parsers["context-derive"]
+    sp_derive.add_argument("--spec", required=True, type=Path,
+                           help='JSON {"base", "prs", "sections": [{"title", "lead", "plan_dir", '
+                                '"producer", "output", "replicate"?, "by_pr"?}]}')
+    sp_derive.add_argument("--out", required=True, type=Path, help="the context file to write")
+    sp_import = parsers["session-import"]
+    sp_import.add_argument("--plan", required=True, type=Path)
+    sp_import.add_argument("--folder", action="append", required=True, metavar="PACKET=FOLDER")
+    sp_import.add_argument("--name", required=True)
+    sp_import.add_argument("--executor", nargs="*", default=[], metavar="KEY=VALUE")
+
+    session = sub.add_parser("session", help="run a sealed session plan's packets as tasks")
+    session.add_argument("--plan", required=True, type=Path)
+    session.add_argument("--config", required=True, type=Path,
+                         help="the sessions' route, e.g. configs/session/packet_session_opus55_claude_sub.yaml")
+    _add_run_name(session)
+    _add_set(session)
+    _add_execute(session)
+
+    match = sub.add_parser("match", help="run a sealed raw-ask matching's blind matchers as tasks")
+    match.add_argument("--plan", required=True, type=Path, help="the measurement directory")
+    match.add_argument("--config", required=True, type=Path,
+                       help="the matcher's route, e.g. configs/match/ask_match_opus55_claude_sub.yaml")
+    _add_run_name(match)
+    _add_set(match)
+    _add_execute(match)
 
     judge = sub.add_parser("judge", help="score a generation run against gold")
     judge.add_argument("--config", type=Path, required=True)
@@ -330,6 +430,50 @@ def build_parser() -> argparse.ArgumentParser:
     retrieval = report_sub.add_parser(
         "retrieval", help="which retrieval tool the arms reached for, and what came back")
     retrieval.add_argument("--run", required=True)
+    match_report = report_sub.add_parser(
+        "match", help="a matching's numbers, with its measurement identity and coverage")
+    match_report.add_argument("--plan", required=True, type=Path)
+    match_report.add_argument("--asks", type=Path, help="the set's asks.json, for --scope families")
+    match_report.add_argument("--scope", nargs="+", help="families to restrict to")
+    match_report.add_argument("--producer", help="read one execution or import of the plan "
+                                                 "(task-<run> or import-<name>); required when "
+                                                 "the store holds several")
+    match_report.add_argument("--producers", nargs="+",
+                              help="read several side by side, each judged on its own coverage")
+    match_report.add_argument("--replicates", nargs="+",
+                              help="read only these observations, e.g. task-r1:1 task-r1:2")
+    sessions_report = report_sub.add_parser(
+        "sessions", help="a session plan's coverage: per producer, the observations held, missing "
+                         "and unreadable")
+    sessions_report.add_argument("--plan", required=True, type=Path)
+    sessions_report.add_argument("--producer", help="one execution or import (task-<run>, import-<name>)")
+    trace = report_sub.add_parser(
+        "trace", help="one number followed back to its bytes: a matching cell (--plan --pr --ask "
+                      "--session) or a judged obligation (--of --obligation)")
+    trace.add_argument("--plan", type=Path, help="a matching's measurement directory")
+    trace.add_argument("--pr", type=int)
+    trace.add_argument("--ask")
+    trace.add_argument("--session")
+    trace.add_argument("--producer", help="one execution or import of the matching; default all")
+    trace.add_argument("--of", dest="of_run", help="a judged generation run")
+    trace.add_argument("--obligation")
+    trace.add_argument("--node", default="judge", help="which judgement of the run")
+    compare = report_sub.add_parser(
+        "compare", help="why two or more results differ: their measurement identities, their runs' "
+                        "sealed plans, and what the difference can support")
+    compare.add_argument("sources", nargs="+", metavar="LABEL=SOURCE",
+                         help="a matching's measurement directory (optionally @<producer>) or a "
+                              "judged run's name")
+    compare.add_argument("--contrast", nargs="+", default=[],
+                         help="what is meant to differ (identity or run-plan fields, e.g. "
+                              "model_name evaluation_settings.design); the rest is listed as "
+                              "undeclared")
+    inputs = report_sub.add_parser(
+        "inputs", help="what a run's reviewers were given: the sealed input files, the route, and "
+                       "each attempt's stored first messages and tools")
+    inputs.add_argument("--run", required=True)
+    inputs.add_argument("--pr", type=int)
+    inputs.add_argument("--full", action="store_true", help="print the messages whole")
     tools = report_sub.add_parser(
         "tools", help="what every tool call came back with: answered, negative, refused, "
                       "error or env, per tool, from the session transcripts in .ape/runs")
@@ -633,6 +777,53 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
+    elif args.report_command == "match":
+        from src.mathlib_review.analysis.matching import report_matching
+
+        families = json.loads(args.asks.read_text()).get("families") if args.asks else None
+        producers = [args.producer] if args.producer else args.producers
+        try:
+            print(json.dumps(report_matching(args.plan, families=families,
+                                             scope=set(args.scope) if args.scope else None,
+                                             replicates=args.replicates, producers=producers),
+                             indent=1))
+        except ValueError as error:
+            raise SystemExit(str(error))
+    elif args.report_command == "sessions":
+        from src.mathlib_review.analysis.sessions import session_coverage
+
+        try:
+            coverage = session_coverage(args.plan, args.producer)
+        except ValueError as error:
+            raise SystemExit(str(error))
+        print(json.dumps(coverage, indent=1))
+        return 0 if all(p["complete"] for p in coverage["producers"].values()) else 1
+    elif args.report_command == "trace":
+        from src.mathlib_review.analysis.trace import trace_judgment, trace_matching
+
+        if args.plan and not args.of_run and None not in (args.pr, args.ask, args.session):
+            print(json.dumps(trace_matching(args.plan, args.pr, args.ask, args.session,
+                                            producer=args.producer), indent=1))
+        elif args.of_run and args.obligation and not args.plan:
+            print(json.dumps(trace_judgment(args.of_run, args.obligation, args.node), indent=1))
+        else:
+            raise SystemExit("trace a matching cell with --plan --pr --ask --session, or a judged "
+                             "obligation with --of --obligation")
+    elif args.report_command == "compare":
+        from src.mathlib_review.analysis.trace import compare_measurements
+
+        sources = {}
+        for item in args.sources:
+            label, sep, source = item.partition("=")
+            sources[label if sep else item] = source if sep else item
+        try:
+            print(json.dumps(compare_measurements(sources, args.contrast), indent=1, default=str))
+        except ValueError as error:
+            raise SystemExit(str(error))
+    elif args.report_command == "inputs":
+        from src.mathlib_review.analysis.trace import run_inputs
+
+        print(json.dumps(run_inputs(args.run, pr=args.pr, full=args.full), indent=1))
     elif args.report_command == "tools":
         from src.mathlib_review.analysis.tool_outcomes import tool_outcomes
 
@@ -690,6 +881,88 @@ def _report(args) -> int:
     return 0
 
 
+def _session(args, overrides, logger) -> int:
+    """Run a sealed session plan's packets as `packet_session` tasks."""
+
+    from src.mathlib_review.analysis.matching import MatchDatasetConfig
+    from src.mathlib_review.analysis.sessions import load_session_plan, run_sessions
+    from src.mathlib_review.run_config import load_run
+
+    plan = load_session_plan(args.plan)
+    plan_dir = args.plan if args.plan.is_dir() else args.plan.parent
+    dataset, scaffold, _task_overrides = load_run(args.config, MatchDatasetConfig, overrides)
+    run_name = args.run_name or dataset.run_name
+    if not run_name:
+        raise SystemExit("name the run: --run-name <name>")
+    if not args.execute:
+        _say_nothing_ran("session", {
+            "plan": f"{plan.plan_id} (brief {plan.brief_sha256[:12]})",
+            "would run": f"{len(plan.packets)} session(s) x {plan.replicates} replicate(s)",
+            "outputs": ", ".join(o["name"] for o in plan.outputs),
+            "route": _route_line(scaffold),
+            "into": f".ape/runs/{run_name}, outputs to {plan_dir}/outputs/",
+        })
+        return 0
+    from src.mathlib_review.review.preflight import assert_credentials
+
+    assert_credentials(scaffold)
+    import asyncio
+
+    from src.mathlib_review.analysis.matching import task_producer
+    from src.mathlib_review.analysis.sessions import session_coverage
+
+    asyncio.run(run_sessions(plan, plan_dir, scaffold, run_name, logger))
+    coverage = session_coverage(plan_dir, task_producer(run_name))
+    held = coverage["producers"][task_producer(run_name)]
+    print(json.dumps({"plan_id": plan.plan_id, "producer": task_producer(run_name), **held}, indent=1))
+    return 0 if held["complete"] else 1
+
+
+def _route_line(scaffold) -> str:
+    """The executor a run binding will record, as one line, so a dry run shows what binds."""
+
+    from src.mathlib_review.analysis.matching import executor_of
+
+    executor = executor_of(scaffold)
+    line = f"{executor['scaffold']} {executor['model']} at effort {executor['effort']}"
+    return line + (f", CLI {executor['cli_version']}" if executor["cli_version"] != "unknown" else "")
+
+
+def _match(args, overrides, logger) -> int:
+    """Run a sealed matching's batches as `lean_pr_review_ask_matching` tasks."""
+
+    from src.mathlib_review.analysis.matching import (
+        MatchDatasetConfig, load_plan, plan_dir_of, run_matching, task_payloads,
+    )
+    from src.mathlib_review.run_config import load_run
+
+    plan = load_plan(args.plan)
+    payloads = task_payloads(plan)
+    dataset, scaffold, _task_overrides = load_run(args.config, MatchDatasetConfig, overrides)
+    run_name = args.run_name or dataset.run_name
+    if not run_name:
+        raise SystemExit("name the run: --run-name <name> (its orchestrator directory and the "
+                         "verdict store's file are named by it)")
+    if not args.execute:
+        _say_nothing_ran("match", {
+            "plan": f"{plan.plan_id} ({plan.identity.instrument}/{plan.identity.instrument_version})",
+            "would run": f"{len(payloads)} batch task(s) x {plan.identity.replicates} replicate(s)",
+            "cells per replicate": plan.expected_cells,
+            "route": _route_line(scaffold),
+            "into": f".ape/runs/{run_name}, verdicts to {plan_dir_of(args.plan)}/verdicts/",
+        })
+        return 0
+    from src.mathlib_review.review.preflight import assert_credentials
+
+    assert_credentials(scaffold)
+    import asyncio
+
+    rows = asyncio.run(run_matching(plan, plan_dir_of(args.plan), scaffold, run_name, logger))
+    print(json.dumps({"plan_id": plan.plan_id, "verdicts": len(rows),
+                      "expected": len(payloads) * plan.identity.replicates}, indent=1))
+    return 0 if len(rows) == len(payloads) * plan.identity.replicates else 1
+
+
 def _probe(args, logger) -> int:
     from src.mathlib_review.analysis import probes
 
@@ -703,6 +976,54 @@ def _probe(args, logger) -> int:
         report = probes.audit_transcript(args.folder, args.transcript)
         print(json.dumps(report, indent=1))
         return 1 if report["flagged"] else 0
+    if args.probe_command == "session-plan":
+        from src.mathlib_review.analysis.sessions import plan_sessions
+
+        outputs = []
+        for item in args.output:
+            out_name, _sep, kind = item.partition(":")
+            outputs.append({"name": out_name, "kind": kind or "text"})
+        inputs_from = {}
+        for item in args.input_from:
+            file_name, _sep, source = item.partition("=")
+            plan_dir, _at, rest = source.partition("@")
+            producer, _colon, output = rest.partition(":")
+            if not (file_name and plan_dir and producer):
+                raise SystemExit(f"--input-from {item!r}: FILE=PLAN_DIR@PRODUCER[:OUTPUT]")
+            inputs_from.setdefault(file_name, []).append(
+                {"plan_dir": plan_dir, "producer": producer, **({"output": output} if output else {})})
+        plan = plan_sessions(args.packets, name=args.name, brief=args.brief.read_text(),
+                             outputs=outputs, out_dir=args.out, replicates=args.replicates,
+                             packet_ids=args.packet_ids, include=args.include,
+                             inputs_from=inputs_from or None,
+                             upstream_packets=dict(i.split("=", 1) for i in args.upstream_packet),
+                             allow_unmatched=args.allow_unmatched)
+        print(json.dumps({"plan": str(args.out), "plan_id": plan.plan_id,
+                          "packets": len(plan.packets), "replicates": plan.replicates,
+                          "brief_sha256": plan.brief_sha256}, indent=1))
+        return 0
+    if args.probe_command == "context-derive":
+        from src.mathlib_review.analysis.sessions import context_lineage_path, derive_context
+
+        spec = json.loads(args.spec.read_text())
+        lineage = derive_context(base=Path(spec["base"]), sections=spec["sections"],
+                                 prs=spec["prs"], out=args.out)
+        print(json.dumps({"context_file": str(args.out),
+                          "lineage": str(context_lineage_path(args.out)),
+                          "context_sha256": lineage.context_sha256,
+                          "prs": sorted(int(p) for p in lineage.rows),
+                          "sections": [s["title"] for s in lineage.sections]}, indent=1))
+        return 0
+    if args.probe_command == "session-import":
+        from src.mathlib_review.analysis.sessions import import_session_outputs, load_session_plan
+
+        plan = load_session_plan(args.plan)
+        folders = dict(item.split("=", 1) for item in args.folder)
+        rows = import_session_outputs(plan, args.plan if args.plan.is_dir() else args.plan.parent,
+                                      {k: Path(v) for k, v in folders.items()}, args.name,
+                                      executor=dict(i.split("=", 1) for i in args.executor))
+        print(json.dumps({"imported": len(rows), "plan_id": plan.plan_id}, indent=1))
+        return 0
     spec = probes.load_probe_set(args.set)
     if args.probe_command == "packets" and args.swap_from:
         if len(args.sessions) != 1:
@@ -774,6 +1095,41 @@ def _probe(args, logger) -> int:
             print(json.dumps({"folder": str(d.resolve()),
                               "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))
         print(json.dumps({"prs": len(stats), "inputs": str(inputs)}))
+    elif args.probe_command == "match-plan":
+        from src.mathlib_review.analysis.matching import SEAL_FILE, plan_matching
+
+        if args.seal:
+            seal_path = args.seal
+        else:
+            asks = json.loads(spec.asks_file.read_text())["asks"]
+            prs = args.prs or [int(pr) for pr, ids in asks.items() if ids]
+            seal_path = args.out / SEAL_FILE
+            if seal_path.exists():
+                raise SystemExit(f"{seal_path} exists; a seal is drawn once")
+            probes.write_json(seal_path, probes.seal_labels(prs, args.sessions))
+        sources = {k: probes.Source.model_validate(v)
+                   for k, v in json.loads(args.sources.read_text()).items()}
+        plan = plan_matching(
+            spec, name=args.name, seal=json.loads(seal_path.read_text()), seal_path=seal_path,
+            sources=sources, out_dir=args.out, version=args.version,
+            question_policy="questions" if args.question_form else "request_only",
+            replicates=args.replicates, batch_size=args.batch_size,
+            harness_blind=args.harness_blind,
+            ask_packets=json.loads(args.ask_packets.read_text()) if args.ask_packets else None,
+            ask_packets_path=args.ask_packets)
+        print(json.dumps({"plan": str(args.out), "plan_id": plan.plan_id,
+                          "identity_sha256": plan.identity_sha256, "prs": len(plan.packets),
+                          "batches": len(plan.batches), "expected_cells": plan.expected_cells,
+                          "replicates": plan.identity.replicates}, indent=1))
+    elif args.probe_command == "match-import":
+        from src.mathlib_review.analysis.matching import import_matches, load_plan, plan_dir_of
+
+        plan = load_plan(args.plan)
+        executor = dict(item.split("=", 1) for item in args.executor)
+        rows = import_matches(plan, plan_dir_of(args.plan),
+                              {str(n): path for n, path in enumerate(args.matches, start=1)},
+                              args.name, executor=executor, allow_incomplete=args.allow_incomplete)
+        print(json.dumps({"imported": len(rows), "plan_id": plan.plan_id}, indent=1))
     elif args.probe_command == "import":
         from src.mathlib_review.paths import run_dir
         print(json.dumps(probes.import_probe_session(spec, args.session, run_dir(args.run_name)), indent=1))
@@ -782,11 +1138,24 @@ def _probe(args, logger) -> int:
         print(json.dumps(status, indent=1))
         return 0 if all(v == "restored" for v in status.values()) else 1
     elif args.probe_command == "unblind":
+        from src.mathlib_review.judge.ask_matching import missing_cells
+
         matches = {m: json.loads((args.matches / f"matches.{m}.json").read_text()) for m in ("1", "2")}
         stats = json.loads((args.matches / "session_stats.json").read_text())
-        print(json.dumps(probes.unblind(json.loads(spec.asks_file.read_text()),
-                                        json.loads(args.seal.read_text()), matches, stats,
-                                        scope=set(args.scope) if args.scope else None), indent=1))
+        asks, seal = json.loads(spec.asks_file.read_text()), json.loads(args.seal.read_text())
+        scope = set(args.scope) if args.scope else None
+        missing = missing_cells(asks, seal, matches, scope)
+        if missing and not args.allow_incomplete:
+            raise SystemExit("the matchers' files miss cells, which unblind would read as not "
+                             "reached: " + "; ".join(f"matcher {m}: {len(v)} ({', '.join(v[:3])})"
+                                                     for m, v in missing.items())
+                             + ". New matchings: `probe match-plan`, `cli match` or `probe "
+                               "match-import`, `report match`. --allow-incomplete reads it "
+                               "anyway, marked forensic.")
+        out = probes.unblind(asks, seal, matches, stats, scope=scope)
+        if missing:
+            out = {"forensic": True, "missing_cells": missing, **out}
+        print(json.dumps(out, indent=1))
     return 0
 
 
@@ -830,6 +1199,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _report(args)
     if args.command == "probe":
         return _probe(args, logger)
+    if args.command == "match":
+        return _match(args, overrides, logger)
+    if args.command == "session":
+        return _session(args, overrides, logger)
     if args.command == "tool":
         from src.mathlib_review.review.toolbox import main as tool_main
 

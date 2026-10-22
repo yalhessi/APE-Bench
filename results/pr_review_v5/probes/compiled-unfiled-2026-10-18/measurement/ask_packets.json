@@ -1,0 +1,318 @@
+{
+ "26755": [
+  {
+   "ask_id": "v0016",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "code_at_comment": "",
+   "comment": "How many `noncomputable`s from this file are still necessary? `coeMonoidHom` looks like it can be computable too?",
+   "replies_to": null
+  }
+ ],
+ "30458": [
+  {
+   "ask_id": "v0060",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "code_at_comment": "@@ -1241,19 +1241,33 @@ lemma card_le_card_pow (hn : n ≠ 0) : #s ≤ #(s ^ n) := by\n \n end CancelMonoid\n \n-section Group\n-variable [Group α] [DecidableEq α] {s t : Finset α}\n+section DivisionMonoid\n+\n+section LeftCancel\n+variable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}\n+\n+@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by",
+   "comment": "you don't need to section these off\r\njust keep things the same as before, collect the common variables, and then add variables as needed\r\nso, in this case, instead of `variable [Group α]` at the start, change it to `[DivisionMonoid α]`, and keep the rest the same, and before this lemma add:\r\n```suggestion\r\nvariable [IsLeftCancelMul α] in\r\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by\r\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0061",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "code_at_comment": " ha⟩ := hs\n+  exact card_le_card_image₂_left _ ha (div_right_injective (b := a))\n+\n+end LeftCancel\n \n-@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n-  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n+section RightCancel\n+variable [DivisionMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}\n \n-@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n-  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective\n+@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by",
+   "comment": "following the above suggestion:\r\n```suggestion\r\nvariable [IsRightCancel α] in\r\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by\r\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0062",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "code_at_comment": "@@ -1241,19 +1241,33 @@ lemma card_le_card_pow (hn : n ≠ 0) : #s ≤ #(s ^ n) := by\n \n end CancelMonoid\n \n-section Group\n-variable [Group α] [DecidableEq α] {s t : Finset α}\n+section DivisionMonoid\n+\n+section LeftCancel\n+variable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}\n+\n+@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by\n+  obtain ⟨a, ha⟩ := hs\n+  exact card_le_card_image₂_left _ ha (div_right_injective (b := a))",
+   "comment": "does the old proof not work?",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0063",
+   "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+   "code_at_comment": "ncel\n \n-@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n-  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n+section RightCancel\n+variable [DivisionMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}\n \n-@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n-  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective\n+@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by\n+  obtain ⟨b, hb⟩ := ht\n+  exact card_le_card_image₂_right _ hb (div_left_injective (b := b))",
+   "comment": "same here, does the old proof not work?",
+   "replies_to": null
+  }
+ ],
+ "32875": [
+  {
+   "ask_id": "v0090",
+   "path": "Mathlib/Data/Finset/Image.lean",
+   "code_at_comment": "@@ -72,11 +72,8 @@ theorem mem_map {b : β} : b ∈ s.map f ↔ ∃ a ∈ s, f a = b :=\n -- Higher priority to apply before `mem_map`.\n @[simp 1100]\n theorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n-  rw [mem_map]\n-  exact\n-    ⟨by\n-      rintro ⟨a, H, rfl⟩\n-      simpa, fun h => ⟨_, h, by simp⟩⟩\n+  simp only [mem_map, Equiv.coe_toEmbedding]",
+   "comment": "Both of these should probably be tagged with `grind`.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0091",
+   "path": "Mathlib/Data/Rat/Lemmas.lean",
+   "code_at_comment": "@@ -300,10 +300,8 @@ theorem inv_natCast_num_of_pos {a : ℕ} (ha0 : 0 < a) : (a : ℚ)⁻¹.num = 1\n   inv_intCast_num_of_pos (mod_cast ha0 : 0 < (a : ℤ))\n \n theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n-  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one]\n-  apply den_div_eq_of_coprime ha0\n-  rw [Int.natAbs_one]\n-  exact Nat.coprime_one_left _\n+  simp only [den_inv, num_intCast]",
+   "comment": "Same here.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0092",
+   "path": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+   "code_at_comment": "@@ -458,12 +458,8 @@ lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Typ\n     refine (e.forall_congr ?_).symm\n     intro i\n     rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n-  rw [this, pi_pi, Finset.prod_equiv e.symm]\n-  · simp only [Finset.mem_univ, implies_true]\n-  intro i _\n-  simp only [s']\n-  congr\n-  all_goals rw [e.apply_symm_apply]\n+  simp only [pi_pi, this]\n+  exact Fintype.prod_equiv _ _ _ (congrFun rfl)",
+   "comment": "`simpa using`?",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0093",
+   "path": "Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+   "code_at_comment": "ndsto_of_forall_isClosed_limsup_le' fun F hF ↦ ?_\n-  rcases L.eq_or_neBot with rfl | hne\n-  · simp\n-  specialize h F hF\n-  simp only [Measure.real_def] at h\n-  rwa [ENNReal.limsup_toReal_eq (b := 1) (by simp) (.of_forall fun i ↦ prob_le_one),\n-    ENNReal.toReal_le_toReal _ (by finiteness)] at h\n-  refine ne_top_of_le_ne_top (b := 1) (by simp) ?_\n-  refine limsup_le_of_le ?_ (.of_forall fun i ↦ prob_le_one)\n-  exact isCoboundedUnder_le_of_le L (x := 0) (by simp)\n+  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h\n+  exact tendsto_of_forall_isClosed_limsup_le h",
+   "comment": "````suggestion\nTendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le (by simpa using h)\n````",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0094",
+   "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+   "code_at_comment": " β} (hs : Measur\n     ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n   have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n     congr; exact (κ.disintegrate _).symm\n-  rw [this, Kernel.compProd_apply (hs.prod ht)]\n-  classical\n-  have : ∀ b, Kernel.condKernel κ (a, b) {c | (b, c) ∈ s ×ˢ t}\n-      = s.indicator (fun b ↦ Kernel.condKernel κ (a, b) t) b := by\n-    intro b\n-    by_cases hb : b ∈ s <;> simp [hb]\n-  simp_rw [Set.preimage, this]\n-  rw [lintegral_indicator hs]\n+  simp only [this]\n+  exact (Kernel.compProd_apply_prod hs ht).symm",
+   "comment": "````suggestion\nsimpa [this] using (Kernel.compProd_apply_prod hs ht).symm\n````",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0095",
+   "path": "Mathlib/Probability/Kernel/Disintegration/Integral.lean",
+   "code_at_comment": "@@ -149,14 +143,8 @@ lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s\n     ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n   have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by\n     congr; exact (ρ.disintegrate _).symm\n-  rw [this, compProd_apply (hs.prod ht)]\n-  classical\n-  have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t)\n-      = s.indicator (fun b ↦ ρ.condKernel b t) b := by\n-    intro b\n-    by_cases hb : b ∈ s <;> simp [hb]\n-  simp_rw [this]\n-  rw [lintegral_indicator hs]\n+  simp only [this]\n+  exact (compProd_apply_prod hs ht).symm",
+   "comment": "simpa",
+   "replies_to": null
+  }
+ ],
+ "33066": [
+  {
+   "ask_id": "d0001",
+   "path": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean",
+   "code_at_comment": "@@ -682,6 +683,36 @@ theorem inner_map_map_of_mem_unitary {u : H →L[𝕜] H} (hu : u ∈ unitary (H\n \n end ContinuousLinearMap\n \n+namespace LinearIsometryEquiv\n+\n+open ContinuousLinearMap ContinuousLinearEquiv in\n+/-- An isometry linear equivalence of two Hilbert spaces induces an equivalence of",
+   "comment": "```suggestion\n/-- An isometric linear equivalence of two Hilbert spaces induces an equivalence of\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0002",
+   "path": "Mathlib/Topology/Algebra/Algebra/Equiv.lean",
+   "code_at_comment": "@@ -302,6 +302,25 @@ theorem _root_.AlgEquiv.isUniformEmbedding {E₁ E₂ : Type*} [UniformSpace E\n     continuous_toFun := h₁\n     continuous_invFun := by dsimp; fun_prop }\n \n+/-- Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous. -/\n+def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm) : A ≃A[R] B :=\n+  { e with continuous_toFun := he, continuous_invFun := he' }",
+   "comment": "This is just the pre-existing constructor for `ContinuousAlgEquiv`:\n```\nContinuousAlgEquiv.mk.{u_1, u_2, u_3} {R : Type u_1} {A : Type u_2} {B : Type u_3} [CommSemiring R] [Semiring A]\n  [TopologicalSpace A] [Semiring B] [TopologicalSpace B] [Algebra R A] [Algebra R B] (toAlgEquiv : A ≃ₐ[R] B)\n  (continuous_toFun : Continuous toAlgEquiv.toFun := by fun_prop)\n  (continuous_invFun : Continuous toAlgEquiv.invFun := by fun_prop) : A ≃A[R]\n```\n(up to some defeqs involving `toAlgEquiv.invFun`, `AlgEquiv.symm` and `DFunLike.coe`). So I think you can remove all this and use `mk` instead.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0003",
+   "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+   "code_at_comment": "ly (auxIsometry e hα hα2 he he' hαa).toContinuousLinearEquiv.injective\n+  simp [smul_smul, inv_mul_cancel₀ (a := α') (by grind)]\n+\n+end auxiliaryDefs\n+\n+open ComplexOrder\n+\n+/-- The ⋆-algebra equivalence version of\n+`ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv`.\n+\n+TODO: remove the hypothesis `Continuous f`, as star-algebra equivalences between endomorphisms are\n+automatically continuous. -/\n+public theorem StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv\n+    (f : (V →L[𝕜] V) ≃⋆ₐ[𝕜] (W →L[𝕜] W)) (hf : Continuous f) :\n+    ∃ U : V ≃ₗᵢ[𝕜] W, f = U.conjStarAlgEquiv := by",
+   "comment": "You can still phrase this as:\n```suggestion\n    Function.Surjective (LinearIsometryEquiv.conjStarAlgEquiv : (V ≃ₗᵢ[𝕜] W) → _) := by\n```\nand I think Lean shouldn't need you to fill in the `_`.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0004",
+   "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+   "code_at_comment": "f = y.conjAlgEquiv`.\n+    Our goal will be to construct an isometry from `y`. We do this by first showing\n+    `adjoint y ∘ y` is in the center of the endormorphisms, and as the algebra of endomorphisms\n+    are central, `adjoint y ∘ y` is a scalar multiple of the identity.\n+    Let `α : 𝕜` be that scalar, i.e., `adjoint y ∘ y = α • id`. This scalar is clearly real.\n+    Also, it's easy to see that `adjoint y ∘ y` is invertible, so `α ≠ 0`.\n+    As `adjoint y ∘ y` is positive, we get `0 < α`.\n+    We also get `y ∘ adjoint y = α • id`.\n+    Finally, we construct our isometry `1/√(re α) • y`. -/",
+   "comment": "This is nice, but it would be even nicer if it were interspersed throughout the code.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0005",
+   "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+   "code_at_comment": "@@ -79,3 +85,145 @@ public theorem ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv\n       suffices T'.toLinearMap = Tₗ.symm from this ▸ T'.continuous\n       simp [LinearMap.ext_iff, ← Tₗ.injective.eq_iff, T', this, hT, hd, Tₗ] }\n   exact ⟨TL, fun A ↦ (ContinuousLinearMap.ext <| this A).symm⟩\n+\n+variable {𝕜 V W : Type*} [RCLike 𝕜] [NormedAddCommGroup V] [InnerProductSpace 𝕜 V] [CompleteSpace V]\n+  [NormedAddCommGroup W] [InnerProductSpace 𝕜 W] [CompleteSpace W]\n+\n+section auxiliaryDefs\n+variable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0)",
+   "comment": "```suggestion\nsection auxiliaryDefs\n\nvariable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0)\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0006",
+   "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+   "code_at_comment": "imp\n+  replace this := (Subalgebra.mem_center_iff (R := 𝕜)).mpr fun _ ↦ this _\n+  simp only [Algebra.IsCentral.center_eq_bot] at this\n+  obtain ⟨α, hα⟩ := this\n+  simp only [AlgHom.toRingHom_eq_coe, Algebra.toRingHom_ofId, Algebra.algebraMap_eq_smul_one] at hα\n+  have this : IsUnit (adjoint y.toContinuousLinearMap ∘L y) :=\n+    isUnit_iff_exists.mpr ⟨y.symm ∘L adjoint y.symm.toContinuousLinearMap, by\n+      simp [mul_def, ← comp_assoc, comp_assoc _ _ (adjoint y.toContinuousLinearMap),\n+        ← adjoint_comp, one_def, comp_assoc _ y.toContinuousLinearMap]⟩\n+  have thisα : α = RCLike.re α := by",
+   "comment": "The naming of your `have`s could use some work. Please improve them.",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0007",
+   "path": null,
+   "code_at_comment": "",
+   "comment": "I guess your contention regarding imports is that because this file is a leaf, the import increase doesn't matter?",
+   "replies_to": null
+  }
+ ],
+ "33098": [
+  {
+   "ask_id": "d0008",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": " rfl\n+\n+open Classical in\n+/-- A finite internal `ε`-cover of a set `A` by closed balls with minimal cardinality.\n+It is defined as the empty set if no such finite cover exists. -/\n+noncomputable\n+def minimalCover (ε : ℝ≥0) (A : Set X) : Set X :=\n+  if h : coveringNumber ε A ≠ ⊤ then (exists_set_encard_eq_coveringNumber h).choose else ∅\n+\n+lemma minimalCover_subset : minimalCover ε A ⊆ A := by\n+  by_cases h : coveringNumber ε A ≠ ⊤\n+  · simp only [minimalCover, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_coveringNumber h).choose_spec.1\n+  · simp [minimalCover, h]",
+   "comment": "This and the next three lemmas can be proven with this, although for it to work on `finite_minimalCover`, you have to add\n```lean\nattribute [grind .] finite_empty\n```\nbut I think we should do that anyway.\n```suggestion\nlemma minimalCover_subset : minimalCover ε A ⊆ A := by\n  grind [minimalCover]\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0009",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": " subset of a set `A` with maximal cardinality.\n+It is defined as the empty set if no such finite subset exists. -/\n+noncomputable\n+def maximalSeparatedSet (ε : ℝ≥0) (A : Set X) : Set X :=\n+  if h : packingNumber ε A ≠ ⊤ then (exists_set_encard_eq_packingNumber h).choose else ∅\n+\n+lemma maximalSeparatedSet_subset : maximalSeparatedSet ε A ⊆ A := by\n+  by_cases h : packingNumber ε A ≠ ⊤\n+  · simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_packingNumber h).choose_spec.1\n+  · simp only [maximalSeparatedSet, h, dite_false, Set.empty_subset]",
+   "comment": "This and the next two lemmas can be proven with this, although for it to work on `isSeparated_maximalSeparatedSet`, you have to add\n```lean\nattribute [grind .] IsSeparated.empty\n```\nbut I think we should do that anyway.\n\n```suggestion\nlemma maximalSeparatedSet_subset : maximalSeparatedSet ε A ⊆ A := by\n  by grind [maximalSeparatedSet]\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0010",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "\n+  · simp [minimalCover, h]\n+\n+lemma finite_minimalCover :\n+    (minimalCover ε A).Finite := by\n+  by_cases h : coveringNumber ε A ≠ ⊤\n+  · simp only [minimalCover, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_coveringNumber h).choose_spec.2.1\n+  · simp [minimalCover, h]\n+\n+lemma isCover_minimalCover (h : coveringNumber ε A ≠ ⊤) :\n+    IsCover ε A (minimalCover ε A) := by\n+  simp only [minimalCover, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+  exact (exists_set_encard_eq_coveringNumber h).choose_spec.2.2.1\n+\n+lemma card_minimalCover (h : coveringNumber ε A ≠ ⊤) :",
+   "comment": "```suggestion\nlemma encard_minimalCover (h : coveringNumber ε A ≠ ⊤) :\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0011",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "t, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_packingNumber h).choose_spec.1\n+  · simp only [maximalSeparatedSet, h, dite_false, Set.empty_subset]\n+\n+lemma isSeparated_maximalSeparatedSet :\n+    IsSeparated ε (maximalSeparatedSet ε A : Set X) := by\n+  by_cases h : packingNumber ε A ≠ ⊤\n+  · simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_packingNumber h).choose_spec.2.2.1\n+  · simp only [maximalSeparatedSet, h, dite_false, IsSeparated.empty]\n+\n+lemma card_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) :",
+   "comment": "```suggestion\nlemma encard_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) :\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0012",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "Set ε A : Set X) := by\n+  by_cases h : packingNumber ε A ≠ ⊤\n+  · simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+    exact (exists_set_encard_eq_packingNumber h).choose_spec.2.2.1\n+  · simp only [maximalSeparatedSet, h, dite_false, IsSeparated.empty]\n+\n+lemma card_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) :\n+    (maximalSeparatedSet ε A).encard = packingNumber ε A := by\n+  simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+  exact (exists_set_encard_eq_packingNumber h).choose_spec.2.2.2\n+\n+lemma card_le_of_isSeparated (h_subset : C ⊆ A)",
+   "comment": "```suggestion\nlemma encard_le_of_isSeparated (h_subset : C ⊆ A)\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0013",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "ε A := by\n+  simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]\n+  exact (exists_set_encard_eq_packingNumber h).choose_spec.2.2.2\n+\n+lemma card_le_of_isSeparated (h_subset : C ⊆ A)\n+    (h_sep : IsSeparated ε C) (h : packingNumber ε A ≠ ⊤) :\n+    C.encard ≤ (maximalSeparatedSet ε A).encard := by\n+  rw [card_maximalSeparatedSet h]\n+  exact le_iSup_of_le C <| le_iSup_of_le h_subset <| le_iSup_of_le h_sep (by simp)\n+\n+/-- The maximal separated set is a cover. -/\n+lemma isCover_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) :\n+    IsCover ε A (maximalSeparatedSet ε A) := by",
+   "comment": "I'm having trouble selecting the whole proof for a suggestion in the GitHub interface, but here's a golf. There's some shuffling, but the main point is to use `Metric.isSeparated_insert_of_notMem`.\n```lean\n  intro x hxA\n  by_contra! h_dist\n  let C := {x} ∪ maximalSeparatedSet ε A\n  have hx_not_mem : x ∉ maximalSeparatedSet ε A := by simpa using h_dist x\n  suffices C ⊆ A ∧ IsSeparated ε C by\n    refine absurd (encard_le_of_isSeparated this.1 this.2 h) ?_\n    simp [C, encard_insert_of_notMem hx_not_mem,\n      ENat.lt_add_one_iff (encard_maximalSeparatedSet h ▸ h)]\n  constructor\n  · simp [C, hxA, maximalSeparatedSet_subset, Set.insert_subset]\n  · exact isSeparated_insert_of_notMem hx_not_mem |>.mpr\n      ⟨isSeparated_maximalSeparatedSet, by simpa using h_dist⟩\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0014",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "@@ -243,4 +390,33 @@ theorem packingNumber_two_mul_le_externalCoveringNumber (ε : ℝ≥0) (A : Set\n       · exact hf' x\n       · simpa [edist_comm, hxy] using hf' y\n \n+theorem coveringNumber_le_packingNumber (ε : ℝ≥0) (A : Set X) :\n+    coveringNumber ε A ≤ packingNumber ε A := by\n+  by_cases h_top : packingNumber ε A ≠ ⊤\n+  · rw [← card_maximalSeparatedSet h_top]\n+    refine (iInf_le _ (maximalSeparatedSet ε A)).trans (le_of_eq ?_)\n+    simp [maximalSeparatedSet_subset, iInf_pos, isCover_maximalSeparatedSet h_top]\n+  · simp only [ne_eq, Decidable.not_not] at h_top\n+    simp [h_top]",
+   "comment": "We now have `by_cases!` to automatically push your negations in the alternate branch. And we have this nice `IsCover.coveringNumber_le_encard` lemma, we might as well use it. :smiley:\n```suggestion\n  by_cases! h_top : packingNumber ε A ≠ ⊤\n  · rw [← encard_maximalSeparatedSet h_top]\n    exact isCover_maximalSeparatedSet h_top |>.coveringNumber_le_encard maximalSeparatedSet_subset\n  · simp [h_top]\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0015",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "Set X) :\n+    coveringNumber ε A ≤ packingNumber ε A := by\n+  by_cases h_top : packingNumber ε A ≠ ⊤\n+  · rw [← card_maximalSeparatedSet h_top]\n+    refine (iInf_le _ (maximalSeparatedSet ε A)).trans (le_of_eq ?_)\n+    simp [maximalSeparatedSet_subset, iInf_pos, isCover_maximalSeparatedSet h_top]\n+  · simp only [ne_eq, Decidable.not_not] at h_top\n+    simp [h_top]\n+\n+theorem coveringNumber_two_mul_le_externalCoveringNumber (ε : ℝ≥0) (A : Set X) :\n+    coveringNumber (2 * ε) A ≤ externalCoveringNumber ε A := by\n+  rcases Set.eq_empty_or_nonempty A with (h_empty | h_nonempty)\n+  · simp [h_empty]",
+   "comment": "```suggestion\n  rcases Set.eq_empty_or_nonempty A with (rfl | h_nonempty)\n  · simp\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0016",
+   "path": "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+   "code_at_comment": "t, iInf_pos, isCover_maximalSeparatedSet h_top]\n+  · simp only [ne_eq, Decidable.not_not] at h_top\n+    simp [h_top]\n+\n+theorem coveringNumber_two_mul_le_externalCoveringNumber (ε : ℝ≥0) (A : Set X) :\n+    coveringNumber (2 * ε) A ≤ externalCoveringNumber ε A := by\n+  rcases Set.eq_empty_or_nonempty A with (h_empty | h_nonempty)\n+  · simp [h_empty]\n+  refine (coveringNumber_le_packingNumber _ A).trans ?_\n+  exact packingNumber_two_mul_le_externalCoveringNumber ε A\n+\n+lemma coveringNumber_subset_le (h : A ⊆ B) :\n+    coveringNumber ε A ≤ coveringNumber (ε / 2) B := by\n+  calc coveringNumber ε A",
+   "comment": "otherwise style guidelines would require to indent all lines below the first `calc` line.\n```suggestion\n    coveringNumber ε A ≤ coveringNumber (ε / 2) B := calc\n  coveringNumber ε A\n```",
+   "replies_to": null
+  }
+ ],
+ "33117": [
+  {
+   "ask_id": "d0018",
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "code_at_comment": "Meromorphic (fun x ↦ f x ^ n) := hf.zpow\n+\n+@[fun_prop]\n+lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv\n+\n+@[fun_prop]\n+lemma fun_deriv [CompleteSpace E] (hf : Meromorphic f) :\n+    Meromorphic (fun x ↦ _root_.deriv f x) := hf.deriv\n+\n+@[fun_prop]\n+lemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n+    Meromorphic (_root_.deriv^[n] f) := fun x ↦ (hf x).iterated_deriv\n+\n+@[fun_prop]\n+lemma fun_iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n+    Meromorphic (fun x ↦ _root_.deriv^[n] f x) := hf.iterated_deriv",
+   "comment": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop)]\nlemma sub (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f - g) := fun x ↦ (hf x).sub (hg x)\n\n@[to_fun (attr := fun_prop)]\nlemma mul {f g : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f * g) := fun x ↦ (hf x).mul (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem prod (h : ∀ σ, Meromorphic (F σ)) :\n    Meromorphic (∏ n ∈ s, F n) := fun x ↦ MeromorphicAt.prod (h · x)\n\n@[to_fun (attr := fun_prop)]\nlemma div {f g : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f / g) := fun x ↦ (hf x).div (hg x)\n\n@[to_fun (attr := fun_prop)]\nlemma pow {f : 𝕜 → 𝕜} {n : ℕ} (hf : Meromorphic f) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n\n\n@[to_fun (attr := fun_prop)]\nlemma zpow {f : 𝕜 → 𝕜} {n : ℤ} (hf : Meromorphic f) : Meromorphic (f ^ n) := fun x ↦ (hf x).zpow n\n\n@[to_fun (attr := fun_prop)]\nlemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv\n\n@[to_fun (attr := fun_prop)]\nlemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n    Meromorphic (_root_.deriv^[n] f) := fun x ↦ (hf x).iterated_deriv\n```",
+   "replies_to": null
+  }
+ ],
+ "33285": [
+  {
+   "ask_id": "d0035",
+   "path": "Mathlib/Algebra/Module/Submodule/Map.lean",
+   "code_at_comment": "@@ -597,9 +597,8 @@ theorem inf_comap_le_comap_add (f₁ f₂ : M →ₛₗ[τ₁₂] M₂) :\n     comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q := by",
+   "comment": "here's an even better golf\r\n```suggestion\r\n    comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q :=\r\n  fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2\r\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0036",
+   "path": "Mathlib/RingTheory/Ideal/Cotangent.lean",
+   "code_at_comment": "ib4/pull/8386 had to specify `(R₂ := R)` because `I.toCotangent` suggested `R ⧸ I^2` instead\n-    I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x,\n-      -- timeout (200000 heartbeats) without `by exact`\n-      by exact Submodule.mem_map_of_mem (F := R →ₗ[R] R ⧸ I ^ 2) (f := (I ^ 2).mkQ) hx⟩ =\n-      I.toCotangent (R := R) ⟨x, hx⟩ := by\n-  apply I.cotangentEquivIdeal.injective\n-  rw [I.cotangentEquivIdeal.apply_symm_apply]\n+    I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x, Submodule.mem_map_of_mem hx⟩ =\n+      I.toCotangent ⟨x, hx⟩ := by\n+  rw [I.cotangentEquivIdeal.symm_apply_eq]\n   ext\n-  rfl\n+  simp",
+   "comment": "or\r\n```lean\r\n  simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff]\r\n```\r\nor\r\n```lean\r\n  exact I.cotangentEquivIdeal.injective (I.cotangentEquivIdeal.apply_symm_apply _)\r\n```",
+   "replies_to": null
+  }
+ ],
+ "33294": [
+  {
+   "ask_id": "d0038",
+   "path": "Mathlib/SetTheory/Cardinal/Cofinality.lean",
+   "code_at_comment": "@@ -532,7 +532,7 @@ theorem cof_cof (a : Ordinal.{u}) : cof (cof a).ord = cof a := by\n   obtain ⟨g, hg⟩ := exists_fundamental_sequence a.cof.ord\n   exact ord_injective (hf.trans hg).cof_eq.symm\n \n-protected theorem IsNormal.isFundamentalSequence {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)\n+theorem isFundamentalSequence_of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)",
+   "comment": "```suggestion\r\ntheorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)\r\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0039",
+   "path": "Mathlib/SetTheory/Ordinal/Topology.lean",
+   "code_at_comment": "@@ -178,12 +178,12 @@ theorem enumOrd_isNormal_iff_isClosed (hs : ¬ BddAbove s) :\n   have Hs := enumOrd_strictMono hs\n   refine\n     ⟨fun h => isClosed_iff_iSup.2 fun {ι} hι f hf => ?_, fun h =>\n-      (isNormal_iff_strictMono_limit _).2 ⟨Hs, fun a ha o H => ?_⟩⟩\n+      isNormal_iff.2 ⟨Hs, fun a ha o H => ?_⟩⟩\n   · let g : ι → Ordinal.{u} := fun i => (enumOrdOrderIso s hs).symm ⟨_, hf i⟩\n     suffices enumOrd s (⨆ i, g i) = ⨆ i, f i by\n       rw [← this]\n       exact enumOrd_mem hs _\n-    rw [IsNormal.map_iSup h g]\n+    rw [Order.IsNormal.map_iSup h (bddAbove_of_small _)]",
+   "comment": "```suggestion\r\n    rw [h.map_iSup (bddAbove_of_small _)]\r\n```\r\nno?\r\n",
+   "replies_to": null
+  }
+ ],
+ "33362": [
+  {
+   "ask_id": "d0047",
+   "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+   "code_at_comment": "oped Topology\n-\n-namespace Complex\n-\n-section Space\n+open scoped Topology ComplexConjugate\n \n-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {R₁ R₂ : ℝ} {f : ℂ → E}\n+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {R R₁ R₂ : ℝ} {f : ℂ → E}\n   {c z z₀ : ℂ}\n \n /-- An auxiliary lemma for `Complex.norm_dslope_le_div_of_mapsTo_ball`. -/\n-theorem schwarz_aux {f : ℂ → ℂ} (hd : DifferentiableOn ℂ f (ball c R₁))\n-    (h_maps : MapsTo f (ball c R₁) (ball (f c) R₂)) (hz : z ∈ ball c R₁) :\n+private theorem Complex.schwarz_aux {f : ℂ → ℂ} (hd : DifferentiableOn ℂ f (ball c R₁))",
+   "comment": "Why not move these a few lines below so that it's on the `Complex` namespace?",
+   "replies_to": null
+  }
+ ],
+ "33421": [
+  {
+   "ask_id": "d0048",
+   "path": "Mathlib/Algebra/Order/Round.lean",
+   "code_at_comment": "@@ -45,6 +45,26 @@ variable [Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n def round (x : α) : ℤ :=\n   if 2 * fract x < 1 then ⌊x⌋ else ⌈x⌉\n \n+/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n+\n+TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\n+theorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by",
+   "comment": "How about `round_eq_div`?",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0049",
+   "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+   "code_at_comment": "ontinuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha",
+   "comment": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+   "replies_to": null
+  },
+  {
+   "ask_id": "d0051",
+   "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+   "code_at_comment": "@@ -267,6 +267,15 @@ theorem mul_cast_floor_div_cancel_of_pos {n : ℤ} (hn : 0 < n) (a : R) : ⌊a *\n theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by\n   simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n \n+theorem two_mul_fract_eq_one_iff_exists_int {x : R} :\n+    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by\n+  rw [fract, mul_sub, sub_eq_iff_eq_add']\n+  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\n+  rintro ⟨n, hn⟩\n+  convert hn\n+  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn]\n+  simp [mul_add]",
+   "comment": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by\r\n  rw [fract, mul_sub, sub_eq_iff_eq_add']\r\n  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\r\n  rintro ⟨n, hn⟩\r\n  convert hn\r\n  have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk\r\n  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn]\r\n  simp [mul_add, hk]\r\n```",
+   "replies_to": null
+  }
+ ],
+ "34091": [
+  {
+   "ask_id": "v0105",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": " exists_infinite_fiber {β α : Type u} (f : β → α) (w : #α < #β) (w' : Infinite α) :\n+theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n     ∃ a : α, Infinite (f ⁻¹' {a}) := by\n-  simp_rw [Cardinal.infinite_iff] at w' ⊢\n-  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w'\n-  exact ⟨a, w'.trans ha.le⟩\n+  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n+  rcases lt_or_ge #α ℵ₀ with hα | hα\n+  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n+  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩",
+   "comment": "Surely this is a one-liner using `infinite_pigeonhole_card_lt`?",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0106",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": "cof_eq])\n+    exact ⟨a, ha.trans' (succ_le_of_lt hα)⟩\n+  · exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h) (hα.trans (le_succ _))\n+      ((lt_succ _).trans_le (isRegular_succ hα).2.ge)\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\n has an infinite fiber. -/\n-theorem exists_infinite_fiber {β α : Type u} (f : β → α) (w : #α < #β) (w' : Infinite α) :\n+theorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :",
+   "comment": "```suggestion\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Infinite β] :\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0107",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": "hole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩\n+\n+/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\n+theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n+    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n+  exists_infinite_fiber f h (by\n+    rw [Cardinal.infinite_iff] at hα ⊢\n+    exact hα.trans h.le)\n+\n+/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\n+has an uncountable fiber. -/\n+theorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :",
+   "comment": "```suggestion\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) [Uncountable β] :\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0108",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": " α, Infinite (f ⁻¹' {a}) := by\n-  simp_rw [Cardinal.infinite_iff] at w' ⊢\n-  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f w w'\n-  exact ⟨a, w'.trans ha.le⟩\n+  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n+  rcases lt_or_ge #α ℵ₀ with hα | hα\n+  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n+  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n+    exact ⟨a, hα.trans ha.le⟩\n+\n+/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\n+theorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :",
+   "comment": "```suggestion\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) [Infinite α] :\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0109",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": "@@ -64,33 +64,51 @@ theorem infinite_pigeonhole_set {β α : Type u} {s : Set β} (f : s → α) (θ\n     rfl\n   rintro x ⟨_, hx'⟩; exact hx'\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's",
+   "comment": "```suggestion\n/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's\n```",
+   "replies_to": null
+  },
+  {
+   "ask_id": "v0110",
+   "path": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+   "code_at_comment": "@@ -64,33 +64,51 @@ theorem infinite_pigeonhole_set {β α : Type u} {s : Set β} (f : s → α) (θ\n     rfl\n   rintro x ⟨_, hx'⟩; exact hx'\n \n-/-- A function whose codomain's cardinality is infinite but strictly smaller than its domain's\n+/-- A function whose domain's cardinality is infinite but strictly greater than its domain's",
+   "comment": "Similarly in comments below",
+   "replies_to": "```suggestion\n/-- A function whose domain's cardinality is infinite and strictly greater than its codomain's\n```"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# The raw-ask matcher, ask-match/2-task, on Sonnet 5.5 through the Claude Code subscription route:
+# the Opus config's route (CLI 2.1.285, contained, no tools but the submission) with the model and
+# the effort the reconstruction baseline ran Sonnet at (high). A different executor from the
+# 1-session Opus matchers, so its verdicts are this route's, not a calibration of 2-task.
+#
+#   python -m src.mathlib_review.review.cli match --plan <measurement dir> \
+#       --config configs/match/ask_match_sonnet55_claude_sub.yaml --run-name <name> --execute
+#
+# The subscription bills nothing per token; a run on the primary token is the user's call.
+extends: ask_match_opus55_claude_sub.yaml
+
+claude_model: claude-sonnet-5-5
+effort: high

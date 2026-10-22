@@ -41,6 +41,16 @@ FIELDS_BEFORE_KNOBS = frozenset({
 })
 
 
+#: A task type added after 2026-10-06 is born with these fields. They are its identity from its
+#: first task, so they move no recorded identity; a field added to it later must be a knob like any
+#: other. Adding a type here is part of the commit that adds the type.
+FIELDS_AT_BIRTH = {
+    # The registered raw-ask matcher (2026-10-22).
+    "AskMatchingData": frozenset({"plan_id", "batch_id", "instrument_version", "question_policy",
+                                  "packets"}),
+}
+
+
 def _review_data_classes():
     for info in pkgutil.iter_modules(review.__path__):
         module = importlib.import_module(f"{review.__name__}.{info.name}")
@@ -66,7 +76,8 @@ def test_a_new_review_task_data_field_is_a_knob():
         f"{cls.__name__}.{name}"
         for cls in _review_data_classes()
         for name, info in cls.model_fields.items()
-        if name not in base and name not in FIELDS_BEFORE_KNOBS and not _is_knob(info))
+        if name not in base and name not in FIELDS_BEFORE_KNOBS
+        and name not in FIELDS_AT_BIRTH.get(cls.__name__, ()) and not _is_knob(info))
     assert not offending, (
         "a new field on review task data moves the global_index of every task of its type, so "
         "every cache and resume misses; declare it with `knob()` from ape.tasks.base:\n  "

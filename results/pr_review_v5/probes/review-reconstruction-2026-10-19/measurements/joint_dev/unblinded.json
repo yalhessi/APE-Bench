@@ -1,0 +1,706 @@
+{
+  "agreement": {
+    "cells": 154,
+    "reached_or_not": 150,
+    "three_valued": 149
+  },
+  "asks": 11,
+  "import-with_opus_dev:1": {
+    "condition_reach": {
+      "DX": 0.12121212121212122,
+      "LN": 0.0,
+      "OP": 0.0909090909090909,
+      "SN": 0.15151515151515152,
+      "X": 0.22727272727272727
+    },
+    "published_reach": {},
+    "reach": {
+      "DX1": 0.0,
+      "DX2": 0.18181818181818182,
+      "DX3": 0.18181818181818182,
+      "LN1": 0.0,
+      "LN2": 0.0,
+      "LN3": 0.0,
+      "OP1": 0.18181818181818182,
+      "OP2": 0.09090909090909091,
+      "OP3": 0.0,
+      "SN1": 0.2727272727272727,
+      "SN2": 0.09090909090909091,
+      "SN3": 0.09090909090909091,
+      "X1": 0.18181818181818182,
+      "X2": 0.2727272727272727
+    },
+    "stable": {
+      "DX": [],
+      "LN": [],
+      "OP": [],
+      "SN": [],
+      "X": [
+        "d0001",
+        "d0007"
+      ]
+    },
+    "table": {
+      "d0001": {
+        "DX1": "no",
+        "DX2": "reached",
+        "DX3": "reached",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "reached",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "reached",
+        "SN2": "partial",
+        "SN3": "no",
+        "X1": "reached",
+        "X2": "reached"
+      },
+      "d0002": {
+        "DX1": "no",
+        "DX2": "partial",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "partial",
+        "X2": "partial"
+      },
+      "d0003": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0004": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "partial",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0005": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0006": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "reached",
+        "OP3": "no",
+        "SN1": "reached",
+        "SN2": "reached",
+        "SN3": "no",
+        "X1": "partial",
+        "X2": "reached"
+      },
+      "d0007": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "reached",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "reached",
+        "X2": "reached"
+      },
+      "d0018": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0048": {
+        "DX1": "no",
+        "DX2": "reached",
+        "DX3": "reached",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "reached",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0049": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "reached",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0051": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      }
+    },
+    "union": {
+      "DX": [
+        "d0001",
+        "d0048"
+      ],
+      "LN": [],
+      "OP": [
+        "d0001",
+        "d0006",
+        "d0007"
+      ],
+      "SN": [
+        "d0001",
+        "d0006",
+        "d0048",
+        "d0049"
+      ],
+      "X": [
+        "d0001",
+        "d0006",
+        "d0007"
+      ]
+    }
+  },
+  "import-with_opus_dev:2": {
+    "condition_reach": {
+      "DX": 0.06060606060606061,
+      "LN": 0.0,
+      "OP": 0.0909090909090909,
+      "SN": 0.12121212121212122,
+      "X": 0.2727272727272727
+    },
+    "published_reach": {},
+    "reach": {
+      "DX1": 0.0,
+      "DX2": 0.09090909090909091,
+      "DX3": 0.09090909090909091,
+      "LN1": 0.0,
+      "LN2": 0.0,
+      "LN3": 0.0,
+      "OP1": 0.18181818181818182,
+      "OP2": 0.09090909090909091,
+      "OP3": 0.0,
+      "SN1": 0.18181818181818182,
+      "SN2": 0.09090909090909091,
+      "SN3": 0.09090909090909091,
+      "X1": 0.2727272727272727,
+      "X2": 0.2727272727272727
+    },
+    "stable": {
+      "DX": [],
+      "LN": [],
+      "OP": [],
+      "SN": [],
+      "X": [
+        "d0001",
+        "d0006",
+        "d0007"
+      ]
+    },
+    "table": {
+      "d0001": {
+        "DX1": "no",
+        "DX2": "reached",
+        "DX3": "reached",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "reached",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "reached",
+        "SN2": "partial",
+        "SN3": "no",
+        "X1": "reached",
+        "X2": "reached"
+      },
+      "d0002": {
+        "DX1": "no",
+        "DX2": "partial",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "partial",
+        "X2": "partial"
+      },
+      "d0003": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0004": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "partial",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0005": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0006": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "reached",
+        "OP3": "no",
+        "SN1": "reached",
+        "SN2": "reached",
+        "SN3": "no",
+        "X1": "reached",
+        "X2": "reached"
+      },
+      "d0007": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "reached",
+        "OP2": "partial",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "reached",
+        "X2": "reached"
+      },
+      "d0018": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0048": {
+        "DX1": "no",
+        "DX2": "partial",
+        "DX3": "partial",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "partial",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0049": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "reached",
+        "X1": "no",
+        "X2": "no"
+      },
+      "d0051": {
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no",
+        "LN1": "no",
+        "LN2": "no",
+        "LN3": "no",
+        "OP1": "no",
+        "OP2": "no",
+        "OP3": "no",
+        "SN1": "no",
+        "SN2": "no",
+        "SN3": "no",
+        "X1": "no",
+        "X2": "no"
+      }
+    },
+    "union": {
+      "DX": [
+        "d0001"
+      ],
+      "LN": [],
+      "OP": [
+        "d0001",
+        "d0006",
+        "d0007"
+      ],
+      "SN": [
+        "d0001",
+        "d0006",
+        "d0049"
+      ],
+      "X": [
+        "d0001",
+        "d0006",
+        "d0007"
+      ]
+    }
+  },
+  "measurement": {
+    "forensic": false,
+    "identity": {
+      "aggregation": "none: each replicate is read on its own, and two are compared cell by cell",
+      "denominator": "the asks of the sealed PRs (in scope, if scoped); a session's reach is asks it reached over that count, per replicate",
+      "instrument": "ask-match",
+      "instrument_version": "1-session",
+      "missingness": "every expected cell needs a verdict in every replicate; a replicate that does not cover them makes the report forensic, and an absent cell is never read as `no`",
+      "population_prs": [
+        33066,
+        33117,
+        33421
+      ],
+      "projection": {
+        "claude_cut_to": 20,
+        "harness_blind": true,
+        "keep": [
+          "target",
+          "claim",
+          "requested_change",
+          "severity"
+        ],
+        "redaction": [
+          "construction cues",
+          "conventions cues"
+        ],
+        "target": "repository path"
+      },
+      "question_policy": "questions",
+      "reference_count": 11,
+      "reference_kind": "raw_ask",
+      "reference_sha256": "12046fa3b4abff0e69646feec367b2a28f61aaf5198a1a58fdaf30a581865390",
+      "reference_source": "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/feedback.json + results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/asks.json",
+      "replicates": 2,
+      "rubric_sha256": "c1094ab650c272edad9c450919802ea49179d96569cc19d5542106624c1f54f8",
+      "schema_version": "measurement-identity1",
+      "seal_path": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/joint_dev/seal.json",
+      "seal_sha256": "d377f12eb9a839c05a909a77877e60d8e58945ef4f895b6fbe3f1d03896ce0a1",
+      "source_sha256": "bf6795899f40c7976426b12402661b2f06bde18d4c8a17166a21777dfbdc9b80",
+      "subjects": [
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_dev_base_rep1"
+          ],
+          "session": "DX1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_dev_base_rep2"
+          ],
+          "session": "DX2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_dev_base_rep3"
+          ],
+          "session": "DX3",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_luna_dev_v1_rep1"
+          ],
+          "session": "LN1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_luna_dev_v1_rep2"
+          ],
+          "session": "LN2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_luna_dev_v1_rep3"
+          ],
+          "session": "LN3",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "probe_dev_opus55_contract2_claude_sub_rep1"
+          ],
+          "session": "OP1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "probe_dev_opus55_contract2_claude_sub_rep2"
+          ],
+          "session": "OP2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "probe_dev_opus55_contract2_claude_sub_rep3"
+          ],
+          "session": "OP3",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_sonnet_sub_dev_v1_rep1"
+          ],
+          "session": "SN1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_sonnet_sub_dev_v1_rep2"
+          ],
+          "session": "SN2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_baseline_sonnet_sub_dev_v1_rep3"
+          ],
+          "session": "SN3",
+          "source": "solo"
+        },
+        {
+          "channel": "packet",
+          "path": null,
+          "runs": [],
+          "session": "X1",
+          "source": "packet"
+        },
+        {
+          "channel": "packet",
+          "path": null,
+          "runs": [],
+          "session": "X2",
+          "source": "packet"
+        }
+      ]
+    },
+    "identity_sha256": "bf6795899f40c7976426b12402661b2f06bde18d4c8a17166a21777dfbdc9b80",
+    "plan_id": "joint_dev_v1",
+    "plan_sha256": "eddc9d7c6efd624038159c529894cbf22ebc0e656090addedb6ee0c48d524246",
+    "producers": {
+      "import-with_opus_dev": {
+        "complete": true,
+        "forensic": false,
+        "replicates": 2
+      }
+    },
+    "replicates": {
+      "import-with_opus_dev:1": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-with_opus_dev",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "effort": "xhigh",
+              "kind": "external session",
+              "model": "claude-opus-5-5",
+              "route": "claude-code-cli-2.1.285-subscription"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/baselines/with_opus/match_dev/matches.1.json",
+              "problems": "0",
+              "sha256": "0a3032f3403f322006ee1c282c2c69948b2d53753890d64750fc4adde16f3637"
+            },
+            "origin": "external_import"
+          }
+        ]
+      },
+      "import-with_opus_dev:2": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-with_opus_dev",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "effort": "xhigh",
+              "kind": "external session",
+              "model": "claude-opus-5-5",
+              "route": "claude-code-cli-2.1.285-subscription"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/baselines/with_opus/match_dev/matches.2.json",
+              "problems": "0",
+              "sha256": "c1f22bff0dededd80af1501b6aae611622fd634d1cdbc093a0a465b92bcbd6e8"
+            },
+            "origin": "external_import"
+          }
+        ]
+      }
+    },
+    "replicates_expected": 2,
+    "scope": null
+  }
+}

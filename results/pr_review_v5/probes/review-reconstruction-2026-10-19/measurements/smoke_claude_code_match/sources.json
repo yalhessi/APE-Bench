@@ -1,0 +1,10 @@
+{
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_dev_base_rep1"
+ },
+ "OP1": {
+  "kind": "solo",
+  "run": "probe_dev_opus55_contract2_claude_sub_rep1"
+ }
+}

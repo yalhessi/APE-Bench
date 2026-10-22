@@ -500,8 +500,12 @@ class BaseTask:
     async def spawn_subtasks(self, specs, *, group: str = "subtasks", logger=None,
                              base=None, concurrency: Optional[int] = None,
                              execution_overrides: Optional[Dict[str, Any]] = None,
-                             orchestrator_id: Optional[str] = None):
+                             orchestrator_id: Optional[str] = None,
+                             task_config_overrides: Optional[Dict[str, Any]] = None):
         """Run child tasks and get one `ChildRun` back per spec.
+
+        Children inherit none of this task's own settings; `task_config_overrides` is the whole
+        of what they are configured with beyond their class defaults.
 
         The framework primitive for nested work. `TaskOrchestrator(` was constructed directly
         in four files with three different conventions, and the divergent one cost this project
@@ -530,6 +534,7 @@ class BaseTask:
             concurrency=DEFAULT_NESTED_CONCURRENCY if concurrency is None else concurrency,
             execution_overrides=execution_overrides,
             orchestrator_id=orchestrator_id,
+            task_config_overrides=task_config_overrides,
             # Where this task's children ran, written down rather than inferred from a
             # directory name later. Both are task-data fields the review family sets; a family
             # that sets neither simply gets no index and no parent id.
@@ -601,6 +606,20 @@ class BaseTask:
             return False
         return evaluation_result.score == 1.0
     
+    @classmethod
+    def product_of(cls, result: BaseTaskResult) -> Optional[Any]:
+        """The domain product of a legal submission, or None when there is none.
+
+        The output contract of design §5 (`docs/research/task-dataflow-refactor-design-2026-10-22.md`):
+        execution status, a file on disk and a legal product are different facts, and readers ask for
+        the product through `ape.orchestration.products.sample_products`, which calls this only on a
+        result of the task's own class. The default is the result itself when it reports success. A
+        task whose domain output is a part of its result overrides this to return that part; it must
+        never return a default or empty product for a failure.
+        """
+
+        return result if getattr(result, "success", False) else None
+
     @classmethod
     def _aggregate_resources(cls, results: List[BaseTaskResult]) -> dict:
         """Aggregate resource consumption statistics from multiple results."""
@@ -679,6 +698,12 @@ def register_task(task_type: str, task_class: type['BaseTask']) -> None:
     _tasks[task_type] = task_class
 
 
+def submission_tools() -> set:
+    """Every registered task's submission tool (`submit_tool`), unprefixed: the calls that end a
+    session rather than ask a tool something."""
+    return {task_class.submit_tool for task_class in _tasks.values()}
+
+
 def get_task_class(task_type: str) -> type['BaseTask']:
     """Get task class from registry.
 
@@ -703,6 +728,77 @@ def result_counts_as_pass(result: BaseTaskResult) -> bool:
     """Check whether a task result counts as a pass in orchestration summaries."""
     task_class = get_task_class(result.task_type)
     return task_class.is_best_result(result)
+
+
+class TaskConfigError(ValueError):
+    """A task setting that would not take effect: an unknown key, or another task's config."""
+
+
+def resolve_task_config(
+    task_class: type,
+    config: Optional['BaseScaffoldConfig'],
+    *,
+    record_overrides: Optional[Dict[str, Any]] = None,
+    invocation_overrides: Optional[Dict[str, Any]] = None,
+) -> BaseTaskConfig:
+    """The one place a task's effective configuration is decided.
+
+    Planning, direct construction, worker reconstruction and nested execution all reach a task
+    through `create_task_from_data`, and so through here. Precedence, lowest first:
+
+    1. the task class's defaults;
+    2. `config.task_config`, when it is a concrete config of this task's own class -- what a
+       caller that builds one by hand (`create_task_config_for_type`) means;
+    3. `task_config_overrides` carried in the task's own record;
+    4. the invocation's `task_config_overrides` (the run config's `task_config:` block).
+
+    **Every key must take effect, or the task is refused.** Until 2026-10-22 the overrides were
+    filtered to the config class's fields before strict validation could see them, and the
+    supplied `config.task_config` was never read: a misspelled override became the default,
+    `finding_budget: 3` given as a concrete config ran as 20, both nested judges ran under their
+    defaults whatever `judge_mode` they were built with, and a parent's settings were broadcast
+    into children of another task type and silently kept where the names happened to match
+    (`docs/todo/framework-defects-2026-09.md`, §1). A key that is not a field of this task's
+    config is now an error naming the task type, the layer it came from and the key.
+
+    A concrete config of another task's class is refused too: it is a parent's resolved config
+    reaching a child, which is exactly the broadcast the nested primitive no longer performs
+    (`ape.orchestration.subtasks.nested_config`). A child's settings are passed explicitly.
+    """
+
+    config_class = task_class.task_config_class
+    task_type = getattr(task_class, "task_type", task_class.__name__)
+    known = set(config_class.model_fields)
+    layers = []
+
+    supplied = getattr(config, "task_config", None) if config is not None else None
+    if supplied is not None:
+        if not isinstance(supplied, config_class):
+            raise TaskConfigError(
+                f"task {task_type!r} was given a {type(supplied).__name__} as its config, which "
+                f"is not a {config_class.__name__}. A config built for one task type does not "
+                f"configure another; pass the child's settings as task_config_overrides.")
+        layers.append(("config.task_config", supplied.model_dump(mode="json", exclude_unset=True)))
+
+    for name, value in (("the task record's task_config_overrides", record_overrides),
+                        ("task_config_overrides", invocation_overrides)):
+        if value is None:
+            continue
+        if not isinstance(value, dict):
+            raise TaskConfigError(f"{name} for task {task_type!r} must be a mapping, "
+                                  f"not {type(value).__name__}")
+        layers.append((name, value))
+
+    merged: Dict[str, Any] = {}
+    for name, values in layers:
+        unknown = sorted(set(values) - known)
+        if unknown:
+            raise TaskConfigError(
+                f"{name} sets {unknown} for task {task_type!r}, but {config_class.__name__} has "
+                f"no such field, so the setting would have no effect. Known fields: "
+                f"{sorted(known)}.")
+        merged = deep_merge(merged, values)
+    return config_class.model_validate(merged)
 
 
 def create_task_from_data(
@@ -736,16 +832,11 @@ def create_task_from_data(
             f"but requested {task_type}"
         )
 
-    record_task_config_overrides = data.get("task_config_overrides")
-    if not isinstance(record_task_config_overrides, dict):
-        record_task_config_overrides = {}
-
-    overrides = deep_merge(record_task_config_overrides, task_config_overrides or {})
-    valid_overrides = {
-        k: v for k, v in overrides.items()
-        if k in task_class.task_config_class.model_fields
-    }
-    task_config = task_class.task_config_class(**valid_overrides)
+    task_config = resolve_task_config(
+        task_class, config,
+        record_overrides=data.get("task_config_overrides"),
+        invocation_overrides=task_config_overrides,
+    )
 
     task_specific_config = config.model_copy(update={'task_config': task_config}, deep=True)
     task_config.apply_to_scaffold_config(task_specific_config)
