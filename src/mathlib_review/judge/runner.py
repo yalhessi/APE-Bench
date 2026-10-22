@@ -25,7 +25,7 @@ from ape.tasks.base import create_task_from_data
 from ape.utils import deep_merge, load_yaml, parse_cli_args
 from ape.utils.logging import create_logger
 
-from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, load_jsonl, pretty_json_bytes, sha256_bytes, write_once
+from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, jsonl_rows, load_jsonl, pretty_json_bytes, sha256_bytes, write_once
 from src.mathlib_review.paths import assert_repo_root
 from src.mathlib_review.schema import (
     CandidateClaim,
@@ -706,8 +706,13 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
          for item in sorted(scored_obligation_ids - {None})},
     )
 
+    measurement = judge_measurement(
+        dataset, identity=identity, sample_count=getattr(execution, "sample_count", 1),
+        report=report, sealed_pairs_path=dataset.out_dir / "semantic_pairs.jsonl",
+        pr_scope=pr_scope)
     write_once(dataset.out_dir / "semantic_report.json", pretty_json_bytes({
         **report, "arm": "registered_task", "judge_identity": identity,
+        "measurement": measurement,
         "pairing_tiers": list(dataset.pairing_tiers),
         # Travels with the numbers. A score read out of a file that does not say its source
         # run was partial is exactly how two September runs were compared to each other.
@@ -749,6 +754,54 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     _record_stage(dataset, stage, identity, model, logger)
     logger.info("Wrote %d matches to %s", len(matches), dataset.out_dir)
     return dataset.out_dir
+
+
+def judge_measurement(dataset: JudgeDatasetConfig, *, identity: str, sample_count: int,
+                      report: Dict[str, Any], sealed_pairs_path: Path,
+                      pr_scope: Optional[List[int]]) -> Dict[str, Any]:
+    """The judge's `MeasurementIdentity`, in the shape the raw-ask matcher's reports carry.
+
+    `judge_identity` already hashes the rubric, model, sampling and context; this says the rest of
+    what a number from this audit means -- which references, which subjects through which output
+    channel, which planned pairs, how many samples and how they were aggregated, what the
+    denominator is and how a missing verdict is treated -- so the two instruments' numbers sit side
+    by side with their definitions and are never mistaken for one metric.
+    """
+
+    from src.mathlib_review.io import sealed_model, sha256_file
+    from src.mathlib_review.judge.protocol import JUDGE_PROMPT
+    from src.mathlib_review.schema import MeasurementIdentity, SubjectBinding
+
+    gold = Path(dataset.release) / "gold/judgments.jsonl"
+    scored = report.get("per_obligation") or []
+    # The reviewed PRs the judge scoped to; else the config's; else every PR a pair was planned on.
+    prs = sorted(set(pr_scope or dataset.pr_numbers or
+                     {int(row["pr_number"]) for row in jsonl_rows(sealed_pairs_path)}))
+    measurement = sealed_model(
+        MeasurementIdentity,
+        instrument="semantic-judge", instrument_version=JUDGE_VERSION,
+        rubric_sha256=sha256_bytes(JUDGE_PROMPT.encode("utf-8")),
+        question_policy="request_only", reference_kind="atomic_obligation",
+        reference_source=str(gold), reference_sha256=sha256_file(gold),
+        reference_count=len(scored), population_prs=prs,
+        seal_path=str(sealed_pairs_path), seal_sha256=sha256_file(sealed_pairs_path),
+        subjects=[SubjectBinding(
+            session=dataset.run_name, source="run",
+            channel="finalized" if dataset.input_kind == "finding" else "candidates",
+            runs=[dataset.run_name], path=str(dataset.candidates))],
+        projection={"judge_identity": identity, "pairing_tiers": list(dataset.pairing_tiers),
+                    "input_kind": dataset.input_kind,
+                    "maintainer_comment": dataset.include_maintainer_comment,
+                    "sibling_claims": dataset.include_sibling_claims},
+        replicates=int(sample_count),
+        aggregation="majority_issue_then_resolution_among_issue_matching",
+        denominator="the eligible atomic obligations of the reviewed PRs (per_obligation)",
+        missingness=("a planned pair with no valid verdict leaves its obligation unscored; the "
+                     "report's coverage block names them, and an incomplete source run is "
+                     "forensic"),
+    )
+    return {"identity": measurement.model_dump(mode="json"),
+            "identity_sha256": measurement.source_sha256}
 
 
 def _record_stage(dataset: JudgeDatasetConfig, stage, identity: str, model: str,

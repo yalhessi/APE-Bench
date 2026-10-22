@@ -270,8 +270,49 @@ async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: s
     await orchestrator.run(tasks)
     rows = await collect_task_verdicts(plan, orchestrator.tasks_dir, tasks, run_name,
                                        executor_of(scaffold))
-    _write_verdicts(plan_dir, f"task-{run_name}", rows)
+    verdicts = _write_verdicts(plan_dir, f"task-{run_name}", rows)
+    record_match_stage(plan, Path(plan_dir), run_name, verdicts, logger)
     return rows
+
+
+def record_match_stage(plan: MatchingPlan, plan_dir: Path, run_name: str, verdicts: Path,
+                       logger=None) -> List[str]:
+    """Leave the matching's row in each source run's stage ledger, as the judge leaves its own.
+
+    "This run's findings were matched, under this identity, into that directory" is a fact about
+    the run (`judge.runner._record_stage`). Solo and lead sources only: a packet or a findings
+    file has no run directory. Digests and identity only -- the asks are gold-side and never enter
+    a run directory. Never fatal: the verdicts are paid for and written. Returns the runs written.
+    """
+
+    from src.mathlib_review import paths
+    from src.mathlib_review.run_state import append_stage, digests_of, stage_record
+
+    written = []
+    for subject in plan.identity.subjects:
+        if subject.source not in ("solo", "lead"):
+            continue
+        for run in subject.runs:
+            try:
+                directory = paths.run_dir(run)
+                if not directory.is_dir():
+                    continue
+                append_stage(directory, stage_record(
+                    "match", run_name=run,
+                    consumed=digests_of([plan_dir / PLAN_FILE]),
+                    produced={**digests_of([verdicts]), "plan_dir": str(plan_dir)},
+                    identity={"instrument": f"{plan.identity.instrument}/"
+                                            f"{plan.identity.instrument_version}",
+                              "plan_id": plan.plan_id,
+                              "identity_sha256": plan.identity_sha256,
+                              "matcher_run": run_name, "session": subject.session,
+                              "channel": subject.channel}))
+                written.append(run)
+            except Exception:  # noqa: BLE001 - see the docstring
+                if logger is not None:
+                    logger.warning("could not record the matching's row in %s's ledger", run,
+                                   exc_info=True)
+    return written
 
 
 def _write_verdicts(plan_dir: Path, name: str, rows: Sequence[MatchVerdict]) -> Path:
@@ -398,77 +439,3 @@ def report_matching(plan_dir: Path, families: Optional[Dict[str, str]] = None,
         tmp.write_bytes(pretty_json_bytes(report))
         tmp.replace(path)
     return report
-
-
-# --- Trace ---------------------------------------------------------------------------------------
-
-
-def trace_matching(plan_dir: Path, pr: int, ask_id: str, session: str) -> Dict[str, Any]:
-    """One cell, followed to its bytes: the label, what that label showed, each replicate's verdict
-    and where it is, and the reviewer's own finding in its source."""
-
-    from src.mathlib_review.analysis import probes
-
-    plan_dir = plan_dir_of(Path(plan_dir))
-    plan = load_plan(plan_dir)
-    labels = plan.seal.get(str(pr))
-    if labels is None:
-        raise ValueError(f"PR {pr} is not in plan {plan.plan_id}")
-    label = next((lab for lab, s in labels.items() if s == session), None)
-    if label is None:
-        raise ValueError(f"session {session!r} is not sealed on PR {pr}: {sorted(labels.values())}")
-    packet = next(p for p in plan.packets if p.pr == int(pr))
-    ask = next((a for a in packet.asks if a.ask_id == ask_id), None)
-    if ask is None:
-        raise ValueError(f"PR {pr} has no ask {ask_id!r} in plan {plan.plan_id}")
-    shown = [f.model_dump(mode="json") for f in packet.reviewers[label]]
-    subject = next(s for s in plan.identity.subjects if s.session == session)
-    cells = []
-    for rep, table in replicate_tables(plan, verdict_rows(plan_dir, plan.plan_id)).items():
-        row = next((a for a in table["matches"]["asks"]
-                    if int(a.get("pr")) == int(pr) and a.get("ask_id") == ask_id), None)
-        value = row.get(label) if row else None
-        index = row.get(f"{label}_finding") if row else None
-        where = next((r for r in table["rows"]
-                      if r["batch_id"] in ("*",) or int(pr) in
-                      next((b.prs for b in plan.batches if b.batch_id == r["batch_id"]), [])), None)
-        cells.append({"replicate": rep, "value": value if row else "(no verdict)",
-                      "finding": index, "note": row.get("note") if row else None,
-                      "shown_finding": shown[index] if isinstance(index, int) and 0 <= index < len(shown) else None,
-                      "verdict_bytes": where})
-    original = None
-    if subject.source in ("solo", "lead", "findings_file", "packet"):
-        original = _original_findings(probes, plan, subject, int(pr))
-    return {
-        "plan": {"plan_id": plan.plan_id, "path": str(plan_dir / PLAN_FILE),
-                 "sha256": plan.source_sha256, "identity_sha256": plan.identity_sha256,
-                 "instrument": f"{plan.identity.instrument}/{plan.identity.instrument_version}",
-                 "question_policy": plan.identity.question_policy},
-        "seal": {"path": plan.identity.seal_path, "sha256": plan.identity.seal_sha256,
-                 "pr": int(pr), "session": session, "label": label},
-        "ask": ask.model_dump(mode="json"),
-        "shown": {"label": label, "findings": shown,
-                  "sha256": sha256_bytes(canonical_json_bytes(shown))},
-        "subject": subject.model_dump(mode="json"),
-        "original": original,
-        "cells": cells,
-    }
-
-
-def _original_findings(probes, plan: MatchingPlan, subject: SubjectBinding, pr: int):
-    """Where the session's findings for this PR came from, and the findings themselves."""
-
-    if subject.source == "solo":
-        for run in subject.runs:
-            found = probes._solo(run).get(pr)
-            if found is not None:
-                return {"run": run, "channel": subject.channel, "findings": found[0],
-                        "where": f".ape/runs/{run}/tasks/*/task_result.json (PR {pr})"}
-        return None
-    if subject.source == "lead":
-        return {"run": subject.runs[0], "channel": subject.channel,
-                "where": f"results/pr_review_v5/runs/{subject.runs[0]}/findings.jsonl (PR {pr})"}
-    if subject.source == "findings_file":
-        return {"path": subject.path, "channel": subject.channel,
-                "findings": json.loads(Path(subject.path).read_text()).get(str(pr))}
-    return {"channel": subject.channel, "where": "the probe session's findings.json"}

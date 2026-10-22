@@ -19,6 +19,7 @@ import pytest
 
 from src.mathlib_review.analysis import matching as MA
 from src.mathlib_review.analysis import probes
+from src.mathlib_review.analysis.trace import trace_matching
 from src.mathlib_review.judge import ask_matching as M
 
 SETS = Path("configs/probe_sets")
@@ -117,7 +118,7 @@ def test_a_cell_traces_to_its_label_its_shown_findings_and_both_verdicts(histori
         if reached:
             break
     pr, ask_id, session, label = reached
-    trace = MA.trace_matching(out, pr, ask_id, session)
+    trace = trace_matching(out, pr, ask_id, session)
     assert trace["seal"]["label"] == label
     assert trace["shown"]["findings"] == [
         f.model_dump(mode="json") for p in plan.packets if p.pr == pr for f in p.reviewers[label]]
@@ -215,7 +216,7 @@ def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
     # Reach is asks reached over every ask in the seal (two): each session reached its one.
     assert report["task:1"]["reach"] == {"S1": 0.5, "S2": 0.5}
     assert report["task:2"]["reach"] == {"S1": 0.0, "S2": 0.0}
-    trace = MA.trace_matching(tmp_path / "m", 8, "a8", "S2")
+    trace = trace_matching(tmp_path / "m", 8, "a8", "S2")
     assert trace["seal"]["label"] == "R1"
     assert trace["original"]["findings"][0]["claim"] == "golf"
     task_cell = next(c for c in trace["cells"] if c["replicate"] == "task:1")
@@ -247,3 +248,42 @@ def test_match_execute_refuses_without_the_subscription_login(monkeypatch, tmp_p
         cli.main(["match", "--plan", str(tmp_path / "m"), "--config",
                   "configs/match/ask_match_opus55_claude_sub.yaml", "--run-name", "x",
                   "--execute"])
+
+
+JUDGED = Path("results/pr_review_v5/audits/iter-ds41-contract2-keepthink-high-rep1")
+
+
+@pytest.mark.skipif(not (JUDGED / "semantic_report.json").is_file()
+                    or not Path(".ape/runs/pr_review_v5_judge_iter_ds41_contract2_keepthink_high_rep1").is_dir(),
+                    reason="needs that judged run and its judge tasks on disk")
+def test_a_judged_obligation_traces_to_its_pair_verdict_votes_finding_and_task():
+    from src.mathlib_review.analysis.trace import trace_judgment
+
+    report = json.loads((JUDGED / "semantic_report.json").read_text())
+    hit = next(r["obligation_id"] for r in report["per_obligation"] if r["issue_status"] == "hit")
+    trace = trace_judgment("iter_ds41_contract2_keepthink_high_rep1", hit)
+    assert trace["obligation"]["issue_status"] == "hit"
+    assert trace["audit"]["measurement"] == "unrecorded (judged before 2026-10-22)"
+    pair = next(p for p in trace["pairs"] if p["verdict"] != "(no verdict)"
+                and p["verdict"]["issue_match"])
+    assert pair["prompt_sha256"] and pair["votes"]["issue_votes"] >= 2
+    assert pair["finding"]["claim"]
+    assert Path(pair["task"]["task_dir"]).is_dir()
+
+
+def test_a_matching_leaves_its_row_in_each_source_runs_ledger(monkeypatch, tmp_path, historical):
+    from src.mathlib_review import paths
+    from src.mathlib_review.io import jsonl_rows
+
+    plan, out = historical
+    runs = tmp_path / "runs"
+    for name in ("probe_postcutoff_gpt52_G_rep1", "probe_postcutoff_gpt52_K_rep2"):
+        (runs / name).mkdir(parents=True)
+    monkeypatch.setattr(paths, "run_dir", lambda name: runs / name)
+    verdicts = out / MA.VERDICTS_DIR / "import-g52.jsonl"
+    written = MA.record_match_stage(plan, out, "matcher_run_x", verdicts)
+    assert sorted(written) == ["probe_postcutoff_gpt52_G_rep1", "probe_postcutoff_gpt52_K_rep2"]
+    (row,) = jsonl_rows(runs / "probe_postcutoff_gpt52_G_rep1" / "stages.jsonl")
+    assert row["stage"] == "match" and row["identity"]["identity_sha256"] == plan.identity_sha256
+    assert row["identity"]["channel"] == "submitted"
+    assert not any("comment" in str(v) for v in row["produced"].values())

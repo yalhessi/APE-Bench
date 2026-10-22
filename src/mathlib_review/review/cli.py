@@ -383,11 +383,15 @@ def build_parser() -> argparse.ArgumentParser:
     match_report.add_argument("--replicates", nargs="+",
                               help="read only these, e.g. task:1 task:2; default every one held")
     trace = report_sub.add_parser(
-        "trace", help="one matching cell, followed back to the bytes behind it")
-    trace.add_argument("--plan", required=True, type=Path)
-    trace.add_argument("--pr", required=True, type=int)
-    trace.add_argument("--ask", required=True)
-    trace.add_argument("--session", required=True)
+        "trace", help="one number followed back to its bytes: a matching cell (--plan --pr --ask "
+                      "--session) or a judged obligation (--of --obligation)")
+    trace.add_argument("--plan", type=Path, help="a matching's measurement directory")
+    trace.add_argument("--pr", type=int)
+    trace.add_argument("--ask")
+    trace.add_argument("--session")
+    trace.add_argument("--of", dest="of_run", help="a judged generation run")
+    trace.add_argument("--obligation")
+    trace.add_argument("--node", default="judge", help="which judgement of the run")
     tools = report_sub.add_parser(
         "tools", help="what every tool call came back with: answered, negative, refused, "
                       "error or env, per tool, from the session transcripts in .ape/runs")
@@ -699,9 +703,15 @@ def _report(args) -> int:
                                          scope=set(args.scope) if args.scope else None,
                                          replicates=args.replicates), indent=1))
     elif args.report_command == "trace":
-        from src.mathlib_review.analysis.matching import trace_matching
+        from src.mathlib_review.analysis.trace import trace_judgment, trace_matching
 
-        print(json.dumps(trace_matching(args.plan, args.pr, args.ask, args.session), indent=1))
+        if args.plan and not args.of_run and None not in (args.pr, args.ask, args.session):
+            print(json.dumps(trace_matching(args.plan, args.pr, args.ask, args.session), indent=1))
+        elif args.of_run and args.obligation and not args.plan:
+            print(json.dumps(trace_judgment(args.of_run, args.obligation, args.node), indent=1))
+        else:
+            raise SystemExit("trace a matching cell with --plan --pr --ask --session, or a judged "
+                             "obligation with --of --obligation")
     elif args.report_command == "tools":
         from src.mathlib_review.analysis.tool_outcomes import tool_outcomes
 
