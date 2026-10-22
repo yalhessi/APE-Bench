@@ -81,6 +81,15 @@ def trace_matching(plan_dir: Path, pr: int, ask_id: str, session: str) -> Dict[s
     }
 
 
+def _reviewer_inputs(run: str, pr: int) -> Dict[str, Any]:
+    """What that run's reviewer of this PR was given (`run_inputs`), or why it cannot be said."""
+
+    try:
+        return run_inputs(run, pr=pr)
+    except (ValueError, FileNotFoundError) as error:
+        return {"unavailable": str(error)}
+
+
 def _original_findings(probes, subject, pr: int) -> Optional[Dict[str, Any]]:
     """Where the session's findings for this PR came from, and the findings themselves."""
 
@@ -89,7 +98,8 @@ def _original_findings(probes, subject, pr: int) -> Optional[Dict[str, Any]]:
             found = probes._solo(run).get(pr)
             if found is not None:
                 return {"run": run, "channel": subject.channel, "findings": found[0],
-                        "where": f".ape/runs/{run}/tasks/*/task_result.json (PR {pr})"}
+                        "where": f".ape/runs/{run}/tasks/*/task_result.json (PR {pr})",
+                        "reviewer_inputs": _reviewer_inputs(run, pr)}
         return None
     if subject.source == "lead":
         return {"run": subject.runs[0], "channel": subject.channel,

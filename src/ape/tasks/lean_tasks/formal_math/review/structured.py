@@ -342,7 +342,7 @@ class StructuredReviewTask(SoloReviewTask):
         config = self.config.task_config
         return (solo_system_prompt(config),
                 solo_user_template(config.filing_bar, False, config.user_prompt, config.notes_form,
-                                   solo_context_block(config, self.data.pr_number)
+                                   solo_context_block(config, self.data.pr_number, **self._context_binding())
                                    if config.user_prompt == "v2" else ""))
 
     def _declaration_names(self) -> List[str]:

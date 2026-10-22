@@ -352,8 +352,17 @@ def solo_system_prompt(config: SoloReviewConfig) -> str:
     return verified_text(path, config.system_prompt_sha256, "system_prompt_file")
 
 
-def solo_context_block(config: SoloReviewConfig, pr_number: int) -> str:
-    """The sections `config.context_file` holds for this PR, or "" when no file is set."""
+def solo_context_block(config: SoloReviewConfig, pr_number: int, *,
+                       episode_id: Optional[str] = None,
+                       reviewed_head_sha: Optional[str] = None) -> str:
+    """The sections `config.context_file` holds for this PR, or "" when no file is set.
+
+    A row may say which episode and reviewed head it was built for (`episode_id`,
+    `reviewed_head_sha`); when it does and the task's differ, the row is refused. Selecting by PR
+    number alone let evidence built for another round, or another state of the PR, reach a
+    reviewer with nothing to say so (design §4: correct types can still bind the wrong episode).
+    A row that carries neither is read as before.
+    """
 
     from src.mathlib_review.review.inputs import verified_text
 
@@ -365,6 +374,13 @@ def solo_context_block(config: SoloReviewConfig, pr_number: int) -> str:
     row = next((item for item in rows if item.get("pr_number") == pr_number), None)
     if row is None:
         raise KeyError(f"context_file {path} holds no row for PR {pr_number}")
+    for field, expected in (("episode_id", episode_id), ("reviewed_head_sha", reviewed_head_sha)):
+        held = row.get(field)
+        if held is not None and expected is not None and held != expected:
+            raise ValueError(
+                f"context_file {path}: PR {pr_number}'s row was built for {field} {held!r}, and "
+                f"this task reviews {expected!r}; evidence for another episode or state of the PR "
+                "is refused, not read.")
     sections = "\n\n".join(f"## {item['title']}\n\n{item['text'].rstrip()}"
                              for item in row["sections"])
     return "\n\n---\n\n" + sections + "\n"
@@ -401,14 +417,22 @@ class SoloReviewTask(BasePRReviewTask):
         return (solo_system_prompt(config),
                 solo_user_template(config.filing_bar, config.review_notes, config.user_prompt,
                                    config.notes_form,
-                                   solo_context_block(config, self.data.pr_number)
+                                   solo_context_block(config, self.data.pr_number,
+                                                      **self._context_binding())
                                    if config.user_prompt == "v2" else ""))
+
+    def _context_binding(self) -> Dict[str, Optional[str]]:
+        """What a context row must have been built for, to be read by this task."""
+
+        return {"episode_id": getattr(self.data, "episode_id", None),
+                "reviewed_head_sha": getattr(self.data, "snapshot_head_sha", None)}
 
     async def create_user_prompt(self) -> str:
         # v1 appends the PR model after the instructions; v2 has already placed it before the diff.
         prompt = await super().create_user_prompt()
         if self.config.task_config.user_prompt == "v1":
-            prompt += solo_context_block(self.config.task_config, self.data.pr_number)
+            prompt += solo_context_block(self.config.task_config, self.data.pr_number,
+                                         **self._context_binding())
         return prompt
 
     def _normalize_findings(self, findings):

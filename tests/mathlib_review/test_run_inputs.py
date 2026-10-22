@@ -207,3 +207,34 @@ def test_report_inputs_names_what_the_claude_code_route_does_not_record(monkeypa
     assert attempt["user"]["head"] == "FIRST USER MESSAGE" and attempt["system"] is None
     assert attempt["observed"]["model"] == "claude-opus-5-5"
     assert any("system prompt is not recorded" in o for o in attempt["opaque"])
+
+
+# --- the domain binding: evidence for another episode is refused ------------------------------
+
+
+def test_a_context_row_built_for_another_episode_or_head_is_refused(tmp_path):
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
+
+    context = tmp_path / "context.jsonl"
+    context.write_text(json.dumps({"pr_number": 7, "episode_id": "ep:7:round1",
+                                   "reviewed_head_sha": "abc",
+                                   "sections": [{"title": "Goal", "text": "x"}]}) + "\n")
+    config = SoloReviewConfig(context_file=context)
+    assert "## Goal" in solo_context_block(config, 7, episode_id="ep:7:round1",
+                                           reviewed_head_sha="abc")
+    with pytest.raises(ValueError, match="evidence for another episode"):
+        solo_context_block(config, 7, episode_id="ep:7:round2", reviewed_head_sha="abc")
+    with pytest.raises(ValueError, match="reviewed_head_sha"):
+        solo_context_block(config, 7, episode_id="ep:7:round1", reviewed_head_sha="def")
+    # A row that names no binding is read as before; a task that knows none checks none.
+    assert "## Goal" in solo_context_block(config, 7)
+
+
+def test_every_reviewer_that_reads_a_context_file_passes_its_binding():
+    from pathlib import Path as _P
+
+    for name in ("solo.py", "structured.py", "filing_contract.py"):
+        text = (_P("src/ape/tasks/lean_tasks/formal_math/review") / name).read_text()
+        calls = text.count("solo_context_block(")
+        bound = text.count("**self._context_binding()")
+        assert calls - ("def solo_context_block(" in text) == bound, name
