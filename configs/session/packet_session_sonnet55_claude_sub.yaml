@@ -1,0 +1,13 @@
+# Model sessions over folders (`packet_session`) on Sonnet 5.5 through the Claude Code subscription
+# route: the Opus config's route (CLI 2.1.285, Read/Write/Grep/Glob contained to the attempt's
+# workspace, no shell, no web) with the model and the effort the reconstruction baseline ran Sonnet
+# at (high). The brief's `{dir}` is the folder's absolute path on this route.
+#
+#   python -m src.mathlib_review.review.cli session --plan <session plan dir> \
+#       --config configs/session/packet_session_sonnet55_claude_sub.yaml --run-name <name> --execute
+#
+# The subscription bills nothing per token; a run on the primary token is the user's call.
+extends: packet_session_opus55_claude_sub.yaml
+
+claude_model: claude-sonnet-5-5
+effort: high
