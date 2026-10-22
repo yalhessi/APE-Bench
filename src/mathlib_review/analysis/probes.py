@@ -25,6 +25,14 @@ from typing import Any, Dict, List, Literal, Optional, Union
 import yaml
 from pydantic import BaseModel, ConfigDict, model_validator
 
+# The matcher's instrument definition moved to `judge/ask_matching.py` (2026-10-22): its rubrics,
+# blind projection, seal and unblinding. Re-exported here because readers on disk under `results/`
+# import them from this module by name.
+from src.mathlib_review.judge.ask_matching import (  # noqa: F401
+    KEEP, MATCHER_RUBRIC, MATCHER_RUBRIC_QUESTIONS, ask_packet, blind_findings, condition,
+    matcher_rubric, redact, repo_target, seal_labels, unblind,
+)
+
 #: The sealed test set: run once, never probed.
 TEST_MANIFEST = Path("inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1/manifest.json")
 #: The roster the post-cutoff and validation extractions used; a PR-list source reads it too.
@@ -776,51 +784,6 @@ def log_call(log: Path, stamp: str, tool: str, args: str, out: Path, status: int
 
 
 # --- Matching -----------------------------------------------------------------------------------
-#: A matcher sees a finding as these four fields and nothing else.
-KEEP = ("target", "claim", "requested_change", "severity")
-_REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"), "a compiled check")]
-MATCHER_RUBRIC = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/matcher_rubric.md")
-#: The same rubric with one paragraph more: a finding may be a question to the author (the filing
-#: contract's pre-registration, 2026-10-12). A separate file, so every earlier seal stays reproducible.
-MATCHER_RUBRIC_QUESTIONS = MATCHER_RUBRIC.with_name("matcher_rubric_questions.md")
-
-
-#: With `harness_blind`, also the cues a conventions condition leaves in its own words: a codebook
-#: id, and "convention" itself (7 of 25 AP findings against 2 of 28 solo ones on validation,
-#: 2026-10-10). Applied to every session alike, so it is not itself a cue.
-_REDACT_CONVENTIONS = [(re.compile(r"\bP\d{3}\b"), "a practice"), (re.compile(r"\bconventions\b"), "practices"),
-                       (re.compile(r"\bconvention\b"), "practice"), (re.compile(r"\bConventions\b"), "Practices"),
-                       (re.compile(r"\bConvention\b"), "Practice")]
-
-
-def redact(text, conventions: bool = False):
-    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text, and with
-    `conventions` the conventions conditions' (`_REDACT_CONVENTIONS`)."""
-    if not isinstance(text, str):
-        return text
-    for pattern, repl in _REDACT + (_REDACT_CONVENTIONS if conventions else []):
-        text = pattern.sub(repl, text)
-    return text
-
-
-#: A workspace prefix on a finding's path: `target/` or `scratch/`, or a resolved
-#: `.../workspaces/<commit>/`. Which one a reviewer writes depends on its harness, not on the code.
-_WORKSPACE_PREFIX = re.compile(r"^(?:.*/workspaces/[^/]+/|(?:target|scratch)/)")
-
-
-def repo_target(target):
-    """A finding's target as a repository path, so its spelling does not say which harness wrote it.
-
-    Seen on the harness comparison (2026-10-01): APE-Agent sessions wrote `target/Mathlib/...`,
-    Claude Code sessions sometimes the absolute store path `.../workspaces/<commit>+<pr>/Mathlib/...`,
-    and Claude's packets `Mathlib/...`. The same location, three cues. A target with no path (a
-    declaration name) is left as it is.
-    """
-    if not isinstance(target, str):
-        return target
-    return _WORKSPACE_PREFIX.sub("", target, count=1)
-
-
 class Source(BaseModel):
     """Where one session label's findings come from.
 
@@ -959,33 +922,6 @@ def _lead(spec: ProbeSet, run: str) -> Dict[int, tuple]:
     return out
 
 
-def ask_packet(feedback: Dict[str, Any], cids: List[str]) -> List[Dict[str, Any]]:
-    """What a matcher sees of each ask: the comment, the code it is attached to, what it answers."""
-
-    rows = {r["cid"]: r for r in feedback["rows"]}
-    packet = []
-    for cid in cids:
-        r = rows[cid]
-        parent = rows.get(r["reply_to_cid"]) if r.get("reply_to_cid") else None
-        packet.append({"ask_id": cid, "path": r["path"], "code_at_comment": r["diff_hunk"],
-                       "comment": r["body"], "replies_to": parent["body"] if parent else None})
-    return packet
-
-
-def seal_labels(prs: List[int], sessions: List[str]) -> Dict[str, Dict[str, str]]:
-    """A fresh blinding: per PR, the sessions shuffled to R1..Rn."""
-
-    import secrets
-
-    seal = {}
-    for pr in prs:
-        pool, order = list(sessions), []
-        while pool:
-            order.append(pool.pop(secrets.randbelow(len(pool))))
-        seal[str(pr)] = {f"R{i + 1}": s for i, s in enumerate(order)}
-    return seal
-
-
 def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
                  seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path,
                  harness_blind: bool = False) -> Dict[str, Any]:
@@ -1023,8 +959,7 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
                     raise ValueError(f"{session} has no successful session for PR {pr}")
                 found, st = loaded[session][int(pr)]
             stats.setdefault(pr, {})[session] = st
-            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k), harness_blind)
-                                    for k in KEEP}} for n, f in enumerate(found)]
+            stripped = blind_findings(found, harness_blind)
             lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
             if lost:
                 raise ValueError(f"{session} on PR {pr}: findings {lost} have no target")
@@ -1063,90 +998,11 @@ def _claude_as_solo(found: List[Dict[str, Any]], st: Dict[str, Any], graph) -> t
                   "targets_unresolved": unresolved}
 
 
-def condition(session: str) -> str:
-    """A session label's condition: the label without its trailing digits (X1 -> X, Gr2 -> Gr)."""
-    return session.rstrip("0123456789")
-
-
-def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict[str, Dict[str, Any]],
-            stats: Dict[str, Any], scope: Optional[set] = None) -> Dict[str, Any]:
-    """Per matcher: each session's reach (asks reached / asks), each condition's mean, the asks every
-    session of a condition reached (stable) and any reached (union), a lead session's reach counting
-    only published findings, and the per-ask table; and the matchers' agreement.
-
-    `scope`, a set of families, restricts every figure to the asks in them. Reading rules are
-    each probe's own, stated in its README before its runs; this computes what they read.
-    """
-
-    items = [(pr, cid) for pr in seal for cid in asks["asks"][pr]
-             if scope is None or asks["families"].get(cid) in scope]
-    sessions = sorted({s for labels in seal.values() for s in labels.values()})
-    out: Dict[str, Any] = {"asks": len(items)}
-    cells_by = {}
-    for m, d in matches.items():
-        cells = {(str(a["pr"]), a["ask_id"], s): (a.get(label), a.get(f"{label}_finding"))
-                 for a in d["asks"] if str(a["pr"]) in seal
-                 for label, s in seal[str(a["pr"])].items()}
-        cells_by[m] = cells
-
-        def hit(pr, cid, s, published=False):
-            value, i = cells.get((pr, cid, s), (None, None))
-            return value == "reached" and (not published or i in stats[pr][s].get("published", []))
-
-        reach = {s: (sum(hit(pr, cid, s) for pr, cid in items) / len(items)) if items else None
-                 for s in sessions}
-        conds: Dict[str, List[str]] = {}
-        for s in sessions:
-            conds.setdefault(condition(s), []).append(s)
-        out[m] = {
-            "reach": reach,
-            "condition_reach": {c: sum(reach[s] for s in ss) / len(ss) for c, ss in conds.items()},
-            "stable": {c: sorted(cid for pr, cid in items if all(hit(pr, cid, s) for s in ss))
-                       for c, ss in conds.items()},
-            "union": {c: sorted(cid for pr, cid in items if any(hit(pr, cid, s) for s in ss))
-                      for c, ss in conds.items()},
-            "published_reach": {s: sum(hit(pr, cid, s, True) for pr, cid in items) / len(items)
-                                for s in sessions if items and any("published" in stats[pr].get(s, {})
-                                                                   for pr in seal)},
-            "table": {cid: {s: cells.get((pr, cid, s), (None,))[0] for s in sessions}
-                      for pr, cid in items},
-        }
-    names = list(matches)
-    if len(names) == 2:
-        a, b = cells_by[names[0]], cells_by[names[1]]
-        keys = [(pr, cid, s) for pr, cid in items for s in sessions]
-        out["agreement"] = {"cells": len(keys),
-                            "three_valued": sum(a.get(k, (None,))[0] == b.get(k, (None,))[0] for k in keys),
-                            "reached_or_not": sum((a.get(k, (None,))[0] == "reached") == (b.get(k, (None,))[0] == "reached")
-                                                  for k in keys)}
-    return out
-
-
 # --- Order, folders and audits ------------------------------------------------------------------
 def unfinished_sessions(spec: ProbeSet, sessions: List[str]) -> List[str]:
     """The (PR, session) packets on the set that hold no findings yet."""
     return [f"pr{pr}/{s}" for pr in spec.pr_numbers for s in sessions
             if not finished(spec.session_dir(pr, s))]
-
-
-_NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight",
-            9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
-
-
-def matcher_rubric(reviewers: int, prs: int, source: Path = MATCHER_RUBRIC) -> str:
-    """The matcher rubric for this many reviewers and PRs. It was written for six and six, and
-    for those it is returned unchanged. `source` is `MATCHER_RUBRIC` or `MATCHER_RUBRIC_QUESTIONS`;
-    either reaches the matcher as `matcher_rubric.md`, the name its prompt reads."""
-
-    text = source.read_text()
-    word = lambda n: _NUMBERS.get(n, str(n))
-    pr_phrase = "one Mathlib pull request" if prs == 1 else f"{word(prs)} Mathlib pull requests"
-    text = text.replace("on six Mathlib pull requests. Six anonymous reviewers, `R1` to `R6`",
-                        f"on {pr_phrase}. {word(reviewers).capitalize()} anonymous reviewers, "
-                        f"`R1` to `R{reviewers}`")
-    text = text.replace("`R6_pr<N>.json`", f"`R{reviewers}_pr<N>.json`")
-    text = text.replace('"R6": ..., "R6_finding": ...', f'"R{reviewers}": ..., "R{reviewers}_finding": ...')
-    return text.replace('"R6": <count>', f'"R{reviewers}": <count>')
 
 
 def judge_folders(root: Path, n: int, files: List[Path], rubric: Path,

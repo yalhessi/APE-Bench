@@ -180,15 +180,31 @@ from .runs import (  # noqa: F401
 
 from .scoring import (  # noqa: F401
     AdjudicationLabel,
+    BlindAsk,
+    BlindFinding,
+    BlindPacket,
+    MatchBatch,
+    MatchVerdict,
+    MatchingPlan,
+    MeasurementIdentity,
     SemanticMatch,
     SemanticPair,
     SilenceLabel,
+    SubjectBinding,
     silence_key,
 )
 
 
 __all__ = [
     "ARMS",
+    "BlindAsk",
+    "BlindFinding",
+    "BlindPacket",
+    "MatchBatch",
+    "MatchVerdict",
+    "MatchingPlan",
+    "MeasurementIdentity",
+    "SubjectBinding",
     "AdjudicationBundle",
     "AdjudicationConsensus",
     "AdjudicationVerificationArtifact",
