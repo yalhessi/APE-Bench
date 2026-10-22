@@ -314,7 +314,9 @@ def build_parser() -> argparse.ArgumentParser:
     sp_plan.add_argument("--input-from", action="append", default=[],
                          metavar="FILE=PLAN_DIR@PRODUCER[:OUTPUT]",
                          help="this input is an upstream session's stored output (taken from it, "
-                              "or with --include checked against it); recorded in lineage.json")
+                              "or with --include checked against it); recorded in lineage.json. "
+                              "Repeat a FILE with --include to bind it to whichever of several "
+                              "producers holds its bytes")
     sp_plan.add_argument("--upstream-packet", action="append", default=[], metavar="PACKET=UPSTREAM",
                          help="the upstream packet a packet's bound inputs come from, when the ids differ")
     sp_plan.add_argument("--allow-unmatched", action="store_true",
@@ -966,8 +968,8 @@ def _probe(args, logger) -> int:
             producer, _colon, output = rest.partition(":")
             if not (file_name and plan_dir and producer):
                 raise SystemExit(f"--input-from {item!r}: FILE=PLAN_DIR@PRODUCER[:OUTPUT]")
-            inputs_from[file_name] = {"plan_dir": plan_dir, "producer": producer,
-                                      **({"output": output} if output else {})}
+            inputs_from.setdefault(file_name, []).append(
+                {"plan_dir": plan_dir, "producer": producer, **({"output": output} if output else {})})
         plan = plan_sessions(args.packets, name=args.name, brief=args.brief.read_text(),
                              outputs=outputs, out_dir=args.out, replicates=args.replicates,
                              packet_ids=args.packet_ids, include=args.include,

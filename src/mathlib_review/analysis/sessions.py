@@ -95,7 +95,7 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
                   out_dir: Path, replicates: int = 1,
                   packet_ids: Optional[Sequence[str]] = None,
                   include: Optional[Sequence[str]] = None,
-                  inputs_from: Optional[Dict[str, Dict[str, str]]] = None,
+                  inputs_from: Optional[Dict[str, Any]] = None,
                   upstream_packets: Optional[Dict[str, str]] = None,
                   allow_unmatched: bool = False) -> SessionPlan:
     """Seal one session per packet folder under `packets_root` (or the named ones).
@@ -107,8 +107,9 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
     `inputs_from` is `{input path: {"plan_dir", "producer", "output"?, "replicate"?}}`: those inputs
     are upstream sessions' outputs, for the same packet id or the one `upstream_packets` maps it to.
     For a new plan the bytes are taken from the observation (`read_observation`); for a historical
-    one (`include`) the folder's bytes are checked against the producer's observations, and an input
-    no observation holds is refused unless `allow_unmatched`, which lists it with the reason.
+    one (`include`) the folder's bytes are checked against the producer's observations -- or several
+    producers', given as a list -- and an input no observation holds is refused unless
+    `allow_unmatched`, which lists it with the reason.
     Either way `lineage.json` records the binding."""
 
     from ape.tasks.packet_session import DIR_TOKEN, OutputSpec
@@ -149,35 +150,53 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
     return plan
 
 
-def _bind_inputs(packet_id: str, files: Dict[str, str], inputs_from: Dict[str, Dict[str, str]],
+def _bind_inputs(packet_id: str, files: Dict[str, str], inputs_from: Dict[str, Any],
                  upstream_packet: str, historical: bool):
-    """`(files, {path: ObservationRef}, {path: reason})` for one packet's bound inputs."""
+    """`(files, {path: ObservationRef}, {path: reason})` for one packet's bound inputs.
+
+    A historical input may name several upstream sources (a list): the reconstruction probe's goal
+    briefs came from first extractions, revisions or repairs, each its own plan. It binds to the one
+    observation among them whose stored bytes are the folder's, preferring the mapped packet id; two
+    different observations with those bytes are refused as ambiguous rather than chosen between."""
 
     files, bound, missed = dict(files), {}, {}
     for path, spec in sorted(inputs_from.items()):
-        output = spec.get("output") or Path(path).name
+        sources = spec if isinstance(spec, list) else [spec]
         if not historical:
-            ref = observation(spec["plan_dir"], spec["producer"], upstream_packet, output,
-                              spec.get("replicate", "1"))
+            if len(sources) != 1:
+                raise ValueError(f"{path}: a new plan takes an input from exactly one producer")
+            source = sources[0]
+            output = source.get("output") or Path(path).name
+            ref = observation(source["plan_dir"], source["producer"], upstream_packet, output,
+                              source.get("replicate", "1"))
             text = read_observation(ref)
             if path in files and files[path] != text:
                 raise ValueError(f"{packet_id}: the folder holds a {path} other than "
-                                 f"{spec['producer']}'s {upstream_packet} {output}")
+                                 f"{source['producer']}'s {upstream_packet} {output}")
             files[path], bound[path] = text, ref
             continue
         if path not in files:
             raise ValueError(f"{packet_id}: {path} is named for binding but is not one of its inputs")
         digest = sha256_bytes(files[path].encode("utf-8"))
-        rows = [row for row in session_outputs(spec["plan_dir"], spec["producer"])
-                if row.packet_id == upstream_packet and output in row.outputs]
-        match = next((row for row in rows if row.outputs[output]["sha256"] == digest), None)
-        if match is None:
-            missed[path] = (f"{spec['producer']} holds no observation of {upstream_packet}"
-                            if not rows else
-                            f"no observation of {spec['producer']} for {upstream_packet} has these bytes")
-            continue
-        bound[path] = observation(spec["plan_dir"], spec["producer"], upstream_packet, output,
-                                  match.replicate)
+        matches = []
+        for source in sources:
+            output = source.get("output") or Path(path).name
+            matches.extend((source, row, output) for row in session_outputs(source["plan_dir"],
+                                                                            source["producer"])
+                           if output in row.outputs and row.outputs[output]["sha256"] == digest)
+        preferred = [m for m in matches if m[1].packet_id == upstream_packet] or matches
+        distinct = sorted({(str(m[0]["plan_dir"]), m[0]["producer"], m[1].packet_id, m[1].replicate)
+                           for m in preferred})
+        producers = ", ".join(s["producer"] for s in sources)
+        if not preferred:
+            missed[path] = f"no observation of {producers} has these bytes"
+        elif len(distinct) > 1:
+            raise ValueError(f"{packet_id}: {path} is the output of several observations {distinct}; "
+                             "name the one it came from")
+        else:
+            source, row, output = preferred[0]
+            bound[path] = observation(source["plan_dir"], source["producer"], row.packet_id, output,
+                                      row.replicate)
     return files, bound, missed
 
 

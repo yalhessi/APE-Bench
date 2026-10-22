@@ -461,3 +461,34 @@ def test_the_trace_finds_a_reviewers_context_lineage_by_content(tmp_path):
     assert (upstream["plan_id"], upstream["producer"], upstream["packet_id"]) == (
         "ex", "import-ex", "pr33117")
     assert context_lineage_of("0" * 64, elsewhere, {}, pr=33117) is None
+
+
+def test_a_historical_input_binds_to_whichever_producer_holds_its_bytes(tmp_path):
+    """The probe's goal briefs came from first extractions, revisions or repairs: three plans."""
+
+    first = _imported(tmp_path, "first")
+    revised = _imported(tmp_path, "revised", goal=lambda pr: f"revised goal of {pr}")
+    done = tmp_path / "decision"
+    for pid, brief in (("pr33066", "goal of pr33066"), ("pr33117", "revised goal of pr33117")):
+        (done / pid).mkdir(parents=True)
+        (done / pid / "goal_brief.md").write_text(brief)
+        (done / pid / "decision_context.md").write_text("done")
+    sources = [{"plan_dir": str(first), "producer": "import-first"},
+               {"plan_dir": str(revised), "producer": "import-revised"}]
+    S.plan_sessions(done, name="d", brief="Folder: {dir}", out_dir=tmp_path / "d",
+                    outputs=[{"name": "decision_context.md"}], include=["goal_brief.md"],
+                    inputs_from={"goal_brief.md": sources})
+    bound = S.load_input_lineage(tmp_path / "d").bound
+    assert bound["pr33066"]["goal_brief.md"].plan_id == "first"
+    assert bound["pr33117"]["goal_brief.md"].plan_id == "revised"
+
+    # The same bytes from two producers, for another packet than the folder's: refused, not chosen.
+    twin = _imported(tmp_path, "twin")
+    (done / "pr33066_r2").mkdir()
+    (done / "pr33066_r2" / "goal_brief.md").write_text("goal of pr33066")
+    with pytest.raises(ValueError, match="several observations"):
+        S.plan_sessions(done, name="d2", brief="Folder: {dir}", out_dir=tmp_path / "d2",
+                        outputs=[{"name": "decision_context.md"}], include=["goal_brief.md"],
+                        packet_ids=["pr33066_r2"],
+                        inputs_from={"goal_brief.md": sources + [
+                            {"plan_dir": str(twin), "producer": "import-twin"}]})
