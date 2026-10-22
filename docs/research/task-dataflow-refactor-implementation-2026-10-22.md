@@ -285,9 +285,12 @@ established it; user-run). A row says the strongest that applies.
     packet session can be granted those episode-bound tools (the base snapshot and the cutoff are the
     episode's, as the review arms have them); until then a swap of the acquisition producer on the real
     chain stops at the decision step, and the swap is shown on the shared derivation's own test.
-14. **The Claude Code route has not run the new tasks.** Smoke plans are sealed and preflighted
-    (`smoke_claude_code_session`, one packet; `smoke_claude_code_match`, one batch of 14 cells);
-    the route stays configured and offline-verified until the user runs them.
+14. **The Claude Code route has run the new tasks once, on Sonnet 5.5** (`fcca6c76`, on the user's
+    request). The smoke plans are complete: one extractor session (the absolute folder path works,
+    containment clean) and one matcher batch (14 cells, agreeing 14/14 with both Opus 1-session
+    replicates on the same cells). The run found that `report tools` read every Claude Code
+    submission as an error except `submit_findings`; fixed (`5390c8f9`). Opus 5.5 on this route
+    (`*_opus55_claude_sub.yaml`) is configured and has not run the new tasks.
 
 Retirement, as the design requires it with an owner and a completion point: `probe seal`,
 `probe match-inputs` and `probe unblind` go when no script under `results/` written after this
@@ -422,7 +425,7 @@ All five are done to the extent that does not need the subscription route or a m
    - CLAUDE.md, the probe rule, four open todos, the CLI help and probes.py's docstring say which routes
      are historical.
 4. **The other scaffold** (`fe80c4a2`). The Claude Code smoke plans are sealed and pass the dry run.
-   Running them is the user's call (gap 14). The commands:
+   Run on Sonnet 5.5 at the user's request (`fcca6c76`): both complete (gap 14). The Opus commands:
 
    ```
    source ~/.config/secrets/env.zsh
@@ -455,8 +458,8 @@ All five are done to the extent that does not need the subscription route or a m
   `review-reconstruction` adds `context_with_sections` and a cap fix beside code this branch touches
   only in `probes.py`'s matcher section; `demonstrated-change` adds a design (gaps 2 and 10).
 - Two live runs on GPT-6 Luna through ELM are recorded above, USD 0.17 billed. The runs on the
-  subscription route (the smoke plans, gap 14) and the v2-against-v1 calibration on the original route
-  remain the user's call.
+  subscription route (the smoke plans ran on Sonnet 5.5, gap 14) and the v2-against-v1 calibration on
+  the original route remain the user's call.
 - The integration order and its conflicts are in "Closure work", item 5. On the merged tree, the
   Phase A runs' contexts are traced by their own bytes.
 - `review-reconstruction`'s `033765c7` and `8b918cce` are on this branch as cherry-picks. Their
