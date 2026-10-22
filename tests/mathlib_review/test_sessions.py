@@ -92,10 +92,37 @@ def test_a_packet_session_lays_its_folder_out_and_hands_in_declared_outputs(tmp_
     assert (task.packet_dir / "base" / "Mathlib" / "X.lean").read_text().startswith("theorem")
     assert not (task.packet_dir / "tmp" / "scratch.txt").exists()   # tmp/ is not a packet file
     prompt = asyncio.run(task.create_user_prompt())
-    assert str(task.packet_dir.resolve()) in prompt and "{dir}" not in prompt
-    assert "submit_outputs" in prompt
+    assert "{dir}" not in prompt and "submit_outputs" in prompt
     assert result.outputs["goal_brief.md"]["content"] == "the goal"
     assert PacketSessionTask.product_of(result)["outputs"]["ledger.json"]["sha256"]
+
+
+def test_the_folder_in_the_brief_is_one_the_routes_file_tools_open(tmp_path):
+    """On `ape_agent` the brief names the folder as APE's file tools take it; they refuse an
+    absolute path. Asserted through the real provider's resolver and a real read, at the far end."""
+
+    from ape.scaffolds.claude_code.config import ClaudeCodeConfig
+    from ape.toolkits.file_system.core import FileSystemProvider
+
+    payload = S.session_payloads(S.plan_sessions(
+        _packets(tmp_path / "packets"), name="x", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS,
+        out_dir=tmp_path / "plan"))[0]
+    task = create_task_from_data(payload, ApeAgentConfig())
+    asyncio.run(_work_a_session(task, tmp_path / "attempt", "the goal"))
+    prompt = asyncio.run(task.create_user_prompt())
+    assert task.folder_reference == "scratch/packet" and "\nscratch/packet\n" in prompt
+    files = FileSystemProvider(task=task, config=task.config)
+    ok, resolved, _ = files._resolve_path(Path(task.folder_reference) / "instructions.md")
+    assert ok and resolved == (task.packet_dir / "instructions.md").resolve()
+    read = asyncio.run(files.file_read(Path(task.folder_reference) / "instructions.md"))
+    assert "Extract the design decisions." in json.dumps(read)
+    refused, _, why = files._resolve_path(task.packet_dir.resolve() / "instructions.md")
+    assert not refused and "Absolute paths are not allowed" in why
+
+    claude = create_task_from_data(payload, ClaudeCodeConfig())
+    asyncio.run(claude.setup(None, "test", attempt_path=tmp_path / "attempt_claude"))
+    assert claude.folder_reference == str(claude.packet_dir.resolve())
+    assert claude.folder_reference in asyncio.run(claude.create_user_prompt())
 
 
 @pytest.mark.parametrize("bad, message", [
@@ -214,6 +241,11 @@ def test_session_without_execute_runs_nothing(monkeypatch, tmp_path, capsys):
                      "configs/session/packet_session_opus55_claude_sub.yaml", "--run-name", "x"]) == 0
     err = capsys.readouterr().err
     assert "NOTHING RAN" in err and "2 session(s) x 2 replicate(s)" in err
+    assert "claude_code claude-opus-5-5 at effort xhigh, CLI 2.1.285" in err
+
+    assert cli.main(["session", "--plan", str(tmp_path / "plan"), "--config",
+                     "configs/session/packet_session_elm_luna.yaml", "--run-name", "x"]) == 0
+    assert "ape_agent elm_gpt_6_luna at effort high" in capsys.readouterr().err
 
 
 # --- each execution or import keeps its own bytes (implementation review 2026-10-22, finding 1) --

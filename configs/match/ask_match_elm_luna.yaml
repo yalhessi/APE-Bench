@@ -1,0 +1,36 @@
+# The raw-ask matcher, ask-match/2-task (src/mathlib_review/judge/ask_matching.py), on GPT-6 Luna
+# through the ELM gateway: `elm_gpt_6_luna` on the ape_agent scaffold, OpenAI Responses with the
+# reasoning carried between turns (CLAUDE.md, "Providers"), at effort high as the reconstruction
+# baseline ran it. The cheap route: USD 0.10 in and 0.50 out per million tokens at list price.
+#
+# It is a different executor from the 1-session matchers (Opus 5.5 at xhigh on the subscription),
+# so its verdicts measure this route. They do not calibrate 2-task against 1-session; that runs on
+# the original route (configs/match/ask_match_opus55_claude_sub.yaml).
+#
+#   python -m src.mathlib_review.review.cli match --plan <measurement dir> \
+#       --config configs/match/ask_match_elm_luna.yaml --run-name <name> --execute
+#
+# The plan fixes the number of blind matchers (sample_count) and early stop is always off.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: elm_gpt_6_luna
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+  reasoning_effort: high
+  # One `submit_matches` call carries a verdict for every ask in the batch.
+  max_tokens: 32000
+
+# Everything the matcher judges is in its first message; the task grants it no tools but its
+# submission.
+batch_preamble: plain
+workspace_environment: false
+
+execution:
+  max_turns: 20
+  # Both halves of the per-session ceiling (CLAUDE.md, "Per-task budget"). At Luna's rates
+  # USD 0.50 is over a million output tokens, so the token half binds first.
+  sample_max_cost: 0.50
+  sample_max_tokens: 3000000
+
+dataset: {}

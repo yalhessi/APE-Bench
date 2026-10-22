@@ -269,6 +269,30 @@ def test_match_execute_refuses_without_the_subscription_login(monkeypatch, tmp_p
                   "--execute"])
 
 
+def test_the_cheap_route_names_its_effort_and_refuses_without_the_gateway_key(monkeypatch, tmp_path,
+                                                                             capsys):
+    """GPT-6 Luna through ELM on ape_agent: effort lives on llm_config there, and the binding and
+    the dry run must both carry it; `--execute` refuses before any request without ELM's key."""
+
+    from src.mathlib_review.review import cli
+    from src.mathlib_review.review.preflight import PreflightError
+    from src.mathlib_review.run_config import load_run
+
+    _v2_plan(tmp_path)
+    monkeypatch.setattr(MA, "run_matching", lambda *a, **k: pytest.fail("ran"))
+    config = "configs/match/ask_match_elm_luna.yaml"
+    assert cli.main(["match", "--plan", str(tmp_path / "m"), "--config", config,
+                     "--run-name", "x"]) == 0
+    assert "ape_agent elm_gpt_6_luna at effort high" in capsys.readouterr().err
+    _dataset, scaffold, _ = load_run(Path(config), MA.MatchDatasetConfig, [])
+    assert MA.executor_of(scaffold) == {"scaffold": "ape_agent", "model": "elm_gpt_6_luna",
+                                        "effort": "high", "cli_version": "unknown"}
+    monkeypatch.delenv("ELM_API_KEY", raising=False)
+    with pytest.raises(PreflightError, match="ELM_API_KEY"):
+        cli.main(["match", "--plan", str(tmp_path / "m"), "--config", config, "--run-name", "x",
+                  "--execute"])
+
+
 JUDGED = Path("results/pr_review_v5/audits/iter-ds41-contract2-keepthink-high-rep1")
 
 

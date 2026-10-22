@@ -209,7 +209,9 @@ def executor_of(scaffold) -> Dict[str, str]:
     return {"scaffold": str(getattr(scaffold, "scaffold_type", "unknown")),
             "model": str(getattr(llm, "model_name", None) or getattr(scaffold, "claude_model", None)
                          or "unknown"),
-            "effort": str(getattr(scaffold, "effort", None) or "unknown"),
+            # Claude Code states effort on the scaffold; every other route on its llm_config.
+            "effort": str(getattr(scaffold, "effort", None)
+                          or getattr(llm, "reasoning_effort", None) or "unknown"),
             "cli_version": str(getattr(scaffold, "cli_version", None) or "unknown")}
 
 

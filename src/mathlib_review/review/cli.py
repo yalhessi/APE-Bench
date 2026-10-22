@@ -861,8 +861,7 @@ def _session(args, overrides, logger) -> int:
             "plan": f"{plan.plan_id} (brief {plan.brief_sha256[:12]})",
             "would run": f"{len(plan.packets)} session(s) x {plan.replicates} replicate(s)",
             "outputs": ", ".join(o["name"] for o in plan.outputs),
-            "route": f"{scaffold.scaffold_type} "
-                     f"{getattr(scaffold, 'claude_model', None) or scaffold.llm_config.model_name}",
+            "route": _route_line(scaffold),
             "into": f".ape/runs/{run_name}, outputs to {plan_dir}/outputs/",
         })
         return 0
@@ -876,6 +875,16 @@ def _session(args, overrides, logger) -> int:
     print(json.dumps({"plan_id": plan.plan_id, "sessions_with_outputs": len(rows),
                       "expected": expected}, indent=1))
     return 0 if len(rows) == expected else 1
+
+
+def _route_line(scaffold) -> str:
+    """The executor a run binding will record, as one line, so a dry run shows what binds."""
+
+    from src.mathlib_review.analysis.matching import executor_of
+
+    executor = executor_of(scaffold)
+    line = f"{executor['scaffold']} {executor['model']} at effort {executor['effort']}"
+    return line + (f", CLI {executor['cli_version']}" if executor["cli_version"] != "unknown" else "")
 
 
 def _match(args, overrides, logger) -> int:
@@ -898,8 +907,7 @@ def _match(args, overrides, logger) -> int:
             "plan": f"{plan.plan_id} ({plan.identity.instrument}/{plan.identity.instrument_version})",
             "would run": f"{len(payloads)} batch task(s) x {plan.identity.replicates} replicate(s)",
             "cells per replicate": plan.expected_cells,
-            "route": f"{scaffold.scaffold_type} "
-                     f"{getattr(scaffold, 'claude_model', None) or scaffold.llm_config.model_name}",
+            "route": _route_line(scaffold),
             "into": f".ape/runs/{run_name}, verdicts to {plan_dir_of(args.plan)}/verdicts/",
         })
         return 0

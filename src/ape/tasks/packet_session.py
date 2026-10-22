@@ -145,9 +145,23 @@ class PacketSessionTask(BaseTask):
                 path.write_text(item.content, encoding="utf-8")
         return logger
 
+    @property
+    def folder_reference(self) -> str:
+        """The folder as the session's file tools name it, which is what `{dir}` becomes.
+
+        APE's own file tools (the `ape_agent` scaffold) refuse an absolute path and resolve a path
+        against the attempt's workspaces folder, so there it is `scratch/packet`. Every other route
+        brings its own tools, which take the absolute path (Claude Code's are contained to the
+        workspace). Before this, an `ape_agent` session was told an absolute folder that every one
+        of its tools refused."""
+
+        if self.config.scaffold_type == "ape_agent":
+            return self.packet_dir.relative_to(self.workspaces_dir).as_posix()
+        return str(self.packet_dir.resolve())
+
     async def create_user_prompt(self) -> str:
         names = ", ".join(f"`{o.name}`" for o in self.data.outputs)
-        return (self.data.brief.replace(DIR_TOKEN, str(self.packet_dir.resolve()))
+        return (self.data.brief.replace(DIR_TOKEN, self.folder_reference)
                 + f"\n\nWhen {names} {'is' if len(self.data.outputs) == 1 else 'are'} written in "
                   f"the working folder, call `{self.submit_tool}` to hand them in.")
 
