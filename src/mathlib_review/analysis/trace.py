@@ -176,3 +176,148 @@ async def _judge_tasks(tasks_dir: Path, obligation_id: str) -> Dict[str, Dict[st
             "task_dir": str(task_dir),
             "attempts": [str(a.path) for _i, s in sorted(samples.items()) for a in s.attempts]}
     return found
+
+
+# --- What a run's reviewers were given -----------------------------------------------------------
+
+
+def run_inputs(run_name: str, pr: Optional[int] = None, full: bool = False,
+               ape_root: Path = Path(".ape/runs")) -> Dict[str, Any]:
+    """What one run's reviewers were given, from the run's own records, never today's files.
+
+    The route the run executed on; each input file the task config names, with the digest the
+    plan sealed, the snapshot of those bytes, and whether the file on disk still matches; and per
+    attempt, the first messages as its transcript stored them and the tools it was offered. What
+    a route does not record -- the Claude Code CLI's own system prompt and the MCP tool schemas it
+    served -- is named as such rather than reconstructed.
+    """
+
+    from src.mathlib_review.paths import run_dir
+    from src.mathlib_review.review.inputs import INPUT_FILE_FIELDS, SNAPSHOT_DIR
+
+    root = Path(ape_root) / run_name
+    config_path = root / "config.json"
+    if not config_path.is_file():
+        raise ValueError(f"no orchestrator record at {config_path}; transcripts live only under the "
+                         "gitignored .ape/runs/ of the machine that ran it")
+    config = json.loads(config_path.read_text()).get("config") or {}
+    llm = config.get("llm_config") or {}
+    route = {"scaffold": config.get("scaffold_type"),
+             "model": config.get("claude_model") or llm.get("model_name"),
+             "cli_version": config.get("cli_version"), "effort": config.get("effort")}
+    overrides = config.get("task_config_overrides") or {}
+
+    results = run_dir(run_name)
+    plan_file = results / "run_plan.json"
+    plans = ([plan_file] if plan_file.is_file() else []) + sorted(
+        results.glob("run_plan_revision_*.json"))
+    sealed = {}
+    for path in plans:
+        sealed.update((json.loads(path.read_text()).get("evaluation_settings") or {})
+                      .get("input_files") or {})
+    index_path = results / SNAPSHOT_DIR / "index.json"
+    index = json.loads(index_path.read_text()) if index_path.is_file() else {}
+    files = {}
+    for field in INPUT_FILE_FIELDS:
+        value = overrides.get(field)
+        if value in (None, "", "None"):
+            continue
+        path = Path(value)
+        current = sha256_bytes(path.read_bytes()) if path.is_file() else None
+        seal = sealed.get(field)
+        files[field] = {
+            "path": str(path), "sealed_sha256": seal, "current_sha256": current,
+            "snapshot": (index.get(field) or {}).get("snapshot"),
+            "status": ("not recorded when the plan was sealed: the file on disk now is not "
+                       "necessarily what the sessions read" if seal is None else
+                       "unchanged since sealed" if seal == current else
+                       "changed since sealed: read the snapshot, not the path")}
+
+    attempts = asyncio.run(_attempts(root / "tasks", pr))
+    shown = []
+    for item in attempts:
+        transcript = _first_messages(Path(item["attempt"]), route["scaffold"])
+        if not full:
+            for key in ("system", "user"):
+                text = transcript.get(key)
+                if isinstance(text, str):
+                    transcript[key] = {"sha256": sha256_bytes(text.encode("utf-8")),
+                                       "chars": len(text), "head": text[:300]}
+        shown.append({**item, **transcript})
+    return {"run": run_name, "route": route, "input_files": files,
+            "plans": [str(p) for p in plans], "attempts": shown}
+
+
+async def _attempts(tasks_dir: Path, pr: Optional[int]) -> List[Dict[str, Any]]:
+    """Every attempt directory of the run's top-level tasks, with the PR each reviewed."""
+
+    import re
+
+    from ape.orchestration.persistence import TaskStorage
+
+    found: List[Dict[str, Any]] = []
+    if not tasks_dir.is_dir():
+        return found
+    for task_dir in sorted(p for p in tasks_dir.iterdir() if p.is_dir()):
+        storage = TaskStorage(task_dir, task_dir.name)
+        result = await storage.load_task_result() or {}
+        outcome_path = task_dir / "task_outcome.json"
+        task_id = (result.get("task_id")
+                   or (json.loads(outcome_path.read_text()).get("task_id")
+                       if outcome_path.is_file() else ""))
+        number = result.get("pr_number")
+        if number is None:
+            match = re.search(r"_(\d+)_round", str(task_id))
+            number = int(match.group(1)) if match else None
+        if pr is not None and number != pr:
+            continue
+        samples = await storage.load_all_samples()
+        for index, sample in sorted(samples.items()):
+            for attempt in sample.attempts:
+                found.append({"task_dir": str(task_dir), "task_id": task_id, "pr": number,
+                              "sample": index, "attempt": str(attempt.path),
+                              "status": str(getattr(attempt.status, "value", attempt.status))})
+    return found
+
+
+def _content_text(content) -> str:
+    if isinstance(content, list):
+        return "".join(block.get("text", "") for block in content if isinstance(block, dict))
+    return "" if content is None else str(content)
+
+
+def _first_messages(attempt: Path, scaffold: Optional[str]) -> Dict[str, Any]:
+    """The first system and user messages and the tools, as this attempt's transcript holds them."""
+
+    sessions = sorted(attempt.glob("ape_agent_session_*.jsonl"))
+    if sessions:
+        rows = jsonl_rows(sessions[-1])
+        first = {}
+        for row in rows:
+            kind = row.get("type")
+            if kind in ("system", "user") and kind not in first:
+                first[kind] = _content_text((row.get("message") or {}).get("content"))
+        definitions = next((row for row in rows if row.get("type") == "tool_definitions"), None)
+        tools = list(((definitions or {}).get("message") or {}).get("tools") or [])
+        return {"transcript": str(sessions[-1]), "system": first.get("system"),
+                "user": first.get("user"),
+                "tools": [t.get("function", {}).get("name") for t in tools],
+                "tool_schemas_sha256": sha256_bytes(canonical_json_bytes(tools)) if tools else None,
+                "opaque": []}
+    conversations = sorted(attempt.glob("claude_code_conversation_*.jsonl"))
+    if conversations:
+        rows = jsonl_rows(conversations[-1])
+        user = next((_content_text((row.get("message") or {}).get("content"))
+                     for row in rows if row.get("type") == "user"), None)
+        session_path = attempt / "claude_code_session.json"
+        init = (json.loads(session_path.read_text()).get("init") or {}) if session_path.is_file() else {}
+        return {"transcript": str(conversations[-1]), "system": None, "user": user,
+                "tools": init.get("tools"),
+                "observed": {"model": init.get("model"),
+                             "cli_version": init.get("claude_code_version"),
+                             "permission_mode": init.get("permissionMode")},
+                "tool_schemas_sha256": None,
+                "opaque": ["the Claude Code CLI's own system prompt is not recorded",
+                           "the MCP tool schemas served to the CLI are not recorded per session"]}
+    return {"transcript": None, "system": None, "user": None, "tools": None,
+            "opaque": [f"no transcript in {attempt} ({scaffold or 'unknown scaffold'})"]}

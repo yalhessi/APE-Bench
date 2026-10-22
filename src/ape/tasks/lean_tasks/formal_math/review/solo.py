@@ -236,6 +236,12 @@ class SoloReviewConfig(BasePRReviewConfig):
     #: file does not hold is refused, not reviewed without its context.
     context_file: Optional[Path] = None
 
+    #: The digests the run sealed for those two files (`review/inputs.py`), set by the runner, never
+    #: by hand. When set, a session refuses a file whose bytes differ: an edit after the plan was
+    #: sealed cannot reach a session of that run. None reads the file as it is, as before 2026-10-22.
+    system_prompt_sha256: Optional[str] = None
+    context_file_sha256: Optional[str] = None
+
     #: How the task frames what a finding is. "merge": the severity line, the mandate and the
     #: submit tool speak of withholding merge and of `merge_ready_as_is` (every run before
     #: 2026-09-30). "request": a finding is a change the reviewer would request, `advisory` when
@@ -336,22 +342,26 @@ def solo_system_prompt(config: SoloReviewConfig) -> str:
     """`SOLO_SYSTEM`, or the brief `config.system_prompt_file` names -- never a silent default
     when a file was named and is missing."""
 
+    from src.mathlib_review.review.inputs import verified_text
+
     if config.system_prompt_file is None:
         return SOLO_SYSTEM
     path = Path(config.system_prompt_file)
     if not path.is_file():
         raise FileNotFoundError(f"system_prompt_file {path} does not exist")
-    return path.read_text(encoding="utf-8")
+    return verified_text(path, config.system_prompt_sha256, "system_prompt_file")
 
 
 def solo_context_block(config: SoloReviewConfig, pr_number: int) -> str:
     """The sections `config.context_file` holds for this PR, or "" when no file is set."""
 
+    from src.mathlib_review.review.inputs import verified_text
+
     if config.context_file is None:
         return ""
     path = Path(config.context_file)
-    with path.open(encoding="utf-8") as handle:
-        rows = [json.loads(line) for line in handle if line.strip()]
+    text = verified_text(path, config.context_file_sha256, "context_file")
+    rows = [json.loads(line) for line in text.split("\n") if line.strip()]
     row = next((item for item in rows if item.get("pr_number") == pr_number), None)
     if row is None:
         raise KeyError(f"context_file {path} holds no row for PR {pr_number}")

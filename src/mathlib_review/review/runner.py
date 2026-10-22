@@ -1562,6 +1562,25 @@ class PlanChangedSemantically(RuntimeError):
     """A resume would answer a different question than the run it is resuming."""
 
 
+#: `evaluation_settings` keys added after plans had been sealed without them. Absent from a sealed
+#: plan, such a key means "not recorded then", not "different"; present in both, it is compared like
+#: any other setting. `input_files`: the digests of the brief and context files (2026-10-22).
+NEWLY_RECORDED_SETTINGS = frozenset({"input_files"})
+
+
+def _newly_recorded_settings(before: Dict[str, Any], after: Dict[str, Any]) -> List[str]:
+    """The settings that differ only because the sealed plan predates recording them."""
+
+    old = dict(before.get("evaluation_settings") or {})
+    new = dict(after.get("evaluation_settings") or {})
+    added = sorted(set(new) - set(old))
+    if not added or set(added) - NEWLY_RECORDED_SETTINGS:
+        return []
+    if {k: v for k, v in new.items() if k not in added} != old:
+        return []
+    return added
+
+
 def seal_or_revise_plan(out: Path, plan: V5RunPlan, logger) -> Path:
     """Write the plan, or record a revision of it when only operational fields moved.
 
@@ -1591,6 +1610,16 @@ def seal_or_revise_plan(out: Path, plan: V5RunPlan, logger) -> Path:
     after = plan.model_dump(mode="json")
     changed = {key for key in set(before) | set(after) if before.get(key) != after.get(key)}
     semantic = sorted(changed - RESUMABLE_PLAN_FIELDS)
+    newly_recorded = _newly_recorded_settings(before, after)
+    if semantic == ["evaluation_settings"] and newly_recorded:
+        # A plan sealed before a setting was recorded at all: nothing it sealed changed, and the
+        # run may finish. Its earlier sessions read those inputs unpinned, so say so loudly; the
+        # revision written below records what this attempt is pinned to.
+        logger.warning(
+            "resuming %s: %s were not recorded when its plan was sealed; from this attempt on "
+            "they are pinned, and sessions run before it may have read other bytes",
+            plan.run_name, newly_recorded)
+        semantic = []
     if semantic:
         raise PlanChangedSemantically(
             f"the sealed plan for {plan.run_name!r} differs in {semantic}, which changes what "
@@ -1610,6 +1639,38 @@ def seal_or_revise_plan(out: Path, plan: V5RunPlan, logger) -> Path:
         "what this attempt ran under.",
         plan.run_name, revision, sorted(changed), path.name)
     return path
+
+
+def _settings_with_inputs(dataset, scaffold) -> Dict[str, Any]:
+    """`evaluation_settings`, plus the digests of the input files the task config names.
+
+    Only when it names any, for the reason the contract directives are added only when set: a
+    plan recomputed for a run that reads no file stays byte-identical to the one it sealed.
+    """
+
+    from src.mathlib_review.review.inputs import resolve_input_files, sealed_digests
+
+    settings = evaluation_settings(dataset)
+    resolved = resolve_input_files(getattr(scaffold, "task_config_overrides", None))
+    if resolved:
+        settings["input_files"] = sealed_digests(resolved)
+    return settings
+
+
+def pin_input_files(scaffold) -> Dict[str, Dict[str, str]]:
+    """Resolve the config's input files and hand each task their digests to verify against.
+
+    Before the plan is built, in a dry run as in a real one, so the scaffold digest the plan seals
+    is the one the tasks run under. Returns what was resolved, for the snapshot.
+    """
+
+    from src.mathlib_review.review.inputs import pin_overrides, resolve_input_files
+
+    resolved = resolve_input_files(getattr(scaffold, "task_config_overrides", None))
+    if resolved:
+        scaffold.task_config_overrides = {**(scaffold.task_config_overrides or {}),
+                                          **pin_overrides(resolved)}
+    return resolved
 
 
 def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
@@ -1649,7 +1710,7 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
         standard_budget_tokens=dataset.standard_budget_tokens,
         per_pr_token_cap=dataset.per_pr_token_cap,
         coordination=coordination_config(dataset).report(),
-        evaluation_settings=evaluation_settings(dataset),
+        evaluation_settings=_settings_with_inputs(dataset, scaffold),
         git_commit=commit, git_tree_state=tree_state,
         source_sha256="",
     )
@@ -1954,6 +2015,9 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
             f"design {dataset.design!r} is a per-PR reviewer and runs under routing_mode: "
             f"solo; this config says {dataset.routing_mode!r}")
     assert_ready(scaffold, logger, enforce=not dataset.dry_run)
+    # The brief and context files a solo-family config names, resolved and pinned before either
+    # plan is built (`review/inputs.py`).
+    input_files = pin_input_files(scaffold)
     assert_the_model_keeps_its_reasoning(scaffold)
 
     release = load_release(dataset)
@@ -2029,6 +2093,13 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
 
     plan = _build_plan(dataset, scaffold, agenda)
     seal_or_revise_plan(out, plan, logger)
+    if input_files:
+        from src.mathlib_review.review.inputs import SNAPSHOT_DIR, snapshot_input_files
+
+        snapped = snapshot_input_files(input_files, out)
+        write_once(out / SNAPSHOT_DIR / "index.json", pretty_json_bytes(
+            {field: {"sha256": item["sha256"], "snapshot": item["snapshot"]}
+             for field, item in sorted(snapped.items())}))
 
     if dataset.routing_mode == "lead":
         # Rank each PR's work before the lead reads it. Relations are computed once for the

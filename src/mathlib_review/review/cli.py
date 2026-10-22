@@ -392,6 +392,12 @@ def build_parser() -> argparse.ArgumentParser:
     trace.add_argument("--of", dest="of_run", help="a judged generation run")
     trace.add_argument("--obligation")
     trace.add_argument("--node", default="judge", help="which judgement of the run")
+    inputs = report_sub.add_parser(
+        "inputs", help="what a run's reviewers were given: the sealed input files, the route, and "
+                       "each attempt's stored first messages and tools")
+    inputs.add_argument("--run", required=True)
+    inputs.add_argument("--pr", type=int)
+    inputs.add_argument("--full", action="store_true", help="print the messages whole")
     tools = report_sub.add_parser(
         "tools", help="what every tool call came back with: answered, negative, refused, "
                       "error or env, per tool, from the session transcripts in .ape/runs")
@@ -712,6 +718,10 @@ def _report(args) -> int:
         else:
             raise SystemExit("trace a matching cell with --plan --pr --ask --session, or a judged "
                              "obligation with --of --obligation")
+    elif args.report_command == "inputs":
+        from src.mathlib_review.analysis.trace import run_inputs
+
+        print(json.dumps(run_inputs(args.run, pr=args.pr, full=args.full), indent=1))
     elif args.report_command == "tools":
         from src.mathlib_review.analysis.tool_outcomes import tool_outcomes
 
