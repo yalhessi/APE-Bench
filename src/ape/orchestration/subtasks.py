@@ -34,7 +34,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from .models import ChildRun, TaskExecutionSpec, TaskExecutionStatus, TaskOutcome
+from .models import (
+    ChildRun, TaskExecutionSpec, TaskExecutionStatus, TaskOutcome, outcome_failure_summary,
+)
 
 #: How many children may run at once inside one parent. Deliberately small: each carries its
 #: own multi-gigabyte Lean workspace overlay, and the failure mode of getting this wrong is
@@ -240,11 +242,12 @@ async def collect_child_runs(
             raw_result = await storage.load_task_result()
             has_result = bool(raw_result and raw_result.get("success"))
             result = None
-            # A task whose samples all failed still gets a `task_result.json` -- a bare
-            # `BaseTaskResult` the worker synthesises with `All samples failed: [...]`. That is
-            # not a submission, so it is not `result`; its sentence is the best account of the
-            # failure anyone has, so it is not discarded either.
-            error = None if has_result else (raw_result or {}).get("error")
+            # A task whose samples all failed has no `task_result.json` since 2026-10-22; before
+            # then the worker synthesised a bare `BaseTaskResult` carrying `All samples failed:
+            # [...]`, and runs on disk still hold those. Neither is a submission, so neither is
+            # `result`. The sentence comes from the old file where one exists and otherwise from
+            # the outcome (below), so a failure is never left without an account.
+            legacy_error = None if has_result else (raw_result or {}).get("error")
             if has_result:
                 try:
                     result = task.task_result_class.model_validate(raw_result)
@@ -264,6 +267,7 @@ async def collect_child_runs(
                 sample_max_tokens=config.execution.sample_max_tokens,
                 has_result=has_result,
             )
+            error = None if has_result else (legacy_error or outcome_failure_summary(outcome))
         except Exception as error:  # noqa: BLE001 - see the docstring
             if logger is not None:
                 logger.warning("child %s: could not read its records (%s)", spec.spec_id, error,

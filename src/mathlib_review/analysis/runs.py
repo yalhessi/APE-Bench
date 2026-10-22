@@ -140,9 +140,10 @@ def scheduled_task_tokens(run_dir: Path) -> int:
     """Processed tokens over the run's top-level tasks, from the record every one of them has.
 
     `OrchestratorResults.total_token_usage` cannot answer this. It sums `task_results`, and a
-    task that paused reaches that list carrying no usage at all: `worker._try_aggregate`
-    synthesises a bare `BaseTaskResult(success=False, error="All samples failed: [...]")`
-    with `token_usage=None` (framework defect #4). Measured on `pr5_elm_qwen_tokencap_probe1`,
+    task that paused or failed reaches that list carrying no usage at all: until 2026-10-22
+    `worker._try_aggregate` synthesised a bare `BaseTaskResult(success=False, error="All samples
+    failed: [...]")` with `token_usage=None` (framework defect #4), and since then it writes no
+    result. `OrchestratorResults.outcome_usage` now carries the same total as this function. Measured on `pr5_elm_qwen_tokencap_probe1`,
     where 10 of 11 arms stopped on their token ceiling: the orchestrator aggregate reported
     **27,593** tokens -- the one job that finished -- against a true **385,684**.
 

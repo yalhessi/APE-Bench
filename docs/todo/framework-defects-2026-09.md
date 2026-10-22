@@ -128,6 +128,27 @@ reads `paused: 0` for a job that paused at $0.18 and lost its answer.
 carry the failure, which is what it exists for), or amend the rule and the docstring to say a
 failure result is written deliberately. Both are readable; the current state is not.
 
+**Closed 2026-10-22** (branch `dataflow-refactor`, Slice 0). The worker writes no result for a task
+whose samples all failed; `task_outcome.json` records it FAILED with every attempt's status, error and
+spend, and nothing is appended to `aggregated_results.jsonl`. `ChildRun.error` reads the outcome
+(`outcome_failure_summary`), or the old sentence on runs that still hold a synthetic file.
+`OrchestratorResults` now carries `failed_tasks`, `paused_tasks`, `tasks_with_unknown_usage` and
+`outcome_usage` from every scheduled task's outcome, so a failed task no longer vanishes from the batch
+totals; `completed_tasks` counts tasks with a result.
+Two more defects on the same path, found while fixing it:
+- **No attempt error ever survived.** `TaskOutcome.from_samples` read `attempt.error`, a field `Attempt`
+  does not have (it is `error_message`), and the worker overwrote a raised attempt's traceback with None
+  two steps after writing it. Measured on `.ape/runs`: 0 non-null errors in 11,501 attempts across 6,135
+  outcomes, 121 of them failed; 0 of 5,000 sample files carry an `error_message`.
+- **A raised attempt was booked at $0.** Its usage never came back, and the worker zeroed the attempt.
+  It now keeps what the attempt had recorded as a lower bound and sets `usage_known: false`, carried to
+  `AttemptOutcome`, `TaskOutcome` and the batch count. Records written before keep reading as known.
+Still open, a named gap rather than a silent narrowing: `OrchestratorResults.total_token_usage` remains
+a sum over results, and `judgment/task.py` and `review_gate.py` still bubble it as their parents'
+`nested_token_usage`, so a failed or paused judge's spend is missing from its parent's cost. The fix is
+to bubble `subtasks.nested_usage(runs)` as the other families do; it changes the proof-engineering
+family's token accounting (cost only, by `nested_usage`'s design), so it is its own change.
+
 ## 5. A pipeline's rows do not say they came from a pipeline
 
 `StageRecord` declares `pipeline` (the root run) and `node` (which node of the graph), and

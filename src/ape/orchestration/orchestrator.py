@@ -525,6 +525,8 @@ class TaskOrchestrator:
                 cached_total_cost=sum((u.cached_total_cost or 0) for u in valid_usages),
             )
 
+        outcome_counts = await self._scheduled_outcomes(tasks)
+
         # Pull sample statistics from progress
         progress = await self.progress_manager.read()
         total_cost = progress.get_total_cost() if progress else 0.0
@@ -558,7 +560,39 @@ class TaskOrchestrator:
             successful_samples=successful_samples,
             total_cost=total_cost,
             total_cached_cost=total_cached_cost,
+            **outcome_counts,
         )
+
+    async def _scheduled_outcomes(self, tasks: List[BaseTask]) -> Dict[str, Any]:
+        """Failure, pause and spend over every scheduled task, from its `task_outcome.json`."""
+
+        from .models import TaskExecutionStatus, TaskOutcome, UsageBreakdown
+
+        failed = paused = missing = unknown = 0
+        billed = nominal = 0.0
+        tokens = 0
+        for task in tasks:
+            path = self.tasks_dir / task.data.global_index / "task_outcome.json"
+            try:
+                outcome = TaskOutcome.model_validate_json(path.read_text(encoding="utf-8"))
+            except FileNotFoundError:
+                missing += 1
+                continue
+            except Exception:  # noqa: BLE001 - an unreadable record is counted, not fatal
+                self.logger.warning("unreadable task_outcome.json at %s", path, exc_info=True)
+                missing += 1
+                continue
+            failed += outcome.execution_status is TaskExecutionStatus.FAILED
+            paused += outcome.execution_status is TaskExecutionStatus.PAUSED
+            unknown += not outcome.usage_known
+            billed += outcome.billed_cost
+            nominal += outcome.nominal_cost
+            tokens += outcome.tokens
+        return {
+            "failed_tasks": failed, "paused_tasks": paused, "tasks_without_outcome": missing,
+            "tasks_with_unknown_usage": unknown,
+            "outcome_usage": UsageBreakdown.of_self(billed=billed, nominal=nominal, tokens=tokens),
+        }
 
 
 async def run_orchestrator_from_file(
