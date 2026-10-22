@@ -492,3 +492,28 @@ def test_a_historical_input_binds_to_whichever_producer_holds_its_bytes(tmp_path
                         packet_ids=["pr33066_r2"],
                         inputs_from={"goal_brief.md": sources + [
                             {"plan_dir": str(twin), "producer": "import-twin"}]})
+
+
+def test_a_reviewers_prompt_finds_the_derivation_that_accounts_for_all_of_it(monkeypatch, tmp_path):
+    """A Phase A run names a context path on another branch. Its first message holds what it was
+    shown; the control's block sits inside every strategy's, so the longest match is the one."""
+
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
+    from src.mathlib_review.analysis.trace import context_lineage_from_prompt
+
+    plan_dir = _imported(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    kept = Path("results/pr_review_v5/probes/x/measurements/ctx")
+    kept.mkdir(parents=True)
+    base = _base_context(tmp_path / "base.jsonl")
+    S.derive_context(base=base, prs=[33066, 33117], out=kept / "context_ctl.jsonl", sections=[])
+    S.derive_context(base=base, prs=[33066, 33117], out=kept / "context_ctx.jsonl",
+                     sections=[{**GOAL_SECTION, "plan_dir": str(plan_dir), "producer": "import-ex"}])
+    shown = solo_context_block(SoloReviewConfig(context_file=kept / "context_ctx.jsonl"), 33117)
+    prompt = f"Review PR 33117.\n\n{shown}\n\nSubmit your findings."
+    found = context_lineage_from_prompt(prompt, 33117)
+    assert found["derived_file"].endswith("context_ctx.jsonl")
+    assert found["upstream"]["Design goal"]["observation"]["packet_id"] == "pr33117"
+    control = solo_context_block(SoloReviewConfig(context_file=kept / "context_ctl.jsonl"), 33117)
+    assert context_lineage_from_prompt(f"Review.\n\n{control}\n", 33117)["sections"] == []
+    assert context_lineage_from_prompt("Review PR 33117 with nothing added.", 33117) is None

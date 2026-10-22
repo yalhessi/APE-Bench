@@ -257,6 +257,14 @@ def run_inputs(run_name: str, pr: Optional[int] = None, full: bool = False,
     shown = []
     for item in attempts:
         transcript = _first_messages(Path(item["attempt"]), route["scaffold"])
+        context = files.get("context_file")
+        # Only for a file no longer at its recorded path: a file on disk is identified by its own
+        # bytes, and a row it shares with a derived file says nothing about where it came from.
+        if context is not None and context["current_sha256"] is None and "lineage" not in context \
+                and item.get("pr") is not None and isinstance(transcript.get("user"), str):
+            lineage = context_lineage_from_prompt(transcript["user"], item["pr"])
+            if lineage is not None:
+                context["lineage"] = lineage
         if not full:
             for key in ("system", "user"):
                 text = transcript.get(key)
@@ -345,6 +353,38 @@ def context_lineage_of(digest: str, path: Path, snapshot: Dict[str, Any],
                                for section, ref in zip(lineage.sections, lineage.rows[str(pr)])}
         return out
     return None
+
+
+def context_lineage_from_prompt(user: str, pr: int) -> Optional[Dict[str, Any]]:
+    """The derivation whose rendered sections for `pr` are in a session's stored first message.
+
+    For a run whose context file is no longer at the path it recorded and whose plan sealed no
+    digest (the reconstruction probe's Phase A runs name a file on another branch): what reached the
+    reviewer is in its first message, and the solo renderer applied to a derived file either
+    produces those bytes or does not."""
+
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
+    from src.mathlib_review.analysis.sessions import CONTEXT_LINEAGE_SUFFIX, load_context_lineage
+
+    best = None
+    for candidate in sorted(Path(".").glob(LINEAGE_GLOB)):
+        lineage = load_context_lineage(candidate)
+        if str(pr) not in lineage.rows:
+            continue
+        derived = candidate.with_name(candidate.name[:-len(CONTEXT_LINEAGE_SUFFIX)])
+        if not derived.is_file():
+            continue
+        block = solo_context_block(SoloReviewConfig(context_file=derived), int(pr))
+        # A strategy's sections follow its control's, so a shorter derivation's block is inside a
+        # longer one's: the longest block in the message is the one that accounts for all of it.
+        if block and block in user and (best is None or len(block) > len(best[0])):
+            best = (block, lineage, derived)
+    if best is None:
+        return None
+    found = context_lineage_of(best[1].context_sha256, best[2], {}, pr)
+    if found is not None:
+        found["found_by"] = "its rendered sections in the session's stored first message"
+    return found
 
 
 def _first_messages(attempt: Path, scaffold: Optional[str]) -> Dict[str, Any]:
