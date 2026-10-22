@@ -1,0 +1,130 @@
+{
+  "bound": {
+    "pr32875": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr32875",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r1",
+        "plan_id": "extract_r1",
+        "plan_sha256": "e7695cce7ebc104404d338c411d22049b6780bb5975f1fa57ae7d84702dd19c8",
+        "producer": "import-extract_r1",
+        "replicate": "1",
+        "sha256": "125c3acd3efb0cef5fdc49efab1279f4ffac11b39364c9ff72a6054b6263ec03"
+      }
+    },
+    "pr33066": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33066_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "d8894aa1aa9d659736c172bba70b0846c825f968ab173f1343f679a071e35c3f"
+      }
+    },
+    "pr33117": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33117_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "71d1e7a02790f6f26b66f5be73e6e41550e23a33e94157ed7d8439802df4cecc"
+      }
+    },
+    "pr33304": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33304_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "5851fb32fd29e3f2bc3f88d9216f3dd435fc7afe1294363e31862d908e43a855"
+      }
+    },
+    "pr33304_r2": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33304_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "5851fb32fd29e3f2bc3f88d9216f3dd435fc7afe1294363e31862d908e43a855"
+      }
+    },
+    "pr33421": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33421_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "8d3dfdd63424345d949b53345067ce5330a8bb5f450bc6c8fc826ec5d92861c9"
+      }
+    },
+    "pr33421_r2": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr33421_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "8d3dfdd63424345d949b53345067ce5330a8bb5f450bc6c8fc826ec5d92861c9"
+      }
+    },
+    "pr42238": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr42238",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r1",
+        "plan_id": "extract_r1",
+        "plan_sha256": "e7695cce7ebc104404d338c411d22049b6780bb5975f1fa57ae7d84702dd19c8",
+        "producer": "import-extract_r1",
+        "replicate": "1",
+        "sha256": "ad5f907d09e0b3d336a3a0dac5129ba220f73adf3aff829ff520b0288c6b1178"
+      }
+    },
+    "pr42814": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr42814_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "796d36411ea6b6884ea1f3ebd7f0f0e11b561408b5c60da4d803e2c38bfa9134"
+      }
+    },
+    "pr43167": {
+      "goal_brief.md": {
+        "output": "goal_brief.md",
+        "packet_id": "pr43167_r2",
+        "plan_dir": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/extract_r2",
+        "plan_id": "extract_r2",
+        "plan_sha256": "c4cd8a455b500c39d1497547227eec50a04c82f3b62bd3d41bf1167359b76423",
+        "producer": "import-extract_r2",
+        "replicate": "1",
+        "sha256": "96e93206d9d86770e71346c70e3a8f274fd7761cdfce9e71ebe1b821eb004a0a"
+      }
+    }
+  },
+  "created_at": "2026-10-22T13:10:56.641155+00:00",
+  "plan_id": "decision",
+  "plan_sha256": "9388bacea8aabc75ef968caf89cdd65f126b754b0fa3c359ce1f3ca8e38883ce",
+  "schema_version": "input-lineage1",
+  "source_sha256": "4abc770d13ff02adf7b32a7b190ab001a1ff663da36b06264583f709ea77e235",
+  "unmatched": {}
+}
