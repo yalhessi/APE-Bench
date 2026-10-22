@@ -100,7 +100,7 @@ Departures and flags:
 | `a644d4d2` | The instrument (`judge/ask_matching.py`): v1 identified by its files' digests, v2's text with v1's judgment rules byte for byte, projection, seal, verdict validation; the evaluation records in `schema/scoring.py` |
 | `2aec9b04` | The registered Task `lean_pr_review_ask_matching` |
 | `e6de27f3` | The lifecycle (`analysis/matching.py`): plan, run, import, report; `cli probe match-plan`, `cli match`, `cli probe match-import`, `cli report match`; the route config |
-| (this commit) | The judge's report carries the same identity; `report conditions` names each repetition's; `cli report trace` for both instruments; the matcher's stage-ledger row; the reporting rule in `CLAUDE.md` |
+| `c443aee8` | The judge's report carries the same identity; `report conditions` names each repetition's; `cli report trace` for both instruments; the matcher's stage-ledger row; the reporting rule in `CLAUDE.md` |
 
 Acceptance, checked without calling a model:
 
@@ -240,3 +240,64 @@ Each property in design §15's slice C, with the test that holds it
 
 Nothing here is a reason to hold back adoption. The plan file grows with the inputs it now keeps,
 which is the point of keeping them.
+
+## Design §15's acceptance checks
+
+| Check | Status | Where |
+|---|---|---|
+| Independent identical outputs remain two observations; resume does not mint a repetition | Met | `test_recovery_and_identity.py` |
+| A stale source, unsupported schema or missing required output fails before consumption | Met | edited plans and briefs refused on load or resume; strict `schema_version`s; `submit_outputs` and the imports refuse a missing output |
+| Same-shaped evidence from another episode fails the domain binding before a paid call | Met for context rows | `solo_context_block` refuses a row bound to another episode or reviewed head (`270838de`) |
+| ... and a check of another patch | **Not met (gap 10)** | on `develop` a compile warrant and its edit are one submission; a check handed between tasks arrives with the demonstrated-change design's construction artifacts, and its binding lands with that branch |
+| Interrupted output recovers a consistent binding or stays visibly incomplete; conflicting publications are not silently chosen | Met | `e90b51ef` |
+| The same sealed cases and recorded judgments give the same report after the refactor; changed semantics get a different protocol | Met | the post-cutoff and filing-contract seals reproduce their committed readings; `ask-match/2-task` is its own version |
+| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | Met | `cli run` for both; acquisition as `packet_session` tasks |
+| A program changes a component and its configuration without editing the common runner's condition branches | Met | `test_sessions.py`: replacing the extractor touches nothing downstream |
+| A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | Met | `cli report trace` (both instruments, with the reviewer's inputs), `cli report inputs` |
+| Editing one prompt or context byte changes the request or refuses resume; an old run still shows its original bytes and tool interface | Met | slice A2 |
+| Comparing saved runs shows differing channels, protocols, populations, seals and routes, refuses unsupported pooling, permits declared contrasts | Met | `cli report compare` |
+| The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | Met | slice B |
+| Handoff writes are bounded; overhead measured on realistic outputs before broad adoption | Met | slice C's table |
+
+10. **A technical check bound to the exact patch across tasks.** Completes with the
+    demonstrated-change design's construction artifacts: a check names the patch digest, imports and
+    workspace it compiled, and the consumer refuses a check of another patch.
+
+## Decisions taken while implementing, for review
+
+None of these changes the agreed plan's scope; each is a choice the plan left open or an
+interaction with an earlier record. All are on this branch and reversible.
+
+1. **Configuration (slice 0).** Children inherit no task settings; the earlier pilot todo advised a
+   call-site fix instead. Measured safe on every config on disk; CLI `--set task_config.X` on a lead
+   run no longer reaches its arms.
+2. **Failure records (slice 0).** `OrchestratorResults.completed_tasks` now counts tasks with a
+   result; failures are `failed_tasks`. Two adjacent defects were fixed because they sat inside
+   "expose failure and usage": attempt errors never reached outcomes, and a raised attempt was booked
+   at $0 (now `usage_known: false`).
+3. **The matcher's v2 text (A1).** v1's judgment rules verbatim; the input and output paragraphs
+   changed for a task route. Declared a new version, not equivalent until calibrated.
+4. **Pins (A1, B).** The schema facade's export count 133 -> 144 with reasons; the pure class-count
+   pin dropped, as the October 6 inventory proposed; the knob guard exempts a new task type's birth
+   fields only.
+5. **Resume boundary (A2).** A run sealed before input files were recorded resumes with a warning and
+   a revision instead of being refused, so paused subscription runs are not stranded.
+6. **Engine extension (B).** `packet_session` and `sample_products` live in APE, domain-free; the
+   spike's evidence (six probes, inputs lost every time) is why it is not a per-study adapter.
+7. **Recovery (C).** On resume the orchestrator writes the missing result, outcome or log row of an
+   interrupted task into that run's directory. That is recovery by the engine's own writer, as the
+   design asks; it does change files of interrupted runs when they are next resumed.
+8. **CLI.** New verbs: `cli match`, `cli session` (both spend, gated); `probe match-plan`,
+   `match-import`, `session-plan`, `session-import`; `report match`, `trace`, `inputs`, `compare`.
+   `probe seal`, `match-inputs` and `unblind` remain for the historical shell chain (gap 1).
+
+## Before merging
+
+- Commit the design documents (`task-dataflow-refactor-design`, the systems reading, the adversarial
+  review, the plan and the audit) to `develop` first; they are untracked in the main checkout and this
+  branch links to them.
+- Read `.claude/worktrees/dataflow-refactor` against the in-flight branches mapped at the start:
+  `review-reconstruction` adds `context_with_sections` and a cap fix beside code this branch touches
+  only in `probes.py`'s matcher section; `demonstrated-change` adds a design (gaps 2 and 10).
+- Nothing on this branch called a model. The first paid uses -- a `cli match` or `cli session` run on
+  the subscription route, and the v2-against-v1 calibration -- are the user's call.

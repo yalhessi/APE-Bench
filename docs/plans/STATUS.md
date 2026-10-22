@@ -271,3 +271,19 @@ names as the new reference baseline.
   items stay unbuilt (`docs/todo/convention-detectors.md`).
 * `docs/research/codebase-redesign-2026-10.md` is a design write-up, not a plan in this directory;
   its own §11 records what is built.
+
+## Added 2026-10-22 (on `dataflow-refactor`)
+
+The task/data refactor (`docs/research/task-dataflow-refactor-design-2026-10-22.md`, v0.3, and its
+plan `docs/plans/2026-10-22-task-native-evaluation-and-exploration.md`; both untracked in the main
+checkout when this was written). Record: `docs/research/task-dataflow-refactor-implementation-2026-10-22.md`.
+
+| Slice | Status |
+|---|---|
+| 0: execution semantics (config resolution, failure records, missing tool results) | **Built** |
+| A1: common evaluation and result inspection (matcher as a versioned instrument and a registered Task; one identity record for both instruments; `report match`, `trace`) | **Built**; v2-against-v1 calibration not run (user-run) |
+| A2: resolved context and run inspection (input files sealed by content; `report inputs`) | **Built** |
+| Comparison path (`report compare`) | **Built** |
+| B: shared composition in two consumers (`sample_products`, `packet_session`, session plans) | **Built**; the probes' hand-launched sessions not migrated (historical) |
+| C: failure and dynamic behaviour (interrupted publication, claims, continuation binding) | **Built** |
+| A check bound to its exact patch across tasks | **Not built**: lands with the demonstrated-change branch's construction artifacts |
