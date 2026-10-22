@@ -35,6 +35,16 @@ Four defects, three still on the tree:
    (`python -m ape.scaffolds.ape_agent.main <jsonl> --config <yaml>`) spends from the first call, with no
    `--execute` gate.
 
+**Defects 1 and 2 closed 2026-10-22** (branch `dataflow-refactor`): the gate's reviewer runs in the
+config's `judge_mode` and holds its own class's tool grant, not the generator's;
+`tests/ape/test_task_config_resolution.py::test_the_pilots_review_gate_neither_sees_gold_nor_holds_write_tools`
+builds it exactly as the task does, from the pilot config, and asserts both on the worker side. The fix
+is in the shared resolution and the nested primitive, not at the gate's call site as recommended below:
+the agreed refactor plan (F1, "do not broadcast a parent config into its children") takes the general
+rule, and the v5 lead inheritance that recommendation protected was measured first -- on all 17 lead
+configs the inherited setting equals the arms' own default. Defects 3 and 4 are untouched, and the four
+pilot runs stay uninterpretable: `_fixed3`'s gate verdicts were given with the gold diff in view.
+
 ## What would close it
 
 Record first, then plumbing, no spend: correct `PROJECT-STATUS.md` §11 ("attempted, uninterpretable",

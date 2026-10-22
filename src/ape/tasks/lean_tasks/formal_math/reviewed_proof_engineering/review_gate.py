@@ -301,7 +301,9 @@ async def lean_review_gate(
             metadata={},
         )
 
-        reviewer_task_config = LeanReviewGateConfig(judge_mode=review_config.judge_mode)
+        # Passed to `run_subtasks` explicitly; see the same note in `judgment/task.py`.
+        reviewer_task_overrides = LeanReviewGateConfig(
+            judge_mode=review_config.judge_mode).model_dump(mode="json", exclude_unset=True)
         reviewer_runtime_config = create_runtime_config_for_type(review_config.runtime_type)
 
         reviewer_config = create_scaffold_config_for_type(
@@ -313,7 +315,6 @@ async def lean_review_gate(
                 max_turns=review_config.max_turns,
                 sample_count=num_reviewers,
             ),
-            task_config=reviewer_task_config,
             llm_config=LLMConfig(model_name=review_config.model),
             runtime_config=reviewer_runtime_config,
         )
@@ -343,6 +344,7 @@ async def lean_review_gate(
             group="subtasks",
             logger=logger,
             concurrency=None,
+            task_config_overrides=reviewer_task_overrides,
         )
 
         nested_usage = reviewer_results.total_token_usage if reviewer_results else None

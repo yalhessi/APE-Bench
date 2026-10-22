@@ -31,6 +31,24 @@ should stop being settable and both callers should pass `task_config_overrides`.
 what a judge run does differently — the defaults may be what everyone has been measuring, in
 which case the fix moves numbers and needs a new run name.
 
+**Closed 2026-10-22** (branch `dataflow-refactor`, Slice 0 of
+`docs/research/task-dataflow-refactor-design-2026-10-22.md`). `ape.tasks.base.resolve_task_config`
+is the one resolution: class defaults, then a concrete `config.task_config` of the task's own class,
+then the record's overrides, then the invocation's. A key that is not a field of the task's config,
+or a concrete config of another task's class, is refused (`TaskConfigError`) instead of dropped. The
+scaffold config now serializes a concrete task config with its class, so it survives the worker
+boundary (pydantic dumps a field by its annotation, which had dropped every subclass field
+silently). Nested children inherit no task settings: `run_subtasks(task_config_overrides=...)` is
+the whole of what they get, and both judges pass `judge_mode` that way.
+What moved: the two nested judges now run in the mode their caller set. The Mathlib review judge is
+not one of them (it is a top-level task with its own config). In `lean_semantic_evaluation` the
+caller's default and the judge's default are both `with_ground_truth`, so only a run that set another
+mode changes. The reviewed-proof-engineering gate does change: its pilot sets `generated_only`, and the
+gate now runs that way (`docs/todo/thesis-pilot-integrity.md`, defects 1-2). v5 lead arms no longer
+receive the lead's run-level settings; on all 17 lead configs on disk the setting they kept was a
+tool list equal to their own default, so no arm on disk receives anything different.
+Tests: `tests/ape/test_task_config_resolution.py`, each asserted on the task the worker rebuilds.
+
 ## 2. `theorem_proving` cannot construct its own result
 
 `tasks/lean_tasks/formal_math/theorem_proving/task.py` calls `create_result(...)` without

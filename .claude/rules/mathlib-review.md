@@ -41,6 +41,13 @@ paths:
   left out of `global_index` until then, so the tasks that do not use it keep their identity and
   the ones that do fork. Never on `task_config`. `test_pr_review_v5_task_data_knobs.py` refuses a
   new review data field that is not a knob, and an old one that becomes one.
+  One exception to "no `__module__` enters an identity" (2026-10-22): a scaffold config holding a
+  *concrete* `task_config` serializes it with its class path, so it survives the worker boundary.
+  Review runs never set one (`load_run` turns `task_config:` into overrides), so no plan digest moves.
+- **A task setting takes effect or is refused (2026-10-22).** `resolve_task_config` refuses an unknown
+  override key and another task's concrete config, and nested children inherit no task settings from
+  their parent: pass them as `run_subtasks(task_config_overrides=...)`. Before this, a typo became the
+  default and a lead's settings were broadcast into its arms.
 - **Concern vocabulary:** arms say `documentation`, gold says `docs`; both spellings are hashed into
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.
