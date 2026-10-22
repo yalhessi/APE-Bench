@@ -1,4 +1,4 @@
-"""One number, followed back to the bytes behind it, for either evaluation instrument.
+"""Inspection and comparison: one number followed back to its bytes, and two numbers set side by side.
 
 A report row says a session reached an ask, or a run hit an obligation. Until 2026-10-22 answering
 "which finding, as the matcher saw it, under which seal, judged by which verdict, from which run" took
@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_rows, sha256_bytes
 
@@ -321,3 +321,174 @@ def _first_messages(attempt: Path, scaffold: Optional[str]) -> Dict[str, Any]:
                            "the MCP tool schemas served to the CLI are not recorded per session"]}
     return {"transcript": None, "system": None, "user": None, "tools": None,
             "opaque": [f"no transcript in {attempt} ({scaffold or 'unknown scaffold'})"]}
+
+
+# --- Why two results differ ----------------------------------------------------------------------
+
+#: Identity fields that make two numbers the same kind of number. Equal on all of them, two
+#: measurements are on one scale; equal on the first four only, they are one instrument read over
+#: different references, seals or projections, and are shown side by side but never subtracted.
+SCALE_FIELDS = ("instrument", "instrument_version", "rubric_sha256", "question_policy",
+                "reference_kind", "reference_sha256", "seal_sha256", "population_prs",
+                "projection", "replicates", "aggregation", "denominator")
+INSTRUMENT_FIELDS = ("instrument", "instrument_version", "rubric_sha256", "question_policy")
+#: Run-plan fields that change what a run measures (the plan's own non-resumable fields).
+#: `agenda_sha256` is not among them: the sealed agenda carries its own run's name, id and
+#: digest, so it differs between any two runs; `agenda_content_sha256` is the agenda without them.
+RUN_FIELDS = ("model_name", "routing_mode", "release", "agenda_content_sha256", "evaluation_settings",
+              "evaluation_contract_version", "coordination", "scaffold_config_sha256",
+              "lead_cost_cap", "standard_budget_cap", "per_pr_cost_cap", "lead_token_cap",
+              "standard_budget_tokens", "per_pr_token_cap")
+
+
+def _measurement(source: str) -> Dict[str, Any]:
+    """A measurement directory (a matching) or a judged run's name, read as identity and numbers."""
+
+    path = Path(source)
+    if path.is_dir() and (path / "matching_plan.json").is_file():
+        from src.mathlib_review.analysis.matching import load_plan, report_matching
+
+        plan = load_plan(path)
+        report = report_matching(path, write=False)
+        numbers = {rep: {"condition_reach": report[rep]["condition_reach"],
+                         "reach": report[rep]["reach"]}
+                   for rep in report["measurement"]["replicates"]}
+        numbers["asks"] = report["asks"]
+        if "agreement" in report:
+            numbers["agreement"] = report["agreement"]
+        return {"kind": "matching", "source": str(path),
+                "identity": plan.identity.model_dump(mode="json"),
+                "identity_sha256": plan.identity_sha256,
+                "forensic": report["measurement"]["forensic"], "numbers": numbers}
+    from src.mathlib_review.judge.runner import derive_from_run
+
+    audit = Path(derive_from_run(source)["out_dir"]) / "semantic_report.json"
+    if not audit.is_file():
+        raise ValueError(f"{source} is neither a matching directory nor a judged run (no {audit})")
+    report = json.loads(audit.read_text())
+    rows = report.get("per_obligation") or []
+    measurement = report.get("measurement") or {}
+    return {"kind": "judged run", "source": source,
+            "identity": measurement.get("identity"),
+            "identity_sha256": measurement.get("identity_sha256")
+            or "unrecorded (judged before 2026-10-22)",
+            "judge_identity": report.get("judge_identity"),
+            "forensic": bool(report.get("forensic")),
+            "numbers": {"denominator": len(rows),
+                        "issue_hits": sum(r.get("issue_status") == "hit" for r in rows),
+                        "resolution_hits": sum(r.get("resolution_status") == "hit" for r in rows)}}
+
+
+def _runs_of(entry: Dict[str, Any]) -> List[str]:
+    identity = entry.get("identity") or {}
+    runs = [run for subject in identity.get("subjects") or [] for run in subject.get("runs") or []]
+    return runs or ([entry["source"]] if entry["kind"] == "judged run" else [])
+
+
+def _run_plan(run: str) -> Optional[Dict[str, Any]]:
+    """The last plan a run ran under: its revision if it has one, else the sealed plan."""
+
+    from src.mathlib_review.paths import run_dir
+
+    directory = run_dir(run)
+    plans = sorted(directory.glob("run_plan_revision_*.json"),
+                   key=lambda p: int(p.stem.rsplit("_", 1)[-1]))
+    path = plans[-1] if plans else directory / "run_plan.json"
+    if not path.is_file():
+        return None
+    plan = json.loads(path.read_text())
+    agenda = directory / "agenda.json"
+    if agenda.is_file():
+        content = {k: v for k, v in json.loads(agenda.read_text()).items()
+                   if k not in ("agenda_id", "run_name", "source_sha256")}
+        plan["agenda_content_sha256"] = sha256_bytes(canonical_json_bytes(content))
+    return plan
+
+
+def _task_settings(run: str, ape_root: Path = Path(".ape/runs")) -> Optional[Dict[str, Any]]:
+    path = Path(ape_root) / run / "config.json"
+    if not path.is_file():
+        return None
+    return dict((json.loads(path.read_text()).get("config") or {}).get("task_config_overrides") or {})
+
+
+def _differing(values: Dict[str, Any]) -> bool:
+    return len({json.dumps(v, sort_keys=True, default=str) for v in values.values()}) > 1
+
+
+def compare_measurements(sources: Dict[str, str],
+                         contrast: Optional[Sequence[str]] = None,
+                         ape_root: Path = Path(".ape/runs")) -> Dict[str, Any]:
+    """Why two or more results differ, and what the difference can and cannot support.
+
+    `sources` is `{label: matching directory or judged run}`. `contrast` names what is meant to
+    differ -- identity fields, or run-plan fields such as `model_name` or
+    `evaluation_settings.design`; everything else that differs is listed as undeclared, because a
+    difference nobody intended is a confound until it is explained. Two measurements on one scale
+    may be read against each other; one instrument over different references or seals is shown side
+    by side and never subtracted; two instruments are never pooled.
+    """
+
+    contrast = set(contrast or ())
+    entries = {label: _measurement(source) for label, source in sources.items()}
+    unrecorded = sorted(label for label, e in entries.items() if not e.get("identity"))
+    identity_differences = {}
+    if not unrecorded:
+        for field in SCALE_FIELDS + ("subjects",):
+            values = {label: e["identity"].get(field) for label, e in entries.items()}
+            if field == "subjects":
+                values = {label: sorted((s.get("session"), s.get("channel")) for s in v or [])
+                          for label, v in values.items()}
+            if _differing(values):
+                identity_differences[field] = values
+    instruments = {label: (e["identity"] or {}).get("instrument") if e.get("identity")
+                   else ("semantic-judge" if e["kind"] == "judged run" else None)
+                   for label, e in entries.items()}
+    if len(set(instruments.values())) > 1:
+        verdict = ("different instruments: never pooled or subtracted; each number is read under "
+                   "its own definition")
+    elif unrecorded:
+        verdict = (f"identity unrecorded for {unrecorded}: comparable only as far as their judge "
+                   "identities and denominators agree (`report conditions` checks both)")
+    elif any(f in identity_differences for f in INSTRUMENT_FIELDS):
+        verdict = "different versions of one instrument: side by side only, never subtracted"
+    elif set(identity_differences) - {"subjects"} - contrast:
+        verdict = ("one instrument over different references, seals or projections: side by side "
+                   "only, never subtracted")
+    else:
+        verdict = "one scale: the numbers may be read against each other"
+
+    runs = {run: _run_plan(run) for e in entries.values() for run in _runs_of(e)}
+    run_differences = {}
+    for field in RUN_FIELDS:
+        values = {run: (plan or {}).get(field) for run, plan in runs.items() if plan}
+        if field == "evaluation_settings":
+            keys = {k for v in values.values() for k in (v or {})}
+            for key in sorted(keys):
+                sub = {run: (v or {}).get(key) for run, v in values.items()}
+                if _differing(sub):
+                    run_differences[f"evaluation_settings.{key}"] = sub
+        elif len(values) > 1 and _differing(values):
+            run_differences[field] = values
+    # What a scaffold digest difference is made of: the task settings each run executed with, from
+    # its orchestrator record (`.ape/runs/<run>/config.json`), key by key.
+    settings = {run: _task_settings(run, ape_root) for run in runs}
+    settings = {run: v for run, v in settings.items() if v is not None}
+    for key in sorted({k for v in settings.values() for k in v}):
+        sub = {run: v.get(key) for run, v in settings.items()}
+        if len(sub) > 1 and _differing(sub):
+            run_differences[f"task_config.{key}"] = sub
+    undeclared = sorted((set(identity_differences) - {"subjects"} | set(run_differences))
+                        - contrast)
+    return {
+        "measurements": {label: {k: e.get(k) for k in ("kind", "source", "identity_sha256",
+                                                         "forensic", "numbers", "judge_identity")
+                                 if k in e}
+                         for label, e in entries.items()},
+        "verdict": verdict,
+        "identity_differences": identity_differences,
+        "run_differences": run_differences,
+        "runs_without_a_plan": sorted(run for run, plan in runs.items() if plan is None),
+        "contrast": sorted(contrast),
+        "undeclared_differences": undeclared,
+    }

@@ -392,6 +392,15 @@ def build_parser() -> argparse.ArgumentParser:
     trace.add_argument("--of", dest="of_run", help="a judged generation run")
     trace.add_argument("--obligation")
     trace.add_argument("--node", default="judge", help="which judgement of the run")
+    compare = report_sub.add_parser(
+        "compare", help="why two or more results differ: their measurement identities, their runs' "
+                        "sealed plans, and what the difference can support")
+    compare.add_argument("sources", nargs="+", metavar="LABEL=SOURCE",
+                         help="a matching's measurement directory or a judged run's name")
+    compare.add_argument("--contrast", nargs="+", default=[],
+                         help="what is meant to differ (identity or run-plan fields, e.g. "
+                              "model_name evaluation_settings.design); the rest is listed as "
+                              "undeclared")
     inputs = report_sub.add_parser(
         "inputs", help="what a run's reviewers were given: the sealed input files, the route, and "
                        "each attempt's stored first messages and tools")
@@ -718,6 +727,17 @@ def _report(args) -> int:
         else:
             raise SystemExit("trace a matching cell with --plan --pr --ask --session, or a judged "
                              "obligation with --of --obligation")
+    elif args.report_command == "compare":
+        from src.mathlib_review.analysis.trace import compare_measurements
+
+        sources = {}
+        for item in args.sources:
+            label, sep, source = item.partition("=")
+            sources[label if sep else item] = source if sep else item
+        try:
+            print(json.dumps(compare_measurements(sources, args.contrast), indent=1, default=str))
+        except ValueError as error:
+            raise SystemExit(str(error))
     elif args.report_command == "inputs":
         from src.mathlib_review.analysis.trace import run_inputs
 
