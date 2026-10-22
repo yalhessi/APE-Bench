@@ -193,9 +193,12 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback": "extract round-1 feedback; --write refuses while a session is unfinished",
         "readers": "reader folders (batch, rubric) and their prompts",
         "asks": "the agreed asks from two readers' labels",
-        "seal": "a fresh blinding of the named sessions",
-        "match-inputs": "blind matcher inputs and matcher folders under a seal",
-        "unblind": "reach per session and condition from the matchers' outputs",
+        "seal": "(historical; new matchings draw it with match-plan --sessions) a fresh blinding of "
+                "the named sessions",
+        "match-inputs": "(historical; new matchings: match-plan, then cli match or match-import) blind "
+                        "matcher inputs and matcher folders under a seal",
+        "unblind": "(historical; new matchings: report match) reach per session and condition from the "
+                   "matchers' outputs; refuses files that miss cells",
         "audit": "check a transcript stayed in its folder",
         "restore-bases": "restore the PRs' built base snapshots, before a reviewed build",
         "import": "write a session's findings as a scoreable run (anchoring + finalize), for the judge",
@@ -257,6 +260,8 @@ def build_parser() -> argparse.ArgumentParser:
     parsers["unblind"].add_argument("--matches", required=True, type=Path,
                                     help="a directory with matches.1.json, matches.2.json, session_stats.json")
     parsers["unblind"].add_argument("--scope", nargs="+", help="families to restrict to")
+    parsers["unblind"].add_argument("--allow-incomplete", action="store_true",
+                                    help="read matchers' files that miss cells, marked forensic")
     parsers["import"].add_argument("--session", required=True)
     parsers["import"].add_argument("--run-name", required=True,
                                    help="the run directory to write under results/pr_review_v5/runs/")
@@ -437,6 +442,11 @@ def build_parser() -> argparse.ArgumentParser:
                               help="read several side by side, each judged on its own coverage")
     match_report.add_argument("--replicates", nargs="+",
                               help="read only these observations, e.g. task-r1:1 task-r1:2")
+    sessions_report = report_sub.add_parser(
+        "sessions", help="a session plan's coverage: per producer, the observations held, missing "
+                         "and unreadable")
+    sessions_report.add_argument("--plan", required=True, type=Path)
+    sessions_report.add_argument("--producer", help="one execution or import (task-<run>, import-<name>)")
     trace = report_sub.add_parser(
         "trace", help="one number followed back to its bytes: a matching cell (--plan --pr --ask "
                       "--session) or a judged obligation (--of --obligation)")
@@ -779,6 +789,15 @@ def _report(args) -> int:
                              indent=1))
         except ValueError as error:
             raise SystemExit(str(error))
+    elif args.report_command == "sessions":
+        from src.mathlib_review.analysis.sessions import session_coverage
+
+        try:
+            coverage = session_coverage(args.plan, args.producer)
+        except ValueError as error:
+            raise SystemExit(str(error))
+        print(json.dumps(coverage, indent=1))
+        return 0 if all(p["complete"] for p in coverage["producers"].values()) else 1
     elif args.report_command == "trace":
         from src.mathlib_review.analysis.trace import trace_judgment, trace_matching
 
@@ -889,11 +908,14 @@ def _session(args, overrides, logger) -> int:
     assert_credentials(scaffold)
     import asyncio
 
-    rows = asyncio.run(run_sessions(plan, plan_dir, scaffold, run_name, logger))
-    expected = len(plan.packets) * plan.replicates
-    print(json.dumps({"plan_id": plan.plan_id, "sessions_with_outputs": len(rows),
-                      "expected": expected}, indent=1))
-    return 0 if len(rows) == expected else 1
+    from src.mathlib_review.analysis.matching import task_producer
+    from src.mathlib_review.analysis.sessions import session_coverage
+
+    asyncio.run(run_sessions(plan, plan_dir, scaffold, run_name, logger))
+    coverage = session_coverage(plan_dir, task_producer(run_name))
+    held = coverage["producers"][task_producer(run_name)]
+    print(json.dumps({"plan_id": plan.plan_id, "producer": task_producer(run_name), **held}, indent=1))
+    return 0 if held["complete"] else 1
 
 
 def _route_line(scaffold) -> str:
@@ -1116,11 +1138,24 @@ def _probe(args, logger) -> int:
         print(json.dumps(status, indent=1))
         return 0 if all(v == "restored" for v in status.values()) else 1
     elif args.probe_command == "unblind":
+        from src.mathlib_review.judge.ask_matching import missing_cells
+
         matches = {m: json.loads((args.matches / f"matches.{m}.json").read_text()) for m in ("1", "2")}
         stats = json.loads((args.matches / "session_stats.json").read_text())
-        print(json.dumps(probes.unblind(json.loads(spec.asks_file.read_text()),
-                                        json.loads(args.seal.read_text()), matches, stats,
-                                        scope=set(args.scope) if args.scope else None), indent=1))
+        asks, seal = json.loads(spec.asks_file.read_text()), json.loads(args.seal.read_text())
+        scope = set(args.scope) if args.scope else None
+        missing = missing_cells(asks, seal, matches, scope)
+        if missing and not args.allow_incomplete:
+            raise SystemExit("the matchers' files miss cells, which unblind would read as not "
+                             "reached: " + "; ".join(f"matcher {m}: {len(v)} ({', '.join(v[:3])})"
+                                                     for m, v in missing.items())
+                             + ". New matchings: `probe match-plan`, `cli match` or `probe "
+                               "match-import`, `report match`. --allow-incomplete reads it "
+                               "anyway, marked forensic.")
+        out = probes.unblind(asks, seal, matches, stats, scope=scope)
+        if missing:
+            out = {"forensic": True, "missing_cells": missing, **out}
+        print(json.dumps(out, indent=1))
     return 0
 
 

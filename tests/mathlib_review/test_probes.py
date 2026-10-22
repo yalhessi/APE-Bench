@@ -326,6 +326,29 @@ def test_the_cli_unblinds_as_the_function_does(capsys):
     assert got["1"]["condition_reach"]["L"] == pytest.approx(0.125)
 
 
+def test_the_historical_unblind_refuses_a_matcher_file_that_misses_cells(tmp_path, capsys):
+    """It used to read an absent cell as not reached; the shared report marks that forensic."""
+
+    import shutil
+
+    from src.mathlib_review.review import cli
+
+    folder = tmp_path / "match_arms"
+    shutil.copytree(G52_DIR / "match_arms", folder)
+    first = json.loads((folder / "matches.1.json").read_text())
+    dropped = first["asks"][0]
+    first["asks"] = first["asks"][1:]
+    (folder / "matches.1.json").write_text(json.dumps(first))
+    argv = ["probe", "unblind", "--set", str(SETS / "postcutoff_2026_07_08_v1.yaml"),
+            "--seal", str(G52_DIR / "blinding_arms_SEALED.json"), "--matches", str(folder)]
+    with pytest.raises(SystemExit, match="miss cells"):
+        cli.main(argv)
+    assert cli.main(argv + ["--allow-incomplete"]) == 0
+    got = json.loads(capsys.readouterr().out)
+    assert got["forensic"] is True
+    assert any(dropped["ask_id"] in cell for cell in got["missing_cells"]["1"])
+
+
 def test_the_audit_flags_what_leaves_the_folder(tmp_path):
     folder = tmp_path / "m1"
     folder.mkdir()
@@ -679,3 +702,14 @@ def test_a_new_packet_goes_where_the_prs_earlier_sessions_live(tmp_path):
     assert plain == tmp_path / "probe" / "pr43024" / "E1"
     assert f"OUT={tmp_path / 'old' / 'pr43192' / 'E1'}" in (moved / "ptool").read_text()
 
+
+
+def test_a_review_task_says_its_pr_by_its_result_or_its_id(tmp_path):
+    from src.mathlib_review.analysis.runs import task_pr_number
+
+    assert task_pr_number(tmp_path, {"pr_number": 33117, "task_id": "x"}) == 33117
+    (tmp_path / "task_outcome.json").write_text(json.dumps(
+        {"task_id": "pr5solo_mathlib4_42814_round1_abc"}))
+    assert task_pr_number(tmp_path) == 42814       # a capped session: no result, the id says it
+    (tmp_path / "task_outcome.json").write_text(json.dumps({"task_id": "no number here"}))
+    assert task_pr_number(tmp_path) is None

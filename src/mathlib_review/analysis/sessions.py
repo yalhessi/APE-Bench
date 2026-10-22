@@ -303,13 +303,12 @@ async def run_sessions(plan: SessionPlan, plan_dir: Path, scaffold, run_name: st
 
     from ape.orchestration.config import EarlyStopMode
     from ape.orchestration.orchestrator import TaskOrchestrator
-    from ape.orchestration.products import sample_products
     from ape.tasks.base import create_task_from_data
 
     if scaffold.execution.sample_count not in (1, plan.replicates):
         raise ValueError(f"the config asks for {scaffold.execution.sample_count} samples and the "
                          f"plan seals {plan.replicates}; the plan decides")
-    from src.mathlib_review.analysis.matching import bind_run_to_plan
+    from src.mathlib_review.analysis.matching import bind_run_to_plan, task_observations, task_producer
 
     binding = bind_run_to_plan(scaffold.runs_base_dir, run_name, "session", plan.plan_id,
                                plan.source_sha256, scaffold)
@@ -321,15 +320,13 @@ async def run_sessions(plan: SessionPlan, plan_dir: Path, scaffold, run_name: st
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=run_name, logger=logger)
     await orchestrator.run(tasks)
     executor = binding["executor"]          # the run's recorded route, never the invoking config's
-    producer = f"task-{run_name}"
+    producer = task_producer(run_name)
     rows = []
-    for item in await sample_products(orchestrator.tasks_dir, tasks, plan.replicates):
-        if item.product is None:
-            continue
+    for item in await task_observations(orchestrator.tasks_dir, tasks, plan.replicates, run_name,
+                                        logger):
         rows.append(_store(
             plan_dir, plan, producer, item.product["packet_id"], str(item.sample_index + 1), "task",
-            {"run": run_name, "task_dir": str(orchestrator.tasks_dir / item.task_global_index),
-             "sample": str(item.sample_index), "attempt": str(item.attempt_path)},
+            item.locator(run_name, orchestrator.tasks_dir),
             executor, {k: v["content"] for k, v in item.product["outputs"].items()}))
     _write_index(plan_dir, producer, rows)
     return rows
@@ -348,17 +345,59 @@ def import_session_outputs(plan: SessionPlan, plan_dir: Path, folders: Dict[str,
     if unknown:
         raise ValueError(f"packets {unknown} are not in plan {plan.plan_id}")
     specs = [OutputSpec.model_validate(o) for o in plan.outputs]
-    executor = {"kind": "external session", "model": "unknown", "route": "unknown",
-                **(executor or {})}
+    from src.mathlib_review.analysis.matching import external_executor, import_producer
+
+    executor = external_executor(executor)
     rows = []
     for packet_id, folder in sorted(folders.items()):
         found, problems = output_problems(Path(folder), specs)
         if problems:
             raise ValueError(f"{folder}: {problems}")
-        rows.append(_store(plan_dir, plan, f"import-{name}", packet_id, "1", "external_import",
+        rows.append(_store(plan_dir, plan, import_producer(name), packet_id, "1", "external_import",
                            {"folder": str(folder)}, executor, found))
-    _write_index(plan_dir, f"import-{name}", rows)
+    _write_index(plan_dir, import_producer(name), rows)
     return rows
+
+
+def session_coverage(plan_dir: Path, producer: Optional[str] = None) -> Dict[str, Any]:
+    """What each producer of a plan covers: the observations it should hold (every packet, times
+    the plan's replicates for a task run, once for an import), the ones it does not, and the stored
+    outputs that no longer verify. A producer that is not complete is forensic, as a matching that
+    misses cells is (`report match`); an absent observation is never read as an empty one."""
+
+    from ape.tasks.packet_session import OutputSpec
+
+    plan = load_session_plan(plan_dir)
+    required = [OutputSpec.model_validate(o).name for o in plan.outputs
+                if OutputSpec.model_validate(o).required]
+    by_producer: Dict[str, List[SessionOutput]] = {}
+    for row in session_outputs(plan_dir, producer):
+        by_producer.setdefault(row.producer, []).append(row)
+    out: Dict[str, Any] = {"plan_id": plan.plan_id, "packets": len(plan.packets),
+                           "replicates": plan.replicates, "producers": {}}
+    for name, rows in sorted(by_producer.items()):
+        replicates = plan.replicates if name.startswith("task-") else 1
+        expected = {(p.packet_id, str(r)) for p in plan.packets for r in range(1, replicates + 1)}
+        held = {(row.packet_id, row.replicate): row for row in rows}
+        problems = []
+        for (packet_id, replicate), row in sorted(held.items()):
+            for output in required:
+                if output not in row.outputs:
+                    problems.append(f"{packet_id}/{replicate}: no {output}")
+                    continue
+                try:
+                    read_output(row, output)
+                except (OSError, ValueError) as error:
+                    problems.append(f"{packet_id}/{replicate}: {error}")
+        missing = sorted(expected - set(held))
+        out["producers"][name] = {
+            "observations": len(held), "expected": len(expected),
+            "missing": [f"{packet_id}/{replicate}" for packet_id, replicate in missing],
+            "unreadable": problems, "complete": not missing and not problems,
+            "forensic": bool(missing or problems)}
+    if producer is not None and producer not in out["producers"]:
+        raise ValueError(f"{plan.plan_id} holds no observations from {producer}")
+    return out
 
 
 def session_outputs(plan_dir: Path, producer: Optional[str] = None) -> List[SessionOutput]:

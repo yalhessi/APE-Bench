@@ -383,6 +383,27 @@ def condition(session: str) -> str:
     return session.rstrip("0123456789")
 
 
+def missing_cells(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]],
+                  matches: Dict[str, Dict[str, Any]], scope: Optional[set] = None) -> Dict[str, List[str]]:
+    """{matcher: ["<pr> <ask> <label>", ...]}: the cells a matcher's file gives no value for.
+
+    `unblind` reads an absent cell as not reached. The shared report marks such a matching forensic
+    (`analysis/matching.report_matching`); the historical `probe unblind` refuses it unless told
+    the input is incomplete, which is the same rule."""
+
+    items = [(pr, cid) for pr in seal for cid in asks["asks"][pr]
+             if scope is None or asks["families"].get(cid) in scope]
+    out = {}
+    for m, d in matches.items():
+        given = {(str(a["pr"]), a["ask_id"], label) for a in d["asks"] if str(a["pr"]) in seal
+                 for label in seal[str(a["pr"])] if a.get(label) in ("reached", "partial", "no")}
+        lost = [f"{pr} {cid} {label}" for pr, cid in items for label in seal[pr]
+                if (pr, cid, label) not in given]
+        if lost:
+            out[m] = lost
+    return out
+
+
 def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict[str, Dict[str, Any]],
             stats: Dict[str, Any], scope: Optional[set] = None) -> Dict[str, Any]:
     """Per matcher: each session's reach (asks reached / asks), each condition's mean, the asks every

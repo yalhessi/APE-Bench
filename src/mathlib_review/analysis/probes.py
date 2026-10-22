@@ -12,6 +12,12 @@ A set is a `ProbeSet`, read from `configs/probe_sets/<name>.yaml`.
 **Order is part of the method.** Feedback is extracted only after every reviewer session on the set
 has finished, and nothing a reviewer reads is written by a step that has seen feedback. The
 extractor refuses a test-set PR, as the one it replaces did.
+
+**What is historical here (2026-10-22).** Sessions over folders and what they hand on run through
+`analysis/sessions.py`, and matchings through `analysis/matching.py`. The seal, `match_inputs`,
+`unblind` and `judge_folders` steps, with `MATCHER_PROMPT` and `READER_PROMPT`, are the route the
+probes before then took; they stay so those probes can be re-read, and a new study does not use them.
+Reviewer packets with `ptool`, feedback and asks extraction, and the transcript audit are current.
 """
 
 from __future__ import annotations
@@ -887,6 +893,7 @@ def _solo(run: str) -> Dict[int, tuple]:
     import asyncio
 
     from ape.orchestration.persistence import TaskStorage
+    from src.mathlib_review.analysis.runs import task_pr_number
 
     compiles = _solo_compiles(run)
 
@@ -914,13 +921,12 @@ def _solo(run: str) -> Dict[int, tuple]:
                 # nothing, and that is what a matcher must see -- an empty list, marked. The PR is in
                 # the task id (`pr5solo_<repo>_<pr>_round1_<sha>`). Seen first on the high-effort
                 # runs, 10 of 32 sessions (2026-09-30).
-                outcome = json.loads((task_dir / "task_outcome.json").read_text())
-                m = re.search(r"mathlib4_(\d+)_round", outcome["task_id"])
+                number = task_pr_number(task_dir)
                 statuses = [str(getattr(s.current_attempt, "status", "")) for s in samples.values()
                             if s.current_attempt is not None]
-                if m and statuses:
-                    out[int(m.group(1))] = ([], {"findings": 0, "compiles": None,
-                                                 "capped": statuses[0].split(".")[-1].lower()})
+                if number is not None and statuses:
+                    out[number] = ([], {"findings": 0, "compiles": None,
+                                        "capped": statuses[0].split(".")[-1].lower()})
         return out
 
     return asyncio.run(load())

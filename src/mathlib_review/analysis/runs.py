@@ -15,6 +15,7 @@ candidate responses through `load_candidate_responses` so there is one parser.
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -22,6 +23,24 @@ from ape.orchestration.persistence import TaskStorage
 from src.mathlib_review.io import jsonl_rows
 
 CANDIDATE_RESPONSE_SCHEMA = "pr4-candidate-response1"
+
+
+#: A review task's id carries its PR: `pr5solo_mathlib4_33117_round1_<sha>`.
+_TASK_PR = re.compile(r"_(\d+)_round")
+
+
+def task_pr_number(task_dir: Path, result: Optional[Dict[str, Any]] = None) -> Optional[int]:
+    """The PR a review task reviewed: its result's `pr_number`, or, for a task with no legal result
+    (a capped or failed session), the number in its task id from `task_outcome.json`. One reading,
+    where the probe reader and the trace each parsed the id with their own pattern."""
+
+    if result and result.get("pr_number") is not None:
+        return int(result["pr_number"])
+    outcome = Path(task_dir) / "task_outcome.json"
+    task_id = (result or {}).get("task_id") or (
+        json.loads(outcome.read_text()).get("task_id") if outcome.is_file() else "")
+    match = _TASK_PR.search(str(task_id or ""))
+    return int(match.group(1)) if match else None
 
 
 async def reviewed_workspace_map(

@@ -236,8 +236,43 @@ def route_sha256(scaffold) -> str:
     return sha256_bytes(canonical_json_bytes(semantic))
 
 
+def task_producer(run_name: str) -> str:
+    """The producer of a plan's observations from a run of its tasks."""
+    return f"task-{run_name}"
+
+
+def import_producer(name: str) -> str:
+    """The producer of a plan's observations imported from outside the orchestrator."""
+    return f"import-{name}"
+
+
+def external_executor(executor: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    """An import's executor: what the caller knows, `unknown` for the rest, never guessed."""
+    return {"kind": "external session", "model": "unknown", "route": "unknown", **(executor or {})}
+
+
+async def task_observations(tasks_dir: Path, tasks: Sequence[Any], replicates: int, run_name: str,
+                            logger=None) -> List[Any]:
+    """Every sample slot with a legal product, read once for every shared path (sessions and
+    matchings both collected a run this way, each with its own copy of the loop). A slot without
+    one is named in a warning, not passed over; whether the plan is covered is the report's
+    question (`report match`, `report sessions`)."""
+
+    from ape.orchestration.products import sample_products
+
+    kept, gaps = [], []
+    for item in await sample_products(tasks_dir, tasks, replicates):
+        (kept if item.product is not None else gaps).append(item)
+    if gaps and logger is not None:
+        logger.warning("%s: %d sample slot(s) have no legal product: %s", run_name, len(gaps),
+                       "; ".join(f"{g.task_id}#{g.sample_index} ({g.status}: {g.error})"
+                                 for g in gaps[:8]))
+    return kept
+
+
 async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequence[Any],
-                                run_name: str, executor: Dict[str, str]) -> List[MatchVerdict]:
+                                run_name: str, executor: Dict[str, str],
+                                logger=None) -> List[MatchVerdict]:
     """Every replicate's verdict, as `sample_products` reads it; a sample with no legal product has
     none, and is a coverage gap in the report rather than a verdict.
 
@@ -245,14 +280,10 @@ async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequ
     resume with the same binding ran on the same route, and a different route is refused before
     any cached sample could be read under its name."""
 
-    from ape.orchestration.products import sample_products
-
     rows: List[MatchVerdict] = []
     by_batch = {b.batch_id: b for b in plan.batches}
     packets = {p.pr: p for p in plan.packets}
-    for item in await sample_products(tasks_dir, tasks, plan.identity.replicates):
-        if item.product is None:
-            continue
+    for item in await task_observations(tasks_dir, tasks, plan.identity.replicates, run_name, logger):
         verdict = item.product
         batch = by_batch[verdict["batch_id"]]
         problems = verdict_problems([packets[pr] for pr in batch.prs], verdict["asks"],
@@ -261,10 +292,9 @@ async def collect_task_verdicts(plan: MatchingPlan, tasks_dir: Path, tasks: Sequ
             raise ValueError(f"{run_name} sample {item.sample_index} of {batch.batch_id}: a "
                              f"recorded verdict does not cover its batch: {problems[:3]}")
         rows.append(MatchVerdict(
-            plan_id=plan.plan_id, batch_id=batch.batch_id, producer=f"task-{run_name}",
+            plan_id=plan.plan_id, batch_id=batch.batch_id, producer=task_producer(run_name),
             replicate=str(item.sample_index + 1), origin="task",
-            locator={"run": run_name, "task_dir": str(Path(tasks_dir) / item.task_global_index),
-                     "sample": str(item.sample_index), "attempt": str(item.attempt_path),
+            locator={**item.locator(run_name, tasks_dir),
                      "prompt_sha256": str(verdict["prompt_sha256"])},
             executor=executor, asks=verdict["asks"], unmatched=verdict["unmatched"]))
     return rows
@@ -339,8 +369,8 @@ async def run_matching(plan: MatchingPlan, plan_dir: Path, scaffold, run_name: s
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=run_name, logger=logger)
     await orchestrator.run(tasks)
     rows = await collect_task_verdicts(plan, orchestrator.tasks_dir, tasks, run_name,
-                                       binding["executor"])
-    verdicts = _write_verdicts(plan_dir, f"task-{run_name}", rows)
+                                       binding["executor"], logger)
+    verdicts = _write_verdicts(plan_dir, task_producer(run_name), rows)
     record_match_stage(plan, Path(plan_dir), run_name, verdicts, logger)
     return rows
 
@@ -421,8 +451,7 @@ def import_matches(plan: MatchingPlan, plan_dir: Path, files: Dict[str, Path], n
     twice is refused; `allow_incomplete` stores it marked so, and the report then says forensic.
     """
 
-    executor = {"kind": "external session", "model": "unknown", "route": "unknown",
-                **(executor or {})}
+    executor = external_executor(executor)
     rows = []
     for replicate, path in sorted(files.items()):
         data = json.loads(Path(path).read_text())
@@ -431,12 +460,12 @@ def import_matches(plan: MatchingPlan, plan_dir: Path, files: Dict[str, Path], n
             raise ValueError(f"{path} does not cover plan {plan.plan_id}: {len(problems)} "
                              f"problem(s), first {problems[:3]}")
         rows.append(MatchVerdict(
-            plan_id=plan.plan_id, batch_id="*", producer=f"import-{name}", replicate=str(replicate),
+            plan_id=plan.plan_id, batch_id="*", producer=import_producer(name), replicate=str(replicate),
             origin="external_import",
             locator={"file": str(path), "sha256": sha256_file(Path(path)),
                      "problems": str(len(problems))},
             executor=executor, asks=data.get("asks") or [], unmatched=data.get("unmatched") or {}))
-    _write_verdicts(plan_dir, f"import-{name}", rows)
+    _write_verdicts(plan_dir, import_producer(name), rows)
     return rows
 
 

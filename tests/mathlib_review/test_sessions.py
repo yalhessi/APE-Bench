@@ -517,3 +517,22 @@ def test_a_reviewers_prompt_finds_the_derivation_that_accounts_for_all_of_it(mon
     control = solo_context_block(SoloReviewConfig(context_file=kept / "context_ctl.jsonl"), 33117)
     assert context_lineage_from_prompt(f"Review.\n\n{control}\n", 33117)["sections"] == []
     assert context_lineage_from_prompt("Review PR 33117 with nothing added.", 33117) is None
+
+
+def test_a_producer_that_misses_an_observation_or_holds_a_changed_one_is_forensic(tmp_path):
+    plan_dir = tmp_path / "plan"
+    plan = S.plan_sessions(_packets(tmp_path / "packets"), name="p", brief=EXTRACTOR_BRIEF,
+                           outputs=OUTPUTS, out_dir=plan_dir)
+    S.import_session_outputs(plan, plan_dir, {"pr33066": _finished(tmp_path / "a", "goal")}, name="half")
+    held = S.session_coverage(plan_dir)["producers"]["import-half"]
+    assert held["missing"] == ["pr33117/1"] and held["forensic"] and not held["complete"]
+
+    S.import_session_outputs(plan, plan_dir, {pid: _finished(tmp_path / pid, f"goal {pid}")
+                                              for pid in ("pr33066", "pr33117")}, name="whole")
+    assert S.session_coverage(plan_dir, "import-whole")["producers"]["import-whole"]["complete"]
+    stored = Path(S.session_outputs(plan_dir, "import-whole")[0].outputs["ledger.json"]["path"])
+    stored.write_text("[1]")
+    changed = S.session_coverage(plan_dir, "import-whole")["producers"]["import-whole"]
+    assert changed["forensic"] and "changed after it was stored" in changed["unreadable"][0]
+    with pytest.raises(ValueError, match="holds no observations from"):
+        S.session_coverage(plan_dir, "task-never")

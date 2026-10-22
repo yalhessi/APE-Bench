@@ -17,7 +17,7 @@ the class's `product_of` projects it; otherwise the row says what happened inste
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 from pydantic import BaseModel, ConfigDict
 
@@ -42,6 +42,16 @@ class SampleProduct(BaseModel):
     error: Optional[str] = None
     #: False when an attempt's usage never came back (`Attempt.usage_known`).
     usage_known: bool = True
+
+    def locator(self, run_name: str, tasks_dir: Path) -> Dict[str, str]:
+        """Where this sample's record is, as stable paths: resolved through any link, so a run made
+        from a worktree, whose `.ape` links the shared store, stays findable after the worktree goes
+        (the first live session and matching runs recorded paths through the worktree, 2026-10-22)."""
+
+        return {"run": run_name,
+                "task_dir": str((Path(tasks_dir) / self.task_global_index).resolve()),
+                "sample": str(self.sample_index),
+                "attempt": str(Path(self.attempt_path).resolve()) if self.attempt_path else ""}
 
 
 async def sample_products(tasks_dir: Path, tasks: Sequence[Any],

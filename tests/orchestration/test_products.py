@@ -108,3 +108,20 @@ def test_a_requested_sample_that_never_ran_is_reported_not_omitted(tmp_path):
 def test_an_empty_product_is_a_product():
     assert _Task.product_of(_Result(task_id="t", task_type="products_probe", global_index="g",
                                     success=True, score=1.0, answer="")) == {"answer": ""}
+
+
+def test_a_locator_names_the_record_through_no_link(tmp_path):
+    """A run made from a worktree reaches the shared store through the worktree's `.ape` link;
+    the locator must outlive the worktree."""
+
+    store = tmp_path / "store"
+    store.mkdir()
+    link = tmp_path / "worktree_ape"
+    link.symlink_to(store)
+    _save(link, "g", 0, ExecutionStatus.SUCCESS,
+          {"task_id": "t", "task_type": "products_probe", "global_index": "g", "success": True,
+           "score": 1.0, "answer": "42"})
+    (row,) = _rows(link, [_task("g")])
+    where = row.locator("r", link)
+    assert where["task_dir"].startswith(str(store.resolve())) and "worktree_ape" not in where["task_dir"]
+    assert where["attempt"].startswith(str(store.resolve())) and where["run"] == "r"

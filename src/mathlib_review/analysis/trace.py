@@ -279,9 +279,8 @@ def run_inputs(run_name: str, pr: Optional[int] = None, full: bool = False,
 async def _attempts(tasks_dir: Path, pr: Optional[int]) -> List[Dict[str, Any]]:
     """Every attempt directory of the run's top-level tasks, with the PR each reviewed."""
 
-    import re
-
     from ape.orchestration.persistence import TaskStorage
+    from src.mathlib_review.analysis.runs import task_pr_number
 
     found: List[Dict[str, Any]] = []
     if not tasks_dir.is_dir():
@@ -293,10 +292,7 @@ async def _attempts(tasks_dir: Path, pr: Optional[int]) -> List[Dict[str, Any]]:
         task_id = (result.get("task_id")
                    or (json.loads(outcome_path.read_text()).get("task_id")
                        if outcome_path.is_file() else ""))
-        number = result.get("pr_number")
-        if number is None:
-            match = re.search(r"_(\d+)_round", str(task_id))
-            number = int(match.group(1)) if match else None
+        number = task_pr_number(task_dir, result)
         if pr is not None and number != pr:
             continue
         samples = await storage.load_all_samples()
