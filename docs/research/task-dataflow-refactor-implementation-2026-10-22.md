@@ -256,12 +256,12 @@ established it; user-run). A row says the strongest that applies.
 | ... and a check of another patch | **not built** (gap 10) | lands with the demonstrated-change branch's construction artifacts |
 | Interrupted publication recovers a consistent binding or stays visibly incomplete; conflicting publications are not silently chosen | offline-verified | `e90b51ef`; review finding 4 (a previous outcome blocked a resumed sample's publication) fixed in `cbb1a9bc` |
 | The same sealed cases and recorded judgments give the same report after the refactor; changed semantics get a different protocol | offline-verified, and integrated for three seals | post-cutoff, filing-contract dev and the reconstruction joint seal reproduce their committed readings; `ask-match/2-task` is its own version, **not calibrated** |
-| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | built; integrated for the reviewer link | `cli run` for both; the acquisition link is integrated on saved data (`extract_r1`) and run as tasks once on GPT-6 Luna (`extract_r1_luna`, 8 of 8) |
+| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | integrated | `cli run` for both; the reconstruction chain end to end on saved data: extraction -> decision and sketch sessions (inputs bound by `lineage.json`) -> the nine Phase A contexts derived byte-identical -> 21 reviewer runs -> three matchings reproduced (closure item 1); the acquisition link also run live on GPT-6 Luna (`extract_r1_luna`, 8 of 8) |
 | A program changes a component and its configuration without editing the common runner's condition branches | offline-verified | `test_sessions.py`: replacing the extractor touches nothing downstream |
-| A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | integrated | `cli report trace` on the joint seal reaches a Sonnet subject's run, route, sealed-input status and stored first message; `report inputs` |
+| A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | integrated | `cli report trace` on the joint seal reaches a Sonnet subject's run, route, sealed-input status and stored first message; on Phase A it goes on through the reviewer's context, its recomputed lineage and each section's session observation back to the extraction (`954c6f9b`); `report inputs` |
 | Editing one prompt or context byte changes the request or refuses resume; an old run still shows its original bytes and tool interface | offline-verified | slice A2 |
 | Comparing saved runs shows differing channels, protocols, populations, seals and routes, refuses unsupported pooling, permits declared contrasts | offline-verified; integrated across the joint seal's subjects | `cli report compare`; subjects whose run plans are on another branch are named as without a plan, not guessed |
-| The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | offline-verified | slice B's fixtures; the demonstrated-change branch itself has not been migrated |
+| The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | integrated | the compiled-unfiled probe's matching planned, imported and read from the common report through a thin adapter that imports the probe's own renderer; its reading reproduced line for line (`68dea3b5`); `match.py inputs`/`read` retire with that branch's merge |
 | Handoff writes are bounded; overhead measured on realistic outputs before broad adoption | offline-verified | slice C's table |
 | Execution provenance identifies what ran | offline-verified | review finding 3: a run is bound to its route; a resume on another route is refused before any cached observation is read (`58ffe5bc`); on the live Luna runs every observation carries its executor, which `report compare` now reads (`6ddb81b3`) |
 
@@ -269,14 +269,25 @@ established it; user-run). A row says the strongest that applies.
     demonstrated-change design's construction artifacts: a check names the patch digest, imports and
     workspace it compiled, and the consumer refuses a check of another patch. Owner: that branch's
     merge.
-11. **`sample_products` has not replaced every result reader.** The review runner's readers of
-    `results.task_results` (`_responses_from_results` and siblings) and the probe readers still read
-    results their own way. Completes when `report conditions` and the run readers take their rows
-    from `sample_products`; owner: the next change to those readers.
+11. **`sample_products` has not replaced every result reader**, and is not meant to (the follow-up
+    review's item 3). The shared paths now collect a run in one place (`matching.task_observations`),
+    name producers and import executors in one place, and report coverage the same way for matchings
+    and sessions (`report sessions`). The review runner's readers of `results.task_results` and
+    `probes._solo` read aggregate results on purpose and stay; they move only when one of them is
+    next changed.
 12. **The reconstruction chain's sessions as tasks.** Run once as tasks, on GPT-6 Luna through ELM
     (`extract_r1_luna`, `f1c6f692`): 8 of 8 sessions handed in both outputs. Completes when the plan
     is run through `cli session --execute` on the subscription route, where the imported extractions
     came from, and the two producers' outputs are compared; user-run.
+13. **Decision-context sessions cannot yet run as tasks.** They searched through `ctxtool`: grep and
+    show at the PR's base commit, and the harness's cutoff-filtered `zulip_search` and
+    `precedent_search`. `packet_session` grants file tools only, on either route. Completes when a
+    packet session can be granted those episode-bound tools (the base snapshot and the cutoff are the
+    episode's, as the review arms have them); until then a swap of the acquisition producer on the real
+    chain stops at the decision step, and the swap is shown on the shared derivation's own test.
+14. **The Claude Code route has not run the new tasks.** Smoke plans are sealed and preflighted
+    (`smoke_claude_code_session`, one packet; `smoke_claude_code_match`, one batch of 14 cells);
+    the route stays configured and offline-verified until the user runs them.
 
 Retirement, as the design requires it with an owner and a completion point: `probe seal`,
 `probe match-inputs` and `probe unblind` go when no script under `results/` written after this
@@ -380,6 +391,61 @@ Three defects the live runs found, which no offline test had reached, each fixed
    unless `--contrast executor` declares the comparison a calibration. `executor_of` also read effort
    only from Claude Code's field, so an ape_agent binding would have said `unknown` (`9d9e593a`).
 
+## Closure work after the follow-up review (2026-10-22)
+
+The independent follow-up on `cd080f56` named five pieces of closure work for the original scope.
+All five are done to the extent that does not need the subscription route or a merge.
+
+1. **One acquisition-to-review handoff** (`d33943e5`, `3e82e102`, `153ffff8`, data `f3486255`, `954c6f9b`).
+   - **Code.** An observation is one checked reference (`ObservationRef`, `read_observation`). A session
+     plan's inputs can be taken from, or checked against, upstream outputs, recorded in `lineage.json`.
+     A reviewer context can be derived from upstream outputs (`context-derive`), with a lineage that the
+     input resolver recomputes before any run, refusing a missing or tampered upstream output.
+   - **Data.** The reconstruction chain on saved data: 32 + 105 + 97 planned inputs equal the probe
+     manifest's digests; every decision and sketch input is bound to the observation it was, with none
+     unmatched.
+   - **Checks.** The nine Phase A contexts derive byte-identical to the files the reviewers read. Their
+     rendered sections are in all 56 stored first messages of the 21 Phase A runs. The three Phase A
+     matchings reproduce their readings on every field. `report trace` walks a matcher's cell back to the
+     extraction.
+   - **The swap.** It changes the derived context and its lineage in the derivation's own test. On the
+     real chain it stops at the decision sessions (gap 13).
+2. **The second consumer** (`68dea3b5`). The compiled-unfiled probe's findings and asks are planned
+   (11 PRs, 126 cells) through a thin adapter that imports the probe's own renderer. Both matchers are
+   imported. Its reading, re-based on the shared report, prints `reading.txt` exactly.
+3. **The prospective cutover** (`ce58055c`, `a5cb0966`).
+   - One collector, one producer naming and one coverage rule for the shared paths. `report sessions` is
+     new.
+   - Locators are resolved through the worktree's `.ape` link.
+   - The historical `probe unblind` refuses a matcher file that misses cells.
+   - One task-to-PR reading is shared.
+   - CLAUDE.md, the probe rule, four open todos, the CLI help and probes.py's docstring say which routes
+     are historical.
+4. **The other scaffold** (`fe80c4a2`). The Claude Code smoke plans are sealed and pass the dry run.
+   Running them is the user's call (gap 14). The commands:
+
+   ```
+   source ~/.config/secrets/env.zsh
+   ape/bin/python -m src.mathlib_review.review.cli session --plan results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/smoke_claude_code_session --config configs/session/packet_session_opus55_claude_sub.yaml --run-name smoke_claude_code_session --execute
+   ape/bin/python -m src.mathlib_review.review.cli match --plan results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/smoke_claude_code_match --config configs/match/ask_match_opus55_claude_sub.yaml --run-name smoke_claude_code_match --execute
+   ```
+5. **The integration record.**
+   - STATUS.md's rows now carry the live runs, the handoff, the second consumer, the cutover and the
+     lead `task_config` change.
+   - The integration was tried in a detached worktree (`.claude/worktrees/integration-trial`). The
+     sequence was: `develop`, then the seven untracked design and review documents and the main
+     checkout's `docs/plans/README.md`, then `dataflow-refactor`, then `review-reconstruction`, then
+     `demonstrated-change`.
+   - **The trial passed.** The suite ran 3157 tests, all passing, and `verify_frozen` reported ok. On
+     the merged tree the Phase A trace finds each context by the file's own bytes, and the adapter
+     prints `reading.txt` from its own probe folder.
+   - **Conflicts and their resolutions:**
+     - `review/runner.py`: keep the lead-run log line and review-reconstruction's `sample_limits`.
+     - `.claude/rules/mathlib-review.md`: three places, keep every bullet.
+     - `docs/plans/README.md`: keep both rows.
+     - `docs/todo/README.md`: keep the new row and demonstrated-change's version of its own row.
+   - Nothing was merged into `develop`.
+
 ## Before merging
 
 - Commit the design documents (`task-dataflow-refactor-design`, the systems reading, the adversarial
@@ -389,7 +455,10 @@ Three defects the live runs found, which no offline test had reached, each fixed
   `review-reconstruction` adds `context_with_sections` and a cap fix beside code this branch touches
   only in `probes.py`'s matcher section; `demonstrated-change` adds a design (gaps 2 and 10).
 - Two live runs on GPT-6 Luna through ELM are recorded above, USD 0.17 billed. The runs on the
-  subscription route and the v2-against-v1 calibration on the original route remain the user's call.
+  subscription route (the smoke plans, gap 14) and the v2-against-v1 calibration on the original route
+  remain the user's call.
+- The integration order and its conflicts are in "Closure work", item 5. On the merged tree, the
+  Phase A runs' contexts are traced by their own bytes.
 - `review-reconstruction`'s `033765c7` and `8b918cce` are on this branch as cherry-picks. Their
   changes are identical except in `.claude/rules/mathlib-review.md`, where this branch took only
   8b918cce's new bullet. Expect a conflict there when both merge; keep both sides' bullets.
