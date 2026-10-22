@@ -30,3 +30,13 @@ account of what it got built, in its own text and in the commits that cite it.
 | [`2026-09-23-one-run-to-move-the-wall.md`](2026-09-23-one-run-to-move-the-wall.md) | The arms hold the answers and the contract tells them to withhold: ask without a compiling fix, account for every target, file advisory asks -- one judged run against a threshold fixed before spending. |
 | [`2026-09-23-unify-the-contract-branches.md`](2026-09-23-unify-the-contract-branches.md) | Two sessions built the same per-target contract in parallel; one mechanism survives (`target_verdicts`), the prompt-side text is ported onto it as opt-in knobs, and the next spend is one change at a time against a control already paid for. |
 | [`2026-10-06-consolidate-worktrees.md`](2026-10-06-consolidate-worktrees.md) | Written as built: 14 topic worktrees read before the clean-up round; eight merged whole, four landed in part, the rest parked on `parked/*` tags with dead-ends entries. |
+| [`2026-10-22-task-native-evaluation-and-exploration.md`](2026-10-22-task-native-evaluation-and-exploration.md) | Proposed, not implemented: canonical finding evaluation first; dependency-ordered, independently adoptable work on Task reuse, artifact handoffs, condition identity, and optional comparison manifests. |
+
+The October 22 refactor now has a [target architecture under review](../research/task-dataflow-refactor-design-2026-10-22.md),
+with [primary-source systems reading](../research/review-refactor-systems-reading-2026-10-22.md)
+and an [author-conducted adversarial pass](../research/task-dataflow-refactor-adversarial-review-2026-10-22.md).
+Read the architecture before adopting the todo plan's implementation order; the design
+remains proposed and includes a brief for independent review.
+The architecture's v0.3 incorporates Claude's appended review; its
+[disposition table](../research/task-dataflow-refactor-design-2026-10-22.md#20-disposition-of-claudes-review)
+separates adopted corrections from the scope judgments the proposal revises.
