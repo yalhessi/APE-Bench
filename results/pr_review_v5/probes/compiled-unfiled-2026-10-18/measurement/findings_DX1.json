@@ -1,0 +1,73 @@
+{
+ "26755": [],
+ "30458": [
+  {
+   "target": "Mathlib/Algebra/Group/Basic.lean:670",
+   "claim": "At `div_right_inj`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  (div_right_injective (G := G) (b := a)).eq_iff\n```\nwith\n```lean\n  (div_right_injective (b := a)).eq_iff\n```",
+   "severity": "advisory",
+   "key": "63dd22eb4be9"
+  },
+  {
+   "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:1249",
+   "claim": "At `Finset.card_le_card_div_left`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by\n  obtain ⟨a, ha⟩ := hs\n  exact card_le_card_image₂_left _ ha (div_right_injective (b := a))\n```\nwith\n```lean\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n```",
+   "severity": "advisory",
+   "key": "d73613239494"
+  },
+  {
+   "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:1258",
+   "claim": "At `Finset.card_le_card_div_right`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by\n  obtain ⟨b, hb⟩ := ht\n  exact card_le_card_image₂_right _ hb (div_left_injective (b := b))\n```\nwith\n```lean\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective\n```",
+   "severity": "advisory",
+   "key": "ad93ce6ee683"
+  },
+  {
+   "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean:1251",
+   "claim": "At `Finset.card_le_card_div_left`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  exact card_le_card_image₂_left _ ha (div_right_injective (b := a))\n```\nwith\n```lean\n  exact card_le_card_image₂_left _ ha div_right_injective\n```",
+   "severity": "advisory",
+   "key": "5430159b8315"
+  }
+ ],
+ "32875": [
+  {
+   "target": "Mathlib/MeasureTheory/Constructions/Pi.lean:462",
+   "claim": "At `MeasureTheory.Measure.pi_map_piCongrLeft`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  exact Fintype.prod_equiv _ _ _ (congrFun rfl)\n```\nwith\n```lean\n  exact Fintype.prod_equiv e _ _ fun _ => rfl\n```",
+   "severity": "advisory",
+   "key": "3d0aa46c1344"
+  }
+ ],
+ "33066": [],
+ "33098": [],
+ "33117": [],
+ "33285": [
+  {
+   "target": "Mathlib/Topology/Algebra/Module/Equiv.lean:1292",
+   "claim": "At `ContinuousLinearEquiv.submoduleMap`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n    p ≃SL[σ₁₂] Submodule.map (e : M →ₛₗ[σ₁₂] M₂) p where\n```\nwith\n```lean\n    p ≃SL[σ₁₂] Submodule.map e p where\n```",
+   "severity": "advisory",
+   "key": "0d13bda60413"
+  },
+  {
+   "target": "Mathlib/RingTheory/Ideal/Cotangent.lean:156",
+   "claim": "At `Ideal.cotangentEquivIdeal_symm_apply`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  rw [I.cotangentEquivIdeal.symm_apply_eq]\n  ext\n  simp\n```\nwith\n```lean\n  simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff]\n```",
+   "severity": "advisory",
+   "key": "b41340ad137d"
+  }
+ ],
+ "33294": [],
+ "33362": [],
+ "33421": [],
+ "34091": [
+  {
+   "target": "Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean:250",
+   "claim": "At `linearIndependent_le_infinite_basis`: this edit compiles in the reviewed file.",
+   "requested_change": "Replace\n```lean\n  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber' Φ h (by infer_instance)\n```\nwith\n```lean\n  have hκ : Infinite κ := by\n    rw [Cardinal.infinite_iff] at ⊢\n    exact (Cardinal.infinite_iff.mp (inferInstance : Infinite (Finset ι))).trans h.le\n  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h hκ\n```",
+   "severity": "advisory",
+   "key": "2973831bdaf0"
+  }
+ ]
+}
