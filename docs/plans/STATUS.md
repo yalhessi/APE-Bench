@@ -281,9 +281,9 @@ checkout when this was written). Record: `docs/research/task-dataflow-refactor-i
 | Slice | Status |
 |---|---|
 | 0: execution semantics (config resolution, failure records, missing tool results) | **Built** |
-| A1: common evaluation and result inspection (matcher as a versioned instrument and a registered Task; one identity record for both instruments; `report match`, `trace`) | **Built**; v2-against-v1 calibration not run (user-run) |
+| A1: common evaluation and result inspection (matcher as a versioned instrument and a registered Task; one identity record for both instruments; `report match`, `trace`) | **Built, integrated** on three historical seals (post-cutoff, filing-contract dev, the reconstruction joint seal); v2-against-v1 calibration not run (user-run) |
 | A2: resolved context and run inspection (input files sealed by content; `report inputs`) | **Built** |
 | Comparison path (`report compare`) | **Built** |
-| B: shared composition in two consumers (`sample_products`, `packet_session`, session plans) | **Built**; the probes' hand-launched sessions not migrated (historical) |
-| C: failure and dynamic behaviour (interrupted publication, claims, continuation binding) | **Built** |
+| B: shared composition in two consumers (`sample_products`, `packet_session`, session plans) | **Built**; the reconstruction extractor sessions integrated from saved data (imported, not re-run); the demonstrated-change branch not migrated |
+| C: failure and dynamic behaviour (interrupted publication, claims, continuation binding) | **Built**; the implementation review's four findings (producer identity, route binding, previous-outcome recovery) fixed `cbb1a9bc`, `58ffe5bc` |
 | A check bound to its exact patch across tasks | **Not built**: lands with the demonstrated-change branch's construction artifacts |

@@ -243,25 +243,72 @@ which is the point of keeping them.
 
 ## Design §15's acceptance checks
 
+Status words, after the implementation review of 2026-10-22: **built** (the code exists),
+**offline-verified** (a test or an offline check on saved records holds it), **integrated** (an
+active study's chain runs through it on its saved data), **calibrated** (a model or human comparison
+established it; user-run). A row says the strongest that applies.
+
 | Check | Status | Where |
 |---|---|---|
-| Independent identical outputs remain two observations; resume does not mint a repetition | Met | `test_recovery_and_identity.py` |
-| A stale source, unsupported schema or missing required output fails before consumption | Met | edited plans and briefs refused on load or resume; strict `schema_version`s; `submit_outputs` and the imports refuse a missing output |
-| Same-shaped evidence from another episode fails the domain binding before a paid call | Met for context rows | `solo_context_block` refuses a row bound to another episode or reviewed head (`270838de`) |
-| ... and a check of another patch | **Not met (gap 10)** | on `develop` a compile warrant and its edit are one submission; a check handed between tasks arrives with the demonstrated-change design's construction artifacts, and its binding lands with that branch |
-| Interrupted output recovers a consistent binding or stays visibly incomplete; conflicting publications are not silently chosen | Met | `e90b51ef` |
-| The same sealed cases and recorded judgments give the same report after the refactor; changed semantics get a different protocol | Met | the post-cutoff and filing-contract seals reproduce their committed readings; `ask-match/2-task` is its own version |
-| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | Met | `cli run` for both; acquisition as `packet_session` tasks |
-| A program changes a component and its configuration without editing the common runner's condition branches | Met | `test_sessions.py`: replacing the extractor touches nothing downstream |
-| A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | Met | `cli report trace` (both instruments, with the reviewer's inputs), `cli report inputs` |
-| Editing one prompt or context byte changes the request or refuses resume; an old run still shows its original bytes and tool interface | Met | slice A2 |
-| Comparing saved runs shows differing channels, protocols, populations, seals and routes, refuses unsupported pooling, permits declared contrasts | Met | `cli report compare` |
-| The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | Met | slice B |
-| Handoff writes are bounded; overhead measured on realistic outputs before broad adoption | Met | slice C's table |
+| Independent identical outputs remain two observations; resume does not mint a repetition | offline-verified | `test_recovery_and_identity.py`; and, after review finding 2, two runs or imports of one plan are separate producers (`test_matching.py`, `test_sessions.py`) |
+| A stale source, unsupported schema or missing required output fails before consumption | offline-verified | edited plans, briefs and stored outputs refused on load or read; strict `schema_version`s; `submit_outputs` and the imports refuse a missing output |
+| Same-shaped evidence from another episode fails the domain binding before a paid call | offline-verified for context rows | `solo_context_block` refuses a row bound to another episode or reviewed head (`270838de`) |
+| ... and a check of another patch | **not built** (gap 10) | lands with the demonstrated-change branch's construction artifacts |
+| Interrupted publication recovers a consistent binding or stays visibly incomplete; conflicting publications are not silently chosen | offline-verified | `e90b51ef`; review finding 4 (a previous outcome blocked a resumed sample's publication) fixed in `cbb1a9bc` |
+| The same sealed cases and recorded judgments give the same report after the refactor; changed semantics get a different protocol | offline-verified, and integrated for three seals | post-cutoff, filing-contract dev and the reconstruction joint seal reproduce their committed readings; `ask-match/2-task` is its own version, **not calibrated** |
+| A whole-PR reviewer and an assisted program run through one execution system and project to one final-finding contract | built; integrated for the reviewer link | `cli run` for both; the acquisition link is integrated on saved data (`extract_r1`), not yet run as tasks |
+| A program changes a component and its configuration without editing the common runner's condition branches | offline-verified | `test_sessions.py`: replacing the extractor touches nothing downstream |
+| A maintainer follows one evaluation row to exact submitted or published bytes and all resolved inputs, with no per-study reader | integrated | `cli report trace` on the joint seal reaches a Sonnet subject's run, route, sealed-input status and stored first message; `report inputs` |
+| Editing one prompt or context byte changes the request or refuses resume; an old run still shows its original bytes and tool interface | offline-verified | slice A2 |
+| Comparing saved runs shows differing channels, protocols, populations, seals and routes, refuses unsupported pooling, permits declared contrasts | offline-verified; integrated across the joint seal's subjects | `cli report compare`; subjects whose run plans are on another branch are named as without a plan, not guessed |
+| The second consumer adds its algorithm and contract extensions without copying evaluation, context resolution, execution or reading code | offline-verified | slice B's fixtures; the demonstrated-change branch itself has not been migrated |
+| Handoff writes are bounded; overhead measured on realistic outputs before broad adoption | offline-verified | slice C's table |
+| Execution provenance identifies what ran | offline-verified | review finding 3: a run is bound to its route; a resume on another route is refused before any cached observation is read (`58ffe5bc`) |
 
 10. **A technical check bound to the exact patch across tasks.** Completes with the
     demonstrated-change design's construction artifacts: a check names the patch digest, imports and
-    workspace it compiled, and the consumer refuses a check of another patch.
+    workspace it compiled, and the consumer refuses a check of another patch. Owner: that branch's
+    merge.
+11. **`sample_products` has not replaced every result reader.** The review runner's readers of
+    `results.task_results` (`_responses_from_results` and siblings) and the probe readers still read
+    results their own way. Completes when `report conditions` and the run readers take their rows
+    from `sample_products`; owner: the next change to those readers.
+12. **The reconstruction chain's sessions as tasks.** Imported, not re-run. Completes when a
+    session plan is run through `cli session --execute` on the subscription route and its outputs
+    are compared with the imported ones; user-run.
+
+Retirement, as the design requires it with an owner and a completion point: `probe seal`,
+`probe match-inputs` and `probe unblind` go when no script under `results/` written after this
+branch calls them (owner: the next matched probe's author); `run_claude_batch.sh` and
+`run_matching.sh` go when the next probe's sessions run through `cli session` and `cli match`
+(owner: that probe's author); `make_packets.py`'s extractor, auditor and sketch folders go when
+that probe is re-run on the shared path (owner: the reconstruction thread).
+
+## The implementation review of 2026-10-22, and what it changed
+
+`docs/research/task-dataflow-refactor-implementation-review-2026-10-22.md` (independent, no fixes
+proposed as code) reproduced four defects on the branch at `768e24b1`, none of which the slices'
+tests had reached. Each is reproduced by a test now and fixed:
+
+| Finding | What was wrong | Fix |
+|---|---|---|
+| 1. Session outputs overwrote each other | the stored path was `<packet>/<replicate>/<name>`; a second execution or import replaced the first's bytes while its index kept the old digest | stored under the producer (`task-<run>`, `import-<name>`), written once; `read_output` verifies the digest (`58ffe5bc`) |
+| 2. Matching replicates merged across runs | observations were keyed `origin:replicate`; two partial runs with complementary batches read as one complete replicate | an observation is `producer:replicate`; a report reads one producer, or several only explicitly, each judged on its own coverage (`58ffe5bc`) |
+| 3. A resume relabelled cached verdicts with a new model | the run binding checked the plan, not the route | the binding records the executor and a digest of every non-operational scaffold setting; a resume on another route is refused before reuse, naming what differs; observations carry the binding's executor (`58ffe5bc`) |
+| 4. A previous outcome blocked a resumed sample's publication | reconciliation skipped any task with an outcome file | the samples decide: `_try_aggregate` runs whenever a result is absent, and a result beside an older outcome refreshes it (`cbb1a9bc`) |
+
+The review's rule, adopted as the record's: a plan describes inputs; a run or import is a producer
+with one execution policy; a sample is an observation; equal values can belong to different
+observations; a resume continues an observation; different observations are never overwritten or
+merged because their sample numbers match.
+
+Its step 4, migrating one active chain on saved data, is done for the reconstruction chain
+(`1b451597`): the joint seal as a plan whose inputs are byte-identical to what its matchers judged
+(45 of 46 files; the 46th equal as JSON), its verdicts imported and its committed reading reproduced
+on every field; the eight extractor sessions as a plan whose 32 inputs carry the manifest's digests,
+their outputs imported. Not done: the chain's remaining links as *tasks* -- the extractor,
+auditor and sketch sessions have been imported, not re-run -- and the demonstrated-change branch,
+which is not on `develop`.
 
 ## Decisions taken while implementing, for review
 
