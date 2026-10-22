@@ -145,7 +145,9 @@ So the provider **translates at its own boundary**, and nothing downstream chang
    (`docs/plans/2026-09-29-probe-harness.md`). Commit the runs before any matcher input.
 6. **Match.** Seal X1, X2, Ha1 (gpt-5.4 high), Hb1 (gpt-5.5 high), and gpt-5.2's Gr1 as anchor, on the
    six ask PRs. Then `cli probe match-inputs`, two blind matchers, `cli probe audit`,
-   `cli probe unblind`, and the write-up in the README and `reviewer-model-gap.md`.
+   `cli probe unblind`, and the write-up in the README and `reviewer-model-gap.md`. (The route as
+   it ran; a re-run since 2026-10-22 uses `probe match-plan`, `cli match` or `probe match-import`,
+   and `report match`.)
 7. **Optional, second:** the carry-over-on condition, the same runs with
    `openai_responses_reasoning_carryover: true`.
 

@@ -167,6 +167,11 @@ six-PR runs (about $20-25 for two) would test it. The details are in the probe R
 
 ## Reproducing the experiment on other sets (the user, 2026-09-29; for a fresh session)
 
+Since 2026-10-22 the session and matching steps below run through the shared paths
+(`analysis/sessions.py`: `probe session-plan`, `cli session`, `probe session-import`; and
+`analysis/matching.py`: `probe match-plan`, `cli match`, `probe match-import`, `report match`). The
+scripts this section names are the record of how the first runs went, not the route for the next.
+
 *"We ideally want to be able to reproduce this experiment on a number of different sets: the dev set
 from Dec 2025, 12 validation from Jan 2026, and any other interesting sets."* Every result above rests
 on `probe-2026-07-08-v1`: 6 PRs and 16 asks. That set is a sealed draw of 10 from a frame of 1,075

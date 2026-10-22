@@ -188,6 +188,9 @@ The other three briefs keep the rule.
 - **Matching:** one seal per step and set, holding the new sessions together with X1 and X2. Two
   blind matchers use the set's existing rubric (`construction-demo-2026-09-29/matcher_rubric.md`,
   generalised), with labels shuffled and condition cues redacted, followed by the usual audit.
+  Since 2026-10-22 this is `probe match-plan` (the rubric, seal and redaction are its own), `cli
+  match` or `probe match-import`, and `report match`; a copied rubric and hand-built folders are
+  historical.
 
 ## Reading rule, fixed before any session runs
 

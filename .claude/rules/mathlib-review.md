@@ -415,7 +415,13 @@ paths:
   Sessions write `calls.jsonl`, `tmp/` and then `findings.json` into their packets as they work, so
   `git add <probe_dir>` mid-run committed 21 half-written session files with the validation
   packets (amended out before any push). Commit a session's outputs only after its transcript is
-  audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
+  audited. Reviewer packets with `ptool` and the transcript audit are `analysis/probes.py` (`cli probe
+  packets`, `cli probe audit`). Sessions over folders and their handoffs are `analysis/sessions.py`
+  (`probe session-plan`, `cli session`, `probe session-import`, `probe context-derive`, `report
+  sessions`), and matchings `analysis/matching.py` (`probe match-plan`, `cli match`, `probe
+  match-import`, `report match`). `probe seal`, `match-inputs`, `unblind` and per-probe launchers
+  such as `run_claude_batch.sh` and `run_matching.sh` are historical (2026-10-22): a new study does
+  not copy them.
 
 - **Count what every tool call came back with before reading a run's tool use as the model's
   (2026-10-01).** The command is `cli report tools --run <run>` (2026-10-06; either scaffold,
