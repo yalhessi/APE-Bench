@@ -659,6 +659,26 @@ def context_sections(path: Path) -> Dict[int, str]:
     return out
 
 
+def context_with_sections(base: Path, extra: Dict[int, List[Dict[str, str]]]) -> str:
+    """A solo `context_file` that reads exactly as `base` does for the PRs in `extra`, with each PR's
+    extra sections after its own: a condition that differs from its control only in what it adds
+    (the reconstruction probe's consumer test, 2026-10-20). Only the PRs in `extra` are kept; a PR
+    with no row in `base` is refused, so a run cannot quietly lose its control's sections."""
+
+    from src.mathlib_review.io import jsonl_rows
+
+    rows = {int(row["pr_number"]): row for row in jsonl_rows(Path(base))}
+    missing = sorted(set(extra) - set(rows))
+    if missing:
+        raise KeyError(f"{base} holds no row for PRs {missing}")
+    out = []
+    for pr in sorted(extra):
+        row = dict(rows[pr])
+        row["sections"] = list(row["sections"]) + [dict(s) for s in extra[pr]]
+        out.append(json.dumps(row, ensure_ascii=False) + "\n")
+    return "".join(out)
+
+
 def _write_ptool(spec: ProbeSet, d: Path, pr: int, session: str, scratch: Path, root: Path) -> None:
     wrapper = (PTOOL_TEMPLATE.replace("__PR__", str(pr)).replace("__OUT__", str(root / d))
                .replace("__WORK__", str(scratch / f"work/pr{pr}/{session}"))

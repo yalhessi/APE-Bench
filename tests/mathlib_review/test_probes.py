@@ -251,6 +251,27 @@ def test_a_packet_ends_with_the_solo_context_section_byte_for_byte(tmp_path):
         probes.write_packets(spec, ["TA1"], tmp_path / "scratch", prs=[43167], root=tmp_path, sections=sections)
 
 
+def test_a_condition_context_file_keeps_its_controls_sections_and_adds_its_own(tmp_path):
+    """The consumer test's strategies differ from the control only in what they append."""
+
+    base = tmp_path / "base.jsonl"
+    model = {"title": "The PR model (pass 0)", "text": "model ⁅H ⊔ K, N⁆  kept"}
+    base.write_text(json.dumps({"pr_number": 1, "sections": [model]}, ensure_ascii=False) + "\n"
+                    + json.dumps({"pr_number": 2, "sections": [{"title": "m", "text": "two"}]}) + "\n")
+    added = {"title": "Decision context", "text": "a packet"}
+    text = probes.context_with_sections(base, {1: [added]})
+    rows = [json.loads(line) for line in text.split("\n") if line]
+    assert rows == [{"pr_number": 1, "sections": [model, added]}], "only PR 1, its own section first"
+    # At the far end: the solo task renders the control's section, then the added one.
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
+    composed = tmp_path / "composed.jsonl"
+    composed.write_text(text, encoding="utf-8")
+    block = solo_context_block(SoloReviewConfig(context_file=composed), 1)
+    assert block.index("## The PR model (pass 0)") < block.index("## Decision context") and "a packet" in block
+    with pytest.raises(KeyError, match="no row for PRs \\[3\\]"):
+        probes.context_with_sections(base, {3: [added]})
+
+
 def test_a_solo_source_may_name_disjoint_runs_and_refuses_a_pr_in_two(monkeypatch):
     """AP in the one reviewer table is stage AP's ten-PR run and the apt run's four: one label, two runs."""
 
