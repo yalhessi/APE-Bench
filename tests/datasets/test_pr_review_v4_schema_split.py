@@ -45,12 +45,14 @@ def test_the_facade_still_resolves_every_name():
     `silence_key` -- one record and the single spelling of its key, which both the store and
     the report call rather than formatting it twice. 141 with the eight evaluation records of
     2026-10-22 (`MeasurementIdentity`, `SubjectBinding`, the matcher's plan, packet and verdict):
-    a number now carries what it measures, and the matcher's inputs are retained.
+    a number now carries what it measures, and the matcher's inputs are retained. 144 with the
+    three session records (`SessionPlan`, `SessionPacket`, `SessionOutput`): a session's folder is
+    kept with what it wrote.
     """
 
     from src.mathlib_review import schema
 
-    assert len(schema.__all__) == 141
+    assert len(schema.__all__) == 144
     for name in schema.__all__:
         assert hasattr(schema, name), name
 

@@ -368,3 +368,44 @@ class PipelinePlan(StrictModel):
     stages: Dict[str, Dict[str, Any]]
     git_commit: Optional[str] = None
     git_tree_state: Optional[Literal["clean", "dirty", "unknown"]] = None
+
+
+class SessionPacket(StrictModel):
+    """One folder a session works in: its files, exactly as the session will read them."""
+
+    packet_id: str
+    files: Dict[str, str]
+    files_sha256: str
+
+
+class SessionPlan(StrictModel):
+    """Model sessions over folders, sealed before any runs (`analysis/sessions.py`).
+
+    Holds the brief, every packet's files and the declared outputs, so the bytes a session read are
+    in the repository with what it wrote, not in a scratch directory with only their digests kept.
+    """
+
+    schema_version: Literal["session-plan1"] = "session-plan1"
+    plan_id: str
+    brief: str
+    brief_sha256: str
+    #: [{"name", "kind", "required"}], as `ape.tasks.packet_session.OutputSpec` takes them.
+    outputs: List[Dict[str, Any]]
+    packets: List[SessionPacket]
+    replicates: int
+    created_at: str
+    source_sha256: str
+
+
+class SessionOutput(StrictModel):
+    """What one session left, with where its bytes came from."""
+
+    schema_version: Literal["session-output1"] = "session-output1"
+    plan_id: str
+    packet_id: str
+    replicate: str
+    origin: Literal["task", "external_import"]
+    locator: Dict[str, str]
+    executor: Dict[str, str]
+    #: {name: {"sha256", "path"}}: the stored copy beside the plan.
+    outputs: Dict[str, Dict[str, str]]

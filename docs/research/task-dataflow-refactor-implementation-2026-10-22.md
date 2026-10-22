@@ -141,3 +141,73 @@ Named here, each with what completes it, rather than dropped:
    say "unrecorded" for them. Re-judging is not required: their meaning is unchanged.
 6. **Choosing the primary instrument per objective** (design §11) is the maintainer's decision; the
    tooling now lets either be named, run and reported, and refuses neither.
+
+## Slice A2: resolved context and run inspection (built, `135e81a2`)
+
+`review/inputs.py` is the one resolver for the files a solo-family config names. The plan seals their
+digests in `evaluation_settings["input_files"]` (only when a file is named), tasks verify the bytes
+they read against the digest, a real run snapshots the bytes into `<run>/inputs/`, and `cli report
+inputs` shows a run's route, its input files' status and each attempt's stored first messages and
+tools, naming what the Claude Code route does not record. **Boundary, flagged:** a run sealed before
+this resumes with a warning and a plan revision instead of being refused, because refusing would
+strand every paused subscription run; a recorded setting that changed alongside is still refused.
+
+Also built with the first evaluation path, as design §11 requires (`e6276795`): `cli report compare`,
+the comparison path -- identity differences, a comparability verdict, each run's sealed plan and task
+settings, and every difference not declared as the contrast. It found that `agenda_sha256` differs
+between any two runs (the agenda names its own run), so the comparison uses the agenda's content.
+
+## Slice B: shared composition in two consumers
+
+### The spike (design §15: before implementing B, walk the consumers through the APIs)
+
+Walked against saved inputs on the two consumer branches, after slices 0, A1 and A2:
+
+| Mechanic | Reconstruction (`review-reconstruction@eecb7d18`) | Demonstrated change (`demonstrated-change@e9b9b6e0`) | Shared after A1/A2? |
+|---|---|---|---|
+| Reviewer runs | `cli run` with a `context_file` per condition | `cli run` with the `compiled_filed` design (a `DESIGNS` entry) | Yes: sealed by content (A2), compared (`report compare`) |
+| Matching and its reading | `probe match-inputs` + `run_matching.sh` + `read_*.py` re-unblinding | `compiled-unfiled-2026-10-18/match.py` building folders by hand | Yes: `match-plan` (with `findings_file` and `--ask-packets`), `match`, `match-import`, `report match`, `report trace` |
+| Model sessions over prepared folders | extractor, auditor, revision, sketch, context preparer, blind trace readers: `make_packets.py` writes folders to scratch, `run_claude_batch.sh` runs them headless outside the orchestrator, `audit_batch.py` audits transcripts, outputs read by path; `manifest.json` keeps only the inputs' digests | the compile probes' added findings are built by a script, not a session | **No.** The one recurring mechanic left; the same chain in at least six probes (conventions-ceiling stages, one-reviewer table, filing contract, ask-reading, stage H, reconstruction) |
+| Packet and section building | `make_packets.py`, `step4/build_sections.py` | the added-findings builder | Study algorithm: stays beside the study |
+| Registered readings | `read_scores.py`, `read_phase_a.py`, `read_baselines.py`, `read_joint.py` | `match.py read` | Stay beside the study; they read the shared report instead of re-unblinding |
+| Blind trace export for readers | `step3/build_traces.py`, `step4/build_place_traces.py` | -- | Partly: `report inputs` and `report trace`; a blinded trace export is a named gap below |
+
+### The decision: an engine extension, not a thin adapter
+
+The bespoke remainder is one lifecycle repeated in six probes, and in every instance the inputs a
+session read were lost. A thin adapter per study would keep that. So, in APE:
+
+- `BaseTask.product_of` and `ape.orchestration.products.sample_products`: every sample's product read
+  one way, validated as the task's own result class (never the `BaseTaskResult` fallback), one row per
+  requested slot, a missing product never empty. This is design §5's output projection. The matcher's
+  verdict store now reads through it.
+- `packet_session`, a generic registered Task: a brief with `{dir}`, the folder's files as task data,
+  declared outputs validated by `submit_outputs`, replicates as independent samples.
+
+and in the domain, `analysis/sessions.py`: a sealed `SessionPlan` holding every packet's files, `cli
+session --execute` (in `SPENDS`), an import for hand-launched sessions' folders, and an outputs store
+with digests and locators; `configs/session/packet_session_opus55_claude_sub.yaml` for the route the
+hand-launched sessions used.
+
+### Acceptance, checked without a model
+
+`tests/mathlib_review/test_sessions.py` drives the real task end to end (setup lays the folder out,
+`submit_outputs` refuses missing outputs and accepts written ones) and walks the reconstruction
+consumer through the shared records: extractor sessions run through `run_sessions`, their outputs
+read from the store into a context file, the context file sealed by content and read by a pinned solo
+config into the reviewer's prompt. Swapping the extractor (a different brief) is a different session
+plan; the context digest and the reviewer's prompt change and no downstream code is touched. The
+demonstrated-change consumer composes through `cli run` and `match-plan` with a `findings_file` source
+(`tests/mathlib_review/test_matching.py`).
+
+### Remaining adoption gaps (slice B)
+
+7. **The probes' hand-launched sessions** still run through `run_claude_batch.sh`. A new probe uses
+   `probe session-plan` and `cli session`; existing ones are historical. A paid first run of a session
+   plan on the subscription route is the user's call.
+8. **A blinded trace export for readers** (`build_traces.py`, `build_place_traces.py`) is still
+   study code; `report inputs` and `report trace` cover the unblinded reading. Completes when the next
+   blind-reader probe exports through a shared function.
+9. **Ask readers and matchers as packet sessions.** Both are folder sessions and can run as `packet_session`
+   with their v1 prompts unchanged; that would make `ask-match/1-session` re-runnable under the task route.
+   Not done: it is a new instrument version and needs its own calibration.

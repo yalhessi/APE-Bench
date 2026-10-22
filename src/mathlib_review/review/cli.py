@@ -44,7 +44,7 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match"})
+SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match", "session"})
 
 
 def _producer(args) -> int:
@@ -203,10 +203,13 @@ def build_parser() -> argparse.ArgumentParser:
                       "measurement identity (analysis/matching.py); calls no model",
         "match-import": "store externally produced matches.json files as a plan's verdicts, "
                         "refused unless they cover every expected cell",
+        "session-plan": "seal model sessions over packet folders: every file, the brief, the "
+                        "declared outputs (analysis/sessions.py); calls no model",
+        "session-import": "store hand-launched sessions' declared outputs beside a session plan",
     }
     parsers = {name: probe_sub.add_parser(name, help=text) for name, text in step.items()}
     for name, sp in parsers.items():
-        if name != "audit":
+        if name not in ("audit", "session-plan", "session-import"):
             sp.add_argument("--set", required=True, type=Path, help="configs/probe_sets/<name>.yaml")
     for name in ("packets", "prompts", "feedback"):
         parsers[name].add_argument("--sessions", nargs="+", default=["X1", "X2"])
@@ -290,6 +293,31 @@ def build_parser() -> argparse.ArgumentParser:
                     help="what is known of how they were produced, e.g. model=claude-opus-5-5")
     mi.add_argument("--allow-incomplete", action="store_true",
                     help="store an import that misses cells; its report is then forensic")
+
+    sp_plan = parsers["session-plan"]
+    sp_plan.add_argument("--packets", required=True, type=Path,
+                         help="a directory holding one folder per session")
+    sp_plan.add_argument("--packet-ids", nargs="+", help="only these folders")
+    sp_plan.add_argument("--brief", required=True, type=Path,
+                         help="the session prompt; {dir} stands for the folder")
+    sp_plan.add_argument("--output", action="append", required=True, metavar="NAME[:KIND]",
+                         help="a file each session must leave, kind json|jsonl|text. Repeatable")
+    sp_plan.add_argument("--name", required=True)
+    sp_plan.add_argument("--out", required=True, type=Path)
+    sp_plan.add_argument("--replicates", type=int, default=1)
+    sp_import = parsers["session-import"]
+    sp_import.add_argument("--plan", required=True, type=Path)
+    sp_import.add_argument("--folder", action="append", required=True, metavar="PACKET=FOLDER")
+    sp_import.add_argument("--name", required=True)
+    sp_import.add_argument("--executor", nargs="*", default=[], metavar="KEY=VALUE")
+
+    session = sub.add_parser("session", help="run a sealed session plan's packets as tasks")
+    session.add_argument("--plan", required=True, type=Path)
+    session.add_argument("--config", required=True, type=Path,
+                         help="the sessions' route, e.g. configs/session/packet_session_opus55_claude_sub.yaml")
+    _add_run_name(session)
+    _add_set(session)
+    _add_execute(session)
 
     match = sub.add_parser("match", help="run a sealed raw-ask matching's blind matchers as tasks")
     match.add_argument("--plan", required=True, type=Path, help="the measurement directory")
@@ -799,6 +827,41 @@ def _report(args) -> int:
     return 0
 
 
+def _session(args, overrides, logger) -> int:
+    """Run a sealed session plan's packets as `packet_session` tasks."""
+
+    from src.mathlib_review.analysis.matching import MatchDatasetConfig
+    from src.mathlib_review.analysis.sessions import load_session_plan, run_sessions
+    from src.mathlib_review.run_config import load_run
+
+    plan = load_session_plan(args.plan)
+    plan_dir = args.plan if args.plan.is_dir() else args.plan.parent
+    dataset, scaffold, _task_overrides = load_run(args.config, MatchDatasetConfig, overrides)
+    run_name = args.run_name or dataset.run_name
+    if not run_name:
+        raise SystemExit("name the run: --run-name <name>")
+    if not args.execute:
+        _say_nothing_ran("session", {
+            "plan": f"{plan.plan_id} (brief {plan.brief_sha256[:12]})",
+            "would run": f"{len(plan.packets)} session(s) x {plan.replicates} replicate(s)",
+            "outputs": ", ".join(o["name"] for o in plan.outputs),
+            "route": f"{scaffold.scaffold_type} "
+                     f"{getattr(scaffold, 'claude_model', None) or scaffold.llm_config.model_name}",
+            "into": f".ape/runs/{run_name}, outputs to {plan_dir}/outputs/",
+        })
+        return 0
+    from src.mathlib_review.review.preflight import assert_credentials
+
+    assert_credentials(scaffold)
+    import asyncio
+
+    rows = asyncio.run(run_sessions(plan, plan_dir, scaffold, run_name, logger))
+    expected = len(plan.packets) * plan.replicates
+    print(json.dumps({"plan_id": plan.plan_id, "sessions_with_outputs": len(rows),
+                      "expected": expected}, indent=1))
+    return 0 if len(rows) == expected else 1
+
+
 def _match(args, overrides, logger) -> int:
     """Run a sealed matching's batches as `lean_pr_review_ask_matching` tasks."""
 
@@ -848,6 +911,30 @@ def _probe(args, logger) -> int:
         report = probes.audit_transcript(args.folder, args.transcript)
         print(json.dumps(report, indent=1))
         return 1 if report["flagged"] else 0
+    if args.probe_command == "session-plan":
+        from src.mathlib_review.analysis.sessions import plan_sessions
+
+        outputs = []
+        for item in args.output:
+            out_name, _sep, kind = item.partition(":")
+            outputs.append({"name": out_name, "kind": kind or "text"})
+        plan = plan_sessions(args.packets, name=args.name, brief=args.brief.read_text(),
+                             outputs=outputs, out_dir=args.out, replicates=args.replicates,
+                             packet_ids=args.packet_ids)
+        print(json.dumps({"plan": str(args.out), "plan_id": plan.plan_id,
+                          "packets": len(plan.packets), "replicates": plan.replicates,
+                          "brief_sha256": plan.brief_sha256}, indent=1))
+        return 0
+    if args.probe_command == "session-import":
+        from src.mathlib_review.analysis.sessions import import_session_outputs, load_session_plan
+
+        plan = load_session_plan(args.plan)
+        folders = dict(item.split("=", 1) for item in args.folder)
+        rows = import_session_outputs(plan, args.plan if args.plan.is_dir() else args.plan.parent,
+                                      {k: Path(v) for k, v in folders.items()}, args.name,
+                                      executor=dict(i.split("=", 1) for i in args.executor))
+        print(json.dumps({"imported": len(rows), "plan_id": plan.plan_id}, indent=1))
+        return 0
     spec = probes.load_probe_set(args.set)
     if args.probe_command == "packets" and args.swap_from:
         if len(args.sessions) != 1:
@@ -1012,6 +1099,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _probe(args, logger)
     if args.command == "match":
         return _match(args, overrides, logger)
+    if args.command == "session":
+        return _session(args, overrides, logger)
     if args.command == "tool":
         from src.mathlib_review.review.toolbox import main as tool_main
 
