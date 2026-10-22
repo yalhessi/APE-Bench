@@ -1,0 +1,2217 @@
+{
+  "batches": [
+    {
+      "batch_id": "b1",
+      "prs": [
+        33066,
+        33117,
+        33421
+      ]
+    }
+  ],
+  "created_at": "2026-10-22T12:11:16.712157+00:00",
+  "expected_cells": 154,
+  "identity": {
+    "aggregation": "none: each replicate is read on its own, and two are compared cell by cell",
+    "denominator": "the asks of the sealed PRs (in scope, if scoped); a session's reach is asks it reached over that count, per replicate",
+    "instrument": "ask-match",
+    "instrument_version": "1-session",
+    "missingness": "every expected cell needs a verdict in every replicate; a replicate that does not cover them makes the report forensic, and an absent cell is never read as `no`",
+    "population_prs": [
+      33066,
+      33117,
+      33421
+    ],
+    "projection": {
+      "claude_cut_to": 20,
+      "harness_blind": true,
+      "keep": [
+        "target",
+        "claim",
+        "requested_change",
+        "severity"
+      ],
+      "redaction": [
+        "construction cues",
+        "conventions cues"
+      ],
+      "target": "repository path"
+    },
+    "question_policy": "questions",
+    "reference_count": 11,
+    "reference_kind": "raw_ask",
+    "reference_sha256": "12046fa3b4abff0e69646feec367b2a28f61aaf5198a1a58fdaf30a581865390",
+    "reference_source": "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/feedback.json + results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/asks.json",
+    "replicates": 2,
+    "rubric_sha256": "c1094ab650c272edad9c450919802ea49179d96569cc19d5542106624c1f54f8",
+    "schema_version": "measurement-identity1",
+    "seal_path": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/joint_dev/seal.json",
+    "seal_sha256": "d377f12eb9a839c05a909a77877e60d8e58945ef4f895b6fbe3f1d03896ce0a1",
+    "source_sha256": "bf6795899f40c7976426b12402661b2f06bde18d4c8a17166a21777dfbdc9b80",
+    "subjects": [
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "iter_ds41_conv_dev_base_rep1"
+        ],
+        "session": "DX1",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "iter_ds41_conv_dev_base_rep2"
+        ],
+        "session": "DX2",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "iter_ds41_conv_dev_base_rep3"
+        ],
+        "session": "DX3",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_luna_dev_v1_rep1"
+        ],
+        "session": "LN1",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_luna_dev_v1_rep2"
+        ],
+        "session": "LN2",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_luna_dev_v1_rep3"
+        ],
+        "session": "LN3",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "probe_dev_opus55_contract2_claude_sub_rep1"
+        ],
+        "session": "OP1",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "probe_dev_opus55_contract2_claude_sub_rep2"
+        ],
+        "session": "OP2",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "probe_dev_opus55_contract2_claude_sub_rep3"
+        ],
+        "session": "OP3",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_sonnet_sub_dev_v1_rep1"
+        ],
+        "session": "SN1",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_sonnet_sub_dev_v1_rep2"
+        ],
+        "session": "SN2",
+        "source": "solo"
+      },
+      {
+        "channel": "submitted",
+        "path": null,
+        "runs": [
+          "recon_baseline_sonnet_sub_dev_v1_rep3"
+        ],
+        "session": "SN3",
+        "source": "solo"
+      },
+      {
+        "channel": "packet",
+        "path": null,
+        "runs": [],
+        "session": "X1",
+        "source": "packet"
+      },
+      {
+        "channel": "packet",
+        "path": null,
+        "runs": [],
+        "session": "X2",
+        "source": "packet"
+      }
+    ]
+  },
+  "identity_sha256": "bf6795899f40c7976426b12402661b2f06bde18d4c8a17166a21777dfbdc9b80",
+  "packets": [
+    {
+      "asks": [
+        {
+          "ask_id": "d0001",
+          "code_at_comment": "@@ -682,6 +683,36 @@ theorem inner_map_map_of_mem_unitary {u : H →L[𝕜] H} (hu : u ∈ unitary (H\n \n end ContinuousLinearMap\n \n+namespace LinearIsometryEquiv\n+\n+open ContinuousLinearMap ContinuousLinearEquiv in\n+/-- An isometry linear equivalence of two Hilbert spaces induces an equivalence of",
+          "comment": "```suggestion\n/-- An isometric linear equivalence of two Hilbert spaces induces an equivalence of\n```",
+          "path": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0002",
+          "code_at_comment": "@@ -302,6 +302,25 @@ theorem _root_.AlgEquiv.isUniformEmbedding {E₁ E₂ : Type*} [UniformSpace E\n     continuous_toFun := h₁\n     continuous_invFun := by dsimp; fun_prop }\n \n+/-- Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous. -/\n+def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm) : A ≃A[R] B :=\n+  { e with continuous_toFun := he, continuous_invFun := he' }",
+          "comment": "This is just the pre-existing constructor for `ContinuousAlgEquiv`:\n```\nContinuousAlgEquiv.mk.{u_1, u_2, u_3} {R : Type u_1} {A : Type u_2} {B : Type u_3} [CommSemiring R] [Semiring A]\n  [TopologicalSpace A] [Semiring B] [TopologicalSpace B] [Algebra R A] [Algebra R B] (toAlgEquiv : A ≃ₐ[R] B)\n  (continuous_toFun : Continuous toAlgEquiv.toFun := by fun_prop)\n  (continuous_invFun : Continuous toAlgEquiv.invFun := by fun_prop) : A ≃A[R]\n```\n(up to some defeqs involving `toAlgEquiv.invFun`, `AlgEquiv.symm` and `DFunLike.coe`). So I think you can remove all this and use `mk` instead.",
+          "path": "Mathlib/Topology/Algebra/Algebra/Equiv.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0003",
+          "code_at_comment": "ly (auxIsometry e hα hα2 he he' hαa).toContinuousLinearEquiv.injective\n+  simp [smul_smul, inv_mul_cancel₀ (a := α') (by grind)]\n+\n+end auxiliaryDefs\n+\n+open ComplexOrder\n+\n+/-- The ⋆-algebra equivalence version of\n+`ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv`.\n+\n+TODO: remove the hypothesis `Continuous f`, as star-algebra equivalences between endomorphisms are\n+automatically continuous. -/\n+public theorem StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv\n+    (f : (V →L[𝕜] V) ≃⋆ₐ[𝕜] (W →L[𝕜] W)) (hf : Continuous f) :\n+    ∃ U : V ≃ₗᵢ[𝕜] W, f = U.conjStarAlgEquiv := by",
+          "comment": "You can still phrase this as:\n```suggestion\n    Function.Surjective (LinearIsometryEquiv.conjStarAlgEquiv : (V ≃ₗᵢ[𝕜] W) → _) := by\n```\nand I think Lean shouldn't need you to fill in the `_`.",
+          "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0004",
+          "code_at_comment": "f = y.conjAlgEquiv`.\n+    Our goal will be to construct an isometry from `y`. We do this by first showing\n+    `adjoint y ∘ y` is in the center of the endormorphisms, and as the algebra of endomorphisms\n+    are central, `adjoint y ∘ y` is a scalar multiple of the identity.\n+    Let `α : 𝕜` be that scalar, i.e., `adjoint y ∘ y = α • id`. This scalar is clearly real.\n+    Also, it's easy to see that `adjoint y ∘ y` is invertible, so `α ≠ 0`.\n+    As `adjoint y ∘ y` is positive, we get `0 < α`.\n+    We also get `y ∘ adjoint y = α • id`.\n+    Finally, we construct our isometry `1/√(re α) • y`. -/",
+          "comment": "This is nice, but it would be even nicer if it were interspersed throughout the code.",
+          "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0005",
+          "code_at_comment": "@@ -79,3 +85,145 @@ public theorem ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv\n       suffices T'.toLinearMap = Tₗ.symm from this ▸ T'.continuous\n       simp [LinearMap.ext_iff, ← Tₗ.injective.eq_iff, T', this, hT, hd, Tₗ] }\n   exact ⟨TL, fun A ↦ (ContinuousLinearMap.ext <| this A).symm⟩\n+\n+variable {𝕜 V W : Type*} [RCLike 𝕜] [NormedAddCommGroup V] [InnerProductSpace 𝕜 V] [CompleteSpace V]\n+  [NormedAddCommGroup W] [InnerProductSpace 𝕜 W] [CompleteSpace W]\n+\n+section auxiliaryDefs\n+variable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0)",
+          "comment": "```suggestion\nsection auxiliaryDefs\n\nvariable (e : V ≃L[𝕜] W) {α α' : 𝕜} (hα : α ≠ 0)\n```",
+          "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0006",
+          "code_at_comment": "imp\n+  replace this := (Subalgebra.mem_center_iff (R := 𝕜)).mpr fun _ ↦ this _\n+  simp only [Algebra.IsCentral.center_eq_bot] at this\n+  obtain ⟨α, hα⟩ := this\n+  simp only [AlgHom.toRingHom_eq_coe, Algebra.toRingHom_ofId, Algebra.algebraMap_eq_smul_one] at hα\n+  have this : IsUnit (adjoint y.toContinuousLinearMap ∘L y) :=\n+    isUnit_iff_exists.mpr ⟨y.symm ∘L adjoint y.symm.toContinuousLinearMap, by\n+      simp [mul_def, ← comp_assoc, comp_assoc _ _ (adjoint y.toContinuousLinearMap),\n+        ← adjoint_comp, one_def, comp_assoc _ y.toContinuousLinearMap]⟩\n+  have thisα : α = RCLike.re α := by",
+          "comment": "The naming of your `have`s could use some work. Please improve them.",
+          "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0007",
+          "code_at_comment": "",
+          "comment": "I guess your contention regarding imports is that because this file is a leaf, the import increase doesn't matter?",
+          "path": null,
+          "replies_to": null
+        }
+      ],
+      "pr": 33066,
+      "reviewers": {
+        "R1": [
+          {
+            "claim": "The proof sketch in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` has a typo ('endormorphisms'). It refers to `y.conjAlgEquiv`, which does not exist; the actual name is `conjContinuousAlgEquiv`. Line 173 also has a double space in `conjContinuousAlgEquiv_apply,  adjoint_comp`.",
+            "i": 0,
+            "requested_change": "Change 'endormorphisms' to 'endomorphisms', `y.conjAlgEquiv` to `y.conjContinuousAlgEquiv`, and remove the double space in the simp_rw list.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:156"
+          }
+        ],
+        "R10": [],
+        "R11": [
+          {
+            "claim": "`AlgEquiv.isUniformEmbedding` re-implements inline the construction that this PR's new `ContinuousAlgEquiv.ofAlgEquiv` (8 lines below, line 306) now provides: its proof is `ContinuousAlgEquiv.isUniformEmbedding { e with continuous_toFun := h₁, continuous_invFun := by dsimp; fun_prop }`, which is exactly `(ofAlgEquiv e h₁ h₂).isUniformEmbedding`, and the inline version even discards the explicit `h₂` hypothesis in favour of `dsimp; fun_prop`. The new definition is not used anywhere in the PR's own new proof either, so the redundant copy stays in the same file.",
+            "i": 0,
+            "requested_change": "Move the new `ofAlgEquiv` block (def plus its `rfl` companions) above this lemma and replace the body of `AlgEquiv.isUniformEmbedding` with `(ofAlgEquiv e h₁ h₂).isUniformEmbedding`. I verified this exact reordering and body compiles in the reviewed workspace.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:297"
+          },
+          {
+            "claim": "The docstring of `LinearIsometryEquiv.conjStarAlgEquiv` calls the structure \"An isometry linear equivalence of two Hilbert spaces\"; the structure is `LinearIsometryEquiv`, i.e. a *linear isometry equivalence*, and the docstring of the sibling it is modelled on (`ContinuousLinearEquiv.conjContinuousAlgEquiv`, `Topology/Algebra/Module/StrongTopology.lean`) reads \"A continuous linear equivalence of two spaces induces a continuous equivalence of algebras of their endomorphisms\". The same reversed phrase is used for `auxIsometry` (line 116).",
+            "i": 1,
+            "requested_change": "Reword to \"A linear isometry equivalence of two Hilbert spaces induces an equivalence of ⋆-algebras of their endomorphisms.\" and, for `auxIsometry`, \"Construct a linear isometry equivalence from a continuous linear equivalence whose adjoint is a real-scalar multiple of its inverse.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:689"
+          },
+          {
+            "claim": "The `## Main definitions` list of this file's module docstring is not updated for the file's new public definition `LinearIsometryEquiv.conjStarAlgEquiv` (line 691), which is exported and is the entry point of the new API added here; the list still only mentions the two adjoint constructions.",
+            "i": 2,
+            "requested_change": "Add a bullet to `## Main definitions`, e.g. \"* `LinearIsometryEquiv.conjStarAlgEquiv : (H ≃ₗᵢ[𝕜] K) → (H →L[𝕜] H) ≃⋆ₐ[𝕜] (K →L[𝕜] K)`: conjugation of endomorphisms by a linear isometry equivalence.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:24"
+          },
+          {
+            "claim": "The new `OrderIsoClass` instance is stated with `_` placeholders both for the class arguments and the goal: `[NonUnitalAlgEquivClass F 𝕜 _ _] [StarHomClass F _ _] [ContinuousMapClass F _ _] : OrderIsoClass F _ _`. The types are only recoverable by unification (they are `V →L[𝕜] V` and `W →L[𝕜] W`), which makes the instance hard to read and hides that it is about star-algebra equivalences between endomorphism algebras; the sibling instance it is modelled on (`StarRingEquivClass.instOrderIsoClass`, `Algebra/Order/Star/Basic.lean`) writes its types out.",
+            "i": 3,
+            "requested_change": "Write the types explicitly: `[NonUnitalAlgEquivClass F 𝕜 (V →L[𝕜] V) (W →L[𝕜] W)]`, `[StarHomClass F (V →L[𝕜] V) (W →L[𝕜] W)]`, `[ContinuousMapClass F (V →L[𝕜] V) (W →L[𝕜] W)]` and `: OrderIsoClass F (V →L[𝕜] V) (W →L[𝕜] W)`. I verified this compiles unchanged in the reviewed workspace.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:221"
+          }
+        ],
+        "R12": [
+          {
+            "claim": "`LinearIsometryEquiv.symm_conjStarAlgEquiv_apply_apply` is the `symm` counterpart of the simp lemma `conjStarAlgEquiv_apply_apply` and is proved by `rfl`, but it lacks `@[simp]`. The `_apply`/`_apply_apply` API is inconsistent, and `theorem` and `lemma` are mixed within one block.",
+            "i": 0,
+            "requested_change": "Add `@[simp]` to `symm_conjStarAlgEquiv_apply_apply` (or drop it, since `symm_conjStarAlgEquiv` plus `conjStarAlgEquiv_apply_apply` already covers it). Use `theorem` or `lemma` consistently within the block.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:700"
+          },
+          {
+            "claim": "The docstring of `auxIsometry` says 'isometry linear equivalence', and the one in Adjoint.lean says the same. Mathlib calls this a 'linear isometry equivalence'. The statement 'adjoint is a real-scalar multiple of its inverse' also does not match the hypotheses, which are `adjoint ∘ e = α • id`. The helper names `auxContinuousLinearEquiv` and `auxIsometry` are generic top-level names that are not namespaced.",
+            "i": 1,
+            "requested_change": "Reword the docstrings to 'linear isometry equivalence' and state the actual hypotheses. Mark the aux declarations `private`, or put them in a descriptive namespace.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:121"
+          },
+          {
+            "claim": "There are typos and formatting slips in the proof of `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`: 'endormorphisms' in the comment, a double space in `conjContinuousAlgEquiv_apply,  adjoint_comp`, and the comment mentions `y.conjAlgEquiv`, which does not exist. The proof also reuses the name `this` many times and has ad-hoc names like `thisα`, `this10` and `this2`, which makes it hard to read.",
+            "i": 2,
+            "requested_change": "Fix the typo and the double space, refer to `y.conjContinuousAlgEquiv` in the comment, and give the intermediate facts descriptive names.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:157"
+          }
+        ],
+        "R13": [
+          {
+            "claim": "The `section auxiliaryDefs` block isn't needed. That covers `auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry`, the shared `variable`/`include`, and the matching `thisU` (`y ∘L adjoint y = α • id`) step in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`. The isometry `c • y` can be built inline with `LinearIsometryEquiv.ofSurjective`. That avoids five root-namespace `abbrev`s and `@[simp]` lemmas that exist only to feed one proof. The resulting proof is shorter and still compiles within the default heartbeats, which goes against the PR description's claim that the auxiliaries are needed for speed.",
+            "i": 0,
+            "requested_change": "Delete lines 92–139 (the whole `section auxiliaryDefs`). In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, once `hα : adjoint ↑y ∘L ↑y = α • 1` and `hαpos : 0 < α` are available, end the proof with:\n```lean\n  obtain ⟨r, hr, rfl⟩ := RCLike.pos_iff_exists_ofReal.mp hαpos\n  set c := (((√r)⁻¹ : ℝ) : 𝕜)\n  have hc : c ≠ 0 := by simp [c, Real.sqrt_ne_zero'.mpr hr]\n  have hcs : starRingEnd 𝕜 c = c := RCLike.conj_ofReal _\n  have hcc : c * c * r = 1 := by\n    simp only [c, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt hr.le]\n    simp [hr.ne']\n  let U₀ : V →ₗᵢ[𝕜] W :=\n    { (c • (y : V →L[𝕜] W)).toLinearMap with\n      norm_map' := (norm_map_iff_adjoint_comp_self (c • (y : V →L[𝕜] W))).mpr <| by\n        simp only [MulActionSemiHomClass.map_smulₛₗ, smul_comp, comp_smulₛₗ, hα, smul_smul,\n          hcs, RingHom.id_apply, ← mul_assoc, hcc, one_smul] }\n  let U := LinearIsometryEquiv.ofSurjective U₀ fun w ↦ ⟨c⁻¹ • y.symm w, by simp [U₀, smul_smul, hc]⟩\n  refine ⟨U, StarAlgEquiv.ext fun x ↦ ContinuousLinearMap.ext fun w ↦ ?_⟩\n  have hU : U.symm w = c⁻¹ • y.symm w := U.injective <| by simp [U, U₀, smul_smul, hc]\n  simp only [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, hU]\n  simpa [U, U₀, smul_smul, hc] using congr($hy x w)\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:92"
+          },
+          {
+            "claim": "In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the steps that show the scalar `α` is real and positive go the long way round:\n- `thisα`/`this10` prove realness through `IsSelfAdjoint.one.adjoint_conj` and `smul_left_injective`.\n- `this2`/`this1` prove positivity, using `▸` rewrites in both directions.\n- `replace this2` then converts the result to `0 < re α`.\n- The scaling factor uses `Real.rpow` with `-(1/2)`, which needs `Real.rpow_add`, `Real.rpow_neg_one` and `Real.rpow_eq_zero`, even though the proof comment itself says `1/√(re α)`.\n- `simp only [Algebra.IsCentral.center_eq_bot]` followed by `simp only [AlgHom.toRingHom_eq_coe, Algebra.toRingHom_ofId, …]` re-proves `Algebra.IsCentral.mem_center_iff`.\nPositivity alone already gives realness through `RCLike.pos_iff_exists_ofReal`.",
+            "i": 1,
+            "requested_change": "Replace lines 181–184 and 189–215 with:\n```lean\n  obtain ⟨α, hα⟩ := Algebra.IsCentral.mem_center_iff 𝕜 |>.mp <|\n    Subalgebra.mem_center_iff.mpr fun _ ↦ this _\n  rw [Algebra.algebraMap_eq_smul_one] at hα\n  have this : IsUnit (adjoint y.toContinuousLinearMap ∘L y) := … -- unchanged\n  have hα0 : α ≠ 0 := fun h ↦ by simp [h, hα] at this\n  have hαpos : 0 < α := by\n    refine lt_of_le_of_ne' ?_ hα0\n    rw [← LinearMap.isPositive_one.isPositive_smul_iff (E := V) one_ne_zero]\n    have := (isPositive_adjoint_comp_self y.toContinuousLinearMap).toLinearMap\n    rw [hα] at this\n    simpa using this\n  obtain ⟨r, hr, hrα⟩ := RCLike.pos_iff_exists_ofReal.mp hαpos\n  … -- thisU as before, using hα.symm\n  set αa := (((√r)⁻¹ : ℝ) : 𝕜)\n  have αa2 : αa * αa = α⁻¹ := by\n    simp [αa, ← hrα, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt hr.le]\n  set U := auxIsometry y hα0 αa2 hα thisU (by simp [αa])\n  use U\n  have la : αa⁻¹ * αa = 1 := inv_mul_cancel₀ (by simp [αa, Real.sqrt_ne_zero'.mpr hr])\n```\nThis is independent of the aux-section removal, and combines with it.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:181"
+          },
+          {
+            "claim": "`import Mathlib.Analysis.SpecialFunctions.Pow.Real` is redundant: the file compiles without it as written, since rpow is already reachable through the public `InnerProductSpace.Positive` import. With the `√` rewrite of the main proof, nothing uses rpow at all. In the same way, `public import Mathlib.Analysis.InnerProductSpace.Adjoint` is implied by `public import Mathlib.Analysis.InnerProductSpace.Positive`.",
+            "i": 2,
+            "requested_change": "Remove `import Mathlib.Analysis.SpecialFunctions.Pow.Real`. Optionally also remove the redundant `public import Mathlib.Analysis.InnerProductSpace.Adjoint`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:15"
+          },
+          {
+            "claim": "The proof sketch comment in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` has errors:\n- It says `f = y.conjAlgEquiv`, but the lemma used gives `f = y.conjContinuousAlgEquiv`.\n- It has the typo \"endormorphisms\".\n- \"the algebra of endomorphisms are central\" has a number-agreement error.\nSeparately, the `simp_rw` list on line 173 has a double space (`conjContinuousAlgEquiv_apply,  adjoint_comp`).",
+            "i": 3,
+            "requested_change": "In the comment, write `f = y.conjContinuousAlgEquiv`, change \"endormorphisms\" to \"endomorphisms\", and change \"are central\" to \"is central\". On line 173, remove the extra space in `conjContinuousAlgEquiv_apply,  adjoint_comp`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:151"
+          },
+          {
+            "claim": "The docstring of `LinearIsometryEquiv.conjStarAlgEquiv` says \"An isometry linear equivalence\". That is not the library's term for `≃ₗᵢ`: Mathlib calls `LinearIsometryEquiv` a \"linear isometric equivalence\". The same wording is in the `auxIsometry` docstring.",
+            "i": 4,
+            "requested_change": "Reword to: \"A linear isometric equivalence of two Hilbert spaces induces a ⋆-algebra equivalence between their algebras of continuous endomorphisms.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:689"
+          },
+          {
+            "claim": "The module docstring's TODO heading was changed to `### TODO:`. That skips a heading level under the `#` title, and Mathlib's practice is `## TODO` (base has only 2 files with `### TODO` against the widespread `## TODO`).",
+            "i": 5,
+            "requested_change": "Use `## TODO` (no trailing colon).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:25"
+          },
+          {
+            "claim": "The Hilbert-space material doesn't belong in this file. The rest of `Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean` covers general normed spaces with separating dual. The PR adds `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` and the `OrderIsoClass` instance here, which makes the file publicly import `InnerProductSpace.Adjoint` and `InnerProductSpace.Positive`. `Positive` pulls in `InnerProductSpace.Spectrum`, `Matrix.Hermitian` and `Matrix.PosDef`, so anyone who only wants the `ContinuousAlgEquiv` result inherits the inner-product-space hierarchy.",
+            "i": 6,
+            "requested_change": "Move the inner-product-space section (the `RCLike`/`InnerProductSpace` variables, the star-algebra theorem, the `OrderIsoClass` instance and the `Positive`/`Adjoint`/`Central` imports) into a new file under `Mathlib/Analysis/InnerProductSpace/`. That file should import `Mathlib.Analysis.Normed.Operator.ContinuousAlgEquiv`. Restore this file's original title and imports.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:89"
+          }
+        ],
+        "R14": [
+          {
+            "claim": "The private section `auxiliaryDefs` (`auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry`, 48 lines) builds a scalar multiple of `y` as a linear isometric equivalence by hand. Existing library constructions already do this: `LinearEquiv.smulOfNeZero` gives the scalar-multiple equivalence, and `LinearEquiv.isometryOfInner` turns an inner-product-preserving linear equivalence into a `≃ₗᵢ`. `Mathlib/Analysis/InnerProductSpace/ConformalLinearMap.lean` (`isConformalMap_iff`) uses the same `c⁻¹ • f |>.isometryOfInner` pattern. The aux API is only used once, inside `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`.",
+            "i": 0,
+            "requested_change": "Delete `section auxiliaryDefs` (lines 92-139) and build the isometry inline in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`: `let U : V ≃ₗᵢ[𝕜] W := (y.toLinearEquiv.trans (.smulOfNeZero 𝕜 W _ (inv_ne_zero hs'))).isometryOfInner fun a b ↦ by simp [inner_smul_left, inner_smul_right, key]; field_simp`. Here `key : inner 𝕜 (y a) (y b) = (s * s : ℝ) * inner 𝕜 a b` is proved by `rw [← ContinuousLinearEquiv.coe_coe, ← adjoint_inner_right, ← comp_apply, ← hα]; simp [inner_smul_right]`. Then close with `refine ⟨U, StarAlgEquiv.ext fun x ↦ ContinuousLinearMap.ext fun w ↦ ?_⟩; obtain ⟨v, rfl⟩ := U.surjective w; have hfx : f x (y v) = y (x v) := by simpa using congr($(congr_fun hy x) (y v)); rw [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, U.symm_apply_apply]; simp [U, hfx]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:118"
+          },
+          {
+            "claim": "The scalar bookkeeping in the proof is roundabout. `thisα : α = RCLike.re α` is proved separately through `IsSelfAdjoint.adjoint_conj` and `smul_left_injective`. `this2 : 0 ≤ α` goes through two `▸` rewrites along `thisα`. The normalising scalar is written `((re α : ℝ) ^ (-(1 / 2 : ℝ)) : 𝕜)` with `Real.rpow`, which needs `Real.rpow_add`, `Real.rpow_neg_one` and a four-line `la` via `Real.rpow_eq_zero`. That is `1/√(re α)`, as the proof's own comment says. Positivity in `ComplexOrder` already implies that α is real, so `thisα` is unnecessary.",
+            "i": 1,
+            "requested_change": "Get `0 ≤ α` directly: `have := isPositive_adjoint_comp_self y.toContinuousLinearMap; rw [← hα, ← isPositive_toLinearMap_iff] at this; exact (LinearMap.isPositive_one.isPositive_smul_iff (one_ne_zero' (V →ₗ[𝕜] V))).mp this`. Then take α real and a square: `obtain ⟨r, hr, rfl⟩ := RCLike.pos_iff_exists_ofReal.mp (hpos.lt_of_ne' hα0)` and `obtain ⟨s, hs, rfl⟩ : ∃ s : ℝ, 0 < s ∧ s * s = r := ⟨√r, Real.sqrt_pos.2 hr, Real.mul_self_sqrt hr.le⟩`, and scale by `(s : 𝕜)⁻¹`. This drops `thisα`, `this2`, `thisU`, `αa`, `αa2` and `la`, and gives the remaining hypotheses descriptive names (`hα0`, `hpos`) in place of `this1`/`this2`/`this10`/`thisα'`. If the aux defs are kept, the minimal version is `set αa := (((√(RCLike.re α))⁻¹ : ℝ) : 𝕜)`, `αa2` by `rw [thisα]; simp [αa, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt this2.le]`, and `la := inv_mul_cancel₀ (by simp [αa, (Real.sqrt_pos.2 this2).ne'])`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "Two of the imports the PR adds are redundant. `public import Mathlib.Analysis.InnerProductSpace.Adjoint` is already implied by `public import Mathlib.Analysis.InnerProductSpace.Positive`. `import Mathlib.Analysis.SpecialFunctions.Pow.Real` is already available transitively, and it is only used for `Real.rpow` in a proof step that `√` does just as well.",
+            "i": 2,
+            "requested_change": "Remove `public import Mathlib.Analysis.InnerProductSpace.Adjoint` and `import Mathlib.Analysis.SpecialFunctions.Pow.Real`. The import block becomes the four existing public imports plus `public import Mathlib.Analysis.InnerProductSpace.Positive` and `import Mathlib.Algebra.Central.Basic`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          },
+          {
+            "claim": "The PR puts Hilbert-space material (`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the `OrderIsoClass` instance and the aux section) into a file under `Analysis/Normed/Operator/` about normed spaces with separating duals. To do so it adds `public import`s of `Analysis.InnerProductSpace.Adjoint` and `Analysis.InnerProductSpace.Positive`, so every user of the normed-space result `ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv` now pulls in the inner product space and positivity theory.",
+            "i": 3,
+            "requested_change": "Move the star-algebra part (everything from the `RCLike`/`InnerProductSpace` `variable` line to the end of the file) into a new file under `Mathlib/Analysis/InnerProductSpace/` (e.g. `.../InnerProductSpace/StarAlgEquiv.lean`) that imports `Mathlib.Analysis.Normed.Operator.ContinuousAlgEquiv`. Revert that file's imports and module docstring to the normed-space-only version.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          },
+          {
+            "claim": "The new `public instance (priority := 100) ... : OrderIsoClass F _ _` is anonymous, so it gets a long auto-generated name. The instance it is meant to be replaced by, `StarRingEquivClass.instOrderIsoClass` (Algebra/Order/Star/Basic.lean:458), and its sibling `StarRingHomClass.instOrderHomClass` are both explicitly named.",
+            "i": 4,
+            "requested_change": "Give the instance an explicit name, e.g. `public instance (priority := 100) ContinuousLinearMap.instOrderIsoClass {F : Type*} ...`, and put the usual `-- see Note [lower instance priority]` comment above it.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          },
+          {
+            "claim": "The docstring says 'An isometry linear equivalence of two Hilbert spaces'. Mathlib's term for `≃ₗᵢ` is 'linear isometric equivalence', and 'isometry linear equivalence' appears nowhere else in the library. The same wording is repeated in the `auxIsometry` docstring.",
+            "i": 5,
+            "requested_change": "Reword to `/-- A linear isometric equivalence of two Hilbert spaces induces an equivalence of ⋆-algebras of their endomorphisms. -/` (and likewise in `auxIsometry`'s docstring if that declaration is kept).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:691"
+          },
+          {
+            "claim": "The proof-sketch comment has a typo, 'endormorphisms', and names a nonexistent API: it says `f = y.conjAlgEquiv`, but `y : V ≃L[𝕜] W` and the result used is `y.conjContinuousAlgEquiv`. It also has a grammar slip: 'the algebra of endomorphisms are central'.",
+            "i": 6,
+            "requested_change": "In the comment, change 'endormorphisms' to 'endomorphisms', `f = y.conjAlgEquiv` to `f = y.conjContinuousAlgEquiv`, and 'the algebra of endomorphisms are central' to 'the algebra of endomorphisms is central'.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "The PR changes the module docstring's `# TODO:` heading to `### TODO:`. Mathlib module docs use a level-2 `## TODO` heading without a colon.",
+            "i": 7,
+            "requested_change": "Replace `### TODO:` with `## TODO`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          },
+          {
+            "claim": "The docstring 'Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous.' understates the hypotheses: the definition also requires `he' : Continuous e.symm`, and continuity of `e` alone does not give a `≃A[R]`.",
+            "i": 8,
+            "requested_change": "Change the docstring to `/-- Interpret an algebra equivalence as a continuous algebra equivalence when it and its inverse are continuous. -/`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:306"
+          },
+          {
+            "claim": "`ofAlgEquiv` is added right after `_root_.AlgEquiv.isUniformEmbedding`, which builds the same object inline as `{ e with continuous_toFun := h₁, continuous_invFun := by dsimp; fun_prop }`. The file thus keeps an ad-hoc copy of the new constructor two lines above it.",
+            "i": 9,
+            "requested_change": "Move the `ofAlgEquiv` block (the def and its five lemmas) above `ContinuousAlgEquiv.isUniformEmbedding`, and prove `_root_.AlgEquiv.isUniformEmbedding` as `(ofAlgEquiv e h₁ h₂).isUniformEmbedding`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:306"
+          },
+          {
+            "claim": "`conjStarAlgEquiv_trans` re-binds `{G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]`, which shadows the file-level `variable {𝕜 E F G : Type*} ... [NormedAddCommGroup G] ... [InnerProductSpace 𝕜 G]` (Adjoint.lean:51-53). Only `CompleteSpace G` is actually missing.",
+            "i": 10,
+            "requested_change": "State it as `theorem conjStarAlgEquiv_trans [CompleteSpace G] (e : H ≃ₗᵢ[𝕜] K) (f : K ≃ₗᵢ[𝕜] G) : (e.trans f).conjStarAlgEquiv = e.conjStarAlgEquiv.trans f.conjStarAlgEquiv := rfl`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:709"
+          },
+          {
+            "claim": "Line 173 has a double space inside the `simp_rw` list: `conjContinuousAlgEquiv_apply,  adjoint_comp] at this`.",
+            "i": 11,
+            "requested_change": "Change it to `conjContinuousAlgEquiv_apply, adjoint_comp] at this`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          }
+        ],
+        "R2": [
+          {
+            "claim": "`LinearIsometryEquiv.symm_conjStarAlgEquiv_apply_apply` is the symm counterpart of the simp lemma `conjStarAlgEquiv_apply_apply` but is not tagged `@[simp]`, so `simp` cannot unfold `e.conjStarAlgEquiv.symm f x` (it only rewrites via `symm_conjStarAlgEquiv` and then the apply lemma, which is inconsistent API).",
+            "i": 0,
+            "requested_change": "Mark `symm_conjStarAlgEquiv_apply_apply` with `@[simp]`, or drop the asymmetry deliberately (and make it `lemma` like its siblings).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:703"
+          },
+          {
+            "claim": "The auxiliary declarations `auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry` are implementation details of one proof (the PR description says they are private) but are declared in the root namespace with generic names and without `private`.",
+            "i": 1,
+            "requested_change": "Mark them `private` (e.g. `private noncomputable abbrev auxIsometry`) so they do not pollute the root namespace; also fix the docstring wording 'isometry linear equivalence' to 'linear isometry equivalence'.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:96"
+          },
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` has a very long proof with many `this`/`this2`/`thisα`/`thisα'`/`thisU` hypothesis names, a typo ('endormorphisms') and a double space (`conjContinuousAlgEquiv_apply,  adjoint_comp`); readability suffers and the proof sketch comment is not matched by named steps.",
+            "i": 2,
+            "requested_change": "Give the intermediate facts descriptive names (e.g. `hcomm`, `hα_real`, `hα_pos`) instead of repeated `this`/`replace this`, split independent chunks (the centrality argument and the positivity of `α`) into separate lemmas, fix the typo 'endormorphisms' → 'endomorphisms' and the double space.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:171"
+          }
+        ],
+        "R3": [
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` requires callers to provide `hf : Continuous f`, although its docstring explicitly notes that these star-algebra equivalences are automatically continuous. This leaves the advertised characterization weaker than necessary and forces callers to carry a redundant hypothesis.",
+            "i": 0,
+            "requested_change": "Prove the automatic continuity of `f` in this endomorphism-algebra setting, remove the `hf` argument from the theorem, and update the `OrderIsoClass` instance to use the continuity obtained internally.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          }
+        ],
+        "R4": [
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` proves that the scalar `α` is real by a detour. `thisα : α = RCLike.re α` goes through `IsSelfAdjoint.one.adjoint_conj`, `smul_left_injective` and `RCLike.conj_eq_iff_re`. The proof then moves positivity back and forth along `thisα ▸` (`this1`, `this2`, and `replace this2 := RCLike.ofReal_pos.mp ...`). None of this is needed: positivity of `adjoint y ∘L y = α • 1` already gives `0 < α` in `ComplexOrder`, and a positive element of an `RCLike` field is the coercion of a positive real.",
+            "i": 0,
+            "requested_change": "Delete `thisα` and the `this2` / `replace this2` block. Prove `0 < α` directly, then substitute a real `r`:\n```\n  have thisα' : α ≠ 0 := fun h ↦ by simp [h, ← hα] at this\n  have this2 : 0 < α := by\n    refine lt_of_le_of_ne' ?_ thisα'\n    rw [← LinearMap.isPositive_one.isPositive_smul_iff (E := V) (one_ne_zero' (V →ₗ[𝕜] V))]\n    exact (hα ▸ isPositive_adjoint_comp_self y.toContinuousLinearMap :\n      (α • 1 : V →L[𝕜] V).IsPositive)\n  obtain ⟨r, hr, rfl⟩ := RCLike.pos_iff_exists_ofReal.mp this2\n```\nAfter that, use `r` / `hr` wherever the proof used `RCLike.re α` / `this2` (in `thisU`, `αa`, `αa2`, `la`). `αa2` no longer needs `rw [thisα]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` builds the normalising scalar as `(((RCLike.re α : ℝ) ^ (-(1 / 2 : ℝ)) : ℝ) : 𝕜)` with `Real.rpow`. Its lemmas then need `Real.rpow_add`, `Real.rpow_neg_one` and a 4-line `Real.rpow_eq_zero` argument for `la`. The proof sketch in the same proof says the isometry is `1/√(re α) • y`, and `Real.sqrt` gives the needed facts directly.",
+            "i": 1,
+            "requested_change": "Use the square root:\n```\n  set αa := (((√(RCLike.re α))⁻¹ : ℝ) : 𝕜)\n  have αa2 : αa * αa = α⁻¹ := by\n    rw [thisα]\n    simp [αa, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt this2.le]\n  ...\n  have la : αa⁻¹ * αa = 1 := inv_mul_cancel₀ (by simp [αa, Real.sqrt_eq_zero', this2])\n```\nThen drop `import Mathlib.Analysis.SpecialFunctions.Pow.Real`, which nothing else in the file uses.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` extracts the central scalar in four steps: `Subalgebra.mem_center_iff`, then `simp only [Algebra.IsCentral.center_eq_bot] at this`, then `obtain`, then a `simp only [AlgHom.toRingHom_eq_coe, Algebra.toRingHom_ofId, Algebra.algebraMap_eq_smul_one] at hα` to clean up the `Algebra.ofId` form. `Algebra.IsCentral.mem_center_iff` already states `x ∈ Subalgebra.center K D ↔ ∃ a, x = algebraMap K D a`.",
+            "i": 2,
+            "requested_change": "Replace the four lines with\n```\n  obtain ⟨α, hα⟩ := (Algebra.IsCentral.mem_center_iff 𝕜).mp <|\n    Subalgebra.mem_center_iff.mpr fun _ ↦ this _\n  rw [Algebra.algebraMap_eq_smul_one, eq_comm] at hα\n```\nThis gives the same `hα : α • 1 = adjoint ↑y ∘L ↑y`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, `this` is rebound by `replace this` three times and then reintroduced as an `IsUnit` fact. The other hypotheses are named `this10`, `this1`, `this2` (later `replace`d with a different statement), `thisα`, `thisα'`, `thisU` and `la`. In a 55-line proof this makes it hard to follow which fact is in use.",
+            "i": 3,
+            "requested_change": "Give the intermediate facts descriptive names instead of re-`replace`-ing `this` and numbering `this1`/`this2`/`this10`. For example: `h_adj` for `adjoint (f x) = f (adjoint x)`, `h_comm` for the `Commute` fact, `h_unit` for `IsUnit (adjoint y ∘L y)`, `hα_real`, `hα_ne`, `hα_pos`, `hyy` for `y ∘L adjoint y = α • id`, `hαa_sq`, `hαa_inv`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the `simp_rw` argument list has a double space: `conjContinuousAlgEquiv_apply,  adjoint_comp] at this`.",
+            "i": 4,
+            "requested_change": "Change it to a single space: `conjContinuousAlgEquiv_apply, adjoint_comp] at this`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "The proof-sketch comment in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` has three errors. It says `f = y.conjAlgEquiv`, but the object is `y.conjContinuousAlgEquiv` (the continuous theorem's conclusion). It misspells \"endormorphisms\". It says \"the algebra of endomorphisms are central\" (subject-verb disagreement).",
+            "i": 5,
+            "requested_change": "In the comment, write `f = y.conjContinuousAlgEquiv`, fix \"endormorphisms\" to \"endomorphisms\", and write \"the algebra of endomorphisms is central\".",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "`auxContinuousLinearEquiv` spells out `toLinearMap`, `invFun`, `left_inv`, `right_inv`, `continuous_toFun` and `continuous_invFun` by hand, with pointwise `congr($he x)` arguments. Mathlib already has `ContinuousLinearEquiv.equivOfInverse'`, which builds a continuous linear equivalence from two continuous linear maps and the two composition identities. That is exactly the shape of `he`/`he'` after scaling.",
+            "i": 6,
+            "requested_change": "Define it as\n```\nnoncomputable abbrev auxContinuousLinearEquiv :\n    V ≃L[𝕜] W :=\n  .equivOfInverse' (α' • e.toContinuousLinearMap) (α' • e.toContinuousLinearMap.adjoint)\n    (by simp [comp_smul, he', smul_smul, hα2, hα, ← mul_assoc])\n    (by simp [comp_smul, he, smul_smul, hα2, hα, ← mul_assoc])\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:99"
+          },
+          {
+            "claim": "`ContinuousAlgEquiv.ofAlgEquiv` is added just below `_root_.AlgEquiv.isUniformEmbedding`. That lemma builds exactly this object by hand (`{ e with continuous_toFun := h₁, continuous_invFun := by dsimp; fun_prop }`), so the new constructor duplicates an inline construction next to it and is not used there.",
+            "i": 7,
+            "requested_change": "Move `ofAlgEquiv` above `ContinuousAlgEquiv.isUniformEmbedding`. Then write `_root_.AlgEquiv.isUniformEmbedding`'s proof as `(ofAlgEquiv e h₁ h₂).isUniformEmbedding`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:306"
+          },
+          {
+            "claim": "`LinearIsometryEquiv.conjStarAlgEquiv_trans` binds a fresh `{G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]`. That shadows the file-level `variable {𝕜 E F G : Type*} ... [NormedAddCommGroup G] ... [InnerProductSpace 𝕜 G]` already in scope in `Adjoint.lean`.",
+            "i": 8,
+            "requested_change": "Drop the redundant binders and use the ambient `G`: `theorem conjStarAlgEquiv_trans [CompleteSpace G] (e : H ≃ₗᵢ[𝕜] K) (f : K ≃ₗᵢ[𝕜] G) : (e.trans f).conjStarAlgEquiv = e.conjStarAlgEquiv.trans f.conjStarAlgEquiv := rfl`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:709"
+          },
+          {
+            "claim": "The module docstring of `ContinuousAlgEquiv.lean` changes the heading `# TODO:` to `### TODO:`. Mathlib module docs use a level-2 `## TODO` heading, without a colon.",
+            "i": 9,
+            "requested_change": "Write the heading as `## TODO`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          },
+          {
+            "claim": "The docstring of `LinearIsometryEquiv.conjStarAlgEquiv` says \"An isometry linear equivalence of two Hilbert spaces\". Mathlib calls `≃ₗᵢ` a \"linear isometric equivalence\", and `Adjoint.lean` itself does (`Unitary.linearIsometryEquiv`: \"the linear isometric equivalences on that Hilbert space\"). The same wording appears in the `auxIsometry` docstring.",
+            "i": 10,
+            "requested_change": "Rephrase, e.g. \"A linear isometric equivalence of two Hilbert spaces induces a ⋆-algebra equivalence of their algebras of continuous endomorphisms.\" Use \"linear isometric equivalence\" in the `auxIsometry` docstring as well.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:691"
+          },
+          {
+            "claim": "The PR puts Hilbert-space material (`auxContinuousLinearEquiv`/`auxIsometry` and their lemmas, `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, and the `OrderIsoClass` instance) into `Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean`. To do so it adds `public import Mathlib.Analysis.InnerProductSpace.Adjoint` and `...InnerProductSpace.Positive` (plus `SpecialFunctions.Pow.Real`). The file's existing result only needs normed spaces with separating dual, so a general `Normed/Operator` file now depends on inner-product-space and positivity theory.",
+            "i": 11,
+            "requested_change": "Move the `RCLike`/inner-product part (from the `variable {𝕜 V W} [RCLike 𝕜] ... [InnerProductSpace 𝕜 V]` block to the end of the file) into a new file under `Mathlib/Analysis/InnerProductSpace/` (e.g. `.../InnerProductSpace/StarAlgEquiv.lean`) that imports `ContinuousAlgEquiv.lean`. Keep `ContinuousAlgEquiv.lean` free of the `InnerProductSpace` imports.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:8"
+          }
+        ],
+        "R5": [
+          {
+            "claim": "The five support declarations `auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry` are declared in the *root* namespace (no surrounding namespace, they are not `private`), and three of them carry `@[simp]`. They are used only inside this file, so the PR exports a globally visible `auxIsometry : V ≃ₗᵢ[𝕜] W` and four `@[simp]` lemmas about `auxIsometry`/`auxContinuousLinearEquiv` into the root namespace and the global simp set — the PR description itself says these auxiliary definitions/lemmas are private, but the code does not make them so.",
+            "i": 0,
+            "requested_change": "Prefix all five declarations with `private` (`private noncomputable abbrev auxContinuousLinearEquiv`, `@[simp] private theorem coe_auxContinuousLinearEquiv`, `private noncomputable abbrev auxIsometry`, `@[simp] private theorem coe_auxIsometry`, `@[simp] private theorem coe_symm_auxIsometry`). I compiled exactly this edit (replacing lines 98–137) against the PR's workspace: it builds with no errors and no new warnings, and private declarations also drop the docstring obligation of the two abbrevs.",
+            "severity": "blocking",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:98"
+          },
+          {
+            "claim": "The `OrderIsoClass F _ _` instance is not used by any declaration in this PR (nor anywhere in the library), and its hypothesis set cannot currently be satisfied by any Mathlib type: `#synth ContinuousMapClass ((V →L[𝕜] V) ≃⋆ₐ[𝕜] (W →L[𝕜] W)) (V →L[𝕜] V) (W →L[𝕜] W)` fails (a `StarAlgEquiv` is not a `ContinuousMapClass`) and `#synth StarHomClass ((V →L[𝕜] V) ≃A[𝕜] (W →L[𝕜] W)) (V →L[𝕜] V) (W →L[𝕜] W)` fails (a `ContinuousAlgEquiv` is not a `StarHomClass`), and there is no `ContinuousStarAlgEquiv`-style type in the tree. So the instance, whose own comment describes it as a stopgap to be removed once `StarOrderedRing (V →L[𝕜] V)` exists, is unreachable: it only adds a speculative global instance at `priority := 100` in an analysis file, with `_` placeholders in its statement.",
+            "i": 1,
+            "requested_change": "Remove the instance from this PR (or move it to the PR that introduces the type whose `EquivLike`/`NonUnitalAlgEquivClass`/`StarHomClass`/`ContinuousMapClass` instances it needs); if it is kept, spell out the arguments instead of `_` and `_ _`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:221"
+          },
+          {
+            "claim": "`ContinuousAlgEquiv.ofAlgEquiv_trans_ofAlgEquiv` is the only lemma of the six new `ofAlgEquiv` lemmas that is not tagged `@[simp]` (`coe_ofAlgEquiv`, `toAlgEquiv_ofAlgEquiv`, `ofAlgEquiv_toAlgEquiv`, `symm_ofAlgEquiv` all are, as are the analogous `Algebra.Star.StarAlgEquiv.ofAlgEquiv_*` lemmas), so the new API is inconsistent and the trans lemma is not available to `simp`.",
+            "i": 2,
+            "requested_change": "Add `@[simp]` to `ofAlgEquiv_trans_ofAlgEquiv`, matching `AffineEquiv.ofLinearEquiv_trans_ofLinearEquiv` and the rest of the block. (Verified: tagging it `@[simp]` compiles with no errors and no linter warnings.)",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:320"
+          }
+        ],
+        "R6": [
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` requires an explicit continuity proof for `f`, although star-algebra equivalences of these endomorphism algebras are automatically continuous (as the theorem's TODO notes). This unnecessarily weakens the new API's usability.",
+            "i": 0,
+            "requested_change": "Establish continuity of a star-algebra equivalence on these operator algebras and remove the `hf` parameter; update the instance below to call the generalized theorem without `map_continuous f`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:149"
+          }
+        ],
+        "R7": [
+          {
+            "claim": "The `auxiliaryDefs` section (`auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry`) is not needed. It only exists to give an explicit inverse `α' • adjoint e`, which requires the extra hypothesis `he'` (and so `thisU` in the main proof). The isometry in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` can instead be built as `LinearIsometryEquiv.ofSurjective` of the linear isometry `αa • y`. The final equation then follows by writing `x = U z`, so `U.symm` never has to be computed.",
+            "i": 0,
+            "requested_change": "Delete the whole `section auxiliaryDefs … end auxiliaryDefs` and `thisU`. End the main proof with:\n```lean\n  have hαa : αa ≠ 0 := by simp [αa, (Real.sqrt_pos.mpr this2).ne']\n  have hαa' : starRingEnd 𝕜 αa = αa := by simp [αa]\n  let U : V →ₗᵢ[𝕜] W :=\n    { toLinearMap := (αa • y.toContinuousLinearMap).toLinearMap\n      norm_map' := (norm_map_iff_adjoint_comp_self (αa • y.toContinuousLinearMap)).mpr <| by\n        rw [MulActionSemiHomClass.map_smulₛₗ, hαa', smul_comp, comp_smul, smul_smul, αa2, ← hα,\n          smul_smul, inv_mul_cancel₀ thisα', one_smul] }\n  set U' := LinearIsometryEquiv.ofSurjective U fun w ↦ ⟨y.symm (αa⁻¹ • w), by simp [U, hαa]⟩\n  use U'\n  ext A x\n  obtain ⟨z, rfl⟩ := U'.surjective x\n  rw [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, U'.symm_apply_apply]\n  have hfA : f A = y.conjContinuousAlgEquiv A := congr_fun hy A\n  simp [U', U, hfA]\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:92"
+          },
+          {
+            "claim": "In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the proofs that `α` is real (`thisα`, via `IsSelfAdjoint.adjoint_conj` and `smul_left_injective`) and nonnegative (`this2`, via `thisα.symm ▸ … thisα ▸ hα ▸ …` and `nonneg_iff_isPositive` twice) are roundabout. Positivity follows directly from `isPositive_adjoint_comp_self` and `IsPositive.isPositive_smul_iff`. Reality then follows from `0 ≤ α` in `ComplexOrder` via `RCLike.nonneg_iff`.",
+            "i": 1,
+            "requested_change": "Prove nonnegativity first and derive reality from it:\n```lean\n  have this2 : 0 ≤ α := by\n    have h := isPositive_adjoint_comp_self y.toContinuousLinearMap\n    rw [← hα, ← isPositive_toLinearMap_iff] at h\n    rwa [← LinearMap.isPositive_one.isPositive_smul_iff (E := V) one_ne_zero]\n  have thisα : α = RCLike.re α :=\n    (RCLike.conj_eq_iff_re.mp (RCLike.conj_eq_iff_im.mpr (RCLike.nonneg_iff.mp this2).2)).symm\n  have thisα' : α ≠ 0 := fun h ↦ by simp [h, ← hα] at this\n  replace this2 := RCLike.ofReal_pos.mp <| thisα ▸ (lt_of_le_of_ne' this2 thisα')\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:189"
+          },
+          {
+            "claim": "In `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the scalar `αa` is written as `(re α) ^ (-(1 / 2 : ℝ))` with `Real.rpow`. This makes `αa2` need `norm_num` with `rpow_add`/`rpow_neg_one`, and `la` needs a 4-line proof via `Real.rpow_eq_zero`. `(√(re α))⁻¹` is the natural spelling, and both facts become one-liners.",
+            "i": 2,
+            "requested_change": "```lean\n  set αa := ((((√(RCLike.re α))⁻¹ : ℝ)) : 𝕜)\n  have αa2 : αa * αa = α⁻¹ := by\n    rw [thisα]\n    simp [αa, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt this2.le]\n  ...\n  have la : αa⁻¹ * αa = 1 := inv_mul_cancel₀ (by simp [αa, (Real.sqrt_pos.mpr this2).ne'])\n```\nAlso update the proof sketch accordingly.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:205"
+          },
+          {
+            "claim": "`import Mathlib.Analysis.SpecialFunctions.Pow.Real` is redundant: it is already imported transitively through the public imports. The file compiles unchanged without it, so `shake` would flag it.",
+            "i": 3,
+            "requested_change": "Remove the line `import Mathlib.Analysis.SpecialFunctions.Pow.Real`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:15"
+          },
+          {
+            "claim": "The proof of `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` reuses `this` through repeated `replace this`, and names other hypotheses `this1`, `this2`, `this10`, `thisα`, `thisα'`, `thisU`, `la`. This makes the long proof hard to follow. Line 173 also has a double space (`conjContinuousAlgEquiv_apply,  adjoint_comp`).",
+            "i": 4,
+            "requested_change": "Give the hypotheses descriptive names, e.g.:\n- `hstar` for `adjoint (f x) = f (adjoint x)`;\n- `hcomm` for the commuting statement;\n- `hunit` for the `IsUnit` fact;\n- `hα_real`, `hα_ne`, `hα_pos` for `thisα`, `thisα'`, `this2`.\n\nAlso remove the extra space on line 173.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:163"
+          },
+          {
+            "claim": "The proof-sketch comment in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` has three errors:\n- it says `f = y.conjAlgEquiv`, but the lemma used gives `y.conjContinuousAlgEquiv`;\n- it misspells \"endomorphisms\" as \"endormorphisms\";\n- \"the algebra of endomorphisms are central\" is ungrammatical.",
+            "i": 5,
+            "requested_change": "Write `f = y.conjContinuousAlgEquiv`, fix the spelling to \"endomorphisms\", and rephrase to \"as the algebra of endomorphisms is central\".",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:151"
+          },
+          {
+            "claim": "`ContinuousAlgEquiv.symm_ofAlgEquiv` states `(ofAlgEquiv e he he').symm = …`. The direct sibling `StarAlgEquiv.ofAlgEquiv_symm` and this file's own `refl_symm : (refl R A).symm = refl R A` both name `(X …).symm` lemmas `X_symm`, so the new name breaks the local practice.",
+            "i": 6,
+            "requested_change": "Rename `ContinuousAlgEquiv.symm_ofAlgEquiv` to `ContinuousAlgEquiv.ofAlgEquiv_symm`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:317"
+          },
+          {
+            "claim": "The docstring of `ContinuousAlgEquiv.ofAlgEquiv` says \"when it is continuous\", but the definition also requires the inverse to be continuous (`he' : Continuous e.symm`).",
+            "i": 7,
+            "requested_change": "Change the docstring to: \"Interpret an algebra equivalence as a continuous algebra equivalence when it and its inverse are continuous.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Algebra/Equiv.lean:305"
+          },
+          {
+            "claim": "The module docstring now uses the heading `### TODO:`. Mathlib module docs use `##` for section headings under the `#` title, conventionally written `## TODO`.",
+            "i": 8,
+            "requested_change": "Replace `### TODO:` with `## TODO`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:25"
+          }
+        ],
+        "R8": [
+          {
+            "claim": "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` unnecessarily requires `hf : Continuous f`; its own docstring says star-algebra equivalences between these endomorphism algebras are automatically continuous.",
+            "i": 0,
+            "requested_change": "Derive continuity of `f` from the endomorphism C⋆-algebra structure and remove the `hf` parameter from this theorem.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:148"
+          },
+          {
+            "claim": "The new `OrderIsoClass` instance unnecessarily requires `[ContinuousMapClass F _ _]`, although its elements are star-algebra equivalences and the PR notes these equivalences are automatically continuous.",
+            "i": 1,
+            "requested_change": "Remove the `ContinuousMapClass` requirement and use the automatic continuity of the star-algebra equivalence when applying the conjugation characterization.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:221"
+          }
+        ],
+        "R9": [
+          {
+            "claim": "The docstring of `LinearIsometryEquiv.conjStarAlgEquiv` reads \"An isometry linear equivalence of two Hilbert spaces ...\", but the argument's type is `LinearIsometryEquiv` (`H ≃ₗᵢ[𝕜] K`), so the words are in the wrong order; the sibling declaration `ContinuousLinearEquiv.conjContinuousAlgEquiv` documents exactly this situation with \"A continuous linear equivalence of two spaces induces a continuous equivalence of algebras of their endomorphisms.\"",
+            "i": 0,
+            "requested_change": "Rewrite the docstring as \"A linear isometry equivalence of two Hilbert spaces induces an equivalence of ⋆-algebras of their endomorphisms.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean:689"
+          },
+          {
+            "claim": "The docstring of `auxIsometry` (\"Construct an isometry linear equivalence from a continuous linear equivalence and that its adjoint is a real-scalar multiple of its inverse.\") is ungrammatical: \"isometry linear equivalence\" has the words in the wrong order for the type `V ≃ₗᵢ[𝕜] W`, and the clause \"and that its adjoint is a real-scalar multiple of its inverse\" does not parse as a condition on the input.",
+            "i": 1,
+            "requested_change": "Rewrite as \"Construct a linear isometry equivalence from a continuous linear equivalence whose adjoint is a scalar multiple of its inverse.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:116"
+          },
+          {
+            "claim": "The in-proof comment of `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` misspells \"endomorphisms\" as \"endormorphisms\" (line 156) and contains the ungrammatical clause \"as the algebra of endomorphisms are central\".",
+            "i": 2,
+            "requested_change": "Write \"... is in the center of the endomorphisms, and since the algebra of endomorphisms is central, `adjoint y ∘ y` is a scalar multiple of the identity.\" (\"endomorphisms\" spelled consistently with the module doc).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:155"
+          },
+          {
+            "claim": "The TODO section of the module doc was changed from `# TODO:` to the level-3 heading `### TODO:`. The module doc has no level-2 heading, and the library practice for these sections is level 2: `## Main definitions`, `## TODO` (only three files in the whole tree use `### TODO`).",
+            "i": 3,
+            "requested_change": "Use `## TODO` (level 2), matching `## TODO` sections throughout the library.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:25"
+          },
+          {
+            "claim": "`coe_symm_auxIsometry` discharges the side condition `α' ≠ 0` of `inv_mul_cancel₀` with `by grind`, although the included hypotheses `hα2 : α' * α' = α⁻¹` and `hα : α ≠ 0` give it in one step.",
+            "i": 4,
+            "requested_change": "Replace `(by grind)` with `(mul_ne_zero_iff.mp (hα2 ▸ inv_ne_zero hα)).1`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:137"
+          },
+          {
+            "claim": "The five auxiliary declarations `auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry` are exported as public API (they sit in the ordinary section `auxiliaryDefs`), even though the PR description states the proof's auxiliary lemmas and definitions are private, and a tree-wide search shows they are used only inside this file.",
+            "i": 5,
+            "requested_change": "Mark all five as `private` (`private noncomputable abbrev auxContinuousLinearEquiv`, `@[simp] private theorem coe_auxContinuousLinearEquiv`, and likewise for `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry`), so that no public declaration of the file mentions them.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:99"
+          },
+          {
+            "claim": "The `OrderIsoClass F _ _` instance added at the end of the file is used by nothing in this PR (the PR's stated result is `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`), and its own comment declares it temporary (\"Remove instance when we have `StarOrderedRing (V →L[𝕜] V)`\"); shipping it now commits the library to a blanket `priority := 100` instance over every `EquivLike`-between-endomorphism-algebras type that cannot be withdrawn later without breaking users.",
+            "i": 6,
+            "requested_change": "Drop the instance from this PR and land it in the PR that consumes it (moving the explanatory comment with it); if it is meant as API of this PR, add the use that exercises it so the intent is visible.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean:221"
+          }
+        ]
+      }
+    },
+    {
+      "asks": [
+        {
+          "ask_id": "d0018",
+          "code_at_comment": "Meromorphic (fun x ↦ f x ^ n) := hf.zpow\n+\n+@[fun_prop]\n+lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv\n+\n+@[fun_prop]\n+lemma fun_deriv [CompleteSpace E] (hf : Meromorphic f) :\n+    Meromorphic (fun x ↦ _root_.deriv f x) := hf.deriv\n+\n+@[fun_prop]\n+lemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n+    Meromorphic (_root_.deriv^[n] f) := fun x ↦ (hf x).iterated_deriv\n+\n+@[fun_prop]\n+lemma fun_iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n+    Meromorphic (fun x ↦ _root_.deriv^[n] f x) := hf.iterated_deriv",
+          "comment": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn't need `public`).\n\n```suggestion\n@[to_fun (attr := fun_prop)]\nlemma neg (hf : Meromorphic f) : Meromorphic (-f) := fun x ↦ (hf x).neg\n\n@[to_fun (attr := fun_prop)]\nlemma add (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f + g) := fun x ↦ (hf x).add (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem sum (h : ∀ σ, Meromorphic (G σ)) :\n    Meromorphic (∑ n ∈ s, G n) := fun x ↦ MeromorphicAt.sum (h · x)\n\n@[to_fun (attr := fun_prop)]\nlemma sub (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f - g) := fun x ↦ (hf x).sub (hg x)\n\n@[to_fun (attr := fun_prop)]\nlemma mul {f g : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f * g) := fun x ↦ (hf x).mul (hg x)\n\n@[to_fun (attr := fun_prop)]\ntheorem prod (h : ∀ σ, Meromorphic (F σ)) :\n    Meromorphic (∏ n ∈ s, F n) := fun x ↦ MeromorphicAt.prod (h · x)\n\n@[to_fun (attr := fun_prop)]\nlemma div {f g : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f / g) := fun x ↦ (hf x).div (hg x)\n\n@[to_fun (attr := fun_prop)]\nlemma pow {f : 𝕜 → 𝕜} {n : ℕ} (hf : Meromorphic f) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n\n\n@[to_fun (attr := fun_prop)]\nlemma zpow {f : 𝕜 → 𝕜} {n : ℤ} (hf : Meromorphic f) : Meromorphic (f ^ n) := fun x ↦ (hf x).zpow n\n\n@[to_fun (attr := fun_prop)]\nlemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv\n\n@[to_fun (attr := fun_prop)]\nlemma iterated_deriv [CompleteSpace E] {n : ℕ} (hf : Meromorphic f) :\n    Meromorphic (_root_.deriv^[n] f) := fun x ↦ (hf x).iterated_deriv\n```",
+          "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+          "replies_to": null
+        }
+      ],
+      "pr": 33117,
+      "reviewers": {
+        "R1": [
+          {
+            "claim": "`Meromorphic` is tagged `@[fun_prop]`, but the PR gives it no identity or constant rule. As a result `fun_prop` cannot prove even `Meromorphic (fun x : 𝕜 ↦ x + 1)`; it reports \"missing identity rule to prove `Meromorphic fun x => x`\" (checked by compiling). `MeromorphicAt.id`, `MeromorphicAt.const`, `MeromorphicOn.id` and `MeromorphicOn.const` all exist, so the new predicate's API is missing them.",
+            "i": 0,
+            "requested_change": "Add, inside `namespace Meromorphic`:\n```lean\n@[fun_prop]\nprotected lemma id : Meromorphic (id : 𝕜 → 𝕜) := fun x ↦ .id x\n\n@[fun_prop]\nlemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun x ↦ .const e x\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "The `Meromorphic` arithmetic API leaves out `inv`/`fun_inv` and `smul`/`fun_smul`, although `MeromorphicAt` and `MeromorphicOn` both have them. `Meromorphic.div` is provided but its basic building block `inv` is not. Because of the gaps, `fun_prop` fails on `Meromorphic (fun x ↦ (f x)⁻¹)` (\"No theorems found for `Inv.inv`\") and on `Meromorphic (fun x ↦ f x • g x)` (checked).",
+            "i": 1,
+            "requested_change": "Add next to `mul`/`div`:\n```lean\n@[fun_prop]\nlemma smul {s : 𝕜 → 𝕜} (hs : Meromorphic s) (hf : Meromorphic f) :\n    Meromorphic (s • f) := fun x ↦ (hs x).smul (hf x)\n\n@[fun_prop]\nlemma fun_smul {s : 𝕜 → 𝕜} (hs : Meromorphic s) (hf : Meromorphic f) :\n    Meromorphic (fun x ↦ s x • f x) := hs.smul hf\n\n@[fun_prop]\nlemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv\n\n@[fun_prop]\nlemma fun_inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic (fun x ↦ (f x)⁻¹) := hf.inv\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:680"
+          },
+          {
+            "claim": "`Meromorphic` has no lemma that goes from the global predicate back to the local ones. Nothing turns `Meromorphic f` into `MeromorphicAt f x`, and nothing turns it into `MeromorphicOn f U` for an arbitrary `U` (only into `MeromorphicOn f univ`, through `meromorphicOn_univ`). With no transition rule, `fun_prop` cannot prove `MeromorphicAt f x` from a `Meromorphic f` hypothesis (checked: \"No theorems found for `f`\"). This differs from `Continuous.continuousAt` and `Differentiable.differentiableAt`.",
+            "i": 2,
+            "requested_change": "Add\n```lean\n@[fun_prop]\nlemma meromorphicAt (hf : Meromorphic f) {x : 𝕜} : MeromorphicAt f x := hf x\n\nlemma meromorphicOn (hf : Meromorphic f) {U : Set 𝕜} : MeromorphicOn f U := fun x _ ↦ hf x\n```\nin `namespace Meromorphic`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is not `protected`, unlike its siblings `MeromorphicAt.deriv` and `MeromorphicOn.deriv`. As a result, inside `namespace Meromorphic` the name `deriv` resolves to the lemma, and `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` have to write `_root_.deriv`. Anyone who opens the namespace would hit the same shadowing.",
+            "i": 3,
+            "requested_change": "Make it `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`. Then replace `_root_.deriv` with plain `deriv` in `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "`meromorphicOn_univ` uses `by tauto` for what is a one-line unfolding of two definitions. The proof should be a direct term. The line also has a double space before `:=`.",
+            "i": 4,
+            "requested_change": "```lean\nlemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f :=\n  ⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:641"
+          },
+          {
+            "claim": "The docstring of `meromorphicOn_univ` writes Set.univ as plain text; Lean identifiers in docstrings should be in backticks.",
+            "i": 5,
+            "requested_change": "Change it to `/-- A function is meromorphic iff it is meromorphic on `Set.univ`. -/`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:639"
+          },
+          {
+            "claim": "`Meromorphic.fun_sum` is proved by `simpa [← Finset.sum_apply] using (sum h)`. The pointwise lemma `MeromorphicAt.fun_sum` already gives a direct term proof, which is also how `MeromorphicOn.fun_sum` is proved.",
+            "i": 6,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_sum (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:667"
+          },
+          {
+            "claim": "`Meromorphic.fun_prod` is proved by `simpa [← Finset.prod_apply] using (prod h)`, where a direct term built from `MeromorphicAt.fun_prod` would do, as in `MeromorphicOn.fun_prod`.",
+            "i": 7,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_prod (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:692"
+          },
+          {
+            "claim": "The definition `Meromorphic` leaves out its `Prop` type ascription, while the neighbouring `MeromorphicOn` states `: Prop` explicitly.",
+            "i": 8,
+            "requested_change": "Write `def Meromorphic (f : 𝕜 → E) : Prop := ∀ x, MeromorphicAt f x`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:637"
+          },
+          {
+            "claim": "`Meromorphic.fun_neg` has a stray space before the closing parenthesis: `(fun x ↦ -f x )`.",
+            "i": 9,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:653"
+          },
+          {
+            "claim": "`Meromorphic.pow`, `fun_pow`, `zpow` and `fun_zpow` take the exponent `n` as an implicit argument. Every sibling (`MeromorphicAt.pow (hf) (n : ℕ)`, `MeromorphicOn.pow (n : ℕ)`, the `zpow` versions, and `Differentiable.pow`) takes it explicitly, so the new API's signatures differ from the existing ones.",
+            "i": 10,
+            "requested_change": "Take `(n : ℕ)` / `(n : ℤ)` as an explicit argument after `hf`, e.g. `lemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n` and `fun_pow ... := hf.pow n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:705"
+          }
+        ],
+        "R10": [
+          {
+            "claim": "`Meromorphic` is registered `@[fun_prop]` and every lemma in the new namespace is too, but the namespace has no constant or identity rule, so `fun_prop` cannot close the two atomic cases that every fun_prop proof bottoms out in. Verified against the library at this state: `example (c : E) : Meromorphic (fun _ : 𝕜 ↦ c) := by fun_prop` fails with \"missing constant rule to prove `Meromorphic fun x => c`\", and `example : Meromorphic (id : 𝕜 → 𝕜) := by fun_prop` fails with \"missing identity rule\". The sibling namespaces do have these (`MeromorphicAt.id`, `@[fun_prop, simp] MeromorphicAt.const` at lines 63–67; `MeromorphicOn.id`, `MeromorphicOn.const` at 465–468), as do the analogous whole-space predicates elsewhere (`Continuous.const`, `Differentiable.const`). The `smul`/`inv` rules (`MeromorphicAt.smul` line 93, `MeromorphicOn.smul` line 496, `MeromorphicAt.inv`) are missing too, so `fun_prop` also fails on `Meromorphic (fun x ↦ (f x)⁻¹)` and `Meromorphic (fun x ↦ s x • f x)` — and the vector-valued scalar multiple is otherwise unreachable from this namespace, since the new `Meromorphic.mul` is restricted to `𝕜 → 𝕜`.",
+            "i": 0,
+            "requested_change": "Add the missing rules to `namespace Meromorphic`, mirroring the `MeromorphicAt`/`MeromorphicOn` names and attributes; the following is verified to compile in place (I spliced it in and recompiled the file) and makes `fun_prop` succeed on all four goal shapes:\n\n```lean\n@[fun_prop, simp]\nlemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun _ ↦ .const e _\n\n@[fun_prop]\nlemma id : Meromorphic (_root_.id : 𝕜 → 𝕜) := fun x ↦ .id x\n\n@[fun_prop]\nlemma smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (fun z ↦ f z • g z) := fun z ↦ (hf z).smul (hg z)\n\n@[fun_prop]\nlemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic (fun z ↦ (f z)⁻¹) :=\n  fun z ↦ (hf z).inv\n```\n\n(`_root_.id` must be spelled out in the statement of `id`, exactly as `Meromorphic.id` shadows root `id` inside its namespace.)",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is declared unprotected, while the two declarations it mirrors in this very file are protected: `protected theorem MeromorphicAt.deriv` (line 378) and `protected theorem MeromorphicOn.deriv` (line 562). Because the unprotected name is picked up by name resolution inside `namespace Meromorphic`, it shadows `_root_.deriv` in the rest of the namespace, which is why `Meromorphic.fun_deriv` (line 722), `Meromorphic.iterated_deriv` (line 726) and `Meromorphic.fun_iterated_deriv` (line 730) all have to spell `_root_.deriv`. Verified: dropping `_root_` from `iterated_deriv` while leaving `deriv` unprotected fails to elaborate (`deriv` resolves to `Meromorphic.deriv`, \"Application type mismatch … Meromorphic ?m.20 → Meromorphic (_root_.deriv ?m.20)\").",
+            "i": 1,
+            "requested_change": "Write `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, and then drop the three `_root_.` prefixes in `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` (writing `Meromorphic (fun x ↦ deriv f x)`, `Meromorphic (deriv^[n] f)`, `Meromorphic (fun x ↦ deriv^[n] f x)`). I verified by splicing exactly this into the file that the whole file still compiles with no errors and no linter warnings.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "`meromorphicOn_univ` is a definitional-unfolding lemma (`∀ x ∈ Set.univ, MeromorphicAt f x` versus `∀ x, MeromorphicAt f x`) but is proved by `by tauto`, which only closes it by unfolding both definitions and is unlike the established proof of every analogous lemma in the library: `differentiableOn_univ`, `analyticOn_univ`, `contDiffOn_univ`, `integrableOn_univ`, `locallyIntegrableOn_univ` and `scottContinuousOn_univ` are all proved by `simp`/`rw` on the two definitions. The same line also has a doubled space before `:=` (`Meromorphic f  := by tauto`).",
+            "i": 2,
+            "requested_change": "Replace the proof with the explicit `by simp [MeromorphicOn, Meromorphic]` (verified to compile in place with no warnings) and remove the doubled space, i.e. `lemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f := by simp [MeromorphicOn, Meromorphic]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:639"
+          },
+          {
+            "claim": "The module docstring's \"Main statements\" list was not updated by the PR, so the file now exports a new headline predicate `Meromorphic` (the whole-space analogue of `MeromorphicAt`, the thing this PR is about) that the module documentation never mentions; the list only names `MeromorphicAt` and `MeromorphicAt.iff_eventuallyEq_zpow_smul_analyticAt`. `MeromorphicOn`, the file's other main definition, is missing from the list as well.",
+            "i": 3,
+            "requested_change": "Add bullets to the \"Main statements\" list, e.g. `* Meromorphic`: definition of meromorphy on all of `𝕜` (and `* MeromorphicOn`: definition of meromorphy on a set).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:15"
+          },
+          {
+            "claim": "`Meromorphic.fun_neg` contains a stray space in the statement — `Meromorphic (fun x ↦ -f x )` — which is not the formatting used elsewhere in the file (`MeromorphicOn.fun_neg` is `fun z ↦ -f z`).",
+            "i": 4,
+            "requested_change": "Write `lemma fun_neg (hf : Meromorphic f) : Meromorphic (fun x ↦ -f x) := hf.neg` (verified to compile unchanged otherwise).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:652"
+          }
+        ],
+        "R11": [
+          {
+            "claim": "The new predicate `Meromorphic` is given a `fun_prop` API (every lemma in `namespace Meromorphic` is `@[fun_prop]`), but the two base rules `Meromorphic.const` and `Meromorphic.id` are missing, so `fun_prop` cannot discharge even the simplest goals: verified failures are `Meromorphic (fun _ : 𝕜 => c)` (\"missing constant rule to prove `Meromorphic fun x => c`\") and `Meromorphic (fun x => f x / 2)`. Both are gaps against the sibling APIs in the same file, where `MeromorphicAt.const` (line 67), `MeromorphicAt.id` (line 64), `MeromorphicOn.const` (line 467) and `MeromorphicOn.id` (line 465) exist.",
+            "i": 0,
+            "requested_change": "Add the base (and inverse) rules in `namespace Meromorphic` alongside the others: `@[fun_prop, simp] lemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun _ ↦ MeromorphicAt.const e _`, `@[fun_prop] lemma id : Meromorphic (id : 𝕜 → 𝕜) := fun x ↦ MeromorphicAt.id x`, and for parity with `MeromorphicOn` also `@[fun_prop] lemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv` (plus `fun_inv`, and `smul`/`fun_smul`). Verified in-file: with `const`, `id` and `inv` added, `fun_prop` closes `Meromorphic (fun _ => c)`, `Meromorphic (fun x => f x + c)`, `Meromorphic (fun x => f x / 2)`, `Meromorphic (fun x => (f x)⁻¹)` and `Meromorphic (fun x => (2 : 𝕜) • f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:635"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is an unprotected `lemma`, unlike its exact counterparts `MeromorphicAt.deriv` (line 378) and `MeromorphicOn.deriv` (line 562), which are `protected theorem`s. The protection is what keeps the root `deriv` reachable when the namespace is opened: verified, `open MeromorphicAt MeromorphicOn` still resolves `deriv` to `_root_.deriv`, whereas an unprotected lemma named `deriv` in an opened namespace shadows it (`open Foo; #check deriv` gives `Foo.deriv`). Since files that handle this predicate open its namespace (e.g. `open Filter MeromorphicOn Metric` in `Mathlib/Analysis/SpecialFunctions/Integrability/LogMeromorphic.lean`, `open Asymptotics Filter Function.locallyFinsuppWithin MeromorphicAt MeromorphicOn Metric Real` in `.../ValueDistribution/FirstMainTheorem.lean`), `open Meromorphic` would silently capture `deriv`.",
+            "i": 1,
+            "requested_change": "Make it `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, matching `MeromorphicAt.deriv`/`MeromorphicOn.deriv`; `Meromorphic.fun_deriv`'s `:= hf.deriv` continues to work (dot notation is unaffected by `protected`).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "`Meromorphic.fun_neg` is written `Meromorphic (fun x ↦ -f x )`, with a stray space before the closing parenthesis, and all eleven new `fun_*` lemmas bind the lambda variable as `x`, whereas the corresponding lemmas in the same file (`MeromorphicAt.fun_neg` line 169, `MeromorphicOn.fun_neg` line 491, and every other `fun_add`/`fun_sub`/`fun_mul`/`fun_div`/`fun_pow`/`fun_zpow`/`fun_deriv` in both namespaces) bind it as `z`. (The same sloppiness appears once more as a double space in `meromorphicOn_univ`, line 641: `Meromorphic f  :=`.)",
+            "i": 2,
+            "requested_change": "Write `Meromorphic (fun z ↦ -f z)` and use `z` as the lambda variable in all the new `fun_*` lemmas, matching the sibling families; drop the doubled space in `meromorphicOn_univ`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:653"
+          }
+        ],
+        "R12": [
+          {
+            "claim": "The new `Meromorphic` predicate's `fun_prop` API lacks basic rules for identity and constant functions, and it also does not lift the existing `MeromorphicAt` scalar-multiplication and inverse rules. Consequently `fun_prop` cannot prove ordinary goals such as `Meromorphic (fun x : 𝕜 => x)`, constant functions, or pointwise inverses from this API.",
+            "i": 0,
+            "requested_change": "Add `Meromorphic.id` and `Meromorphic.const`, and lift the `MeromorphicAt.smul` and `MeromorphicAt.inv` rules into `Meromorphic` (with lambda-form variants where needed), marking the rules for `fun_prop`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:637"
+          }
+        ],
+        "R13": [
+          {
+            "claim": "The new `Meromorphic` predicate is marked `@[fun_prop]`, but its API has no identity or constant-function rules, so `fun_prop` cannot prove even `Meromorphic (id : 𝕜 → 𝕜)` or `Meromorphic (fun _ : 𝕜 => e)`.",
+            "i": 0,
+            "requested_change": "Add `@[fun_prop]` lemmas for identity and constant functions, proved pointwise using `MeromorphicAt.id` and `MeromorphicAt.const`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:637"
+          }
+        ],
+        "R14": [
+          {
+            "claim": "The docstrings of the new `Meromorphic` def and `meromorphicOn_univ` are sloppy. The def says \"Meromorphy of a function on all of 𝕜\", which is not a word and doesn't define the predicate. The lemma docstring writes `Set.univ` without backticks.",
+            "i": 0,
+            "requested_change": "Write: /-- A function `f : 𝕜 → E` is meromorphic if it is meromorphic at every point of `𝕜`. -/ for the def, and /-- A function is meromorphic iff it is meromorphic on `Set.univ`. -/ for the lemma.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:635"
+          },
+          {
+            "claim": "Formatting nits in `meromorphicOn_univ` and `Meromorphic.fun_neg`: there is a double space before `:= by tauto`, and a stray space in `-f x )`.",
+            "i": 1,
+            "requested_change": "Change to `... ↔ Meromorphic f := by tauto` and `Meromorphic (fun x ↦ -f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:641"
+          },
+          {
+            "claim": "The `Meromorphic` namespace API is incomplete compared to `MeromorphicAt` and `MeromorphicOn`. There are no `Meromorphic.smul`/`fun_smul`, `inv`/`fun_inv`, `const`, `id`, or `fun_prop`-usable `fun_const`/`id` lemmas. The `fun_prop` attribute cannot close goals like `Meromorphic fun x => c`, `Meromorphic id` or `Meromorphic (fun x => (f x)⁻¹)`. `mul`, `div` and `pow` also only cover `f : 𝕜 → 𝕜`, with no `smul` for `E`-valued functions.",
+            "i": 2,
+            "requested_change": "Add `Meromorphic.const`, `Meromorphic.id`, `Meromorphic.smul`, `Meromorphic.fun_smul`, `Meromorphic.inv` and `Meromorphic.fun_inv`, each marked `@[fun_prop]` and proved from the `MeromorphicAt` lemmas.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:660"
+          }
+        ],
+        "R2": [
+          {
+            "claim": "`Meromorphic` is tagged `@[fun_prop]`, but the PR adds no identity or constant rule and no lemma turning `Meromorphic` into `MeromorphicAt`. As a result, `fun_prop` cannot prove even `Meromorphic (fun x : 𝕜 ↦ x + 1)`; it fails with \"missing identity rule to prove `Meromorphic fun x => x`\". It also cannot prove `MeromorphicAt (fun z ↦ f z * f z) x` from `hf : Meromorphic f`. The `@[fun_prop]` tag is therefore close to unusable on the new predicate.",
+            "i": 0,
+            "requested_change": "Add the basic rules in `namespace Meromorphic`:\n```lean\n@[fun_prop]\nlemma meromorphicAt (hf : Meromorphic f) {x : 𝕜} : MeromorphicAt f x := hf x\n\nlemma meromorphicOn (hf : Meromorphic f) {U : Set 𝕜} : MeromorphicOn f U := fun x _ ↦ hf x\n\n@[fun_prop]\nlemma id : Meromorphic (id : 𝕜 → 𝕜) := MeromorphicAt.id\n\n@[fun_prop]\nlemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := MeromorphicAt.const e\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:637"
+          },
+          {
+            "claim": "The arithmetic API in `namespace Meromorphic` is missing `smul`/`fun_smul` and `inv`/`fun_inv`, which both sibling namespaces (`MeromorphicAt`, `MeromorphicOn`) provide. `Meromorphic.mul` is only stated for `𝕜 → 𝕜`, when the general form is `f • g` with `f : 𝕜 → 𝕜` and `g : 𝕜 → E`. `div` is provided but `inv` is not, so `fun_prop` cannot prove a goal like `Meromorphic (fun z ↦ (f z)⁻¹)` (it fails with \"No theorems found for `Inv.inv`\").",
+            "i": 1,
+            "requested_change": "Add, next to `mul`:\n```lean\n@[fun_prop]\nlemma smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (f • g) := fun x ↦ (hf x).smul (hg x)\n\n@[fun_prop]\nlemma fun_smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (fun x ↦ f x • g x) := hf.smul hg\n\n@[fun_prop]\nlemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv\n\n@[fun_prop]\nlemma fun_inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic (fun x ↦ (f x)⁻¹) := hf.inv\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:681"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is not `protected`, unlike its siblings `MeromorphicAt.deriv` and `MeromorphicOn.deriv`, which both are. Because of this, `deriv` inside `namespace Meromorphic` resolves to the lemma, and `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` have to spell `_root_.deriv`.",
+            "i": 2,
+            "requested_change": "Declare it as `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, and write plain `deriv` instead of `_root_.deriv` in `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:718"
+          },
+          {
+            "claim": "`Meromorphic.pow`, `fun_pow`, `zpow` and `fun_zpow` take the exponent `n` as an implicit argument. `MeromorphicAt.pow (hf) (n : ℕ)`, `MeromorphicOn.pow (n : ℕ)` (and the `zpow` versions) and `Differentiable.pow` all take it explicitly, so `hf.pow 3` works for every sibling except the new predicate.",
+            "i": 3,
+            "requested_change": "Make the exponent explicit after `hf`, e.g. `lemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n` and `lemma fun_pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (fun x ↦ f x ^ n) := hf.pow n`. Do the same for `zpow`/`fun_zpow` with `(n : ℤ)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:706"
+          },
+          {
+            "claim": "`Meromorphic.fun_sum` (and likewise `Meromorphic.fun_prod` at line 693) is proved by `simpa [← Finset.sum_apply] using (sum h)`. A direct pointwise term proof through the existing `MeromorphicAt.fun_sum` / `MeromorphicAt.fun_prod` is shorter and avoids `simp`. This is also how `MeromorphicOn.fun_sum` and `MeromorphicOn.fun_prod` are proved, and how the PR itself proves `sum` and `prod`.",
+            "i": 4,
+            "requested_change": "Replace the proofs with `fun x ↦ MeromorphicAt.fun_sum (h · x)` for `fun_sum` and `fun x ↦ MeromorphicAt.fun_prod (h · x)` for `fun_prod`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:668"
+          },
+          {
+            "claim": "`meromorphicOn_univ` proves a definitional unfolding with the heavy `by tauto`. Its statement line has a double space before `:=`, and its docstring writes Set.univ without code backticks.",
+            "i": 5,
+            "requested_change": "Use the docstring \"A function is meromorphic iff it is meromorphic on `Set.univ`.\" and write\n```lean\n@[simp]\nlemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f :=\n  ⟨fun h x ↦ h x (mem_univ x), fun h x _ ↦ h x⟩\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:639"
+          },
+          {
+            "claim": "`Meromorphic.fun_neg` has a stray space before the closing parenthesis: `Meromorphic (fun x ↦ -f x )`.",
+            "i": 6,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:653"
+          }
+        ],
+        "R3": [
+          {
+            "claim": "`meromorphicOn_univ` has a docstring that writes `Set.univ` without backticks, and has a stray double space before `:=` (`Meromorphic f  := by tauto`). `Meromorphic.fun_neg` has a stray space in `-f x )`.",
+            "i": 0,
+            "requested_change": "Write the docstring as \"A function is meromorphic iff it is meromorphic on `Set.univ`.\" Remove the extra spaces in `meromorphicOn_univ` and in `fun_neg`. Optionally replace `by tauto` with `Iff.rfl`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:640"
+          },
+          {
+            "claim": "The `Meromorphic` API is missing `smul`/`fun_smul`. `MeromorphicAt.smul` and `MeromorphicOn.smul` exist, and `Meromorphic.mul` is restricted to `𝕜 → 𝕜`. `Meromorphic.smul` is therefore the general-purpose version for `E`-valued functions.",
+            "i": 1,
+            "requested_change": "Add `@[fun_prop] lemma smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g)` and a `fun_smul` variant, as in `MeromorphicOn.smul`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic` is a new core definition, but it has a one-line docstring only, and the PR leaves the module docstring unchanged.",
+            "i": 2,
+            "requested_change": "Mention `Meromorphic` in the module docstring of the file. Improve the docstring to say that `Meromorphic f` means `f` is meromorphic at every point of `𝕜`, equivalently `MeromorphicOn f Set.univ`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          }
+        ],
+        "R4": [
+          {
+            "claim": "The closure API around `Meromorphic.mul` omits scalar multiplication for the general codomain `E`. In particular, `fun_prop` cannot prove meromorphy of `fun x ↦ f x • g x`, despite the corresponding `MeromorphicAt.smul` and `MeromorphicOn.smul` rules.",
+            "i": 0,
+            "requested_change": "Add `Meromorphic.smul` and its pointwise `Meromorphic.fun_smul` counterpart, using the corresponding `MeromorphicAt.smul` rule pointwise and marking both with `@[fun_prop]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:681"
+          },
+          {
+            "claim": "`Meromorphic.div` is added without the corresponding inverse closure rules. Consequently, `fun_prop` cannot prove meromorphy of `fun x ↦ (f x)⁻¹` from `hf : Meromorphic f`, although the pointwise and on-set APIs already provide inverse rules.",
+            "i": 1,
+            "requested_change": "Add `Meromorphic.inv` and `Meromorphic.fun_inv`, with `@[fun_prop]`, using `MeromorphicAt.inv` pointwise.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:698"
+          },
+          {
+            "claim": "`Meromorphic.prod` requires every `F σ` to be meromorphic, even when `σ ∉ s`; the finite product only uses indices in `s`.",
+            "i": 2,
+            "requested_change": "Change the premises of both `Meromorphic.prod` and `Meromorphic.fun_prod` to `∀ σ ∈ s, Meromorphic (F σ)`, and adapt the induction and wrapper proof accordingly.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:689"
+          },
+          {
+            "claim": "`Meromorphic.sum` requires every `G σ` to be meromorphic, even when `σ ∉ s`; the finite sum only uses indices in `s`.",
+            "i": 3,
+            "requested_change": "Change the premises of both `Meromorphic.sum` and `Meromorphic.fun_sum` to `∀ σ ∈ s, Meromorphic (G σ)`, and adapt the induction and wrapper proof accordingly.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:664"
+          }
+        ],
+        "R5": [
+          {
+            "claim": "`Meromorphic` is registered as a `fun_prop` predicate, but the PR adds no transition lemma from `Meromorphic f` to `MeromorphicAt f x` (or to `MeromorphicOn f U`). As a result `fun_prop` cannot use a hypothesis `hf : Meromorphic f` to close any `MeromorphicAt` goal, and there is no dot-notation projection `hf.meromorphicAt` / `hf.meromorphicOn`. The analogous whole-space predicate `Differentiable` has `@[fun_prop] Differentiable.differentiableAt` and `@[fun_prop] Differentiable.differentiableOn`.",
+            "i": 0,
+            "requested_change": "Add to `namespace Meromorphic`: `@[fun_prop] lemma meromorphicAt (hf : Meromorphic f) {x : 𝕜} : MeromorphicAt f x := hf x` and `lemma meromorphicOn (hf : Meromorphic f) {U : Set 𝕜} : MeromorphicOn f U := fun x _ ↦ hf x`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "The `fun_prop` API for `Meromorphic` lacks the identity and constant rules (and `inv`/`smul`), so `fun_prop` fails on elementary goals such as `Meromorphic (fun x : 𝕜 ↦ x)`, `Meromorphic (fun _ ↦ e)`, `Meromorphic (fun x ↦ f x + e)` and anything involving `⁻¹`. `MeromorphicAt` and `MeromorphicOn` both provide `id`, `const`, `inv`/`fun_inv` and `smul`/`fun_smul`.",
+            "i": 1,
+            "requested_change": "Add in `namespace Meromorphic`: `@[fun_prop] lemma id : Meromorphic (id : 𝕜 → 𝕜) := fun x ↦ .id x`, `@[fun_prop] lemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun x ↦ .const e x`, `@[fun_prop] lemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv`, `fun_inv`, and `@[fun_prop] lemma smul {f : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g) := fun x ↦ (hf x).smul (hg x)` with `fun_smul`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is declared unprotected, unlike its siblings `protected theorem MeromorphicAt.deriv` and `protected theorem MeromorphicOn.deriv`. Inside `namespace Meromorphic` a bare `deriv` then resolves to `Meromorphic.deriv`, which is why the following lemmas have to write `_root_.deriv`.",
+            "i": 2,
+            "requested_change": "Declare it as `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, and drop the `_root_.` prefixes from `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "`Meromorphic.pow` (and `zpow`, `fun_pow`, `fun_zpow`) take the exponent as an implicit `{n : ℕ}`/`{n : ℤ}`, whereas `MeromorphicAt.pow hf n`, `MeromorphicOn.pow n` (and `zpow`) take it explicitly. Because `Meromorphic f` unfolds to a pi-type, the sibling-style call `hf.pow 3` still elaborates, but it means evaluation at the point `3`: it has type `MeromorphicAt (f ^ ?n) 3`, not `Meromorphic (f ^ 3)`.",
+            "i": 3,
+            "requested_change": "Make the exponent explicit and after `hf`, as in the siblings: `lemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n`, `fun_pow ... (n : ℕ) ... := hf.pow n`, and likewise `zpow`/`fun_zpow` with `(n : ℤ)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:705"
+          },
+          {
+            "claim": "`Meromorphic.fun_sum` is proved by `simpa [← Finset.sum_apply] using (sum h)`, a simp call (with redundant parentheses) where the pointwise lemma `MeromorphicAt.fun_sum` already gives a one-line term proof in the same style as every other lemma in this namespace.",
+            "i": 4,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_sum (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:667"
+          },
+          {
+            "claim": "`Meromorphic.fun_prod` is proved by `simpa [← Finset.prod_apply] using (prod h)`, a simp call where the existing pointwise lemma `MeromorphicAt.fun_prod` gives a direct term proof matching the rest of the namespace.",
+            "i": 5,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_prod (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:692"
+          },
+          {
+            "claim": "`meromorphicOn_univ` is closed by `by tauto`, a heavyweight search tactic for what is a two-line unfolding, and the statement line has a double space before `:=`.",
+            "i": 6,
+            "requested_change": "Write `lemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f Set.univ ↔ Meromorphic f :=\n  ⟨fun h x ↦ h x (mem_univ x), fun h x _ ↦ h x⟩` (or `by simp [MeromorphicOn, Meromorphic]`), with a single space before `:=`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:640"
+          },
+          {
+            "claim": "The docstring \"A function is meromorphic iff it is meromorphic on Set.univ.\" leaves the Lean name `Set.univ` unformatted.",
+            "i": 7,
+            "requested_change": "Change the docstring to \"A function is meromorphic on `Set.univ` iff it is meromorphic.\" (code in backticks, sides in the order of the statement).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:640"
+          },
+          {
+            "claim": "The statement `Meromorphic (fun x ↦ -f x )` has a stray space before the closing parenthesis.",
+            "i": 8,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:652"
+          },
+          {
+            "claim": "The module docstring's 'Main statements' list only mentions `MeromorphicAt` and one characterisation; the PR adds a new main definition `Meromorphic` to this file without listing it (nor is `MeromorphicOn` listed).",
+            "i": 9,
+            "requested_change": "Add bullets to the module docstring: `* `MeromorphicOn`: definition of meromorphy on a set` and `* `Meromorphic`: definition of meromorphy on all of `𝕜``.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:634"
+          }
+        ],
+        "R6": [
+          {
+            "claim": "`Meromorphic.deriv` is not `protected`, although the two sibling `deriv` lemmas in this same file (`MeromorphicAt.deriv`, line 378, and `MeromorphicOn.deriv`, line 562) are. Because Lean 4 automatically opens `MyNamespace` for `MyNamespace.my_theorem`, the unprotected `Meromorphic.deriv` shadows the root `deriv` inside the namespace: I verified that writing the unqualified `deriv f x` in the very next declaration `Meromorphic.fun_deriv` fails with an application type mismatch (the argument `f` is expected to have type `Meromorphic _`), which is why the PR has to spell `_root_.deriv` in `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv`; the same clash would hit any file that writes `open Meromorphic`. This is the practice maintainers state for exactly this case (`_root_`/commonly-opened names should be protected).",
+            "i": 0,
+            "requested_change": "Declare it as `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv` (statement on its own line, so the long-line linter is not triggered). With that, the `_root_.` qualifiers in `fun_deriv`/`iterated_deriv`/`fun_iterated_deriv` can also be dropped.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:718"
+          },
+          {
+            "claim": "`Meromorphic` is tagged `@[fun_prop]`, but the API added with it contains no rule for constant or identity functions, so `fun_prop` fails on the most basic goals about the new predicate: verified `fun_prop` errors on `Meromorphic (fun _ : 𝕜 ↦ 0)` with \"missing constant rule\" and on `Meromorphic (fun z : 𝕜 ↦ z)` with \"missing identity rule\" (and consequently on `Meromorphic (fun z ↦ 2 * f z)`). The analogous whole-space predicates do have these rules (`continuous_const`, `continuous_id`, both `[fun_prop]`), and this file already tags the pointwise counterparts for fun_prop (`MeromorphicAt.const` is `[fun_prop, simp]`, `MeromorphicAt.id` is `[fun_prop]`), so a fun_prop-tagged `Meromorphic` that cannot prove constants/identity is an unfinished API surface.",
+            "i": 1,
+            "requested_change": "Add the two whole-space rules to `namespace Meromorphic`, mirroring `MeromorphicOn.id`/`MeromorphicOn.const`, e.g.\n\n```lean\n@[fun_prop]\nlemma id : Meromorphic (id : 𝕜 → 𝕜) := fun x ↦ MeromorphicAt.id x\n\n@[fun_prop]\nlemma const (e : E) : Meromorphic (fun _ ↦ e) := fun x ↦ MeromorphicAt.const e x\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:637"
+          },
+          {
+            "claim": "Stray whitespace in the new statements: `Meromorphic.fun_neg` is written `Meromorphic (fun x ↦ -f x )` with a space before the closing parenthesis (every other `fun_*` lemma in this block, and in the `MeromorphicAt`/`MeromorphicOn` blocks above, has no such space), and `meromorphicOn_univ` (line 641) is written `Meromorphic f  := by tauto` with a double space before `:=`.",
+            "i": 2,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x) := hf.neg` and `: MeromorphicOn f Set.univ ↔ Meromorphic f := by tauto`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:653"
+          },
+          {
+            "claim": "The module docstring's `Main statements` list (lines 12-21) was not updated for this PR: it still lists only `MeromorphicAt` and `MeromorphicAt.iff_eventuallyEq_zpow_smul_analyticAt`, so the headline definition introduced here (`Meromorphic`, and `MeromorphicOn`/`Meromorphic` throughout) is not mentioned anywhere in the module documentation.",
+            "i": 3,
+            "requested_change": "Add bullets to `Main statements`, e.g. `* `MeromorphicOn`: definition of meromorphy on a set` and `* `Meromorphic`: meromorphy on all of `𝕜` (= `MeromorphicOn _ Set.univ`)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:17"
+          }
+        ],
+        "R7": [
+          {
+            "claim": "`Meromorphic.deriv` is not `protected`, unlike its siblings `MeromorphicAt.deriv` and `MeromorphicOn.deriv` (both `protected theorem deriv`). Inside `namespace Meromorphic`, and anywhere `Meromorphic` is opened, the bare identifier `deriv` now resolves to this lemma instead of `_root_.deriv`. That is why the following lemmas have to write `_root_.deriv`.",
+            "i": 0,
+            "requested_change": "Declare it as `@[fun_prop] protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, then drop the `_root_.` prefixes from `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` (write `deriv f x` and `deriv^[n] f`).",
+            "severity": "blocking",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "`Meromorphic.pow` and `Meromorphic.fun_pow` take the exponent as an implicit `{n : ℕ}` before `hf`. The sibling lemmas `MeromorphicAt.pow (hf) (n : ℕ)`, `MeromorphicAt.fun_pow` and `MeromorphicOn.pow (n : ℕ)` take it explicitly after the hypothesis, as do `Continuous.pow` and `Differentiable.pow`. So `hf.pow` here and `hf.pow n` for `MeromorphicAt` are called differently.",
+            "i": 1,
+            "requested_change": "Make the exponent explicit and put it after the hypothesis: `lemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n`, and `lemma fun_pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (fun x ↦ f x ^ n) := hf.pow n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:705"
+          },
+          {
+            "claim": "`Meromorphic.zpow` and `Meromorphic.fun_zpow` take `{n : ℤ}` implicitly before `hf`, while `MeromorphicAt.zpow (hf) (n : ℤ)` and `MeromorphicOn.zpow (n : ℤ)` take it explicitly after the hypothesis.",
+            "i": 2,
+            "requested_change": "Change the signatures to `lemma zpow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℤ) : Meromorphic (f ^ n) := fun x ↦ (hf x).zpow n` and `lemma fun_zpow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℤ) : Meromorphic (fun x ↦ f x ^ n) := hf.zpow n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:711"
+          },
+          {
+            "claim": "The new predicate has no way back to the pointwise and set notions. There is no `Meromorphic.meromorphicAt` (tagged `@[fun_prop]`) and no `Meromorphic.meromorphicOn`, the analogues of `Differentiable.differentiableAt` and `Differentiable.differentiableOn`. So `fun_prop` cannot use a `Meromorphic f` hypothesis to prove a `MeromorphicAt` goal, and users must unfold the definition by hand.",
+            "i": 3,
+            "requested_change": "Add, inside `namespace Meromorphic`: `@[fun_prop] lemma meromorphicAt (hf : Meromorphic f) (x : 𝕜) : MeromorphicAt f x := hf x` and `lemma meromorphicOn (hf : Meromorphic f) (U : Set 𝕜) : MeromorphicOn f U := fun x _ ↦ hf x`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "The `@[fun_prop]` API for `Meromorphic` has no identity or constant rule, unlike `MeromorphicAt.id` and `MeromorphicAt.const`. As a result `fun_prop` cannot prove that even `fun x ↦ x` or a constant function is meromorphic, so it fails on any polynomial or rational expression in `x`.",
+            "i": 4,
+            "requested_change": "Add `@[fun_prop] protected lemma id : Meromorphic (id : 𝕜 → 𝕜) := fun x ↦ .id x` and `@[fun_prop] lemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun x ↦ .const e x` to `namespace Meromorphic`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "The arithmetic API covers `div` but not `inv`, and has no `smul`, although `MeromorphicAt` and `MeromorphicOn` both provide `smul`/`fun_smul` and `inv`/`fun_inv`. So `fun_prop` cannot handle `(f x)⁻¹` or `f x • g x` for `Meromorphic`.",
+            "i": 5,
+            "requested_change": "Add `@[fun_prop] lemma smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g) := fun x ↦ (hf x).smul (hg x)`, `fun_smul` (`Meromorphic (fun x ↦ f x • g x) := hf.smul hg`), `@[fun_prop] lemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv` and `fun_inv` (`Meromorphic (fun x ↦ (f x)⁻¹) := hf.inv`).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`fun_sum` is proved by `simpa [← Finset.sum_apply] using (sum h)`, a simp detour with redundant parentheses. The sibling `MeromorphicOn.fun_sum` (and `sum` just above) builds the term pointwise from the existing `MeromorphicAt.fun_sum`.",
+            "i": 6,
+            "requested_change": "Replace the proof with the term `fun x ↦ MeromorphicAt.fun_sum (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:667"
+          },
+          {
+            "claim": "`fun_prod` is proved by `simpa [← Finset.prod_apply] using (prod h)` rather than directly from `MeromorphicAt.fun_prod`, as `MeromorphicOn.fun_prod` and `prod` just above are.",
+            "i": 7,
+            "requested_change": "Replace the proof with the term `fun x ↦ MeromorphicAt.fun_prod (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:692"
+          },
+          {
+            "claim": "`meromorphicOn_univ` calls `tauto` to prove an iff that is just the two definitions unfolded, `(∀ x ∈ univ, MeromorphicAt f x) ↔ ∀ x, MeromorphicAt f x`. That is a heavy tactic for a one-line term.",
+            "i": 8,
+            "requested_change": "Replace `by tauto` with the term `⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩` (on its own line after `:=`).",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:640"
+          },
+          {
+            "claim": "The docstring refers to `Set.univ` without code backticks, and the statement has a double space before `:=` (`↔ Meromorphic f  := by tauto`).",
+            "i": 9,
+            "requested_change": "Write the docstring as `/-- A function is meromorphic iff it is meromorphic on `Set.univ`. -/` and use a single space before `:=`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:640"
+          },
+          {
+            "claim": "The statement has a stray space before the closing parenthesis: `Meromorphic (fun x ↦ -f x )`.",
+            "i": 10,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:652"
+          }
+        ],
+        "R8": [
+          {
+            "claim": "The `Meromorphic` API is missing the basic `fun_prop` rules, so `fun_prop` cannot prove simple goals about `Meromorphic`. It has no identity or constant rule, so `Meromorphic (fun x : 𝕜 ↦ x)` and `Meromorphic (fun x ↦ f x * f x + 1)` both fail, the second with \"missing constant rule\". It has no `inv`/`fun_inv`, so `Meromorphic (fun x ↦ (f x)⁻¹)` fails even though `div` and `zpow` are provided. It has no `smul`/`fun_smul`. It has no transition lemma, so `fun_prop` cannot get `MeromorphicAt f x` from `hf : Meromorphic f`. `MeromorphicAt` and `MeromorphicOn` both have `id`, `const`, `inv`, `fun_inv`, `smul` and `fun_smul`.",
+            "i": 0,
+            "requested_change": "Add these to `namespace Meromorphic`:\n```lean\n@[fun_prop]\nlemma meromorphicAt (hf : Meromorphic f) {x : 𝕜} : MeromorphicAt f x := hf x\n\nlemma meromorphicOn (hf : Meromorphic f) {U : Set 𝕜} : MeromorphicOn f U := fun x _ ↦ hf x\n\n@[fun_prop]\nlemma id : Meromorphic (id : 𝕜 → 𝕜) := MeromorphicAt.id\n\n@[fun_prop]\nlemma const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := MeromorphicAt.const e\n\n@[fun_prop]\nlemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv\n\n@[fun_prop]\nlemma fun_inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic (fun x ↦ (f x)⁻¹) := hf.inv\n\n@[fun_prop]\nlemma smul {f : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g) :=\n  fun x ↦ (hf x).smul (hg x)\n\n@[fun_prop]\nlemma fun_smul {f : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) :\n    Meromorphic (fun x ↦ f x • g x) := hf.smul hg\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic.deriv` is not `protected`, unlike its siblings `MeromorphicAt.deriv` and `MeromorphicOn.deriv`. Inside the namespace, and wherever `Meromorphic` is opened, `deriv` now clashes with `_root_.deriv`. That is why `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` must write `_root_.deriv`.",
+            "i": 1,
+            "requested_change": "Declare it as `@[fun_prop] protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`. Then drop the `_root_.` prefixes in `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:717"
+          },
+          {
+            "claim": "In `Meromorphic.pow`, `Meromorphic.fun_pow`, `Meromorphic.zpow` and `Meromorphic.fun_zpow`, the exponent is an implicit `{n}`. In `MeromorphicAt.pow (hf) (n : ℕ)`, `MeromorphicOn.pow (n : ℕ)`, their `zpow`/`fun_*` versions and `Differentiable.pow (hf) (n : ℕ)`, it is explicit. So `hf.pow 3` works for `MeromorphicAt` and `MeromorphicOn` but not for `Meromorphic`.",
+            "i": 2,
+            "requested_change": "Make the exponent explicit, after `hf`, and wrap lines to stay within 100 characters:\n```lean\n@[fun_prop]\nlemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n\n\n@[fun_prop]\nlemma fun_pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (fun x ↦ f x ^ n) :=\n  hf.pow n\n```\nDo the same for `zpow` and `fun_zpow` with `(n : ℤ)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:705"
+          },
+          {
+            "claim": "`meromorphicOn_univ` proves a trivial unfolding with `by tauto`, has a double space before `:=`, and has an un-backticked `Set.univ` in its docstring. `open Set` is already in effect, so `univ` is enough.",
+            "i": 3,
+            "requested_change": "```lean\n/-- A function is meromorphic on `univ` iff it is meromorphic. -/\n@[simp]\nlemma meromorphicOn_univ {f : 𝕜 → E} : MeromorphicOn f univ ↔ Meromorphic f :=\n  ⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:639"
+          },
+          {
+            "claim": "`Meromorphic.fun_sum` re-derives the statement from `sum` with `simpa [← Finset.sum_apply]`. The pointwise lemma `MeromorphicAt.fun_sum` already exists, and every other lemma in this block is a one-line pointwise term proof.",
+            "i": 4,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_sum (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:667"
+          },
+          {
+            "claim": "`Meromorphic.fun_prod` re-derives the statement from `prod` with `simpa [← Finset.prod_apply]`, although `MeromorphicAt.fun_prod` already gives it pointwise.",
+            "i": 5,
+            "requested_change": "Replace the proof with `fun x ↦ MeromorphicAt.fun_prod (h · x)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:692"
+          },
+          {
+            "claim": "The definition `Meromorphic` has no result type, unlike its sibling `def MeromorphicOn (f : 𝕜 → E) (U : Set 𝕜) : Prop`.",
+            "i": 6,
+            "requested_change": "Write `def Meromorphic (f : 𝕜 → E) : Prop := ∀ x, MeromorphicAt f x`. A clearer docstring would also help, e.g. \"A function is meromorphic if it is meromorphic at every point of `𝕜`.\"",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`Meromorphic.fun_neg` has a stray space before the closing parenthesis in `(fun x ↦ -f x )`.",
+            "i": 7,
+            "requested_change": "Write `Meromorphic (fun x ↦ -f x) := hf.neg`.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:652"
+          }
+        ],
+        "R9": [
+          {
+            "claim": "The `Meromorphic` API is missing `smul`/`fun_smul` and `inv`/`fun_inv`, although `MeromorphicAt` and `MeromorphicOn` have all four. The new namespace therefore lacks `fun_prop` lemmas for scalar multiplication and inversion. `div`, `zpow` and `pow` are provided, so the omission is inconsistent.",
+            "i": 0,
+            "requested_change": "Add `@[fun_prop] lemma smul {f : 𝕜 → 𝕜} {g : 𝕜 → E} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g) := fun x ↦ (hf x).smul (hg x)`. Add `fun_smul`, `inv` and `fun_inv` in the same way.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:672"
+          },
+          {
+            "claim": "The new `def Meromorphic` and the Zulip-driven `meromorphicOn_univ` have weak docstrings. `Meromorphic` says \"Meromorphy of a function on all of 𝕜\" and never mentions `MeromorphicAt` at every point. The `meromorphicOn_univ` docstring writes `Set.univ` without backticks. `meromorphicOn_univ` also has a stray double space before `:= by tauto`. The `fun_neg` statement has a stray space in `-f x )`.",
+            "i": 1,
+            "requested_change": "Use a docstring such as \"A function `f : 𝕜 → E` is meromorphic if it is meromorphic at every point of `𝕜`.\" Write `Set.univ` in backticks in the second docstring. Remove the extra spaces.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:636"
+          },
+          {
+            "claim": "`meromorphicOn_univ` is stated and proved by `tauto`. The proof relies on unfolding the new definition, so it is fragile. The statement should also be consistent with the file's practices: for simp-normal form and discoverability it would be better as `Iff.rfl` in the direction that the library actually uses.",
+            "i": 2,
+            "requested_change": "Prove it with `Iff.rfl` or `⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩` instead of `tauto`. Keep `@[simp]` only if the direction `MeromorphicOn f univ ↔ Meromorphic f` is the intended normal form.",
+            "severity": "advisory",
+            "target": "Mathlib/Analysis/Meromorphic/Basic.lean:642"
+          }
+        ]
+      }
+    },
+    {
+      "asks": [
+        {
+          "ask_id": "d0048",
+          "code_at_comment": "@@ -45,6 +45,26 @@ variable [Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n def round (x : α) : ℤ :=\n   if 2 * fract x < 1 then ⌊x⌋ else ⌈x⌉\n \n+/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n+\n+TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\n+theorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by",
+          "comment": "How about `round_eq_div`?",
+          "path": "Mathlib/Algebra/Order/Round.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0049",
+          "code_at_comment": "ontinuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha",
+          "comment": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+          "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+          "replies_to": null
+        },
+        {
+          "ask_id": "d0051",
+          "code_at_comment": "@@ -267,6 +267,15 @@ theorem mul_cast_floor_div_cancel_of_pos {n : ℤ} (hn : 0 < n) (a : R) : ⌊a *\n theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by\n   simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n \n+theorem two_mul_fract_eq_one_iff_exists_int {x : R} :\n+    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by\n+  rw [fract, mul_sub, sub_eq_iff_eq_add']\n+  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\n+  rintro ⟨n, hn⟩\n+  convert hn\n+  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn]\n+  simp [mul_add]",
+          "comment": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by\r\n  rw [fract, mul_sub, sub_eq_iff_eq_add']\r\n  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\r\n  rintro ⟨n, hn⟩\r\n  convert hn\r\n  have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk\r\n  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn]\r\n  simp [mul_add, hk]\r\n```",
+          "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+          "replies_to": null
+        }
+      ],
+      "pr": 33421,
+      "reviewers": {
+        "R1": [
+          {
+            "claim": "The docstring on `round_eq'` says the formula works over “any ring,” although the declaration requires a linearly ordered ring with a `FloorRing`; it also exposes an undecided implementation TODO in the public API documentation.",
+            "i": 0,
+            "requested_change": "Replace the docstring with a description such as “Formula for `round` in terms of `Int.floor`, without requiring a field structure,” and remove the TODO from the public docstring.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:48"
+          }
+        ],
+        "R10": [
+          {
+            "claim": "The PR demotes `public import Mathlib.Algebra.Order.Interval.Set.Group` in Round.lean to a private `import`. Nothing in the file uses it any more. The old `round_eq_zero_iff` proof needed `add_mem_Ico_iff_left`; the new one goes through `round_eq_iff`. So the file keeps an import it does not need, and downstream files get no benefit from it because a private import is not re-exported.",
+            "i": 0,
+            "requested_change": "Delete the line `import Mathlib.Algebra.Order.Interval.Set.Group` from Mathlib/Algebra/Order/Round.lean instead of keeping it as a private import. The downstream files already add the import themselves.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "`continuousAt_ceil` has no `@[fun_prop]`, although its floor twin `continuousAt_floor` and its own consequence `continuousOn_ceil_compl_range` in the same hunk are both tagged `@[fun_prop]`. So `fun_prop` can use the floor pointwise lemma but not the ceil one.",
+            "i": 1,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`, matching `continuousAt_floor`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`continuousAt_ceil` states its non-integrality hypothesis in terms of floor, `hx : x ≠ ⌊x⌋`. For a lemma about `ceil` that is unnatural, and the proof has to convert it back with `fun h ↦ hx <| by rw [h, floor_intCast]`.",
+            "i": 2,
+            "requested_change": "State the hypothesis as `(hx : x ≠ ⌈x⌉)` and shorten the proof to `(continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "The PR changes the codomain of `continuousOn_floor` from `α → α` to `α → ℤ`. The lambda `fun x => floor x` was there only to insert the cast into `α`, so it is now a plain eta-expansion of `floor`. This is inconsistent with the new `continuousOn_floor_compl_range`, which writes `(floor : α → ℤ)`.",
+            "i": 3,
+            "requested_change": "State it as `ContinuousOn (floor : α → ℤ) (Ico n (n + 1) : Set α)`. The proof `(continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const` stays as it is.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88"
+          },
+          {
+            "claim": "Same as `continuousOn_floor`: the codomain is now `ℤ`, so `fun x => ceil x : α → ℤ` is an eta-expanded `ceil`, unlike the new `continuousOn_ceil_compl_range`, which writes `(ceil : α → ℤ)`.",
+            "i": 4,
+            "requested_change": "State it as `ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n : Set α)` and keep the proof.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:92"
+          },
+          {
+            "claim": "The name reads as `pure (⌈x⌉ / 2)`, but the limit is `pure (⌈2 * x⌉ / 2)`. The PR's own companion lemma for the same quantity is named `round_eq_half_ceil_two_mul` and spells out the `two_mul`.",
+            "i": 5,
+            "requested_change": "Rename to `tendsto_round_nhdsLT_pure_half_ceil_two_mul`, or use whatever spelling `round_eq_half_ceil_two_mul` ends up with, so the two names describe `⌈2 * x⌉ / 2` the same way. Update the use in `continuousAt_round`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:215"
+          },
+          {
+            "claim": "The four new `round` lemmas (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) each repeat `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit just above the file's existing `variable [IsStrictOrderedRing α]` line, so the first binder is redundant boilerplate.",
+            "i": 6,
+            "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`, inside a `section` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, and drop the per-lemma instance binders.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9"
+          },
+          {
+            "claim": "The module docstring was not updated for this PR. It still describes the file as facts about `Int.floor`, `Int.ceil` and `Int.fract`, yet the file now publicly imports `Round` and proves `continuousAt_round`, `continuousOn_round`, `continuousAt_floor` and `continuousAt_ceil`. Its `continuousOn_ceil` bullet also gives the interval as `Ioc n (n + 1)`, while the statement, which this PR edits, is `Ioc (n - 1) n`.",
+            "i": 7,
+            "requested_change": "Update the module docstring: mention `round` in the title and summary, add bullets for `continuousAt_floor` / `continuousAt_ceil` and `continuousAt_round` / `continuousOn_round`, and correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9"
+          },
+          {
+            "claim": "The PR adds `Int.ceil_one_add : ⌈1 + a⌉ = 1 + ⌈a⌉` to complete the left-addition ceil API, but there is no floor counterpart. `Int.floor_one_add` does not exist, although `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` and `fract_one_add` do. The floor and ceil APIs stay asymmetric.",
+            "i": 8,
+            "requested_change": "Add `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` next to `floor_natCast_add` in Mathlib/Algebra/Order/Floor/Ring.lean.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655"
+          },
+          {
+            "claim": "`continuousAt_round` leaves two side goals and closes them with tactic blocks, `rw [round_eq_half_ceil_two_mul hx]` and `gcongr; apply Ioi_subset_Ici_self`. Both are single terms.",
+            "i": 9,
+            "requested_change": "Write the proof as `rw [continuousAt_iff_continuous_left'_right']; exact ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right (pure_le_nhds_iff.mpr (round_eq_half_ceil_two_mul hx).symm), (tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self) |>.mono_right (pure_le_nhds _)⟩`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225"
+          }
+        ],
+        "R11": [
+          {
+            "claim": "The PR turns `public import Mathlib.Algebra.Order.Interval.Set.Group` in `Round.lean` into a private import. But after the PR nothing in the file uses it: `round_eq_zero_iff`, the only user of `add_mem_Ico_iff_left`, now goes through `round_eq_iff`. The file compiles with the import deleted. The PR already adds the import directly to every downstream file that needs it, so keeping a private copy here only adds a useless dependency.",
+            "i": 0,
+            "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean` and keep only `public import Mathlib.Algebra.Order.Floor.Ring`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "`continuousAt_ceil` states its hypothesis with floor (`hx : x ≠ ⌊x⌋`) even though the lemma is about `ceil`. The proof then needs an extra `fun h ↦ hx <| by rw [h, floor_intCast]` to turn this into `x ≠ ⌈x⌉`. The natural dual of `continuousAt_floor (hx : x ≠ ⌊x⌋)` is `x ≠ ⌈x⌉`.",
+            "i": 1,
+            "requested_change": "Change the statement to `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`. `continuousOn_ceil_compl_range` still closes with `simp_all [eq_comm]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`continuousAt_ceil` has no `@[fun_prop]` attribute, while its floor counterpart `continuousAt_floor` and the two `ContinuousOn` lemmas `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` are all tagged `@[fun_prop]`. As a result, `fun_prop` can prove `ContinuousAt floor x` but not `ContinuousAt ceil x`.",
+            "i": 2,
+            "requested_change": "Add `@[fun_prop]` above `theorem continuousAt_ceil`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "The PR changes the codomain of `continuousOn_floor` (and of its sibling `continuousOn_ceil`) from `α` to `ℤ`. The lambdas `fun x => floor x : α → ℤ` and `fun x => ceil x : α → ℤ` were only there to insert the cast into `α`. Now they are plain eta-expansions of `floor` and `ceil`, unlike the new lemmas next to them, which write `(floor : α → ℤ)` and `(ceil : α → ℤ)`.",
+            "i": 3,
+            "requested_change": "State them as `theorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1) : Set α)` and `theorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n : Set α)`, keeping the same proofs.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88"
+          },
+          {
+            "claim": "The four new lemmas `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` each repeat the binders `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit just above the existing `variable [IsStrictOrderedRing α]` at line 238, and the file already uses sections to manage these instances.",
+            "i": 4,
+            "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`. Wrap them in a `section` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, then drop the repeated instance binders from each statement.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205"
+          },
+          {
+            "claim": "The PR now publicly imports `Round` and adds the main continuity results for `round` (`continuousAt_round`, `continuousOn_round`), plus `continuousAt_floor` and `continuousAt_ceil`. The module docstring was not updated: its title still says \"`Int.floor`, `Int.ceil` and `Int.fract`\", and its list of main declarations mentions none of these lemmas. Its entry for `continuousOn_ceil`, a lemma this PR restates, also gives the wrong interval: `Ioc n (n + 1)` instead of `Ioc (n - 1) n`.",
+            "i": 5,
+            "requested_change": "Add `round` to the module title and summary. Add bullets for `continuousAt_floor`/`continuousAt_ceil` and for `continuousAt_round`/`continuousOn_round` (\"`round` is continuous away from points with `2 * fract x = 1`\"). Fix the `continuousOn_ceil` bullet to say `Ioc (n - 1) n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13"
+          },
+          {
+            "claim": "The PR adds `Int.ceil_one_add`, mirroring `fract_one_add`, but the floor counterpart `Int.floor_one_add` (`⌊1 + a⌋ = 1 + ⌊a⌋`) still does not exist. The floor, ceil and fract `_add` API is therefore still asymmetric after this API pass.",
+            "i": 6,
+            "requested_change": "Add `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` right after `floor_natCast_add`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655"
+          }
+        ],
+        "R12": [
+          {
+            "claim": "`continuousAt_ceil` lacks the `@[fun_prop]` attribute that its siblings `continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` carry. Its hypothesis is also stated as `x ≠ ⌊x⌋`, which is awkward for a ceiling lemma.",
+            "i": 0,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil` for consistency. Consider stating the hypothesis as `x ≠ ⌈x⌉`, or add a docstring explaining why `⌊x⌋` is used.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:109"
+          },
+          {
+            "claim": "`round_eq_iff` is a new public iff lemma without a docstring. `Int.two_mul_fract_eq_one_iff_exists_int` in Floor/Ring.lean also has no docstring, even though its statement is not self-explanatory.",
+            "i": 1,
+            "requested_change": "Add short docstrings, e.g. `/-- `round x = n` iff `x ∈ [n - 1/2, n + 1/2)`. -/` for `round_eq_iff`, and a docstring for `two_mul_fract_eq_one_iff_exists_int`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:173"
+          },
+          {
+            "claim": "`round_eq'` is a primed name for a result that is a different formula, `(⌊2x⌋ + 1) / 2` over any ring, rather than a variant of `round_eq`. It carries a TODO in its docstring, and its proof is a long `rw` chain with several bullet sub-proofs.",
+            "i": 2,
+            "requested_change": "Rename it descriptively, e.g. `round_eq_floor_two_mul_add_one_ediv_two`. Move the TODO out of the docstring into a comment. Shorten the proof if possible.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:51"
+          }
+        ],
+        "R13": [],
+        "R14": [
+          {
+            "claim": "The module docstring still describes the file as `# Topological facts about `Int.floor`, `Int.ceil` and `Int.fract`` and its `## Main declarations` list ends at `ContinuousOn.comp_fract`, although this PR makes the file prove continuity/limit facts about `round` (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) and adds `continuousAt_floor`/`continuousAt_ceil`; the `continuousOn_ceil` bullet is also wrong on the interval, giving `Ioc n (n + 1)` where the lemma is stated on `Ioc (n - 1) n`.",
+            "i": 0,
+            "requested_change": "Update the header (title and summary sentence) to mention `Int.round`, add the new `round`, `continuousAt_floor` and `continuousAt_ceil` declarations to `## Main declarations`, and correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14"
+          },
+          {
+            "claim": "`continuousAt_ceil` is missing the `@[fun_prop]` attribute that the exactly parallel new lemma `continuousAt_floor` (line 100) and the two new `continuousOn_*_compl_range` lemmas carry, so `fun_prop` has a floor rule but no ceil rule.",
+            "i": 1,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil` (the same inconsistency applies to `continuousAt_fract`, whose proof this PR rewrites, if the attribute is meant to be part of this API).",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`round_eq'` is named with a bare prime, unlike its sibling `round_eq_half_ceil_two_mul` added by the same PR and unlike `round_eq_iff`; the name does not say which formula it states, even though it is the workhorse of the new API (it is the ring-level form `round x = (⌊2 * x⌋ + 1) / 2`, from which `round_eq` is now derived).",
+            "i": 2,
+            "requested_change": "Rename `round_eq'` to a descriptive name in the style of its siblings, e.g. `round_eq_floor_two_mul`, updating its four uses (`Mathlib/Algebra/Order/Round.lean` lines 93 and 174, `Mathlib/Topology/Algebra/Order/Floor.lean` lines 207 and 217).",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:48"
+          },
+          {
+            "claim": "`continuousAt_round` closes the second goal `𝓝[>] x ≤ 𝓝[≥] x` by `gcongr; apply Ioi_subset_Ici_self`, i.e. it decomposes a monotonicity-of-neighbourhoods goal and then re-assembles it, although the canonical `nhdsWithin_mono` application does it directly.",
+            "i": 3,
+            "requested_change": "Drop the `gcongr` bullet and write `(tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self) |>.mono_right (pure_le_nhds _)`, leaving only the `round_eq_half_ceil_two_mul hx` bullet.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:228"
+          }
+        ],
+        "R2": [
+          {
+            "claim": "`import Mathlib.Algebra.Order.Interval.Set.Group` in `Mathlib/Algebra/Order/Round.lean` is no longer used by this file (its only user was the old proof of `round_eq_zero_iff`, which used `add_mem_Ico_iff_left`); the PR demoted it from `public import` to `import` but left the now-dead line in place, and this demotion is what forced the 13 unrelated downstream files to import the module directly.",
+            "i": 0,
+            "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean`. The file compiles unchanged without it.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "The new `Int.ceil_one_add` (`⌈1 + a⌉ = 1 + ⌈a⌉`) completes the “constant first” ceil family, but `Mathlib/Algebra/Order/Floor/Ring.lean` still has no `Int.floor_one_add` although it has `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` (and the fract API has `fract_one_add`). The floor and ceil APIs the PR is aligning are therefore left asymmetric.",
+            "i": 1,
+            "requested_change": "Add the counterpart next to the other `Int.floor_*_add` lemmas, e.g. after `floor_ofNat_add`: `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656"
+          },
+          {
+            "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a lemma about `Int.fract` but is placed in the middle of the floor-division block (`section LinearOrderedRing`, between `mul_natCast_floor_div_cancel` and `end LinearOrderedRing`), whereas every other `fract` lemma in this file lives in the dedicated `section fract` under `/-! #### Fractional part -/`.",
+            "i": 2,
+            "requested_change": "Move the declaration into `section fract`, after `variable [IsStrictOrderedRing R]` (e.g. next to `fract_lt_one`/`fract_eq_iff`), where the instance context is the same (`[Ring R] [LinearOrder R] [IsStrictOrderedRing R] [FloorRing R]`) and all its dependencies (`fract`, `floor_eq_iff`, `mul_le_mul_iff_right₀`) are available.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270"
+          },
+          {
+            "claim": "The names `tendsto_round_nhdsGE_pure` and `tendsto_round_nhdsLT_pure_half_ceil` use the `nhdsGE`/`nhdsLT` spelling, which is not the practice of the file they are added to: every neighbouring `Tendsto … (pure …)` lemma on a one-sided filter is named with `_right_`/`_left_` for `𝓝[≥]`/`𝓝[<]` (`tendsto_floor_right_pure_floor`, `tendsto_floor_left_pure_ceil_sub_one`, `tendsto_ceil_right_pure_floor_add_one`, `tendsto_floor_left_pure_sub_one`).",
+            "i": 3,
+            "requested_change": "Rename them to follow the file's spelling, e.g. `tendsto_round_right_pure` for `tendsto_round_nhdsGE_pure` and `tendsto_round_left_pure_half_ceil` for `tendsto_round_nhdsLT_pure_half_ceil` (and update the two uses in `continuousAt_round`).",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205"
+          },
+          {
+            "claim": "`continuousAt_ceil` is the only one of the four continuity lemmas added by this PR that is not tagged `@[fun_prop]` (`continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` all are), so `fun_prop` cannot prove `ContinuousAt (Int.ceil : α → ℤ) x` even when the side condition `x ≠ ⌊x⌋` is in the context.",
+            "i": 4,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`, exactly as was done for `continuousAt_floor`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "By switching `continuousOn_floor`/`continuousOn_ceil` to the ℤ-valued `floor_eq_on_Ico`/`ceil_eq_on_Ioc`, this PR removes the last in-tree uses of `Int.floor_eq_on_Ico'` (line 158) and `Int.ceil_eq_on_Ioc'` (line 710), which are now dead code — and they are precisely prime-named declarations listed in `scripts/nolints_prime_decls.txt`, a list that is supposed to be emptied over time.",
+            "i": 5,
+            "requested_change": "Delete `Int.floor_eq_on_Ico'` and `Int.ceil_eq_on_Ioc'` from `Mathlib/Algebra/Order/Floor/Ring.lean` (dropping their lines from `scripts/nolints_prime_decls.txt` as well); users who need the coerced form get it by `mod_cast`ing the unprimed lemma, as the two removed proofs did.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:158"
+          }
+        ],
+        "R3": [
+          {
+            "claim": "`import Mathlib.Algebra.Order.Interval.Set.Group` in Round.lean is now unused. `round_eq_zero_iff` was the only proof that needed it (through `add_mem_Ico_iff_left`), and it now goes through `round_eq_iff`. Making the import private instead of deleting it leaves a dead dependency, and the downstream files already import the module themselves.",
+            "i": 0,
+            "requested_change": "Delete line 9 (`import Mathlib.Algebra.Order.Interval.Set.Group`) from `Mathlib/Algebra/Order/Round.lean`. Keep only `public import Mathlib.Algebra.Order.Floor.Ring`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "In `round_eq'`, the first `split_ifs` branch is a roundabout 6-line proof. It proves the side goal `fract x < 1` by going through `h : 2 * fract x < 1` and `le_mul_of_one_le_left`, even though `simp` already knows `⌊fract x⌋ = 0`. The only fact the branch needs is `⌊2 * fract x⌋ = 0`, which follows directly from `h`.",
+            "i": 1,
+            "requested_change": "Replace the branch with\n```lean\n  · simp [floor_eq_zero_iff.mpr (show 2 * fract x ∈ Ico 0 1 from ⟨by simp, h⟩)]\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:56"
+          },
+          {
+            "claim": "`Int.two_mul_fract_eq_one_iff_exists_int` is a statement about `fract`, but it sits in the `floor` section's `LinearOrderedRing` subsection. The `fract` section (after `variable [IsStrictOrderedRing R]`, line 335) already has the needed `Ring`/`IsStrictOrderedRing` context and holds all the other `fract` API.",
+            "i": 2,
+            "requested_change": "Move `two_mul_fract_eq_one_iff_exists_int` into `section fract` (for example at the end of that section's ring part, before `section LinearOrderedField`).",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:270"
+          },
+          {
+            "claim": "The PR adds `Int.ceil_one_add`, which completes the `ceil_intCast_add`/`ceil_natCast_add`/`ceil_ofNat_add` family. The floor side still lacks the matching `Int.floor_one_add`, even though `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` and `fract_one_add` all exist. As a result, `simp` normalises `⌈1 + a⌉` but not `⌊1 + a⌋`.",
+            "i": 3,
+            "requested_change": "Add the floor counterpart next to `floor_natCast_add`:\n```lean\n@[simp]\ntheorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ :=\n  mod_cast floor_natCast_add 1 a\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656"
+          },
+          {
+            "claim": "`continuousAt_ceil` has two problems. First, it takes `hx : x ≠ ⌊x⌋` instead of the natural `x ≠ ⌈x⌉`, so its proof has to convert back with `rw [h, floor_intCast]`. Second, it is missing the `@[fun_prop]` attribute that its sibling `continuousAt_floor` has.",
+            "i": 4,
+            "requested_change": "State it as\n```lean\n@[fun_prop]\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x :=\n  (continuousOn_ceil ⌈x⌉).continuousAt <|\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`continuousOn_floor_compl_range` (and likewise `continuousOn_ceil_compl_range`) uses a 3-line tactic proof (`intro`/`refine`/`simp_all [eq_comm]`). The same thing is a one-line term, in the same style as `continuousOn_round` just below.",
+            "i": 5,
+            "requested_change": "Use\n```lean\ntheorem continuousOn_floor_compl_range : ContinuousOn (floor : α → ℤ) (range Int.cast)ᶜ :=\n  fun _x hx ↦ (continuousAt_floor fun h ↦ hx ⟨_, h.symm⟩).continuousWithinAt\n```\nand write the `ceil` version the same way.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:106"
+          },
+          {
+            "claim": "`continuousOn_floor` and `continuousOn_ceil` now have `ℤ` as codomain, but they keep the eta-expanded `fun x => floor x : α → ℤ` and the redundant `( … : Set α)` ascription. That is inconsistent with the new `continuousOn_floor_compl_range`/`continuousAt_floor`, which use `(floor : α → ℤ)`.",
+            "i": 6,
+            "requested_change": "Write\n```lean\ntheorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1)) :=\n  (continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const\n\ntheorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n) :=\n  (continuousOn_congr <| ceil_eq_on_Ioc n).mpr continuousOn_const\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88"
+          },
+          {
+            "claim": "`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` each repeat `[IsStrictOrderedRing α]` as a binder, and the very next line (238) is `variable [IsStrictOrderedRing α]`.",
+            "i": 7,
+            "requested_change": "Move the four round lemmas below `variable [IsStrictOrderedRing α]`, or move that `variable` line above them, and drop the explicit `[IsStrictOrderedRing α]` binders.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205"
+          },
+          {
+            "claim": "The proof of `continuousAt_round` uses a tactic block with `rw [round_eq_half_ceil_two_mul hx]` and `gcongr; apply Ioi_subset_Ici_self` for side goals that existing lemmas close directly.",
+            "i": 8,
+            "requested_change": "Use the term proof\n```lean\n  continuousAt_iff_continuous_left'_right'.mpr\n    ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right\n      (pure_le_nhds_iff.mpr (round_eq_half_ceil_two_mul hx).symm),\n    ((tendsto_round_nhdsGE_pure x).mono_left (nhdsWithin_mono _ Ioi_subset_Ici_self)).mono_right\n      (pure_le_nhds _)⟩\n```",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:225"
+          },
+          {
+            "claim": "The module docstring is now out of date. The title only mentions `Int.floor`, `Int.ceil` and `Int.fract`, and \"Main declarations\" lists none of the new results (`continuousAt_floor`, `continuousAt_ceil`, `continuousAt_round`, `continuousOn_round`), although the file now publicly imports `Round` to prove them. Also, the `continuousOn_ceil` entry gives the interval as `Ioc n (n + 1)`, while the (modified) statement is `Ioc (n - 1) n`.",
+            "i": 9,
+            "requested_change": "Mention `round` in the title and description. Add entries for `continuousAt_floor`/`continuousAt_ceil` and `continuousAt_round`/`continuousOn_round`. Correct the `continuousOn_ceil` line to `Ioc (n - 1) n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13"
+          }
+        ],
+        "R4": [
+          {
+            "claim": "After this PR, `Round.lean` uses nothing from `Mathlib.Algebra.Order.Interval.Set.Group`. The PR turns the `public import` into a private `import`, but the import is no longer needed at all: the only former user was `round_eq_zero_iff` (via `add_mem_Ico_iff_left`), and its new proof goes through `round_eq_iff`. With line 9 deleted, the file still compiles.",
+            "i": 0,
+            "requested_change": "Delete `import Mathlib.Algebra.Order.Interval.Set.Group` from `Round.lean`. Keep the explicit imports that the PR adds to the downstream files.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "The PR adds `public import Mathlib.Algebra.Order.Round`, and `Round.lean` already does `public import Mathlib.Algebra.Order.Floor.Ring`. So the existing `public import Mathlib.Algebra.Order.Floor.Ring` in this file is now redundant.",
+            "i": 1,
+            "requested_change": "Drop `public import Mathlib.Algebra.Order.Floor.Ring` and keep only `public import Mathlib.Algebra.Order.Round`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:8"
+          },
+          {
+            "claim": "`continuousOn_floor` and `continuousOn_ceil` now have codomain `ℤ`. That means the lambdas `fun x => floor x : α → ℤ` and `fun x => ceil x : α → ℤ` are just eta-expansions of `floor` and `ceil`; before the PR they hid a cast to `α`. The new siblings `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` already write `(floor : α → ℤ)` and `(ceil : α → ℤ)`.",
+            "i": 2,
+            "requested_change": "State them as `ContinuousOn (floor : α → ℤ) (Ico n (n + 1) : Set α)` and `ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n : Set α)`. The proofs stay the same.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88"
+          },
+          {
+            "claim": "`continuousAt_ceil` has no `@[fun_prop]` attribute. Its counterpart `continuousAt_floor` and the new `continuousOn_floor_compl_range` / `continuousOn_ceil_compl_range` all have one, so `fun_prop` can prove continuity of `floor` at non-integers but not of `ceil`.",
+            "i": 3,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`continuousAt_ceil` states its non-integrality hypothesis in terms of floor (`hx : x ≠ ⌊x⌋`). The proof then has to convert it with `fun h ↦ hx <| by rw [h, floor_intCast]`. The natural hypothesis for ceil is `x ≠ ⌈x⌉`, and with it the proof becomes a one-step `lt_of_ne`.",
+            "i": 4,
+            "requested_change": "Change the statement to `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne hx`. `continuousOn_ceil_compl_range` keeps working unchanged with `simp_all [eq_comm]`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` each repeat `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit just before the existing `variable [IsStrictOrderedRing α]` (line 238), so the repetition is avoidable.",
+            "i": 5,
+            "requested_change": "Move these four theorems below `variable [IsStrictOrderedRing α]`, inside a `section Round` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, and drop the repeated instance binders.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:205"
+          },
+          {
+            "claim": "The PR reorders the `OrderClosedTopology` section so `tendsto_floor_right_pure_floor` no longer needs `omit [IsStrictOrderedRing α] in`. The same workaround is left on `tendsto_ceil_right_pure_floor_add_one` (line 150), although that lemma does not need the instance either.",
+            "i": 6,
+            "requested_change": "Move `tendsto_ceil_right_pure_floor_add_one` up next to `tendsto_floor_right_pure_floor`, before `variable [IsStrictOrderedRing α]`, and delete the `omit [IsStrictOrderedRing α] in` line.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:150"
+          },
+          {
+            "claim": "The module docstring still says the file is about \"`Int.floor`, `Int.ceil` and `Int.fract`\". Its \"Main declarations\" list omits the new `round` results (`continuousAt_round`, `continuousOn_round`) and the new `continuousAt_floor` / `continuousAt_ceil`. It also still describes `continuousOn_ceil` as continuity on `Ioc n (n + 1)`, but the statement uses `Ioc (n - 1) n`.",
+            "i": 7,
+            "requested_change": "Mention `round` in the module description. Add bullets for `continuousAt_floor`, `continuousAt_ceil`, `continuousAt_round` and `continuousOn_round`. Fix the `continuousOn_ceil` bullet to `Ioc (n - 1) n`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:13"
+          },
+          {
+            "claim": "The PR adds `Int.ceil_one_add` to complete the `ceil_*_add` family, but the floor side has no `Int.floor_one_add`, even though `floor_intCast_add`, `floor_natCast_add`, `floor_ofNat_add` and `fract_one_add` all exist. This leaves floor and ceil asymmetric.",
+            "i": 8,
+            "requested_change": "Add `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a` next to `floor_ofNat_add`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655"
+          }
+        ],
+        "R5": [],
+        "R6": [
+          {
+            "claim": "The new `Int.ceil_one_add` completes only half of the `*_one_add` family that this PR is reviewing: after it, `simp` can simplify `⌈1 + a⌉`, but `⌊1 + a⌋` still cannot be simplified because `Int.floor_one_add` does not exist (`Int.floor_add_one` handles `⌊a + 1⌋`, and `Int.floor_natCast_add` does not fire on the numeral `1`, which is exactly why `ceil_one_add` was needed for `ceil`).",
+            "i": 0,
+            "requested_change": "Add the missing twin in the same position where `Int.ceil_one_add` sits for `ceil` (i.e. in the `*_add` group, after `Int.floor_ofNat_add`): `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:656"
+          },
+          {
+            "claim": "The `round` translation API that this PR reviews still has the hole this PR just closed for `ceil`: there is no `round_one_add`, so `simp` cannot simplify `round (1 + a)` (`Int.round_intCast_add`'s left-hand side is `round (↑z + x)`, which does not match the numeral `1`), although `round (2 + a)` and `round (a + 1)` are both handled by `round_ofNat_add`/`round_add_one`.",
+            "i": 1,
+            "requested_change": "Add `@[simp] theorem round_one_add (a : α) : round (1 + a) = 1 + round a` next to `round_add_one` (proof: `simpa using round_intCast_add a 1`).",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:101"
+          },
+          {
+            "claim": "The change of this line from `public import` to `import` does not achieve anything for this file: `Mathlib.Algebra.Order.Round` does not use `Mathlib.Algebra.Order.Interval.Set.Group` at all (its `Ico` occurrences come from the `public import Mathlib.Algebra.Order.Floor.Ring` above), so a plain `import` here is a dead import, which is what `lake exe shake` reports; the 13 files that use declarations of that module must import it directly anyway (verified for three of them).",
+            "i": 2,
+            "requested_change": "Delete line 9 rather than demoting it (keeping the added direct imports in the 13 files); if instead the re-export is wanted, restore `public import` and drop those additions.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "`round_eq'` introduces a new primed name for a lemma that is not a variant of a named constructor but simply the ring-level formula for `round` (`round x = (⌊2 * x⌋ + 1) / 2`); new primed declarations are discouraged in Mathlib (the `docPrime` linter and its exception file `scripts/nolints_prime_decls.txt` exist to stop them accumulating), and it sits beside the unprimed field-level `round_eq`.",
+            "i": 3,
+            "requested_change": "Rename it to a descriptive unprimed name such as `round_eq_floor_two_mul_add_one_div` — or, if the docstring's TODO is accepted, adopt the formula as the definition of `round` so that this lemma becomes `rfl` and needs no name at all.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:51"
+          },
+          {
+            "claim": "The docstring of the new `round_eq'` carries a design TODO ('TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`.') instead of describing the statement, so the rendered documentation of the lemma shows an open question and the formula is nowhere stated.",
+            "i": 4,
+            "requested_change": "State the formula in the docstring (e.g. ``round x = (⌊2 * x⌋ + 1) / 2`` via `Int.floor`, valid over any ring) and move the remark out of the docstring into a `-- TODO: ...` comment above the declaration — or resolve it in this PR.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:50"
+          },
+          {
+            "claim": "`ContinuousOn.comp_fract''` is added with a doubly primed name, although its own docstring says it is a special case of the existing `ContinuousOn.comp_fract`, and the neighbouring `ContinuousOn.comp_fract'` is explicitly marked 'Do not use this, use `ContinuousOn.comp_fract` instead' — chaining a second prime onto a name that is not a variant of a named constructor leaves an unreadable name for users.",
+            "i": 5,
+            "requested_change": "Give it an unprimed, descriptive name, e.g. `ContinuousOn.comp_fract_Icc` (the `f : α → β` case of `ContinuousOn.comp_fract` on `Icc 0 1`).",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:291"
+          },
+          {
+            "claim": "The module docstring of this file was not updated although the PR adds an entire `round` section to it: the header still says the file is about `Int.floor`, `Int.ceil` and `Int.fract`, and the '## Main declarations' list does not mention any of the new results (`continuousAt_floor`, `continuousOn_floor_compl_range`, `continuousAt_ceil`, `continuousOn_ceil_compl_range`, `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`).",
+            "i": 6,
+            "requested_change": "Extend the module docstring: mention `round` in the title/description and add the new continuity lemmas (at least `continuousAt_floor`, `continuousOn_round`) to the '## Main declarations' list.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:14"
+          },
+          {
+            "claim": "`continuousAt_ceil` states its hypothesis in terms of the wrong function for the statement: it takes `x ≠ ⌊x⌋`, while its sibling `continuousAt_floor` states the analogous condition with its own function (`x ≠ ⌊x⌋`), and the mismatch forces the proof to convert `x = ⌈x⌉` into `x = ⌊x⌋` by rewriting.",
+            "i": 7,
+            "requested_change": "State it as `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) ((le_ceil x).lt_of_ne hx)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          }
+        ],
+        "R7": [
+          {
+            "claim": "The docstring on `round_eq'` says the formula works “over any ring,” although the theorem needs a linear order, `IsStrictOrderedRing`, and `FloorRing`; it also exposes an unresolved implementation TODO as public API documentation.",
+            "i": 0,
+            "requested_change": "Rewrite the docstring to state the formula's scope accurately (linear ordered rings with a floor structure) and remove the internal TODO from the public-facing documentation.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:48"
+          }
+        ],
+        "R8": [
+          {
+            "claim": "`tendsto_round_nhdsGE_pure` and `tendsto_round_nhdsLT_pure_half_ceil` each re-prove, inline, that `(2 * ·)` maps `𝓝[≥] x` to `𝓝[≥] (2 * x)` (and `𝓝[<]` to `𝓝[<]`) with near-identical `have` blocks. This is duplicated code.",
+            "i": 0,
+            "requested_change": "Replace the two `have` blocks with an existing lemma such as `tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within` or a monotone-map lemma. Otherwise factor them into one small helper lemma, so the two proofs share the argument.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:207"
+          },
+          {
+            "claim": "`continuousAt_ceil` is the only new floor/ceil `continuousAt` lemma without `@[fun_prop]`, although its siblings `continuousAt_floor`, `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` carry it. This is inconsistent.",
+            "i": 1,
+            "requested_change": "Add `@[fun_prop]` to `continuousAt_ceil`, or drop it from the siblings so they are consistent.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:115"
+          },
+          {
+            "claim": "The new public theorems `tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round` and `continuousOn_round` have no docstrings. The `half_ceil` limit and the `2 * fract x ≠ 1` side condition are not self-explanatory.",
+            "i": 2,
+            "requested_change": "Add short docstrings saying that `round` is continuous away from points with fractional part `1/2`. Say what each one-sided limit is.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:207"
+          }
+        ],
+        "R9": [
+          {
+            "claim": "Round.lean keeps `import Mathlib.Algebra.Order.Interval.Set.Group` (demoted from public to private), but nothing in the file uses it any more: its only use was `add_mem_Ico_iff_left` in the old proof of `round_eq_zero_iff`, which this PR replaced by `simp [round_eq_iff]`. The demotion is also what forced the 11 downstream files to add their own imports.",
+            "i": 0,
+            "requested_change": "Delete line 9, `import Mathlib.Algebra.Order.Interval.Set.Group`, from Mathlib/Algebra/Order/Round.lean. Keep the downstream import additions, since those files no longer get it transitively.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:9"
+          },
+          {
+            "claim": "`continuousAt_ceil` has no `@[fun_prop]` attribute, but its twin `continuousAt_floor` and both `continuousOn_floor_compl_range` and `continuousOn_ceil_compl_range` have one. So `fun_prop` can prove continuity of `floor` at a non-integer but not of `ceil`.",
+            "i": 1,
+            "requested_change": "Tag `continuousAt_ceil` with `@[fun_prop]`, matching `continuousAt_floor`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "`continuousAt_ceil` takes the hypothesis `hx : x ≠ ⌊x⌋`, a floor-shaped condition on a ceil lemma. Because of this the proof has to turn `x = ⌈x⌉` into a contradiction with `floor_intCast` inside a lambda. The natural dual of `continuousAt_floor (hx : x ≠ ⌊x⌋)` is `x ≠ ⌈x⌉`, and with it the proof is direct.",
+            "i": 2,
+            "requested_change": "State it as `theorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x := (continuousOn_ceil ⌈x⌉).continuousAt <| Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) ((le_ceil x).lt_of_ne hx)`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:117"
+          },
+          {
+            "claim": "The PR rewrites the statements of `continuousOn_floor` and `continuousOn_ceil` to be ℤ-valued, but leaves them eta-expanded with redundant ascriptions: `ContinuousOn (fun x => floor x : α → ℤ) (Ico n (n + 1) : Set α)`. Now that the codomain is ℤ, the lambda is just `floor`, and the PR's own new lemmas write `ContinuousOn (floor : α → ℤ) ...` and `ContinuousAt floor x`.",
+            "i": 3,
+            "requested_change": "State them as `theorem continuousOn_floor (n : ℤ) : ContinuousOn (floor : α → ℤ) (Ico n (n + 1))` and `theorem continuousOn_ceil (n : ℤ) : ContinuousOn (ceil : α → ℤ) (Ioc (n - 1) n)`, keeping the proofs unchanged.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:88"
+          },
+          {
+            "claim": "The four new round lemmas (`tendsto_round_nhdsGE_pure`, `tendsto_round_nhdsLT_pure_half_ceil`, `continuousAt_round`, `continuousOn_round`) each repeat `[IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]`. They sit two lines above `variable [IsStrictOrderedRing α]` (l.238), which already supplies the first binder.",
+            "i": 4,
+            "requested_change": "Move the four lemmas below `variable [IsStrictOrderedRing α]`, in a `section Round` with `variable [OrderClosedTopology α] [ContinuousAdd α]`, and drop the per-lemma instance binders, e.g. `theorem continuousAt_round {x : α} (hx : 2 * fract x ≠ 1) : ContinuousAt round x`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:234"
+          },
+          {
+            "claim": "The PR adds `Int.ceil_one_add` to complete the ceil `*_add` family, but the floor family it mirrors has no `Int.floor_one_add`: `floor_intCast_add`, `floor_natCast_add` and `floor_ofNat_add` exist, and `fract_one_add` exists. After this PR, ceil has a `one_add` simp lemma and floor does not.",
+            "i": 5,
+            "requested_change": "Add the missing counterpart next to `floor_natCast_add` in Mathlib/Algebra/Order/Floor/Ring.lean: `@[simp] theorem floor_one_add (a : R) : ⌊1 + a⌋ = 1 + ⌊a⌋ := mod_cast floor_natCast_add 1 a`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Floor/Ring.lean:655"
+          },
+          {
+            "claim": "The module docstring still says the file is about `Int.floor`, `Int.ceil` and `Int.fract` and lists none of the new results (`continuousAt_floor`, `continuousAt_ceil`, `continuousAt_round`, `continuousOn_round`), though the file now imports `Round` and proves continuity of `round`. Its bullet for `continuousOn_ceil`, whose statement this PR edits, also gives the wrong interval: it says `Ioc n (n + 1)`, but the lemma is about `Ioc (n - 1) n`.",
+            "i": 6,
+            "requested_change": "Retitle the module doc to `Topological facts about Int.floor, Int.ceil, Int.fract and round` and mention `round` in its first sentence. Correct the `continuousOn_ceil` bullet to `Ioc (n - 1) n`. Add bullets for `continuousAt_floor`/`continuousAt_ceil` (continuous away from the integers) and `continuousAt_round`/`continuousOn_round` (continuous away from the points with fractional part `1 / 2`).",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:9"
+          },
+          {
+            "claim": "`continuousOn_floor_compl_range` (and its twin `continuousOn_ceil_compl_range`) uses a three-line tactic proof with `simp_all [eq_comm]` for a one-line term: the membership hypothesis already gives the needed `x ≠ ⌊x⌋` directly.",
+            "i": 7,
+            "requested_change": "Replace the proof with `fun _x hx ↦ (continuousAt_floor fun h ↦ hx ⟨_, h.symm⟩).continuousWithinAt`, and the same with `continuousAt_ceil` in `continuousOn_ceil_compl_range`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:105"
+          },
+          {
+            "claim": "The name ends in `half_ceil`, which reads as `⌈x⌉ / 2`, but the limit is `⌈2 * x⌉ / 2`. Its sibling in this PR spells the same expression `half_ceil_two_mul` (`round_eq_half_ceil_two_mul : round x = ⌈2 * x⌉ / 2`), and the file's existing names spell the limit value in full (`tendsto_floor_left_pure_ceil_sub_one`).",
+            "i": 8,
+            "requested_change": "Rename to `tendsto_round_nhdsLT_pure_half_ceil_two_mul` and update its use in `continuousAt_round`.",
+            "severity": "advisory",
+            "target": "Mathlib/Topology/Algebra/Order/Floor.lean:215"
+          },
+          {
+            "claim": "The docstring of `round_eq'` contains a design TODO for maintainers (`TODO: decide if we want to use this as a definition. It may be slightly faster over ℚ.`), which will be rendered in the API documentation users read.",
+            "i": 9,
+            "requested_change": "Take the TODO out of the docstring and put it in a `-- TODO:` comment above the declaration, leaving the docstring as `/-- Formula for round in terms of Int.floor, a version that works over any ring. -/`.",
+            "severity": "advisory",
+            "target": "Mathlib/Algebra/Order/Round.lean:51"
+          }
+        ]
+      }
+    }
+  ],
+  "plan_id": "joint_dev_v1",
+  "schema_version": "matching-plan1",
+  "seal": {
+    "33066": {
+      "R1": "SN3",
+      "R10": "OP3",
+      "R11": "DX2",
+      "R12": "SN1",
+      "R13": "OP1",
+      "R14": "X1",
+      "R2": "SN2",
+      "R3": "LN2",
+      "R4": "X2",
+      "R5": "DX1",
+      "R6": "LN1",
+      "R7": "OP2",
+      "R8": "LN3",
+      "R9": "DX3"
+    },
+    "33117": {
+      "R1": "OP1",
+      "R10": "DX3",
+      "R11": "DX1",
+      "R12": "LN3",
+      "R13": "LN2",
+      "R14": "SN2",
+      "R2": "OP3",
+      "R3": "SN3",
+      "R4": "LN1",
+      "R5": "X2",
+      "R6": "DX2",
+      "R7": "X1",
+      "R8": "OP2",
+      "R9": "SN1"
+    },
+    "33421": {
+      "R1": "LN2",
+      "R10": "X1",
+      "R11": "OP1",
+      "R12": "SN1",
+      "R13": "SN2",
+      "R14": "DX2",
+      "R2": "DX1",
+      "R3": "OP2",
+      "R4": "OP3",
+      "R5": "LN1",
+      "R6": "DX3",
+      "R7": "LN3",
+      "R8": "SN3",
+      "R9": "X2"
+    }
+  },
+  "session_stats": {
+    "33066": {
+      "DX1": {
+        "compile_split": {
+          "lean_verify": 1,
+          "lean_verify_edit": 2
+        },
+        "compiles": 3,
+        "findings": 3
+      },
+      "DX2": {
+        "compile_split": {
+          "lean_verify": 7,
+          "lean_verify_edit": 7
+        },
+        "compiles": 14,
+        "findings": 4
+      },
+      "DX3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 6
+        },
+        "compiles": 6,
+        "findings": 7
+      },
+      "LN1": {
+        "compile_split": {
+          "lean_verify": 1,
+          "lean_verify_edit": 0
+        },
+        "compiles": 1,
+        "findings": 1
+      },
+      "LN2": {
+        "compile_split": {
+          "lean_verify": 3,
+          "lean_verify_edit": 2
+        },
+        "compiles": 5,
+        "findings": 1
+      },
+      "LN3": {
+        "compile_split": {
+          "lean_verify": 1,
+          "lean_verify_edit": 1
+        },
+        "compiles": 2,
+        "findings": 2
+      },
+      "OP1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 7
+      },
+      "OP2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 9
+      },
+      "OP3": {
+        "capped": "failed_error",
+        "compiles": null,
+        "findings": 0
+      },
+      "SN1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "SN2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "SN3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 1
+      },
+      "X1": {
+        "compiles": 14,
+        "cut_to_budget": 0,
+        "findings": 12,
+        "targets_unresolved": 0
+      },
+      "X2": {
+        "compiles": 17,
+        "cut_to_budget": 0,
+        "findings": 12,
+        "targets_unresolved": 0
+      }
+    },
+    "33117": {
+      "DX1": {
+        "compile_split": {
+          "lean_verify": 10,
+          "lean_verify_edit": 2
+        },
+        "compiles": 12,
+        "findings": 3
+      },
+      "DX2": {
+        "compile_split": {
+          "lean_verify": 6,
+          "lean_verify_edit": 6
+        },
+        "compiles": 12,
+        "findings": 4
+      },
+      "DX3": {
+        "compile_split": {
+          "lean_verify": 3,
+          "lean_verify_edit": 8
+        },
+        "compiles": 11,
+        "findings": 5
+      },
+      "LN1": {
+        "compile_split": {
+          "lean_verify": 2,
+          "lean_verify_edit": 12
+        },
+        "compiles": 14,
+        "findings": 4
+      },
+      "LN2": {
+        "compile_split": {
+          "lean_verify": 4,
+          "lean_verify_edit": 5
+        },
+        "compiles": 9,
+        "findings": 1
+      },
+      "LN3": {
+        "compile_split": {
+          "lean_verify": 3,
+          "lean_verify_edit": 3
+        },
+        "compiles": 6,
+        "findings": 1
+      },
+      "OP1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 11
+      },
+      "OP2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 8
+      },
+      "OP3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 7
+      },
+      "SN1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "SN2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "SN3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "X1": {
+        "compiles": 4,
+        "cut_to_budget": 0,
+        "findings": 11,
+        "targets_unresolved": 0
+      },
+      "X2": {
+        "compiles": 19,
+        "cut_to_budget": 0,
+        "findings": 10,
+        "targets_unresolved": 0
+      }
+    },
+    "33421": {
+      "DX1": {
+        "compile_split": {
+          "lean_verify": 8,
+          "lean_verify_edit": 7
+        },
+        "compiles": 15,
+        "findings": 6
+      },
+      "DX2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 5
+        },
+        "compiles": 5,
+        "findings": 4
+      },
+      "DX3": {
+        "compile_split": {
+          "lean_verify": 7,
+          "lean_verify_edit": 9
+        },
+        "compiles": 16,
+        "findings": 8
+      },
+      "LN1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 3
+        },
+        "compiles": 3,
+        "findings": 0
+      },
+      "LN2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 1
+        },
+        "compiles": 1,
+        "findings": 1
+      },
+      "LN3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 15
+        },
+        "compiles": 15,
+        "findings": 1
+      },
+      "OP1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 7
+      },
+      "OP2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 10
+      },
+      "OP3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 9
+      },
+      "SN1": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "SN2": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 0
+      },
+      "SN3": {
+        "compile_split": {
+          "lean_verify": 0,
+          "lean_verify_edit": 0
+        },
+        "compiles": 0,
+        "findings": 3
+      },
+      "X1": {
+        "compiles": 11,
+        "cut_to_budget": 0,
+        "findings": 10,
+        "targets_unresolved": 0
+      },
+      "X2": {
+        "compiles": 13,
+        "cut_to_budget": 0,
+        "findings": 10,
+        "targets_unresolved": 0
+      }
+    }
+  },
+  "source_sha256": "eddc9d7c6efd624038159c529894cbf22ebc0e656090addedb6ee0c48d524246"
+}
