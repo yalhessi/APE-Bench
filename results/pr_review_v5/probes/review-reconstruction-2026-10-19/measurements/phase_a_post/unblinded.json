@@ -1,0 +1,510 @@
+{
+  "agreement": {
+    "cells": 80,
+    "reached_or_not": 80,
+    "three_valued": 80
+  },
+  "asks": 8,
+  "import-phase_a_post:1": {
+    "condition_reach": {
+      "CTL": 0.25,
+      "CTX": 0.25,
+      "CXS": 0.2916666666666667,
+      "DX": 0.25
+    },
+    "published_reach": {},
+    "reach": {
+      "CTL1": 0.25,
+      "CTX1": 0.25,
+      "CTX2": 0.25,
+      "CTX3": 0.25,
+      "CXS1": 0.25,
+      "CXS2": 0.375,
+      "CXS3": 0.25,
+      "DX1": 0.25,
+      "DX2": 0.25,
+      "DX3": 0.25
+    },
+    "stable": {
+      "CTL": [
+        "p0009",
+        "p0011"
+      ],
+      "CTX": [
+        "p0009",
+        "p0011"
+      ],
+      "CXS": [
+        "p0009",
+        "p0011"
+      ],
+      "DX": [
+        "p0009",
+        "p0011"
+      ]
+    },
+    "table": {
+      "p0004": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0005": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "partial",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0006": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0007": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0009": {
+        "CTL1": "reached",
+        "CTX1": "reached",
+        "CTX2": "reached",
+        "CTX3": "reached",
+        "CXS1": "reached",
+        "CXS2": "reached",
+        "CXS3": "reached",
+        "DX1": "reached",
+        "DX2": "reached",
+        "DX3": "reached"
+      },
+      "p0010": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0011": {
+        "CTL1": "reached",
+        "CTX1": "reached",
+        "CTX2": "reached",
+        "CTX3": "reached",
+        "CXS1": "reached",
+        "CXS2": "reached",
+        "CXS3": "reached",
+        "DX1": "reached",
+        "DX2": "reached",
+        "DX3": "reached"
+      },
+      "p0012": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "reached",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      }
+    },
+    "union": {
+      "CTL": [
+        "p0009",
+        "p0011"
+      ],
+      "CTX": [
+        "p0009",
+        "p0011"
+      ],
+      "CXS": [
+        "p0009",
+        "p0011",
+        "p0012"
+      ],
+      "DX": [
+        "p0009",
+        "p0011"
+      ]
+    }
+  },
+  "import-phase_a_post:2": {
+    "condition_reach": {
+      "CTL": 0.25,
+      "CTX": 0.25,
+      "CXS": 0.2916666666666667,
+      "DX": 0.25
+    },
+    "published_reach": {},
+    "reach": {
+      "CTL1": 0.25,
+      "CTX1": 0.25,
+      "CTX2": 0.25,
+      "CTX3": 0.25,
+      "CXS1": 0.25,
+      "CXS2": 0.375,
+      "CXS3": 0.25,
+      "DX1": 0.25,
+      "DX2": 0.25,
+      "DX3": 0.25
+    },
+    "stable": {
+      "CTL": [
+        "p0009",
+        "p0011"
+      ],
+      "CTX": [
+        "p0009",
+        "p0011"
+      ],
+      "CXS": [
+        "p0009",
+        "p0011"
+      ],
+      "DX": [
+        "p0009",
+        "p0011"
+      ]
+    },
+    "table": {
+      "p0004": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0005": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "partial",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0006": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0007": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0009": {
+        "CTL1": "reached",
+        "CTX1": "reached",
+        "CTX2": "reached",
+        "CTX3": "reached",
+        "CXS1": "reached",
+        "CXS2": "reached",
+        "CXS3": "reached",
+        "DX1": "reached",
+        "DX2": "reached",
+        "DX3": "reached"
+      },
+      "p0010": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "no",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      },
+      "p0011": {
+        "CTL1": "reached",
+        "CTX1": "reached",
+        "CTX2": "reached",
+        "CTX3": "reached",
+        "CXS1": "reached",
+        "CXS2": "reached",
+        "CXS3": "reached",
+        "DX1": "reached",
+        "DX2": "reached",
+        "DX3": "reached"
+      },
+      "p0012": {
+        "CTL1": "no",
+        "CTX1": "no",
+        "CTX2": "no",
+        "CTX3": "no",
+        "CXS1": "no",
+        "CXS2": "reached",
+        "CXS3": "no",
+        "DX1": "no",
+        "DX2": "no",
+        "DX3": "no"
+      }
+    },
+    "union": {
+      "CTL": [
+        "p0009",
+        "p0011"
+      ],
+      "CTX": [
+        "p0009",
+        "p0011"
+      ],
+      "CXS": [
+        "p0009",
+        "p0011",
+        "p0012"
+      ],
+      "DX": [
+        "p0009",
+        "p0011"
+      ]
+    }
+  },
+  "measurement": {
+    "forensic": false,
+    "identity": {
+      "aggregation": "none: each replicate is read on its own, and two are compared cell by cell",
+      "denominator": "the asks of the sealed PRs (in scope, if scoped); a session's reach is asks it reached over that count, per replicate",
+      "instrument": "ask-match",
+      "instrument_version": "1-session",
+      "missingness": "every expected cell needs a verdict in every replicate; a replicate that does not cover them makes the report forensic, and an absent cell is never read as `no`",
+      "population_prs": [
+        42814,
+        43167
+      ],
+      "projection": {
+        "claude_cut_to": 20,
+        "harness_blind": true,
+        "keep": [
+          "target",
+          "claim",
+          "requested_change",
+          "severity"
+        ],
+        "redaction": [
+          "construction cues",
+          "conventions cues"
+        ],
+        "target": "repository path"
+      },
+      "question_policy": "questions",
+      "reference_count": 8,
+      "reference_kind": "raw_ask",
+      "reference_sha256": "3b51eaab9ab4befbc2f68bcf804d18c33b3178334c1e1e7ac127d75a62fe2c29",
+      "reference_source": "results/pr_review_v5/probes/postcutoff-2026-09-29/feedback.json + results/pr_review_v5/probes/postcutoff-2026-09-29/asks.json",
+      "replicates": 2,
+      "rubric_sha256": "c1094ab650c272edad9c450919802ea49179d96569cc19d5542106624c1f54f8",
+      "schema_version": "measurement-identity1",
+      "seal_path": "results/pr_review_v5/probes/review-reconstruction-2026-10-19/measurements/phase_a_post/seal.json",
+      "seal_sha256": "3c4fb1ef159699b420e429e24812936397dabbe2d67a113d1b98bc2a702aedeb",
+      "source_sha256": "c0b9f1bc086ab241985327ab3c5730ac1c3cc21819f04d67da4e40ab7b8507b6",
+      "subjects": [
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctl_post_rep1"
+          ],
+          "session": "CTL1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctx_post_rep1"
+          ],
+          "session": "CTX1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctx_post_rep2"
+          ],
+          "session": "CTX2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctx_post_rep3"
+          ],
+          "session": "CTX3",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctxsk_post_rep1"
+          ],
+          "session": "CXS1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctxsk_post_rep2"
+          ],
+          "session": "CXS2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "recon_ds41_ctxsk_post_rep3"
+          ],
+          "session": "CXS3",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_post_base_rep1"
+          ],
+          "session": "DX1",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_post_base_rep2"
+          ],
+          "session": "DX2",
+          "source": "solo"
+        },
+        {
+          "channel": "submitted",
+          "path": null,
+          "runs": [
+            "iter_ds41_conv_post_base_rep3"
+          ],
+          "session": "DX3",
+          "source": "solo"
+        }
+      ]
+    },
+    "identity_sha256": "c0b9f1bc086ab241985327ab3c5730ac1c3cc21819f04d67da4e40ab7b8507b6",
+    "plan_id": "phase_a_post",
+    "plan_sha256": "514ece2815b3c67e1b9aee9fff84b31d6081fd9232a309d0340f0f9b18bdfe45",
+    "producers": {
+      "import-phase_a_post": {
+        "complete": true,
+        "forensic": false,
+        "replicates": 2
+      }
+    },
+    "replicates": {
+      "import-phase_a_post:1": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-phase_a_post",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "kind": "external session",
+              "model": "claude-opus-5-5",
+              "route": "claude-code-subagent"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/phase_a/match_post/matches.1.json",
+              "problems": "0",
+              "sha256": "3db6ba98ec284228d926a206f1e73a19d0fbf6d8e6754ba82a01f278264919e0"
+            },
+            "origin": "external_import"
+          }
+        ]
+      },
+      "import-phase_a_post:2": {
+        "complete": true,
+        "problem_count": 0,
+        "problems": [],
+        "producer": "import-phase_a_post",
+        "rows": [
+          {
+            "batch_id": "*",
+            "executor": {
+              "kind": "external session",
+              "model": "claude-opus-5-5",
+              "route": "claude-code-subagent"
+            },
+            "locator": {
+              "file": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/phase_a/match_post/matches.2.json",
+              "problems": "0",
+              "sha256": "2b233a1e014dc8a27301609c20b2b05e425d3a7950b8a53744ffb3f33f95d8b9"
+            },
+            "origin": "external_import"
+          }
+        ]
+      }
+    },
+    "replicates_expected": 2,
+    "scope": null
+  }
+}

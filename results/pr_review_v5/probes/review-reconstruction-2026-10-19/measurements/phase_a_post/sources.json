@@ -1,0 +1,42 @@
+{
+ "DX1": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_post_base_rep1"
+ },
+ "DX2": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_post_base_rep2"
+ },
+ "DX3": {
+  "kind": "solo",
+  "run": "iter_ds41_conv_post_base_rep3"
+ },
+ "CTL1": {
+  "kind": "solo",
+  "run": "recon_ds41_ctl_post_rep1"
+ },
+ "CTX1": {
+  "kind": "solo",
+  "run": "recon_ds41_ctx_post_rep1"
+ },
+ "CXS1": {
+  "kind": "solo",
+  "run": "recon_ds41_ctxsk_post_rep1"
+ },
+ "CTX2": {
+  "kind": "solo",
+  "run": "recon_ds41_ctx_post_rep2"
+ },
+ "CXS2": {
+  "kind": "solo",
+  "run": "recon_ds41_ctxsk_post_rep2"
+ },
+ "CTX3": {
+  "kind": "solo",
+  "run": "recon_ds41_ctx_post_rep3"
+ },
+ "CXS3": {
+  "kind": "solo",
+  "run": "recon_ds41_ctxsk_post_rep3"
+ }
+}
