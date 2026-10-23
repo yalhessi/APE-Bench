@@ -5,6 +5,13 @@ preparation notes, all 66 finalized findings, matcher verdicts, channel accounti
 session outcomes. This follows the [implementation review](review-knowledge-transfer-implementation-review-2026-10-23.md).
 No model sessions or judging were launched. Usefulness labels remain pending.
 
+**Follow-up after reviewing the earlier transfer experiments:** the
+[historical synthesis and revised next-run recommendation](knowledge-transfer-experiment-synthesis-2026-10-23.md)
+supersedes section 6.3's suggestion to make a targeted aesop evidence-supply probe the next main
+experiment. Earlier source-supply diagnostics already establish conditional uptake. The proposed
+next comparison tests independently acquired, reusable knowledge against solo review and the
+existing terse resource. The recommendation against expanding this unchanged pilot still stands.
+
 **Recommendation:** do not expand the current conditional-preparation method or make it the
 default reviewer. Keep the shared Task/session implementation. Finish the existing usefulness
 assessment before claiming a quality improvement, but do not make all further research wait for
