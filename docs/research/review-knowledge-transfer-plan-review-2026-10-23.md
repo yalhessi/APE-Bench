@@ -312,3 +312,104 @@ briefs with audits cost 2.72M).
 5. Part C on two PRs by three reps, then the rest. 6-10 windows in all, staged.
 6. Parts D and E as written, with the tuning concerns (API redundancy, generation) listed before
    C so E's held-out concern is fixed in advance.
+
+---
+
+## Second response (Claude, 2026-10-23), on the revised plan at `develop@817a606c`
+
+Read the revised plan, this record and the theoretical companion against the branches they
+cite. Checks run: every relative link in the three documents (14, 9 and 3) resolves and the three
+source files the companion cites are tracked; `review-operations@01008813` descends from the
+refactor merge `a9154196`, is 296 commits ahead of `develop` and 6 behind, all six docs, so
+integration is a merge; the companion's reading of the slides matches their text
+(`slides.md:132` for A as "the region ≽ does not require leaving", `:203` for the completeness
+condition); the session arithmetic (24 for the pilot, 48 for the expansion) is right. No model
+ran.
+
+### Conceded
+
+**Stage W.** The generation-suppression plan's status line
+(`generation-suppression@d7c65fa6`) reports gpt-5.5 on stage M's other 13 PRs: in-census reach
+0.43 to 0.62, +0.189 on both matchers, nine asks gained and none lost, findings a PR 2.38 to
+3.15, one run a condition. That is a separate, positive, conditional result, and my correction
+conflated it with the detector pass-through. Withdrawn. Two things remain true of it: it is one
+run under exact convention supply, as the plan says; and it is in no line of `docs/questions.md`,
+whose two disposition-paragraph lines carry only the detector reading. The probe directory exists
+only on that branch.
+
+**The 35-place threshold.** Sessions, asks and overlapping pools are different units, and no
+argument tied one third to the value of an autonomous method. Withdrawn as stated. What it was
+for survives below as item 1.
+
+### Where the revision is better than the draft
+
+- The reopening is named, and the distinct claim is now a claim about investigation ("a source
+  reason changes what is investigated") with four predicted effects and, for each, what would
+  separate it from an explanation written afterwards (§3). That is the right shape for a
+  pre-registration.
+- The first batch is capped at 24 sessions, the fixed-evidence diagnostic is a named alternative
+  rather than a sequel, retrieval's two objects are separated, and §5D's fifth row ("performs checks
+  but final review does not improve: do not expand") closes the loophole the draft left.
+- Weights fixed; the source policy stated; the output channel fixed at finalized findings with
+  submitted and anchored counts retained.
+
+### What is still missing, in the order it would cost to leave out
+
+1. **A countable stop rule for A, as a guard against fitting the examples.** The revision keeps
+   only a qualitative stop ("only restated rules, authority or per-concern instructions"). Register
+   three yes/no readings per worked choice before writing it: (i) an eligible dated source exists
+   outside the target's thread; (ii) it names an investigation (a check or a comparison) that the
+   ordinary producer's saved trace did not perform; (iii) that investigation's result could change
+   the comparison either way. Rule: fewer than 3 of 4 choices with all three, park before B. This
+   is pre-registration against post-hoc writing, not a population estimate, so the units objection
+   does not apply.
+2. **A blind reading rule for the first predicted effect, written before the pilot is unblinded.**
+   On fresh PRs nobody knows the relevant investigation in advance, so "a relevant investigation
+   that ordinary preparation missed" is read from traces after the fact. The dossiers round shows
+   what that produces: each reviewer's own non-blind miss classification, a quarter to a half
+   apart. Put in `PROTOCOL.md` what counts, who reads, and that the reader does not see the
+   condition. The fixture replay was the cheap way to have known targets; with it optional, the
+   blind rule is mandatory.
+3. **Name the fresh-PR pool now.** `val-2025-06-2026-03-v1` (60 PRs, 50 natural-rate and 10
+   AI-authored, sealed before any candidate was collected; `docs/todo/eval-set-selection.md`),
+   outside small12 and outside every probe's PR list (Phase A's eight, the conventions PRs, P14),
+   with a reviewed workspace (37 of 39 validation-window workspaces build, `docs/questions.md`).
+   The test release stays untouched. "Select before reading review outcomes" needs a recorded
+   mechanical selection: a seed and the visible-change characteristics, in the protocol.
+4. **A prior for the cost, from the record.** The six Opus C sessions were about 20M processed
+   tokens, about 3.3M each with investigation; ordinary Opus sessions run 1.3-2M. So 12 producers
+   20-40M, 12 consumers 15-25M: **35-65M processed tokens, 2-3 five-hour windows on the primary
+   token**, plus matchers (about 0.3M a seal) and readers. The plan's "estimate from the selected
+   route at handoff" is right; this is the number to check it against.
+5. **The record work the plan creates, one commit, no spend.**
+   - `docs/plans/STATUS.md` has no row for this plan (nor for the operations foundation beyond
+     the dataflow entry). Add it as not built.
+   - `docs/dead-ends.md`: "Reopened 2026-10-23, under its own condition" on Mode A (line 150) and
+     on the library-knowledge entry (line 347), pointing here, as the specialists entry does at
+     line 110. Without it the next session that reads the ledger sees two closed threads.
+   - `docs/questions.md`: one line for stage W, marked one run a condition and branch-only.
+   - `docs/todo/review-library-mechanism-over-local-precedent.md` (`grounds-reading`): its step 2,
+     "the supplied-grounds test is not yet designed", is this plan's pilot. Say so there when the
+     branch merges, or two owners hold the same next test.
+
+### Two residual disagreements, stated once and left to the user
+
+- **The fixture replay.** Six sessions against twenty-four, at the only two places where the
+  relevant investigation is known in advance (count uses at 33066; try the client call at 33117).
+  I accept "not the default". The consequence for §5D's fifth row is that on fresh PRs
+  "performed the relevant check" and "performed a check" may not be separable, which is why item 2
+  matters.
+- **The corpus as the reviewer's knowledge.** This record settles it by argument ("preserves the
+  goal of general taste"). The request was for the user's word against the 2026-09-26 framing.
+  Until it comes, the protocol's "Already answered?" section should carry it as an assumption.
+
+**The second model.** The revision stages it (first-model signal, then a matched replication). The
+user's standing rule is a factorial, not a sequence; for a two-PR pilot the sequence is tolerable
+if §5E never makes the second cell optional, and if the plan says which model it is when `first`
+is busy. Sonnet measures an interaction with the pointer, as the record says, which is a reason to
+report it as such, not to prefer it.
+
+### Verdict
+
+Go on A-B as revised, with items 1-3 in the protocol before B closes and item 5 in the same
+commit series. Nothing here needs a model run.
