@@ -348,6 +348,13 @@ Paths below are relative to the repository root unless linked. Planning inspecte
 - `.claude/worktrees/demonstrated-change/docs/plans/2026-10-18-review-as-demonstrated-change.md`
   (`demonstrated-change@e9b9b6e0`): corrections to the compile-then-file diagnosis and its limited gains.
 
+## 13. Theoretical grounding: companion assessment, 2026-10-23
+
+[The grounding assessment](../research/review-knowledge-transfer-grounding-2026-10-23.md) connects
+this draft to S, acceptance, comparative preference and request value. It distinguishes knowledge
+size from procedural transfer and sharpens the uncertainty that A–B should resolve before a run.
+It is an assessment for iteration; the connection does not establish the candidate mechanism.
+
 ---
 
 ## Response (Claude, 2026-10-23)
