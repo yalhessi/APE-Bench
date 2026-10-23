@@ -1,574 +1,367 @@
 # Review knowledge transfer across the long tail
 
-**Status: draft for iteration, 2026-10-23.** This proposes a research direction and a first
-candidate mechanism. No new experiment, corpus construction or runtime implementation has
-been performed for this plan. Model-backed generation, ingestion and judging remain user-run.
+**Status: revised draft for iteration, 2026-10-23.** Incorporates the assessment of Claude's
+response. The [review record](../research/review-knowledge-transfer-plan-review-2026-10-23.md)
+preserves its text and explains the decisions. No new model runs, corpus construction or runtime
+implementation have been performed for this plan. Model-backed generation, ingestion and judging
+remain user-run. The immediate handoff is A-B below, not a full campaign.
 
-## 1. The decision this plan proposes
+## 1. The research decision
 
-Prioritize a method that can improve reviewing across different concerns without requiring a
-custom implementation for every convention. Keep the current Task/dataflow foundation stable.
-Use small experiments to test the breadth of a mechanism before investing in its architecture.
+Prioritize a method that improves reviewing across different concerns without a custom
+implementation for every convention. Keep the Task/dataflow foundation stable. Additional
+knowledge should usually enter as data; the procedure should earn its complexity through better
+review on situations beyond its development cases.
 
-The first candidate is **case-based transfer of review knowledge**: recover what made an earlier
-review decision appropriate, determine whether that relationship holds in a new contribution,
-and investigate the consequences of a concrete alternative. This is a hypothesis, not a validated
-replacement for the strongest ordinary reviewer. Existing precedent retrieval already provides
-part of this capability; changing its name or adding a longer prompt would not establish progress.
+The first candidate is **case-based transfer of review knowledge**. Recover a
+conditional reason from independent earlier decisions or library evidence, relate it to a choice
+in the visible PR, and use it to decide what to investigate. The investigation can support a
+revision, defeat the proposed revision, or leave the choice unresolved. Ordinary review still
+decides whether a request is justified.
 
-The immediate deliverable is a concrete, distinguishable intervention and an executable comparison.
-Do not begin by building a convention platform, another reviewer hierarchy or a catalogue of checks.
-Whole-PR reconstruction and the specialized comparison-session Task remain deferred as current
-investments. Neither is a prerequisite for testing the candidate described here.
+This reopens the July precedent direction and October library-knowledge question. It is not a new
+solution by virtue of its name or representation. The proposed difference is that conditional
+knowledge guides the investigation of consequences, rather than merely priming a reviewer with
+similar comments. Whether this adds anything to ordinary source-grounded review is unproven.
 
-## 2. The problem we need to solve
+The next deliverable is four worked choices and **one shared, executable comparison recipe**.
+Use them to decide whether a small pilot is worth running. Whole-PR reconstruction remains parked;
+a convention platform, a new hierarchy of reviewers and a detector catalogue are not prerequisites.
 
-The census spreads 1,833 asks over roughly 400 conventions at its chosen grain. Its top ten
-entries cover about one fifth of asks and its top fifty about half. The four conventions behind
-the deterministic-detector experiment cover about 3%. The exact counts vary with codebook and
-classification; the practical lesson is that a few manually implemented rules have a low ceiling.
+## 2. What the existing results permit us to believe
 
-Our desired economy is different: additional historical examples should let a fixed method handle
-additional situations. Acquiring another convention should usually change the knowledge supplied
-to the system, rather than require another producer, prompt branch or execution path.
+The census spreads 1,833 asks over roughly 400 conventions at its chosen grain. Its top ten cover
+about one fifth and its top fifty about half; the deterministic-detector experiment's four
+conventions cover about 3%. These are descriptive, codebook-dependent counts. They motivate a
+method with broad reuse, without proving that the knowledge itself can fit in a short rule list.
+A small stable codebase may need a large, evolving knowledge resource.
 
-There may be fewer underlying capabilities than named concerns: recognizing a design role,
-finding a relevant comparison, constructing an alternative, testing its consequences and assessing
-whether its benefit warrants a request. That compression is plausible but unproven. Reusing the
-same words or tools across cases does not demonstrate that the difficult reasoning transfers.
-
-Success therefore has two requirements: better useful review, and evidence that the method extends
-beyond the particular concerns used to develop it. A reliable check for one narrow convention can
-still be useful engineering, but it does not satisfy this research objective by itself.
-
-## 3. Already answered? Constraints from the record
-
-| Observation | What it changes about this proposal |
+| Existing observation | Consequence for this plan |
 |---|---|
-| Exact convention supply substantially improves recovery on selected asks; ask-free shortlists and pinpointed delivery have not reliably carried that gain. | Knowledge matters, but relevance, applicability and use must be tested independently. Do not repeat the ceiling test. |
-| Examples plus disposition instructions have some positive results, including GPT's stage W under exact convention supply. Later ask-free results are mixed or negative. | Do not claim prompting or examples never help. A positive result conditional on target knowledge is insufficient for autonomous transfer. |
-| Reconstruction proposals reached consumer findings, including the compiling normalizer generalization. No registered stable historical-ask gain followed. | Transmission is feasible. Additional plausible edits are insufficient evidence of better review. Human usefulness labels on the latest additions panel remain pending. |
-| At 33066, avoiding a constructor in a different proof did not establish redundancy in the submitted design. | Compare the role and value of the submitted object; difference from an independent solution is not itself an objection. |
-| With search fixed at 33117, all six assisted Opus sessions connected `to_fun` to the handwritten twins, but only one filed the change. | Retrieval and an explicit correspondence can succeed while construction or judgment still fails. A comparison stage alone is not an established solution. |
-| Generated interfaces at 33117 have real client-call differences; the grounds reading contains legitimate exceptions to avoiding duplication. | Retain costs and contrary examples. A generic preference for generation, reuse or fewer declarations would decide the question prematurely. |
-| A proposed topology generalization compiled under stronger assumptions. Some trial edits failed because required imports were absent. | Check the relationship claimed by a proposal. Neither successful compilation nor a failed trial alone settles the comparison. |
-| Forced filing, artifact-only selection and convention detectors have already encountered volume, judgment or coverage limits. | Do not replace the missing capability with more filings, confidence gates or one detector per concern. |
+| July Mode A delivered precedents and showed uptake, but its early gain did not replicate: 13 versus 11 covered on 41 shared PRs. | Name this predecessor. Another priming prompt needs a concrete difference and an appropriate repeated comparison. |
+| Exact convention supply improves selected-ask recovery; ask-free shortlists, pinpointing and verification framing have not reliably carried that gain. | Do not repeat the ceiling test. The missing capability could be selection, applicability or use, and these need different tests. |
+| GPT stage W improved under exact convention supply; DeepSeek examples/precedence also have positive conditional results. | Prompting is not categorically exhausted. These results do not establish autonomous transfer. Stage W is separate from the detector pass-through experiment. |
+| Of 41 difficult free-reviewer misses, the library decided 7, or 5 on recheck; for 19 it exposed options while a choice remained. | Pair facts with conditional project knowledge as a candidate intervention. Use the 19 as a development pool, not a new mandatory campaign. |
+| Ask-blind decision-context packets did not improve recovery in the reconstruction probe; some deciding sources were missed or misidentified. | Evidence gathering and its interpretation are both uncertain. Do not assume a useful source will be found. |
+| At 33117 with search fixed, all six assisted Opus sessions related `to_fun` to the twins; one filed. Three of five declines involved a faulty trial. | A correspondence alone is insufficient. Repair incidental construction failures; distinguish technical failure from a reason to retain the design. |
+| Generated `fun_sum`/`fun_prod` forms have real client-call differences. At 33066, an independent solution avoiding the wrapper did not establish its redundancy. | Compare the submitted object's role and interface. Compilation or a different solution does not establish preference or request value. |
+| The grounds reading found a recurring reason and substantive exceptions, not a universal priority. Most asks do not state a reason. | Retain contrary cases and uncertainty; distinguish stated reasons from inference. Do not encode 'prefer generation/reuse' as the answer. |
+| The compiling normalizer proposal reached final review; useful-addition labels remain pending. Forced filing and detectors encountered burden or coverage limits. | Score final findings, retain losses, and assess request-worthiness separately. More technically sound proposals alone are insufficient. |
 
-The primary reading list and branch locations are in section 12. These are development findings,
-not independent evidence for the new candidate. The historical asks also omit potentially useful
-suggestions, so historical recovery and request-worthiness need separate measurements.
+These are development observations, not independent validation of the new candidate. The 3-4
+remaining asks out of 93 for redundancy/generation bound those two families, not this broader
+research goal. Repeated runs overlap substantially, which makes pure resampling a weak bet;
+it does not remove the need for an ordinary additional-work control.
 
-## 4. The hypothesis and its proposed mechanism
+## 3. The mechanism, its predictions and its failure conditions
 
-**Hypothesis:** a shared procedure can use prior review cases to recover conditional design
-expectations, relate them to a new PR, and produce useful requests across different concern families.
-
-The candidate changes what the preparatory investigation establishes. Instead of supplying only
-"this convention may apply" or an independently reconstructed contribution, it supplies a sourced
-relationship between the current design, relevant earlier decisions and a proposed alternative.
-Its distinctive content is the applicability argument and the consequences that could defeat it.
+**Hypothesis:** a fixed procedure can use independently sourced conditional knowledge to choose
+better investigations and make better requests across different concerns.
 
 The same procedure would:
 
-1. Identify consequential choices in the visible PR at declaration, family, file or PR scope.
-2. Query existing dated sources for comparable design roles, mechanisms and prior decisions.
-3. Recover what the source actually supports: a requested change, stated reason, relevant context
-   and any observed response. Separate quotation, technical fact and inferred rationale.
-4. Explain the correspondence to the current choice and where that correspondence breaks down.
-   Look for relevant competing evidence within the same investigation budget.
-5. Investigate a concrete alternative with existing tools. Check the consequences relevant to the
-   claim: for example, preserved client calls, changed automation or implication of assumptions.
-6. Hand the ordinary reviewer the evidence, limitations and alternative. The reviewer may request
-   a change or retain the submitted design under the same output contract as the control.
+1. Identify consequential choices in the visible PR. Do not start from a maintainer's target ask.
+2. Search existing dated sources for comparable roles, mechanisms and decisions. Inspect source
+   context, not just a retrieved comment or an embedding score.
+3. Recover the reason the source supports and the circumstances limiting it. Separate a stated
+   reason, an observed fact or outcome, and the investigator's inference.
+4. Relate that reason to the target and identify the uncertainty that could change the comparison.
+   Consider contrary evidence within the same budget. A purported benefit may be absent here.
+5. Investigate that uncertainty with existing tools: inspect a family, compare naming practice,
+   try client calls, test assumptions or automation, or construct an alternative. Repair incidental
+   errors before treating a failed trial as evidence against the alternative.
+6. Give ordinary review the comparison, actual checks and unresolved consequences. The final
+   reviewer can request a change, retain the submitted form, or omit an insufficiently supported
+   concern under the same contract as the control.
 
-These are investigation steps, not mandatory ledger cells or a quota of objections. A source can
-be relevant without settling the decision. Missing counterevidence is not evidence that none exists.
-The method must discover its targets from the PR; a maintainer's target comment is never an input.
+This is a method for allocating investigation, not a mandatory tradeoff ledger. Some reasons
+remain matters of scope or judgment; no executable check is guaranteed to settle them. Counting
+uses, successful compilation and a recorded earlier request are evidence, not universal policies.
 
-For a concrete development illustration, consider 33117's handwritten `fun_*` twins. The preparation
-would search for prior handwritten/generated API decisions, rather than only the current lemma
-names. A useful result would establish both the maintenance saving from generation and any changes
-to existing client expressions such as `Meromorphic.fun_sum h`. The proposed transformation could
-then preserve a useful wrapper, convert only compatible members, or retain the current form if the
-cost dominates. These are possible outcomes to investigate, not recommendations established here.
-The next different concern must work through the same procedure with different source evidence.
-33117 itself is an already studied fixture and is not scheduled for more model runs by this plan.
-
-## 5. What data moves through the method
-
-Start with source excerpts and small retained notes using existing observation references. The
-following is a content contract for the experiment, not a request to implement new schema classes.
-
-| Value | Content required by its consumer |
+| Predicted effect | What would distinguish it from an attractive explanation afterward |
 |---|---|
-| Historical case | Source identity/date; code and discussion sufficient to understand the choice; exact requested change; stated reason if present; observed outcome if actually available |
-| Candidate expectation | A revisable account of the circumstances and benefit; known costs, scope and exceptions; supporting sources; explicit uncertainty |
-| Target correspondence | Which choice in the new PR is related, why the relationship is relevant, and material differences from the historical case |
-| Investigation result | Concrete alternative; checks performed and their exact outcomes; consequences established, contradicted or unresolved |
-| Delivered review | Ordinary final findings, consumed by the shared evaluation path |
+| A source reason changes what is investigated. | Retained inputs and traces identify the eligible source, target correspondence and a relevant investigation that ordinary preparation missed or handled incorrectly. |
+| The result changes the comparison appropriately. | The proposal responds to established costs or contrary evidence, including retaining a useful local form. Merely mentioning both sides is insufficient. |
+| Better investigation improves review. | The delivered requests improve in historical recovery or assessed usefulness, without an offsetting pattern of unwanted demands or lost useful coverage. |
+| The procedure extends through knowledge. | An untouched concern benefits from new eligible examples without a new prompt branch, trigger or checker. |
 
-A past request is evidence of that decision, not a universal rule. An author's later edit is not
-an independent usefulness label. Unasked code is not a negative example merely because it merged.
-Cases that explicitly justify retaining a local form or rejecting a proposed change are especially
-useful contrasts, but their availability must be reported rather than manufactured.
+A trace showing a check was performed is a mechanism observation, not success by itself. If the
+producer writes a more complete account but the comparisons and final requests do not improve,
+the intervention has not earned expansion. If ordinary preparation does the same useful work,
+prefer the simpler instructions. A positive result in one family supports that family first.
 
-Derived notes may be computed now from eligible historical sources. Their information must still
-respect each target's cutoff and exclusions. A codebook or summary prepared after reading a target's
-asks is development material; removing its direct quotation does not make it independent again.
+**Development illustration: 33117.** 'Prefer generated twins' is not the intervention. The
+maintenance reason must be compared with the actual interface: handwritten
+`Meromorphic.fun_sum h` works while the generated analogue exposes different parameters. The
+investigation could support retaining a wrapper, converting compatible members, or retaining the
+submitted form. Those are alternatives to investigate, not established recommendations. This PR
+and 33066 remain fixtures; neither receives another model campaign by default.
 
-## 6. How the candidate differs from earlier designs
+## 4. Data and scope boundaries
 
-| Earlier design | Difference this candidate must actually demonstrate |
+Use source excerpts and small notes with existing observation references. These are content
+requirements, not new schema classes or a second provenance ledger.
+
+| Value | Required content |
 |---|---|
-| Existing lexical/dense precedent retrieval | A useful relationship between retrieved evidence and the target, not merely a relevant comment or a new index |
-| Selector-picked convention sentences and pinpointed rules | A supported account of applicability and competing consequences, without asserting the target's historical conclusion |
-| Examples and proposed dossiers | Transfer to new PRs without being given the applicable rule or place; no convention-specific exam that supplies the missing target |
-| Whole-PR reconstruction | Investigation of choices in the submitted contribution; no requirement to construct an independent contribution first |
-| Demonstrated-change and compile-then-file proposals | Technical construction supplies evidence; it does not automatically establish that a change should be requested |
-| Artifact-only finding selection | No new generic scorer or gate over the same candidates; the intended gain is better investigation and proposal content |
+| Source case | Identity/date, relevant code/discussion, requested change and stated reason when present; observed response only when actually available |
+| Conditional knowledge | What favors a form in which circumstances; costs/exceptions; supporting sources; uncertainty and inferred elements |
+| Target correspondence | The visible choice, the relevant relationship and material differences from the source |
+| Investigation result | Alternative or comparison; checks and exact outcomes; consequences established, contradicted or unresolved |
+| Delivered review | Ordinary finalized findings through shared evaluation |
 
-If the actual input difference reduces to more examples, a generic principle, an authority paragraph
-or extra computation, say so. Reuse the relevant earlier result or test that simpler explanation.
-The proposal earns further work only if its new information and predicted effect can be stated
-concretely. A more elaborate representation is not itself evidence of a new mechanism.
+When a reason is unstated, the method may infer one from code, discussion and contrasting practice,
+but must mark that inference. It may look for better evidence or leave the comparison unresolved.
+Do not invent maintainer authority, fill a compulsory ledger or treat lack of explicit rationale
+as proof that there is no transferable knowledge.
 
-## 7. Dependency order and work packages
+The source policy is independent historical knowledge for generalizable conditions, not lookup
+of the target's historical review. Exclude the target's asks, later fixes, discussion and summaries
+of those outcomes, including cross-PR references caught by existing gates. Library evidence must
+be available in the permitted episode view. Derived notes must respect the target's cutoff and
+exclusions even when computed now. An ask-informed codebook remains development material.
+
+A historical request is evidence about one decision. An author's edit is not an independent
+usefulness judgment. Merged or unasked code is not automatically a negative example. Explicit
+reasons for retaining a form are valuable contrasts even if they occur once. Model weights remain
+fixed in this plan; training is outside this work rather than another dependency to resolve now.
+
+## 5. The dependencies
 
 ```text
-A. Check the distinct mechanism and existing capabilities
-  -> B. Prepare concrete development examples and one recipe
-    -> C. Run a bounded autonomous comparison across concerns
-      -> D. Resolve the uncertainty that changes the next decision
-        -> E. Test transfer on a broader untouched panel
+A. Bounded worked choices: what information/action would actually differ?
+  -> B. One recipe, local source/tool checks, costed manual handoff
+    -> C. Small paired pilot on two PRs, or one targeted diagnostic instead
+      -> D. Diagnose the loss and decide whether to stop, revise or expand
+        -> E. Untouched broader panel, new concern and second-model validation
 ```
 
-Runtime fixes can proceed independently when they have an active consumer. Corpus expansion,
-learned adaptation and new Task classes are conditional branches, not prerequisites for A–C.
+The operations foundation is a shared engineering dependency of a tool-using producer. Source
+expansion, another index, a convention ontology and a new generic experiment abstraction are not.
+Do not turn the branches below into a sequence that must all be completed.
 
-### A. Check the premise and choose the first implementation
+### A. Make four choices concrete from existing evidence
 
-Use the existing results and up to six saved development cases. Reuse their assessments; do not
-repeat the additions triage, reconstruct the census or commission another broad failure taxonomy.
-For each case, identify the missing information or relationship and whether the current record
-already supplies it. Include a case where the relevant mechanism was known and still rejected.
+Prepare four worked choices across at least three concern families. Reuse existing readings and
+traces. The 19 `library_partial` asks provide candidates beyond 33066/33117; do not reread all 19
+or pool sessions and asks into a prevalence estimate. Include a justified retention or contrary
+case and at least one concern outside redundancy/generation, such as naming, assumptions or docs.
 
-Inventory the source views and retrieval operations available in the selected implementation
-checkout. Inspect both existing precedent paths before proposing another retriever. The Task/data
-refactor is on `develop`; the operations work and its implementation review are on `review-operations`
-at this draft's writing. Verify integration status before executing anything based on that branch.
+For each show:
 
-**Output:** one brief mechanism table and the chosen input difference. Stop or revise if the
-candidate duplicates an old intervention or depends mainly on new scripts for individual concerns.
+- What ordinary review already knew, retrieved, attempted and delivered, citing the saved record.
+- A missing or misused relationship, or an explicit finding that the record already supplies it.
+- An independently eligible source and the conditional reason it supports. Mark ask-informed
+  source selection as development assistance, not evidence of autonomous retrieval.
+- What that reason would lead the session to investigate and what result could defeat the revision.
+- The exact addition relative to prior priming, dossiers, decision-context or demonstrated-change
+  inputs. If there is no addition, say so rather than declare a new mechanism.
 
-### B. Make the mechanism reviewable before building it
+**Deliverable:** one short worked-example file and a common procedure. This is not a new taxonomy,
+a 35-place audit, or another additions panel. If a focused pass produces only restated rules,
+authority or per-concern instructions, revise or park this candidate before building it. Failure
+to find a stated reason in this small set does not settle all knowledge-transfer designs.
 
-Prepare worked examples spanning at least four distinct concerns, such as API redundancy,
-generation/interface design, naming organization, and assumptions or automation. Familiar PRs can
-illustrate the mechanics, but cannot count as new evidence of benefit. Include contrary cases.
+### B. Prepare one executable recipe and check its real dependencies
 
-For each example show: the old source, what the baseline could already retrieve, the additional
-relationship this method would establish, and what observation would change the recommendation.
-The same procedure must handle the examples. A special prompt or trigger per concern is evidence
-that the proposed compression has not yet been achieved.
+Use the selected checkout's existing retrieval and session paths. On the worked cases, inspect
+what a query derived from visible code returns under the actual cutoff and exclusions. Distinguish:
+no eligible evidence identified; an eligible source missed by retrieval; a misleading analogue;
+and a useful source whose relevance the model may still misuse. Retain queries and returned excerpts.
 
-Prepare one recipe with source eligibility, prompts, retained outputs, resource limits, controls
-and measurement. Use existing source excerpts and session/context handoffs initially. Identify any
-missing engineering as a concrete dependency, with a caller and a minimal acceptance check.
+This is a bounded feasibility check, not a new retrieval benchmark. The 43 library/sibling analogue
+asks and the old dense-index benchmark answer related but different questions. The relevant
+historical case need not be the exact analogue named in the target's review. Do not require a
+universal hit@5 threshold, rebuild the corpus/index, or assume semantic relevance can be judged
+with CPU alone. Local deterministic queries and manual reading suffice for this handoff.
 
-**Output:** executable preparation and review inputs, plus a short protocol beginning with
-"Already answered?". Proposed planning budget for A–B together: one focused workday, revised
-explicitly if the missing work warrants it. No model campaign or new knowledge store follows by default.
+Specify one producer prompt, source policy, Task inputs, note allowance, context rendering,
+consumer and resource limits. Ordinary and treatment preparation must have the same opportunities
+to use evidence. State which inference the pilot tests and which source/model/route is held fixed.
+Before reading pilot outcomes, state what improvement in delivered requests would justify another
+batch, what burden would stop it, and the maximum resource allocation. These are investment
+criteria for this pilot, not universal numerical laws for reviewing.
 
-### C. Test the method across concerns without target asks
+**Deliverable:** a `PROTOCOL.md` opening with 'Already answered?', no-spend preflight results,
+complete verified manual commands and a route-specific cost estimate. No model work launches
+from plan drafting. A-B together should take one focused workday; if they need substantial new
+infrastructure or corpus work, report the concrete obstacle and reconsider the investment.
+Cost any judging, transport smokes and retry allowance separately from the main generation count.
 
-The first model-backed comparison should exercise autonomous target and source selection.
-A suggested reconnaissance panel is six fresh PRs spanning at least four observable change
-contexts, selected before reading their review outcomes. Include ordinary PRs, preserve AI-authored
-PRs where present, and allow cases without agreed asks. Selection by changed-code characteristics
-is allowed; selection by whether this method will recover a known ask is not.
+### C. Run one small test that answers the remaining question
 
-Use the strongest intended reviewer on one fixed route. A cheaper model can establish operational
-correctness, but its results cannot settle the benefit on the intended reviewer. Freeze these two
-conditions before running:
+**Default: a two-PR autonomous pilot.** Select both PRs before reading their review outcomes,
+using visible change characteristics to cover different contexts. Keep AI-authored contributions
+eligible and allow PRs without agreed asks. Record whether the selected targets are genuinely
+unseen by the method's development process; a fresh pair cannot be manufactured from old fixtures.
+
+Use the strongest intended reviewer on one fixed route. Freeze these two conditions:
 
 | Condition | Preparation | Consumer |
 |---|---|---|
-| Ordinary additional work | The producer investigates the visible PR with the normal tools and records ordinary review notes | Ordinary final review with those notes |
-| Case-based transfer | The same producer uses the procedure in section 4 and records the resulting evidence and proposals | The same final review with that material |
+| Ordinary additional work | Investigate the visible PR normally with all permitted sources/tools; record ordinary review notes | Ordinary final review using those notes |
+| Investigation using conditional reasons | Use section 3's shared procedure with the same source access/tools and note allowance | The same final review using that material |
 
-Both preparations have the same source access, model, route, investigation limits and output
-allowance. Both consumers use the same contract, tools and limits. The treatment changes the
-preparatory method. This comparison includes the producer's effort rather than treating an
-expensive helper artifact as free assistance to a weaker reviewer.
+Match model, route, producer/consumer limits, source policy and final output contract. The baseline
+is allowed to compare alternatives and cite precedent; do not weaken it to make the intervention
+distinct. Regenerate preparation and review for each independent repetition. Three repetitions
+per PR and condition give **12 preparation sessions + 12 final reviews = at most 24 main sessions**.
+This is the first batch, not the first installment of an automatically authorized 72-session run.
 
-Three independent preparation/consumer repetitions per PR give **36 final reviews and 36
-preparatory sessions** on this suggested panel. Regenerate preparation per repetition; a fixed
-sketch would estimate a different source of variability. An operational smoke precedes the batch.
-The counts are adjustable reconnaissance bounds, not a claim of statistical power. Before launch,
-estimate total tokens, wall time and account/quota use from the actual selected route; provide
-complete manual commands and do not launch model work from this drafting task.
+Use existing transport evidence where sufficient. Any additional live smoke is separately named
+and costed before the batch; a cheap model establishes operation, not intended-reviewer benefit.
+Estimate processed tokens, actual subscription/account impact, wall time and billed spend from
+the selected route. Historical usage warns that this can consume substantial interactive capacity;
+it is not a verified current schedule or assurance that a zero-billing model is available.
 
-Equal limits do not ensure equal consumed resources. Report actual preparation and consumer use,
-including index or corpus preparation costs. A large difference requires a further resource
-comparison before claiming efficiency or superiority. Keep any ordinary one-pass results as a
-separately identified reference, not a substitute for this additional-work control.
+**Alternative: one fixed-evidence diagnostic.** Choose this instead when A-B locate the uncertainty
+in use of already supplied evidence, or source/tool availability prevents an informative autonomous
+pilot. Give both conditions the same eligible source set and visible target; change the preparation
+method. Use the same paired composition and repetition accounting, with no more main sessions than
+the default. It tests investigation/use conditional on supplied evidence, not source discovery or
+autonomous transfer. Do not handcraft the treatment's final recommendation. Do not routinely run
+this diagnostic, fixture replays and the autonomous pilot in sequence.
 
-**Output:** a result by PR and concern, including failures, lost coverage and actual resources.
-This small, deliberately varied panel can reject a candidate or motivate another test. It cannot
-estimate population-wide yield or establish that a broad capability has been learned.
+**Deliverable:** retained sources, prepared notes, rendered contexts, delivered findings and a
+short result by PR with actual resources. Equal limits do not imply equal consumption. Neither
+two PRs nor three repetitions estimates population-wide yield or demonstrates broad transfer.
+Record any one-time knowledge preparation and manual curation separately from session usage.
 
-### D. Choose the next step from the observed failure
+### D. Spend only on the failure that matters next
 
-| Result | Next decision |
+| Observed result | Next decision |
 |---|---|
-| Relevant source cases are not found | Examine query/role representation on these failures. Build a different retriever only if it adds missing evidence; do not expand the corpus automatically. |
-| Relevant cases arrive, but applicability is inferred incorrectly | Test that relationship on saved contrasted cases. Consider learned adaptation if the fixed model repeatedly misuses sufficient evidence. More retrieved comments alone have not earned priority. |
-| The correspondence is useful, but trial edits are misleading | Fix the shared construction/checking defect and test it across concerns. Avoid a separate verifier per convention. |
-| Better supported proposals arrive, but consumers lose them | Isolate handoff with information held fixed. Do not add the missing answer and attribute the gain to communication. |
-| The apparent gain is confined to one family or consists mostly of optional edits | Keep any cheap useful component, but stop claiming a general mechanism. Park or change the research bet. |
-| Useful gains extend across different concerns without greater unwanted burden | Advance the fixed method to E; run a targeted ablation only if it could change the design. |
+| No useful eligible sources arrive. | Separate source availability from query/selection failure. A fixed-source diagnostic is justified only if such evidence actually exists and testing its use would change the next decision. |
+| Useful sources arrive, but correspondence or judgment is wrong. | Inspect the exact comparison. More retrieval or a compulsory ledger has no demonstrated benefit; test a concrete interpretation change or park the candidate. |
+| Relevant investigations fail for incidental construction defects. | Repair the shared defect and test the claimed relation, including interface or assumption consequences. No verifier per convention. |
+| Better proposals disappear during handoff/finalization. | Hold information fixed and repair that shared path. Do not silently score richer intermediate proposals. |
+| The method performs checks but final review does not improve. | Do not expand for mechanism compliance alone. Decide whether one identified fix is worth another bounded test; otherwise stop. |
+| Useful improvement appears across different choices with acceptable burden. | Consider the next tranche or independent validation. A targeted ablation is optional when it could change the implementation. |
 
-One possible ablation reuses the exact retrieved source set and compares raw cases with the
-derived applicability/consequence notes under a common context allowance. That isolates the
-interpretation contribution conditional on those sources. It does not test autonomous retrieval.
-More examples, more context and the generic additional-review control are simpler explanations
-to consider. Do not schedule every ablation regardless of the result.
+For a historical-recovery claim, 0/3 control versus at least 2/3 treatment on different PR kinds
+is a particularly clear pilot pattern. It is not the only legitimate outcome: better useful
+additions or fewer unjustified requests can matter. Conversely, one attractive optional edit or
+one noisy matcher gain does not justify a large campaign. Read the exact delivered findings before
+choosing the next spend, and leave unresolved human usefulness judgments pending.
 
-### E. Test breadth and extension before expanding the architecture
+One possible ablation holds retrieved sources fixed and compares ordinary preparation with the
+derived comparison under a common context allowance. This isolates use of those sources; it does
+not validate retrieval. Do not schedule every conceivable ablation before seeing a result.
 
-Freeze the method, then evaluate on untouched PRs beyond the reconnaissance panel. Choose the
-population and size from the claim and pilot variability before reading outcomes. Retain a broad
-unselected component so a balanced development panel cannot masquerade as expected real-world yield.
+### E. Test breadth before scaling the architecture
 
-Test two distinct claims: performance on new PRs under a fixed source policy, and extension to a
-concern not used to tune the procedure. For the latter, earlier eligible examples of that concern
-may be supplied as data; change neither the procedure nor its prompts. This is transfer through
-additional knowledge, not zero-shot discovery of a convention with no evidence anywhere.
+Only after an informative pilot, freeze the method and choose an untouched broader panel for the
+claim being made. Six PRs across four contexts remain a possible reconnaissance expansion, not a
+requirement. If the first two were run unchanged, adding four uses at most 48 more main sessions;
+if prompts or source policy changed, analyze the new version separately. Include a broad unselected
+component before claiming real-world yield, and choose size from pilot variation and the claim.
 
-Report results by concern and PR as well as overall, and record any manual tailoring. One concern
-dominating the gain, or needing an implementation patch for each new concern, weakens the broad
-claim. Family labels are descriptive analysis, not a permanent ontology or runtime router.
+Test extension to a concern outside the tuning examples. Earlier eligible examples may be added
+as data; neither prompts nor code acquire a tailored path. Record the development concerns before
+running, and select the held-out concern without choosing it for an observed treatment success.
+Report gains, losses and manual tailoring by concern; family labels are analysis, not a runtime router.
 
-## 8. What counts as better review
+Include a second model before claiming general harness benefit. Its first cell can be a small
+matched replication. Record model-by-method results rather than assuming a gain or failure transfers.
+Sonnet's different fixture behavior is a reason to measure an interaction, not to disqualify it.
+Do not assume DeepSeek serving capacity is available. Cross-route tool smoke tests and cross-model
+reviewing validation answer different questions.
 
-Use final delivered findings as the primary output. Retain preparation, submissions, anchoring
-and finalization records to explain losses; never silently score a richer intermediate channel.
+## 6. What counts as better reviewing
 
-- **Historical recovery:** use the shared matcher or issue judge, naming its version, population,
-  channel and repetitions. Preserve disagreements. Different matcher versions remain separate
-  instruments unless calibrated; no new private matcher is part of this plan.
-- **Useful additions:** distinguish new concerns from better repairs of already covered concerns.
-  Assess exact findings with the shared human rubric, including control findings under the same
-  presentation. Pending labels stay pending; model technical-support labels are not usefulness.
-- **Costs and losses:** report wrong or excessive demands, unresolved proposals, useful baseline
-  concerns missed by treatment, finding volume and resources. Unasked findings are not automatically wrong.
-- **Breadth:** show which concerns improved, remained unchanged or worsened. Count repeated sibling
-  findings and repeated PR sessions transparently; they are not independent discoveries.
+Use **final delivered findings** as the primary output. Retain submitted, anchored and finalized
+counts and content to locate losses. Preparation is explanatory evidence, never silently scored
+as if the reviewer delivered it.
 
-Do not replace these dimensions with an arbitrary net score. Before the user-run pilot, state the
-smallest improvement and maximum burden that would justify the next investment. A noisy result
-may justify parking the method without establishing zero effect. If human reading is sampled,
-define the sampling before reading and keep conclusions within what that sample supports.
+- **Historical recovery:** use shared matching/judging, identifying instrument/version, population,
+  final channel and repetitions. Report disagreements. Uncalibrated matcher versions stay separate;
+  do not introduce a private matcher or require agreement as a substitute for inspecting a dispute.
+- **Useful requests:** assess the exact pilot findings, including controls, under the same human
+  rubric and blinded condition labels where feasible. Distinguish new concerns and better repairs.
+  A small pilot reading does not require completion of every older triage panel. Pending is pending;
+  technical support is not a usefulness label.
+- **Burden and losses:** inspect wrong, excessive or poorly supported demands; useful control
+  concerns lost by treatment; finding volume and author effort. No historical ask is not proof of
+  a false positive, and one extra finding is not a universal failure threshold.
+- **Mechanism and cost:** identify source use, correspondence, relevant checks, changed comparisons,
+  finalization losses and actual resources. Repetitions and sibling findings are not independent
+  discoveries; retained traces do not make every causal claim identifiable.
 
-## 9. Stable foundation and conditional engineering
+Do not collapse these into a new net score. The next-investment decision considers whether a useful
+change survived finalization, whether the pattern extends beyond one tailored example, what was
+lost, and what it cost. A noisy small result can justify parking the bet without proving zero effect.
+A cross-family positive pilot warrants validation, not a claim that the long tail is solved.
 
-Use APE Tasks and the standard orchestrator for model operations. Small deterministic rendering
-and joins remain functions. Use shared observation/context lineage, matching, result readers,
-retrieval and verification; Python and scaffold tools must reach the same domain implementations.
+## 7. Stable engineering foundation
 
-The initial composition is: eligible source view -> preparation Task -> selected notes/evidence
-output -> context rendering -> ordinary review Task -> finalized findings -> shared evaluation.
-Retain the actual sources and rendered context, including truncation. Data identifies the content
-and its occurrence; it does not need a new global experiment class or another execution ledger.
+Reuse APE Tasks, the standard orchestrator, observation/context lineage, existing retrieval,
+verification, result readers and evaluation. Deterministic rendering and joins remain functions.
+Python and scaffold tools must call the same domain operations.
 
-If a preparation Task genuinely needs episode-bound retrieval tools that the selected checkout
-cannot provide, complete that part of the operations foundation on its shared path. A folder
-session cannot be presumed to have tools it has not been granted. Do not work around that gap
-with a private runner. A bounded fixed-source diagnostic may proceed meanwhile, labeled as such.
+```text
+eligible source view -> preparation Task -> retained notes/evidence observation
+  -> ordinary context rendering -> ordinary review Task -> final findings -> shared evaluation
+```
 
-Add schema classes or an index only when repeated consumers need them. Specialized compiler-style
-review representations, a blackboard and a convention-specific plugin catalogue are outside this
-draft. Existing narrow checks can remain useful utilities; they are not the main coverage strategy.
+The tool-using producer is a consumer of operations increment 4, with this experiment's recipe as
+the increment 5 consumer. Reuse the existing comparison-session handoff's resource binding and
+publication design. Its original scope supplies a decision and alternatives; autonomous selection
+in this study must come from the producer's visible-PR investigation. Neither a specialized
+comparison Task nor a new runner is required if the shared episode-bound session can do the work.
 
-## 10. Alternatives and adoption boundaries
+At this revision, the foundation is on `review-operations@01008813`; the comparison-session handoff
+is written there and increment 4 is still planned. `develop@72bff55e` has the Task/dataflow refactor
+but not that branch's operations foundation. Verify integration before implementation. A generic
+folder-session Task cannot be assumed to have episode-bound retrieval or Lean tools. Complete the
+minimal shared binding when the recipe needs it; a fixed-source diagnostic can be prepared meanwhile.
 
-Case-based transfer is the first candidate because the exact-knowledge gains motivate learning
-from review decisions, while the failures expose a missing applicability/use capability. The
-record does not establish that this representation will fix it.
+Do not add a new knowledge store, global experiment class, execution ledger, compiler-style review
+representation or convention plugin catalogue for this pilot. Add structured schemas only when
+repeated real consumers need them. A component can be retained independently if it proves useful;
+rejecting the candidate need not discard the foundation or the broader research objective.
 
-If relevant evidence is repeatedly available but the fixed model cannot use it well, consider
-learned adaptation from contrasting decisions rather than another instruction layer. That requires
-a separate data/label feasibility check, an adaptation-capable model and independent evaluation;
-historical requests alone do not supply clean negative labels. It is not a prerequisite here.
+## 8. Immediate handoff
 
-We can adopt only the source/content contract, a demonstrated cross-concern checking improvement,
-or a successful preparation method. Each can use the existing foundation without committing to
-the other parts. We can also reject case-based transfer while retaining the broader research goal.
-No uncertainty in this plan makes completion of the census, dossiers or all human panels mandatory.
+The next work is A-B, with no model campaign implied:
 
-## 11. Immediate handoff and questions for iteration
+- [ ] Prepare the four worked choices using existing sources/traces, with the common procedure and
+  the exact difference from old inputs. Include contrary evidence and a concern beyond generation.
+- [ ] Check the chosen source/tool path locally without rebuilding shared stores or launching judges.
+- [ ] Choose one test: autonomous pilot by default, fixed-evidence diagnostic only for a stated reason.
+- [ ] Provide the shared Task recipe, no-spend preflight, evaluation export and costed manual commands.
+- [ ] End with a go/revise/park recommendation grounded in those examples and dependencies.
 
-The next work is **A–B**, not the full experiment sequence:
+The criterion for this handoff is a testable intervention at a tolerable cost, not a polished new
+architecture. Another review round, a 35-case audit, a retrieval benchmark and old-fixture replays
+are not automatic prerequisites. Future convention discovery and learned adaptation can be planned
+separately; neither is implementation work authorized by this plan.
 
-- [ ] Confirm the implementation checkout and reuse existing results to identify the distinct mechanism.
-- [ ] Prepare worked inputs across four concerns, including contrary evidence and predicted failures.
-- [ ] Decide whether the candidate adds information beyond existing precedent/example treatments.
-- [ ] Specify the paired preparation/consumer recipe, eligible source view and evaluation channel.
-- [ ] Produce a bounded user-run cost/command plan, or recommend stopping before implementation.
+## 9. Reading list and review history
 
-The main design questions to settle while iterating are whether case interpretation is the right
-first intervention; what evidence would justify treating it as a shared capability; and how much
-research effort to allocate before pivoting toward learned adaptation or another mechanism.
-The working examples should make those decisions concrete. A polished architecture is not an
-acceptance criterion for this phase.
+Paths are repository-relative. Worktree heads were verified when revising this plan; recheck them
+before implementation. Worktree files are evidence locations, not dependencies to copy wholesale.
 
-## 12. Reading list and branch-aware evidence
-
-Paths below are relative to the repository root unless linked. Planning inspected `develop` at
-`4c759195` and the worktree heads listed here; check them again before implementation.
-
-- [Questions already answered](../questions.md), especially conventions, knowledge and filing;
-  [stopped designs](../dead-ends.md), especially detectors, selection and filing contracts.
-- [Context and evidence needs](../todo/review-context-needs.md) and
-  [convention discovery](../todo/conventions-nature.md): existing owners of these open questions.
-- [Dossiers adversarial review](../research/conventions-dossiers-review-2026-10.md): what the
-  proposed understanding test would and would not establish.
-- Existing retrieval: `src/mathlib_review/retrieval/precedents.py` and `precedent_index.py`;
-  existing session/context composition: `src/mathlib_review/analysis/sessions.py`.
-- [Operations foundation](2026-10-22-review-operations-foundation.md), with implementation/review
-  in `.claude/worktrees/review-operations/docs/research/` (`review-operations@01008813`).
+- [Questions already answered](../questions.md), [stopped designs](../dead-ends.md),
+  [context needs](../todo/review-context-needs.md) and [design comparison](../todo/review-design-comparison.md).
+- [July precedent design](../research/precedent-retrieval-design.md) and its Mode A stop entry.
+- [Dossiers adversarial review](../research/conventions-dossiers-review-2026-10.md): oracle versus
+  transfer, retrieval and supplied-applicability limits.
+- [Operations foundation](2026-10-22-review-operations-foundation.md) and the
+  [comparison-session handoff](../../.claude/worktrees/review-operations/docs/plans/2026-10-22-review-comparison-next-step.md)
+  (`review-operations@01008813`).
+- Existing owners: `src/mathlib_review/retrieval/precedents.py`, `precedent_index.py`,
+  `src/mathlib_review/analysis/sessions.py` and the operations branch's shared domain functions.
 - [Reconstruction results](../../.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/RESULTS.md)
-  (`review-reconstruction@eecb7d18`): Phase A and the fixed-search follow-up.
+  (`review-reconstruction@eecb7d18`), especially decision-context, Phase A and amendment 7.
 - [Grounds reading and qualifications](../../.claude/worktrees/grounds-reading/docs/research/library-mechanism-grounds-2026-10-22.md)
-  (`grounds-reading@b1b2d859`): conditional costs and legitimate exceptions.
+  (`grounds-reading@b1b2d859`).
 - [Additions triage and independent review](../../.claude/worktrees/useful-additions-triage/docs/research/phase-a-additions-triage-2026-10-23.md)
-  (`useful-additions-triage@f2e4ba95`): stopping decision, pending labels and output-channel corrections.
-- `.claude/worktrees/generation-suppression/docs/plans/2026-10-06-generation-without-suppression.md`
-  (`generation-suppression@d7c65fa6`): stage W's positive result under exact convention supply.
-- `.claude/worktrees/demonstrated-change/docs/plans/2026-10-18-review-as-demonstrated-change.md`
-  (`demonstrated-change@e9b9b6e0`): corrections to the compile-then-file diagnosis and its limited gains.
-
-## 13. Theoretical grounding: companion assessment, 2026-10-23
-
-[The grounding assessment](../research/review-knowledge-transfer-grounding-2026-10-23.md) connects
-this draft to S, acceptance, comparative preference and request value. It distinguishes knowledge
-size from procedural transfer and sharpens the uncertainty that A–B should resolve before a run.
-It is an assessment for iteration; the connection does not establish the candidate mechanism.
-
----
-
-## Response (Claude, 2026-10-23)
-
-Read against `develop@165347f2`, the worktree heads in section 12 (all verified by `git worktree
-list`), `docs/dead-ends.md`, `docs/questions.md`, `docs/todo/README.md`, the reconstruction
-`RESULTS.md`, the grounds reading with its assessment, the additions triage with its review, and
-the two retrieval modules. No model ran; nothing was spent.
-
-### The verdict in four lines
-
-1. **The goal is right and the control is right.** A fixed method that handles more situations as
-   more cases are supplied is the only shape that escapes the census tail, and the paired "same
-   producer, ordinary extra work" comparator is what the Phase A review found missing.
-2. **The plan is a reopening, not a new direction, and should say so.** It reopens two recorded
-   entries under their own conditions. It should also cite the July design it restates.
-3. **The distinct input is already known from the record.** Part A does not need an inventory: five
-   of the six steps in section 4 were delivered to the strongest reviewer at two decisions and it
-   declined 6 of 6. What was never delivered is the maintainers' conditional ledger with the check
-   each side names, and a repaired construction. Part A should state that as the premise and
-   falsify it on the sessions and asks already on disk.
-4. **Part C as drafted is 72 Opus sessions on the user's interactive account, with a retrieval
-   step whose instrument has never been measured on the asks it must find.** Stage it behind two
-   cheap readings and state the headroom and the rules now.
-
-### 1. What the record already says about this proposal
-
-**It was proposed in July under another name.**
-[`research/precedent-retrieval-design.md`](../research/precedent-retrieval-design.md) (2026-07-02):
-"maintainer judgment is case law, not statute ... the missing piece is which principle is active
-here, which is exactly what a retrieved precedent supplies". Its first use, Mode A, is a dead end:
-delivery worked (47% of primed findings echoed a precedent) and transfer failed (13 against 11
-covered on 41 shared PRs). It **reopens only** "with a different use of the precedent (recognition
-mode, ranking), not as prompt priming" (`docs/dead-ends.md`). Section 4's use, an applicability
-argument plus a checked alternative, is a different use, so the reopening is legitimate. Section 3
-should carry this row; it is the closest prior result and the plan does not name it.
-
-**It is the library-knowledge entry's own reopen condition.** The 2026-10-13 premise check found
-that of 41 asks no free-reviewer session reached, the library decides 7 and for **19** "the library
-points to the change but a choice remains" among its options. It stopped because "what decides
-these asks is maintainers' preference among the library's options, which the library does not
-record", and **reopens if** "the library is paired with a record of which option maintainers prefer
-... and that pairing is tested on the 19" (`docs/dead-ends.md`;
-`results/pr_review_v5/probes/library-knowledge-2026-10-13/asks.jsonl`, rows with the
-`library_partial` reading). That pairing is this plan. The 19 are its premise-check set and
-section 7A should use them instead of "up to six saved development cases".
-
-**Five of the six steps were delivered to Opus, and it declined.** Step 4's C and Cplus sections at
-33117 held the mechanism, the dated base-commit uses, one sentence relating the attribute to the
-PR's twins, and a compiled demonstration; at 33066 the constructor's elaborated signature and the
-relation. Opus 5.5 related the source to the declaration in every assisted session and filed in
-**1 of 6** at 33117 (C5 0 of 3, Cplus 1 of 3) and **0 of 3** at 33066; Sonnet filed 4 of 5 at
-33117 and 0 of 5 at 33066 (`RESULTS.md`, step 4 and amendment 7). Two things in that reading are
-the plan's real openings:
-- the declines name one side only: at 33117 the mechanism's costs (a new import, the file's
-  hand-written siblings, "used in only one other file") and no cost of the hand-written form; at
-  33066 the wrapper's benefit asserted and nothing counted (grounds response, §"The next steps"
-  item 2);
-- 3 of the 5 declines at 33117 rested on an attempt that failed for a missing import line, and
-  the one session that repaired it filed (amendment 7).
-
-**Assertion carried every positive; verification carried none.** The exact brief said "these
-conventions apply here" and Claude read 0.46 to 0.74 of in-census asks. The same sentence
-pinpointed at the place with a check to run, stage G, read **+0.000**, and at the 10 asks only the
-exact brief reached, G's reviewer filed a different change at 6; picked from the diff without the
-asks, stage F, +0.03; "offered for verification rather than asserted as applying" +0.00 to +0.03
-(`docs/questions.md`, conventions; `research/conventions-dossiers-review-2026-10.md` §2.4). Section
-6 is right to forbid asserting the target's conclusion, but it then places the method exactly in
-the regime where nothing on record has moved a reviewer. The plan has to say where its effect
-comes from instead. The grounds response gives the candidate: the reviewer **performs the check
-the reason names** (counts uses at 33066, tries the client call at 33117, repairs the import) and
-decides on it. That is visible in a transcript without a matcher, and it is the prediction that
-separates this from the ceiling test.
-
-**The decision-context packet is step 2 and step 3 without the alternative, and it moved nothing.**
-Packets of library examples, uses, mechanisms and earlier review and Zulip decisions, gathered
-without the asks, left the sketches' reach at 5/4 against 5/4 of 25 and "did not add reasons"; on
-the free reviewer the packet alone lost one ask (`RESULTS.md`, decision-context round and Phase A).
-Of the four target decisions, the ask-blind preparer found the deciding source at one (33066's
-`mk`), missed the mechanism at one (`to_fun`), and at 43167 shipped the wrong pair of conventions
-(the deciding family `inf_sup_left` was absent). So step 2 fails more often than it succeeds on
-the only sample we have, and section 3's row 5 understates it.
-
-**Retrieval of the comparable case is an unmeasured instrument.** The dense precedent index's hit@5
-of 0.49 was measured on the bench's own corpus, never on census hunks
-(`docs/todo/parked-corpora.md`; dossiers review §8). On the 43 agreed design-comparison asks a
-name-token search from the PR's declarations found the analogue in the top ten for **0 of 43**;
-unification by shape found 6 of 50 sites; **18 of 99** comparison asks have a plausible wrong
-analogue, each a twin along one axis (`docs/todo/review-design-comparison.md`). The dossiers
-review's step 1, retrieval as the selector over the shipped index, $0 of CPU, was registered and
-**never run** (`probes/conventions-ladder-2026-10-08/README.md`: "skipped for now"). It is the
-check section 7B needs before any producer searches for cases.
-
-**What there is to transfer is bounded.** About 37% of asks state any ground; of 246 with one, a
-technical fact 32%, a principle 27%, preference 16%, the scope's practice 11%
-(`probes/stated-grounds-2026-10-16`). In the grounds reading, 154 in-scope asks hold 43 stated
-reasons, 30 phrased to carry to another PR. The one supported reason is a cost-benefit with
-conditions, not a priority: every library-side statement names a cost of the duplicate, every
-local-side statement a benefit it keeps, with a checkable criterion on the benefit side (used as an
-object, repeatedly: v1044, v1326, v0860). Step 3's "stated reason if present" will be absent for
-most cases, and section 5 should say what the method does then.
-
-**Headroom on the sets.** For Opus on the 93 asks of P14 and D12, the redundancy and generation
-families hold 8 asks, 5 already reached, **3 remaining** (d0002, d0018, p0006), 3.2 points; the
-generous envelope 4 of 93
-(`research/review-design-decisions-revised-2026-10-19.md`, `audit.py`). The never-reached 37 of 93
-are the population the method is for, and 34 of the free reviewer's 66 missed asks "lacked
-nothing" (`probes/ask-reading-2026-10-12`). A positive Part C on six PRs can add a handful of
-asks at most; the additions channel will carry most of its signal, and that channel's labels are
-the ones the triage left pending.
-
-### 2. Corrections to section 3
-
-- Row 2, "GPT's stage W": the positive examples-and-precedence result is DeepSeek's stage D,
-  +0.197 / +0.179 over three reps with the exact conventions (`conventions-ds41@18f7c3c1`);
-  gpt-5.5 under the disposition paragraph filed 5 of 13 stated asks and 13 of 14 unasked facts,
-  a pass-through, not a positive (`docs/dead-ends.md`, detectors).
-- Add rows for: Mode A; the library-knowledge reopen condition; stage G's +0.000 and the
-  assertion reading; the decision-context packet's null; the retrieval measurements above;
-  "a second run of the same reviewer reaches the same asks, so resampling is not a lever"
-  (`docs/questions.md`), which bounds the control; the stated-grounds shares.
-
-### 3. Part A, rewritten as the premise check CLAUDE.md asks for
-
-No spend, about half a day. The claim to falsify: *at the places the strongest reviewer declines
-with the facts in hand, a dated maintainer reason for this kind of choice exists in the record,
-the reviewer's reasoning never weighs the cost or benefit it names, and there is a check that would
-settle it.* Data on disk:
-
-| Set | Where | Already read |
-|---|---|---|
-| The 6 Opus C and Cplus sessions at 33117 and 33066 | `review-reconstruction` `step4/place_opus*/` | yes: one side of the ledger, no check |
-| Claude's 10 exact-brief misses, 6 judged "a matter of taste" | `probes/conventions-ceiling-2026-10-04` | the grounds, not against the record's reasons |
-| The 19 `library_partial` asks with the free reviewer's rows that named the topic | `probes/library-knowledge-2026-10-13/asks.jsonl`; `probes/ask-reading-2026-10-12` | no |
-
-For each place: (i) is there a reason in the record for this kind of choice (the grounds
-reading's 43; the stated-grounds probe's 246), dated before the target; (ii) did the reviewer weigh
-it; (iii) does the reason name a check. **Threshold, stated now:** if a dated reason exists and was
-absent from the weighing at fewer than a third of the 35 places, the knowledge is not there to
-transfer, the mechanism is the decision itself, and Part C does not run. Output: the mechanism
-table section 7A asks for, with the input difference named as the ledger and the repaired
-construction, or the stop.
-
-### 4. Part B, two additions
-
-- **The retrieval check first**, the dossiers review's step 1: for each of the 43 agreed
-  comparison asks and the 9 supporting PRs of the grounds reading, query the shipped index with its
-  dated gate (`PrecedentIndex.eligible_mask(as_of, exclude_pr)`,
-  `src/mathlib_review/retrieval/precedent_index.py:406`) from the target's hunk, and ask whether the
-  maintainer's case is in the top 5; beside it, the design-comparison todo's routes (siblings,
-  shape, neighbourhood, role). Threshold: recall at or above 0.5 on the 43 by any single route, or
-  section 7D's first row applies before Part C, not after it.
-- **The mechanism reading on the fixtures, three sessions a cell, before any fresh PR.** Replay
-  C at 33117 and 33066 with the ledger and its checks added, Opus on the existing route, and read
-  only whether the session performs the named check and decides on it. This is development
-  material and proves no benefit; it is the cheapest falsifier of the prediction in §1, about 1-2
-  five-hour windows against Part C's 6-10. If no session runs the check, Part C has no mechanism.
-
-A-B by hand is about two days, or one with subagents at about 1-2M tokens (Probe 0's eight
-briefs with audits cost 2.72M).
-
-### 5. Part C, what to fix before it is costed
-
-- **Cost from the record.** Six Opus C sessions were about 20M processed tokens; a dev run of 12-15
-  ordinary sessions is 19-24M, about one five-hour window. Thirty-six investigating producers are
-  therefore 60-120M and thirty-six consumers 50-70M: **6-10 five-hour windows on the primary token**,
-  which is the user's interactive account and the only one that runs. Stage it: two PRs by three
-  reps (24 sessions) first, the rest only if the mechanism reading in §4 passed.
-- **State the rules now, not "before the pilot".** Registered gain: an ask reached in 0 of 3
-  control sessions and at least 2 of 3 treatment sessions on both matchers, on two PRs of
-  different kinds (Phase A's gate). Burden: finalized findings on no-ask PRs at most the control's
-  plus one a PR (the revised decisions' guard). Mechanism: the transcript-visible check. Report
-  submitted, anchored and finalized counts apart; Phase A lost 33 of 255 submissions at anchoring,
-  including both occurrences of its best documentation fix.
-- **Say what the control will do.** Two runs of one Opus configuration reach the same asks (7
-  and 7 of 23; the misses are systematic), while four passes unioned reach 12 against 7-9 at 7.0
-  findings on a control PR. So the ordinary-extra-work control gains on volume and little on asks;
-  the treatment is read against it on both.
-- **Second model.** The user's standing rule is model-by-harness, never one model. Sonnet is not an
-  instrument here: it filed on the stated relation where Opus declined, so a Sonnet gain says
-  nothing about the weighing. The free reviewer is, at $0 when `first` is free, and the same
-  recipe should run there as the second cell.
-- **Infrastructure, named.** The producer needs base-commit search (the route's own tools, with
-  amendment 7's symlink fix), dated review and Zulip sources through the index's gate, and Lean
-  checks, which `review-operations@0123f43a` serves through an MCP server. That producer is
-  increment 4's live consumer, which the comparison-session handoff
-  (`review-operations`, `docs/plans/2026-10-22-review-comparison-next-step.md`) already selected;
-  the plan should say Part C is that increment with ask-free targets, not a parallel line. The
-  reconstruction probe's subagent route is the project's route and not a private runner, if
-  increment 4 is not ready.
-- **Output channel.** Finalized findings, as section 8 says; the producer's notes are retained and
-  never scored.
-
-### 6. Three things for the user to rule on
-
-- **Section 10's "learned adaptation"** is training a model, which the project's framing has
-  excluded (2026-09-24, leakage proportionate to not training). Keep it as a user decision, not as
-  a branch of section 7D.
-- **The review corpus as the reviewer's knowledge.** On 2026-09-26 the user said asks should
-  "reflect a general taste or design choice the community follows, not repeat historically asked
-  reviews", and that the corpus's legitimate use is "the taxonomy of what matters, not a lookup"
-  (`docs/todo/review-design-comparison.md`). Sections 4 and 5 use dated prior decisions as the
-  reviewer's evidence. The guards are there (sources predate the target, the target's thread is
-  excluded, the finding names its case so a wrong one is refutable), and the 2026-10-13 reopen
-  condition points the same way, but the ruling is the user's.
-- **The five-hour windows.** Part C's full size is a week or more of the interactive account.
-
-### 7. The order I would run
-
-1. Part A as the premise check in §3, with its threshold. Half a day, $0.
-2. The retrieval check in §4. Minutes of CPU, $0.
-3. The mechanism reading on the two fixtures, Opus, three sessions a cell. 1-2 windows.
-4. Part B's four worked examples and the protocol, opening with "Already answered?" and the rows
-   in §2.
-5. Part C on two PRs by three reps, then the rest. 6-10 windows in all, staged.
-6. Parts D and E as written, with the tuning concerns (API redundancy, generation) listed before
-   C so E's held-out concern is fixed in advance.
+  (`useful-additions-triage@f2e4ba95`): pending labels and output-channel corrections.
+- [GPT stage W record](../../.claude/worktrees/generation-suppression/docs/plans/2026-10-06-generation-without-suppression.md)
+  (`generation-suppression@d7c65fa6`); the detector experiment is a different measurement.
+- [Demonstrated-change corrections](../../.claude/worktrees/demonstrated-change/docs/plans/2026-10-18-review-as-demonstrated-change.md)
+  (`demonstrated-change@e9b9b6e0`).
+- [Theoretical companion](../research/review-knowledge-transfer-grounding-2026-10-23.md): feasibility,
+  conditional preference and justified request are separate. It motivates no particular architecture.
+- [Claude's response and disposition](../research/review-knowledge-transfer-plan-review-2026-10-23.md).
+  The original draft remains in `165347f2`; its appended review in `a7138cf5`.
