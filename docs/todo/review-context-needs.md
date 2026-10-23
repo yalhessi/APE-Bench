@@ -3,6 +3,11 @@
 **Status:** open, 2026-09-25, **for a fresh session**. It is its own thread: context and evidence
 for the arms, not how the arms are divided.
 
+**Draft follow-up, 2026-10-23:** [review knowledge transfer across the long tail](../plans/2026-10-23-review-knowledge-transfer.md)
+proposes a shared method for interpreting and applying historical review cases across concerns.
+Its immediate work is to distinguish the mechanism from previous precedent/example treatments
+and prepare a controlled recipe. It does not authorize a model campaign or a new collector catalogue.
+
 **Cost:** free to scope, using the probe's transcripts and val1000's labelled asks. Any collector
 it proposes is code; a judged check is a probe of about 12 Claude runs, as in
 `facet-brief-probe-2026-09.md`.
