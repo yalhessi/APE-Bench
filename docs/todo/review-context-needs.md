@@ -9,9 +9,18 @@ investigations across concerns. Its immediate work is four worked choices and on
 recipe, distinguishing the mechanism from earlier precedent/example treatments. A later first
 pilot is staged at two PRs; this drafting work authorizes no model campaign or collector catalogue.
 
-**Cost:** free to scope, using the probe's transcripts and val1000's labelled asks. Any collector
-it proposes is code; a judged check is a probe of about 12 Claude runs, as in
-`facet-brief-probe-2026-09.md`.
+**Next experiment, 2026-10-24:** the
+[reusable-review-knowledge plan](../plans/2026-10-24-reusable-review-knowledge.md) follows the
+[historical synthesis](../research/knowledge-transfer-experiment-synthesis-2026-10-23.md) and the
+completed pilot's null historical-recovery result. It compares solo review, a fixed bank of terse
+entries, and independently acquired conditional entries. The first deliverable is bounded
+source/target selection and a costed Task recipe; source acquisition and the 54 final reviews
+remain user-run. This is the active next plan; the October 23 draft above is historical.
+
+**Cost:** the next plan budgets source acquisition/checks and 54 final reviews, with a maximum
+of 254M processed tokens including optional repairs, smokes and matching. An expected range and
+human reading effort are implementation deliverables before launch. The original scoping work
+below is free to read from existing transcripts and val1000's labelled asks.
 
 **The user (2026-09-25):**
 

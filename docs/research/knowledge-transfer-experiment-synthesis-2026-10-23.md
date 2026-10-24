@@ -5,6 +5,10 @@
 generation-suppression results. No new generation, judging or reviewer runs were launched.
 This is an investment recommendation, not a frozen execution protocol.
 
+**Next plan, 2026-10-24:** [reusable review knowledge](../plans/2026-10-24-reusable-review-knowledge.md)
+turns the recommendation into a staged handoff. It uses three repetitions/54 final reviews,
+revising the two-repetition proposal below, and specifies source eligibility and evaluation.
+
 ## 1. Recommendation
 
 Continue investigating knowledge transfer, but move the next intervention from **how a reviewer
