@@ -12,15 +12,18 @@ pilot is staged at two PRs; this drafting work authorizes no model campaign or c
 **Next experiment, 2026-10-24:** the
 [reusable-review-knowledge plan](../plans/2026-10-24-reusable-review-knowledge.md) follows the
 [historical synthesis](../research/knowledge-transfer-experiment-synthesis-2026-10-23.md) and the
-completed pilot's null historical-recovery result. It compares solo review, a fixed bank of terse
-entries, and independently acquired conditional entries. The first deliverable is bounded
-source/target selection and a costed Task recipe; source acquisition and the 54 final reviews
-remain user-run. This is the active next plan; the October 23 draft above is historical.
+completed pilot's null historical-recovery result. Revised after review, it compares ordinary
+review with compact and full knowledge banks acquired from the same eligible earlier sources.
+Either resource can earn a fresh test; the fuller version must justify its added context over
+a qualifying compact version. The first deliverable is bounded source/target selection and a
+costed Task recipe; source acquisition and the 54 final reviews remain user-run. This is the
+active next plan; the October 23 draft above is historical.
 
 **Cost:** the next plan budgets source acquisition/checks and 54 final reviews, with a maximum
-of 254M processed tokens including optional repairs, smokes and matching. An expected range and
-human reading effort are implementation deliverables before launch. The original scoping work
-below is free to read from existing transcripts and val1000's labelled asks.
+of 266M processed tokens including twelve source checks, bounded repairs, smokes and matching.
+The provisional 45–95M ordinary-work estimate and human reading allowances must be replaced by
+a target-specific estimate before launch. The original scoping work below is free to read from
+existing transcripts and val1000's labelled asks.
 
 **The user (2026-09-25):**
 

@@ -289,3 +289,17 @@ checkout when this was written). Record: `docs/research/task-dataflow-refactor-i
 | Lead runs: `task_config` configures the lead only (children inherit no task settings since slice 0) | **Built**, logged at every lead run |
 | C: failure and dynamic behaviour (interrupted publication, claims, continuation binding) | **Built**; the implementation review's four findings (producer identity, route binding, previous-outcome recovery) fixed `cbb1a9bc`, `58ffe5bc` |
 | A check bound to its exact patch across tasks | **Not built**: lands with the demonstrated-change branch's construction artifacts |
+
+## Added 2026-10-24: reusable review knowledge
+
+Active handoff: [reusable review knowledge](2026-10-24-reusable-review-knowledge.md), revised after
+review. It compares ordinary review with compact/full banks acquired from the same eligible
+sources; the original census sentences are historical artifacts. This row describes the new
+experiment, not the already-completed October 23 preparation pilot.
+
+| Slice | Status |
+|---|---|
+| A: bounded source/target selection, three primary concerns, contrary definitions and cutoff | **Not built** — the immediate implementation deliverable is `selection.json`, `SELECTION.md` and the initial protocol. |
+| B/C: shared acquisition recipe, paired bank outputs and entry-specific source checks | **Not built** — uses existing packet-session Tasks; no acquisition launched. |
+| D: ordinary-review bindings and 54 final reviews | **Not built** — depends on foundation integration, frozen banks and checked preflight. |
+| E/F: canonical matching, full human usefulness panel and investment decision | **Not built** — setup can proceed in parallel; final interpretation requires complete output and labels. |

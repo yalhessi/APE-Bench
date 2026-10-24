@@ -9,6 +9,12 @@ This is an investment recommendation, not a frozen execution protocol.
 turns the recommendation into a staged handoff. It uses three repetitions/54 final reviews,
 revising the two-repetition proposal below, and specifies source eligibility and evaluation.
 
+**Revision after review, 2026-10-24:** the active plan compares ordinary review with compact and
+full banks acquired from the same eligible sources. The original census sentences remain
+historical artifacts rather than arm B. Either acquired resource can earn a fresh test; fuller
+notes need additional evidence to displace a qualifying compact bank. The synthesis below
+preserves the earlier recommendation and experiment history.
+
 ## 1. Recommendation
 
 Continue investigating knowledge transfer, but move the next intervention from **how a reviewer
