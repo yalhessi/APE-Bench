@@ -19,6 +19,17 @@ a qualifying compact version. The first deliverable is bounded source/target sel
 costed Task recipe; source acquisition and the 54 final reviews remain user-run. This is the
 active next plan; the October 23 draft above is historical.
 
+**Results follow-up, 2026-10-27:** the
+[updated synthesis and next question](../research/review-harness-next-question-2026-10-27.md)
+reviews the completed bank comparison and the subsequent 72-session focused-application
+probe on their topic branches. Neither bank reached a primary concern. Focus exposed
+working alternatives in two concern families, followed by decisions to decline them;
+the automation question tested registration rather than the requested proof change.
+The recommended next investigation fixes a technically checked generalization and
+tests the grounds for suggesting or retaining it against explicit, feasible contrary
+cases. This supersedes the launch recommendation above; it does not register a new
+experiment or complete the pending usefulness evaluation.
+
 **Cost:** the next plan budgets source acquisition/checks and 54 final reviews, with a maximum
 of 266M processed tokens including twelve source checks, bounded repairs, smokes and matching.
 The provisional 45–95M ordinary-work estimate and human reading allowances must be replaced by
