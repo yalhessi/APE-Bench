@@ -4,6 +4,11 @@ Fresh copy of [the October update](../supervisor_update_2026-10/slides.md), prep
 3 November. The October Markdown, HTML and PDF are preserved. The separate
 [living research overview](../docs/project-research-overview.md) is also unchanged.
 
+- [Restructuring options for the monthly check-in](presentation-options.md)
+- [Separate meeting prototype](meeting-draft.md): 13 main slides plus four backups;
+  [HTML](meeting-draft.html) and [PDF](meeting-draft.pdf). This question-led version is
+  designed for 15–20 minutes followed by discussion. The detailed update below remains
+  the reference version.
 - [Slide source and speaker notes](slides.md)
 - [HTML presentation](slides.html)
 - [PDF](slides.pdf)
