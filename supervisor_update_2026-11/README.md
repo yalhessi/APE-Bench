@@ -4,11 +4,16 @@ Fresh copy of [the October update](../supervisor_update_2026-10/slides.md), prep
 3 November. The October Markdown, HTML and PDF are preserved. The separate
 [living research overview](../docs/project-research-overview.md) is also unchanged.
 
-- [Revised meeting version](meeting-v2.md): 18 main slides plus six backups;
+- [Experiment map since September](experiment-map.md): 25 relevant experiment families,
+  their motivations, comparisons, answers, corrections and consequences for the research.
+- [Working content narrative](content-narrative.md): a proposed argument built from that
+  map, with broad questions, narrower tests, changes of direction and concrete zooms.
+  This is the current content work; it sets aside the presentation time limit.
+- [Earlier meeting version](meeting-v2.md): 18 main slides plus six backups;
   [HTML](meeting-v2.html) and [PDF](meeting-v2.pdf). The main talk includes the theoretical
   frame and comparison with previous work, then separates research questions, monthly
   experiments and open questions for discussion.
-- [Current structure and timing](meeting-structure.md): the four parts, the research
+- [Earlier structure and timing](meeting-structure.md): the four parts, the research
   questions, and the studies mapped to them; designed for 15–20 minutes before discussion.
 - [Earlier restructuring options](presentation-options.md), preserved for comparison.
 - [First meeting prototype](meeting-draft.md), also preserved;
