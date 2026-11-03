@@ -4,23 +4,27 @@ Fresh copy of [the October update](../supervisor_update_2026-10/slides.md), prep
 3 November. The October Markdown, HTML and PDF are preserved. The separate
 [living research overview](../docs/project-research-overview.md) is also unchanged.
 
-- [Restructuring options for the monthly check-in](presentation-options.md)
-- [Separate meeting prototype](meeting-draft.md): 13 main slides plus four backups;
-  [HTML](meeting-draft.html) and [PDF](meeting-draft.pdf). This question-led version is
-  designed for 15–20 minutes followed by discussion. The detailed update below remains
-  the reference version.
+- [Revised meeting version](meeting-v2.md): 18 main slides plus six backups;
+  [HTML](meeting-v2.html) and [PDF](meeting-v2.pdf). The main talk includes the theoretical
+  frame and comparison with previous work, then separates research questions, monthly
+  experiments and open questions for discussion.
+- [Current structure and timing](meeting-structure.md): the four parts, the research
+  questions, and the studies mapped to them; designed for 15–20 minutes before discussion.
+- [Earlier restructuring options](presentation-options.md), preserved for comparison.
+- [First meeting prototype](meeting-draft.md), also preserved;
+  [HTML](meeting-draft.html) and [PDF](meeting-draft.pdf).
 - [Slide source and speaker notes](slides.md)
 - [HTML presentation](slides.html)
 - [PDF](slides.pdf)
 - [Evidence register](evidence.md)
 
-This first pass updates experiments and lessons, especially conventions. It includes completed
+The detailed reference updates experiments and lessons, especially conventions. It includes completed
 experiments through 26 October and the 27 October assessment, checked against the current local
-records, including experiment branches. The existing task formulation is retained for a second
-pass on theoretical framing. The literature slide's categorical recommendations are softened
-where the experimental record does not warrant them.
+records, including experiment branches. It retains the earlier task formulation. The revised
+meeting version above incorporates the later theoretical qualifications and places the
+prior-work comparison before the project questions and monthly studies.
 
-The deck has 37 slides: 33 main slides and four backups. For a shorter meeting path, use slides
+The detailed reference has 37 slides: 33 main slides and four backups. Its shorter path uses slides
 1, 7–8, 13, 16, 18–23 and 25–33; the earlier formalization and literature remain available for
 discussion. Slides 14–16 report the historical baseline experiments, rather than new November
 measurements. Speaker notes give qualifications; the evidence register maps each new claim to
@@ -44,9 +48,9 @@ the evidence register before moving or removing those worktrees.
 Render from the repository root with a local Marp CLI and Chrome:
 
 ```bash
-marp supervisor_update_2026-11/slides.md --html -o supervisor_update_2026-11/slides.html
-marp supervisor_update_2026-11/slides.md --html --pdf --allow-local-files \
-  -o supervisor_update_2026-11/slides.pdf
+marp supervisor_update_2026-11/meeting-v2.md --html -o supervisor_update_2026-11/meeting-v2.html
+marp supervisor_update_2026-11/meeting-v2.md --html --pdf --allow-local-files \
+  -o supervisor_update_2026-11/meeting-v2.pdf
 ```
 
 These commands only render local documents. No generation, semantic matching or judging is
@@ -54,7 +58,9 @@ needed to build the presentation. Relative links in the HTML open local source d
 the PDF is the portable presentation, while the Markdown and evidence register carry the
 full research trail.
 
-Validation: Marp rendered both formats; the PDF has 37 pages. Chrome checks found no
+Use `slides.md` in the same commands to regenerate the detailed reference.
+
+Reference validation: Marp rendered both formats; the PDF has 37 pages. Chrome checks found no
 slide overflow or footer overlap, and the main new result slides were visually inspected.
 All 47 local Markdown links resolve in this checkout. The bank's reported counts and
 primary misses were checked against both saved matcher tables, and the original October

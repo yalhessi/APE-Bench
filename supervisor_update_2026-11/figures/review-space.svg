@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="290" viewBox="0 0 1120 290" role="img" aria-labelledby="title desc">
+  <title id="title">Valid, acceptable and preferred changes</title>
+  <desc id="desc">A schematic solution set S contains an acceptable region A. One point outside A needs revision. Within A, an arrow illustrates a possible improvement between acceptable forms.</desc>
+  <defs>
+    <marker id="blue-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#294b80"/></marker>
+    <marker id="amber-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#a56716"/></marker>
+  </defs>
+  <g font-family="Arial, sans-serif" fill="#223047">
+    <rect x="4" y="4" width="1112" height="282" rx="14" fill="#f4f6f9" stroke="#a9b6c9" stroke-width="2"/>
+    <text x="26" y="42" font-size="26" font-weight="bold">S: changes that compile and realize the purpose</text>
+    <rect x="383" y="64" width="702" height="196" rx="26" fill="#e5f1ed" stroke="#5e8f7d" stroke-width="2"/>
+    <text x="408" y="103" font-size="26" font-weight="bold">A: acceptable in this review context</text>
+    <circle cx="133" cy="177" r="9" fill="#a56716"/>
+    <text x="37" y="222" font-size="24">needs revision</text>
+    <path d="M156 177 L487 177" stroke="#a56716" stroke-width="3" marker-end="url(#amber-arrow)"/>
+    <text x="240" y="160" font-size="23" fill="#89520d">required repair</text>
+    <circle cx="512" cy="177" r="9" fill="#294b80"/>
+    <text x="425" y="222" font-size="24">acceptable form</text>
+    <path d="M536 177 L905 177" stroke="#294b80" stroke-width="3" marker-end="url(#blue-arrow)"/>
+    <text x="606" y="160" font-size="23" fill="#294b80">possible improvement</text>
+    <circle cx="931" cy="177" r="9" fill="#294b80"/>
+    <text x="827" y="222" font-size="24">another acceptable form</text>
+  </g>
+</svg>
