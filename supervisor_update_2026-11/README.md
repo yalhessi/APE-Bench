@@ -1,7 +1,18 @@
 # Supervisor update for 4 November 2026
 
 **Current presentation: [HTML](original-led.html), [PDF](original-led.pdf),
-[Markdown and speaker notes](original-led.md).**
+[Markdown and speaker notes](original-led.md).** Since the 05:08 revision every result
+slide in section 2 carries a comparison strip (what is compared, what is held fixed, how it
+is measured, when it ran), and the ask-free delivery table states its units.
+
+**Proposed restructure of section 2: [HTML](original-led-v2.html), [PDF](original-led-v2.pdf),
+[Markdown and speaker notes](original-led-v2.md).** Same section 1, same backups, same
+numbers and speaker notes; section 2 is reorganised as four questions (A attention,
+B standard, C delivery without the answer key, D the decision) with a route slide at the
+start, a verdict line closing each question, and the same route table, filled in, at the end.
+The alternative-generation slide moves to backup as the fourth row of the delivery table.
+Kept as a separate file so the two can be compared slide by slide; see the
+[notes](original-led-notes.md#second-pass-4-november-comparison-strips-and-the-four-question-route).
 
 This copy develops the [October deck](../supervisor_update_2026-10/slides.md). The
 first section keeps its task formulation. Automated checks help separate solutions
@@ -49,10 +60,13 @@ marp supervisor_update_2026-11/original-led.md --html --pdf --allow-local-files 
   -o supervisor_update_2026-11/original-led.pdf
 ```
 
+The same two commands with `original-led-v2` render the proposed deck. Marp blocks when
+its stdin is an open pipe; from a script, append `< /dev/null`.
+
 These commands render local documents without generation, matching or judging.
 HTML and PDF are generated local exports; source documents are versioned.
 
-Validation: the PDF has 42 pages. Chrome found no slide overflow or footer overlap;
-the revised framing and experimental opening were visually inspected. All 75 local
-links across the current deck, notes, README and evidence register resolve. Earlier
-presentation sources remain unchanged.
+Validation: the current PDF has 42 pages and the proposed one 43. A headless-Chrome
+check at 1280×720 reports no slide overflow or footer overlap in either; section 2 of the
+proposed deck and the two altered slides of the current one were visually inspected.
+Earlier presentation sources remain unchanged.

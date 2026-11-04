@@ -99,3 +99,42 @@ All earlier decks remain preserved. The immediately preceding original-led versi
 is in commit `7ff09a23`; the preferred [October source](../supervisor_update_2026-10/slides.md)
 and [detailed November reference](slides.md) are unchanged. No new model runs or
 literature searches were performed for this revision.
+
+## Second pass, 4 November: comparison strips and the four-question route
+
+The user's reading of the 05:08 deck: no clear narrative flow; numbers mixed, so a listener
+cannot tell what each result is compared against or what it establishes; section 2 a linear
+dump. Two changes, kept separable.
+
+**In the current deck** (`original-led.md`, necessary only): every result slide in section 2
+gets a strip under its title, in one order, **Compare** what against what · **Held fixed**
+what · **Measured** how, with the denominator and the instrument (registered judge on
+obligations of 23; blind ask matchers on in-census reach; two blind readers; cells of three),
+and a date tag; tags after 14 October are amber, since the October update covered work to
+that date. The ask-free delivery table now states its units: "+3 points" was in-census reach
+0.46 → 0.49 on the ceiling's own comparison, where the exact brief gave 0.74; "0 points" was
+0.000; the examples-and-precedence row names its fresh-set readings. The remark that
+October's ceiling table mixed two reporting views goes to the speaker notes. Nothing else
+in the current deck changes.
+
+**In the proposed deck** (`original-led-v2.md`): section 1 and the backups are the current
+deck's bytes, apart from the shared CSS. Section 2 becomes:
+
+| Slides | Role |
+|---|---|
+| 11–12 | Section title; the route: four questions with their answers so far, and the strip legend |
+| 13–14 | The solo baseline and what it misses (4, 4, 1 of 23) |
+| 15–19 | **A · Does the reviewer fail to look?** Specialists (7, 5, 6 against 4, 4, 1; 64 of 71 from the generalist); why the decomposition is unpromising; 63 of 67 inspected; 17 of 23 told the check. Verdict: attention is not the missing piece |
+| 20–23 | **B · Does it lack the standard?** 30 of 31 principled, 8 documented; census; ceiling (in-census reach); the correction to October's "≤ 5%". Verdict: exact supply is the one intervention that moved recovery |
+| 24–26 | **C · Can the standard arrive without the answer key?** One table of five deliveries, each with its own comparison; the acquired-notes setup and primary result. Verdict: none reproduced the gain; the brief carried a judgment |
+| 27–29 | **D · With the alternative in hand, does it ask?** #42814; focus with and without the note; the generality case. Verdict: the alternative is available, the decision differs |
+| 30–31 | The route table again, filled in; the next design and discussion questions |
+| 32–43 | Backups: the alternative-generation slide moved here verbatim with its strip, then the earlier backups unchanged |
+
+The letters prefix the slide titles, so a listener always knows which question a slide
+serves; each question closes with an **Establishes** line, and the next question is the one
+that line leaves open. Nothing was renumbered in the speaker notes, and no number changed:
+the same figures sit on the same slides with the same caveats. The second-section speaker
+notes carry the per-row sources for the delivery table (ceiling README stages F and G, the
+12 October assessment, the reconstruction consumer study, E8).
+
