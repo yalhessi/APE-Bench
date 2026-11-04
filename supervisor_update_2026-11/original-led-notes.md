@@ -138,3 +138,17 @@ the same figures sit on the same slides with the same caveats. The second-sectio
 notes carry the per-row sources for the delivery table (ceiling README stages F and G, the
 12 October assessment, the reconstruction consumer study, E8).
 
+## Presentation revision: less text, explicit introductions
+
+The user's feedback on `original-led-v2`: remove the Check/Compare boxes. Less content
+per slide must not rely on unexplained terms or skip the setup needed to interpret a result.
+
+The boxes' full comparison details, dates and instruments now live in speaker notes.
+Section 2 keeps a short setup, the main evidence and a concise takeaway. The 23 baseline
+changes, convention selection, the 39 covered requests, the three note conditions and the
+focused-review inputs are introduced before their results. Internal labels such as
+"in-census reach", "exact supply" and lettered experimental arms are replaced with plain
+descriptions. Long closing boxes are replaced by short sentences. Removed numerical
+detail is retained in the notes and earlier drafts. The four questions remain the main
+takeaways; section 1 and the original October source are unchanged.
+

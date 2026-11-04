@@ -45,14 +45,6 @@ style: |
   section.rules .take { font-size: 22px; margin-top: 10px; }
   .above { color: #1a7f37; font-weight: bold; }
   .below { color: #b3261e; font-weight: bold; }
-  .cmp { font-size: 19px; color: #333; background: #eef1f7; border-left: 6px solid #9aa7c7; border-radius: 6px; padding: 7px 14px; margin: -4px 0 14px; line-height: 1.3; }
-  .cmp b { color: #1d2b53; }
-  .tag { display: inline-block; font-size: 15px; font-weight: bold; color: #fff; background: #9aa7c7; border-radius: 4px; padding: 1px 7px; margin-left: 8px; vertical-align: middle; }
-  .tag.new { background: #e0a020; }
-  section.dense .cmp, section.tbl .cmp { font-size: 17px; margin-bottom: 10px; }
-  section.routes table { width: 100%; }
-  section.routes th:first-child, section.routes td:first-child { width: 30%; }
-  section.routes th:nth-child(2):not(:last-child), section.routes td:nth-child(2):not(:last-child) { width: 24%; }
   footer { font-size: 16px; color: #888; }
 footer: "Mathlib PR review · Supervisor update · 4 November 2026"
 ---
@@ -293,10 +285,10 @@ Four questions about why the reviewer misses what maintainers ask for
 
 | | Question | Answer so far |
 |---|---|---|
-| **A** | Would **more focused attention** resolve the missed requests? | **It has not been enough in our tests.** Many misses persist even when the reviewer inspects the relevant code or is told what to check. |
-| **B** | Does supplying the **right convention** help? | **Yes.** It recovers substantially more maintainer requests when we supply conventions selected from the human review. |
+| **A** | Would **more focused attention** resolve the missed requests? | **Not enough in our tests.** Misses persist after inspection or specific instructions. |
+| **B** | Does supplying the **right convention** help? | **Yes, when chosen using the human review.** This supplies both the convention and its relevance. |
 | **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
-| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** In focused tests, it constructed and checked alternatives but still judged the changes unnecessary. |
+| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** Reviewers can construct and check changes, then decline to request them. |
 
 <!--
 These questions and answers are the main takeaways. The following experiments
@@ -313,29 +305,24 @@ relevant alternative, and attention failures still occur. B supplies relevance a
 well as convention content by selecting entries from target historical requests.
 C is bounded to the tested delivery methods; it does not show conventions cannot
 be acquired or used independently. D is a selected-case diagnosis, not proof that
-declining the change is wrong. Sources and denominators are on the result slides.
-Explain the comparison strips aloud if needed: Compare what against what; Held
-fixed what; Measured how, with the denominator. Dates after 14 October are amber
-because they follow the October update. Measurements from different strips are
-never pooled: the instruments differ (registered judge on obligations; blind ask
-matchers on reach; reader labels; cells of three).
+declining the change is wrong. Sources remain in the speaker notes.
+The result slides retain the setup needed to interpret each figure. Detailed
+comparison conditions, dates and instruments are in their speaker notes.
 -->
 
 ---
 
 # What is a good baseline?
 
-**Goal:** capture human review, or a useful subset, as additional automated checks on a Mathlib PR.
-
-Start with **one reviewer, the whole PR, and the tools**:
+Start with **one reviewer, the whole PR, and tools**:
 
 - Read the purpose, diff, surrounding code and library.
-- Search for relevant definitions and precedents; check proposed edits.
+- Search for definitions and precedents; check proposed edits.
 - Return the requests it judges worth making.
 
-A more elaborate system must improve on this reviewer, accounting for cost and comment burden.
+A more elaborate system must improve on this baseline, accounting for cost and extra comments.
 
-<div class="source">MathlibPR studies merge readiness; SWR-Bench and SWE-PRBench study review requests.</div>
+<div class="source">MathlibPR: merge readiness. SWR-Bench and SWE-PRBench: review requests.</div>
 
 <!--
 The solo session with tools is the baseline, not an assumed successful design.
@@ -352,19 +339,23 @@ Historical ask recovery is one measurement, not an exhaustive usefulness score.
 
 # What does the solo reviewer miss?
 
-<div class="cmp"><b>Compare</b> three runs of one reviewer, nothing added · <b>Held fixed</b> GPT 5.2 with reasoning off, tools, 12 held-out PRs · <b>Measured</b> obligations recovered of the 23 the maintainers asked for, registered judge<span class="tag">Sept</span></div>
-
-Solo GPT 5.2 recovered **4, 4 and 1 of 23 obligations** across the three runs.
+**12 PRs; 23 individual changes requested by maintainers.** Solo GPT 5.2, with reasoning off, recovered **4, 4 and 1** across three runs.
 
 | Example | What was missing |
 |---|---|
-| **#33305:** long doc-comment line | The relevant location was never reached |
-| **#33421:** naming and generality | The relevant declarations were reached, but the requests were inconsistent or absent |
-| **#33117:** generated `fun_*` family | The reviewer found `to_fun` in one run, then missed the request in two |
+| Doc-comment line too long | The relevant location was never reached |
+| Naming and generality | Requests were inconsistent or absent despite reaching the declarations |
+| Hand-written theorem family | A generated alternative was found in only one of three runs |
 
-<div class="take">The misses are not one kind. <b>First hypothesis:</b> give different concerns more dedicated attention.</div>
+Could dedicated passes catch more?
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare three runs of one reviewer, nothing added · Held fixed GPT 5.2 with reasoning off, tools, 12 held-out PRs · Measured obligations recovered of the 23 the maintainers asked for, registered judge [Date: Sept]
+
+Additional reference detail:
+The 23 individual requested changes are atomic obligations under registered judge v4-semantic-v3-v9-rubric, not a raw-ask denominator. Examples: #33305 doc-comment line, #33421 naming and generality, #33117 generated fun_* family and to_fun.
+
 Evidence E13, ab-heldout12-obligation-spine.md. GPT-5.2 reasoning off, three reps,
 23 obligations, registered judge v4-semantic-v3-v9-rubric. In that source, location
 means a candidate at the gold site; it is not proof that the precise alternative was
@@ -378,13 +369,13 @@ all specialist design historically. This weak-model baseline is dated explicitly
 
 # A · Would specialized reviewers catch more?
 
-**Hypothesis:** separate passes for proof, naming, generality and other concerns will catch issues one general pass misses.
+Separate passes for **proof, naming, generality and other concerns** might catch what one general pass misses.
 
-**Design:** a lead delegates to a generalist and ten specialist arms, then combines their findings.
+A lead reviewer combines findings from **one generalist and ten specialists**.
 
-**Test:** the same twelve PRs, model and tools; three repetitions against solo review.
+Test against solo review: same twelve PRs, GPT 5.2 with reasoning off, same tools; three runs each.
 
-<div class="source">Related caution: Di Biase et al. found no defect gain from decomposed diffs; Alibaba's file-grouping experiment lost recall.</div>
+<div class="source">Di Biase et al.: decomposing diffs found no more defects. Alibaba: file grouping reduced recall.</div>
 
 <!--
 References are placed before our experimental result rather than in a standalone
@@ -396,24 +387,24 @@ not an inference that all specialization fails. Our A/B cost is not matched.
 
 ---
 
-<!-- _class: tbl -->
-
 # A · What did the specialist design buy?
 
-<div class="cmp"><b>Compare</b> a lead with a generalist and ten specialist arms, against the solo reviewer · <b>Held fixed</b> the 12 PRs, GPT 5.2 with reasoning off, tools, three runs each · <b>Measured</b> obligations recovered of 23, registered judge; billed cost per run<span class="tag">Sept</span></div>
+Same 12 PRs and 23 requested changes; three runs of each design.
 
-| | Lead + arms | Solo |
+| | Lead + specialists | Solo |
 |---|---:|---:|
-| Obligations recovered per run | 7, 5, 6 | 4, 4, 1 |
-| Recovered in all three runs | **5** | 0 |
-| Findings on the two PRs with no recorded asks | 3, 4, 5 | **0** |
-| Billed per run | $14.59 | **$1.90** |
+| Requested changes recovered, of 23 | 7, 5, 6 | 4, 4, 1 |
+| Cost per run | $14.59 | **$1.90** |
 
-The generalist arm produced **64 of the 71** matched finding occurrences.
-
-<div class="take"><b>Establishes:</b> the extra passes buy a little recovery at 7.7× the cost, plus comments on clean PRs; the specialists themselves add almost nothing. Not cost-matched; mean superiority is unresolved at this size.</div>
+A modest gain at **7.7× the cost**. Most comments matching maintainer requests came from the generalist.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare a lead with a generalist and ten specialist arms, against the solo reviewer · Held fixed the 12 PRs, GPT 5.2 with reasoning off, tools, three runs each · Measured obligations recovered of 23, registered judge; billed cost per run [Date: Sept]
+
+Additional reference detail:
+Additional table rows retained from the previous draft: recovered in all three runs, lead 5 / solo 0; findings on the two PRs with no recorded asks, lead 3, 4, 5 / solo 0. Trace attribution: the generalist produced 64 of 71 matched finding occurrences across repeated reviews, not 64 unique maintainer requests.
+
 Source: ../docs/research/ab-heldout12-obligation-spine.md, registered obligation judge
 v4-semantic-v3-v9-rubric. Lead includes a generalist and ten specialist arms; the
 October label "ten arms + a lead" was imprecise. Runs are not cost-matched. Mean
@@ -427,15 +418,13 @@ not 71 distinct historical obligations and not 64 distinct asks.
 
 # A · Why this decomposition is unpromising
 
-**The problem:** naming, generality and proof structure often depend on the same mathematical and library context. Each arm has to reconstruct it again.
+Naming, generality and proof structure depend on the **same mathematical and library context**. Each specialist has to reconstruct it.
 
-**Example — #33421:** understanding the lemma supports three related questions:
+On **#33421**, understanding one lemma supports three questions:
 
 - What should it be called?
-- Is the numeral `2` essential, or can it be a parameter?
+- Is `2` essential, or can it be a parameter?
 - Can its repeated argument be factored out?
-
-<div class="take">If attention were the missing piece, the arms should have caught more. Before giving up on focus, check what the reviewer was doing at the places it missed.</div>
 
 <!--
 This states the user's design assessment, grounded in the overlap/context record;
@@ -456,18 +445,23 @@ This narrows the tried decomposition; it does not rule out all decomposition.
 
 # A · Are missed requests simply overlooked?
 
-<div class="cmp"><b>Population</b> the 67 asks solo GPT 5.2 never reached: 37 reached by no reviewer, 30 reached only by Opus 5.5 · <b>Reviewers</b> GPT 5.2 with reasoning carried, and Opus 5.5 · <b>Measured</b> two blind readers label the transcript at each missed ask; a count needs both readers<span class="tag">30 Sept</span></div>
+**67 requests missed by solo GPT 5.2**, audited in transcripts from GPT 5.2 with reasoning enabled and Opus 5.5.
 
-| What the transcript readers found | Asks, of 67 |
+| What the transcripts showed | Requests, of 67 |
 |---|---:|
-| Every missing reviewer had inspected the object | **63** |
+| Every reviewer that missed it had inspected the relevant code | **63** |
 | A reviewer concluded the code was fine | **40** |
 | A reviewer pursued a different change | **25** |
-| The object was never attempted | **4** |
 
-These counts overlap. Inspecting the object still does not show that the reviewer considered the relevant alternative.
+Categories overlap. Inspecting the code does not establish that the right alternative was considered.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Population the 67 asks solo GPT 5.2 never reached: 37 reached by no reviewer, 30 reached only by Opus 5.5 · Reviewers GPT 5.2 with reasoning carried, and Opus 5.5 · Measured two blind readers label the transcript at each missed ask; a count needs both readers [Date: 30 Sept]
+
+Additional reference detail:
+The 67 requests were missed by the solo GPT-5.2 baseline: 37 were reached by no reviewer and 30 only by Opus 5.5. The omitted never-attempted category has 4 requests. Inspection is not proof of attention to the right issue.
+
 Evidence E13, residual-mechanisms 2026-09-30. Two readers, 141 ask/reviewer pairs;
 mechanism counts require both readers and count an ask if any relevant reviewer has
 the label. The 63 figure requires every missing reviewer to have attended the object.
@@ -482,17 +476,18 @@ later mechanism labels, not proof that all 63 understood and rejected the ask.
 
 # A · Does spelling out the check solve it?
 
-<div class="cmp"><b>Audit</b> the specialist briefs against the 23 obligations · <b>Reviewer</b> the GPT 5.2 arms above · <b>Measured</b> obligations whose brief names the specific check, by the more conservative of two readers; then whether the arm made the request<span class="tag">Sept</span></div>
-
-A brief directed the reviewer to the specific check behind **17 of 23 obligations**. One asked about:
+Specialist instructions named the specific check behind **17 of the 23 requested changes**. One asked about:
 
 > “every member fixed to `2` where `k` would do”
 
-The corresponding arm ran but did not produce the requested generalization. It investigated a different family.
+The specialist investigated a different family and did not request the generalization.
 
-<div class="take"><b>Answer (A):</b> more focused attention alone did not resolve these misses. Even specific instructions can leave the request unmade. That motivates asking which standard the reviewer applies, and how it judges the change.</div>
+**More focused attention has not been enough.** Which standard is the reviewer applying?
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Audit the specialist briefs against the 23 obligations · Reviewer the GPT 5.2 arms above · Measured obligations whose brief names the specific check, by the more conservative of two readers; then whether the arm made the request [Date: Sept]
+
 Evidence E13, the-question-is-already-asked-2026-09.md. Two model readers; the second
 conservatively counted 17 full, 4 partial, 2 none. Seven of the 17 full cases relied
 on text written after inspecting these very PRs; this is a development diagnostic,
@@ -509,20 +504,22 @@ also failed to establish a strong specialist route; retained in source notes.
 
 # B · Which standard should the reviewer apply?
 
-<div class="cmp"><b>Reading</b> 31 design asks from the validation PRs · <b>Measured</b> whether a reader could state the principle behind the ask, and whether Mathlib documents it<span class="tag">29 Sept</span></div>
+In a reading of **31 design requests**, a principle could be stated for **30**, but only **8** were documented.
 
-**Hypothesis:** the reviewer needs evidence about what current library practice expects in this situation.
+This separates two questions:
 
-Reviewers could state a principle behind **30 of 31 asks**, but only **8** were documented anywhere.
+1. **Discovery:** what conventions hold, and where?
+2. **Use:** if we supply the right convention, does review improve?
 
-This leads to two different questions:
-
-1. **Discovery:** what conventions hold, in which scopes and periods?
-2. **Use:** if we supply the right convention, does the reviewer make the requested change?
-
-<div class="source">Related work: Tricorder (analyzers); AutoCommenter (best-practice comments).</div>
+<div class="source">Tricorder: automated analyzers. AutoCommenter: comments about documented best practices.</div>
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Reading 31 design asks from the validation PRs · Measured whether a reader could state the principle behind the ask, and whether Mathlib documents it [Date: 29 Sept]
+
+Additional reference detail:
+This is the selected reading of 31 design asks from validation PRs. The hypothesis is that the reviewer needs evidence about what current library practice expects in this situation.
+
 Retains the motivation for conventions while connecting it to the judgment problem.
 The 30/31 and 8 counts are a selected design-ask reading, not the entire review
 population. ../docs/todo/conventions-nature.md records the user's 29 September
@@ -538,17 +535,20 @@ unwritten standards. See the saved review-systems survey and comparison backup.
 
 ---
 
-# B · How many conventions? The census
+# B · How many conventions?
 
-<div class="cmp"><b>Readers</b> two independent Opus 5.5 sessions, each keeping a running codebook · <b>Input</b> the 1,833 first-round asks on the 973 validation PRs · <b>Measured</b> distinct principles per codebook; coverage checked on 14 PRs outside the census<span class="tag">early Oct</span></div>
+Two Opus 5.5 readings of **1,833 first-round requests across 973 PRs**, each keeping a list of distinct conventions.
 
-- **409 and 407 entries** at this grain; neither reading had saturated.
-- **Small head, long tail:** top 10 cover 22%; top 50 cover 55% of principled asks.
-- On the 14 outside PRs, an entry describes **39 of 46 asks (85%)**.
+- **409 and 407 entries**; new conventions were still appearing.
+- The top 10 cover **22%**; the top 50 cover **55%** of requests with an identifiable principle.
+- On 14 further PRs, an entry describes **39 of 46 requests**.
 
-<div class="take">Review is not a hundred rules. An entry is a reader's description of a practice, not a validated rule; its scope and force still have to be checked.</div>
+These are **candidate conventions**. Their scope and exceptions still need checking.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Readers two independent Opus 5.5 sessions, each keeping a running codebook · Input the 1,833 first-round asks on the 973 validation PRs · Measured distinct principles per codebook; coverage checked on 14 PRs outside the census [Date: early Oct]
+
 Evidence E1 and ../docs/todo/conventions-nature.md, Study 1 result. The initial
 codebooks are 409/407; later expanded or merged views (438, 399) are not pooled.
 The nominal thousand-PR validation draw had 973 available PRs; the slide uses the
@@ -559,25 +559,27 @@ model family. One ask in ten was estimated to introduce another principle.
 
 ---
 
-<!-- _class: tbl -->
+# B · A best-case test: supply the right convention
 
-# B · Does knowing the convention help? The ceiling
+Select conventions **using the human review**, then supply general statements without code locations.
 
-<div class="cmp"><b>Compare</b> the same reviewer briefed with the conventions the maintainers invoked on the PR, as general sentences without locations, against unbriefed · <b>Held fixed</b> reviewer, tools, the 14 held-out PRs · <b>Measured</b> share of the 39 in-census asks (of 46) reached per session, blind matchers<span class="tag">4 Oct</span></div>
+On 14 further PRs, measure recovery of the **39 requests covered by the convention list**:
 
-| Reviewer | Repetitions | Unbriefed | Exact brief |
-|---|---:|---:|---:|
-| Opus 5.5 | 2 | 46–49% | **74%** |
-| GPT 5.5 | 1 | 19% | **41%** |
-| DeepSeek-V4.1-Flash | 3 | 22% | **44%** |
-| DeepSeek + examples and precedence | 3 | 22% | **64%** |
-| Qwen3.5-397B | 3 | 3% | 9% |
+| Reviewer | Without conventions | With selected conventions |
+|---|---:|---:|
+| Opus 5.5 | 46–49% | **74%** |
+| GPT 5.5 | 19% | **41%** |
+| DeepSeek-V4.1-Flash | 22% | **44%** |
 
-<div class="take">The brief supplies both the convention and evidence that this concern matters on this PR. That is the answer key. <b>Establishes (B):</b> this is the one intervention that moved recovery substantially.</div>
-
-<div class="source">October's table mixed two reporting views; this one uses the in-census measure throughout, so its unbriefed column differs slightly.</div>
+The brief supplies **relevance as well as knowledge**.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare the same reviewer briefed with the conventions the maintainers invoked on the PR, as general sentences without locations, against unbriefed · Held fixed reviewer, tools, the 14 held-out PRs · Measured share of the 39 in-census asks (of 46) reached per session, blind matchers [Date: 4 Oct]
+
+Additional reference detail:
+Full previous table: Opus 5.5, 2 repetitions, 46–49% to 74%; GPT 5.5, 1 repetition, 19% to 41%; DeepSeek-V4.1-Flash, 3 repetitions, 22% to 44%; DeepSeek with examples and precedence, 3 repetitions, 22% to 64%; Qwen3.5-397B, 3 repetitions, 3% to 9%. October mixed reporting views; the present table uses the in-census measure throughout, so its unbriefed column differs slightly.
+
 Evidence E1, synthesis section B and ceiling probe results. In-census ask reach
 within each original comparison, 39 asks across 14 ask-bearing PRs. Percentages
 rounded; matcher and seal details remain in the linked record. Rows are not a
@@ -591,21 +593,27 @@ and its briefed figure from the in-census view (ceiling README, Result 3).
 
 ---
 
-<!-- _class: tbl -->
+# B · Why we withdrew the “≤ 5%” claim
 
-# B · A correction to October: “≤ 5% of applicable places”
+**October's claim:** maintainers raise conventions at ≤ 5% of the places where they apply.
 
-<div class="cmp"><b>Check</b> flagged places and known fixes for three conventions by hand, instead of inferring applicability from survival at merge · <b>Measured</b> small selected strata; not population rates<span class="tag new">16 Oct</span></div>
+Checking examples against the proposed rules exposed problems:
 
-| Convention | What the check found |
+| Proposed rule | What we found |
 |---|---|
-| Predicate namespaces | **85–97%** of selected unasked survivors were **not departures** under the reconstructed rule |
-| Dot-notation calls | **12–13 of 16** checked survivors were genuine departures that merged unasked |
-| Primed names | Both readers found only **4/6** known fixes; the revised rule failed calibration |
+| Namespace placement for predicate lemmas | Most flagged examples were not actually violations |
+| Dot-notation calls (`x.f`) | Genuine violations also merged without comment |
+| Primed lemma names (`foo'`) | The revised rule failed on known fixes |
 
-<div class="take">Withdraw the October claim that maintainers raise a convention at ≤ 5% of the places it applies. It mixed incorrect rules with genuine unasked departures. So the census is a list of candidates; B holds for a convention whose scope and force are known.</div>
+**The rate mixed faulty rules with genuine unasked departures.**
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Check flagged places and known fixes for three conventions by hand, instead of inferring applicability from survival at merge · Measured small selected strata; not population rates [Date: 16 Oct]
+
+Additional reference detail:
+Quantitative checks retained from the previous slide: predicate namespaces, 85–97% of selected unasked survivors were not departures under the reconstructed rule; dot-notation calls, 12–13 of 16 checked survivors were genuine departures that merged unasked; primed names, both readers found only 4/6 known fixes and the revised rule failed calibration. These are small selected strata, not population rates.
+
 Evidence E3, final corrections. Small selected strata, not population rates.
 Scope, rule precedence, incomplete ask counting and attention all affected the old
 denominator. Survival cannot show that a maintainer knowingly accepted a departure.
@@ -615,23 +623,24 @@ were simply bad rules. The six form-rule practice study is in backup (E4).
 
 ---
 
-<!-- _class: dense routes -->
+# C · Can we get the benefit without the review?
 
-# C · Can the standard arrive without the answer key?
+Choose conventions or generate alternatives from the PR and library; compare with review without these additions.
 
-<div class="cmp"><b>Compare</b> each delivery against the same reviewer without it; row 4 against three historical controls · <b>Target</b> the ceiling's gain, which chose the conventions from the maintainers' asks · <b>Measured</b> per row; different sets, never pooled<span class="tag">5–12 Oct</span><span class="tag new">19–25 Oct</span></div>
-
-| Delivery | Reviewer and set | Result |
-|---|---|---|
-| **25 entries selected from the diff**, as sentences | Opus 5.5; the ceiling's 14 PRs, 39 in-census asks | entry present for 22 of 33 asks; reach 0.46 → **0.49** (exact brief 0.74) |
-| The same, **pinpointed as guarded rules**, with a check | Opus 5.5; same | **0.00**; the reviewer overrode the rule at the place |
-| Selected entries **with examples and precedence** | DeepSeek; Opus 5.5 | about **+0.2** on the PRs it was built with; **0.00, −0.01** on fresh sets (DeepSeek); +0.02 to +0.09, intervals through zero (Opus) |
-| **A generated alternative** with library context | DeepSeek reviewer, Opus sketches; 8 dev PRs, 25 asks | registered gain not met: no ask missed by all controls was reached in 2 of 3 sessions |
-| **Six notes acquired from earlier PRs**, checked and frozen | Opus 5.5; 6 dev PRs × 3 repetitions | next two slides |
-
-<div class="take">Each got the topic to the reviewer; none reproduced the ceiling's gain. What was the exact brief doing that these did not?</div>
+| Method | Result |
+|---|---|
+| Select conventions from the diff | Small gain: **46% → 49%**, versus 74% with human-selected conventions |
+| Point to a possible application and ask for a check | No increase in recovery |
+| Add examples and explain which rules take priority | Initial gains did not reliably transfer to new PRs |
+| Give the reviewer a generated alternative | Did not consistently recover requests missed by ordinary review |
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare each delivery against the same reviewer without it; row 4 against three historical controls · Target the ceiling's gain, which chose the conventions from the maintainers' asks · Measured per row; different sets, never pooled [Date: 5–12 Oct] [Date: 19–25 Oct]
+
+Additional reference detail:
+The generated-alternative row concerns one reconstruction route and its registered recovery criterion, not all pairwise preference experiments. Some proposals transferred. Six notes acquired from earlier PRs form the next experiment, introduced on slide 25. Every result in this table is measured against its own ordinary-review comparison; the rows are not pooled.
+
 Say aloud: before these, Mathlib's written guides in the prompt gave no gain (GPT,
 115 obligations, an older judge). ProofJudge judges supplied pairs; row 4 had to
 generate its own alternative (detail in backup).
@@ -646,7 +655,7 @@ findings. Row 4: reconstruction consumer study, 56 new DeepSeek reviews (8 contr
 24 context, 24 context plus sketch), 25 agreed asks on six of the eight PRs; the
 criterion was an ask missed by all three historical controls and reached in at least
 two of three strategy sessions on both matchers. Some sketch proposals did transfer;
-not a proof of zero usefulness. Row 5: E8, next slides. The guidelines comparison
+not a proof of zero usefulness. The next experiment is E8, on the following slides. The guidelines comparison
 (57 PRs, 115 obligations, older topical judge) is not on the same instrument and is
 kept to the source line. Deterministic head detectors covered ~2.9% of asks;
 exhaustive application and forced filing added burden; omitted here, in the
@@ -655,21 +664,27 @@ detailed reference. Neither proves all unmatched findings wrong.
 
 ---
 
-# C · Notes acquired without the targets
+# C · Convention notes from earlier PRs
 
-<div class="cmp"><b>Compare</b> three arms of the same reviewer · <b>Held fixed</b> Opus 5.5, tools, 6 development PRs, three repetitions · <b>Measured</b> whether each PR's primary concern becomes a request; then all 30 historical asks, blind matchers<span class="tag new">24–25 Oct</span></div>
+Acquire and check **six convention notes from earlier PRs**, then keep them fixed.
 
-**Experiment:** acquire six entries from earlier sources, check and repair them, freeze them, then review whole PRs.
-
-| Arm | The reviewer receives |
+| Inputs to Opus 5.5 | Contents |
 |---|---|
-| A | Ordinary inputs and tools |
-| B | The same + compact notes |
-| C | The same + full conditional notes |
+| Ordinary review | PR and tools |
+| Short notes | Same inputs + compact statements of the conventions |
+| Detailed notes | Same inputs + fuller conditions and exceptions |
 
-All six notes go to every treatment review. No note says that it applies to this PR. **6 PRs × 3 arms × 3 repetitions = 54 reviews.**
+Every notes review receives all six. No note says it applies to this PR.
+
+**6 PRs × 3 input conditions × 3 runs = 54 reviews.**
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare three arms of the same reviewer · Held fixed Opus 5.5, tools, 6 development PRs, three repetitions · Measured whether each PR's primary concern becomes a request; then all 30 historical asks, blind matchers [Date: 24–25 Oct]
+
+Additional reference detail:
+Short and detailed denote the original compact and full-conditional arms. Both derive from the same eligible earlier sources. Conditions were ordinary review, compact notes, and full conditional notes. Entries include namespace placement, name order, grind registration, to_additive, generality, and simp/iff orientation.
+
 Evidence E8–E9. Compact/full acquired from the SAME eligible earlier sources;
 B is not the historical census. Entries: namespace, name order, grind registration,
 to_additive, generality, simp/iff orientation. Developmental cases; source selection
@@ -681,22 +696,26 @@ population claim follows. Date gates and target exclusions remain in protocol.
 
 ---
 
-<!-- _class: tbl -->
+# C · Did the notes recover the missed requests?
 
-# C · The notes did not recover the primary concerns
+Three runs per condition, using the notes just described.
 
-<div class="cmp"><b>Same comparison</b> as the previous slide · <b>Measured</b> repetitions in which the primary concern was requested, of 3 per arm; then the mean share of the 30 historical asks reached, blind matchers<span class="tag new">24–25 Oct</span></div>
-
-| Primary concern | A: ordinary | B: compact | C: full |
+| Maintainer request | Ordinary | Short notes | Detailed notes |
 |---|---:|---:|---:|
-| Namespace choice, #33294 | 0/3 | 0/3 | 0/3 |
-| `grind` proof families, #33098 | 0/3 | 0/3 | 0/3 |
-| Generalize the numeral, #33421 | 0/3 | 0/3 | 0/3 |
-| **All historical asks, mean recovery** | **35.6%** | **34.4%** | **41.1%** |
+| Move lemma to the preferred namespace | 0/3 | 0/3 | 0/3 |
+| Shorten proofs with `grind` | 0/3 | 0/3 | 0/3 |
+| Replace `2` with a parameter | 0/3 | 0/3 | 0/3 |
+| All 30 recorded requests: mean % recovered | 35.6% | 34.4% | 41.1% |
 
-<div class="take"><b>Establishes (C):</b> every ask-free delivery put the topic in front of the reviewer; none reproduced the gain of being told that this concern matters on this PR. The exact brief carried a judgment, not only a convention. So narrow the question: given the declaration and the concern, can the reviewer construct the alternative and judge its value?</div>
+**None of these three target requests was recovered.** A broader gain remains unestablished.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Same comparison as the previous slide · Measured repetitions in which the primary concern was requested, of 3 per arm; then the mean share of the 30 historical asks reached, blind matchers [Date: 24–25 Oct]
+
+Additional reference detail:
+The three rows identify #33294 namespace choice, #33098 grind proof families, and #33421 generalizing the numeral. Counts are reviews requesting the target change, out of three per condition. The final row is mean recovery over all 30 historical asks. This experiment did not establish that all convention knowledge arrived at the right application; it is not proof that the exact brief changed only judgment.
+
 Evidence E8; two matcher replications agree on all 270 reached/not-reached cells.
 Each primary row is a separate concern on its PR. The grind pair is one concern.
 All-ask denominator: 30 asks per repetition; finalized findings 165/158/168.
@@ -711,21 +730,20 @@ An exploratory dslope addition outside the historical reference is in backup.
 
 ---
 
-# D · The mechanism, on one PR
+# D · Knowing the convention, declining the request
 
-<div class="cmp"><b>Case</b> Opus 5.5 with the convention pinpointed at the declaration, the second delivery in C · <b>Observed</b> the reviewer's written reasoning at that place<span class="tag">Oct</span></div>
+On **#42814**, the maintainer requested one shared `variable {D}` declaration.
 
-**#42814:** the maintainer asked for `variable {D}` declared once.
-
-Opus held the convention at the relevant declaration, then wrote:
+Opus 5.5 received the relevant convention at the declaration, but wrote:
 
 > “Mathlib does not require these, so I would not request them.”
 
-**The topic arrived. The decision differed.** In the earlier experiments, asserting that a convention applied could change that decision.
-
-<div class="take">That leaves a harder question: is the rule right here, and is its benefit worth requesting a change?</div>
+**Knowing the convention did not settle whether to request the change.**
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Case Opus 5.5 with the convention pinpointed at the declaration, the second delivery in C · Observed the reviewer's written reasoning at that place [Date: Oct]
+
 Retains the October example. Evidence E1, stage G and subsequent precedence/ladder
 results. Do not retain the original universal "application solved" conclusion or
 turn assertion into a validated delivery policy. Assertive instructions were tested
@@ -735,21 +753,24 @@ and request value require evidence beyond historical agreement.
 
 ---
 
-<!-- _class: tbl -->
+# D · What if we supply the exact concern?
 
-# D · Is focus enough?
+Give Opus 5.5 the **declaration and concern**. Compare with and without the detailed convention note; three runs each.
 
-<div class="cmp"><b>Compare</b> the same reviewer with and without the frozen note, after being handed the declaration and the concern · <b>Held fixed</b> Opus 5.5, three target PRs, three repetitions per cell · <b>Measured</b> by reading each session: was the alternative constructed, and was it requested<span class="tag new">26 Oct</span></div>
-
-| Target | Without note | With note |
+| Change sought | Without note | With note |
 |---|---|---|
-| Namespace | Intended form absent, 0/3 | Formulated **2/3**; declined both |
-| Generality | Constructed **3/3**; one reached request, one partial | Constructed **3/3**; all declined |
-| Automation | No target `grind` proof | Same; probe asked about **registration** |
+| Preferred namespace | Intended change absent, 0/3 | Constructed 2/3; declined both |
+| Replace `2` with a parameter | Compiled 3/3; two suggested generalizing | Compiled 3/3; all declined |
 
-<div class="take">Focus can expose an alternative. Constructing it and deciding to ask for it are separate steps.</div>
+**Constructing the change and deciding to request it are separate steps.**
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare the same reviewer with and without the frozen note, after being handed the declaration and the concern · Held fixed Opus 5.5, three target PRs, three repetitions per cell · Measured by reading each session: was the alternative constructed, and was it requested [Date: 26 Oct]
+
+Additional reference detail:
+Without the note, the two generality requests were one full historical match and one partial match; with the note, all three declined. The automation target is omitted from the displayed table because its probe asked about registration, not a clean test of proof simplification: no target grind proof in either condition. The study includes three selected targets, not only the two displayed here.
+
 Evidence E10–E11. 72 sessions including sibling cases, not 72 independent PRs;
 three selected target PRs, Opus 5.5, three repetitions/cell. Conditional diagnosis,
 not ordinary autonomous review. All six generalizations have successful verified
@@ -763,19 +784,23 @@ registration. Historical silence on siblings is not a wrong label.
 
 # D · Generality: constructed, then declined
 
-<div class="cmp"><b>Case</b> #33421 from the previous slide, six sessions · <b>Observed</b> the parameterized version each session compiled, and its stated reason to request or decline<span class="tag new">26 Oct</span></div>
+**#33421:** generalize a lemma about `2 * fract x = 1` by replacing `2` with a parameter.
 
-**#33421:** a lemma about `2 * fract x = 1`.
+All **six focused sessions** compiled a parameterized version.
 
-With the declaration and generality question supplied, **all six sessions compiled a parameterized version**, keeping the original as a corollary.
-
-With the note, all three declined to suggest it. One compiled essentially the maintainer's form, then wrote:
+With the convention note, **all three declined** to suggest it. One wrote:
 
 > “The constant 2 is what the lemma is about.”
 
-<div class="take"><b>Establishes (D):</b> the technical alternative is available to the reviewer. What differs from the maintainer is the decision that it is worth asking for. Whether its reasons mark useful restraint or a missed improvement is the open question.</div>
+**Do its reasons justify declining the change?**
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Case #33421 from the previous slide, six sessions · Observed the parameterized version each session compiled, and its stated reason to request or decline [Date: 26 Oct]
+
+Additional reference detail:
+All six parameterized alternatives kept the original as a corollary; their statements and parameter domains differed. One with-note session compiled essentially the maintainer form before declining. The evidence does not independently establish whether declining was wrong.
+
 Evidence E10–E11. Retains the detailed November example without treating its
 historical maintainer as an independent usefulness adjudicator. No-note: two
 requests, one reached/one partial. With-note: zero. Three samples per condition
@@ -788,17 +813,14 @@ is printed: the six emitted generalizations differ.
 
 ---
 
-<!-- _class: tbl -->
-
 # Where we stand, 4 November
 
 | | Question | What the experiments support |
 |---|---|---|
-| **A** | Would **more focused attention** resolve the missed requests? | **It has not been enough in our tests.** Many misses persist even when the reviewer inspects the relevant code or is told what to check. |
-| **B** | Does supplying the **right convention** help? | **Yes**, when selected from the human review. The census supplies candidate conventions; scope and force still need checking. |
+| **A** | Would **more focused attention** resolve the missed requests? | **Not enough in our tests.** Misses persist after inspection or specific instructions. |
+| **B** | Does supplying the **right convention** help? | **Yes, when chosen using the human review.** This supplies both the convention and its relevance. |
 | **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
-| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** It can construct and check the alternative, yet judge the change unnecessary. Its reasons are the next question. |
-| | Evaluation | Historical agreement, feasibility and usefulness are different; the usefulness panels remain unfinished. |
+| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** Reviewers can construct and check changes, then decline to request them. |
 
 <!--
 Synthesis of the baseline, specialization and convention questions, not a universal
@@ -814,11 +836,9 @@ sources checked for the 4 November update.
 
 # What this says about the next design
 
-**Proposed next question:** when a reviewer has a checked alternative, do its reasons for declining it identify when a suggestion is worthwhile?
+Hold checked alternatives fixed. Test the reviewer's **reasons for requesting or declining a change**.
 
-Hold the alternatives fixed; compare nearby cases with different benefits and costs before building another whole-PR intervention.
-
-**For discussion:**
+For discussion:
 
 - What makes extra generality or library reuse worth asking for?
 - What evidence would justify keeping the existing form?
@@ -837,17 +857,23 @@ estimates and universal prescription with questions the evidence leaves open.
 
 # Backup · Can generating an alternative improve review?
 
-<div class="cmp"><b>Compare</b> a reviewer given a generated alternative and library context against the same reviewer without · <b>Held fixed</b> DeepSeek reviewer, Opus-produced sketches, 8 development PRs, 25 agreed asks · <b>Measured</b> registered gain: an ask missed by all three historical controls and reached in two of three sessions, both matchers<span class="tag new">19–20 Oct</span></div>
+**ProofJudge** compares supplied pairs of versions. We tried generating an alternative first:
 
-**Related work:** ProofJudge compares supplied original/revised pairs. Our formulation also suggests generating an alternative and comparing it with the PR.
+**PR purpose → independent alternative and library context → reviewer**
 
-**Our tested route:** goal brief → independent sketch and library context → ordinary reviewer.
+On 8 PRs, we tracked 25 maintainer requests using a DeepSeek reviewer and Opus-generated alternatives.
 
-On **8 development PRs, 56 new consumer reviews, 25 agreed asks**, neither context nor context-plus-sketch met the registered improvement criterion.
+Neither library context alone nor context plus an alternative consistently recovered requests that ordinary review missed.
 
-Some sketch proposals did reach final reviews. Producing an alternative did not establish better decisions about which changes to request.
+Here, “consistently” means at least **two of three runs**, with both independent assessments agreeing.
 
 <!--
+Comparison and measurement details (moved from the former on-slide box):
+Compare a reviewer given a generated alternative and library context against the same reviewer without · Held fixed DeepSeek reviewer, Opus-produced sketches, 8 development PRs, 25 agreed asks · Measured registered gain: an ask missed by all three historical controls and reached in two of three sessions, both matchers [Date: 19–20 Oct]
+
+Additional reference detail:
+56 new consumer reviews: 8 controls, 24 library-context reviews, 24 context-plus-sketch reviews. Registered gain required a request missed by all three historical controls and reached in at least two of three strategy sessions, as agreed by both matchers. Neither treatment met that requirement.
+
 Evidence E14. ProofJudge 2608.20432 is a supplied-pair preference task, not a system
 for choosing useful alternatives or determining acceptance. Our reconstruction
 consumer is DeepSeek high, Opus-produced sketches: 8 fresh controls + 24 CTX +
@@ -867,23 +893,17 @@ audit, plus the comparison source table in backup.
 
 <!-- _class: tbl -->
 
-# Backup · Instructions can help under exact supply
+# Backup · Instructions can help with selected conventions
 
-**GPT 5.5, exact convention supply held fixed:** change the filing instructions to require a disposition and use a request threshold.
+**GPT 5.5, given conventions selected from the human review:** require an explicit decision on each candidate change and when it warrants a request.
 
 | 13 other PRs; one run per condition | Before | After |
 |---|---:|---:|
-| In-census ask reach, 37 asks | 0.43 | **0.62** |
+| Requests covered by the convention list: share recovered, of 37 | 0.43 | **0.62** |
 | Excluding one partly encountered PR, 32 asks | 0.44 | **0.56** |
 | Findings per PR | 2.38 | 3.15 |
 
-Seven asks became reached; two more became partial; none was lost.
-
-<div class="take">
-
-Instructions can change requests when the right conventions are supplied. Ask-free transfer remains a separate test.
-
-</div>
+Seven requests became full matches; two more became partial matches; none was lost.
 
 <!--
 Evidence: E2, generation-suppression stage W, run 6 October and brought back into
@@ -952,7 +972,7 @@ The broad substantive rules were not tested by these scripts.
 
 On **#33000**, the notes arms proposed a `dslope` factorization that removes a manual proof and avoids new derivative imports.
 
-| Request delivered | Ordinary | Compact | Full |
+| Request delivered | Ordinary | Short notes | Detailed notes |
 |---|---:|---:|---:|
 | `dslope` factorization | 0/3 | **2/3** | **2/3** |
 
@@ -976,15 +996,15 @@ in for the full panel if an overall usefulness claim is wanted.
 
 <!-- _class: dense -->
 
-# Backup · The same five points, in our experiments
+# Backup · Five design lessons
 
-| Earlier point | What our experiments now say |
+| Design idea | What our experiments now say |
 |---|---|
-| **Tell the reviewer the standard** | General guides did not help in the older comparison; exact convention supply does. Ask-free transfer is unresolved. |
+| **Tell the reviewer the standard** | General guides did not help in the older comparison; conventions selected using the human review do. Getting the same benefit without those requests is unresolved. |
 | **Evidence and request value** | Compiling an alternative establishes feasibility. The usefulness panels are still unfinished. |
 | **Diversity and recall** | Earlier run unions recover more asks; measure their additional comment burden too. |
 | **Decomposition** | The generalist produced most specialist-system matches. The tried arm designs do not justify repeating shared understanding. |
-| **Silence and the filing bar** | Forcing can increase volume sharply. GPT disposition improved recovery with exact briefs; DeepSeek forcing did not unlock never-reached asks. |
+| **When to make a request** | Requiring output can increase volume sharply. Explicit decisions helped GPT given human-selected conventions; forcing DeepSeek to submit findings did not recover previously missed requests. |
 
 <!--
 Keeps the October return to the literature's five points, qualified by later results.
@@ -1068,12 +1088,12 @@ dropped by our client (defect found 7 October) and is not a reasoning reading.
 
 # Backup · Can the library settle the choice?
 
-**Diagnostic:** inspect **41 asks** the free reviewer never reached.
+**Diagnostic:** inspect **41 requests** the ordinary reviewer never recovered.
 
 - In **5–7**, library evidence decides the change.
 - In **19**, it supplies ingredients, but a choice remains.
 
-**Example:** finding `to_fun` connects a hand-written family to a generated alternative. Whether to adopt it still depends on interface and import costs.
+**Example:** the `to_fun` attribute generates a theorem family that could replace a hand-written one. Whether to adopt it still depends on interface and import costs.
 
 <div class="take">
 

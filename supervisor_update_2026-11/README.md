@@ -6,11 +6,13 @@ slide in section 2 carries a comparison strip (what is compared, what is held fi
 is measured, when it ran), and the ask-free delivery table states its units.
 
 **Proposed restructure of section 2: [HTML](original-led-v2.html), [PDF](original-led-v2.pdf),
-[Markdown and speaker notes](original-led-v2.md).** Same section 1, same backups, same
-numbers and speaker notes; section 2 is reorganised as four questions (A attention,
-B standard, C delivery without the answer key, D the decision) with a route slide at the
-start, a verdict line closing each question, and the same route table, filled in, at the end.
-The alternative-generation slide moves to backup as the fourth row of the delivery table.
+[Markdown and speaker notes](original-led-v2.md).** Preserves section 1 and the experimental
+record; section 2 follows four questions (A attention, B conventions, C supplying useful
+context without the maintainer's requests, D deciding to request a change). The opening
+and closing slides give those questions and their answers. The comparison boxes are
+removed: each result keeps a short setup and readable measurement labels, with full
+comparison conditions, dates and instruments in speaker notes. The alternative-generation
+experiment is summarized in section 2 and detailed in backup.
 Kept as a separate file so the two can be compared slide by slide; see the
 [notes](original-led-notes.md#second-pass-4-november-comparison-strips-and-the-four-question-route).
 
@@ -24,8 +26,8 @@ changes and optional preferences remain distinct. Boxed closing sentences are re
 The experimental argument starts with the goal of building a reviewer, the solo
 baseline and its misses, then asks about specialization, judgment and convention
 supply. Relevant references appear at those questions. The former design-space
-section is retained as backup tables. There are 31 main slides and 11 backups,
-with no duration target.
+section is retained as backup tables. The proposed deck has 31 main slides and 12
+backups, with no duration target.
 
 [Framing and narrative notes](original-led-notes.md) explain the revisions and trace
 the conventions motivation. The [evidence register](evidence.md) and speaker notes
