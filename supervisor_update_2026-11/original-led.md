@@ -45,6 +45,14 @@ style: |
   section.rules .take { font-size: 22px; margin-top: 10px; }
   .above { color: #1a7f37; font-weight: bold; }
   .below { color: #b3261e; font-weight: bold; }
+  .cmp { font-size: 19px; color: #333; background: #eef1f7; border-left: 6px solid #9aa7c7; border-radius: 6px; padding: 7px 14px; margin: -4px 0 14px; line-height: 1.3; }
+  .cmp b { color: #1d2b53; }
+  .tag { display: inline-block; font-size: 15px; font-weight: bold; color: #fff; background: #9aa7c7; border-radius: 4px; padding: 1px 7px; margin-left: 8px; vertical-align: middle; }
+  .tag.new { background: #e0a020; }
+  section.dense .cmp, section.tbl .cmp { font-size: 17px; margin-bottom: 10px; }
+  section.routes table { width: 100%; }
+  section.routes th:first-child, section.routes td:first-child { width: 30%; }
+  section.routes th:nth-child(2):not(:last-child), section.routes td:nth-child(2):not(:last-child) { width: 24%; }
   footer { font-size: 16px; color: #888; }
 footer: "Mathlib PR review · Supervisor update · 4 November 2026"
 ---
@@ -312,6 +320,8 @@ Historical ask recovery is one measurement, not an exhaustive usefulness score.
 
 # What does the solo reviewer miss?
 
+<div class="cmp"><b>Compare</b> three runs of one reviewer, nothing added · <b>Held fixed</b> GPT 5.2 with reasoning off, tools, 12 held-out PRs · <b>Measured</b> obligations recovered of the 23 the maintainers asked for, registered judge<span class="tag">Sept</span></div>
+
 On the twelve-PR comparison, solo GPT 5.2 recovered **4, 4 and 1 of 23 obligations** across three runs.
 
 | Example | What was missing |
@@ -357,6 +367,8 @@ not an inference that all specialization fails. Our A/B cost is not matched.
 <!-- _footer: "Mathlib PR review · Specialist comparison · September experiments" -->
 
 # What did the specialist design buy?
+
+<div class="cmp"><b>Compare</b> a lead with a generalist and ten specialist arms, against the solo reviewer · <b>Held fixed</b> the 12 PRs, GPT 5.2 with reasoning off, tools, three runs each · <b>Measured</b> obligations recovered of 23, registered judge; billed cost per run<span class="tag">Sept</span></div>
 
 **Experiment:** concern specialists plus a lead, against one whole-PR reviewer.
 
@@ -412,6 +424,8 @@ This narrows the tried decomposition; it does not rule out all decomposition.
 
 # Are missed requests simply overlooked?
 
+<div class="cmp"><b>Population</b> the 67 asks solo GPT 5.2 never reached: 37 reached by no reviewer, 30 reached only by Opus 5.5 · <b>Reviewers</b> GPT 5.2 with reasoning carried, and Opus 5.5 · <b>Measured</b> two blind readers label the transcript at each missed ask; a count needs both readers<span class="tag">30 Sept</span></div>
+
 **Diagnostic:** 67 residual asks — **37 reached by nobody**, plus **30 reached only by Claude**.
 
 | What the transcript readers found | Asks, of 67 |
@@ -437,6 +451,8 @@ later mechanism labels, not proof that all 63 understood and rejected the ask.
 ---
 
 # Does spelling out the check solve it?
+
+<div class="cmp"><b>Audit</b> the specialist briefs against the 23 obligations · <b>Reviewer</b> the GPT 5.2 arms above · <b>Measured</b> obligations whose brief names the specific check, by the more conservative of two readers; then whether the arm made the request<span class="tag">Sept</span></div>
 
 In the specialist-brief audit, a prompt directed the reviewer to the specific check behind **17 of 23 obligations**.
 
@@ -464,6 +480,8 @@ also failed to establish a strong specialist route; retained in source notes.
 ---
 
 # Which standard should the reviewer apply?
+
+<div class="cmp"><b>Reading</b> 31 design asks from the validation PRs · <b>Measured</b> whether a reader could state the principle behind the ask, and whether Mathlib documents it<span class="tag">29 Sept</span></div>
 
 **Hypothesis:** the reviewer needs evidence about what current library practice expects in this situation.
 
@@ -494,6 +512,8 @@ unwritten standards. See the saved review-systems survey and comparison backup.
 
 # How many conventions? The census
 
+<div class="cmp"><b>Readers</b> two independent Opus 5.5 sessions, each keeping a running codebook · <b>Input</b> the 1,833 first-round asks on the 973 validation PRs · <b>Measured</b> distinct principles per codebook; coverage checked on 14 PRs outside the census<span class="tag">early Oct</span></div>
+
 **How:** two independent model readers summarized the principles behind **1,833 first-round validation asks**, each keeping a running codebook.
 
 - **409 and 407 entries** at this grain; neither reading had saturated.
@@ -516,6 +536,8 @@ model family. One ask in ten was estimated to introduce another principle.
 
 # Does knowing the convention help? The ceiling
 
+<div class="cmp"><b>Compare</b> the same reviewer briefed with the conventions the maintainers invoked on the PR, as general sentences without locations, against unbriefed · <b>Held fixed</b> reviewer, tools, the 14 held-out PRs · <b>Measured</b> share of the 39 in-census asks (of 46) reached per session, blind matchers<span class="tag">4 Oct</span></div>
+
 **Experiment:** select entries using the PR's historical asks; give the reviewer those general sentences, without locations.
 
 | Reviewer | Repetitions | Unbriefed | Exact brief |
@@ -535,24 +557,29 @@ pooled or common-seal model ranking. The DeepSeek variants share their unbriefed
 comparison. Exact supply conveys relevance as well as content; no locations does
 not make it answer-free. The Qwen row is ~.034→.085, +.051, not a strong local-model
 unlock. For GPT's separate disposition positive under exact supply, see backup.
+Say aloud: October's table mixed two reporting views (its Opus row took the
+unbriefed figure from the all-asks view); this one uses the in-census measure
+throughout, so the unbriefed column differs slightly.
 -->
 
 The target-selected brief improves recovery for several reviewers. It supplies both the convention and evidence that this concern matters on the PR.
 
 ---
 
-<!-- _class: tbl -->
+<!-- _class: dense routes -->
 
 # Getting the knowledge in without the answer key
+
+<div class="cmp"><b>Compare</b> each delivery against the same reviewer without it · <b>Target</b> the ceiling's gain, which used the maintainers' asks to choose the conventions · <b>Measured</b> per row; different sets, never pooled<span class="tag">5–12 Oct</span></div>
 
 **Experiment:** select from the diff, then vary how the entries are delivered.
 
 | Delivery | Result in the tested comparison |
 |---|---|
-| General guides in the prompt | No gain in the earlier GPT comparison |
-| Select 25 entries from the diff | Entry for 22/33 asks; Opus gain **about +3 points** |
-| Guarded rules, pinpointed at places | Opus gain **0 points** |
-| Selected entries + examples + precedence | Initial gains; no reliable gain across the later sets |
+| Mathlib's written guides in the prompt | No gain (GPT, 115 obligations, an older judge) |
+| 25 entries selected from the diff, as sentences | Entry present for 22 of 33 asks; reach 0.46 → **0.49** (exact brief 0.74) |
+| The same, pinpointed as guarded rules with a check | **0.00** change; the reviewer overrode the rule at the place |
+| Selected entries with examples and precedence | About **+0.2** on the PRs it was built with; **0.00, −0.01** on fresh sets (DeepSeek); +0.02 to +0.09, intervals through zero (Opus) |
 
 <div class="take">
 
@@ -575,6 +602,8 @@ wrong. The detailed reference and experiment map retain these omitted variants.
 ---
 
 # The mechanism, on one PR
+
+<div class="cmp"><b>Case</b> Opus 5.5 with the convention pinpointed at the declaration, the second delivery above · <b>Observed</b> the reviewer's written reasoning at that place<span class="tag">Oct</span></div>
 
 **#42814:** the maintainer asked for `variable {D}` declared once.
 
@@ -604,6 +633,8 @@ and request value require evidence beyond historical agreement.
 
 # First check what “applies” meant
 
+<div class="cmp"><b>Check</b> flagged places and known fixes for three conventions by hand, instead of inferring applicability from survival at merge · <b>Measured</b> small selected strata; not population rates<span class="tag new">16 Oct</span></div>
+
 **Follow-up:** inspect flagged code and known fixes, rather than infer applicability from survival at merge.
 
 | Convention | What the check found |
@@ -629,6 +660,8 @@ were simply bad rules. The six form-rule practice study is in backup (E4).
 ---
 
 # Can generating an alternative improve review?
+
+<div class="cmp"><b>Compare</b> a reviewer given a generated alternative and library context against the same reviewer without · <b>Held fixed</b> DeepSeek reviewer, Opus-produced sketches, 8 development PRs, 25 agreed asks · <b>Measured</b> registered gain: an ask missed by all three historical controls and reached in two of three sessions, both matchers<span class="tag new">19–20 Oct</span></div>
 
 **Related work:** ProofJudge compares supplied original/revised pairs. Our formulation also suggests generating an alternative and comparing it with the PR.
 
@@ -658,6 +691,8 @@ audit, plus the comparison source table in backup.
 
 # Can independently acquired notes transfer?
 
+<div class="cmp"><b>Compare</b> three arms of the same reviewer · <b>Held fixed</b> Opus 5.5, tools, 6 development PRs, three repetitions · <b>Measured</b> whether each PR's primary concern becomes a request; then all 30 historical asks, blind matchers<span class="tag new">24–25 Oct</span></div>
+
 **Experiment:** acquire six entries from earlier sources, check and repair them, then freeze them before whole-PR review.
 
 | Arm | Same Opus 5.5 reviewer receives |
@@ -685,6 +720,8 @@ population claim follows. Date gates and target exclusions remain in protocol.
 <!-- _class: tbl -->
 
 # The notes did not recover the primary concerns
+
+<div class="cmp"><b>Same comparison</b> as the previous slide · <b>Measured</b> repetitions in which the primary concern was requested, of 3 per arm; then the mean share of the 30 historical asks reached, blind matchers<span class="tag new">24–25 Oct</span></div>
 
 | Primary concern | A: ordinary | B: compact | C: full |
 |---|---:|---:|---:|
@@ -720,6 +757,8 @@ An exploratory dslope addition outside the historical reference is in backup.
 
 # Is focus enough?
 
+<div class="cmp"><b>Compare</b> the same reviewer with and without the frozen note, after being handed the declaration and the concern · <b>Held fixed</b> Opus 5.5, three target PRs, three repetitions per cell · <b>Measured</b> by reading each session: was the alternative constructed, and was it requested<span class="tag new">26 Oct</span></div>
+
 **Diagnostic:** supply a declaration and concern; compare no note with its frozen note, three repetitions per condition.
 
 | Target | Without note | With note |
@@ -747,6 +786,8 @@ registration. Historical silence on siblings is not a wrong label.
 ---
 
 # Generality: constructed, then declined
+
+<div class="cmp"><b>Case</b> #33421 from the previous slide, six sessions · <b>Observed</b> the parameterized version each session compiled, and its stated reason to request or decline<span class="tag new">26 Oct</span></div>
 
 **#33421:** a lemma about `2 * fract x = 1`.
 
