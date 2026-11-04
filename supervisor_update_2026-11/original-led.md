@@ -153,35 +153,41 @@ No claim of an identifiable global partial order or automatic acceptance oracle.
 
 ---
 
-# Solutions, preferences and acceptance
+# Extending what we can check
 
-| Question | What it asks |
+| Role | Contribution |
 |---|---|
-| **δ ∈ S(C, p)?** | Does this diff compile and accomplish its stated task? |
-| **δ′ ≽_t δ?** | Would the community favour this alternative? |
-| **δ ∈ A_t?** | Is the contribution acceptable to merge without a required change? |
+| **Compiler, kernel, tests** | Help separate solutions from non-solutions by checking explicit requirements |
+| **Human reviewers** | Identify acceptable or preferred solutions using further community standards |
+| **Automated reviewer** | Capture human review, or a useful subset, as additional checks |
 
-A PR can accomplish its task while departing from the library's expectations about its interface, organization or presentation.
+```text
+S_R(C, p) = { δ ∈ S(C, p) : δ passes the additional review checks R }
+```
 
-Several differently ranked solutions may be acceptable. **Preference alone does not determine the acceptance boundary.**
+The aim is to exclude more unacceptable contributions from what passes, while retaining acceptable ones.
 
 <!--
-p is the contribution's stated task; P concerns the library it joins. The conceptual
-distinction depends on that choice of p: if p already encoded all library standards,
-there would be no separate acceptance question by construction. The research problem
-includes discovering which additional expectations hold and which are requirements.
-This explains the roles of S and A; it does not pretend to derive or measure A_t.
-"Would merge without requiring revision" is an idealized current community judgment,
-not an inference from one reviewer staying silent or from an eventual merged revision.
-A preferred alternative need not make the original unacceptable, nor need every
-feasible preference be worth raising as an optional request.
+User's revised framing: automated systems help separate solutions/non-solutions;
+reviewers identify accepted/preferred solutions; automating human review, or part
+of it, makes more unacceptable solutions fail the combined system's requirements.
+S_R denotes that refinement rather than changing the meaning of the original S.
+R is the subset of required-change judgments we automate, not a claim that all
+human preferences are blocking requirements. Ideally A_t ⊆ S_R ⊆ S, with fewer
+members of S\A_t surviving. This is an aim, not a property established for our
+current reviewer: false rejections and missed requirements must both be assessed.
+Tests need not completely decide "realises p"; the slide says they HELP separate
+solutions/non-solutions. Review can also uncover correctness or specification
+failures missed by the existing checks. Some reviewer preferences remain advisory,
+guiding improvement among solutions that pass. No recorded comment is automatically
+a valid reusable check, and historical silence is not proof of acceptance.
 -->
 
 ---
 
 # Conventions in this formulation
 
-A convention describes a **situation, scope, preferred form and exceptions**. Its scope can depend on the area and date.
+A convention describes a **situation, scope, preferred form and exceptions**. These are candidate standards for the automated reviewer to capture.
 
 ```text
 An applicable convention can support       δ′ ≽_t δ
@@ -190,7 +196,7 @@ A convention treated as a merge requirement can constrain membership in A_t
 
 - It supplies a reason for a preference or requirement; other reasons can outweigh it.
 - Knowing a general principle still leaves its application and priority to be judged.
-- Discovering these conventions is part of recovering the community's standard.
+- A reliable requirement can become an additional check; preferences can guide improvements among solutions that pass.
 
 <!--
 Brings the October convention/trigger account into the opening formulation rather
@@ -199,7 +205,10 @@ all conventions into fixed categories: a convention's force can depend on contex
 Conventions are evidence for the relation and sometimes acceptance requirements;
 they are not claimed to exhaustively determine ≽_t or A_t. A technical rule may
 also be part of the declared task p. The census entries are candidate descriptions
-of these practices, not automatically validated rules. Source background:
+of these practices, not automatically validated rules. Scope includes area and date.
+Adding a blocking check requires establishing both the rule and its force here;
+a mere preference for an alternative does not make the original unacceptable.
+Source background:
 ../docs/todo/conventions-nature.md; evidence E1 and E3–E5.
 -->
 
@@ -249,6 +258,7 @@ required revision and optional request value remain distinct decisions.
 - **The acceptance boundary:** which expectations are requirements, and which are preferences?
 - **The conventions:** what holds in this area and period, with what exceptions?
 - **The comparisons:** which alternative exposes a consequential difference?
+- **The automation:** which reviewer judgments can we reliably turn into checks?
 - **The evidence:** a historical review records some requests, not the whole standard.
 
 Generating an alternative gives a pair to compare. We still need to judge the difference and whether it warrants a request.
@@ -273,7 +283,7 @@ From the solo baseline to conventions
 
 # What is a good baseline?
 
-**Goal:** build a system that produces useful requests about a Mathlib PR.
+**Goal:** capture human review, or a useful subset, as additional automated checks on a Mathlib PR.
 
 Start with **one reviewer, the whole PR, and the tools**:
 

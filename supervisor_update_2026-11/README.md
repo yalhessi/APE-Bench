@@ -4,9 +4,11 @@
 [Markdown and speaker notes](original-led.md).**
 
 This copy develops the [October deck](../supervisor_update_2026-10/slides.md). The
-first section keeps its task formulation, with explicit distinctions between a
-solution, a preferred alternative and an acceptable contribution. Conventions now
-enter that account. Its boxed closing sentences are removed.
+first section keeps its task formulation. Automated checks help separate solutions
+from non-solutions; human review identifies acceptable or preferred solutions;
+automating review adds checks that exclude more unacceptable contributions from
+what passes. Conventions supply candidate standards for that extension. Required
+changes and optional preferences remain distinct. Boxed closing sentences are removed.
 
 The experimental argument starts with the goal of building a reviewer, the solo
 baseline and its misses, then asks about specialization, judgment and convention

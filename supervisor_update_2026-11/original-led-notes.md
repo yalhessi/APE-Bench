@@ -7,13 +7,26 @@ Current presentation: [HTML](original-led.html), [PDF](original-led.pdf),
 
 The first section keeps the October objects and progression: library and PR purpose,
 solution set, APE-Bench, reviewing, worked PR examples, reviewer work and limitations.
-The boxed closing sentences are removed. Two clarifications are now explicit:
+The boxed closing sentences are removed. The framing now follows the user's
+division of work: compilers, kernels and tests help separate solutions from
+non-solutions; reviewers identify accepted or preferred solutions; an automated
+reviewer captures human review, or a useful subset, as additional checks.
+
+The refined solution set is written `S_R = {δ ∈ S : δ passes the additional review
+checks R}`. The aim is to exclude more unacceptable contributions from what passes,
+while retaining acceptable ones. This describes extending the combined system's
+requirements; it does not claim that the existing reviewers achieve that aim.
+Tests can miss specification failures, and automated review can reject a change
+incorrectly. Both kinds of error matter.
+
+Two distinctions remain explicit:
 
 - **Solutions and acceptance:** S consists of diffs that compile and accomplish the
   stated task p. A_t consists of those the community would merge without requiring
   revision. This distinction assumes p does not already encode all library standards.
   Several differently preferred solutions can be acceptable. The preference relation
-  does not determine an acceptance threshold by itself.
+  does not determine an acceptance threshold by itself. Required changes can become
+  checks that narrow S_R; optional preferences can guide improvements within it.
 - **Conventions:** contextual practices supply reasons for preferences and, when
   treated as requirements, constrain acceptance. Their scope, period, exceptions
   and force must be discovered. A census entry is a candidate description of a
@@ -30,7 +43,7 @@ also stop treating an empty historical review as proof of acceptability.
 
 | Slides | Question or role |
 |---|---|
-| 1–10 | Task framing, S versus A_t, conventions, examples and unresolved questions |
+| 1–10 | Automated checks, human review, the refined solution set, conventions and examples |
 | 11–13 | Build a reviewing system; choose a solo baseline; inspect its failures |
 | 14–16 | Would dedicated specialists help? Result, cost and shared-context limitation |
 | 17–18 | Was the issue overlooked? What happens when the check is explicit? |
