@@ -152,3 +152,29 @@ descriptions. Long closing boxes are replaced by short sentences. Removed numeri
 detail is retained in the notes and earlier drafts. The four questions remain the main
 takeaways; section 1 and the original October source are unchanged.
 
+## Third pass, 4 November: the notes experiment and the focused sessions, explained
+
+The user could not recall what the notes-from-earlier-PRs experiment was for, and asked for
+the second half of C and all of D to be clarified. The six slides (25–30) now each say why
+the experiment ran, what the reviewer was given, what we expected, what happened and what
+it establishes, in the current deck's style (short setup, one table, one bold sentence; the
+comparison details and dates in the speaker notes).
+
+- **C, the notes.** The point, stated on the slide: every ask-free delivery handed the
+  reviewer a one-line convention, some of them wrong; if knowledge quality was the gap, a
+  proper account written from earlier PRs should close it. The result slide names the three
+  maintainer requests and the note each reviewer held, then what the transcripts show at
+  each: the note was read and used as a reason to keep the form, or judged not to apply, or
+  applied along another axis. Takeaway: better knowledge, delivered this way, did not change
+  what was proposed; the human-chosen brief had also carried the pointer, this concern here.
+- **D, the focused sessions.** The #42814 case now ends with the question it raises: built
+  and rejected, or never built? A whole review cannot show which. A new setup slide says what
+  the focused session receives (one declaration, one concern, the tree, a compile check;
+  never told a maintainer asked; answers revise or keep) and lists the three cases. The
+  result slide separates "built it" from "requested it" per case against the nine whole
+  reviews, and states the two findings: what gets built follows the question; once built,
+  the decision is where it is lost. The generality slide gives the maintainer's words, the
+  reviewer's reasons in both conditions, and the quote.
+
+44 slides; no overflow or footer overlap by the headless check; pages 25–30 inspected.
+

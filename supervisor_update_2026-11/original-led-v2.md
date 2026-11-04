@@ -664,68 +664,78 @@ detailed reference. Neither proves all unmatched findings wrong.
 
 ---
 
-# C · Convention notes from earlier PRs
+<!-- _class: dense -->
 
-Acquire and check **six convention notes from earlier PRs**, then keep them fixed.
+# C · The best knowledge we could write: notes from earlier PRs
+
+The one-line conventions above were sometimes wrong. If the quality of the knowledge was the gap, a proper account should close it.
+
+**Six notes**, one per convention (naming scope, `grind` registration, generality, three more), written from earlier PRs where maintainers had decided the question: when it applies, the competing forms, reasons to decline, what to check.
 
 | Inputs to Opus 5.5 | Contents |
 |---|---|
 | Ordinary review | PR and tools |
-| Short notes | Same inputs + compact statements of the conventions |
-| Detailed notes | Same inputs + fuller conditions and exceptions |
+| Short notes | Same + one paragraph per convention |
+| Detailed notes | Same + conditions, exceptions and sources |
 
-Every notes review receives all six. No note says it applies to this PR.
-
-**6 PRs × 3 input conditions × 3 runs = 54 reviews.**
+All six notes go to every review; none says it applies to this PR. **6 PRs × 3 conditions × 3 runs = 54 reviews.** On three of the PRs we knew the maintainer's request, and which note held it.
 
 <!--
-Comparison and measurement details (moved from the former on-slide box):
-Compare three arms of the same reviewer · Held fixed Opus 5.5, tools, 6 development PRs, three repetitions · Measured whether each PR's primary concern becomes a request; then all 30 historical asks, blind matchers [Date: 24–25 Oct]
+Comparison and measurement details:
+Compare the same reviewer with no notes, short notes and detailed notes · Held fixed Opus 5.5, tools, 6 development PRs, three reviews per condition · Measured whether the three requests the whole reviews had missed now appear; then all 30 historical asks, blind matchers [Date: 24–25 Oct]
 
-Additional reference detail:
-Short and detailed denote the original compact and full-conditional arms. Both derive from the same eligible earlier sources. Conditions were ordinary review, compact notes, and full conditional notes. Entries include namespace placement, name order, grind registration, to_additive, generality, and simp/iff orientation.
+The target PRs were excluded from the sources. Why this experiment, in one line for the room: it is the strongest version of "supply the
+knowledge" we could build without using the maintainers' asks. Its decision table was fixed
+before the run (synthesis 2026-10-23, section 4; plan 2026-10-24, section 1): if the notes
+state accurate distinctions and the whole review still makes the same choices, park this
+representation and do not keep elaborating notes.
 
-Evidence E8–E9. Compact/full acquired from the SAME eligible earlier sources;
-B is not the historical census. Entries: namespace, name order, grind registration,
-to_additive, generality, simp/iff orientation. Developmental cases; source selection
-steered by known targets and disclosed. Reserved checks and repairs are specification
-checks, not a controlled compact/full effectiveness result. Primary opportunities
-namespace, automation, generality, plus contrary targets. No fresh autonomous
-population claim follows. Date gates and target exclusions remain in protocol.
+Evidence E8–E9. Short and detailed notes were acquired from the SAME eligible earlier
+sources; the short form is not the historical census sentence. Entries: namespace, name
+order, grind registration, to_additive, generality, simp/iff orientation. Developmental
+cases; source selection steered by known targets and disclosed. Reserved checks and
+repairs are specification checks, not a short-versus-detailed effectiveness result.
+Each of the three PRs also had a contrary target where the tempting change should be
+declined. No fresh autonomous population claim follows. Date gates and target
+exclusions remain in the protocol.
 -->
 
 ---
 
-# C · Did the notes recover the missed requests?
+<!-- _class: dense -->
 
-Three runs per condition, using the notes just described.
+# C · The notes arrived; the three requests did not
 
-| Maintainer request | Ordinary | Short notes | Detailed notes |
-|---|---:|---:|---:|
-| Move lemma to the preferred namespace | 0/3 | 0/3 | 0/3 |
-| Shorten proofs with `grind` | 0/3 | 0/3 | 0/3 |
-| Replace `2` with a parameter | 0/3 | 0/3 | 0/3 |
-| All 30 recorded requests: mean % recovered | 35.6% | 34.4% | 41.1% |
+| Maintainer request | The note the reviewer held | Ordinary | Short | Detailed |
+|---|---|---:|---:|---:|
+| **#33294** name the lemma by its conclusion | naming a lemma by its conclusion or by its hypothesis | 0/3 | 0/3 | 0/3 |
+| **#33098** prove the accessor lemmas by `grind` | when to register facts for `grind` | 0/3 | 0/3 | 0/3 |
+| **#33421** replace `2` by a parameter | when to ask for a more general statement | 0/3 | 0/3 | 0/3 |
+| All 30 recorded requests, mean recovered | | 35.6% | 34.4% | 41.1% |
 
-**None of these three target requests was recovered.** A broader gain remains unestablished.
+The reviewer read the right declaration, and the notes, every time. On #33294 it took “several forms are defensible” as a reason to keep the name. On #33098 it wrote that the notes do not apply and never tried `grind`. On #33421 it checked the generality of the types, not of the constant.
+
+**Better knowledge, delivered this way, did not change what was proposed. The human-chosen brief had carried something more: this concern, here.**
 
 <!--
-Comparison and measurement details (moved from the former on-slide box):
-Same comparison as the previous slide · Measured repetitions in which the primary concern was requested, of 3 per arm; then the mean share of the 30 historical asks reached, blind matchers [Date: 24–25 Oct]
-
-Additional reference detail:
-The three rows identify #33294 namespace choice, #33098 grind proof families, and #33421 generalizing the numeral. Counts are reviews requesting the target change, out of three per condition. The final row is mean recovery over all 30 historical asks. This experiment did not establish that all convention knowledge arrived at the right application; it is not proof that the exact brief changed only judgment.
+Comparison and measurement details:
+Same comparison as the previous slide · Measured reviews, of three per condition, that make the maintainer's request; then the mean share of the 30 historical asks reached, blind matchers [Date: 24–25 Oct]
 
 Evidence E8; two matcher replications agree on all 270 reached/not-reached cells.
-Each primary row is a separate concern on its PR. The grind pair is one concern.
-All-ask denominator: 30 asks per repetition; finalized findings 165/158/168.
-The primary progression rule fails. The 5.5-point full/ordinary descriptive
-all-ask difference is not a demonstrated population effect. Primary concerns were
-absent at submission as well as finalization, not lost during serialization.
-The 491-finding usefulness panel is unlabelled; historical recovery is not quality.
-The namespace form was not requested, generality not proposed, and no target grind
-proof was tried. The notes' topics did not map perfectly to these opportunities.
-An exploratory dslope addition outside the historical reference is in backup.
+Each primary row is a separate concern on its PR; the grind pair is one concern.
+All-ask denominator: 30 asks per repetition; finalized findings 165/158/168. The
+primary progression rule fails. The 5.5-point detailed/ordinary difference is not a
+demonstrated population effect. Primary concerns were absent at submission as well
+as finalization. Transcript reading, results reading of 2026-10-25: on 33294 a
+short-notes review wrote that the p_of_q form is acceptable under the note and a
+detailed-notes review that the note leaves the case open; on 33098 no tool request
+tried grind in any of the nine, and a detailed-notes review wrote that the notes do
+not apply here; on 33421 the generality note's first test is replacing a concrete
+type with a type variable, and no review considered the constant. This experiment
+did not establish that every note arrived at the right application; it is not proof
+that the exact brief changed only judgment. The 491-finding usefulness panel is
+unlabelled. An exploratory dslope addition outside the historical reference is in
+backup.
 -->
 
 ---
@@ -734,81 +744,124 @@ An exploratory dslope addition outside the historical reference is in backup.
 
 On **#42814**, the maintainer requested one shared `variable {D}` declaration.
 
-Opus 5.5 received the relevant convention at the declaration, but wrote:
+Opus 5.5 received that convention at that declaration, checked it, and wrote:
 
 > “Mathlib does not require these, so I would not request them.”
 
-**Knowing the convention did not settle whether to request the change.**
+**Knowing the convention, at the right place, did not settle whether to request the change.**
+
+Did it build the alternative and reject it, or never build it? A whole review cannot show which. So strip the review down to one declaration and one concern, where both steps are visible.
 
 <!--
-Comparison and measurement details (moved from the former on-slide box):
-Case Opus 5.5 with the convention pinpointed at the declaration, the second delivery in C · Observed the reviewer's written reasoning at that place [Date: Oct]
+Comparison and measurement details:
+Case from the pinpointed delivery in C: Opus 5.5, a whole review, the convention and a check delivered at the declaration · Observed the reviewer's submitted notes at that place [Date: Oct]
 
-Retains the October example. Evidence E1, stage G and subsequent precedence/ladder
-results. Do not retain the original universal "application solved" conclusion or
-turn assertion into a validated delivery policy. Assertive instructions were tested
-with target-derived entries; the separate GPT positive is in backup. Actual validity
-and request value require evidence beyond historical agreement.
+Retains the October example. Evidence E1, stage G (ceiling README, Result 5): of the
+10 asks only the exact brief reached, the pinpointed delivery reached none, and 8
+had a candidate at the place; the session verified the candidate and overrode it.
+Do not retain the original universal "application solved" conclusion or turn
+assertion into a validated delivery policy. Assertive instructions were tested with
+target-derived entries; the separate GPT positive is in backup. Actual validity and
+request value require evidence beyond historical agreement.
 -->
 
 ---
 
-# D · What if we supply the exact concern?
+# D · One declaration, one concern, the same reviewer
 
-Give Opus 5.5 the **declaration and concern**. Compare with and without the detailed convention note; three runs each.
+Opus 5.5 gets one declaration, one concern, the PR's purpose and diff for that declaration, the reviewed tree, lookups and a compile check. It is never told that a maintainer asked. It answers **revise** or **keep**, with the request it would make.
 
-| Change sought | Without note | With note |
+| PR | Declaration | Concern put to it |
 |---|---|---|
-| Preferred namespace | Intended change absent, 0/3 | Constructed 2/3; declined both |
-| Replace `2` with a parameter | Compiled 3/3; two suggested generalizing | Compiled 3/3; all declined |
+| #33294 | the lemma named `…_of_isNormal` | naming a lemma that derives one property from another |
+| #33421 | the lemma about `2 * fract x = 1` | the generality its argument supports |
+| #33098 | the accessor lemmas | registering lemmas for `grind` |
 
-**Constructing the change and deciding to request it are separate steps.**
+With and without the detailed note, three runs each, sibling declarations as controls: **72 sessions**. Expected: with the concern pointed out, the maintainer's change gets built and requested.
 
 <!--
-Comparison and measurement details (moved from the former on-slide box):
-Compare the same reviewer with and without the frozen note, after being handed the declaration and the concern · Held fixed Opus 5.5, three target PRs, three repetitions per cell · Measured by reading each session: was the alternative constructed, and was it requested [Date: 26 Oct]
+Comparison and measurement details:
+Compare the same reviewer with and without the detailed note from C, given one declaration and one concern · Held fixed Opus 5.5, the three PRs from C, three sessions per cell, sibling declarations as controls · Measured by reading each answer: did it build the maintainer's alternative; did it request it (blind matchers) [Date: 26 Oct]
 
-Additional reference detail:
-Without the note, the two generality requests were one full historical match and one partial match; with the note, all three declined. The automation target is omitted from the displayed table because its probe asked about registration, not a clean test of proof simplification: no target grind proof in either condition. The study includes three selected targets, not only the two displayed here.
-
-Evidence E10–E11. 72 sessions including sibling cases, not 72 independent PRs;
-three selected target PRs, Opus 5.5, three repetitions/cell. Conditional diagnosis,
-not ordinary autonomous review. All six generalizations have successful verified
-edits; their parameter domains/statements differ. No case passed the registered
-progression rule for autonomous step 2, which did not run. Automation is not a
-clean test of discovering a proof simplification because its question concerns
-registration. Historical silence on siblings is not a wrong label.
+Evidence E10–E11. Protocol: focused-application-2026-10-26/PROTOCOL.md, step 1,
+registered before each case ran. 72 sessions = 24 per case (two conditions, four
+declarations, three replicates at 33294 and 33421; two targets and siblings at
+33098), not 72 independent PRs. Opus 5.5 xhigh on the contained route, the reviewed
+tree, declaration search, naming lookup and the compile check; no Zulip or precedent
+retrieval. The packets differ only by the presence of the note; no packet holds the
+merged name, "maintainer" or "suggestion". Conditional diagnosis, not ordinary
+autonomous review: declaration isolation, the supplied concern and the instructions
+all differ from whole review and are not separately isolated.
 -->
 
 ---
 
-# D · Generality: constructed, then declined
+<!-- _class: tbl -->
 
-**#33421:** generalize a lemma about `2 * fract x = 1` by replacing `2` with a parameter.
+# D · The change gets built, then declined
 
-All **six focused sessions** compiled a parameterized version.
+| Change sought | Built it: no note · note | Requested it: no note · note | Whole reviews |
+|---|---|---|---|
+| Name by conclusion, #33294 | 0/3 · **2/3** | 0 · 0 | 0/9 |
+| Replace `2` by a parameter, #33421 | **3/3 · 3/3**, all compiled | **1**, plus 1 partial · 0 | 0/9 |
+| Prove by `grind`, #33098 | 0/6 · 0/6 | 0 · 0 | 0/9 |
 
-With the convention note, **all three declined** to suggest it. One wrote:
+- **What gets built follows the question.** Asked about generality, every session built the general theorem no whole review had considered. Asked about *registering* for `grind`, none thought of *proving by* `grind`.
+- **Once built, the decision is where it is lost.** Of the eight sessions holding the maintainer's change, one requested it and one partly, both without the note.
 
-> “The constant 2 is what the lemma is about.”
-
-**Do its reasons justify declining the change?**
+**Pointing at the concern fixes construction, not the decision. The note, written to prevent over-application, supplied the reasons to decline.**
 
 <!--
-Comparison and measurement details (moved from the former on-slide box):
-Case #33421 from the previous slide, six sessions · Observed the parameterized version each session compiled, and its stated reason to request or decline [Date: 26 Oct]
+Comparison and measurement details:
+Same comparison as the previous slide · Measured sessions of three per cell; "built" means the maintainer's alternative appears in the answer, for generality compiled; "requested" means the request matches the maintainer's, blind matchers [Date: 26 Oct]
 
-Additional reference detail:
-All six parameterized alternatives kept the original as a corollary; their statements and parameter domains differed. One with-note session compiled essentially the maintainer form before declining. The evidence does not independently establish whether declining was wrong.
+Evidence E10–E11, RESULTS.md "Step 1 across the three cases". Both matcher
+replicates agree three ways on all 48 namespace, 72 generality and 216 automation
+cells. At 33294 the no-note sessions asked for the hypothesis namespace instead
+(2 of 3; with the note 1 of 3), which both matchers call partial. The six
+generalizations differ (natural-number parameters, ring-valued, the maintainer's
+1 < c form); all six have a saved successful verified_edit with zero errors,
+keeping the special case as a corollary. One note session compiles the conclusion
+form at 33294 and declines it as the odd sibling with marginal gain, so the lambda
+is not a technical barrier. Automation is a narrow negative: the packets ask about
+tagging, the historical asks use grind [definition] in the proofs; zero under the
+tagging question does not test proof simplification. Siblings: no wrong generality
+or grind requests in 30; at 33294, 5 of 9 without the note and 3 of 9 with it
+moved siblings the merge kept, all to Order.IsNormal.*, historical non-asks rather
+than established wrong requests. No case met the registered rule for the next
+step. 72 sessions, 21.7M processed tokens.
+-->
 
-Evidence E10–E11. Retains the detailed November example without treating its
-historical maintainer as an independent usefulness adjudicator. No-note: two
-requests, one reached/one partial. With-note: zero. Three samples per condition
-do not show a stable causal harm from notes. The note favored generalizing proof
-artifacts; the reviewer invoked that condition, plus sometimes lack of another
-caller, to decline. The broad next question is decision quality with checked
-candidates fixed, not forcing this historical answer. No exact synthesized theorem
-is printed: the six emitted generalizations differ.
+---
+
+# D · Generality: the reasons given for declining
+
+**#33421.** The maintainer: “Better I think as” the version with `1 < c` in place of `2`. The author generalised it; it cost nothing.
+
+All six sessions built and compiled a general version, keeping the original as a corollary.
+
+- **Without the note:** two requested a general version, one in the maintainer's form. One kept the lemma: the general version “needs two side hypotheses and has no other user”.
+- **With the note**, which says to ask when the restriction is an artifact of the proof: all three kept it. One compiled the maintainer's form, then wrote:
+
+> “The restriction does not come from how the proof was written. The constant 2 is what the lemma is about.”
+
+**The reviewer can build the change. What differs is the judgment that it is worth asking for, and its reasons are ones a maintainer could give too.**
+
+<!--
+Comparison and measurement details:
+Case #33421 from the previous slide, six sessions · Observed the general version each session compiled, and its stated reason to request or to keep [Date: 26 Oct]
+
+Evidence E10–E11; answers in eval/generality/answers.json. No-note: one reached
+(k * fract x = m), one partial (natural m < n), one kept ("needs two side hypotheses
+and has no other user"). With the note: "the constants 2 and 1 are what the lemma is
+about, not a side effect of the proof"; the quoted session compiles the 1 < c form
+and keeps the lemma; the third, "the constant 2 comes from round's definition".
+Three samples per condition do not show a stable causal harm from the note; the
+27 October review calls the note's use as an exclusive permission condition a
+hypothesis. The historical maintainer is not an independent usefulness adjudicator;
+"Better I think as" is a suggestion, not a required revision. The next question
+(next-design slide) is decision quality with checked candidates fixed, not forcing
+this historical answer.
 -->
 
 ---
