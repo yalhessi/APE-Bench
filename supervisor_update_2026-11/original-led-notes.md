@@ -1,83 +1,88 @@
-# Notes on the original-led revision
+# Framing and narrative notes
 
-Prepared for 4 November 2026. Presentation: [HTML](original-led.html),
-[PDF](original-led.pdf), [Markdown and speaker notes](original-led.md).
+Current presentation: [HTML](original-led.html), [PDF](original-led.pdf),
+[Markdown and speaker notes](original-led.md). Revised for 4 November 2026.
 
-This revision follows the [October deck](../supervisor_update_2026-10/slides.md).
-The added “Four parts, at two levels” overview from `meeting-v2` is omitted.
-The original “1 · The problem” divider remains. There is no duration target.
+## Framing changes
 
-## What stayed, and what changed
+The first section keeps the October objects and progression: library and PR purpose,
+solution set, APE-Bench, reviewing, worked PR examples, reviewer work and limitations.
+The boxed closing sentences are removed. Two clarifications are now explicit:
 
-| October material | Location in this copy | Treatment |
-|---|---|---|
-| Problem divider and theoretical framing, slides 2–8 | 2–8 | Verbatim, including notes |
-| Design-space divider and prior-work comparison, 9–10 | 9–10 | Same content; comparison table uses a smaller layout class |
-| Literature findings, 11 | 11 | Same five comparisons; uses the detailed November reference's qualifications |
-| Thesis and solo baseline, 12–13 | 12–13 | Same thesis; four questions stated explicitly |
-| Q1: decomposition, 14 | 14–15 | Same comparison, with context fragmentation and repeated understanding explicit |
-| Q2: reasoning/harness/model and residuals, 15–16 | 16–17 | Model table retained; interpretation moved to notes; residual population corrected |
-| Q3: conventions, census, ceiling, 17–19 | 18–21 | Motivation added; original convention formulation retained; reporting views corrected |
-| Q4: delivery and the example, 20–21 | 22–23 | Same question and example, with later qualifications |
-| Subsequent convention experiments | 24–29 | Validity, library evidence, acquired bank, focused application |
-| Status and next design, 22–23 | 30–31 | Updated status and questions for discussion |
-| Five-point synthesis and sources, 24–25 | 36–38 | Synthesis updated and moved to backup; original source list retained |
+- **Solutions and acceptance:** S consists of diffs that compile and accomplish the
+  stated task p. A_t consists of those the community would merge without requiring
+  revision. This distinction assumes p does not already encode all library standards.
+  Several differently preferred solutions can be acceptable. The preference relation
+  does not determine an acceptance threshold by itself.
+- **Conventions:** contextual practices supply reasons for preferences and, when
+  treated as requirements, constrain acceptance. Their scope, period, exceptions
+  and force must be discovered. A census entry is a candidate description of a
+  practice, not a fully validated rule.
 
-Backups 32–35 retain the GPT disposition positive, preparation pilot, practice
-check and exploratory `dslope` suggestion. The [detailed November reference](slides.md)
-and [experiment map](experiment-map.md) preserve further material; this copy does
-not attempt to present every experiment.
+This clarifies the intended meanings; it does not claim to recover A_t from the
+historical data. The old phrase “the region the preference does not require leaving”
+was circular. The old completeness condition, requiring one test shared by every
+acceptable revision, was stronger than this account justified. It is replaced by
+an aim of identifying a required change when revision is necessary. The examples
+also stop treating an empty historical review as proof of acceptability.
 
-## What motivated the conventions work
+## Main presentation
 
-There were several stages, rather than a single origin. These are contemporaneous
-records, not a claim that the work was planned in the order of this presentation.
+| Slides | Question or role |
+|---|---|
+| 1–10 | Task framing, S versus A_t, conventions, examples and unresolved questions |
+| 11–13 | Build a reviewing system; choose a solo baseline; inspect its failures |
+| 14–16 | Would dedicated specialists help? Result, cost and shared-context limitation |
+| 17–18 | Was the issue overlooked? What happens when the check is explicit? |
+| 19–21 | What standard should apply? Convention discovery, census and favorable supply test |
+| 22–24 | Can the knowledge arrive without the answer? Which applicability assumptions were wrong? |
+| 25 | Related branch: generate an alternative and compare it with the submission |
+| 26–29 | Independently acquired notes, whole-review test, focus and the generality example |
+| 30–31 | Current status and questions for discussion |
+| 32–42 | Supporting results, historical model comparison, library diagnostic and prior work |
 
-1. **10–11 September: missed and changing idioms, and an inadequate denominator.**
-   The [drift plan](../docs/plans/2026-09-10-convention-drift-mechanics.md) starts from
-   reviewers failing to reach for conventions Mathlib was adopting. The
-   [catalogue](../docs/research/mathlib-convention-catalogue.md) explains that proposed
-   discovery mechanisms had been fitted to a few familiar examples. It sought a
-   denominator against which discovery could fail. Its binding-linter inventory also
-   highlighted that many already encoded rules were handled by CI. These documents
-   preserve early interpretations; their hypotheses are not all current conclusions.
+The argument order follows the user's requested progression. It does not claim
+that the studies were designed in this chronological order. “Models make similar
+decisions regardless of focus” is deliberately narrowed to what the records show:
+reviewers can inspect the relevant object, or receive a specific check, without
+producing the maintainer's request. Pruning, contracts, missing alternatives and
+judgment all occur in the record. E13 in the [evidence register](evidence.md) gives
+the distinctions and the development-set limitations.
 
-2. **29 September: characterize the conventions themselves.** The opening of
-   [conventions-nature](../docs/todo/conventions-nature.md), recorded in `b291e80d`,
-   quotes the user's concern: “it's really learning what conventions hold at a given
-   point and in a given window/scope that is fundamentally hard.” The motivating
-   design-ask reading found a one-sentence principle behind 30/31 asks, but only eight
-   documented principles. The resulting questions were count, scope, conflict and
-   maturity. This directly motivates the census used in the October slides.
+The design-space section is removed. MathlibPR, SWR-Bench/SWE-PRBench, Di Biase,
+Tricorder/AutoCommenter and ProofJudge appear at the questions they bear on, before
+our results. The former comparison tables remain in backups 41–42.
 
-3. **30 September: test knowledge as a lever on missed asks.** The
-   [residual audit](../results/pr_review_v5/probes/phase1-residual-mechanisms-2026-09-30/mechanisms.md)
-   studied 67 residual asks: 37 reached by nobody and 30 reached only by Claude.
-   In 63, every missing reviewer had inspected the object. Both readers identified
-   convention/mechanism knowledge in 25. Its stated consequence, also recorded in the
-   [replan](../docs/plans/2026-09-30-post-carryover-replan.md), was to test try-it evidence
-   and convention supply directly instead of funding another coverage intervention.
+## Why comparisons are a branch, rather than the whole narrative
 
-4. **4 October: establish whether supply can help in the best case.** In the
-   [ceiling-probe brief](../docs/todo/conventions-ceiling-probe.md), recorded in
-   `898a7be5`, the user asked for a ceiling before further designs: if conventions are
-   useful, briefing the reviewer should improve judgments. Entries were deliberately
-   selected from the target asks. The positive therefore motivates testing transfer;
-   it does not establish autonomous selection or applicability.
+The formulation suggests producing an alternative δ′ and comparing it with δ.
+That requires both a relevant pair and a sound judgment of the difference. A
+preference for δ′ still does not imply that δ is unacceptable or worth revising.
+ProofJudge studies supplied pairs; our reconstruction experiment tested one route
+for generating alternatives and supplying them to an ordinary reviewer. It did not
+meet the main recovery criterion, though some proposals transferred. It is not a
+negative result about all pairwise judgment. E14 records the exact experiment.
 
-The presentation uses stages 2–4 as its bridge. The earlier drift/catalogue work
-stays in these notes so that the motivation is traceable without adding a historical
-detour to the main talk.
+## Contemporaneous motivation for conventions
 
-## Empirical corrections carried forward
+- **10–11 September:** the [drift plan](../docs/plans/2026-09-10-convention-drift-mechanics.md)
+  addressed missed evolving idioms. The [catalogue](../docs/research/mathlib-convention-catalogue.md)
+  sought a denominator beyond a few familiar examples. Early interpretations in
+  those records are historical hypotheses.
+- **29 September:** [conventions-nature](../docs/todo/conventions-nature.md), recorded
+  in `b291e80d`, quotes the user's question about “what conventions hold at a given
+  point and in a given window/scope.” The design-ask reading found principles behind
+  30/31 asks but only eight documented. This motivated count, scope, conflict and
+  maturity studies.
+- **30 September:** the [residual audit](../results/pr_review_v5/probes/phase1-residual-mechanisms-2026-09-30/mechanisms.md)
+  and [replan](../docs/plans/2026-09-30-post-carryover-replan.md) identified knowledge
+  supply as a lever at already-inspected objects, alongside trying concrete checks.
+- **4 October:** the [ceiling brief](../docs/todo/conventions-ceiling-probe.md), recorded
+  in `898a7be5`, requested a favorable test before further designs. Entries were
+  deliberately selected from target asks. Its positive result motivates transfer
+  experiments; it is not a strict upper bound on all possible review systems.
 
-The [evidence register](evidence.md) remains the source for the later results.
-In particular: the 67 residuals are not all Claude successes; the ceiling uses
-in-census reporting within each comparison; the single “≤5% of applicable places”
-interpretation is withdrawn; and the stated-grounds evidence does not establish
-that taste is a small residual. Historical recovery, a checked alternative and a
-useful request remain distinct. The bank and pilot usefulness panels are unfinished.
-
-The fragmentation slide expresses the user's design assessment, supported by the
-context/overlap record. It does not claim that the experiments isolated fragmentation
-as the cause of the measured cost or recall differences.
+All earlier decks remain preserved. The immediately preceding original-led version
+is in commit `7ff09a23`; the preferred [October source](../supervisor_update_2026-10/slides.md)
+and [detailed November reference](slides.md) are unchanged. No new model runs or
+literature searches were performed for this revision.

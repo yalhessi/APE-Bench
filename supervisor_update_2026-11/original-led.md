@@ -60,11 +60,14 @@ footer: "Mathlib PR review · Supervisor update · 4 November 2026"
 **Yousef Alhessi** · University of Edinburgh
 
 <!--
-Original-led revision. Parts 1 and 2 follow the October deck; the theoretical slides
-are unchanged. Part 3 keeps its thesis and Q1–Q4 sequence, updates the empirical
-claims and adds the later convention experiments. No duration target is imposed.
-See original-led-notes.md for the source correspondence and conventions motivation;
-evidence.md supports the later results. Earlier drafts remain available for reference.
+The October task formulation remains the starting point. This revision makes the
+solution/acceptance distinction explicit, brings conventions into the formulation,
+and removes the boxed closing sentences from the first section. The former design-
+space section is folded into the empirical questions; its comparison tables remain
+in backup. The experimental opening follows the user's requested baseline → misses
+→ specialized review → judgment → conventions → ceiling progression. This is an
+argument order, not a claim about the chronology in which studies were designed.
+See original-led-notes.md and evidence.md. Earlier presentation sources are preserved.
 -->
 
 ---
@@ -82,7 +85,7 @@ What are we actually asking a reviewer to do?
 # The shared pieces
 
 ```text
-Library     L = (C, P)          code C, and a purpose P        P is constant across years
+Library     L = (C, P)          code C, and a purpose P        the library's overall purpose
 PR          (δ, p)              a diff δ, and a purpose p      what this change is for
 
 merge(C, δ)                     the code after δ               defined iff the patch applies
@@ -91,12 +94,6 @@ merge(C, δ) compiles            the kernel accepts it
 
 S(C, p)  =  { δ : merge(C, δ) compiles  ∧  δ realises p in C }      the solutions of a task
 ```
-
-<div class="take">
-
-Merging and compiling act on code; P stays fixed. Both tasks live in S; they differ in what is given and what is emitted.
-
-</div>
 
 ---
 
@@ -110,11 +107,6 @@ emit         δ
 correct iff  δ ∈ S(C_b, p)       the kernel decides "compiles", a judge decides "realises"
 ```
 
-<div class="take">
-
-The specification is in the input. The performer's whole job is reaching S.
-
-</div>
 
 <!--
 The paper (arXiv 2504.19110, Sections 3 and 4.1) gives this in prose: instruction, pinned
@@ -122,185 +114,239 @@ environment, boundaries, verification protocol; "compilation plus semantic valid
 evaluated agent: 47 of 100 tasks.
 -->
 
+<div class="source">APE-Bench · arXiv 2504.19110</div>
+
 ---
 
-<!-- _class: formulation -->
+<!-- _class: formulation lg -->
 
 # Reviewing
 
 ```text
-given        (C_b, δ, p)                          P in the background
-emit         D, a set of requests
+given      (C_b, δ, p)          library purpose P in the background
+emit       D                   a set of requests
 
-Preference   ≽_t  on S(C_b, p)                    P evaluated at the current code · unstated · drifts
-Acceptable   A_t  ⊆ S(C_b, p)                     the region ≽_t does not require leaving
+Preference   ≽_t on S(C_b, p)    which solutions the community favours
+Acceptable   A_t ⊆ S(C_b, p)     mergeable without a required revision
 
-a request    a test on revised PRs: the submitted δ fails it, revisions ≽_t favours pass it
-             witness?   one revision that passes it, compiles, and still realises p        kernel-checkable
+request    a test on revised PRs that the submitted δ fails
+witness?   a revision that passes, compiles, and still realises p
 
-correct iff  sound:     every test in D is one the community would set
-             complete:  if δ ∉ A_t, some test in D is passed by every revision in A_t
-merge   iff  δ ∈ A_t             next base (merge(C_b, δ), P)      one round: δ_{i+1} = author(C_b, p, δ_i, D_i)
+aims       sound:     requests the community would endorse
+           coverage:  identifies a required change when δ ∉ A_t
+
+one round  δ_{i+1} = author(C_b, p, δ_i, D_i)
 ```
 
-<div class="take">
-
-The specification is not in the input. Review predicts an unstated, drifting standard whose samples come from its own members.
-
-</div>
-
 <!--
-From the 22 September session, with the purpose line from its last reply. The target is a preorder
-over the solutions of this task, so legacy code is never asked to satisfy the standard. P is stable;
-the preference drifts because the state it is evaluated against changes.
+Retains the October objects: task purpose p, library purpose P, solution set S,
+preference relation, acceptance set, requests and optional witnesses. A_t now has
+an explicit idealized interpretation instead of "the region ≽ does not require
+leaving", which hid the missing acceptance judgment. A preference relation alone
+does not identify A_t. The old completeness condition requiring a single test
+passed by EVERY acceptable revision was stronger than this informal task account
+justified; coverage here states the intended task without that universal claim.
+A request may be optional even when δ is already acceptable. Endorsement and
+coverage are aims; historical matching only observes one sample of requests.
+No claim of an identifiable global partial order or automatic acceptance oracle.
 -->
 
 ---
 
-# The formulation on four PRs
+# Solutions, preferences and acceptance
 
-| PR | what the review said | in the formulation |
-|---|---|---|
-| **#33149** | three vacuous definitions; 19 axioms | δ ∉ S: "realises p" fails. "No axioms" is a test every revision in A_t passes |
-| **#33305** | one doc-comment line too long | δ ∈ S, δ ∉ A_t: one test separates them |
-| **#33304** | nothing | δ ∈ A_t: D is empty, correctly |
-| **#33098** | make this proof one tactic call | δ ∈ A_t already; one test ≽_t favours, two witnesses (`grind`, `simpa`) |
+| Question | What it asks |
+|---|---|
+| **δ ∈ S(C, p)?** | Does this diff compile and accomplish its stated task? |
+| **δ′ ≽_t δ?** | Would the community favour this alternative? |
+| **δ ∈ A_t?** | Is the contribution acceptable to merge without a required change? |
 
-<div class="take">
+A PR can accomplish its task while departing from the library's expectations about its interface, organization or presentation.
 
-Of the convening's 23 tests, 4 separate the PR from A_t. The rest are preferences inside it: placement.
-
-</div>
+Several differently ranked solutions may be acceptable. **Preference alone does not determine the acceptance boundary.**
 
 <!--
-All four from the twelve December-2025 PRs in the convening talk. 33305's line was located by neither
-reviewer in six runs. On 33098 the maintainer asked for grind, our reviewer chose simpa; both compile;
-grind went from 0% of Mathlib files in January 2025 to 14.5% by May 2026.
+p is the contribution's stated task; P concerns the library it joins. The conceptual
+distinction depends on that choice of p: if p already encoded all library standards,
+there would be no separate acceptance question by construction. The research problem
+includes discovering which additional expectations hold and which are requirements.
+This explains the roles of S and A; it does not pretend to derive or measure A_t.
+"Would merge without requiring revision" is an idealized current community judgment,
+not an inference from one reviewer staying silent or from an eventual merged revision.
+A preferred alternative need not make the original unacceptable, nor need every
+feasible preference be worth raising as an optional request.
 -->
 
 ---
 
-# What a reviewer has to do
+# Conventions in this formulation
 
-1. **Membership.** Is δ in S? The kernel settles "compiles"; "realises p" needs a judge.
-2. **Placement.** Where is δ under ≽_t? Judged against the tree, recent practice, and the alternative the reviewer would have written. **The wall.**
-3. **Request.** The few tests worth setting: those that cut δ off from A_t, and the preferences that matter. Maintainers under-report on purpose.
-4. **Update.** Merging moves C, so ≽_t moves; P does not.
+A convention describes a **situation, scope, preferred form and exceptions**. Its scope can depend on the area and date.
 
-<!--
-The author's turn is the inverse: resample S subject to the tests until a draw lands in A_t. The Δ dead
-end reads correctly here: the author's next draw is one point on the passing side and does not identify
-the tests. Placement is where the agent fails: most gold sites had a candidate, and it cannot rank its
-draws under ≽_t.
--->
+```text
+An applicable convention can support       δ′ ≽_t δ
+A convention treated as a merge requirement can constrain membership in A_t
+```
 
----
-
-# What the formulation does not settle
-
-- **≽_t is never observed.** Each review is one sample of it, and partly constitutes it.
-- **A_t is seen only through merges.** The gold is a lower bound.
-- **Two witnesses in A_t** have no adjudicator yet.
-
-<div class="take">
-
-The task: from (C_b, δ, p) alone, emit the tests the community would set, with witnesses. Score soundness and completeness against the one sample on record.
-
-</div>
-
----
-
-<!-- _class: section-title -->
-
-# 2 · The design space
-
-What review systems have in common, and where they part
-
----
-
-<!-- _class: dense -->
-
-# The question each published formulation answers
-
-| work | the question | in the formulation |
-|---|---|---|
-| MathlibPR | Is this PR merge-ready? | δ ∈ A_t ? |
-| Tricorder, BitsAI-CR, AutoCommenter | Which written rules does it break? | which tests from the written part of ≽_t δ fails |
-| Qodo, Greptile, Semgrep | Where does it depart from what we accepted lately? | tests read off recent points of ≽_t |
-| ProofJudge | Of these two versions, which would the maintainer take? | ≽_t on a given pair (δ, δ'') |
-| c-CRAB; resolution rates | Did the author act on the comment? | δ_{i+1} passes the test |
-| SWR-Bench, SWE-PRBench, **ours** | What would the reviewer ask for? | the tests the community would set on δ, with witnesses |
-
-<div class="take">
-
-Only the last asks for the tests themselves. The others ask what an answer key can settle: membership, a written rule, a given pair, an outcome.
-
-</div>
+- It supplies a reason for a preference or requirement; other reasons can outweigh it.
+- Knowing a general principle still leaves its application and priority to be judged.
+- Discovering these conventions is part of recovering the community's standard.
 
 <!--
-MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge: recovers
-reviewer preference on 63.5-80.8% of 218 before/after pairs. Sources in
-docs/research/code-review-systems-survey-2026-09.md.
+Brings the October convention/trigger account into the opening formulation rather
+than introducing it only after experiments. The two roles are not a partition of
+all conventions into fixed categories: a convention's force can depend on context.
+Conventions are evidence for the relation and sometimes acceptance requirements;
+they are not claimed to exhaustively determine ≽_t or A_t. A technical rule may
+also be part of the declared task p. The census entries are candidate descriptions
+of these practices, not automatically validated rules. Source background:
+../docs/todo/conventions-nature.md; evidence E1 and E3–E5.
 -->
 
 ---
 
 <!-- _class: tbl -->
 
-# What the literature suggests testing
+# The formulation on four PRs
 
-| point | evidence | for us |
+| PR | What the review said | What this illustrates |
 |---|---|---|
-| **General guidelines alone can be insufficient.** | guidelines in the prompt: Atlassian +5% | test more specific, usable knowledge |
-| **Evidence shows a finding is true, not wanted. Many evidenced findings; few get acted on.** | Atlassian: 4% of comments match a human one, 38.7% get resolved; a truth check did nothing, a gate trained on 50k resolved comments +15–20pp | evidence shows only the checkable part of ≽_t, which the kernel gives us free; nothing on record shows the rest |
-| **Diversity can buy recall; voting can lose it.** | aggregating reviews +44% F1; an ensemble's union +83%; majority vote a "popularity trap" | measure union recall alongside comment burden |
-| **Decomposition can lose recall.** | Di Biase: decomposed diffs found no more defects; Alibaba's file grouping cut recall 20% → 12.7% | compare each decomposition with a solo reviewer |
-| **Restraint can suppress findings.** | Cursor needed "aggressive" prompts once restraint made it quiet | test the filing contract and measure output burden |
+| **#33149** | Three vacuous definitions; 19 axioms | Compilation does not establish that the claimed task was accomplished |
+| **#33305** | One doc-comment line too long | A presentation requirement can matter even when the mathematics is unchanged |
+| **#33304** | Nothing | An empty review is observed; it does not certify membership in A_t |
+| **#33098** | Make this proof one tactic call | `grind` and `simpa` give feasible alternatives; feasibility alone does not settle preference or request value |
 
 <!--
-Sources: RovoDev, Atlassian (2601.01129); open-code-review's commit history (the filter fix, the grouping
-regression); SWR-Bench (2509.01494); LLM ensembles for code (2510.21513); Di Biase et al. (1805.10978);
-Cursor's Bugbot write-up. Our own evidence on each point is the last slide of Part 3.
+Retains the four familiar examples from the October framing. Removes the unsupported
+inference from no recorded requests to known acceptability, and avoids claiming that
+severity labels identify an empirical S/A boundary. For 33149, failure of "realises p"
+assumes the stated purpose is to prove the advertised mathematics under the accepted
+assumptions; compilation alone cannot certify that. For 33305, the historical request
+is evidence of one reviewer's requirement, not an independently adjudicated community
+acceptance label. The October "4 of 23" classification is not an estimate of A_t.
+-->
+
+---
+
+# What a reviewer has to do
+
+1. **Membership.** Does the PR accomplish its task? Compilation settles only part of this.
+2. **Placement.** What alternatives are relevant, and which does current library practice favour?
+3. **Request.** Which differences require a revision, or are worth raising as improvements?
+4. **Update.** As the library and practice change, the relevant comparisons and conventions change too.
+
+<!--
+Keeps the October membership/placement/request/update structure. Removes the early
+"the wall" verdict from the definition of the task; experiments establish particular
+failure stages later. Relevant pair comparisons can inform placement. Preference,
+required revision and optional request value remain distinct decisions.
+-->
+
+---
+
+# What the formulation leaves open
+
+- **The acceptance boundary:** which expectations are requirements, and which are preferences?
+- **The conventions:** what holds in this area and period, with what exceptions?
+- **The comparisons:** which alternative exposes a consequential difference?
+- **The evidence:** a historical review records some requests, not the whole standard.
+
+Generating an alternative gives a pair to compare. We still need to judge the difference and whether it warrants a request.
+
+<!--
+The formulation names the unknowns rather than solving them. A_t is not recovered
+from the existence of a better witness, and historical silence is not a negative
+usefulness label. The pair-comparison route is an empirical hypothesis; the main
+experimental section reports its tested reconstruction version alongside the later
+transfer work. The full previous-work comparison remains in backup.
 -->
 
 ---
 
 <!-- _class: section-title -->
 
-# 3 · What we did, and where we stand
+# 2 · Building a reviewer
 
-Decomposition, the solo baseline, then conventions
+From the solo baseline to conventions
 
 ---
 
-# The thesis, and the baseline
+# What is a good baseline?
 
-<div class="box">
+**Goal:** build a system that produces useful requests about a Mathlib PR.
 
-**Understand the review process, then decompose it.** That is what can make a harness more useful than one agent with tools. So one agent with tools is the baseline, always.
+Start with **one reviewer, the whole PR, and the tools**:
 
-</div>
+- Read the purpose, diff, surrounding code and library.
+- Search for relevant definitions and precedents; check proposed edits.
+- Return the requests it judges worth making.
 
-**The baseline:** one session, the whole PR, the brief, the tools, and compile-my-edit.
+A more elaborate system must improve on this reviewer, accounting for cost and comment burden.
 
-**The questions:**
-
-- **Q1:** What decomposition is effective?
-- **Q2:** What limits the solo reviewer?
-- **Q3:** What conventions does the community follow?
-- **Q4:** Can that knowledge improve review on another PR?
+<div class="source">MathlibPR studies merge readiness; SWR-Bench and SWE-PRBench study review requests.</div>
 
 <!--
-Retains the October thesis and four-question progression. These are research questions;
-the following slides identify the experiments that narrow each one. Historical baseline
-results remain historical, rather than being presented as new November measurements.
+The solo session with tools is the baseline, not an assumed successful design.
+MathlibPR 2605.07147 asks about readiness; SWR-Bench 2509.01494 and SWE-PRBench
+2603.26130 concern review generation. Sources and formal mapping retained in backup.
+Historical experiments used several models and harnesses; the baseline must be
+controlled within each comparison. Later reasoning/tool repairs and stronger solo
+models prevent treating a gain over old GPT-5.2 as a gain over current solo review.
+The model/harness table is retained in backup, not interposed in the argument here.
+Historical ask recovery is one measurement, not an exhaustive usefulness score.
 -->
 
 ---
 
-<!-- _footer: "Mathlib PR review · Q1: decomposition · September experiments" -->
+<!-- _footer: "Mathlib PR review · The solo baseline · Historical September comparison" -->
 
-# Q1 · What decomposition is effective?
+# What does the solo reviewer miss?
+
+On the twelve-PR comparison, solo GPT 5.2 recovered **4, 4 and 1 of 23 obligations** across three runs.
+
+| Example | What was missing |
+|---|---|
+| **#33305:** long doc-comment line | The relevant location was never reached |
+| **#33421:** naming and generality | The relevant declarations were reached, but the requests were inconsistent or absent |
+| **#33117:** generated `fun_*` family | The reviewer found `to_fun` in one run, then missed the request in two |
+
+**First hypothesis:** give different concerns more dedicated attention.
+
+<!--
+Evidence E13, ab-heldout12-obligation-spine.md. GPT-5.2 reasoning off, three reps,
+23 obligations, registered judge v4-semantic-v3-v9-rubric. In that source, location
+means a candidate at the gold site; it is not proof that the precise alternative was
+considered. #33421 solo naming and generality each reached once; repeat factoring
+located all three times, never recovered. #33117 solo HLL. The narrative is a
+logical motivation for decomposition, not a claim that these A/B runs preceded
+all specialist design historically. This weak-model baseline is dated explicitly.
+-->
+
+---
+
+# Would specialized reviewers catch more?
+
+**Hypothesis:** separate passes for proof, naming, generality and other concerns will catch issues one general pass misses.
+
+**Design:** a lead delegates to a generalist and ten specialist arms, then combines their findings.
+
+**Test:** the same twelve PRs, model and tools; three repetitions against solo review.
+
+<div class="source">Related caution: Di Biase et al. found no defect gain from decomposed diffs; Alibaba's file-grouping experiment lost recall.</div>
+
+<!--
+References are placed before our experimental result rather than in a standalone
+literature section. Di Biase et al. 1805.10978; Alibaba record in
+../docs/research/open-code-review-comparison-2026-09.md and the saved review-systems
+survey. Their tasks/decompositions differ; they motivate a controlled comparison,
+not an inference that all specialization fails. Our A/B cost is not matched.
+-->
+
+---
+
+<!-- _footer: "Mathlib PR review · Specialist comparison · September experiments" -->
+
+# What did the specialist design buy?
 
 **Experiment:** concern specialists plus a lead, against one whole-PR reviewer.
 
@@ -311,11 +357,6 @@ results remain historical, rather than being presented as new November measureme
 | Findings on the two PRs with no recorded asks | 3, 4, 5 | **0** |
 | Billed per run | $14.59 | **$1.90** |
 
-<div class="take">
-
-The generalist produced 64 of 71 matched finding occurrences. Specialists added little at 7.7× the total cost.
-
-</div>
 
 <!--
 Source: ../docs/research/ab-heldout12-obligation-spine.md, registered obligation judge
@@ -327,9 +368,11 @@ The 64/71 attribution is the October trace analysis: matched finding occurrences
 not 71 distinct historical obligations and not 64 distinct asks.
 -->
 
+**The generalist produced 64 of 71 matched finding occurrences.** The specialist contribution was small relative to the additional cost.
+
 ---
 
-# Q1 · Specialized arms fracture shared context
+# Why this decomposition is unpromising
 
 **The problem:** naming, generality and proof structure often depend on the same mathematical and library context. Each arm has to reconstruct it again.
 
@@ -339,11 +382,6 @@ not 71 distinct historical obligations and not 64 distinct asks.
 - Is the numeral `2` essential, or can it be a parameter?
 - Can its repeated argument be factored out?
 
-<div class="take">
-
-Our design lesson: keep the shared understanding together. Specialized checks can support it without becoming separate reviewers.
-
-</div>
 
 <!--
 This states the user's design assessment, grounded in the overlap/context record;
@@ -362,123 +400,89 @@ This narrows the tried decomposition; it does not rule out all decomposition.
 
 ---
 
-<!-- _class: dense -->
-
-<!-- _footer: "Mathlib PR review · Q2: the solo baseline · Measurements through 14 October" -->
-
-# Q2 · Reasoning, harness, or model?
-
-| model | harness | reasoning | dev, of 23 | post-cutoff reach |
-|---|---|---|---|---|
-| GPT 5.2 | ours | off | 2 | 0.02–0.17 |
-| GPT 5.2 | ours · Claude Code · Codex | carried | 2–3 | 0.21 · 0.25 · 0.29 |
-| GPT 5.5 | ours · Codex | carried | 3 | 0.31 · 0.25 |
-| Opus 4.8 · Opus 5 · Opus 5.5 | ours | on | 3 · 8 · 7–9 | — |
-| Opus 5.5 | its own shell | on | 11–12 | 0.47 |
-| Qwen3.5-397B, self-hosted | ours | off | 2, 0, 2 | — |
-| DeepSeek-V4.1-Flash, self-hosted | ours | off · high, carried | 5 · 8, 6, 9 | — |
-
-<div class="take">
-
-Reasoning and harness repairs matter, but they do not close the gap. Next: inspect what reviewers miss.
-
-</div>
-
-<!--
-- **Reasoning:** GPT 5.2 barely moves (2 → 2–3) though every session now finishes at a third of the cost. DeepSeek: 5 → 8, 6, 9, only with its thinking carried between turns.
-- **Harness:** three harnesses with GPT 5.2 held reach the same. Ours costs Opus 5.5 about three asks against its own shell.
-- **Model:** Opus 4.8 → 5 → 5.5 is 3 → 8 → 7–12. Not the prompt: Opus on GPT 5.2's exact messages reaches 10.
-
-dev = twelve held-out PRs, 23 obligations, judge v9. post-cutoff = six PRs created after the Claude
-models' cutoff, 16 asks, reach per session by blind matchers. "carried" = reasoning at high effort
-with the reasoning items passed back between tool calls; "off" = no reasoning tokens. GPT 5.4 carried
-reads 0.19 (ours) and 0.31 (Codex) on post-cutoff. Qwen's one reasoning-high run had its thinking
-dropped by our client (defect found 7 October) and is not a reasoning reading.
--->
-
----
-
-# Q2 · What is missing at places already inspected?
+# Are missed requests simply overlooked?
 
 **Diagnostic:** 67 residual asks — **37 reached by nobody**, plus **30 reached only by Claude**.
 
-In **63 of 67**, every reviewer that missed the ask had read, searched or compiled the relevant object.
-
-| Mechanism identified by both readers | Asks, of 67 |
+| What the transcript readers found | Asks, of 67 |
 |---|---:|
-| Convention or library-mechanism knowledge (`to_fun`, naming, dot notation) | **25** |
-| A check nobody tried (`positivity`, `simpa`, the old proof) | **19** |
-| An analogue in the library not compared | **6** |
+| Every missing reviewer had inspected the object | **63** |
+| A reviewer concluded the code was fine | **40** |
+| A reviewer pursued a different change | **25** |
+| The object was never attempted | **4** |
 
-<div class="take">
-
-More coverage is not the first lever suggested by this audit. Can we supply the knowledge needed to reach a different conclusion?
-
-</div>
+These counts overlap. Inspecting the object still does not show that the reviewer considered the relevant alternative.
 
 <!--
-Sources: ../results/pr_review_v5/probes/phase1-residual-mechanisms-2026-09-30/mechanisms.md
-and ../docs/plans/2026-09-30-post-carryover-replan.md, final Phase 1 result.
-Two readers over 141 ask/reviewer pairs; non-exclusive mechanism labels. The counts
-are transcript-based model judgments. Four asks were never attempted; two were
-verified and withheld. The 67 are NOT all Claude successes over GPT, as the original
-slide said. The audit's stated consequence was not to fund a coverage-motivated
-lead/carried-reasoning run; try-it and convention supply were pursued directly.
+Evidence E13, residual-mechanisms 2026-09-30. Two readers, 141 ask/reviewer pairs;
+mechanism counts require both readers and count an ask if any relevant reviewer has
+the label. The 63 figure requires every missing reviewer to have attended the object.
+Never attempted 4, verified/withheld 2. Labels are judgments from transcripts/notes,
+not direct observation of hidden reasoning. This is why the on-screen claim is
+narrower than "models make the same decision regardless of focus". Knowledge/
+convention mechanism 25; try-it-not-tried 19; analogue-not-compared 6. These are
+later mechanism labels, not proof that all 63 understood and rejected the ask.
 -->
 
 ---
 
-# Q3 · Why study conventions?
+# Does spelling out the check solve it?
 
-**Earlier clue:** readers could state a principle behind **30 of 31 design asks**, but only **8** were documented.
+In the specialist-brief audit, a prompt directed the reviewer to the specific check behind **17 of 23 obligations**.
 
-**The question we posed on 29 September:**
+For example, one brief explicitly asked about:
 
-> “It's really learning what conventions hold at a given point and in a given window/scope that is fundamentally hard.”
+> “every member fixed to `2` where `k` would do”
 
-How many conventions are there? Where do they hold? What happens when they conflict?
+The corresponding arm ran but did not produce the requested generalization. It investigated a different family.
 
-<div class="take">
-
-The census asks what the knowledge is. The ceiling experiment asks whether supplying it can help a reviewer.
-
-</div>
+**The gap can persist after a specific instruction.** Some losses came from scheduling or contracts; others involved the comparison made or the judgment reached.
 
 <!--
-Source: ../docs/todo/conventions-nature.md, opening user statement dated 2026-09-29
-and motivating design-comparison-val1000-v1 reading. Recorded at b291e80d.
-The 30/31 and 8 counts belong to that design-ask reading, not all review asks.
-Conventions work predates the residual audit: the 10 September drift plan addressed
-missed evolving idioms, and the 11 September catalogue sought a denominator beyond
-a few familiar examples. The 29 September prompt motivates the census in the form
-used here. The 30 September residual audit adds intervention evidence. On 4 October,
-the user explicitly requested a best-case/ceiling test before further designs:
-../docs/todo/conventions-ceiling-probe.md, recorded at 898a7be5.
+Evidence E13, the-question-is-already-asked-2026-09.md. Two model readers; the second
+conservatively counted 17 full, 4 partial, 2 none. Seven of the 17 full cases relied
+on text written after inspecting these very PRs; this is a development diagnostic,
+not a generalization result. The numeric-constant prompt is one such tailored case.
+The generality question was contested between family/generalist remits. The target
+family_design arm ran on the generality obligation in all five inspected runs and
+looked at a different family. Other missed asks were pruned or blocked by evidence/
+compile contracts. Therefore neither "focus never helps" nor "all misses are
+verified changes withheld" is licensed. Forcing/no-pruning/unified-contract results
+also failed to establish a strong specialist route; retained in source notes.
 -->
 
 ---
 
-# Q3 · A convention, in the formulation
+# Which standard should the reviewer apply?
 
-```text
-trigger_c holds at a place in δ     (area, date) ∈ scope_c     no defeater
-──────────────────────────────────────────────────────────────────────────
-a test at that place: revisions with the form are the ones ≽_t favours
-```
+**Hypothesis:** the reviewer needs evidence about what current library practice expects in this situation.
 
-- No trigger fires: silence is correct.
-- Several accepted forms: a question, not a change.
-- The trigger is decided by syntax, execution, lookup, or judgement.
+In a design-ask reading, reviewers could state a principle behind **30 of 31 asks**, but only **8** were documented.
 
-<div class="take">
+This leads to two different questions:
 
-The experiments ask how many such entries we need, whether supplying them helps, and whether their triggers and scope describe actual practice.
+1. **Discovery:** what conventions hold, in which scopes and periods?
+2. **Use:** if we supply the right convention, does the reviewer make the requested change?
 
-</div>
+<div class="source">Related work: Tricorder (analyzers); AutoCommenter (best-practice comments).</div>
+
+<!--
+Retains the motivation for conventions while connecting it to the judgment problem.
+The 30/31 and 8 counts are a selected design-ask reading, not the entire review
+population. ../docs/todo/conventions-nature.md records the user's 29 September
+scope/time/conflict questions; the 30 September residual audit identifies 25
+knowledge/convention cases. On 4 October the user requests a best-case ceiling
+before further intervention designs. This argument order is not the exact discovery
+chronology. Scope, priority, exceptions and even rule validity remain hypotheses;
+we do not identify all judgment failures with missing convention knowledge.
+References: Tricorder, ICSE 2015; AutoCommenter, arXiv 2405.13565. These are
+comparisons with review assistance, not claims that their rules cover Mathlib's
+unwritten standards. See the saved review-systems survey and comparison backup.
+-->
 
 ---
 
-# Q3 · How many conventions? The census
+# How many conventions? The census
 
 **How:** two independent model readers summarized the principles behind **1,833 first-round validation asks**, each keeping a running codebook.
 
@@ -486,11 +490,6 @@ The experiments ask how many such entries we need, whether supplying them helps,
 - **Small head, long tail:** top 10 cover 22%; top 50 cover 55% of principled asks.
 - On 14 PRs outside the census, an entry describes **39 of 46 asks (85%)**.
 
-<div class="take">
-
-A substantial inventory of review concerns. Whether each entry is a valid rule, and where it applies, remain separate questions.
-
-</div>
 
 <!--
 Evidence E1 and ../docs/todo/conventions-nature.md, Study 1 result. The initial
@@ -505,7 +504,7 @@ model family. One ask in ten was estimated to introduce another principle.
 
 <!-- _class: tbl -->
 
-# Q3 · Does knowing the convention help? The ceiling
+# Does knowing the convention help? The ceiling
 
 **Experiment:** select entries using the PR's historical asks; give the reviewer those general sentences, without locations.
 
@@ -517,11 +516,6 @@ model family. One ask in ten was estimated to introduce another principle.
 | DeepSeek + examples and precedence | 3 | 22% | **64%** |
 | Qwen3.5-397B | 3 | 3% | 9% |
 
-<div class="take">
-
-A conditional positive: the entries help when selected using the answer. Can we obtain the gain without that selection?
-
-</div>
 
 <!--
 Evidence E1, synthesis section B and ceiling probe results. In-census ask reach
@@ -533,11 +527,13 @@ not make it answer-free. The Qwen row is ~.034→.085, +.051, not a strong local
 unlock. For GPT's separate disposition positive under exact supply, see backup.
 -->
 
+The target-selected brief improves recovery for several reviewers. It supplies both the convention and evidence that this concern matters on the PR.
+
 ---
 
 <!-- _class: tbl -->
 
-# Q4 · Getting the knowledge in without the answer key
+# Getting the knowledge in without the answer key
 
 **Experiment:** select from the diff, then vary how the entries are delivered.
 
@@ -568,7 +564,7 @@ wrong. The detailed reference and experiment map retain these omitted variants.
 
 ---
 
-# Q4 · The mechanism, on one PR
+# The mechanism, on one PR
 
 **#42814:** the maintainer asked for `variable {D}` declared once.
 
@@ -596,7 +592,7 @@ and request value require evidence beyond historical agreement.
 
 <!-- _class: tbl -->
 
-# Q4 · First check what “applies” meant
+# First check what “applies” meant
 
 **Follow-up:** inspect flagged code and known fixes, rather than infer applicability from survival at merge.
 
@@ -622,35 +618,35 @@ were simply bad rules. The six form-rule practice study is in backup (E4).
 
 ---
 
-# Q4 · Can the library settle the choice?
+# Can generating an alternative improve review?
 
-**Diagnostic:** inspect **41 asks** the free reviewer never reached.
+**Related work:** ProofJudge compares supplied original/revised pairs. Our formulation also suggests generating an alternative and comparing it with the PR.
 
-- In **5–7**, library evidence decides the change.
-- In **19**, it supplies ingredients, but a choice remains.
+**Our tested route:** goal brief → independent sketch and library context → ordinary reviewer.
 
-**Example:** finding `to_fun` connects a hand-written family to a generated alternative. Whether to adopt it still depends on interface and import costs.
+On **8 development PRs, 56 new consumer reviews, 25 agreed asks**, neither context nor context-plus-sketch met the registered improvement criterion.
 
-<div class="take">
-
-Next test: acquire conditional reasons from earlier PRs, then ask whether they improve ordinary review elsewhere.
-
-</div>
+Some sketch proposals did reach final reviews. Producing an alternative did not establish better decisions about which changes to request.
 
 <!--
-Evidence E5–E6. Library-knowledge diagnostic: two readers, selected 41-ask residual;
-5–7 and 19 are not a general population estimate. The to_fun reconstruction/source
-probes are separate selected-case experiments. After fixing symlink search, all six
-assisted Opus sessions connected the alternative; baseline 0/3, correspondence 0/3,
-correspondence+adoption 1/3 historical recovery. Some constructions/import checks
-failed, and some interface costs were real; connection is not a compiled full
-replacement or an obligation to adopt it. Stated-grounds reading is mixed and does
-not establish the old claim that taste is a small residual. Pilot details in backup.
+Evidence E14. ProofJudge 2608.20432 is a supplied-pair preference task, not a system
+for choosing useful alternatives or determining acceptance. Our reconstruction
+consumer is DeepSeek high, Opus-produced sketches: 8 fresh controls + 24 CTX +
+24 CXS = 56 new reviews. Three historical controls are also matched. No registered
+gain: an ask missed by all three historical controls and reached by >=2/3 strategy
+sessions on both matchers. Small selected panel, fixed artifacts, material matcher
+disagreement on one proof family; not a proof of zero usefulness. Some concrete
+proposals transfer; value and resource comparison remain unresolved. Initial scorer
+packets had missing context and goal extraction imposed invented requirements;
+consumer briefs were repaired. This experiment tests one end-to-end reconstruction
+route, not direct learning of ≽_t from controlled pair judgments. The broader
+comparison hypothesis remains open. See reconstruction-phase-a-review and initial
+audit, plus the comparison source table in backup.
 -->
 
 ---
 
-# Q4 · Can independently acquired notes transfer?
+# Can independently acquired notes transfer?
 
 **Experiment:** acquire six entries from earlier sources, check and repair them, then freeze them before whole-PR review.
 
@@ -678,7 +674,7 @@ population claim follows. Date gates and target exclusions remain in protocol.
 
 <!-- _class: tbl -->
 
-# Q4 · The notes did not recover the primary concerns
+# The notes did not recover the primary concerns
 
 | Primary concern | A: ordinary | B: compact | C: full |
 |---|---:|---:|---:|
@@ -712,7 +708,7 @@ An exploratory dslope addition outside the historical reference is in backup.
 
 <!-- _class: tbl -->
 
-# Q4 · Is focus enough?
+# Is focus enough?
 
 **Diagnostic:** supply a declaration and concern; compare no note with its frozen note, three repetitions per condition.
 
@@ -740,7 +736,7 @@ registration. Historical silence on siblings is not a wrong label.
 
 ---
 
-# Q4 · Generality: constructed, then declined
+# Generality: constructed, then declined
 
 **#33421:** a lemma about `2 * fract x = 1`.
 
@@ -782,7 +778,7 @@ is printed: the six emitted generalizations differ.
 | **Evaluation** | Historical agreement, feasibility and usefulness are different; usefulness remains unfinished |
 
 <!--
-Synthesis of Q1–Q4, not a universal impossibility result. Exact supply has several
+Synthesis of the baseline, specialization and convention questions, not a universal impossibility result. Exact supply has several
 conditional positives, including GPT disposition (backup). Acquired-bank primary
 failure is bounded to six development PRs and the tested notes. Focus is conditional.
 The 491-item bank and 66-item pilot usefulness panels remain without completed
@@ -960,6 +956,7 @@ design assessment of the tried specialist arms, not a ban on specialized tools.
 | E8–E9 | 54 whole reviews and source-bank checks |
 | E10–E11 | 72 focused sessions, audit and next question |
 | E12 | Shared experimental foundation |
+| E13–E14 | Baseline/focus diagnostics and alternative-generation experiment |
 
 The 54-review and 72-session records are on **experiment branches**. The register records their revisions; they have not all been merged into `develop`.
 
@@ -976,3 +973,114 @@ The 54-review and 72-session records are on **experiment branches**. The registe
 **Mathlib.** MathlibPR (2605.07147) · ProofJudge (2608.20432) · Growing Mathlib (2508.21593) · APE-Bench (2504.19110).
 
 **Ours.** `docs/research/code-review-systems-survey-2026-09.md`, `open-code-review-comparison-2026-09.md`, `conventions-assessment-2026-10-12.md`.
+
+---
+
+<!-- _class: dense -->
+
+<!-- _footer: "Mathlib PR review · The solo baseline · Measurements through 14 October" -->
+
+# Backup · Reasoning, harness, or model?
+
+| model | harness | reasoning | dev, of 23 | post-cutoff reach |
+|---|---|---|---|---|
+| GPT 5.2 | ours | off | 2 | 0.02–0.17 |
+| GPT 5.2 | ours · Claude Code · Codex | carried | 2–3 | 0.21 · 0.25 · 0.29 |
+| GPT 5.5 | ours · Codex | carried | 3 | 0.31 · 0.25 |
+| Opus 4.8 · Opus 5 · Opus 5.5 | ours | on | 3 · 8 · 7–9 | — |
+| Opus 5.5 | its own shell | on | 11–12 | 0.47 |
+| Qwen3.5-397B, self-hosted | ours | off | 2, 0, 2 | — |
+| DeepSeek-V4.1-Flash, self-hosted | ours | off · high, carried | 5 · 8, 6, 9 | — |
+
+<div class="take">
+
+Reasoning and harness repairs matter, but they do not close the gap. Next: inspect what reviewers miss.
+
+</div>
+
+<!--
+- **Reasoning:** GPT 5.2 barely moves (2 → 2–3) though every session now finishes at a third of the cost. DeepSeek: 5 → 8, 6, 9, only with its thinking carried between turns.
+- **Harness:** three harnesses with GPT 5.2 held reach the same. Ours costs Opus 5.5 about three asks against its own shell.
+- **Model:** Opus 4.8 → 5 → 5.5 is 3 → 8 → 7–12. Not the prompt: Opus on GPT 5.2's exact messages reaches 10.
+
+dev = twelve held-out PRs, 23 obligations, judge v9. post-cutoff = six PRs created after the Claude
+models' cutoff, 16 asks, reach per session by blind matchers. "carried" = reasoning at high effort
+with the reasoning items passed back between tool calls; "off" = no reasoning tokens. GPT 5.4 carried
+reads 0.19 (ours) and 0.31 (Codex) on post-cutoff. Qwen's one reasoning-high run had its thinking
+dropped by our client (defect found 7 October) and is not a reasoning reading.
+-->
+
+---
+
+# Backup · Can the library settle the choice?
+
+**Diagnostic:** inspect **41 asks** the free reviewer never reached.
+
+- In **5–7**, library evidence decides the change.
+- In **19**, it supplies ingredients, but a choice remains.
+
+**Example:** finding `to_fun` connects a hand-written family to a generated alternative. Whether to adopt it still depends on interface and import costs.
+
+<div class="take">
+
+Next test: acquire conditional reasons from earlier PRs, then ask whether they improve ordinary review elsewhere.
+
+</div>
+
+<!--
+Evidence E5–E6. Library-knowledge diagnostic: two readers, selected 41-ask residual;
+5–7 and 19 are not a general population estimate. The to_fun reconstruction/source
+probes are separate selected-case experiments. After fixing symlink search, all six
+assisted Opus sessions connected the alternative; baseline 0/3, correspondence 0/3,
+correspondence+adoption 1/3 historical recovery. Some constructions/import checks
+failed, and some interface costs were real; connection is not a compiled full
+replacement or an obligation to adopt it. Stated-grounds reading is mixed and does
+not establish the old claim that taste is a small residual. Pilot details in backup.
+-->
+
+---
+
+<!-- _class: dense -->
+
+# Backup · The question each published formulation answers
+
+| work | the question | in the formulation |
+|---|---|---|
+| MathlibPR | Is this PR merge-ready? | δ ∈ A_t ? |
+| Tricorder, BitsAI-CR, AutoCommenter | Which written rules does it break? | which tests from the written part of ≽_t δ fails |
+| Qodo, Greptile, Semgrep | Where does it depart from what we accepted lately? | tests read off recent points of ≽_t |
+| ProofJudge | Of these two versions, which would the maintainer take? | ≽_t on a given pair (δ, δ'') |
+| c-CRAB; resolution rates | Did the author act on the comment? | δ_{i+1} passes the test |
+| SWR-Bench, SWE-PRBench, **ours** | What would the reviewer ask for? | the tests the community would set on δ, with witnesses |
+
+<div class="take">
+
+Only the last asks for the tests themselves. The others ask what an answer key can settle: membership, a written rule, a given pair, an outcome.
+
+</div>
+
+<!--
+MathlibPR: models and agents cannot separate merge-ready from build-passing PRs. ProofJudge: recovers
+reviewer preference on 63.5-80.8% of 218 before/after pairs. Sources in
+docs/research/code-review-systems-survey-2026-09.md.
+-->
+
+---
+
+<!-- _class: tbl -->
+
+# Backup · What the literature suggests testing
+
+| point | evidence | for us |
+|---|---|---|
+| **General guidelines alone can be insufficient.** | guidelines in the prompt: Atlassian +5% | test more specific, usable knowledge |
+| **Evidence shows a finding is true, not wanted. Many evidenced findings; few get acted on.** | Atlassian: 4% of comments match a human one, 38.7% get resolved; a truth check did nothing, a gate trained on 50k resolved comments +15–20pp | evidence shows only the checkable part of ≽_t, which the kernel gives us free; nothing on record shows the rest |
+| **Diversity can buy recall; voting can lose it.** | aggregating reviews +44% F1; an ensemble's union +83%; majority vote a "popularity trap" | measure union recall alongside comment burden |
+| **Decomposition can lose recall.** | Di Biase: decomposed diffs found no more defects; Alibaba's file grouping cut recall 20% → 12.7% | compare each decomposition with a solo reviewer |
+| **Restraint can suppress findings.** | Cursor needed "aggressive" prompts once restraint made it quiet | test the filing contract and measure output burden |
+
+<!--
+Sources: RovoDev, Atlassian (2601.01129); open-code-review's commit history (the filter fix, the grouping
+regression); SWR-Bench (2509.01494); LLM ensembles for code (2510.21513); Di Biase et al. (1805.10978);
+Cursor's Bugbot write-up. Our own evidence on each point is the last slide of Part 3.
+-->

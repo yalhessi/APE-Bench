@@ -1,6 +1,6 @@
 # Evidence for the November supervisor update
 
-Checked 3 November 2026 for the 4 November meeting. This register supports the empirical
+Checked 3–4 November 2026 for the 4 November meeting. This register supports the empirical
 update; it is not a new experiment or a new literature review. E1–E12 identify sources in
 the slide speaker notes. Read the final corrections in each results file, since several
 files preserve superseded tables and conclusions above their corrected readings.
@@ -232,3 +232,62 @@ Integrated at `a9154196`, reviewed at `e13343c8`. Reconstruction-chain reproduct
 `954c6f9b`. Second-consumer matching reproduction: `68dea3b5`. Sonnet transport smoke:
 `fcca6c76`. These establish execution, lineage and reproduction properties, not an
 improvement in maintainer-worthy review. Later comparisons used the shared paths.
+
+## E13 — Baseline misses, specialist focus and residual judgments
+
+Sources:
+
+- [Held-out lead/solo comparison](../docs/research/ab-heldout12-obligation-spine.md)
+- [Specific questions already in the specialist briefs](../docs/research/the-question-is-already-asked-2026-09.md)
+- [Residual-mechanism reading](../results/pr_review_v5/probes/phase1-residual-mechanisms-2026-09-30/mechanisms.md)
+
+The twelve-PR comparison used GPT-5.2 with reasoning off and the registered obligation
+judge `v4-semantic-v3-v9-rubric`: lead 7/5/6, solo 4/4/1 of 23 across three repetitions.
+Costs were not matched; the experiment did not resolve mean superiority. Solo's
+`HLL` on #33117, inconsistent requests on #33421, and never-located doc-comment line
+on #33305 illustrate different failures. Location matching is not evidence that the
+precise alternative was considered. Later model/tool improvements remain in backup.
+
+The brief audit found 17/23 obligations specifically covered by an instruction,
+using the second, more conservative model reader. Seven of those cases depended on
+text written after earlier work on the same PRs. The numeric-constant example is
+one such tailored instruction: the arm ran but investigated another family. Other
+misses involved pruning, contracts and evidence gates. This is a developmental
+diagnostic; it does not show that focus never changes decisions or that every miss
+is a checked change deliberately withheld.
+
+The residual population was 37 asks reached by nobody plus 30 reached only by
+Claude. In 63/67, every missing reviewer had inspected the object. Both readers
+labelled 40 asks as concluded fine, 25 as a different/opposite change, four as never
+attempted, and 25 as convention/mechanism knowledge. Labels overlap and count an
+ask when the mechanism occurs for a relevant reviewer; they are not a partition or
+direct observations of hidden reasoning. The source's implications motivate a
+knowledge intervention; they do not identify a universal cause of review failure.
+
+## E14 — Generating alternatives and consuming them in review
+
+Sources:
+
+- [Initial reconstruction audit](../docs/research/review-reconstruction-results-review-2026-10-19.md)
+- [Consumer study assessment](../docs/research/review-reconstruction-phase-a-review-2026-10-20.md)
+- [Primary reconstruction record](../.claude/worktrees/review-reconstruction/results/pr_review_v5/probes/review-reconstruction-2026-10-19/RESULTS.md)
+- [Saved prior-work survey](../docs/research/code-review-systems-survey-2026-09.md)
+
+The reconstruction consumer study ran 56 new DeepSeek reviews on eight selected
+development PRs: eight fresh controls, 24 with context and 24 with context plus
+fixed Opus-produced independent sketches. Twenty-five agreed asks belong to six
+PRs; two have no agreed asks. Three historical controls also entered matching.
+Neither intervention achieved the registered gain: an ask missed by all three
+historical controls and recovered in at least two of three strategy sessions on
+both matchers. Some concrete sketch proposals were checked and delivered as requests.
+
+The panel is small and selected; the matchers disagree materially on one proof
+family. Initial goal-extraction and scorer-context defects were corrected or
+qualified in the linked audits. Transmission, historical agreement, usefulness and
+value at the added cost are separate outcomes. The result limits this whole-PR
+reconstruction route. It does not establish that comparing fixed alternatives is
+unproductive or that the preference relation cannot be learned.
+
+ProofJudge (arXiv 2608.20432) supplies the relevant prior-work comparison: preference
+between given before/after versions. The open review task also requires choosing
+which alternative to construct and deciding whether its advantage warrants a request.

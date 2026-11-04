@@ -1,45 +1,44 @@
 # Supervisor update for 4 November 2026
 
-**Current presentation: [original-led HTML](original-led.html), [PDF](original-led.pdf),
+**Current presentation: [HTML](original-led.html), [PDF](original-led.pdf),
 [Markdown and speaker notes](original-led.md).**
 
-This fresh copy returns to the [October deck](../supervisor_update_2026-10/slides.md).
-Its theoretical slides are unchanged, its prior-work comparison is retained, and
-the experimental section follows the original thesis and Q1–Q4 progression. It
-removes the added overview from `meeting-v2`, makes the shared-context problem with
-specialist arms explicit, traces the motivation for conventions, and folds in the
-later experimental results. There is no duration target.
+This copy develops the [October deck](../supervisor_update_2026-10/slides.md). The
+first section keeps its task formulation, with explicit distinctions between a
+solution, a preferred alternative and an acceptable contribution. Conventions now
+enter that account. Its boxed closing sentences are removed.
 
-The deck has 31 main slides and seven backups. [Revision notes](original-led-notes.md)
-map it to the original and link the contemporaneous motivation for conventions.
-The [evidence register](evidence.md) supports the later empirical claims. Speaker
-notes carry measurement details, limitations and sources.
+The experimental argument starts with the goal of building a reviewer, the solo
+baseline and its misses, then asks about specialization, judgment and convention
+supply. Relevant references appear at those questions. The former design-space
+section is retained as backup tables. There are 31 main slides and 11 backups,
+with no duration target.
 
-## Preserved references and earlier drafts
+[Framing and narrative notes](original-led-notes.md) explain the revisions and trace
+the conventions motivation. The [evidence register](evidence.md) and speaker notes
+carry experimental sources, denominators, qualifications and corrections.
 
-- [October update](../supervisor_update_2026-10/slides.md): the preferred starting point;
-  its Markdown, local HTML and PDF remain unchanged.
-- [Detailed November reference](slides.md), [HTML](slides.html), [PDF](slides.pdf):
-  the 37-slide empirical update, preserved unchanged.
-- [Experiment map since September](experiment-map.md): 25 experiment families with
-  motivations, comparisons, answers, corrections and consequences.
-- [Earlier content narrative](content-narrative.md): preserved working proposal;
-  it is not the structure of the current presentation.
+## Preserved references
+
+- [October update](../supervisor_update_2026-10/slides.md), unchanged.
+- [Detailed November reference](slides.md), [HTML](slides.html), [PDF](slides.pdf), unchanged.
+- The preceding original-led source is preserved in commit `7ff09a23`.
+- [Experiment map since September](experiment-map.md): 25 experiment families.
+- [Earlier proposed narrative](content-narrative.md).
 - [Earlier meeting version](meeting-v2.md), [HTML](meeting-v2.html), [PDF](meeting-v2.pdf),
   and [structure/timing notes](meeting-structure.md).
 - [First prototype](meeting-draft.md), [HTML](meeting-draft.html), [PDF](meeting-draft.pdf),
   and [restructuring options](presentation-options.md).
 - [Living research overview](../docs/project-research-overview.md), unchanged.
 
-The experiment review covers completed work through 26 October and the 27 October
-assessment, including branch-local records. The knowledge-bank and preparation
-usefulness panels are unfinished. No overall usefulness improvement is claimed.
-The evidence register records branch snapshots and source paths; some links depend
-on the experiment worktrees remaining in this checkout.
+The record covers experiments through 26 October and the 27 October assessment,
+including branch-local results. The knowledge-bank and preparation usefulness
+panels remain unfinished. Some evidence links depend on the experiment worktrees
+remaining in this checkout.
 
 ## Render locally
 
-From the repository root, with a local Marp CLI and Chrome:
+From the repository root, with Marp and Chrome:
 
 ```bash
 marp supervisor_update_2026-11/original-led.md --html \
@@ -48,11 +47,10 @@ marp supervisor_update_2026-11/original-led.md --html --pdf --allow-local-files 
   -o supervisor_update_2026-11/original-led.pdf
 ```
 
-These commands render local documents; they do not run generation, matching or
-judging. HTML and PDF are generated local exports, as in the October update. Source
-documents are versioned. Substitute `slides.md` to rebuild the detailed reference.
+These commands render local documents without generation, matching or judging.
+HTML and PDF are generated local exports; source documents are versioned.
 
-Validation: the current PDF has 38 pages. Chrome found no slide overflow or footer
-overlap; the updated experimental slides were visually inspected. All 35 local
-Markdown links resolve. The original theoretical slides and convention formulation
-were compared directly, and the earlier presentation sources remain unchanged.
+Validation: the PDF has 42 pages. Chrome found no slide overflow or footer overlap;
+the revised framing and experimental opening were visually inspected. All 75 local
+links across the current deck, notes, README and evidence register resolve. Earlier
+presentation sources remain unchanged.
