@@ -293,7 +293,7 @@ Four questions about why the reviewer misses what maintainers ask for
 
 | | Question | Answer so far |
 |---|---|---|
-| **A** | Do **specialized reviewers** catch what solo review misses? | A modest gain at **7.7× the cost**. Many misses persist even after the relevant code is inspected. |
+| **A** | Would **more focused attention** resolve the missed requests? | **It has not been enough in our tests.** Many misses persist even when the reviewer inspects the relevant code or is told what to check. |
 | **B** | Does supplying the **right convention** help? | **Yes.** It recovers substantially more maintainer requests when we supply conventions selected from the human review. |
 | **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
 | **D** | If it can **construct the change**, will it request it? | **Not necessarily.** In focused tests, it constructed and checked alternatives but still judged the changes unnecessary. |
@@ -304,7 +304,9 @@ provide the evidence; slide 30 returns to the same questions. This is argument
 order, not the chronology in which studies were designed (see original-led-notes.md).
 A and B were reported in October; C is partly October (ask-free selection) and
 partly new (the generated alternative, the acquired notes); D is new.
-A combines the specialist comparison with a separate residual audit. The 7.7× is
+A asks about attention; specialized reviewers are one intervention, not the
+question itself. It combines the specialist comparison with the residual and
+specific-brief audits. The 7.7× cost shown in the specialist result is
 billed cost in the dated GPT-5.2 comparison, not a cost-matched estimate or a claim
 about current solo models. Inspection does not establish consideration of the
 relevant alternative, and attention failures still occur. B supplies relevance as
@@ -792,7 +794,7 @@ is printed: the six emitted generalizations differ.
 
 | | Question | What the experiments support |
 |---|---|---|
-| **A** | Do **specialized reviewers** catch what solo review misses? | A modest gain at **7.7× the cost**. Many misses persist even after inspection; preserve shared context. |
+| **A** | Would **more focused attention** resolve the missed requests? | **It has not been enough in our tests.** Many misses persist even when the reviewer inspects the relevant code or is told what to check. |
 | **B** | Does supplying the **right convention** help? | **Yes**, when selected from the human review. The census supplies candidate conventions; scope and force still need checking. |
 | **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
 | **D** | If it can **construct the change**, will it request it? | **Not necessarily.** It can construct and check the alternative, yet judge the change unnecessary. Its reasons are the next question. |
