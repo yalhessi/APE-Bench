@@ -289,30 +289,34 @@ Four questions about why the reviewer misses what maintainers ask for
 
 ---
 
-<!-- _class: tbl -->
-
-# The route through the experiments
-
-Section 1 left open where a reviewer can fail: the acceptance boundary, the conventions, the comparison, the automation. Each experiment asks which of these the reviewer is actually failing at.
+# What have we learned about building a reviewer?
 
 | | Question | Answer so far |
 |---|---|---|
-| **A** | Does the reviewer fail to **look**? | No. It reaches the object, and often the exact question, and still does not ask. |
-| **B** | Does it lack the **standard**? | Told which convention applies, recovery rises substantially. |
-| **C** | Can the standard arrive **without the answer key**? | Not by any delivery tested: selection, examples, a generated alternative, acquired notes. |
-| **D** | With the alternative in hand, does it **ask**? | Often not. It constructs the change and declines it. |
-
-<div class="cmp">Every result slide carries a strip like this one: <b>Compare</b> what against what · <b>Held fixed</b> what · <b>Measured</b> how, with the denominator. The date tag says when the experiment ran; the October update covered work to 14 October, so <span class="tag new">later dates</span> are new.</div>
+| **A** | Do **specialized reviewers** catch what solo review misses? | A modest gain at **7.7× the cost**. Many misses persist even after the relevant code is inspected. |
+| **B** | Does supplying the **right convention** help? | **Yes.** It recovers substantially more maintainer requests when we supply conventions selected from the human review. |
+| **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
+| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** In focused tests, it constructed and checked alternatives but still judged the changes unnecessary. |
 
 <!--
-A map, not a result. The four questions are the argument order, not the chronology
-in which studies were designed (see original-led-notes.md). A and B were reported in
-the October update; C is partly October (ask-free selection) and partly new (the
-generated alternative, the acquired notes); D is new. The strips answer the two
-questions a listener otherwise has to reconstruct: what is this number compared
-against, and what does it establish. Numbers from different strips are never
-pooled: the instruments differ (registered judge on obligations; blind ask matchers
-on reach; reader labels; cells of three).
+These questions and answers are the main takeaways. The following experiments
+provide the evidence; slide 30 returns to the same questions. This is argument
+order, not the chronology in which studies were designed (see original-led-notes.md).
+A and B were reported in October; C is partly October (ask-free selection) and
+partly new (the generated alternative, the acquired notes); D is new.
+A combines the specialist comparison with a separate residual audit. The 7.7× is
+billed cost in the dated GPT-5.2 comparison, not a cost-matched estimate or a claim
+about current solo models. Inspection does not establish consideration of the
+relevant alternative, and attention failures still occur. B supplies relevance as
+well as convention content by selecting entries from target historical requests.
+C is bounded to the tested delivery methods; it does not show conventions cannot
+be acquired or used independently. D is a selected-case diagnosis, not proof that
+declining the change is wrong. Sources and denominators are on the result slides.
+Explain the comparison strips aloud if needed: Compare what against what; Held
+fixed what; Measured how, with the denominator. Dates after 14 October are amber
+because they follow the October update. Measurements from different strips are
+never pooled: the instruments differ (registered judge on obligations; blind ask
+matchers on reach; reader labels; cells of three).
 -->
 
 ---
@@ -484,7 +488,7 @@ A brief directed the reviewer to the specific check behind **17 of 23 obligation
 
 The corresponding arm ran but did not produce the requested generalization. It investigated a different family.
 
-<div class="take"><b>Establishes (A):</b> the reviewer reaches the object, and often the exact question, and still does not make the request. Attention is not the missing piece. What is missing is the standard, or the judgment that applies it.</div>
+<div class="take"><b>Answer (A):</b> more focused attention alone did not resolve these misses. Even specific instructions can leave the request unmade. That motivates asking which standard the reviewer applies, and how it judges the change.</div>
 
 <!--
 Evidence E13, the-question-is-already-asked-2026-09.md. Two model readers; the second
@@ -788,10 +792,10 @@ is printed: the six emitted generalizations differ.
 
 | | Question | What the experiments support |
 |---|---|---|
-| **A** | Attention | The reviewer reaches the object, and often the question. The tried specialist arms are unpromising; preserve shared context. |
-| **B** | Standard | Told which convention applies, recovery rises substantially. The census is a list of candidate rules, not validated ones. |
-| **C** | Delivery | No ask-free delivery reproduced that gain: selection, examples, a generated alternative, acquired notes. |
-| **D** | Decision | With the alternative in hand, the reviewer often declines. Its reasons are the next object of study. |
+| **A** | Do **specialized reviewers** catch what solo review misses? | A modest gain at **7.7× the cost**. Many misses persist even after inspection; preserve shared context. |
+| **B** | Does supplying the **right convention** help? | **Yes**, when selected from the human review. The census supplies candidate conventions; scope and force still need checking. |
+| **C** | Can we get that benefit **without knowing the maintainer's requests**? | The methods tested so far have **not reliably reproduced that gain**. |
+| **D** | If it can **construct the change**, will it request it? | **Not necessarily.** It can construct and check the alternative, yet judge the change unnecessary. Its reasons are the next question. |
 | | Evaluation | Historical agreement, feasibility and usefulness are different; the usefulness panels remain unfinished. |
 
 <!--
