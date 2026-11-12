@@ -1,5 +1,7 @@
 # What a reviewer needs to know, and how to collect it
 
+**Design follow-up, 2026-11-12:** [alternative reviewing harnesses](../research/review-harness-design-alternatives-2026-11-12.md) compares transfer from complete historical episodes, live investigation of design choices across their dependencies, and a proposal policy learned from actual expert requests. The motivation is the gap between oracle knowledge and ask-free transfer, coupled with the current concern boundaries and summary-only handoffs. The preferred candidate combines the first two within one per-PR task, while preserving solo review. This revisits the October 23 transfer method explicitly; another preparation note is not the proposed change. The next design check is whether the explicit target correspondence and persistent comparison cause an observable operation that ordinary review with the same sources lacks. Expert issue/resolution recovery remains the outcome; the earlier arbitrary-usefulness-label recommendations below are superseded. No new run or training campaign is registered here.
+
 **Status:** open, 2026-09-25, **for a fresh session**. It is its own thread: context and evidence
 for the arms, not how the arms are divided.
 
