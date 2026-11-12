@@ -1,5 +1,7 @@
 # After focused application: what failed, and what to investigate next
 
+> **Recommendation update, 2026-11-12:** the [revised project assessment](project-assessment-2026-11-12.md) supersedes the proposed usefulness reading and request-worthiness diagnostic below. The user reaffirmed naturally occurring expert reviews as the independent target, excluding human or LLM labels of arbitrary review quality. The measured focused-application results remain evidence; the next priority is distinguishing partial expert recovery and preserving comparability across PRs.
+
 2026-10-27. Analytical review of `focused-application@f0a322eb`,
 `reusable-review-knowledge@bbba4f24`, and `develop@a4c2e5c6`. No model session,
 semantic adjudication or new Lean compilation was run. The next study below is a

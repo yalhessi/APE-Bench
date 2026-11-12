@@ -1,7 +1,30 @@
 # The judge and the denominators — what every recall number in the record is conditioned on
 
-**Status** — open; all four items are re-scoring or docs edits on committed artifacts
+**Status** — open. Items 1–4 preserve the September audit; the 2026-11-12 follow-up below concerns partial expert recovery and comparable PR panels.
 **Cost** — no generation spend
+
+**Follow-up, 2026-11-12: measure partial expert recovery on fixed comparisons.** The [project assessment](../research/project-assessment-2026-11-12.md) revisits the July issue/resolution split and current raw-ask matcher. This does not reopen arbitrary review-quality adjudication or selection of findings.
+
+- **Motivating evidence:** the latest bank's 90 ask-by-run observations per condition contain 32 reached and 11–14 partial for ordinary review, versus 37 reached and 12–15 partial for the full bank. Existing partials include both a different rename and the opposite remedy to a `simp`/deprecation concern. All eight matcher disagreements concern one ambiguous “similarly below” reference. The 60-PR coverage audit also had four of seven claims fail on the larger corpus: measurement and PR composition both matter.
+- **What would close it:** a source-grounded contract distinguishing expert-issue recovery, resolution recovery and the relationship of a partial remedy; an explicit rule for ambiguous references and repeated/multi-site requests; and a shared report over fixed baseline/treatment outputs showing per-PR gains, losses, disagreement, scope and output volume. Preserve old instruments and scores. A proposed new definition must not be accepted merely because it favours an intervention.
+- **Read:** `docs/research/intervention-benchmark-redesign.md` (prior design), `docs/research/phase-c-corrected-history.md` (oracle-site limitation), `src/mathlib_review/judge/protocol.py` and `src/mathlib_review/judge/ask_matching.py` (different active instruments), the assessment's linked bank reference packets and match report (saved boundary cases), and `docs/todo/eval-set-selection.md` (existing panels and exposure constraints).
+- **Run:** the local command below reproduces the stored three-way counts; it neither calls a model nor assigns a new verdict. Any new semantic judging remains user-run.
+- **Bounded by:** no arbitrary usefulness labels; no `partial = 0.5` scalar; no conversion of investigation notes into delivered hits; no comparison of treatment on one sample with baseline on another. A fixed diagnostic panel tests a mechanism; an independent paired panel tests transfer. Existing definitions and report machinery should be extended where needed, not replaced by a new evaluation framework.
+
+```bash
+python3 - <<'PY'
+from collections import Counter
+import json
+from pathlib import Path
+path = Path('.claude/worktrees/reusable-review-knowledge/results/pr_review_v5/probes/reusable-review-knowledge-2026-10-24/eval/match_report.json')
+report = json.loads(path.read_text())
+for replicate in ('task-rrk_match:1', 'task-rrk_match:2'):
+    table = report[replicate]['table']
+    for arm in 'ABC':
+        counts = Counter(row[f'{arm}{i}'] for row in table.values() for i in (1, 2, 3))
+        print(replicate, arm, dict(counts))
+PY
+```
 
 ## 1. The judge only ever pairs at `anchor`
 

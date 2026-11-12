@@ -1,6 +1,6 @@
 # What an LLM adjudicator would be asked, and how we would know it was any good
 
-**Status** — open; the socket is built (2026-09-21), the rubric is not
+**Status** — parked for the current research programme, 2026-11-12. The user reaffirmed that arbitrary review quality cannot be established through human or LLM labels. Expert issue and resolution recovery remain the evaluation target; see the [revised assessment](../research/project-assessment-2026-11-12.md) and [measurement follow-up](judge-and-measurement.md). The historical proposal below and existing storage interfaces are retained for provenance, not as the next evaluation task.
 **Cost** — no spend to design; a validation sitting costs ~30 human labels and one cheap run
 **Owner question** — can a model tell "true and not something a maintainer would raise" from
 "the maintainer would have raised this", well enough to order a queue?
