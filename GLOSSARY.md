@@ -40,6 +40,15 @@ The revision of the author's contribution that the reviewer is asked to assess. 
 **First review round**
 The exchange that begins with the first maintainer review. For the first-round task, the feedback window runs from that first event to the author's next push.
 
+**Solo review**
+One reviewer assesses the whole PR in a single session with the review brief and the permitted tools. In an ordinary solo review, the reviewer chooses what to investigate from the PR and the sources it can inspect.
+
+**Submitted review**
+The feedback a reviewer hands in about a particular revision on a particular occasion. It can include a whole-review message, ordered comments, a verdict and suggested edits. A reviewer can complete a review with zero comments.
+
+**Reference feedback**
+The feedback selected for comparison with a submitted review. In a historical first review round, it can include comments and replies from several maintainers.
+
 **Raw ask**
 A first-round request expressed in the maintainer's own words. One request can ask the author to address several things.
 
