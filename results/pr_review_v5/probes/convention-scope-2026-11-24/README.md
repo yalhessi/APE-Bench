@@ -1,6 +1,6 @@
 # Can a convention improve a whole-PR review?
 
-On Mathlib PR 42184, the full-tool reviewer asked for the historical change after receiving a short instruction to compare two kinds of callers. Ordinary solo missed it. The two reviews ran under the same pinned model, tools, pass-0 PR description, source snapshot and token limit. This was a known development case; the convention question was written by hand. [Frozen protocol](PROTOCOL.md) · [Exact instruction](intervention.md) · [Historical maintainer request](https://github.com/leanprover-community/mathlib4/pull/42184#discussion_r3667804073)
+On Mathlib PR 42184, the full-tool reviewer asked for the historical change after receiving a short instruction to compare two kinds of callers. Ordinary solo missed it. The two reviews ran under the same pinned model, tools, pass-0 PR description, source snapshot and token limit. This was a known development case; the convention question was written by hand. [Frozen protocol](PROTOCOL.md) · [Exact instruction](intervention.md) · [Historical maintainer request](https://github.com/leanprover-community/mathlib4/pull/42184#discussion_r3667804073) · [Comparison with earlier experiments](prior-evidence.md)
 
 ## What the author would receive
 
