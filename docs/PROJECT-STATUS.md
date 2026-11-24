@@ -27,8 +27,8 @@ plus `STATUS.md` — every numbered item marked built, partial or not built, che
 tree. Read `STATUS.md` first.
 
 `docs/dead-ends.md` is the register of abandoned threads and retracted conclusions, each with what
-would reopen it; `docs/todo/` is the register of open ones, each with the motivating result behind
-it; `CLAUDE.md` at the root is the standing instruction set for working in this tree.
+would reopen it; `docs/todo/` preserves earlier proposals. New specs and tickets live in GitHub Issues.
+See `AGENTS.md` for shared project guidance.
 
 ## How to read this branch
 
