@@ -1,0 +1,26 @@
+# Does a reviewer change its request when an API convention is already satisfied?
+
+## Already answered?
+
+Supplying a rule known to match can recover historical asks. Bundling six retrieved conventions gave 37/90 matches against 32/90 solo and recovered none of the three intended stable misses. Rephrasing delivery as an invitation to verify had little effect. Library inspection decided only 5–7 of 41 selected misses, though it supplied ingredients for 19. Prior prompts have already recovered the companion on PR 42184, and sometimes solo has too. Neither asking the model to file all plausible ideas nor another win on that original would demonstrate scope sensitivity. See [questions](../../../../docs/questions.md), [dead ends](../../../../docs/dead-ends.md), [open convention questions](../../../../docs/todo/conventions-nature.md), and [library study](../library-knowledge-2026-10-13/RESULTS.md).
+
+## Decision and sample
+
+Frozen before launching these model calls. The candidate practice is to expose a reusable bound on a specified limit when a client has a convergence witness, and derive the aggregate corollary when appropriate. The submitted diff and comparable code can license an investigation. Whether the caller benefits enough to request an edit remains a maintainer judgment. The treatment adds one [inspection instruction](intervention.md) without target lemma names, historical answers or a filing quota. Neighboring non-strict and strict bounds furnish supporting and contrary examples. Both arms can read the same submitted source.
+
+| Selected development input | What the reviewer receives | Focal decision |
+|---|---|---|
+| Historical Mathlib 42184 | Submitted proof of a nonnegative infinite product | Ask to expose a bound on an independently supplied product-limit witness. Naming the witness only in internal notes does not count. |
+| Controlled edit of 42184 | Same change, plus a compiling public witness-level lemma, leaving the original proof intact | Asking to add this operation is a duplicate. Asking the existing proof to **use** the supplied lemma is a distinct, supportable change. |
+| Historical Mathlib 29857 | A separate PR selected by inspecting development submission diffs. It supplies a product-limit operation and calls it in two corollaries. | A request to add the same operation or wire those existing calls is redundant. Other legitimate feedback remains in scope. This is a broader aggregate operation, outside the narrow non-strict-order trigger, intentionally exposed to the question as an over-delivery control. |
+
+These cases were selected by the investigators. The original is a known success opportunity and the edit is synthetic. The natural control has an observable code property, independent of whether a maintainer commented. None is fresh confirmation of selection or recall. No future PR comments, merge revisions, evaluator material, or outcome labels appear in the model inputs.
+
+## Model comparison and reading rules
+
+1. Run one ordinary full-tool APE solo review and one with the instruction appended to the same system brief on the original PR. Preserve context, model, cutoff, tools and budget. Inspect serialized findings and the finalization channels, and check scope-specific advice and tool failures. One pair measures delivery on the normal route.
+2. On APE's contained packet-session route run two independent Opus 5.5 samples per arm on each of the three whole submitted changes (12 samples). Match input, model, access, limits and brief within each pair, except the operation. The packet route has file tools and no live Lean or online precedent. It tests sensitivity to the changed premise separately from the normal-tool result. Preserve source/patch hashes and session outputs.
+3. Score only the delivered change for focal **add**, **reuse existing**, and **redundant add/reuse**. An equivalent spelling of the mathematical operation counts. A newly requested distinct generalization, an automation extension or an unrelated cleanup is recorded separately. Read notes and tool traces after scoring to distinguish an unexamined issue, a reasoned decline, a mistaken premise and an idea dropped before submission. Preserve ambiguous decisions and local failures; a missing or invalid submission is not a correct abstention.
+4. For a preliminary benefit on this mechanism require more correct add requests than solo on the original packet, zero redundant requests in treated controls, and at least one appropriate switch to reuse on the edited case. Report cell counts even on a tie or failure. Report the production pair separately. These small dependent observations cannot estimate population benefit. A contrary example or null result calls for diagnosing where the decision failed before devising a new prompt.
+
+For a subsequent efficacy trial, freeze an input-only opportunity finder, keep every fired opportunity and a random sample of non-fires, and freeze the convention and baseline before reading outcomes on newer PRs. Pair treatments at PR level, retain all other author comments for precision and regression checks, and use blinded independent maintainers to judge useful actions, duplicates and warranted abstentions. Log snapshot, source support and contrary practice over time and score routing, adoption and author-facing usefulness separately.
