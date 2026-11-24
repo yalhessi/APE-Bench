@@ -1,0 +1,10 @@
+{
+  "context_file": {
+    "sha256": "ab82a5c180bac82e387833156fa25dd64502ee8f354d1a1bfe9e0bc00d5f07c7",
+    "snapshot": "results/pr_review_v5/runs/scope_solo_opus55_42184_comparison_20261124/inputs/context_file-ab82a5c180bac82e.jsonl"
+  },
+  "system_prompt_file": {
+    "sha256": "3ebabe7cf7bf85b998aac5f7c64446d954c7b051a8858acedf4d3fac30b679f4",
+    "snapshot": "results/pr_review_v5/runs/scope_solo_opus55_42184_comparison_20261124/inputs/system_prompt_file-3ebabe7cf7bf85b9.md"
+  }
+}

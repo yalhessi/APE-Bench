@@ -1,0 +1,90 @@
+{
+  "agenda_sha256": "7c4fc161e5ba17d7c2ddf08b38aac9f2e4254e63e795bcbc7e5ac3b2d75a1b8f",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "7682ad4cc34607864be97fda5ec529c45b4bbb1ab5f44635c7b4f6bcea478788",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "5bc52988f129e93e4a0337e11ade7dad384df8e2e5e0bd9cd758fc65a6f3d2df",
+    "generalist": "b9469e8bd80d20ede958386604423a3181b48bccef0ac3ed51a3157776e415e7",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "23d299ef9b19a21286b1740aa951fd2a09968026ec3bd14b579307b16f2494c0",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_index_version": "v5-precedent-index/2",
+    "precedent_meta_version": "v5-precedent-meta/2",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "precedent_rows": "43736",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "input_files": {
+      "context_file": "ab82a5c180bac82e387833156fa25dd64502ee8f354d1a1bfe9e0bc00d5f07c7",
+      "system_prompt_file": "3ebabe7cf7bf85b998aac5f7c64446d954c7b051a8858acedf4d3fac30b679f4"
+    },
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "dcbae10ece514ac79c1eb9ec07b02b77b7cd662a",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "lead_token_cap": 1200000,
+  "model_name": "claude-opus-5-5",
+  "per_pr_cost_cap": 1.5,
+  "per_pr_token_cap": 1800000,
+  "prompt_sha256_by_invocation": {
+    "wu:a3efc5d697492cf06eb1c807#api_reuse": "8c0774d439422aa5c35f0cc504ec0e57fd3d2bb85c0ae90bf68683f1c6bcb96f",
+    "wu:a3efc5d697492cf06eb1c807#correctness": "837227fce618e40001e4634ac1714ebaf6bba52bd7d314829f8032206ab4dd63",
+    "wu:a3efc5d697492cf06eb1c807#docs": "0813fefe4fa6bc4903e5365320c1c75820df41915c783c4523089e22b42314da",
+    "wu:a3efc5d697492cf06eb1c807#duplication": "4f61ce459d4e55874bd96317863eabbece7d054a50145b81aa3f1b09f8a5fcc0",
+    "wu:a3efc5d697492cf06eb1c807#family_design": "37aaa4e5d71c6ffd8ac23261cd6a3c6294faf109210c03466dc3011b8382282b",
+    "wu:a3efc5d697492cf06eb1c807#generalist": "cbb7526267e808579c88824dbee96a6ce4e6d126a158afb2b2e046daa5e3d7dc",
+    "wu:a3efc5d697492cf06eb1c807#generality": "cb5188ef362677f68d6c899576dfb69c5914b8ee9db8cc9712b8167d82c7ab91",
+    "wu:a3efc5d697492cf06eb1c807#naming": "55c24db0b3384fdcd471936e5fb8c932e48bb7a79ca490a31a894327e884b7a1",
+    "wu:a3efc5d697492cf06eb1c807#proof_golf": "cb3b4cc580174f42cc60993c5c33935101b46cb6f463938b33a7202cede50443",
+    "wu:a3efc5d697492cf06eb1c807#proof_idiom": "dc0253a390d9e9fe4d70e6a0f7f90031702ca0186435164ca9fd87c9ea710169",
+    "wu:a3efc5d697492cf06eb1c807#style": "f3b4827cdfd758a7946cd6696a7a63abb753d5a2c679a7008c69ada74700355a"
+  },
+  "release": "inputs/probes/probe-2026-07-08-v1",
+  "release_manifest_sha256": null,
+  "routing_mode": "solo",
+  "run_id": "v5run:scope_solo_opus55_42184_comparison_20261124",
+  "run_name": "scope_solo_opus55_42184_comparison_20261124",
+  "scaffold_config_sha256": "f93abcd2c9ccf9b87bf9d4e7218876d08ea3feb5e87315273ca2e0d4f1c17a79",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "64e8b993538f970906b71548e254f3cc6678ffc2ffcda6b68eee1a82079fdaf5",
+  "standard_budget_cap": 0.3,
+  "standard_budget_tokens": 360000
+}
