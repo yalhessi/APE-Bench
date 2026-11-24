@@ -1,0 +1,10 @@
+{
+  "context_file": {
+    "sha256": "bde0dfd03904140aff4f91cefca26df956730809602e5067cc541ab337642f0b",
+    "snapshot": "results/pr_review_v5/runs/smoke_20261124_solo_opus55_pr33438/inputs/context_file-bde0dfd03904140a.jsonl"
+  },
+  "system_prompt_file": {
+    "sha256": "aafac29605a6edd49d36dd8fcc087b4ed6f64c05c15969b34135f843d2167e5b",
+    "snapshot": "results/pr_review_v5/runs/smoke_20261124_solo_opus55_pr33438/inputs/system_prompt_file-aafac29605a6edd4.md"
+  }
+}

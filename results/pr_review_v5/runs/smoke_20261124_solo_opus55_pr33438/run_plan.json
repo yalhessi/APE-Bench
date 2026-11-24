@@ -1,0 +1,90 @@
+{
+  "agenda_sha256": "601aef56a988b84408e415589e22cbe9b3fc4e351b6672029a551ad5227be016",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "7682ad4cc34607864be97fda5ec529c45b4bbb1ab5f44635c7b4f6bcea478788",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "5bc52988f129e93e4a0337e11ade7dad384df8e2e5e0bd9cd758fc65a6f3d2df",
+    "generalist": "af0055979fa0304f38d8766b80cf51de4c2a25ff052956ac333ba74cce30a8e8",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "23d299ef9b19a21286b1740aa951fd2a09968026ec3bd14b579307b16f2494c0",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_index_version": "v5-precedent-index/2",
+    "precedent_meta_version": "v5-precedent-meta/2",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "precedent_rows": "43736",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "input_files": {
+      "context_file": "bde0dfd03904140aff4f91cefca26df956730809602e5067cc541ab337642f0b",
+      "system_prompt_file": "aafac29605a6edd49d36dd8fcc087b4ed6f64c05c15969b34135f843d2167e5b"
+    },
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "358a95abe169dbb763b11a9208097c31d663f111",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "lead_token_cap": 1200000,
+  "model_name": "claude-opus-5-5",
+  "per_pr_cost_cap": 1.5,
+  "per_pr_token_cap": 1800000,
+  "prompt_sha256_by_invocation": {
+    "wu:230e4c75daf818c75b024525#api_reuse": "c6b21dc4fc4db5c1e3449d426692d7188047429324d907e7ae0c63d2fc22e054",
+    "wu:230e4c75daf818c75b024525#correctness": "fe6db7f34845986a5f2be5b850119c54f8bba32e39c03ce45f063d5fa4300528",
+    "wu:230e4c75daf818c75b024525#docs": "ae216f83ca4b7d442f13110c6e8b6469b3075dcbca6be539dad3916dbfbcd545",
+    "wu:230e4c75daf818c75b024525#duplication": "e96b52bb4d3b320d320d9afa9dcc5530ca44ae2528dd99699fc13a13da4d5e85",
+    "wu:230e4c75daf818c75b024525#family_design": "87f97c8cf8cc1f741886216ebc9fd683976ed4579727debcce3b420de1faf851",
+    "wu:230e4c75daf818c75b024525#generalist": "ee5f1255d7d76e4e5f932b4b7ba2b1ed2f625ebaacc6d8828227368f0dce44f5",
+    "wu:230e4c75daf818c75b024525#generality": "ee60b863c2b18c6bd303df3b4e72dd9e43d2f603ab0f350ff8572c5f64a9cf4f",
+    "wu:230e4c75daf818c75b024525#naming": "337d7188f82ebe1d2cb90ab032efd87fdaf03977c291cd3fd39e728983d8d69e",
+    "wu:230e4c75daf818c75b024525#proof_golf": "66a2058b161de564646ece8855a4bec0e87354fad8258e9e4168a27597eff599",
+    "wu:230e4c75daf818c75b024525#proof_idiom": "56af99bdaa3aa423ada5db9630718f4f39c989ca20a7ceb7660ef6c1f9e3a592",
+    "wu:230e4c75daf818c75b024525#style": "d508c18e70625648ab06bd78b5095a3c9c2587717a3965f8fd77cfd548a9f310"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "release_manifest_sha256": null,
+  "routing_mode": "solo",
+  "run_id": "v5run:smoke_20261124_solo_opus55_pr33438",
+  "run_name": "smoke_20261124_solo_opus55_pr33438",
+  "scaffold_config_sha256": "c65e8ba9486d02aa1011be077bfd630d19dfb4e86667712ef0f74f29f97590fd",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "a79d0b45565ac41540976b4a20f472cdf762d6dc7bc30bc4bdd4162467051a48",
+  "standard_budget_cap": 0.3,
+  "standard_budget_tokens": 360000
+}
