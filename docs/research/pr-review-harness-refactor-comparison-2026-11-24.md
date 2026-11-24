@@ -4,6 +4,8 @@
 
 The first change I would land is to make **one complete, ordered review submission replayable**. A reviewer should be able to ask about a PR's purpose, cite two declarations in one request, propose a cross-file edit, or return an empty review. The current path through work units, anchors and candidates can change what the author or evaluator receives in all four cases. Recording the original lets us change one part of the harness at a time and locate gains and losses. The [implementation audit](pr-review-harness-code-audit-2026-11-24.md) covers the repository and individual defects. This companion identifies external precedents, interfaces and a migration order.
 
+The [industrial implementation study](industrial-review-harness-internals-2026-11-24.md) follows deployed reviewers through source selection, investigation, author interpretation and subsequent discussion, and tests their assumptions on saved Mathlib inputs.
+
 ## What the archive lets us establish
 
 Every Git-tracked anchoring report reconciles internally. The incoming count equals anchored plus unanchored. I grouped the reports by the completion status in the adjacent manifest.
