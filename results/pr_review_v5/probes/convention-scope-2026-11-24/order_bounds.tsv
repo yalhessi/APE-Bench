@@ -1,0 +1,21 @@
+cutoff	commit	committed_at	subject	value_declaration	named_witness	proof_line
+2024-01-01T00:00:00Z	7d31d03376f02197961d8bd00d110d74b59a1d07	2023-12-31T21:44:50+00:00	weak lower	tsum_nonneg@133	HasSum.nonneg@125	135 · exact hg.hasSum.nonneg h
+2024-01-01T00:00:00Z	7d31d03376f02197961d8bd00d110d74b59a1d07	2023-12-31T21:44:50+00:00	weak upper	tsum_nonpos@139	HasSum.nonpos@129	141 · exact hf.hasSum.nonpos h
+2024-01-01T00:00:00Z	7d31d03376f02197961d8bd00d110d74b59a1d07	2023-12-31T21:44:50+00:00	strict lower	tsum_pos@185	-	188 exact tsum_lt_tsum hg hi summable_zero hsum
+2024-01-01T00:00:00Z	7d31d03376f02197961d8bd00d110d74b59a1d07	2023-12-31T21:44:50+00:00	strict upper	-	-	-
+2024-07-01T00:00:00Z	454c40501feacb5aef56e707d6b348fc68897dce	2024-06-30T23:36:49+00:00	weak lower	one_le_tprod@162	HasProd.one_le@152	164 · exact hg.hasProd.one_le h
+2024-07-01T00:00:00Z	454c40501feacb5aef56e707d6b348fc68897dce	2024-06-30T23:36:49+00:00	weak upper	tprod_le_one@169	HasProd.le_one@157	171 · exact hf.hasProd.le_one h
+2024-07-01T00:00:00Z	454c40501feacb5aef56e707d6b348fc68897dce	2024-06-30T23:36:49+00:00	strict lower	one_lt_tprod@220	-	223 exact tprod_lt_tprod hg hi multipliable_one hsum
+2024-07-01T00:00:00Z	454c40501feacb5aef56e707d6b348fc68897dce	2024-06-30T23:36:49+00:00	strict upper	-	-	-
+2025-07-01T00:00:00Z	96db0ceb66e5b4d468a52c4c5fc5ac57cc6f8bd9	2025-06-30T22:15:48+00:00	weak lower	one_le_tprod@190	HasProd.one_le@182	192 · exact hg.hasProd.one_le h
+2025-07-01T00:00:00Z	96db0ceb66e5b4d468a52c4c5fc5ac57cc6f8bd9	2025-06-30T22:15:48+00:00	weak upper	tprod_le_one@196	HasProd.le_one@186	198 · exact hf.hasProd.le_one h
+2025-07-01T00:00:00Z	96db0ceb66e5b4d468a52c4c5fc5ac57cc6f8bd9	2025-06-30T22:15:48+00:00	strict lower	Multipliable.one_lt_tprod@250	-	253 exact multipliable_one.tprod_lt_tprod hg hi hsum
+2025-07-01T00:00:00Z	96db0ceb66e5b4d468a52c4c5fc5ac57cc6f8bd9	2025-06-30T22:15:48+00:00	strict upper	-	-	-
+2026-01-01T00:00:00Z	f6f4dd59f58a71148bdfc60847bc65fb8b0f36b8	2025-12-31T22:05:59+00:00	weak lower	one_le_tprod@169	HasProd.one_le@161	172 · exact hg.hasProd.one_le h
+2026-01-01T00:00:00Z	f6f4dd59f58a71148bdfc60847bc65fb8b0f36b8	2025-12-31T22:05:59+00:00	weak upper	tprod_le_one@177	HasProd.le_one@165	180 · exact hf.hasProd.le_one h
+2026-01-01T00:00:00Z	f6f4dd59f58a71148bdfc60847bc65fb8b0f36b8	2025-12-31T22:05:59+00:00	strict lower	Multipliable.one_lt_tprod@229	-	232 exact multipliable_one.tprod_lt_tprod hg hi hsum
+2026-01-01T00:00:00Z	f6f4dd59f58a71148bdfc60847bc65fb8b0f36b8	2025-12-31T22:05:59+00:00	strict upper	-	-	-
+review base	5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3	2026-07-27T23:44:07+00:00	weak lower	one_le_tprod@168	HasProd.one_le@160	171 · exact hg.hasProd.one_le h
+review base	5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3	2026-07-27T23:44:07+00:00	weak upper	tprod_le_one@176	HasProd.le_one@164	179 · exact hf.hasProd.le_one h
+review base	5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3	2026-07-27T23:44:07+00:00	strict lower	Multipliable.one_lt_tprod@230	-	233 exact multipliable_one.tprod_lt_tprod hg hi hsum
+review base	5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3	2026-07-27T23:44:07+00:00	strict upper	-	-	-
