@@ -111,7 +111,7 @@ async def mcp_signatures(task):
     from ape.toolkits.mcp_manager import MCPManager
 
     # Use the same tool binding as MCPManager.setup_http_mode, entirely in memory.
-    manager = MCPManager(task, logging.getLogger(__name__), task.config, use_native_tools=task.config.use_native_tools)
+    manager = MCPManager(task, logging.getLogger(__name__), task.config, use_native_tools=getattr(task.config, "use_native_tools", True))
     manager.mcp_server = FastMCP("inspect")
     manager._bind_tools_to_server(manager.calculate_enabled_tools())
     await task.register_task_tools(manager.mcp_server)
@@ -126,6 +126,20 @@ async def first_message(task, cwd, target):
     task.workspaces_dir = cwd
     task.scratch_workspace = WorkspaceInfo(name="scratch", path=cwd / "scratch")
     task.target_workspace = WorkspaceInfo(name="target", path=target, read_only_path_patterns=["**/*"])
+    if task.config.scaffold_type == "ape_agent":
+        prompt = await task.create_user_prompt()
+        if task.config.system_prompt_role == "system":
+            return prompt
+        from ape.scaffolds.prompts import build_system_prompt, first_user_prompt, with_task_system_prompt
+        preamble = await build_system_prompt(task.scratch_workspace, task.target_workspace,
+                                             task.reference_workspaces, batch_preamble=task.config.batch_preamble,
+                                             workspace_environment=task.config.workspace_environment)
+        return first_user_prompt(await with_task_system_prompt(preamble, task, logging.getLogger(__name__)), prompt)
+    if task.config.scaffold_type == "codex":
+        from ape.scaffolds.codex.scaffold import CodexScaffold
+        scaffold = CodexScaffold()
+        scaffold.task, scaffold.logger = task, logging.getLogger(__name__)
+        return await scaffold._initial_prompt(cwd)
     scaffold = ClaudeCodeScaffold()
     scaffold.task, scaffold.logger = task, logging.getLogger(__name__)
     return await scaffold._initial_prompt(scaffold._session_cwd())
@@ -144,15 +158,21 @@ async def inspect_review(payload, ds, scaffold, ep):
     task = create_task_from_data(payload, scaffold, task_config_overrides=scaffold.task_config_overrides)
     key = reviewed_workspace_key(task.data.snapshot_base_sha, task.data.diff)
     target = Path("data/code_execute/repos/mathlib4/workspaces") / key
-    cwd = (Path(".ape/runs") / ds.run_name / "workspaces").resolve()
-    message = (await first_message(task, cwd, target)).replace(str(cwd), "{attempt_workspaces}")
-    tools = await mcp_signatures(task)
+    # File tools validate the workspace at registration. Give preview a private empty
+    # workspace, so it cannot create state that the run-name guard would consider spent.
+    from tempfile import TemporaryDirectory
+    with TemporaryDirectory() as directory:
+        cwd = Path(directory).resolve()
+        message = (await first_message(task, cwd, target)).replace(str(cwd), "{attempt_workspaces}")
+        tools = await mcp_signatures(task)
     return message, tools, {
         "episode_id": ep.episode_id, "patch_sha256": ep.patch_sha256, "cutoff": payload["retrieval_cutoff"],
         "message_sha256": sha256_bytes(message.encode()),
         "mcp": sorted(tools), "mcp_schema_sha256": sha256_bytes(canonical_json_bytes(tools)),
-        "builtins": sorted(scaffold.tools), "model": scaffold.claude_model,
-        "effort": scaffold.effort, "cli_version": scaffold.cli_version,
+        "builtins": sorted(getattr(scaffold, "tools", None) or getattr(scaffold, "relayed_builtin_tools", None) or []),
+        "model": getattr(scaffold, "claude_model", None) or scaffold.llm_config.model_name,
+        "effort": getattr(scaffold, "effort", None) or scaffold.llm_config.reasoning_effort,
+        "cli_version": getattr(scaffold, "cli_version", None),
         "max_turns": scaffold.execution.max_turns, "token_cap": ds.solo_token_cap,
         "cost_cap": ds.solo_cost_cap,
     }

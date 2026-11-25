@@ -1,6 +1,7 @@
 """Archive exactly the accepted reviews, then blind and score independently of generation."""
 
 import asyncio
+import itertools
 import json
 import re
 from pathlib import Path
@@ -63,6 +64,70 @@ def check_attempt(attempt, expected):
     if sha256_bytes(normalized.encode()) != expected["message_sha256"]:
         raise ValueError(f"{attempt}: live first user message differs from the preflight")
     return transcript, precedent_calls(audit)
+
+
+def _opening_matches(rows, expected, tools):
+    grants = [r["message"]["tools"] for r in rows if r["type"] == "tool_definitions"]
+    if len(grants) != 1 or {t["function"]["name"] for t in grants[0]} != tools:
+        return False
+    for row in rows:
+        if row["type"] == "user":
+            workspace = Path(row["cwd"]).parent
+            for block in row["message"]["content"]:
+                message = (block.get("text") or "").replace(str(workspace), "{attempt_workspaces}")
+                message = message.replace(str(workspace.resolve()), "{attempt_workspaces}")
+                if sha256_bytes(message.encode()) == expected["message_sha256"]:
+                    return True
+    return False
+
+
+def _relay_openings(path):
+    # Housekeeping requests can precede the review. Each tree records its shared opening
+    # on the trunk before the first assistant reply.
+    with path.open() as stream:
+        for line in stream:
+            tree = json.loads(line)["tree"]
+            rows = []
+            while tree and tree["node"]["type"] != "assistant":
+                rows.append(tree["node"])
+                tree = next(iter(tree["children"]), None)
+            yield rows
+
+
+def attempt_evidence(directory, expected):
+    """Check the first review message and grant against the scaffold's native records."""
+    scaffold = expected.get("scaffold_type", "claude_code")
+    if scaffold == "claude_code" and not expected.get("relay"):
+        transcript, calls = check_attempt(directory, expected)
+        return (*ATTEMPT_EVIDENCE, transcript.name), calls
+    if scaffold == "ape_agent":
+        transcript, = directory.glob("ape_agent_session_*.jsonl")
+        rows = jsonl_rows(transcript)
+        calls = sum(block.get("type") == "tool_use" and block.get("name") == "precedent_search"
+                    for row in rows if row["type"] == "assistant" for block in row["message"]["content"])
+        opening = list(itertools.takewhile(lambda r: r["type"] != "assistant", rows))
+        if not _opening_matches(opening, expected, set(expected["mcp"])):
+            raise ValueError(f"{directory}: APE-Agent first message or tool grant differs from preflight")
+        return (transcript.name,), calls
+
+    tools = set(expected["builtins"]) | {"mcp__core__" + name for name in expected["mcp"]}
+    tree = "conversation_trees.jsonl"
+    if not any(_opening_matches(rows, expected, tools) for rows in _relay_openings(directory / tree)):
+        raise ValueError(f"{directory}: relay first message or tool grant differs from preflight")
+    audit = read(directory / "containment_audit.json")
+    if not (audit["clean"] and audit["usable"]):
+        raise ValueError(f"{directory}: {scaffold} containment audit failed")
+    if scaffold == "claude_code":
+        transcript, = directory.glob(TRANSCRIPT_PREFIX + "*.jsonl")
+        first = next(r for r in jsonl_rows(transcript) if r["type"] == "user")
+        message = first["message"]["content"].replace(first["cwd"], "{attempt_workspaces}")
+        if sha256_bytes(message.encode()) != expected["message_sha256"]:
+            raise ValueError(f"{directory}: SDK first message differs from preflight")
+        return (tree, transcript.name, "containment_audit.json"), precedent_calls(audit)
+    events = "codex_events.jsonl"
+    calls = sum(row.get("type") == "item.completed" and row.get("item", {}).get("tool") == "precedent_search"
+                for row in jsonl_rows(directory / events))
+    return (tree, events, "containment_audit.json"), calls
 
 
 #: A named review's design and search index, by run, written before its reviewer is dispatched.
@@ -168,7 +233,7 @@ async def capture(out, runs):
                     expected["max_turns"], expected["token_cap"], expected["cost_cap"]):
                 raise ValueError(f"{task_dir}: live review budget differs from the preflight")
             attempt = Path(accepted.path)
-            transcript, calls = check_attempt(attempt, expected)
+            evidence, calls = attempt_evidence(attempt, expected)
             traced = [r for r in search_rows if r.get("invocation_id") == raw.get("invocation_id")]
             if len(samples[0].attempts) == 1 and calls != len(traced):
                 raise ValueError(f"{attempt}: search calls in the transcript disagree with the run trace")
@@ -177,7 +242,7 @@ async def capture(out, runs):
                     for r in traced)):
                 raise ValueError(f"{attempt}: search used an unverified corpus or cutoff")
             dest = base / pr
-            files = {f: archive(attempt / f, dest / f) for f in (*ATTEMPT_EVIDENCE, transcript.name)}
+            files = {f: archive(attempt / f, dest / f) for f in evidence}
             task_files = dict(zip(TASK_EVIDENCE, (task_dir / "task_result.json", task_dir / "samples/0/sample.json")))
             files.update({name: archive(path, dest / name) for name, path in task_files.items()})
             findings[pr] = matcher_findings(raw)
@@ -247,10 +312,14 @@ def check_archived_run(out, arm, run, artifact, *, named):
             raise ValueError(f"{out}: archived first message changed for {arm} PR {pr}")
         dest = base / pr
         files = record["files"]
-        missing = [name for name in (*ATTEMPT_EVIDENCE, *TASK_EVIDENCE) if name not in files]
-        transcripts = [name for name in files if Path(name).match(TRANSCRIPT_PREFIX + "*.jsonl")]
-        if len(transcripts) != 1:
-            missing.append(TRANSCRIPT_PREFIX + "*.jsonl")
+        scaffold = episode.get("scaffold_type", "claude_code")
+        claude_files = ("containment_audit.json", "conversation_trees.jsonl") if episode.get("relay") else ATTEMPT_EVIDENCE
+        required = {"claude_code": claude_files, "ape_agent": (),
+                    "codex": ("codex_events.jsonl", "containment_audit.json", "conversation_trees.jsonl")}[scaffold]
+        missing = [name for name in (*required, *TASK_EVIDENCE) if name not in files]
+        patterns = {"claude_code": TRANSCRIPT_PREFIX + "*.jsonl", "ape_agent": "ape_agent_session_*.jsonl"}
+        if scaffold in patterns and sum(Path(n).match(patterns[scaffold]) for n in files) != 1:
+            missing.append(patterns[scaffold])
         if missing:
             raise ValueError(f"{out}: the archive record for PR {pr} lacks {missing}")
         if set(record["run_files"]) != run_files:
@@ -269,9 +338,11 @@ def check_archived_run(out, arm, run, artifact, *, named):
         if str(raw["pr_number"]) != pr or raw["episode_id"] != episode["episode_id"]:
             raise ValueError(f"{out}: accepted task result differs from the generated episode for {arm} PR {pr}")
         findings[pr] = matcher_findings(raw)
+        calls = (precedent_calls(read(dest / "containment_audit.json")) if scaffold == "claude_code"
+                 else attempt_evidence(dest, episode)[1])
         if (record["findings"] != len(findings[pr])
                 or record["attempts"] != len(sample.attempts)
-                or record["search_calls"] != precedent_calls(read(dest / "containment_audit.json"))):
+                or record["search_calls"] != calls):
             raise ValueError(f"{out}: archive counts differ from the accepted evidence for {arm} PR {pr}")
     if read(path) != findings:
         raise ValueError(f"{arm}: archived matcher input differs from the accepted submissions")
@@ -332,19 +403,19 @@ REFERENCE = Path("configs/probe_sets/postcutoff_2026_07_08_v1.yaml")
 MATCHER = Path("configs/match/ask_match_opus55_claude_sub.yaml")
 
 
-def scoring_description(scorer):
+def scoring_description(scorer, reference=REFERENCE):
     policy = "question form" if SCORERS[scorer] else "request only"
-    return (f"{scorer}: ordered submitted findings against {REFERENCE}, "
+    return (f"{scorer}: ordered submitted findings against {reference}, "
             f"{policy} rubric, two blind readings via {MATCHER}")
 
 
-def score_reviews(directories, scorer, *, execute):
+def score_reviews(directories, scorer, *, execute, reference_path=REFERENCE):
     """Read independently accepted submissions on the same reviewed head."""
     from src.mathlib_review.io import canonical_json_bytes
 
     if len(directories) != len(set(directories)):
         raise ValueError("Each requested submission must be distinct")
-    reference = probes.load_probe_set(REFERENCE)
+    reference = probes.load_probe_set(reference_path)
     reference_heads = {(r["pr_number"], r["episode_id"], r["patch_sha256"], r["reviewed_head_sha"])
                        for r in jsonl_rows(reference.release / "input/episodes.jsonl")}
     sources = {}
@@ -382,11 +453,12 @@ def score_reviews(directories, scorer, *, execute):
             "route_sha256": matching.route_sha256(scaffold), "max_turns": scaffold.execution.max_turns,
             "token_cap": scaffold.execution.sample_max_tokens, "cost_cap": scaffold.execution.sample_max_cost,
         }
-        identity = sha256_bytes(canonical_json_bytes([asks, settings]))
+        identity = sha256_bytes(canonical_json_bytes([asks, settings] if reference_path == REFERENCE
+                                                    else [asks, settings, reference.model_dump(mode="json")]))
         plan, folder = prepare_reading(out, sources, [case[0]], SCORERS[scorer],
                                        reference=reference, name="reviews", reading=f"{scorer}-{identity[:16]}")
         write_once(folder / "scorer.json", pretty_json_bytes(settings))
-        print(scoring_description(scorer))
+        print(scoring_description(scorer, reference_path))
         packet, = plan.packets
         for label, found in packet.reviewers.items():
             alias = plan.seal[str(case[0])][label]

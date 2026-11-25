@@ -28,10 +28,12 @@ class ExcerptCollection(BaseModel):
     model_revision: str
     sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
 
-    def index(self):
+    def index(self, *, prepare=True):
         directory = Path(".ape/review-history") / self.sha256
         index = directory / "index"
         if not index.is_dir():
+            if not prepare:
+                raise ValueError(f"{index}: prepare the named history collection before planning a study")
             excerpts.prepare(directory, self.source, self.before, self.excluded)
         built = submissions.read(index / "manifest.json")
         if (sha256_file(directory / "excerpts.jsonl") != self.sha256 or built["corpus_sha256"] != self.sha256
@@ -60,10 +62,12 @@ class PreparedRun:
 @dataclass
 class ReviewRequest:
     reviewer: str
-    definition: Reviewer
+    definition: Reviewer | None
     pr: int
     head: str
     directory: Path
+    condition: dict | None = None
+    sample: int = 1
 
     def accepted(self):
         return (self.directory / "archive.json").is_file()
@@ -75,7 +79,7 @@ class ReviewRequest:
         writes and `preview` prints.
         """
         task_config = scaffold.task_config_overrides or {}
-        if (dataset.design != "whole_pr" or scaffold.scaffold_type != "claude_code"
+        if self.condition is None and (dataset.design != "whole_pr" or dataset.whole_pr_brief or scaffold.scaffold_type != "claude_code"
                 or scaffold.batch_preamble != "plain" or scaffold.workspace_environment
                 or set(scaffold.tools) != {"Read", "Grep", "Glob"} or task_config.get("system_prompt_file")
                 or task_config.get("context_file") or scaffold.execution.sample_count != 1):
@@ -84,17 +88,29 @@ class ReviewRequest:
         expected = set(COMMON_TOOLS)
         run = {"run": dataset.run_name, "episodes": {str(self.pr): record},
                "tasks_dir": str(scaffold.execution.get_tasks_path(Path(scaffold.runs_base_dir) / dataset.run_name))}
-        manifest = {"fixture": False, "reviewer": self.reviewer, "sample": 1, "runs": {self.reviewer: run},
+        manifest = {"fixture": False, "reviewer": self.reviewer, "sample": self.sample, "runs": {self.reviewer: run},
                     "profile_sha256": sha256_bytes(canonical_json_bytes(scaffold.model_dump(mode="json"))),
-                    "definition": self.definition.model_dump(mode="json"), "release": str(dataset.release)}
-        if self.definition.history:
-            history = self.definition.history
+                    "release": str(dataset.release)}
+        if self.condition is not None:
+            preview = self.condition["stages"]["reviewer"]["review_inputs"][ep.episode_id]
+            if any(record[key] != value for key, value in preview.items()):
+                raise ValueError(f"{ep.episode_id}: dispatched reviewer inputs differ from the study plan")
+            manifest["condition"] = self.condition
+            record["scaffold_type"] = scaffold.scaffold_type
+            if scaffold.scaffold_type == "claude_code" and not scaffold.subscription_route:
+                record["relay"] = True
+        if self.definition is not None:
+            manifest["definition"] = self.definition.model_dump(mode="json")
+        history = self.definition.history if self.definition else None
+        if self.condition and self.condition["stages"]["reviewer"].get("history"):
+            history = ExcerptCollection.model_validate(self.condition["stages"]["reviewer"]["history"])
+        if history:
             if RetrievalGate(as_of=history.before).cutoff_epoch > RetrievalGate(as_of=record["cutoff"]).cutoff_epoch:
                 raise ValueError(f"History extends beyond the reviewed head {ep.episode_id}")
             expected.add("precedent_search")
             run["history_sha256"] = manifest["history_sha256"] = history.sha256
             manifest["index_manifest_sha256"] = payload["precedent_manifest_sha256"]
-        if set(tools) != expected:
+        if self.condition is None and set(tools) != expected:
             raise ValueError(f"{self.reviewer}: expected {sorted(expected)}, got {sorted(tools)}")
         record.update(mcp_schemas=tools, reviewed_head_sha=ep.reviewed_head_sha, base_sha=ep.base_sha,
                       message=str(self.directory / "first-message.txt"))
@@ -109,7 +125,7 @@ class ReviewRequest:
                 # Historical search records also named the ungranted Zulip corpus. Preserve its
                 # recorded digest while comparing every granted index pin against the live one.
                 old_index = held_run["inputs"].get("context_index_sha256", {})
-                if self.definition.history and "zulip_corpus" in old_index:
+                if self.definition and self.definition.history and "zulip_corpus" in old_index:
                     index = {**inputs["context_index_sha256"], "zulip_corpus": old_index["zulip_corpus"]}
                     run["inputs"] = {**inputs, "context_index_sha256": index}
             kept = {saved: pretty_json_bytes(manifest),
