@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Literal, NamedTuple
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
 from src.mathlib_review.io import (
@@ -37,7 +37,7 @@ class ReviewStudy(BaseModel):
     name: str
     output: Path
     reviewer: Path
-    selector: Path
+    selector: Path | None = None
     matcher: Path
     reference: Path
     history: Path
@@ -46,19 +46,32 @@ class ReviewStudy(BaseModel):
 
     strategies: tuple[Strategy, ...] = DEFAULT_STRATEGIES
 
-    @field_validator("strategies")
-    @classmethod
-    def paired_with_solo(cls, names):
+    @model_validator(mode="after")
+    def validate_strategies(self):
+        names = self.strategies
         if len(names) < 2 or names[0] != "solo" or len(names) != len(set(names)):
             raise ValueError("List solo first and at least one distinct comparison strategy")
-        return names
+        if self.selectors and self.selector is None:
+            raise ValueError("Supply a selector config for automatic or exact convention selection")
+        return self
 
     @property
     def selectors(self):
         return tuple(s for s in self.strategies if s in ("automatic", "exact"))
 
     def generation_definition(self):
-        return self.model_dump(mode="json", exclude={"matcher"}, exclude_defaults=True)
+        excluded = {"matcher"} if self.selectors else {"matcher", "selector"}
+        return self.model_dump(mode="json", exclude=excluded, exclude_defaults=True)
+
+    def pin_generation_definition(self):
+        path = self.output / "study.json"
+        definition = self.generation_definition()
+        if not self.selectors and path.is_file():
+            # Older solo/history studies recorded an unused selector. Preserve their sealed bytes.
+            saved = json.loads(path.read_bytes())
+            if "selector" in saved:
+                definition["selector"] = saved["selector"]
+        write_once(path, pretty_json_bytes(definition))
 
     def cases(self, reference):
         ds, scaffold, _ = runner.load_run(self.reviewer, {"dataset": {"pr_numbers": sorted(self.heads)}})
@@ -229,7 +242,7 @@ def run_study(args, logger):
         _, scaffold, _ = runner.load_run(study.reviewer)
         runner.assert_ready(scaffold, logger)
         asyncio.run(runner.assert_reviewed_workspaces_prebuilt(cases.episodes, required=True))
-    write_once(study.output / "study.json", pretty_json_bytes(study.generation_definition()))
+    study.pin_generation_definition()
     history = study.output / "history"
     collect = excerpts.prepare if "history" in study.strategies else excerpts.freeze
     collect(history, study.history, study.history_before, sorted(study.heads))

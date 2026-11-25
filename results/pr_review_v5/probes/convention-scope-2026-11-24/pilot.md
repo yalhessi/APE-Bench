@@ -13,7 +13,7 @@ The public review is the ordered list of findings the reviewer submits. A findin
 
 ## Run from this topic worktree
 
-The [study definition](../../../../configs/studies/familiar-conventions.yaml) pins the reviewed heads, shared history and cutoff, reference set, model configs and output directory. The same CLI accepts another study YAML. For a solo versus search comparison, set `strategies: [solo, history]` and give it a new output directory. That comparison skips catalogue and selector sessions. Use the repository’s worktree environment and your Claude subscription login for model execution.
+The [study definition](../../../../configs/studies/familiar-conventions.yaml) pins the reviewed heads, shared history and cutoff, reference set, model configs and output directory. The same CLI accepts another study YAML. For a solo versus search comparison, set `strategies: [solo, history]`, omit `selector`, and give the study a new output directory. That comparison skips catalogue and selector sessions. Use the repository’s worktree environment and your Claude subscription login for model execution.
 
 ```bash
 cd /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/convention-scope-pilot-20261124

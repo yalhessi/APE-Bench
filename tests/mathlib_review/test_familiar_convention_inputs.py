@@ -9,8 +9,53 @@ from src.mathlib_review.io import jsonl_bytes, pretty_json_bytes, sha256_file
 
 from src.mathlib_review.analysis import probes
 from src.mathlib_review.conventions import selection as study
+from src.mathlib_review.retrieval import excerpts
+from src.mathlib_review.review.cli import main
 from src.mathlib_review.review.study import ReviewStudy
 import yaml
+
+
+def test_history_comparison_accepts_no_selector_and_reuses_older_studies(tmp_path, monkeypatch):
+    spec = yaml.safe_load(Path("configs/studies/familiar-conventions.yaml").read_text())
+    old_selector = spec.pop("selector")
+    spec.update(strategies=["solo", "history"], output=str(tmp_path / "out"))
+    config = tmp_path / "study.yaml"
+    seal = tmp_path / "out/study.json"
+    # History indexing has its own tests. Keep the CLI, case validation and on-disk pin real.
+    monkeypatch.setattr(excerpts, "prepare", lambda *args: None)
+
+    def prepare():
+        config.write_text(yaml.safe_dump(spec))
+        return main(["study", "prepare", str(config)])
+
+    assert prepare() == 0
+    definition = json.loads(seal.read_bytes())
+    assert "selector" not in definition
+    spec["selector"] = "unused.yaml"
+    assert prepare() == 0
+    assert not (seal.parent / "conventions").exists()
+
+    old_bytes = pretty_json_bytes({**definition, "selector": old_selector})
+    seal.write_bytes(old_bytes)
+    assert prepare() == 0
+    assert seal.read_bytes() == old_bytes
+    spec["name"] += "-different-study"
+    with pytest.raises(SystemExit, match="2"):
+        prepare()
+    assert seal.read_bytes() == old_bytes
+
+
+@pytest.mark.parametrize("strategy", ["automatic", "exact"])
+def test_selection_requires_a_selector_before_execution(tmp_path, capsys, strategy):
+    spec = yaml.safe_load(Path("configs/studies/familiar-conventions.yaml").read_text())
+    del spec["selector"]
+    spec.update(strategies=["solo", strategy], output=str(tmp_path / "out"))
+    config = tmp_path / "study.yaml"
+    config.write_text(yaml.safe_dump(spec))
+    with pytest.raises(SystemExit, match="2"):
+        main(["study", "prepare", str(config)])
+    assert "Supply a selector config" in capsys.readouterr().err
+    assert not (tmp_path / "out").exists()
 
 
 @pytest.mark.parametrize("selectors", [("automatic", "exact"), ("automatic",), ("exact",)])
