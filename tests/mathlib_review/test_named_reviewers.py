@@ -363,16 +363,21 @@ def test_an_accepted_run_recorded_with_inline_inputs_resumes(checkout, provider,
     assert archive["records"][0]["findings"] == 0
 
 
-def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch):
-    alias = "no-login-42184"
+@pytest.mark.parametrize("missing", ["assert_ready", "assert_reviewed_workspaces_prebuilt"])
+def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch, missing):
+    alias = "refused-42184"
+    present = getattr(runner, missing)
+
+    async def absent_workspace(*args, **kwargs):
+        raise RuntimeError("reviewed workspace for 42184 is not prebuilt")
 
     def no_credential(*args, **kwargs):
         raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
 
-    monkeypatch.setattr(runner, "assert_ready", no_credential)
-    with pytest.raises(RuntimeError, match="Claude login"):
+    monkeypatch.setattr(runner, missing, no_credential if missing == "assert_ready" else absent_workspace)
+    with pytest.raises(RuntimeError, match="Claude login|not prebuilt"):
         cli.main(run_options("solo-v1", alias))
-    monkeypatch.setattr(runner, "assert_ready", lambda *a, **kw: None)
+    monkeypatch.setattr(runner, missing, present)
     assert cli.main(run_options("solo-v1", alias)) == 0
     assert provider.sessions == [alias]
 

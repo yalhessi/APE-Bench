@@ -2425,6 +2425,13 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         # refused start leaves nothing behind and the same command can be run again.
         assert_ready(scaffold, logger, enforce=True)
         _report_budget(dataset, {}, len(data), logger, enforce=True, scaffold=scaffold)
+        await assert_workspaces_prebuilt(data, required=dataset.require_prebuilt_workspaces)
+        await assert_reviewed_workspaces_prebuilt(
+            [episode], required=dataset.require_reviewed_workspaces, logger=logger)
+        if resume and not any(path.exists() for path in scratch):
+            # Interrupted after the generation inputs were recorded and before the first attempt.
+            resume = False
+        guard_run_name(dataset, logger, scaffold, resume=resume)
     request.record(prepared)
     # After the generation record, which hashes the profile as `plan` previews it; the orchestrator
     # reads the session ceilings from here.
@@ -2439,10 +2446,6 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         return await TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                       logger=logger).run(tasks)
 
-    if resume and not any(path.exists() for path in scratch):
-        # Interrupted after the generation inputs were recorded and before the first attempt.
-        resume = False
-    guard_run_name(dataset, logger, scaffold, resume=resume)
     if resume:
         from ape.orchestration.persistence import requeue_failed_samples
 
@@ -2453,9 +2456,6 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
             logger.info("requeued %d session(s) that failed on errors", len(requeued))
     out.mkdir(parents=True, exist_ok=True)
     _snapshot_inputs(input_files, out)
-    await assert_workspaces_prebuilt(data, required=dataset.require_prebuilt_workspaces)
-    await assert_reviewed_workspaces_prebuilt(
-        [episode], required=dataset.require_reviewed_workspaces, logger=logger)
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name, logger=logger)
     results = await orchestrator.run(tasks)
     if _solo_coverage_gaps(results, data):
