@@ -113,6 +113,8 @@ def test_case_selection_keeps_ai_reviews_and_detects_the_october_drift(capsys, c
 
 def test_two_stage_design_holds_the_upstream_model_fixed_and_refuses_missing_operations(capsys, catalogue):
     root = catalogue
+    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_SYSTEM
+
     upstream = {"algorithm": "structured", "operations": ["file_read"], "context_tools": []}
     critic = {"algorithm": "structured_critic", "reads": "selector", "operations": ["file_read"]}
     stages = {"reviewer": critic, "selector": upstream}
@@ -125,6 +127,7 @@ def test_two_stage_design_holds_the_upstream_model_fixed_and_refuses_missing_ope
     a, b = preview(capsys, study=file)["conditions"]
     assert a["stages"]["selector"] == b["stages"]["selector"]
     assert a["stages"]["selector"]["model"] == "gpt_5.2"
+    assert a["stages"]["selector"]["brief"] == SOLO_SYSTEM
     assert [c["stages"]["reviewer"]["model"] for c in (a, b)] == ["gpt_5.4", "gpt_5.5"]
     assert a["stages"]["reviewer"]["reads"] == "selector"
     for field, value, reason in [("operations", ["no_such_tool"], "no_such_tool"),

@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, PositiveFloat, PositiveInt
 
 from ape.llm_clients.config import ConfigurationError, MODEL_MAPPINGS
 from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+from ape.tasks.lean_tasks.formal_math.review.solo import solo_system_prompt
 from ape.tasks.lean_tasks.formal_math.review.whole_pr import DEFAULT_BRIEF
 from ape.scaffolds.skills import SKILL_TOOL_NAMES
 from ape.toolkits import BashExecuteToolsProvider, FileSystemToolsProvider, get_all_tool_names
@@ -209,11 +210,10 @@ def compose_stage(stage, model, scaffold, spec, study, episodes, logger, history
         raise ValueError("whole_pr precedent_search requires a named, pinned history collection")
     if cls.reads_stage != bool(stage.reads):
         raise ValueError(f"{stage.algorithm}: reads must bind exactly the required upstream ledger")
-    brief = None
     if stage.algorithm == "whole_pr":
         brief = stage.brief or DEFAULT_BRIEF
-    elif task.get("system_prompt_file"):
-        brief = Path(task["system_prompt_file"]).read_text()
+    else:
+        brief = solo_system_prompt(effective_task)
     return {"brief": brief, "history": history.model_dump(mode="json") if history else None,
             "run_config": raw, "model": runner._plan_model_name(config), "reads": stage.reads,
             "effective_scaffold": config.model_dump(mode="json"),
