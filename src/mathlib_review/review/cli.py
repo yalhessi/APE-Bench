@@ -1210,16 +1210,14 @@ def main(argv: Optional[List[str]] = None) -> int:
                 from src.mathlib_review.analysis.submissions import review_directory, score_reviews
                 return score_reviews([review_directory(name) for name in args.runs], args.using, execute=args.execute)
             from src.mathlib_review.review.reviewers import run_reviewer
-            return run_reviewer(args, logger)
+            from src.mathlib_review.review.runner import NoSubmittedReview
+            try:
+                return run_reviewer(args, logger)
+            except NoSubmittedReview as error:
+                print(f"NO SUBMITTED REVIEW: {error}", file=sys.stderr)
+                return 1
         except (ValueError, FileNotFoundError, FileExistsError) as error:
             parser.error(str(error))
-        except RuntimeError as error:
-            from src.mathlib_review.review.runner import NoAcceptedReview
-
-            if not isinstance(error, NoAcceptedReview):
-                raise
-            print(f"NO ACCEPTED REVIEW: {error}", file=sys.stderr)
-            return 1
     if args.command in ("plan", "run") and (args.case or args.score):
         parser.error("--case and --score require --reviewer")
     if args.command == "study":

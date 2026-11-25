@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from ape.orchestration.persistence import TaskStorage
 from ape.tasks.lean_tasks.formal_math.review.whole_pr import SubmittedFinding
 from src.mathlib_review.analysis import submissions
 from src.mathlib_review.io import pretty_json_bytes
@@ -74,6 +75,10 @@ def provider(checkout, monkeypatch):
     async def accept(self, tasks):
         task, = tasks
         task_dir = self.tasks_dir / task.data.global_index
+        stored = await TaskStorage(task_dir, task.data.global_index).load_all_samples()
+        if 0 in stored and stored[0].is_failed_on_errors(self.config.execution.task_max_retries):
+            # As the orchestrator does: a sample whose retries are spent stays failed until requeued.
+            return SimpleNamespace(task_results=[])
         plans = {path: submissions.read(path) for path in Path(".ape/reviews").glob("*/generation.json")}
         (plan_path, record), = [(path, run["episodes"]["42184"]) for path, plan in plans.items()
                                 for run in plan["runs"].values() if run["run"] == self.orchestrator_id]
@@ -95,10 +100,14 @@ def provider(checkout, monkeypatch):
         sample = {"sample_id": "s", "sample_index": 0, "task_global_index": task.data.global_index,
                   "created_at": "2026-11-25", "updated_at": "2026-11-25"}
         limits = {"max_turns": record["max_turns"], "cost_limit": record["cost_cap"], "token_limit": record["token_cap"]}
-        if review == "fail":
-            # The session stopped without calling the submission tool. No task result is written for it.
+        if review in ("fail", "lost"):
+            # "fail": the model stopped without calling the submission tool. "lost": every attempt
+            # died on a system error until its retries ran out. Neither writes a task result.
+            status, count = (("failed_model", 1) if review == "fail"
+                             else ("failed_error", self.config.execution.task_max_retries + 1))
             put(folder / "sample.json", {**sample, "attempts": [
-                {"attempt_id": 1, "path": str(attempt), "status": "failed_model", "created_at": "2026-11-25", **limits}]})
+                {"attempt_id": n + 1, "path": str(attempt), "status": status, "created_at": "2026-11-25", **limits}
+                for n in range(count)]})
             return SimpleNamespace(task_results=[])
         submitted = [SubmittedFinding(**finding) for finding in review.get("findings", [])]
         raw = {"pr_number": task.data.pr_number, "episode_id": task.data.episode_id, "success": True,
@@ -109,12 +118,28 @@ def provider(checkout, monkeypatch):
             {"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
              **limits, "result": raw}]})
         put(task_dir / "task_result.json", raw)
+        if review.get("then") == "kill":
+            raise InterruptedError("process killed after the session was accepted")
         return SimpleNamespace(task_results=[raw])
 
     accept.reviews, accept.sessions, accept.release = {}, [], None
     monkeypatch.setattr(runner.TaskOrchestrator, "run", accept)
 
     return accept
+
+
+@pytest.fixture
+def frozen_history(monkeypatch):
+    """Stand in only for the embedding data. The runner still pins the index and grants the tool."""
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+
+    def index(collection):
+        directory = Path("frozen-index")
+        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
+        return directory
+
+    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
+    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
 
 
 def episodes_only_release(checkout, *extra):
@@ -127,21 +152,14 @@ def episodes_only_release(checkout, *extra):
     return release.resolve()
 
 
-def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, provider, monkeypatch):
+def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, provider):
     alias = "guided-42184-a"
     out = submissions.review_directory(alias)
     opts = run_options("solo-v1", alias)
-    provider.reviews[alias] = saved_42184_reviews(checkout)["guided"]
-    original_capture = submissions.capture
-
-    async def interrupt(*args):
-        raise InterruptedError("killed after the session was accepted")
-
-    monkeypatch.setattr(submissions, "capture", interrupt)
+    provider.reviews[alias] = {**saved_42184_reviews(checkout)["guided"], "then": "kill"}
     with pytest.raises(InterruptedError, match="accepted"):
         cli.main(opts)
     assert provider.sessions == [alias] and not (out / "archive.json").exists()
-    monkeypatch.setattr(submissions, "capture", original_capture)
     # The resumed run archives the accepted session that is already on disk.
     assert cli.main([*opts, "--resume"]) == 0
     assert cli.main([*opts, "--resume"]) == 0
@@ -217,7 +235,7 @@ def test_empty_mixed_and_failed_reviews_have_distinct_outcomes(checkout, provide
         {"target": submissions.probes.PR_LEVEL_TARGET, "claim": question["claim"],
          "requested_change": question["suggested_fix"]}]
     assert cli.main(run_options("solo-v1", "failed")) == 1
-    assert "NO ACCEPTED REVIEW" in capsys.readouterr().err
+    assert "NO SUBMITTED REVIEW" in capsys.readouterr().err
     failed = submissions.review_directory("failed")
     assert (failed / "generation.json").is_file() and not (failed / "archive.json").exists()
     with pytest.raises(SystemExit) as refused:
@@ -226,16 +244,19 @@ def test_empty_mixed_and_failed_reviews_have_distinct_outcomes(checkout, provide
     assert provider.sessions == ["empty", "mixed", "failed"]
 
 
-def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, provider, monkeypatch, capsys):
-    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+def test_a_session_lost_to_system_errors_runs_again_on_resume(checkout, provider, capsys):
+    alias = "lost-42184"
+    provider.reviews[alias] = "lost"
+    assert cli.main(run_options("solo-v1", alias)) == 1
+    assert "failed_error" in capsys.readouterr().err
+    provider.reviews[alias] = {"findings": [], "message": "No changes requested."}
+    assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
+    assert provider.sessions == [alias, alias]
+    _, archive = submissions.saved_reviews(submissions.review_directory(alias))
+    assert archive["records"][0]["findings"] == 0
 
-    def index(collection):
-        directory = Path("frozen-index")
-        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
-        return directory
 
-    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
-    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
+def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, provider, frozen_history, capsys):
     generated = {}
     for label, release in (("profile", None), ("episodes", episodes_only_release(checkout))):
         provider.release = release
@@ -277,17 +298,7 @@ def test_a_case_names_exactly_one_reviewed_episode(checkout, provider, capsys):
     assert provider.sessions == []
 
 
-def test_overlapping_reviewers_can_finish_and_resume_independently(provider, monkeypatch):
-    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
-
-    # Stand in only for the embedding data. The native runner seals the index and grants the tool.
-    def index(collection):
-        directory = Path("frozen-index")
-        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
-        return directory
-
-    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
-    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
+def test_overlapping_reviewers_can_finish_and_resume_independently(provider, frozen_history, monkeypatch):
     entered, release = Event(), Event()
     solo = run_options("solo-v1", "first")
     search = run_options("pr-search-v1", "second")
@@ -350,7 +361,7 @@ from src.mathlib_review.review import cli, reviewers, runner
 def refuse(*args, **kwargs):
     raise SystemExit("generation is disabled in this process")
 
-TaskOrchestrator.run = runner.run = reviewers.run_reviewer = refuse
+TaskOrchestrator.run = runner.run = runner.review_episode = reviewers.run_reviewer = refuse
 sys.exit(cli.main(sys.argv[1:]))
 """
 
@@ -381,16 +392,7 @@ def matcher_messages(alias):
     return out
 
 
-def test_named_reading_reproduces_the_pre_change_matcher_input(checkout, provider, monkeypatch):
-    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
-
-    def index(collection):
-        directory = Path("frozen-index")
-        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
-        return directory
-
-    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
-    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
+def test_named_reading_reproduces_the_pre_change_matcher_input(checkout, provider, frozen_history):
     saved = saved_42184_reviews(checkout)
     assert [len(saved[s]["findings"]) for s in ("ordinary", "guided")] == [1, 2]
     assert saved["guided"]["findings"][0]["line_start"] == 239

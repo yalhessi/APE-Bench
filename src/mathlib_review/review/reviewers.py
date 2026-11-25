@@ -56,19 +56,13 @@ class ReviewRequest:
     def accepted(self):
         return (self.directory / "archive.json").is_file()
 
-    async def inspect(self, payloads, episodes, dataset, scaffold, *, inputs):
-        if len(episodes) != 1 or len(payloads) != 1:
-            raise ValueError(f"Expected one reviewed head for PR {self.pr}")
-        ep, = episodes
-        if ep.pr_number != self.pr or not ep.reviewed_head_sha.startswith(self.head):
-            raise ValueError(f"Requested {self.pr}@{self.head}, release has {ep.pr_number}@{ep.reviewed_head_sha}")
+    async def inspect(self, payload, ep, dataset, scaffold, *, inputs):
         task_config = scaffold.task_config_overrides or {}
         if (dataset.design != "whole_pr" or scaffold.scaffold_type != "claude_code"
                 or scaffold.batch_preamble != "plain" or scaffold.workspace_environment
                 or set(scaffold.tools) != {"Read", "Grep", "Glob"} or task_config.get("system_prompt_file")
                 or task_config.get("context_file") or scaffold.execution.sample_count != 1):
             raise ValueError("The profile differs from the standard single-session whole-PR contract")
-        payload, = payloads
         message, tools, record = await inspect_review(payload, dataset, scaffold, ep)
         expected = set(COMMON_TOOLS)
         run = {"run": dataset.run_name, "episodes": {str(self.pr): record}, "inputs": inputs,
@@ -91,7 +85,11 @@ class ReviewRequest:
             print(message)
             print(json.dumps(manifest, indent=2))
         else:
-            write_once(self.directory / "generation.json", pretty_json_bytes(manifest))
+            saved = self.directory / "generation.json"
+            if saved.is_file() and all("inputs" not in r for r in submissions.read(saved)["runs"].values()):
+                # Recorded before a named run kept its inputs; its run plan holds them instead.
+                run.pop("inputs")
+            write_once(saved, pretty_json_bytes(manifest))
             write_once(self.directory / "first-message.txt", message.encode())
 
 

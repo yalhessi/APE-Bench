@@ -81,7 +81,7 @@ async def capture(out, runs):
             raise ValueError(f"{name}: review generation is incomplete; resume the generation command")
         inputs = generation_inputs(name, run)
         if inputs["design"] != "whole_pr":
-            raise ValueError(f"{name}: run plan belongs to a different reviewer")
+            raise ValueError(f"{name}: generated with design {inputs['design']!r}, not a whole-PR review")
         search = "history_sha256" in run or arm == "history"
         if search:
             index = inputs["context_index_sha256"]
