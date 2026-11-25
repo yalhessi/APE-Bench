@@ -50,6 +50,7 @@ from .solo import (
     SoloReviewResult, SoloReviewTask,
 )
 from .structured import STRUCTURED_TASK_TYPE, StructuredReviewTask
+from .whole_pr import WholePRReviewTask
 from .structured_critic import CRITIC_TASK_TYPE, StructuredCriticTask
 from .filing_contract import FILING_TASK_TYPE, FilingContractTask
 
@@ -65,6 +66,7 @@ from .filing_contract import FILING_TASK_TYPE, FilingContractTask
 #: baseline and is never edited again; every other design is read against it.
 DESIGNS = {
     "solo": SoloReviewTask,
+    "whole_pr": WholePRReviewTask,
     "structured": StructuredReviewTask,
     "structured_critic": StructuredCriticTask,
     "filing_contract": FilingContractTask,
