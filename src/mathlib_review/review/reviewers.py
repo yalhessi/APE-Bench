@@ -53,7 +53,7 @@ class PreparedRun:
     manifest: dict
     inputs: dict
     run_name: str
-    #: The name already holds a record that keeps its inputs inside it (`holds_inline_inputs`).
+    #: The existing generation record keeps its inputs inside it.
     inline_inputs: bool
 
 
@@ -102,9 +102,16 @@ class ReviewRequest:
         saved = self.directory / "generation.json"
         if saved.is_file():
             held = submissions.read(saved)
-            if submissions.holds_inline_inputs(held):
+            held_run = held.get("runs", {}).get(self.reviewer, {})
+            if "inputs" in held_run:
                 run["inputs"] = inputs
                 inline = True
+                # Historical search records also named the ungranted Zulip corpus. Preserve its
+                # recorded digest while comparing every granted index pin against the live one.
+                old_index = held_run["inputs"].get("context_index_sha256", {})
+                if self.definition.history and "zulip_corpus" in old_index:
+                    index = {**inputs["context_index_sha256"], "zulip_corpus": old_index["zulip_corpus"]}
+                    run["inputs"] = {**inputs, "context_index_sha256": index}
             kept = {saved: pretty_json_bytes(manifest),
                     self.directory / "first-message.txt": message.encode()}
             if (self.directory / submissions.INPUTS_FILE).is_file():

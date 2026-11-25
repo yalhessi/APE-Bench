@@ -64,12 +64,6 @@ def check_attempt(attempt, expected):
 INPUTS_FILE = "inputs.json"
 
 
-def holds_inline_inputs(generation):
-    """Whether a generation record keeps its inputs inside itself, as the development branch
-    recorded them between 968c285e and 86bb0f88, rather than in `inputs.json`."""
-    return any("inputs" in run for run in generation.get("runs", {}).values())
-
-
 def record_inputs(out, name, inputs):
     """Record a named run's inputs before its reviewer is dispatched, beside its generation record.
 
@@ -93,7 +87,7 @@ def generation_inputs(out, name, run):
     """
     if (out / INPUTS_FILE).is_file():
         return read(out / INPUTS_FILE)[name]
-    if holds_inline_inputs({"runs": {name: run}}):
+    if "inputs" in run:
         return run["inputs"]
     plan = read(run_dir(name) / "run_plan.json")
     if plan["run_name"] != name:

@@ -350,21 +350,37 @@ def test_a_refused_resume_of_an_earlier_run_writes_nothing(checkout, provider, f
     assert provider.sessions == [alias]
 
 
-def test_an_accepted_run_recorded_with_inline_inputs_resumes(checkout, provider, monkeypatch):
+@pytest.mark.parametrize("reviewer", ["solo-v1", "pr-search-v1"])
+def test_an_accepted_run_recorded_with_inline_inputs_resumes(provider, frozen_history, monkeypatch, reviewer):
     alias = "inline-42184"
     out = submissions.review_directory(alias)
+    options = run_options(reviewer, alias)
     provider.reviews[alias] = {"findings": [], "message": "No changes requested.", "then": "kill"}
     with pytest.raises(InterruptedError, match="accepted"):
-        cli.main(run_options("solo-v1", alias))
+        cli.main(options)
     # The shape 968c285e..86bb0f88 recorded: the inputs inside the generation record itself.
     recorded = submissions.read(out / submissions.INPUTS_FILE)
     generation = submissions.read(out / "generation.json")
-    for run in generation["runs"].values():
-        run["inputs"] = recorded[run["run"]]
-    put(out / "generation.json", generation)
+    run = generation["runs"][reviewer]
+    run["inputs"] = recorded[run["run"]]
+    if reviewer == "pr-search-v1":
+        # Recorded in the real 86bb0f88 search preview, alongside the granted precedent index.
+        index = run["inputs"]["context_index_sha256"]
+        index["zulip_corpus"] = "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+    saved = out / "generation.json"
+    put(saved, generation)
+    before = saved.read_bytes()
     (out / submissions.INPUTS_FILE).unlink()
     refuse_new_sessions(monkeypatch)
-    assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
+    if reviewer == "pr-search-v1":
+        index["precedent_manifest"] = "0" * 64
+        put(saved, generation)
+        with pytest.raises(SystemExit) as refused:
+            cli.main([*options, "--resume"])
+        assert refused.value.code == 2 and not (out / "archive.json").exists()
+        saved.write_bytes(before)
+    assert cli.main([*options, "--resume"]) == 0
+    assert saved.read_bytes() == before and provider.sessions == [alias]
     assert not (out / submissions.INPUTS_FILE).exists()
     _, archive = submissions.saved_reviews(out)
     assert archive["records"][0]["findings"] == 0
