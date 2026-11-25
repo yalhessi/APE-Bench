@@ -76,7 +76,7 @@ class WholePRReviewTask(SoloReviewTask):
         if "precedent_search" in self.data.context_tools:
             raise ValueError("This review design offers either excerpt search or a delivered convention list")
         content = verified_text(config.context_file, config.context_file_sha256, "context_file")
-        rows = [json.loads(line) for line in content.splitlines() if line.strip()]
+        rows = [json.loads(line) for line in content.split("\n") if line.strip()]
         matches = [row for row in rows if row["pr_number"] == self.data.pr_number]
         if len(matches) != 1:
             raise ValueError(f"Expected one context row for PR {self.data.pr_number}, found {len(matches)}")

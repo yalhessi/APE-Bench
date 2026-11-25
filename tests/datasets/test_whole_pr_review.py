@@ -24,7 +24,7 @@ def reviewer(tmp_path, *, tools=(), context=None):
     overrides = {}
     if context is not None:
         path = tmp_path / "context.jsonl"
-        path.write_text(json.dumps(context) + "\n")
+        path.write_text(json.dumps(context, ensure_ascii=False) + "\n")
         overrides["context_file"] = str(path)
     task = create_task_from_data({
         "task_type": "lean_pr_review_v5_whole_pr", "task_id": "r", "pr_number": 12,
@@ -67,8 +67,9 @@ async def test_search_grant_and_delivered_lists_are_the_only_differences(tmp_pat
     assert set(common["submit_findings"]["properties"]) == {"findings", "message"}
     row = {"pr_number": 12, "episode_id": "ep", "reviewed_head_sha": "abc123", "sections": []}
     assert await first_message(reviewer(tmp_path, context=row)) == plain
-    row["sections"] = [{"title": "Conventions", "text": "An advisory convention."}]
-    assert await first_message(reviewer(tmp_path, context=row)) == plain + "\n\n## Conventions\n\nAn advisory convention."
+    convention = "An advisory convention with\u2028a Unicode line separator."
+    row["sections"] = [{"title": "Conventions", "text": convention}]
+    assert await first_message(reviewer(tmp_path, context=row)) == plain + "\n\n## Conventions\n\n" + convention
     with pytest.raises(ValueError, match="either excerpt search"):
         await first_message(reviewer(tmp_path, tools=["precedent_search"], context=row))
     row["reviewed_head_sha"] = "another"
