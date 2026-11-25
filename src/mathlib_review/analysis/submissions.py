@@ -5,6 +5,7 @@ import json
 import re
 from pathlib import Path
 
+from ape.orchestration.models import Sample
 from ape.orchestration.persistence import TaskStorage
 from src.mathlib_review.analysis import matching, probes
 from src.mathlib_review.io import jsonl_rows, pretty_json_bytes, sha256_bytes, sha256_file, write_once
@@ -106,6 +107,27 @@ def matcher_findings(raw):
             for f in raw["submitted_findings"]]
 
 
+def accepted_submission(sample, raw, directory):
+    accepted = sample.successful_attempt
+    if sample.sample_index != 0 or accepted is None or not raw or not raw["success"]:
+        raise ValueError(f"{directory}: no accepted submission for this sample")
+    if not isinstance(accepted.result, dict) or any(
+            accepted.result.get(k) != raw.get(k)
+            for k in ("pr_number", "episode_id", "submitted_findings", "review_message")):
+        raise ValueError(f"{directory}: task result differs from the accepted attempt's submission")
+    return accepted
+
+
+def run_evidence_names(directory, out, run, *, named):
+    """The trace when one exists, plus the run records written by this generation format."""
+    names = {f for f in ("context_trace.jsonl", "run_plan.json") if (directory / f).is_file()}
+    if not (out / INPUTS_FILE).is_file() and "inputs" not in run:
+        names.add("run_plan.json")
+    if not named:
+        names.add("run_manifest.json")
+    return names
+
+
 async def capture(out, runs):
     sources, records = {}, []
     generation = read(out / "generation.json")
@@ -127,28 +149,21 @@ async def capture(out, runs):
                 raise ValueError(f"{name}: the live search index differs from the generation plan")
         base = out / "submissions" / name
         findings = {}
-        files_to_keep = ["run_plan.json", "context_trace.jsonl"]
-        if not named:
-            files_to_keep.append("run_manifest.json")
-        run_files = {f: archive(run_dir(name) / f, base / f) for f in files_to_keep
-                     if (run_dir(name) / f).exists()}
+        run_files = {f: archive(run_dir(name) / f, base / f)
+                     for f in run_evidence_names(run_dir(name), out, run, named=named)}
         trace_file = run_dir(name) / "context_trace.jsonl"
         search_rows = [r for r in jsonl_rows(trace_file) if r["tool"] == "precedent_search"] if trace_file.exists() else []
         for task_dir in sorted(p for p in task_root.iterdir() if p.is_dir()):
             storage = TaskStorage(task_dir, task_dir.name)
             samples = await storage.load_all_samples()
             raw = await storage.load_task_result()
-            if set(samples) != {0} or samples[0].successful_attempt is None or not raw or not raw["success"]:
+            if set(samples) != {0}:
                 raise ValueError(f"{task_dir}: no accepted submission for this sample")
+            accepted = accepted_submission(samples[0], raw, task_dir)
             pr = str(raw["pr_number"])
             expected = run["episodes"][pr]
             if pr in findings or raw["episode_id"] != expected["episode_id"]:
                 raise ValueError(f"{task_dir}: duplicate or incorrect review episode")
-            accepted = samples[0].successful_attempt
-            if not isinstance(accepted.result, dict) or any(
-                    accepted.result.get(k) != raw.get(k)
-                    for k in ("episode_id", "submitted_findings", "review_message")):
-                raise ValueError(f"{task_dir}: task result differs from the accepted attempt's submission")
             if (accepted.max_turns, accepted.token_limit, accepted.cost_limit) != (
                     expected["max_turns"], expected["token_cap"], expected["cost_cap"]):
                 raise ValueError(f"{task_dir}: live review budget differs from the preflight")
@@ -206,7 +221,7 @@ def prepare_reading(out, sources, prs, question_form, *, reference, name, readin
     return plan, folder
 
 
-def check_archived_run(out, arm, run, artifact):
+def check_archived_run(out, arm, run, artifact, *, named):
     """Check the matcher's source and its evidence against the same run and reviewed episodes."""
     base = out / "submissions" / run["run"]
     source = artifact["sources"][arm]
@@ -221,6 +236,7 @@ def check_archived_run(out, arm, run, artifact):
     if covered != sorted(run["episodes"]):
         raise ValueError(f"{out}: archive records for {arm} cover PRs {covered}, "
                          f"not the generated {sorted(run['episodes'])}")
+    run_files = run_evidence_names(base, out, run, named=named)
     findings = {}
     for record in records:
         pr = record["pr"]
@@ -237,6 +253,8 @@ def check_archived_run(out, arm, run, artifact):
             missing.append(TRANSCRIPT_PREFIX + "*.jsonl")
         if missing:
             raise ValueError(f"{out}: the archive record for PR {pr} lacks {missing}")
+        if set(record["run_files"]) != run_files:
+            raise ValueError(f"{out}: archived run evidence for {arm} must list {sorted(run_files)}")
         for directory, kept_files in ((dest, files), (base, record["run_files"])):
             for name, kept in kept_files.items():
                 expected_path = directory / name
@@ -246,11 +264,13 @@ def check_archived_run(out, arm, run, artifact):
                     what = "accepted task result" if name == "task_result.json" else f"archived {name}"
                     raise ValueError(f"{out}: {what} changed")
         raw = read(dest / "task_result.json")
-        if str(raw["pr_number"]) != pr or raw["episode_id"] != episode["episode_id"] or not raw["success"]:
+        sample = Sample.model_validate_json((dest / "sample.json").read_bytes())
+        accepted_submission(sample, raw, dest)
+        if str(raw["pr_number"]) != pr or raw["episode_id"] != episode["episode_id"]:
             raise ValueError(f"{out}: accepted task result differs from the generated episode for {arm} PR {pr}")
         findings[pr] = matcher_findings(raw)
         if (record["findings"] != len(findings[pr])
-                or record["attempts"] != len(read(dest / "sample.json")["attempts"])
+                or record["attempts"] != len(sample.attempts)
                 or record["search_calls"] != precedent_calls(read(dest / "containment_audit.json"))):
             raise ValueError(f"{out}: archive counts differ from the accepted evidence for {arm} PR {pr}")
     if read(path) != findings:
@@ -278,7 +298,7 @@ def saved_reviews(out, *, recover=False):
     if any(record["strategy"] not in arms for record in artifact["records"]):
         raise ValueError(f"{out}: archived record belongs to an unplanned strategy")
     for arm, run in generation["runs"].items():
-        check_archived_run(out, arm, run, artifact)
+        check_archived_run(out, arm, run, artifact, named="reviewer" in generation)
     return generation, artifact
 
 

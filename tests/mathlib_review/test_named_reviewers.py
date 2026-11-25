@@ -15,7 +15,7 @@ import pytest
 from ape.orchestration.persistence import TaskStorage
 from ape.tasks.lean_tasks.formal_math.review.whole_pr import SubmittedFinding
 from src.mathlib_review.analysis import submissions
-from src.mathlib_review.io import pretty_json_bytes
+from src.mathlib_review.io import pretty_json_bytes, sha256_file
 from src.mathlib_review.judge.ask_matching import render_matcher_prompt
 from src.mathlib_review.review import cli, reviewers, runner
 
@@ -224,6 +224,7 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
     ("sample.json", "archived sample.json changed"),
     ("first-message.txt", "archived first message changed"),
     ("episode_id", "different run or episode"),
+    ("other accepted result", "accepted attempt's submission"),
     ("records", "cover PRs []"),
     ("evidence list", "lacks ['claude_code_session.json', 'containment_audit.json', 'task_result.json', "
                       "'sample.json', 'claude_code_conversation_*.jsonl']")])
@@ -239,6 +240,14 @@ def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper, 
         (out / tamper).write_text("A different first message.")
     elif tamper == "episode_id":
         archive["records"][0]["episode_id"] = "another reviewed head"
+        put(path, archive)
+    elif tamper == "other accepted result":
+        sample_file = archive["records"][0]["files"]["sample.json"]
+        target = Path(sample_file["path"])
+        sample = submissions.read(target)
+        sample["attempts"][0]["result"]["submitted_findings"] = []
+        put(target, sample)
+        sample_file["sha256"] = sha256_file(target)
         put(path, archive)
     elif tamper == "records":
         archive["records"] = []
@@ -443,10 +452,14 @@ def test_resuming_an_archived_review_from_before_the_inputs_record_changes_nothi
     alias = "archived-42184"
     out = submissions.review_directory(alias)
     assert cli.main(run_options("solo-v1", alias)) == 0
-    # The same review as the earlier code archived it: no inputs record and no digest of one.
+    # The earlier format archived its run plan and had no separate inputs record.
     (out / submissions.INPUTS_FILE).unlink()
     archive = submissions.read(out / "archive.json")
     archive.pop("inputs_sha256")
+    record, = archive["records"]
+    plan = out / "submissions" / record["run"] / "run_plan.json"
+    put(plan, {"run_name": record["run"], "evaluation_settings": {"design": "whole_pr"}})
+    record["run_files"][plan.name] = {"path": str(plan), "sha256": sha256_file(plan)}
     put(out / "archive.json", archive)
     before = sorted((p.relative_to(out), p.read_bytes()) for p in out.rglob("*") if p.is_file())
     assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
@@ -465,6 +478,10 @@ def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, p
     provider.reviews[alias] = {**saved_42184_reviews(checkout)["guided"], "then": stop}
     with pytest.raises(InterruptedError, match="accepted"):
         cli.main(opts)
+    run = submissions.read(submissions.review_directory(alias) / "generation.json")["runs"]["pr-search-v1"]["run"]
+    trace = runner.run_dir(run) / "context_trace.jsonl"
+    trace.parent.mkdir(parents=True, exist_ok=True)
+    trace.write_text(json.dumps({"tool": "declaration_search"}) + "\n")
     # A Zulip index the reviewer was never granted appears, and the session credential is gone.
     Path("zulip.sqlite3").write_text("")
     monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("zulip.sqlite3").resolve()))
@@ -473,8 +490,15 @@ def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, p
     refuse_new_sessions(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     assert provider.sessions == [alias]
-    _, archive = submissions.saved_reviews(submissions.review_directory(alias))
+    out = submissions.review_directory(alias)
+    _, archive = submissions.saved_reviews(out)
     assert archive["records"][0]["findings"] == 2
+    del archive["records"][0]["run_files"]["context_trace.jsonl"]
+    put(out / "archive.json", archive)
+    copy_reference(checkout)
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["score", "--of", alias, "--using", "round1-requests-v1"])
+    assert refused.value.code == 2
 
 
 def refuse_new_sessions(monkeypatch):

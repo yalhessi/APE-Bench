@@ -87,16 +87,25 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
         episode = {"episode_id": "42184-round1", "message": str(prompt), "message_sha256": sha256_file(prompt)}
         runs[arm] = {"run": arm, "episodes": {"42184": episode}}
         files = {}
+        raw = {"pr_number": 42184, "episode_id": episode["episode_id"], "success": True, "submitted_findings": []}
+        attempt = {"attempt_id": 1, "path": "attempt-1", "status": "success", "max_turns": 2, "cost_limit": 1.5,
+                   "created_at": "2026-11-25", "result": raw}
+        sample = {"sample_id": "s", "sample_index": 0, "task_global_index": arm,
+                  "created_at": "2026-11-25", "updated_at": "2026-11-25", "attempts": [attempt]}
         evidence = {"claude_code_session.json": {}, "containment_audit.json": {"transcripts": []},
-                    "claude_code_conversation_1.jsonl": {}, "sample.json": {"attempts": [{}]},
-                    "task_result.json": {"pr_number": 42184, "episode_id": episode["episode_id"],
-                                         "success": True, "submitted_findings": []}}
+                    "claude_code_conversation_1.jsonl": {}, "sample.json": sample, "task_result.json": raw}
         for name, content in evidence.items():
             kept = base / "42184" / name
             put(kept, content)
             files[name] = {"path": str(kept), "sha256": sha256_file(kept)}
+        run_files = {}
+        for name, content in (("run_manifest.json", {"completion_status": "complete"}),
+                              ("run_plan.json", {"run_name": arm})):
+            kept = base / name
+            put(kept, content)
+            run_files[name] = {"path": str(kept), "sha256": sha256_file(kept)}
         records.append({"strategy": arm, "pr": "42184", "run": arm, "episode_id": episode["episode_id"],
-                        "attempts": 1, "findings": 0, "search_calls": 0, "run_files": {}, "files": files})
+                        "attempts": 1, "findings": 0, "search_calls": 0, "run_files": run_files, "files": files})
     put(out / "generation.json", {"fixture": False, "runs": runs})
     put(out / "archive.json", {"generation_sha256": sha256_file(out / "generation.json"), "sources": sources,
                                "records": records,
@@ -107,3 +116,10 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
     assert len(plans) == 2 and plans[0].packets == plans[1].packets
     assert plans[0].identity.rubric_sha256 != plans[1].identity.rubric_sha256
     assert not (tmp_path / "conventions").exists()
+    # An incomplete evidence list must not silently remove a run file from verification.
+    receipt = measure.read(out / "archive.json")
+    del receipt["records"][0]["run_files"]["run_manifest.json"]
+    put(out / "archive.json", receipt)
+    with pytest.raises(SystemExit) as refused:
+        main(["study", "score", str(config), "--sample", "2"])
+    assert refused.value.code == 2
