@@ -36,19 +36,26 @@ def check_artifact(release_dir: Path, artifact) -> None:
         )
 
 
-def check_released_episodes(release_dir: Path) -> None:
-    """When a release carries its manifest, its episode file must be the one the manifest hashed.
+#: The episode file a reviewer's task data is built from.
+EPISODES_PATH = "input/episodes.jsonl"
 
-    A release of visible inputs alone has no manifest, and its rows are checked one by one
-    (`validate_episode`).
+
+def check_released_episodes(release_dir: Path) -> None:
+    """When a release carries its manifest, the episode file read must be the one it hashed.
+
+    Bound to `EPISODES_PATH`, the file the reviewer's input is read from, so a manifest that
+    hashes some other file cannot vouch for it. A release of visible inputs alone has no
+    manifest, and its rows are checked one by one (`validate_episode`).
     """
     manifest_path = release_dir / "manifest.json"
     if not manifest_path.is_file():
         return
     manifest = DatasetManifest.model_validate_json(manifest_path.read_text())
-    for artifact in manifest.input_artifacts:
-        if artifact.schema_version == "episode1":
-            check_artifact(release_dir, artifact)
+    hashed = [a for a in manifest.input_artifacts if a.path == EPISODES_PATH]
+    if not hashed:
+        raise ValueError(f"{release_dir}: the manifest does not hash {EPISODES_PATH}, the file reviewers read")
+    for artifact in hashed:
+        check_artifact(release_dir, artifact)
 
 
 def validate_episode(episode: ReviewEpisodeInput) -> None:

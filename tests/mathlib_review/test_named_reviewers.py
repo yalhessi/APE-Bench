@@ -527,6 +527,26 @@ def test_a_release_manifest_refuses_an_episode_rewritten_with_another_prs_patch(
     assert refused.value.code == 2 and "input/episodes.jsonl" in capsys.readouterr().err
 
 
+def test_the_manifest_must_hash_the_episode_file_the_reviewer_reads(checkout, provider, capsys):
+    source = checkout / "inputs/probes/probe-2026-07-08-v1"
+    release = Path("renamed")
+    (release / "input").mkdir(parents=True)
+    shutil.copy(source / "input/episodes.jsonl", release / "input/renamed.jsonl")
+    manifest = json.loads((source / "manifest.json").read_text())
+    for artifact in manifest["input_artifacts"]:
+        if artifact["path"] == "input/episodes.jsonl":
+            artifact["path"] = "input/renamed.jsonl"
+    (release / "manifest.json").write_text(json.dumps(manifest))
+    rows = episode_rows(checkout)
+    edited = {**rows[42184], "title": {**rows[42184]["title"], "text": "A title the author never wrote"}}
+    (release / "input/episodes.jsonl").write_text(
+        "".join(json.dumps(edited if pr == 42184 else row) + "\n" for pr, row in rows.items()))
+    provider.release = release.resolve()
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["plan", "--reviewer", "solo-v1", "--case", "42184@c5474cb4"])
+    assert refused.value.code == 2 and "input/episodes.jsonl" in capsys.readouterr().err
+
+
 def test_a_case_names_exactly_one_reviewed_episode(checkout, provider, capsys):
     source = checkout / "inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl"
     (episode,) = [json.loads(line) for line in source.read_text().split("\n")

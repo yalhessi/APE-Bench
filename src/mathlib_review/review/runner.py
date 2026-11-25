@@ -74,7 +74,7 @@ from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
 from src.mathlib_review.evidence.chain import collect_supported, reviewed_workspaces
 from src.mathlib_review.review.finalize import finalize
 from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
-from src.mathlib_review.release.validate import check_released_episodes, validate_episode
+from src.mathlib_review.release.validate import EPISODES_PATH, check_released_episodes, validate_episode
 from src.mathlib_review.review.preflight import (
     assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
 )
@@ -432,7 +432,7 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
     """
 
     check_released_episodes(Path(release))
-    episodes = load_jsonl(Path(release) / "input/episodes.jsonl", ReviewEpisodeInput)
+    episodes = load_jsonl(Path(release) / EPISODES_PATH, ReviewEpisodeInput)
     found = [ep for ep in episodes
              if ep.pr_number == pr_number and ep.reviewed_head_sha.startswith(head.lower())]
     if not found:
