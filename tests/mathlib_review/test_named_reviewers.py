@@ -20,6 +20,8 @@ from src.mathlib_review.judge.ask_matching import render_matcher_prompt
 from src.mathlib_review.review import cli, reviewers, runner
 
 PROBE = Path("results/pr_review_v5/probes/named-episode-review-2026-11-25")
+#: The orchestrator's own run, kept before any test replaces it with the local provider.
+APE_RUN = runner.TaskOrchestrator.run
 
 
 def put(path, value):
@@ -110,10 +112,12 @@ def provider(checkout, monkeypatch):
                 for n in range(count)]})
             return SimpleNamespace(task_results=[])
         submitted = [SubmittedFinding(**finding) for finding in review.get("findings", [])]
-        raw = {"pr_number": task.data.pr_number, "episode_id": task.data.episode_id, "success": True,
-               "submitted_findings": [f.model_dump(exclude_unset=True) for f in submitted],
-               "findings": [f.recorded() for f in submitted],
-               "review_message": review.get("message", "No changes requested.")}
+        # The result the submission tool builds, through the task's own result class.
+        raw = task.create_result(
+            success=True, score=1.0, pr_number=task.data.pr_number,
+            review_message=review.get("message", "No changes requested."),
+            findings=[f.recorded() for f in submitted],
+            submitted_findings=[f.model_dump(exclude_unset=True) for f in submitted]).model_dump(mode="json")
         put(folder / "sample.json", {**sample, "attempts": [
             {"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
              **limits, "result": raw}]})
@@ -152,7 +156,7 @@ def episodes_only_release(checkout, *extra):
     return release.resolve()
 
 
-def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, provider):
+def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, provider, monkeypatch):
     alias = "guided-42184-a"
     out = submissions.review_directory(alias)
     opts = run_options("solo-v1", alias)
@@ -161,6 +165,7 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         cli.main(opts)
     assert provider.sessions == [alias] and not (out / "archive.json").exists()
     # The resumed run archives the accepted session that is already on disk.
+    recover_through_ape(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     assert cli.main([*opts, "--resume"]) == 0
     assert provider.sessions == [alias]
@@ -177,6 +182,7 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         cli.main([*run_options("solo-v1", alias, "0000000"), "--resume"])
     assert wrong_head.value.code == 2
     second = "solo-42184-b"
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", provider)
     assert cli.main(run_options("solo-v1", second)) == 0
     copy_reference(checkout)
     score = ["score", "--of", alias, "--using"]
@@ -310,10 +316,40 @@ def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, p
         raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
 
     monkeypatch.setattr(runner, "assert_ready", no_credential)
+    recover_through_ape(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     assert provider.sessions == [alias]
     _, archive = submissions.saved_reviews(submissions.review_directory(alias))
     assert archive["records"][0]["findings"] == 2
+
+
+def recover_through_ape(monkeypatch):
+    """Resume through the orchestrator itself, with any new session refused."""
+    async def no_session(self, *args, **kwargs):
+        raise AssertionError("recovery scheduled a review session")
+
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", APE_RUN)
+    monkeypatch.setattr(runner.TaskOrchestrator, "_execute_jobs", no_session)
+
+
+def test_recovery_completes_the_outcome_record_an_interrupted_worker_left(checkout, provider, monkeypatch):
+    alias = "outcome-42184"
+    out = submissions.review_directory(alias)
+    opts = run_options("solo-v1", alias)
+    # Killed between writing the accepted task result and its outcome record.
+    provider.reviews[alias] = {"findings": [], "message": "No changes requested.", "then": "kill"}
+    with pytest.raises(InterruptedError, match="accepted"):
+        cli.main(opts)
+    tasks = Path(submissions.read(out / "generation.json")["runs"]["solo-v1"]["tasks_dir"])
+    (task_dir,) = [p for p in tasks.iterdir() if p.is_dir()]
+    assert (task_dir / "task_result.json").is_file() and not (task_dir / "task_outcome.json").exists()
+
+    recover_through_ape(monkeypatch)
+    assert cli.main([*opts, "--resume"]) == 0
+    outcome = submissions.read(task_dir / "task_outcome.json")
+    assert outcome["has_result"] is True
+    assert provider.sessions == [alias]
+    submissions.saved_reviews(out)
 
 
 def test_a_session_lost_to_system_errors_runs_again_on_resume(checkout, provider, capsys):

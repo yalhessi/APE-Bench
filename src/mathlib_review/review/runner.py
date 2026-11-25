@@ -2420,10 +2420,13 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
     tasks = [create_task_from_data(item, scaffold, task_config_overrides=scaffold.task_config_overrides)
              for item in data]
     if resume and await _accepted_on_disk(tasks_dir, tasks):
-        # Interrupted after the session was accepted and before it was archived.
+        # Interrupted after the session was accepted and before it was archived. The orchestrator
+        # finishes the task's publication, its outcome record included, and schedules nothing,
+        # since the task has its result; no session is started, so none of its resources is needed.
         logger.info("%s: the accepted session is on disk; archiving it without another session",
                     dataset.run_name)
-        return None
+        return await TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
+                                      logger=logger).run(tasks)
     # Everything from here on is needed only to run a session.
     assert_ready(scaffold, logger, enforce=True)
     if resume and not any(path.exists() for path in scratch):
