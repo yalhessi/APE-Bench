@@ -208,6 +208,31 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         submissions.saved_reviews(out)
 
 
+@pytest.mark.parametrize("tamper", ["containment_audit.json", "claude_code_session.json", "transcript",
+                                    "sample.json", "records"])
+def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper):
+    alias = "guided-42184"
+    provider.reviews[alias] = saved_42184_reviews(checkout)["guided"]
+    assert cli.main(run_options("solo-v1", alias)) == 0
+    copy_reference(checkout)
+    out = submissions.review_directory(alias)
+    path = out / "archive.json"
+    archive = submissions.read(path)
+    if tamper == "records":
+        archive["records"] = []
+        put(path, archive)
+    else:
+        files = archive["records"][0]["files"]
+        name = next(n for n in files if n.startswith("claude_code_conversation")) if tamper == "transcript" else tamper
+        target = Path(files[name]["path"])
+        target.write_text(json.dumps({"clean": False, "usable": False}) if tamper == "containment_audit.json"
+                          else target.read_text() + " ")
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["score", "--of", alias, "--using", "round1-requests-v1"])
+    assert refused.value.code == 2
+    assert not Path(".ape/review-comparisons").exists()
+
+
 def test_empty_mixed_and_failed_reviews_have_distinct_outcomes(checkout, provider, capsys):
     guided = saved_42184_reviews(checkout)["guided"]
     question = {"claim": "The description does not say why the NeBot instance was needed.",

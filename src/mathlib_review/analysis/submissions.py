@@ -189,11 +189,16 @@ def saved_reviews(out, *, recover=False):
     for arm, digest in artifact["projection_sha256"].items():
         if sha256_file(Path(artifact["sources"][arm]["path"])) != digest:
             raise ValueError(f"{arm}: archived matcher input changed")
-    if "reviewer" in generation:
-        for record in artifact["records"]:
-            original = record["files"]["task_result.json"]
-            if sha256_file(Path(original["path"])) != original["sha256"]:
-                raise ValueError(f"{out}: accepted task result changed")
+    for arm, run in generation["runs"].items():
+        covered = sorted(r["pr"] for r in artifact["records"] if r["strategy"] == arm)
+        if covered != sorted(run["episodes"]):
+            raise ValueError(f"{out}: archive records for {arm} cover PRs {covered}, "
+                             f"not the generated {sorted(run['episodes'])}")
+    for record in artifact["records"]:
+        for name, kept in {**record["files"], **record["run_files"]}.items():
+            if sha256_file(Path(kept["path"])) != kept["sha256"]:
+                what = "accepted task result" if name == "task_result.json" else f"archived {name}"
+                raise ValueError(f"{out}: {what} changed")
     return generation, artifact
 
 

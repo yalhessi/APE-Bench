@@ -81,7 +81,15 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
         put(path, {"42184": []})
         sources[arm] = {"kind": "findings_file", "path": str(path)}
     put(out / "generation.json", {"fixture": False, "runs": {arm: {"episodes": {"42184": {}}} for arm in sources}})
+    records = []
+    for arm in sources:
+        # One accepted task result per arm and head, as `capture` records it.
+        result = out / arm / "42184" / "task_result.json"
+        put(result, {"pr_number": 42184, "success": True, "submitted_findings": []})
+        records.append({"strategy": arm, "pr": "42184", "run_files": {},
+                        "files": {"task_result.json": {"path": str(result), "sha256": sha256_file(result)}}})
     put(out / "archive.json", {"generation_sha256": sha256_file(out / "generation.json"), "sources": sources,
+                               "records": records,
                                "projection_sha256": {a: sha256_file(Path(v["path"])) for a, v in sources.items()}})
     for flags in ([], ["--question-form"]):
         assert main(["study", "score", str(config), "--sample", "2", *flags]) == 0
