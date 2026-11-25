@@ -436,7 +436,8 @@ def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict
             conds.setdefault(condition(s), []).append(s)
         out[m] = {
             "reach": reach,
-            "condition_reach": {c: sum(reach[s] for s in ss) / len(ss) for c, ss in conds.items()},
+            "condition_reach": {c: (sum(reach[s] for s in ss) / len(ss) if items else None)
+                                for c, ss in conds.items()},
             "stable": {c: sorted(cid for pr, cid in items if all(hit(pr, cid, s) for s in ss))
                        for c, ss in conds.items()},
             "union": {c: sorted(cid for pr, cid in items if any(hit(pr, cid, s) for s in ss))
