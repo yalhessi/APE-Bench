@@ -23,9 +23,7 @@ DEFAULT_STRATEGIES = ("solo", "history", "automatic", "exact")
 
 
 class ReviewedCases(NamedTuple):
-    dataset: runner.V5DatasetConfig
     release: dict
-    units: list
     episodes: list
     cutoffs: dict
 
@@ -84,14 +82,14 @@ class ReviewStudy(BaseModel):
         if ds.design != "whole_pr" or ds.release != reference.release or not self.heads.keys() <= set(reference.pr_numbers):
             raise ValueError("A convention study needs whole_pr and a reference set covering the same reviewed cases")
         release = runner.load_release(ds)
-        units, episodes = runner.select_units_and_episodes(ds, release)
+        _, episodes = runner.select_units_and_episodes(ds, release)
         if {e.pr_number: e.reviewed_head_sha for e in episodes} != self.heads or len(episodes) != len(self.heads):
             raise ValueError("Release does not match the study's pinned heads")
         cutoffs = runner.cutoffs_by_episode(episodes)
         cutoff = RetrievalGate(as_of=self.history_before).cutoff_epoch
         if cutoff is None or any(cutoff > RetrievalGate(as_of=date).cutoff_epoch for date in cutoffs.values()):
             raise ValueError("History extends beyond a reviewed revision")
-        return ReviewedCases(ds, release, units, episodes, cutoffs)
+        return ReviewedCases(release, episodes, cutoffs)
 
 
 ADVICE = "Use these conventions when they apply. Decide whether any change is worth asking the author to make."
@@ -114,7 +112,7 @@ def context_rows(episodes, rules, choices):
 
 
 async def generation_plan(study, out, sample, fixture, cases, products):
-    base, release, units, episodes, cutoffs = cases
+    release, episodes, cutoffs = cases
     await runner.assert_reviewed_workspaces_prebuilt(episodes, required=True)
     history = study.output / "history"
     conventions = study.output / "conventions"
@@ -139,7 +137,6 @@ async def generation_plan(study, out, sample, fixture, cases, products):
     if not fixture and study.selectors:
         manifest["convention_files"] = {f: sha256_file(conventions / f)
                                         for f in ("catalogue.json", *(s + ".json" for s in study.selectors))}
-    agenda, _ = runner.agenda_for_release(base, release, units, episodes, sorted(study.heads))
     base_messages, common_signatures = {}, None
     commands = []
     # Existing manifests keep their original opaque run names. New samples also bind
@@ -168,7 +165,7 @@ async def generation_plan(study, out, sample, fixture, cases, products):
                                                "run_name": name}}
         ds, scaffold, _ = runner.load_run(study.reviewer, run_options)
         runner.pin_input_files(scaffold)
-        tasks = runner._solo_task_data(agenda, episodes, ds, cutoffs, runner.run_dir(name) /
+        tasks = runner.review_task_data(episodes, ds, cutoffs, runner.run_dir(name) /
                                        "context_trace.jsonl", release["graphs"])
         record = {"run": name, "overrides": overrides, "episodes": {}}
         for payload in tasks:

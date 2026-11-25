@@ -29,7 +29,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import ConfigDict, BaseModel, Field, field_validator
+from pydantic import ConfigDict, BaseModel, Field, field_validator, model_validator
 
 from ape.orchestration import TaskOrchestrator
 from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
@@ -49,7 +49,9 @@ from src.mathlib_review.io import (
     jsonl_bytes,
     jsonl_rows,
     load_jsonl,
+    load_jsonl_optional,
     pretty_json_bytes,
+    sealed_model,
     sha256_bytes,
     sha256_file,
     write_once,
@@ -76,7 +78,7 @@ from src.mathlib_review.review.preflight import (
     assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
 )
 from src.mathlib_review.schema.review import (
-    ROUTING_MODES, ArmResponse, DelegationRecord, V5RunManifest, V5RunPlan,
+    ROUTING_MODES, ArmResponse, DelegationRecord, ReviewAgenda, V5RunManifest, V5RunPlan, WholePRTarget,
 )
 from src.mathlib_review.review.trace import reconcile
 from src.mathlib_review.run_config import load_run as _load_run
@@ -97,7 +99,13 @@ class V5DatasetConfig(BaseModel):
     release: Path
     #: The modification inventory is a treatment artifact, not part of a release, and it is
     #: what specialist eligibility is enumerated from.
-    modification_inventory: Path
+    modification_inventory: Optional[Path] = None
+
+    @model_validator(mode="after")
+    def _inventory_for_arms(self):
+        if self.design != "whole_pr" and self.modification_inventory is None:
+            raise ValueError("modification_inventory is required for the specialist agenda")
+        return self
     #: The frozen deterministic execution release, so the non-model arm is identical in all
     #: three modes. Optional: without it the comparison is model-arms-only, which is a
     #: narrower claim but still a clean one.
@@ -365,32 +373,46 @@ def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
     return _load_run(config_path, V5DatasetConfig, overrides)
 
 
-def load_release(dataset: V5DatasetConfig):
+def load_release(dataset: V5DatasetConfig, *, arm_bench: bool = False):
     release = dataset.release
-    return {
-        "units": load_jsonl(release / "derived/work_units.jsonl", ReviewWorkUnit),
+    whole_pr = dataset.design == "whole_pr" and not arm_bench
+    load_projection = load_jsonl_optional if whole_pr else load_jsonl
+    records = {
+        "units": load_projection(release / "derived/work_units.jsonl", ReviewWorkUnit),
         "episodes": load_jsonl(release / "input/episodes.jsonl", ReviewEpisodeInput),
-        "graphs": load_jsonl(release / "derived/change_graphs.jsonl", ChangeGraph),
-        "release_prompts": load_jsonl(release / "derived/rendered_prompts.jsonl", RenderedPrompt),
-        "modifications": load_jsonl(dataset.modification_inventory, ModificationRecord),
+        "graphs": load_projection(release / "derived/change_graphs.jsonl", ChangeGraph),
     }
+    if not whole_pr:
+        if dataset.modification_inventory is None:
+            raise ValueError("The arm bench requires a modification_inventory")
+        records["release_prompts"] = load_jsonl(release / "derived/rendered_prompts.jsonl", RenderedPrompt)
+        records["modifications"] = load_jsonl(dataset.modification_inventory, ModificationRecord)
+    return records
 
 
 def select_units_and_episodes(dataset: V5DatasetConfig, release: Dict[str, Any]):
-    """The work units a config selects, and the episodes those units belong to.
+    """Select reviewed episodes and the work units available for this run.
 
     One function because two things must agree on it: the run, which schedules the units, and
     the reviewed-workspace prebuild, which must build a workspace for exactly the episodes the
-    run will verify in. `work_unit_limit` can drop a PR entirely, so the episode set follows
-    from the unit set rather than from `pr_numbers` directly.
+    run will verify in. Whole-PR review selects episodes directly. Its optional work-unit
+    limit bounds downstream anchoring. Historical designs select episodes through their units.
     """
 
     units = release["units"]
-    if dataset.pr_numbers:
-        wanted = set(dataset.pr_numbers)
+    wanted = set(dataset.pr_numbers)
+    if wanted:
         units = [unit for unit in units if unit.pr_number in wanted]
     if dataset.work_unit_limit:
         units = units[:dataset.work_unit_limit]
+    if dataset.design == "whole_pr":
+        episodes = [ep for ep in release["episodes"] if not wanted or ep.pr_number in wanted]
+        missing = wanted - {ep.pr_number for ep in episodes}
+        if missing:
+            raise ValueError(f"No reviewed episode for requested PRs: {sorted(missing)}")
+        if not episodes:
+            raise ValueError("Release contains no reviewed episodes")
+        return units, episodes
     if not units:
         raise ValueError("no work units selected; check dataset.pr_numbers")
     selected_prs = {unit.pr_number for unit in units}
@@ -533,21 +555,15 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
 def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str],
                     trace_path: Path, graphs=(), stage_rows: Optional[Dict[str, Any]] = None,
                     ) -> List[Dict[str, Any]]:
-    """`solo`: one agent per episode, handed the whole PR and no work units.
+    """Historical solo comparisons use the episodes covered by the specialist agenda."""
+    if dataset.design != "whole_pr":
+        wanted = {item.episode_id for item in agenda.proposals}
+        episodes = [ep for ep in episodes if ep.episode_id in wanted]
+    return review_task_data(episodes, dataset, cutoff_by_episode, trace_path, graphs, stage_rows)
 
-    Built from the episodes rather than from `agenda.proposals`, because the proposals are the
-    decomposition and this condition exists to do without it. The agenda is still built and
-    still sealed -- it is what makes `agenda_report.json` scope identically to the `lead` run
-    on the same config, which is the denominator the judge corroborates against.
 
-    The retrieval cutoff is carried even though no work unit is: it is gold-free and it is what
-    stops a retrieval tool answering from after the review happened.
-
-    Which per-PR reviewer runs is `dataset.design`: the task type, the task-id prefix and the
-    design's own payload come from the registered class, so this function has no design
-    branch. For `solo` the payload is exactly what it was before designs existed.
-    """
-
+def review_task_data(episodes, dataset, cutoff_by_episode, trace_path, graphs=(), stage_rows=None):
+    """Build one reviewer input per selected episode using the configured design."""
     from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 
     design_cls = DESIGNS[dataset.design]
@@ -556,11 +572,8 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
     if dataset.solo_precedent_index is not None:
         source = {"precedent_index_dir": str(dataset.solo_precedent_index.resolve()),
                   "precedent_manifest_sha256": dataset.solo_precedent_manifest_sha256}
-    wanted = {item.episode_id for item in agenda.proposals}
     data = []
     for episode in sorted(episodes, key=lambda item: item.episode_id):
-        if episode.episode_id not in wanted:
-            continue
         data.append({
             "task_type": design_cls.task_type,
             "task_id": f"pr5{dataset.design}_{episode.episode_id.replace(':', '_')}",
@@ -792,10 +805,6 @@ def solo_responses(results, graphs, units, logger=None):
             # the agent.
             continue
         graph = graph_by_episode.get(episode_id)
-        if graph is None:
-            if logger:
-                logger.warning("solo: no change graph for episode %s — not anchored", episode_id)
-            continue
         by_unit, rows = anchor_submitted_findings(
             raw.get("findings") or [], graph=graph,
             units=units_by_episode.get(episode_id, []), logger=logger)
@@ -1180,7 +1189,7 @@ def assert_coverage_is_reachable(dataset, report, logger) -> None:
     from arms that looked and missed.
     """
 
-    if dataset.generalist_floor:
+    if dataset.generalist_floor or getattr(dataset, "design", None) == "whole_pr":
         return
     uncovered = report.get("units_without_specialist") or []
     if not uncovered:
@@ -2035,6 +2044,17 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
 
 
 def agenda_for_release(dataset, release, units, episodes, selected_prs):
+    if getattr(dataset, "design", None) == "whole_pr":
+        targets = [WholePRTarget(
+            episode_id=ep.episode_id, pr_number=ep.pr_number, reviewed_head_sha=ep.reviewed_head_sha,
+            input_sha256=sha256_bytes(canonical_json_bytes(ep.model_dump(mode="json"))),
+            work_unit_ids=sorted(u.work_unit_id for u in units if u.episode_id == ep.episode_id),
+        ) for ep in sorted(episodes, key=lambda e: e.episode_id)]
+        return sealed_model(
+            ReviewAgenda, agenda_id=f"agenda:{dataset.run_name}", run_name=dataset.run_name,
+            release=str(dataset.release), routing_mode="solo", whole_pr_targets=targets,
+            arms=[], proposals=[], scheduler_version="whole-pr/1", renderer_version="whole-pr/1",
+        ), {}
     return build_agenda(
         run_name=dataset.run_name, routing_mode=dataset.routing_mode,
         release=dataset.release, modification_inventory=dataset.modification_inventory,
@@ -2066,7 +2086,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
 
     release = load_release(dataset)
     units, episodes = select_units_and_episodes(dataset, release)
-    selected_prs = sorted({unit.pr_number for unit in units})
+    selected_prs = sorted({episode.pr_number for episode in episodes})
+    review_count = len(episodes) if dataset.design == "whole_pr" else len(selected_prs)
     stage_rows = stage_rows_for(dataset, selected_prs, logger, dry_run=dataset.dry_run)
 
     agenda, pool = agenda_for_release(dataset, release, units, episodes, selected_prs)
@@ -2099,7 +2120,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         if resume:
             await reopen_partial_run(dataset, scaffold, logger, dry_run=True)
         logger.info("%s", json.dumps(report, indent=2))
-        _report_budget(dataset, report, len(selected_prs), logger, scaffold=scaffold)
+        _report_budget(dataset, report, review_count, logger, scaffold=scaffold)
         assert_coverage_is_reachable(dataset, report, logger)
         assert_the_judge_model_is_pinned(dataset, logger)
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
@@ -2123,7 +2144,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
         return None
 
-    _report_budget(dataset, report, len(selected_prs), logger, enforce=True,
+    _report_budget(dataset, report, review_count, logger, enforce=True,
                    scaffold=scaffold)
     assert_coverage_is_reachable(dataset, report, logger)
     assert_the_judge_model_is_pinned(dataset, logger)
@@ -2195,9 +2216,6 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         scaffold.execution.sample_max_cost = dataset.lead_cost_cap
         scaffold.execution.sample_max_tokens = dataset.lead_token_cap or None
     elif dataset.routing_mode == "solo":
-        # No census, no arm pool, no journal: there is nothing to route. The agenda was still
-        # built and sealed above, which is what makes this run's `agenda_report.json` scope
-        # identically to the `lead` run on the same config.
         data = named_data if named_data is not None else _solo_task_data(
             agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs=release["graphs"], stage_rows=stage_rows)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap

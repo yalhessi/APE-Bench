@@ -16,7 +16,21 @@
 
 **APE-Bench** is the reference implementation for the paper "[APE-Bench: Evaluating Automated Proof Engineering for Formal Math Libraries](https://arxiv.org/abs/2504.19110v3)". This codebase implements the complete infrastructure described in the paper, including APE-Bench automated pipeline, APE-Harness task contract framework, and multi-version verification/retrieval services.
 
-For the Mathlib PR-review experiments in this fork, see [comparing review strategies](docs/guides/checkout-and-runs.md#compare-review-strategies).
+## Start here for Mathlib PR review
+
+Given a Mathlib PR that compiles, what changes would a maintainer ask the author to make, and why? Follow one saved review of PR **42184**. It added `tprod_nonneg`, a lemma about products of nonnegative terms. The October comparison reused review sample **X1**. You can follow it without running a model.
+
+| Question | Where to look |
+|---|---|
+| What did the reviewer see? | The [reviewed revision](inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl) pins the diff at `c5474cb4`. In this historical design the reviewer also received a [change map](results/pr_review_v5/probes/postcutoff-2026-09-29/model_pr42184.md) and a [checklist](results/pr_review_v5/probes/construction-demo-2026-09-29/brief_X.md). Its [tool calls](results/pr_review_v5/probes/postcutoff-2026-09-29/pr42184/X1/calls.jsonl) show what it investigated. |
+| What would it ask the author to do? | Read its three [submitted findings, in order](results/pr_review_v5/probes/postcutoff-2026-09-29/pr42184/X1/findings.json). The first requested dropping the unnecessary `[L.NeBot]` hypothesis. Its [private notes](results/pr_review_v5/probes/postcutoff-2026-09-29/pr42184/X1/notes.md) mention searching for `HasProd.nonneg`. The submitted list contains no request to add it. |
+| What did the evaluation credit? | The two [reference requests](results/pr_review_v5/probes/postcutoff-2026-09-29/feedback.json) enter the blind matching step. The [label map](results/pr_review_v5/probes/conventions-ceiling-2026-10-04/blinding_F_post_SEALED.json) identifies X1 as R1 on this PR. Both [reader 1](results/pr_review_v5/probes/conventions-ceiling-2026-10-04/match_F_post/matches.1.json) and [reader 2](results/pr_review_v5/probes/conventions-ceiling-2026-10-04/match_F_post/matches.2.json) credited finding 0 for `p0002` and recorded a miss for `p0003`, the companion lemma request. That gives **one of two requests recovered**. The [replay commands](results/pr_review_v5/probes/convention-scope-2026-11-24/reproduce-review-reading.md#what-we-can-reproduce-from-october) reconstruct the reading from these files. |
+
+**Try a second case.** Follow [X1 on PR 42814](results/pr_review_v5/probes/postcutoff-2026-09-29/pr42814/X1/findings.json) through the same label map and reader files. Look up request `p0004`. The reviewer commented on the proof, and both readers recorded a miss for the maintainer’s requested one-direction alias.
+
+**Where to change current behavior.** The [whole-PR task](src/ape/tasks/lean_tasks/formal_math/review/whole_pr.py) defines the current reviewer instruction and submission tool. The [review runner](src/mathlib_review/review/runner.py) selects revisions and dispatches tasks. The [submission archive](src/mathlib_review/analysis/submissions.py) reads the accepted attempt, and the [matcher](src/mathlib_review/analysis/matching.py) prepares and reports a reading. The [42184 finalization example](results/pr_review_v5/probes/convention-scope-2026-11-24/full-tool.md) shows why the artifact matters. In a separate November run the guided reviewer submitted two compatible changes. Both reached the review channel and zero reached the verified channel. To answer what this reviewer asked the author, open the accepted submission.
+
+The [glossary](GLOSSARY.md#mathlib-pr-review-in-this-fork) defines these terms. The [run guide](docs/guides/checkout-and-runs.md#compare-review-strategies) explains how to generate and score reviews.
 
 ## Table of Contents
 * [Paper to Code Mapping](#paper-to-code-mapping)

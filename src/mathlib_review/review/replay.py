@@ -46,6 +46,7 @@ from src.mathlib_review.io import (
     canonical_json_bytes, git_state, jsonl_bytes, jsonl_rows, load_jsonl, pretty_json_bytes,
     sha256_bytes, sha256_file, write_once,
 )
+from src.mathlib_review.schema.review import agenda_pr_numbers
 from src.mathlib_review.paths import run_dir
 
 SUBMIT_TOOL = "submit_candidates"
@@ -290,7 +291,7 @@ def _control_abstentions(dataset: ReplayDatasetConfig) -> Tuple[set, Dict[str, A
             "--select control-abstentions needs the release the run was built from, to say "
             "which PRs carry no obligation; this run's plan names none")
     agenda = json.loads(stage.path("agenda").read_text())
-    reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
+    reviewed = agenda_pr_numbers(agenda)
     with_gold = {row.get("pr_number") for row in jsonl_rows(stage.release / "gold/judgments.jsonl")
                  if any((obligation.get("status") == "proposed_atomic")
                         for obligation in row.get("obligations") or [])}

@@ -227,7 +227,7 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
 
     logger = logger or create_logger("bench")
     dataset, scaffold, _overrides = load_run(config)
-    release = load_release(dataset)
+    release = load_release(dataset, arm_bench=True)
 
     # `audited` by default: the gold-label rule gives `family_design` one positive case in
     # the whole release and `proof_idiom` three, and floods `style` with twelve that belong to

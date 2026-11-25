@@ -512,6 +512,7 @@ def agenda_report(agenda: ReviewAgenda,
              else {item.work_unit_id for item in agenda.proposals})
     covered = {item.work_unit_id for item in eligible
                if item.arm_id != GENERALIST_ARM_ID}
+    scope = agenda.whole_pr_targets if agenda.whole_pr_targets is not None else agenda.proposals
     return {
         "agenda_version": AGENDA_VERSION,
         "scheduler_version": agenda.scheduler_version,
@@ -519,7 +520,7 @@ def agenda_report(agenda: ReviewAgenda,
         "routing_mode": agenda.routing_mode,
         "work_units": len(units),
         "units_without_specialist": sorted(units - covered),
-        "pr_numbers": sorted({item.pr_number for item in agenda.proposals}),
+        "pr_numbers": sorted({row.pr_number for row in scope}),
         "proposals_enumerated": len(agenda.proposals),
         "proposals_eligible": len(eligible),
         "by_arm": by_arm,
