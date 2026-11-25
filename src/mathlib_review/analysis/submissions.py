@@ -54,6 +54,21 @@ def check_attempt(attempt, expected):
     return transcript, calls
 
 
+def generation_inputs(name, run):
+    """The design and search index one generation ran with.
+
+    A named run records them beside its first message. Study generations, and named ones
+    recorded before 25 November 2026, sealed them in the runner's `run_plan.json`.
+    """
+    if "inputs" in run:
+        return run["inputs"]
+    plan = read(run_dir(name) / "run_plan.json")
+    if plan["run_name"] != name:
+        raise ValueError(f"{name}: run plan belongs to a different reviewer")
+    return {"design": plan["evaluation_settings"].get("design"),
+            "context_index_sha256": plan.get("context_index_sha256", {})}
+
+
 async def capture(out, runs):
     sources, records = {}, []
     generation = read(out / "generation.json")
@@ -64,12 +79,12 @@ async def capture(out, runs):
         manifest = run_dir(name) / "run_manifest.json"
         if not named and (not manifest.exists() or read(manifest)["completion_status"] != "complete"):
             raise ValueError(f"{name}: review generation is incomplete; resume the generation command")
-        plan = read(run_dir(name) / "run_plan.json")
-        if plan["run_name"] != name or plan["evaluation_settings"].get("design") != "whole_pr":
+        inputs = generation_inputs(name, run)
+        if inputs["design"] != "whole_pr":
             raise ValueError(f"{name}: run plan belongs to a different reviewer")
         search = "history_sha256" in run or arm == "history"
         if search:
-            index = plan["context_index_sha256"]
+            index = inputs["context_index_sha256"]
             if (index.get("precedent_corpus"), index.get("precedent_manifest")) != (
                     generation["history_sha256"], generation["index_manifest_sha256"]):
                 raise ValueError(f"{name}: the live search index differs from the generation plan")

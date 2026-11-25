@@ -39,6 +39,11 @@ def run_options(reviewer, alias, head="c5474cb4"):
     return ["run", "--reviewer", reviewer, "--case", f"42184@{head}", "--run-name", alias, "--execute"]
 
 
+#: The specialist and historical stages. A named review ends at its accepted submission without them.
+SPECIALIST_STAGES = ("load_release", "select_units_and_episodes", "agenda_for_release", "build_agenda",
+                     "stamp_submission_directives", "_build_plan", "solo_responses", "finalize", "reconcile")
+
+
 @pytest.fixture
 def provider(checkout, monkeypatch):
     # Supply only the commit date. Prior reviews and expert requests are absent during generation.
@@ -49,10 +54,16 @@ def provider(checkout, monkeypatch):
     def load(*args):
         dataset, scaffold, overrides = original_load(*args)
         scaffold.runs_base_dir = Path.cwd() / ".ape/runs"
+        if accept.release is not None:
+            dataset.release = accept.release
         return dataset, scaffold, overrides
 
     monkeypatch.setattr(runner, "load_run", load)
     monkeypatch.setattr(runner, "assert_ready", lambda *a, **kw: None)
+    for stage in SPECIALIST_STAGES:
+        def refuse(*args, stage=stage, **kwargs):
+            raise AssertionError(f"the named review invoked {stage}")
+        monkeypatch.setattr(runner, stage, refuse)
 
     async def prebuilt(*args, **kwargs):
         return []
@@ -66,6 +77,8 @@ def provider(checkout, monkeypatch):
         plans = {path: submissions.read(path) for path in Path(".ape/reviews").glob("*/generation.json")}
         (plan_path, record), = [(path, run["episodes"]["42184"]) for path, plan in plans.items()
                                 for run in plan["runs"].values() if run["run"] == self.orchestrator_id]
+        alias = Path(plan_path).parent.name
+        accept.sessions.append(alias)
         folder = task_dir / "samples/0"
         attempt = folder / "attempts/ok"
         cwd = str(attempt / "workspaces")
@@ -78,56 +91,76 @@ def provider(checkout, monkeypatch):
         message = Path(record["message"]).read_text().replace("{attempt_workspaces}", cwd)
         (attempt / "claude_code_conversation_1.jsonl").write_text(
             json.dumps({"type": "user", "message": {"content": message}}) + "\n")
-        review = reviews.get(Path(plan_path).parent.name, {})
+        review = accept.reviews.get(alias, {})
+        sample = {"sample_id": "s", "sample_index": 0, "task_global_index": task.data.global_index,
+                  "created_at": "2026-11-25", "updated_at": "2026-11-25"}
+        limits = {"max_turns": record["max_turns"], "cost_limit": record["cost_cap"], "token_limit": record["token_cap"]}
+        if review == "fail":
+            # The session stopped without calling the submission tool. No task result is written for it.
+            put(folder / "sample.json", {**sample, "attempts": [
+                {"attempt_id": 1, "path": str(attempt), "status": "failed_model", "created_at": "2026-11-25", **limits}]})
+            return SimpleNamespace(task_results=[])
         submitted = [SubmittedFinding(**finding) for finding in review.get("findings", [])]
         raw = {"pr_number": task.data.pr_number, "episode_id": task.data.episode_id, "success": True,
                "submitted_findings": [f.model_dump(exclude_unset=True) for f in submitted],
                "findings": [f.recorded() for f in submitted],
                "review_message": review.get("message", "No changes requested.")}
-        put(folder / "sample.json", {"sample_id": "s", "sample_index": 0,
-            "task_global_index": task.data.global_index, "created_at": "2026-11-25", "updated_at": "2026-11-25",
-            "attempts": [{"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
-                          "max_turns": record["max_turns"], "cost_limit": record["cost_cap"],
-                          "token_limit": record["token_cap"], "result": raw}]})
+        put(folder / "sample.json", {**sample, "attempts": [
+            {"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
+             **limits, "result": raw}]})
         put(task_dir / "task_result.json", raw)
         return SimpleNamespace(task_results=[raw])
 
-    reviews = {}
-    accept.reviews = reviews
+    accept.reviews, accept.sessions, accept.release = {}, [], None
     monkeypatch.setattr(runner.TaskOrchestrator, "run", accept)
 
     return accept
 
 
-def test_cli_accepts_empty_review_before_downstream_failure_and_can_read_it_again(checkout, provider, monkeypatch):
-    alias = "solo-42184-a"
+def episodes_only_release(checkout, *extra):
+    """A release holding only the visible episodes: no work units, change graphs or feedback."""
+    release = Path("episodes-only")
+    (release / "input").mkdir(parents=True)
+    source = checkout / "inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl"
+    rows = [json.loads(line) for line in source.read_text().split("\n") if line.strip()]
+    (release / "input/episodes.jsonl").write_text("".join(json.dumps(r) + "\n" for r in [*rows, *extra]))
+    return release.resolve()
+
+
+def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, provider, monkeypatch):
+    alias = "guided-42184-a"
     out = submissions.review_directory(alias)
     opts = run_options("solo-v1", alias)
+    provider.reviews[alias] = saved_42184_reviews(checkout)["guided"]
+    original_capture = submissions.capture
 
-    def interrupt(*args):
-        raise InterruptedError("post-processing interrupted")
+    async def interrupt(*args):
+        raise InterruptedError("killed after the session was accepted")
 
-    original_responses = runner.solo_responses
-    monkeypatch.setattr(runner, "solo_responses", interrupt)
-    with pytest.raises(InterruptedError, match="post-processing"):
+    monkeypatch.setattr(submissions, "capture", interrupt)
+    with pytest.raises(InterruptedError, match="accepted"):
         cli.main(opts)
-    archived = submissions.read(out / "archive.json")["records"][0]
-    assert archived["findings"] == 0
-    raw_path = Path(archived["files"]["task_result.json"]["path"])
-    assert submissions.read(raw_path)["review_message"] == "No changes requested."
-    # A resume uses the accepted archive even though downstream reporting was interrupted.
+    assert provider.sessions == [alias] and not (out / "archive.json").exists()
+    monkeypatch.setattr(submissions, "capture", original_capture)
+    # The resumed run archives the accepted session that is already on disk.
     assert cli.main([*opts, "--resume"]) == 0
+    assert cli.main([*opts, "--resume"]) == 0
+    assert provider.sessions == [alias]
+    archived = submissions.read(out / "archive.json")["records"][0]
+    raw = submissions.read(Path(archived["files"]["task_result.json"]["path"]))
+    submitted = provider.reviews[alias]
+    assert raw["review_message"] == submitted["message"]
+    assert [(f["path"], f["line_start"], f["line_end"], f["claim"]) for f in raw["submitted_findings"]] == [
+        (f["path"], f["line_start"], f["line_end"], f["claim"]) for f in submitted["findings"]]
+    projected = submissions.read(out / f"submissions/{archived['run']}/findings.json")["42184"]
+    assert [f["target"] for f in projected] == [
+        f"{f['path']}:{f['line_start']}" for f in submitted["findings"]]
     with pytest.raises(SystemExit) as wrong_head:
         cli.main([*run_options("solo-v1", alias, "0000000"), "--resume"])
     assert wrong_head.value.code == 2
-    monkeypatch.setattr(runner, "solo_responses", original_responses)
     second = "solo-42184-b"
     assert cli.main(run_options("solo-v1", second)) == 0
-    monkeypatch.setattr(runner, "run", lambda *a, **kw: pytest.fail("scoring invoked reviewer"))
-    reference = submissions.probes.load_probe_set(submissions.REFERENCE)
-    reference.probe_dir.mkdir(parents=True)
-    for path in (reference.asks_file, reference.feedback_file):
-        shutil.copy(checkout / path, path)
+    copy_reference(checkout)
     score = ["score", "--of", alias, "--using"]
     for policy in ("round1-requests-v1", "round1-questions-v1", "round1-requests-v1"):
         assert cli.main([*score, policy]) == 0
@@ -139,15 +172,96 @@ def test_cli_accepts_empty_review_before_downstream_failure_and_can_read_it_agai
     assert {p.expected_cells for p in before} == {2}
     paired = ["score", "--of", alias, second, "--using", "round1-requests-v1"]
     assert cli.main(paired) == 0
+    reference = submissions.probes.load_probe_set(submissions.REFERENCE)
     asks = submissions.read(reference.asks_file)
     asks["asks"]["42184"].pop()
     put(reference.asks_file, asks)
     assert cli.main([*score, "round1-requests-v1"]) == 0
     assert cli.main(paired) == 0
     assert sorted(p.expected_cells for p in plans()) == [1, 2, 2, 2, 4]
-    raw_path.write_text("{}")
+    projection = out / f"submissions/{archived['run']}/findings.json"
+    saved_projection = projection.read_bytes()
+    projection.write_text(json.dumps({"42184": []}))
+    with pytest.raises(ValueError, match="archived matcher input changed"):
+        submissions.saved_reviews(out)
+    projection.write_bytes(saved_projection)
+    Path(archived["files"]["task_result.json"]["path"]).write_text("{}")
     with pytest.raises(ValueError, match="accepted task result changed"):
-        submissions.saved_reviews(submissions.review_directory(alias))
+        submissions.saved_reviews(out)
+
+
+def test_empty_question_and_failed_reviews_have_distinct_outcomes(checkout, provider, capsys):
+    question = {"claim": "The description does not say why the NeBot instance was needed.",
+                "suggested_fix": "Could you say in the description whether any caller relies on it?"}
+    provider.reviews.update({"question": {"findings": [question], "message": "One question."}, "failed": "fail"})
+    for alias in ("empty", "question"):
+        assert cli.main(run_options("solo-v1", alias)) == 0
+    projections = {}
+    for alias in ("empty", "question"):
+        _, archive = submissions.saved_reviews(submissions.review_directory(alias))
+        projections[alias] = submissions.read(Path(archive["sources"]["solo-v1"]["path"]))["42184"]
+    assert projections["empty"] == []
+    assert projections["question"] == [{"target": submissions.probes.PR_LEVEL_TARGET, "claim": question["claim"],
+                                        "requested_change": question["suggested_fix"]}]
+    assert cli.main(run_options("solo-v1", "failed")) == 1
+    assert "NO ACCEPTED REVIEW" in capsys.readouterr().err
+    failed = submissions.review_directory("failed")
+    assert (failed / "generation.json").is_file() and not (failed / "archive.json").exists()
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["score", "--of", "failed", "--using", "round1-requests-v1"])
+    assert refused.value.code == 2
+    assert provider.sessions == ["empty", "question", "failed"]
+
+
+def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, provider, monkeypatch, capsys):
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+
+    def index(collection):
+        directory = Path("frozen-index")
+        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
+        return directory
+
+    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
+    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
+    generated = {}
+    for label, release in (("profile", None), ("episodes", episodes_only_release(checkout))):
+        provider.release = release
+        for reviewer in ("solo-v1", "pr-search-v1"):
+            assert cli.main(["plan", "--reviewer", reviewer, "--case", "42184@c5474cb4"]) == 0
+            capsys.readouterr()
+            alias = f"{reviewer}-{label}"
+            assert cli.main(run_options(reviewer, alias)) == 0
+            out = submissions.review_directory(alias)
+            plan, archive = submissions.saved_reviews(out)
+            assert archive["records"][0]["findings"] == 0
+            run = plan["runs"][reviewer]
+            assert run["inputs"]["design"] == "whole_pr"
+            assert not Path(".ape/runs", run["run"], "run_plan.json").exists()
+            generated[label, reviewer] = ((out / "first-message.txt").read_text(), run["episodes"]["42184"])
+    keys = ("message_sha256", "mcp", "mcp_schema_sha256", "builtins", "model", "effort", "cutoff",
+            "max_turns", "token_cap", "cost_cap", "reviewed_head_sha", "base_sha", "episode_id")
+    for reviewer in ("solo-v1", "pr-search-v1"):
+        (message, record), (again, other) = generated["profile", reviewer], generated["episodes", reviewer]
+        assert message == again and {k: record[k] for k in keys} == {k: other[k] for k in keys}
+    solo, search = generated["episodes", "solo-v1"][1], generated["episodes", "pr-search-v1"][1]
+    assert solo["message_sha256"] == search["message_sha256"]
+    assert set(search["mcp"]) - set(solo["mcp"]) == {"precedent_search"} and set(solo["mcp"]) < set(search["mcp"])
+
+
+def test_a_case_names_exactly_one_reviewed_episode(checkout, provider, capsys):
+    source = checkout / "inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl"
+    (episode,) = [json.loads(line) for line in source.read_text().split("\n")
+                  if line.strip() and json.loads(line)["pr_number"] == 42184]
+    later = {**episode, "reviewed_head_sha": "c5474cb4" + "f" * 32,
+             "episode_id": episode["episode_id"].replace("round1", "round2")}
+    provider.release = episodes_only_release(checkout, later)
+    for head, problem in (("c5474cb4", "names 2 reviewed episodes"), ("0000000", "no reviewed episode")):
+        with pytest.raises(SystemExit) as refused:
+            cli.main(["plan", "--reviewer", "solo-v1", "--case", f"42184@{head}"])
+        assert refused.value.code == 2 and problem in capsys.readouterr().err
+    assert cli.main(["plan", "--reviewer", "solo-v1", "--case", "42184@c5474cb4a"]) == 0
+    assert episode["reviewed_head_sha"] in capsys.readouterr().out
+    assert provider.sessions == []
 
 
 def test_overlapping_reviewers_can_finish_and_resume_independently(provider, monkeypatch):

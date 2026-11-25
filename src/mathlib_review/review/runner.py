@@ -420,6 +420,27 @@ def select_units_and_episodes(dataset: V5DatasetConfig, release: Dict[str, Any])
     return units, episodes
 
 
+def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInput:
+    """The one reviewed episode of a release at `pr_number@head`, where `head` is a SHA prefix.
+
+    Reads only `input/episodes.jsonl`: the visible author text, the merge base and the patch.
+    A release can hold several rounds of one PR, so the head is part of the request, and a
+    prefix that names none or several of them is refused rather than resolved by order.
+    """
+
+    episodes = load_jsonl(Path(release) / "input/episodes.jsonl", ReviewEpisodeInput)
+    found = [ep for ep in episodes
+             if ep.pr_number == pr_number and ep.reviewed_head_sha.startswith(head.lower())]
+    if not found:
+        heads = sorted(ep.reviewed_head_sha[:12] for ep in episodes if ep.pr_number == pr_number)
+        raise ValueError(f"{release}: no reviewed episode for {pr_number}@{head}"
+                         + (f"; its reviewed heads are {heads}" if heads else ""))
+    if len(found) > 1:
+        raise ValueError(f"{release}: {pr_number}@{head} names {len(found)} reviewed episodes "
+                         f"({sorted(ep.episode_id for ep in found)}); give more of the head")
+    return found[0]
+
+
 def _context_index_identity(index_dir: Optional[Path] = None,
                             manifest_sha256: Optional[str] = None) -> Dict[str, str]:
     """Hashes of the corpora a context read ranks over.
@@ -2069,8 +2090,7 @@ def agenda_for_release(dataset, release, units, episodes, selected_prs):
     )
 
 
-async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False,
-              review_request=None):
+async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
@@ -2094,22 +2114,6 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
     report = agenda_report(agenda, work_unit_ids=[unit.work_unit_id for unit in units])
-
-    named_data = None
-    if review_request is not None:
-        named_data = _solo_task_data(agenda, episodes, dataset, cutoffs_by_episode(episodes),
-                                     run_dir(dataset.run_name) / "context_trace.jsonl",
-                                     graphs=release["graphs"], stage_rows=stage_rows)
-        await review_request.inspect(named_data, episodes, dataset, scaffold)
-        manifest = run_dir(dataset.run_name) / "run_manifest.json"
-        if not dataset.dry_run and resume:
-            if (review_request.directory / "archive.json").is_file():
-                return run_dir(dataset.run_name)
-            if manifest.exists() and json.loads(manifest.read_bytes())["completion_status"] == "complete":
-                return run_dir(dataset.run_name)
-        if resume and not manifest.exists() and not any(p.exists() for p in _scratch_dirs(dataset.run_name, scaffold)):
-            # An interrupt between sealing the named inputs and starting its first attempt.
-            resume = False
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")
@@ -2216,8 +2220,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         scaffold.execution.sample_max_cost = dataset.lead_cost_cap
         scaffold.execution.sample_max_tokens = dataset.lead_token_cap or None
     elif dataset.routing_mode == "solo":
-        data = named_data if named_data is not None else _solo_task_data(
-            agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs=release["graphs"], stage_rows=stage_rows)
+        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
+                               graphs=release["graphs"], stage_rows=stage_rows)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
         scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     else:
@@ -2237,10 +2241,6 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                     logger=logger)
     results = await orchestrator.run(tasks)
-    if review_request is not None and not _solo_coverage_gaps(results, data):
-        from src.mathlib_review.analysis import submissions
-        generation = submissions.read(review_request.directory / "generation.json")
-        await submissions.capture(review_request.directory, generation["runs"])
     children = (await _direct_children(orchestrator, tasks, data, agenda, scaffold, logger)
                 if dataset.routing_mode not in ("lead", "solo") else None)
 
@@ -2341,6 +2341,130 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
             len(manifest.coverage_gaps),
             ", ".join(sorted(g.get("invocation_id", "?") for g in manifest.coverage_gaps)[:8]))
     return out
+
+
+class NoAcceptedReview(RuntimeError):
+    """The reviewer's session ended without an accepted submission, so nothing was archived."""
+
+
+async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, logger, request, *,
+                         resume: bool = False):
+    """Run one whole-PR reviewer on one reviewed episode, up to its accepted submission.
+
+    The named reviewer's path (`review/reviewers.py`). It reads the episode alone: no work units,
+    change graph, agenda or expert feedback enter it, and it stops where the reviewer's session
+    is accepted. Anchoring, finalization and the run manifest belong to `run`, whose specialist
+    and historical callers need them. Everything a session depends on is the same as there: the
+    preflight, the pinned input files, the gold-free cutoff, the reviewed workspace, the
+    per-session cost and token ceilings, the run-name guard and the orchestrator's resume.
+
+    `request` names the case (`pr`, `head`), inspects the task data before anything runs
+    (`inspect`, which records the generation inputs) and says whether a submission has already
+    been archived (`accepted`). Returns the orchestrator's results, or None for a dry run or an
+    archived review. Raises `NoAcceptedReview` when the session ended without one.
+    """
+
+    if dataset.design != "whole_pr" or dataset.routing_mode != "solo":
+        raise ValueError(f"A named reviewer runs the whole_pr design under routing_mode solo, "
+                         f"not {dataset.design!r} under {dataset.routing_mode!r}")
+    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
+    input_files = pin_input_files(scaffold)
+    assert_the_model_keeps_its_reasoning(scaffold)
+    assert_run_is_named(dataset)
+    assert_solo_task_config_builds(dataset, task_overrides)
+
+    episode = select_episode(dataset.release, request.pr, request.head)
+    out = run_dir(dataset.run_name)
+    data = review_task_data([episode], dataset, cutoffs_by_episode([episode]),
+                            out / "context_trace.jsonl")
+    inputs: Dict[str, Any] = {"design": dataset.design}
+    if dataset.solo_precedent_index is not None:
+        inputs["context_index_sha256"] = _context_index_identity(
+            dataset.solo_precedent_index, dataset.solo_precedent_manifest_sha256)
+    await request.inspect(data, [episode], dataset, scaffold, inputs=inputs)
+    _report_budget(dataset, {}, len(data), logger, enforce=not dataset.dry_run, scaffold=scaffold)
+
+    if dataset.dry_run:
+        logger.info("DRY RUN — nothing is written and no model is called")
+        guard_run_name(dataset, logger, scaffold, fatal=False, resume=resume)
+        missing = await assert_reviewed_workspaces_prebuilt(
+            [episode], required=dataset.require_reviewed_workspaces, logger=logger)
+        logger.info("reviewed workspace for %s: %s", episode.episode_id,
+                    "missing — the session would verify against base .oleans" if missing
+                    else "prebuilt")
+        return None
+    if resume and request.accepted():
+        logger.info("%s: the accepted submission is already archived; nothing to run",
+                    dataset.run_name)
+        return None
+
+    scratch = _scratch_dirs(dataset.run_name, scaffold)
+    if resume and not any(path.exists() for path in scratch):
+        # Interrupted after the generation inputs were recorded and before the first attempt.
+        resume = False
+    guard_run_name(dataset, logger, scaffold, resume=resume)
+    if resume:
+        from ape.orchestration.persistence import requeue_failed_samples
+
+        # A session lost to its environment runs again; a model's own failure stays the result.
+        requeued = await requeue_failed_samples(
+            scaffold.execution.get_tasks_path(scratch[0]), scaffold.execution.task_max_retries,
+            "named review resumed with --resume")
+        if requeued:
+            logger.info("requeued %d session(s) that failed on errors", len(requeued))
+    out.mkdir(parents=True, exist_ok=True)
+    if input_files:
+        from src.mathlib_review.review.inputs import SNAPSHOT_DIR, snapshot_input_files
+
+        snapped = snapshot_input_files(input_files, out)
+        write_once(out / SNAPSHOT_DIR / "index.json", pretty_json_bytes(
+            {field: {"sha256": item["sha256"], "snapshot": item["snapshot"]}
+             for field, item in sorted(snapped.items())}))
+
+    scaffold.execution.sample_max_cost = dataset.solo_cost_cap
+    scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
+    tasks = [create_task_from_data(item, scaffold, task_config_overrides=scaffold.task_config_overrides)
+             for item in data]
+    if resume and await _accepted_on_disk(scaffold.execution.get_tasks_path(scratch[0]), tasks):
+        # Interrupted after the session was accepted and before it was archived.
+        logger.info("%s: the accepted session is on disk; archiving it without another session",
+                    dataset.run_name)
+        return None
+    await assert_workspaces_prebuilt(data, required=dataset.require_prebuilt_workspaces)
+    await assert_reviewed_workspaces_prebuilt(
+        [episode], required=dataset.require_reviewed_workspaces, logger=logger)
+    orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name, logger=logger)
+    results = await orchestrator.run(tasks)
+    if _solo_coverage_gaps(results, data):
+        raise NoAcceptedReview(
+            f"{episode.episode_id}: the review ended without an accepted submission "
+            f"({await _session_outcomes(orchestrator.tasks_dir)}). Nothing was archived. "
+            "--resume runs again only a session lost to system errors.")
+    return results
+
+
+async def _accepted_on_disk(tasks_dir: Path, tasks) -> bool:
+    """Whether every task already holds an accepted submission, which the orchestrator would skip."""
+    from ape.orchestration.persistence import TaskStorage
+
+    for task in tasks:
+        storage = TaskStorage(tasks_dir / task.data.global_index, task.data.global_index)
+        result = await storage.load_task_result()
+        samples = await storage.load_all_samples()
+        if not (result and result.get("success")
+                and any(sample.successful_attempt for sample in samples.values())):
+            return False
+    return True
+
+
+async def _session_outcomes(tasks_dir: Path) -> str:
+    from ape.orchestration.persistence import TaskStorage
+
+    statuses = []
+    for task_dir in sorted(p for p in Path(tasks_dir).iterdir() if p.is_dir()):
+        samples = await TaskStorage(task_dir, task_dir.name).load_all_samples()
+        statuses += [sample.status.value for sample in samples.values()]
+    return ", ".join(statuses) or "no session recorded"
 
 
 def main():

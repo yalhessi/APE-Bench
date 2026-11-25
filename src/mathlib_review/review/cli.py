@@ -1213,6 +1213,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             return run_reviewer(args, logger)
         except (ValueError, FileNotFoundError, FileExistsError) as error:
             parser.error(str(error))
+        except RuntimeError as error:
+            from src.mathlib_review.review.runner import NoAcceptedReview
+
+            if not isinstance(error, NoAcceptedReview):
+                raise
+            print(f"NO ACCEPTED REVIEW: {error}", file=sys.stderr)
+            return 1
     if args.command in ("plan", "run") and (args.case or args.score):
         parser.error("--case and --score require --reviewer")
     if args.command == "study":

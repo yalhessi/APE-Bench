@@ -53,7 +53,10 @@ class ReviewRequest:
     head: str
     directory: Path
 
-    async def inspect(self, payloads, episodes, dataset, scaffold):
+    def accepted(self):
+        return (self.directory / "archive.json").is_file()
+
+    async def inspect(self, payloads, episodes, dataset, scaffold, *, inputs):
         if len(episodes) != 1 or len(payloads) != 1:
             raise ValueError(f"Expected one reviewed head for PR {self.pr}")
         ep, = episodes
@@ -68,7 +71,7 @@ class ReviewRequest:
         payload, = payloads
         message, tools, record = await inspect_review(payload, dataset, scaffold, ep)
         expected = set(COMMON_TOOLS)
-        run = {"run": dataset.run_name, "episodes": {str(self.pr): record},
+        run = {"run": dataset.run_name, "episodes": {str(self.pr): record}, "inputs": inputs,
                "tasks_dir": str(scaffold.execution.get_tasks_path(Path(scaffold.runs_base_dir) / dataset.run_name))}
         manifest = {"fixture": False, "reviewer": self.reviewer, "sample": 1, "runs": {self.reviewer: run},
                     "profile_sha256": sha256_bytes(canonical_json_bytes(scaffold.model_dump(mode="json"))),
@@ -107,7 +110,7 @@ def run_reviewer(args, logger):
     definition = Reviewer.model_validate(yaml.safe_load(path.read_text()))
     request = ReviewRequest(args.reviewer, definition, pr, head, directory)
     opaque_name = "r" + sha256_bytes(canonical_json_bytes(["named-review", directory.name]))[:24]
-    options = {"run_name": opaque_name, "pr_numbers": [pr]}
+    options = {"run_name": opaque_name}
     if definition.history:
         options.update(solo_context_tools=["declaration_search", "precedent_search"],
                        solo_precedent_index=str(definition.history.index()))
@@ -119,8 +122,7 @@ def run_reviewer(args, logger):
             raise ValueError(f"{directory}: name already used. Resume this sample or choose a fresh name.")
         if resume and execute and not (directory / "generation.json").exists():
             raise ValueError(f"{directory}: no saved named review to resume")
-        asyncio.run(runner.run(dataset, scaffold, task_options, logger, resume=resume,
-                               review_request=request))
+        asyncio.run(runner.review_episode(dataset, scaffold, task_options, logger, request, resume=resume))
         if execute:
             submissions.saved_reviews(directory, recover=True)
             print(f"Saved submitted review: {directory / 'archive.json'}")
