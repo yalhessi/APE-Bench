@@ -80,6 +80,10 @@ def generation_inputs(out, name):
     """
     if (out / INPUTS_FILE).is_file():
         return read(out / INPUTS_FILE)[name]
+    inline = [r["inputs"] for r in read(out / "generation.json")["runs"].values()
+              if r["run"] == name and "inputs" in r]
+    if inline:  # recorded between 968c285e and 86bb0f88, inside the generation record
+        return inline[0]
     plan = read(run_dir(name) / "run_plan.json")
     if plan["run_name"] != name:
         raise ValueError(f"{name}: run plan belongs to a different reviewer")

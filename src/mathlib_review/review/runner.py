@@ -2373,9 +2373,9 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
     preflight, the pinned input files, the gold-free cutoff, the reviewed workspace, the
     per-session cost and token ceilings, the run-name guard and the orchestrator's resume.
 
-    `request` names the case (`pr`, `head`), inspects the task data before anything runs
-    (`inspect`, which records the generation inputs) and says whether a submission has already
-    been archived (`accepted`). Returns the orchestrator's results, or None for a dry run or an
+    `request` names the case (`pr`, `head`). It checks the task data against anything its name
+    already holds before anything is written (`prepare`), writes the generation record and inputs
+    (`record`) or prints them (`preview`), and says whether a submission is archived (`accepted`). Returns the orchestrator's results, or None for a dry run or an
     archived review. Raises `NoSubmittedReview` when the session ended without one.
     """
 
@@ -2397,9 +2397,10 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         inputs["context_index_sha256"] = _context_index_identity(
             dataset.solo_precedent_index, dataset.solo_precedent_manifest_sha256, include_zulip=False)
     (payload,) = data
+    prepared = await request.prepare(payload, episode, dataset, scaffold, inputs=inputs)
 
     if dataset.dry_run:
-        await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
+        request.preview(prepared)
         _report_budget(dataset, {}, len(data), logger, scaffold=scaffold)
         logger.info("DRY RUN — nothing is written and no model is called")
         assert_ready(scaffold, logger, enforce=False)
@@ -2424,7 +2425,7 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         # refused start leaves nothing behind and the same command can be run again.
         assert_ready(scaffold, logger, enforce=True)
         _report_budget(dataset, {}, len(data), logger, enforce=True, scaffold=scaffold)
-    await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
+    request.record(prepared)
     # After the generation record, which hashes the profile as `plan` previews it; the orchestrator
     # reads the session ceilings from here.
     scaffold.execution.sample_max_cost = dataset.solo_cost_cap

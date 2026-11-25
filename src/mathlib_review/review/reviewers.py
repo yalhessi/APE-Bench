@@ -57,7 +57,12 @@ class ReviewRequest:
     def accepted(self):
         return (self.directory / "archive.json").is_file()
 
-    async def inspect(self, payload, ep, dataset, scaffold, *, inputs):
+    async def prepare(self, payload, ep, dataset, scaffold, *, inputs):
+        """The generation record this request implies, checked against what its name already holds.
+
+        Writes nothing, so a refused request leaves the name as it was. Returns what `record`
+        writes and `preview` prints.
+        """
         task_config = scaffold.task_config_overrides or {}
         if (dataset.design != "whole_pr" or scaffold.scaffold_type != "claude_code"
                 or scaffold.batch_preamble != "plain" or scaffold.workspace_environment
@@ -82,14 +87,39 @@ class ReviewRequest:
             raise ValueError(f"{self.reviewer}: expected {sorted(expected)}, got {sorted(tools)}")
         record.update(mcp_schemas=tools, reviewed_head_sha=ep.reviewed_head_sha, base_sha=ep.base_sha,
                       message=str(self.directory / "first-message.txt"))
-        if dataset.dry_run:
-            print(message)
-            print(json.dumps(manifest, indent=2))
-            print(f"Run inputs: {json.dumps(inputs, sort_keys=True)}", file=sys.stderr)
-        else:
-            submissions.record_inputs(self.directory, dataset.run_name, inputs)
-            write_once(self.directory / "generation.json", pretty_json_bytes(manifest))
-            write_once(self.directory / "first-message.txt", message.encode())
+        prepared = {"message": message, "manifest": manifest, "inputs": inputs, "name": dataset.run_name,
+                    "inline_inputs": False}
+        saved = self.directory / "generation.json"
+        if saved.is_file():
+            held = submissions.read(saved)
+            if any("inputs" in r for r in held.get("runs", {}).values()):
+                # Recorded between 968c285e and 86bb0f88, with the inputs inside the record itself.
+                run["inputs"] = inputs
+                prepared["inline_inputs"] = True
+            kept = {saved: pretty_json_bytes(manifest),
+                    self.directory / "first-message.txt": message.encode()}
+            if (self.directory / submissions.INPUTS_FILE).is_file():
+                kept[self.directory / submissions.INPUTS_FILE] = pretty_json_bytes({dataset.run_name: inputs})
+            if any(path.is_file() and path.read_bytes() != data for path, data in kept.items()):
+                cases = []
+                for name, held_run in held.get("runs", {}).items():
+                    heads = [f"{pr}@{e.get('reviewed_head_sha', '?')[:8]}" for pr, e in held_run["episodes"].items()]
+                    cases.append(f"{name} on {', '.join(heads)}")
+                raise ValueError(f"{self.directory}: this name holds a different review ({'; '.join(cases)}) "
+                                 "or one recorded with other inputs. Resume it with its own reviewer and case, "
+                                 "or choose a fresh name.")
+        return prepared
+
+    def preview(self, prepared):
+        print(prepared["message"])
+        print(json.dumps(prepared["manifest"], indent=2))
+        print(f"Run inputs: {json.dumps(prepared['inputs'], sort_keys=True)}", file=sys.stderr)
+
+    def record(self, prepared):
+        if not prepared["inline_inputs"]:
+            submissions.record_inputs(self.directory, prepared["name"], prepared["inputs"])
+        write_once(self.directory / "generation.json", pretty_json_bytes(prepared["manifest"]))
+        write_once(self.directory / "first-message.txt", prepared["message"].encode())
 
 
 def run_reviewer(args, logger):

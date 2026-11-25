@@ -309,6 +309,57 @@ def test_a_run_records_the_profile_its_plan_previewed(checkout, provider, capsys
     assert recorded["profile_sha256"] == previewed["profile_sha256"]
 
 
+def test_a_resume_must_name_the_review_its_name_holds(checkout, provider, frozen_history, capsys):
+    alias = "held-42184"
+    assert cli.main(run_options("pr-search-v1", alias)) == 0
+    archive = (submissions.review_directory(alias) / "archive.json").read_bytes()
+    with pytest.raises(SystemExit) as refused:
+        cli.main([*run_options("solo-v1", alias), "--resume"])
+    assert refused.value.code == 2 and "different review" in capsys.readouterr().err
+    assert (submissions.review_directory(alias) / "archive.json").read_bytes() == archive
+    assert cli.main([*run_options("pr-search-v1", alias), "--resume"]) == 0
+
+
+def test_a_refused_resume_of_an_earlier_run_writes_nothing(checkout, provider, frozen_history, monkeypatch, capsys):
+    alias = "early-search-42184"
+    out = submissions.review_directory(alias)
+
+    async def lost(self, tasks):
+        raise InterruptedError("killed before the first attempt")
+
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", lost)
+    with pytest.raises(InterruptedError):
+        cli.main(run_options("pr-search-v1", alias))
+    (out / submissions.INPUTS_FILE).unlink()  # as the earlier code left it, before its run plan
+    with pytest.raises(SystemExit) as refused:
+        cli.main([*run_options("solo-v1", alias), "--resume"])
+    assert refused.value.code == 2 and "different review" in capsys.readouterr().err
+    assert not (out / submissions.INPUTS_FILE).exists()
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", provider)
+    assert cli.main([*run_options("pr-search-v1", alias), "--resume"]) == 0
+    assert provider.sessions == [alias]
+
+
+def test_an_accepted_run_recorded_with_inline_inputs_resumes(checkout, provider, monkeypatch):
+    alias = "inline-42184"
+    out = submissions.review_directory(alias)
+    provider.reviews[alias] = {"findings": [], "message": "No changes requested.", "then": "kill"}
+    with pytest.raises(InterruptedError, match="accepted"):
+        cli.main(run_options("solo-v1", alias))
+    # The shape 968c285e..86bb0f88 recorded: the inputs inside the generation record itself.
+    recorded = submissions.read(out / submissions.INPUTS_FILE)
+    generation = submissions.read(out / "generation.json")
+    for run in generation["runs"].values():
+        run["inputs"] = recorded[run["run"]]
+    put(out / "generation.json", generation)
+    (out / submissions.INPUTS_FILE).unlink()
+    refuse_new_sessions(monkeypatch)
+    assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
+    assert not (out / submissions.INPUTS_FILE).exists()
+    _, archive = submissions.saved_reviews(out)
+    assert archive["records"][0]["findings"] == 0
+
+
 def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch):
     alias = "no-login-42184"
 
