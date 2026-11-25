@@ -24,6 +24,33 @@ from src.mathlib_review.schema import (
 )
 
 
+def check_artifact(release_dir: Path, artifact) -> None:
+    """Refuse a release file that is missing or is not the bytes its manifest hashed."""
+    path = release_dir / artifact.path
+    if not path.is_file():
+        raise ValueError(f"manifest artifact missing: {artifact.path}")
+    actual = sha256_file(path)
+    if actual != artifact.sha256:
+        raise ValueError(
+            f"artifact hash mismatch for {artifact.path}: {actual} != {artifact.sha256}"
+        )
+
+
+def check_released_episodes(release_dir: Path) -> None:
+    """When a release carries its manifest, its episode file must be the one the manifest hashed.
+
+    A release of visible inputs alone has no manifest, and its rows are checked one by one
+    (`validate_episode`).
+    """
+    manifest_path = release_dir / "manifest.json"
+    if not manifest_path.is_file():
+        return
+    manifest = DatasetManifest.model_validate_json(manifest_path.read_text())
+    for artifact in manifest.input_artifacts:
+        if artifact.schema_version == "episode1":
+            check_artifact(release_dir, artifact)
+
+
 def validate_episode(episode: ReviewEpisodeInput) -> None:
     """Refuse an episode whose visible patch is not the one its digest and file index record."""
     if sha256_bytes(episode.diff.encode("utf-8")) != episode.patch_sha256:
@@ -44,14 +71,7 @@ def validate_release(release_dir: Path) -> Dict[str, int]:
         + manifest.derived_artifacts
     )
     for artifact in artifacts:
-        path = release_dir / artifact.path
-        if not path.is_file():
-            raise ValueError(f"manifest artifact missing: {artifact.path}")
-        actual = sha256_file(path)
-        if actual != artifact.sha256:
-            raise ValueError(
-                f"artifact hash mismatch for {artifact.path}: {actual} != {artifact.sha256}"
-            )
+        check_artifact(release_dir, artifact)
 
     episode_ref = next(
         (artifact for artifact in manifest.input_artifacts if artifact.schema_version == "episode1"),

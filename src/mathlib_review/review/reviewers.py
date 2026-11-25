@@ -87,12 +87,9 @@ class ReviewRequest:
             print(json.dumps(manifest, indent=2))
             print(f"Run inputs: {json.dumps(inputs, sort_keys=True)}", file=sys.stderr)
         else:
+            submissions.record_inputs(self.directory, dataset.run_name, inputs)
             write_once(self.directory / "generation.json", pretty_json_bytes(manifest))
             write_once(self.directory / "first-message.txt", message.encode())
-            # Beside the generation record, so a record written before runs kept their inputs
-            # still matches byte for byte and gains them before its reviewer is dispatched.
-            write_once(self.directory / submissions.INPUTS_FILE,
-                       pretty_json_bytes({dataset.run_name: inputs}))
 
 
 def run_reviewer(args, logger):

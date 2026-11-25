@@ -58,6 +58,20 @@ def check_attempt(attempt, expected):
 INPUTS_FILE = "inputs.json"
 
 
+def record_inputs(out, name, inputs):
+    """Record a named run's inputs before its reviewer is dispatched, beside its generation record.
+
+    Kept apart from `generation.json`, so a record written before runs kept their inputs still
+    matches byte for byte on resume. Such a run that already sealed its run plan keeps that plan as
+    its record; one interrupted before sealing it gains this record now.
+    """
+    path = out / INPUTS_FILE
+    sealed = (out / "generation.json").is_file() and (run_dir(name) / "run_plan.json").is_file()
+    if sealed and not path.is_file():
+        return
+    write_once(path, pretty_json_bytes({name: inputs}))
+
+
 def generation_inputs(out, name):
     """The design and search index one generation ran with.
 

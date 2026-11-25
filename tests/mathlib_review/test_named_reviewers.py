@@ -20,8 +20,9 @@ from src.mathlib_review.judge.ask_matching import render_matcher_prompt
 from src.mathlib_review.review import cli, reviewers, runner
 
 PROBE = Path("results/pr_review_v5/probes/named-episode-review-2026-11-25")
-#: The orchestrator's own run, kept before any test replaces it with the local provider.
-APE_RUN = runner.TaskOrchestrator.run
+#: The orchestrator's own run and the environment preflight, kept before any test replaces them.
+ORCHESTRATOR_RUN = runner.TaskOrchestrator.run
+ENVIRONMENT_PREFLIGHT = runner.assert_ready
 
 
 def put(path, value):
@@ -121,6 +122,8 @@ def provider(checkout, monkeypatch):
         put(folder / "sample.json", {**sample, "attempts": [
             {"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
              **limits, "result": raw}]})
+        if review.get("then") == "kill before its result":
+            raise InterruptedError("process killed after the session was accepted, before its task result")
         put(task_dir / "task_result.json", raw)
         if review.get("then") == "kill":
             raise InterruptedError("process killed after the session was accepted")
@@ -165,7 +168,7 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         cli.main(opts)
     assert provider.sessions == [alias] and not (out / "archive.json").exists()
     # The resumed run archives the accepted session that is already on disk.
-    recover_through_ape(monkeypatch)
+    refuse_new_sessions(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     assert cli.main([*opts, "--resume"]) == 0
     assert provider.sessions == [alias]
@@ -287,7 +290,6 @@ def test_a_pre_change_run_interrupted_before_its_run_plan_resumes_and_archives(c
         cli.main(run_options("solo-v1", alias))
     # The record the earlier code left: its generation alone, before it sealed a run plan.
     generation = submissions.read(out / "generation.json")
-    assert all("inputs" not in run for run in generation["runs"].values())
     for run in generation["runs"].values():
         assert not Path("results/pr_review_v5/runs", run["run"], "run_plan.json").exists()
     (out / submissions.INPUTS_FILE).unlink()
@@ -298,37 +300,64 @@ def test_a_pre_change_run_interrupted_before_its_run_plan_resumes_and_archives(c
     assert archive["records"][0]["findings"] == 0
 
 
-def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, provider, frozen_history,
-                                                                     monkeypatch):
-    from src.datasets.zulip.config import ZulipConfig
-
-    alias = "search-42184"
-    opts = run_options("pr-search-v1", alias)
-    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("absent/zulip.sqlite3")))
-    provider.reviews[alias] = {**saved_42184_reviews(checkout)["guided"], "then": "kill"}
-    with pytest.raises(InterruptedError, match="accepted"):
-        cli.main(opts)
-    # A Zulip index the reviewer was never granted appears, and the session credential is gone.
-    Path("zulip.sqlite3").write_text("")
-    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("zulip.sqlite3").resolve()))
+def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch):
+    alias = "no-login-42184"
 
     def no_credential(*args, **kwargs):
         raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
 
     monkeypatch.setattr(runner, "assert_ready", no_credential)
-    recover_through_ape(monkeypatch)
+    with pytest.raises(RuntimeError, match="Claude login"):
+        cli.main(run_options("solo-v1", alias))
+    monkeypatch.setattr(runner, "assert_ready", lambda *a, **kw: None)
+    assert cli.main(run_options("solo-v1", alias)) == 0
+    assert provider.sessions == [alias]
+
+
+def test_resuming_an_archived_review_from_before_the_inputs_record_changes_nothing(checkout, provider):
+    alias = "archived-42184"
+    out = submissions.review_directory(alias)
+    assert cli.main(run_options("solo-v1", alias)) == 0
+    # The same review as the earlier code archived it: no inputs record and no digest of one.
+    (out / submissions.INPUTS_FILE).unlink()
+    archive = submissions.read(out / "archive.json")
+    archive.pop("inputs_sha256")
+    put(out / "archive.json", archive)
+    before = sorted((p.relative_to(out), p.read_bytes()) for p in out.rglob("*") if p.is_file())
+    assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
+    assert sorted((p.relative_to(out), p.read_bytes()) for p in out.rglob("*") if p.is_file()) == before
+    assert provider.sessions == [alias]
+
+
+@pytest.mark.parametrize("stop", ["kill", "kill before its result"])
+def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, provider, frozen_history,
+                                                                     monkeypatch, stop):
+    from src.datasets.zulip.config import ZulipConfig
+
+    alias = "search-42184"
+    opts = run_options("pr-search-v1", alias)
+    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("absent/zulip.sqlite3")))
+    provider.reviews[alias] = {**saved_42184_reviews(checkout)["guided"], "then": stop}
+    with pytest.raises(InterruptedError, match="accepted"):
+        cli.main(opts)
+    # A Zulip index the reviewer was never granted appears, and the session credential is gone.
+    Path("zulip.sqlite3").write_text("")
+    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("zulip.sqlite3").resolve()))
+    monkeypatch.delenv("CLAUDE_CODE_OAUTH_TOKEN", raising=False)
+    monkeypatch.setattr(runner, "assert_ready", ENVIRONMENT_PREFLIGHT)
+    refuse_new_sessions(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     assert provider.sessions == [alias]
     _, archive = submissions.saved_reviews(submissions.review_directory(alias))
     assert archive["records"][0]["findings"] == 2
 
 
-def recover_through_ape(monkeypatch):
+def refuse_new_sessions(monkeypatch):
     """Resume through the orchestrator itself, with any new session refused."""
     async def no_session(self, *args, **kwargs):
         raise AssertionError("recovery scheduled a review session")
 
-    monkeypatch.setattr(runner.TaskOrchestrator, "run", APE_RUN)
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", ORCHESTRATOR_RUN)
     monkeypatch.setattr(runner.TaskOrchestrator, "_execute_jobs", no_session)
 
 
@@ -344,7 +373,7 @@ def test_recovery_completes_the_outcome_record_an_interrupted_worker_left(checko
     (task_dir,) = [p for p in tasks.iterdir() if p.is_dir()]
     assert (task_dir / "task_result.json").is_file() and not (task_dir / "task_outcome.json").exists()
 
-    recover_through_ape(monkeypatch)
+    refuse_new_sessions(monkeypatch)
     assert cli.main([*opts, "--resume"]) == 0
     outcome = submissions.read(task_dir / "task_outcome.json")
     assert outcome["has_result"] is True
@@ -398,13 +427,15 @@ def episode_rows(checkout):
                                               if line.strip())}
 
 
-@pytest.mark.parametrize("patch", ["another PR", "empty"])
-def test_an_episode_whose_patch_disagrees_with_its_digest_is_refused(checkout, provider, capsys, patch):
+@pytest.mark.parametrize("patch, problem", [("another PR", "patch hash mismatch"), ("empty", "patch hash mismatch"),
+                                            ("file index", "changed-files index mismatch")])
+def test_an_episode_whose_patch_disagrees_with_its_digest_is_refused(checkout, provider, capsys, patch, problem):
     rows = episode_rows(checkout)
     episode, other = rows[42184], rows[41930]
-    swapped = ({**episode, "diff": "", "changed_files": []} if patch == "empty" else
-               {**episode, "base_sha": other["base_sha"], "diff": other["diff"],
-                "changed_files": other["changed_files"]})
+    swapped = {"empty": {**episode, "diff": "", "changed_files": []},
+               "file index": {**episode, "changed_files": other["changed_files"]},
+               "another PR": {**episode, "base_sha": other["base_sha"], "diff": other["diff"],
+                              "changed_files": other["changed_files"]}}[patch]
     release = Path("swapped")
     (release / "input").mkdir(parents=True)
     (release / "input/episodes.jsonl").write_text(json.dumps(swapped) + "\n")
@@ -413,8 +444,24 @@ def test_an_episode_whose_patch_disagrees_with_its_digest_is_refused(checkout, p
                     run_options("solo-v1", "swapped")):
         with pytest.raises(SystemExit) as refused:
             cli.main(command)
-        assert refused.value.code == 2 and "patch hash mismatch" in capsys.readouterr().err
+        assert refused.value.code == 2 and problem in capsys.readouterr().err
     assert provider.sessions == [] and not (submissions.review_directory("swapped") / "generation.json").exists()
+
+
+def test_a_release_manifest_refuses_an_episode_rewritten_with_another_prs_patch(checkout, provider, capsys):
+    rows = episode_rows(checkout)
+    other = rows[41930]
+    # Consistent with itself: 41930's base, patch, file index and digest under 42184's head.
+    swapped = {**rows[42184], **{k: other[k] for k in ("base_sha", "diff", "changed_files", "patch_sha256")}}
+    release = Path("released")
+    (release / "input").mkdir(parents=True)
+    shutil.copy(checkout / "inputs/probes/probe-2026-07-08-v1/manifest.json", release / "manifest.json")
+    (release / "input/episodes.jsonl").write_text(
+        "".join(json.dumps(swapped if pr == 42184 else row) + "\n" for pr, row in rows.items()))
+    provider.release = release.resolve()
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["plan", "--reviewer", "solo-v1", "--case", "42184@c5474cb4"])
+    assert refused.value.code == 2 and "input/episodes.jsonl" in capsys.readouterr().err
 
 
 def test_a_case_names_exactly_one_reviewed_episode(checkout, provider, capsys):

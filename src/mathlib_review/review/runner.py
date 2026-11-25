@@ -74,6 +74,7 @@ from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
 from src.mathlib_review.evidence.chain import collect_supported, reviewed_workspaces
 from src.mathlib_review.review.finalize import finalize
 from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
+from src.mathlib_review.release.validate import check_released_episodes, validate_episode
 from src.mathlib_review.review.preflight import (
     assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
 )
@@ -426,9 +427,11 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
     Reads only `input/episodes.jsonl`: the visible author text, the merge base and the patch.
     A release can hold several rounds of one PR, so the head is part of the request, and a
     prefix that names none or several of them is refused rather than resolved by order. The
-    episode is checked as release validation checks it, so its patch is the one its digest names.
+    episode is checked as release validation checks it, so its patch is the one its digest names
+    and, when the release carries its manifest, the episode file is the one the release hashed.
     """
 
+    check_released_episodes(Path(release))
     episodes = load_jsonl(Path(release) / "input/episodes.jsonl", ReviewEpisodeInput)
     found = [ep for ep in episodes
              if ep.pr_number == pr_number and ep.reviewed_head_sha.startswith(head.lower())]
@@ -439,14 +442,13 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
     if len(found) > 1:
         raise ValueError(f"{release}: {pr_number}@{head} names {len(found)} reviewed episodes "
                          f"({sorted(ep.episode_id for ep in found)}); give more of the head")
-    from src.mathlib_review.release.validate import validate_episode
-
     validate_episode(found[0])
     return found[0]
 
 
 def _context_index_identity(index_dir: Optional[Path] = None,
-                            manifest_sha256: Optional[str] = None) -> Dict[str, str]:
+                            manifest_sha256: Optional[str] = None, *,
+                            include_zulip: bool = True) -> Dict[str, str]:
     """Hashes of the corpora a context read ranks over.
 
     Recorded in the plan because a retrieval result is only interpretable relative to the
@@ -472,6 +474,8 @@ def _context_index_identity(index_dir: Optional[Path] = None,
         identity["precedent_meta_version"] = payload.get("meta_version", "")
         identity["precedent_model_revision"] = payload.get("model_revision", "")
         identity["precedent_rows"] = str(payload.get("rows", ""))
+    if not include_zulip:
+        return identity
     from src.datasets.zulip.config import ZulipConfig
 
     zulip = Path(ZulipConfig().sqlite_path)
@@ -2390,15 +2394,13 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
     inputs: Dict[str, Any] = {"design": dataset.design}
     if dataset.solo_precedent_index is not None:
         # Only the index the reviewer is granted: a corpus it cannot search is not its input.
-        identity = _context_index_identity(dataset.solo_precedent_index,
-                                           dataset.solo_precedent_manifest_sha256)
-        inputs["context_index_sha256"] = {key: value for key, value in identity.items()
-                                          if key.startswith("precedent_")}
+        inputs["context_index_sha256"] = _context_index_identity(
+            dataset.solo_precedent_index, dataset.solo_precedent_manifest_sha256, include_zulip=False)
     (payload,) = data
-    await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
-    _report_budget(dataset, {}, len(data), logger, enforce=not dataset.dry_run, scaffold=scaffold)
 
     if dataset.dry_run:
+        await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
+        _report_budget(dataset, {}, len(data), logger, scaffold=scaffold)
         logger.info("DRY RUN — nothing is written and no model is called")
         assert_ready(scaffold, logger, enforce=False)
         guard_run_name(dataset, logger, scaffold, fatal=False, resume=resume)
@@ -2409,8 +2411,7 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
                     else "prebuilt")
         return None
     if resume and request.accepted():
-        logger.info("%s: the accepted submission is already archived; nothing to run",
-                    dataset.run_name)
+        logger.info("%s: the submitted review is already archived; nothing to run", dataset.run_name)
         return None
 
     scaffold.execution.sample_max_cost = dataset.solo_cost_cap
@@ -2419,16 +2420,22 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
     tasks_dir = scaffold.execution.get_tasks_path(scratch[0])
     tasks = [create_task_from_data(item, scaffold, task_config_overrides=scaffold.task_config_overrides)
              for item in data]
-    if resume and await _accepted_on_disk(tasks_dir, tasks):
+    recovering = resume and await _accepted_on_disk(tasks_dir, tasks)
+    if not recovering:
+        # What only a session needs, checked before the generation record is written, so a
+        # refused start leaves nothing behind and the same command can be run again.
+        assert_ready(scaffold, logger, enforce=True)
+        _report_budget(dataset, {}, len(data), logger, enforce=True, scaffold=scaffold)
+    await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
+    if recovering:
         # Interrupted after the session was accepted and before it was archived. The orchestrator
-        # finishes the task's publication, its outcome record included, and schedules nothing,
-        # since the task has its result; no session is started, so none of its resources is needed.
+        # finishes the task's publication, its result and outcome records included, and schedules
+        # nothing, since the task has an accepted sample; no session is started.
         logger.info("%s: the accepted session is on disk; archiving it without another session",
                     dataset.run_name)
         return await TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                       logger=logger).run(tasks)
-    # Everything from here on is needed only to run a session.
-    assert_ready(scaffold, logger, enforce=True)
+
     if resume and not any(path.exists() for path in scratch):
         # Interrupted after the generation inputs were recorded and before the first attempt.
         resume = False
@@ -2457,15 +2464,17 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
 
 
 async def _accepted_on_disk(tasks_dir: Path, tasks) -> bool:
-    """Whether every task already holds an accepted submission, which the orchestrator would skip."""
+    """Whether every task already holds an accepted sample, so no further session is needed.
+
+    The task result may still be missing: a process killed between saving the sample and
+    publishing it leaves that state, and the orchestrator's reconciliation publishes it.
+    """
     from ape.orchestration.persistence import TaskStorage
 
     for task in tasks:
         storage = TaskStorage(tasks_dir / task.data.global_index, task.data.global_index)
-        result = await storage.load_task_result()
         samples = await storage.load_all_samples()
-        if not (result and result.get("success")
-                and any(sample.successful_attempt for sample in samples.values())):
+        if not any(sample.successful_attempt for sample in samples.values()):
             return False
     return True
 
