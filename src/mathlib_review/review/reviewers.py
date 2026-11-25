@@ -3,6 +3,7 @@
 import asyncio
 import json
 import re
+import sys
 from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
@@ -65,7 +66,7 @@ class ReviewRequest:
             raise ValueError("The profile differs from the standard single-session whole-PR contract")
         message, tools, record = await inspect_review(payload, dataset, scaffold, ep)
         expected = set(COMMON_TOOLS)
-        run = {"run": dataset.run_name, "episodes": {str(self.pr): record}, "inputs": inputs,
+        run = {"run": dataset.run_name, "episodes": {str(self.pr): record},
                "tasks_dir": str(scaffold.execution.get_tasks_path(Path(scaffold.runs_base_dir) / dataset.run_name))}
         manifest = {"fixture": False, "reviewer": self.reviewer, "sample": 1, "runs": {self.reviewer: run},
                     "profile_sha256": sha256_bytes(canonical_json_bytes(scaffold.model_dump(mode="json"))),
@@ -84,13 +85,14 @@ class ReviewRequest:
         if dataset.dry_run:
             print(message)
             print(json.dumps(manifest, indent=2))
+            print(f"Run inputs: {json.dumps(inputs, sort_keys=True)}", file=sys.stderr)
         else:
-            saved = self.directory / "generation.json"
-            if saved.is_file() and all("inputs" not in r for r in submissions.read(saved)["runs"].values()):
-                # Recorded before a named run kept its inputs; its run plan holds them instead.
-                run.pop("inputs")
-            write_once(saved, pretty_json_bytes(manifest))
+            write_once(self.directory / "generation.json", pretty_json_bytes(manifest))
             write_once(self.directory / "first-message.txt", message.encode())
+            # Beside the generation record, so a record written before runs kept their inputs
+            # still matches byte for byte and gains them before its reviewer is dispatched.
+            write_once(self.directory / submissions.INPUTS_FILE,
+                       pretty_json_bytes({dataset.run_name: inputs}))
 
 
 def run_reviewer(args, logger):

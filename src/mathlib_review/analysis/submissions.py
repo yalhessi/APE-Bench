@@ -54,14 +54,18 @@ def check_attempt(attempt, expected):
     return transcript, calls
 
 
-def generation_inputs(name, run):
+#: A named review's design and search index, by run, written before its reviewer is dispatched.
+INPUTS_FILE = "inputs.json"
+
+
+def generation_inputs(out, name):
     """The design and search index one generation ran with.
 
-    A named run records them beside its first message. Study generations, and named ones
-    recorded before 25 November 2026, sealed them in the runner's `run_plan.json`.
+    A named run records them in `inputs.json` beside its generation record. Study generations,
+    and named ones archived before 25 November 2026, sealed them in the runner's `run_plan.json`.
     """
-    if "inputs" in run:
-        return run["inputs"]
+    if (out / INPUTS_FILE).is_file():
+        return read(out / INPUTS_FILE)[name]
     plan = read(run_dir(name) / "run_plan.json")
     if plan["run_name"] != name:
         raise ValueError(f"{name}: run plan belongs to a different reviewer")
@@ -79,7 +83,7 @@ async def capture(out, runs):
         manifest = run_dir(name) / "run_manifest.json"
         if not named and (not manifest.exists() or read(manifest)["completion_status"] != "complete"):
             raise ValueError(f"{name}: review generation is incomplete; resume the generation command")
-        inputs = generation_inputs(name, run)
+        inputs = generation_inputs(out, name)
         if inputs["design"] != "whole_pr":
             raise ValueError(f"{name}: generated with design {inputs['design']!r}, not a whole-PR review")
         search = "history_sha256" in run or arm == "history"
@@ -141,6 +145,7 @@ async def capture(out, runs):
         write_once(path, pretty_json_bytes(findings))
         sources[arm] = {"kind": "findings_file", "path": str(path)}
     artifact = {"generation_sha256": sha256_file(out / "generation.json"), "records": records,
+                **({"inputs_sha256": sha256_file(out / INPUTS_FILE)} if (out / INPUTS_FILE).is_file() else {}),
                 "sources": sources, "projection_sha256": {
                     arm: sha256_file(Path(src["path"])) for arm, src in sources.items()}}
     write_once(out / "archive.json", pretty_json_bytes(artifact))
@@ -183,6 +188,8 @@ def saved_reviews(out, *, recover=False):
     artifact = read(path) if path.is_file() else asyncio.run(capture(out, generation["runs"]))
     if artifact["generation_sha256"] != sha256_file(out / "generation.json"):
         raise ValueError("The archived reviews refer to another generation plan")
+    if "inputs_sha256" in artifact and artifact["inputs_sha256"] != sha256_file(out / INPUTS_FILE):
+        raise ValueError(f"{out}: the recorded run inputs changed")
     arms = set(generation["runs"])
     if arms != set(artifact["sources"]) or arms != set(artifact["projection_sha256"]):
         raise ValueError(f"{out}: archived finding sources differ from the planned strategies")

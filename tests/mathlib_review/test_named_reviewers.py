@@ -269,6 +269,29 @@ def test_empty_mixed_and_failed_reviews_have_distinct_outcomes(checkout, provide
     assert provider.sessions == ["empty", "mixed", "failed"]
 
 
+def test_a_pre_change_run_interrupted_before_its_run_plan_resumes_and_archives(checkout, provider, monkeypatch):
+    alias = "early-42184"
+    out = submissions.review_directory(alias)
+
+    async def lost(self, tasks):
+        raise InterruptedError("killed before the first attempt")
+
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", lost)
+    with pytest.raises(InterruptedError):
+        cli.main(run_options("solo-v1", alias))
+    # The record the earlier code left: its generation alone, before it sealed a run plan.
+    generation = submissions.read(out / "generation.json")
+    assert all("inputs" not in run for run in generation["runs"].values())
+    for run in generation["runs"].values():
+        assert not Path("results/pr_review_v5/runs", run["run"], "run_plan.json").exists()
+    (out / submissions.INPUTS_FILE).unlink()
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", provider)
+    assert cli.main([*run_options("solo-v1", alias), "--resume"]) == 0
+    assert provider.sessions == [alias]
+    _, archive = submissions.saved_reviews(out)
+    assert archive["records"][0]["findings"] == 0
+
+
 def test_a_session_lost_to_system_errors_runs_again_on_resume(checkout, provider, capsys):
     alias = "lost-42184"
     provider.reviews[alias] = "lost"
@@ -294,7 +317,9 @@ def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, prov
             plan, archive = submissions.saved_reviews(out)
             assert archive["records"][0]["findings"] == 0
             run = plan["runs"][reviewer]
-            assert run["inputs"]["design"] == "whole_pr"
+            recorded = submissions.read(out / submissions.INPUTS_FILE)[run["run"]]
+            assert recorded["design"] == "whole_pr"
+            assert ("context_index_sha256" in recorded) == (reviewer == "pr-search-v1")
             assert not Path(".ape/runs", run["run"], "run_plan.json").exists()
             generated[label, reviewer] = ((out / "first-message.txt").read_text(), run["episodes"]["42184"])
     keys = ("message_sha256", "mcp", "mcp_schema_sha256", "builtins", "model", "effort", "cutoff",
