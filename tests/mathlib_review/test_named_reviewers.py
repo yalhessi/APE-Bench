@@ -1,7 +1,10 @@
 """Independent reviewer entry points and fresh readings of a saved submission."""
 
 import json
+import os
 import shutil
+import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Event
@@ -9,9 +12,13 @@ from types import SimpleNamespace
 
 import pytest
 
+from ape.tasks.lean_tasks.formal_math.review.whole_pr import SubmittedFinding
 from src.mathlib_review.analysis import submissions
 from src.mathlib_review.io import pretty_json_bytes
+from src.mathlib_review.judge.ask_matching import render_matcher_prompt
 from src.mathlib_review.review import cli, reviewers, runner
+
+PROBE = Path("results/pr_review_v5/probes/named-episode-review-2026-11-25")
 
 
 def put(path, value):
@@ -56,9 +63,9 @@ def provider(checkout, monkeypatch):
     async def accept(self, tasks):
         task, = tasks
         task_dir = self.tasks_dir / task.data.global_index
-        plans = [submissions.read(path) for path in Path(".ape/reviews").glob("*/generation.json")]
-        record, = [run["episodes"]["42184"] for plan in plans for run in plan["runs"].values()
-                   if run["run"] == self.orchestrator_id]
+        plans = {path: submissions.read(path) for path in Path(".ape/reviews").glob("*/generation.json")}
+        (plan_path, record), = [(path, run["episodes"]["42184"]) for path, plan in plans.items()
+                                for run in plan["runs"].values() if run["run"] == self.orchestrator_id]
         folder = task_dir / "samples/0"
         attempt = folder / "attempts/ok"
         cwd = str(attempt / "workspaces")
@@ -71,8 +78,12 @@ def provider(checkout, monkeypatch):
         message = Path(record["message"]).read_text().replace("{attempt_workspaces}", cwd)
         (attempt / "claude_code_conversation_1.jsonl").write_text(
             json.dumps({"type": "user", "message": {"content": message}}) + "\n")
+        review = reviews.get(Path(plan_path).parent.name, {})
+        submitted = [SubmittedFinding(**finding) for finding in review.get("findings", [])]
         raw = {"pr_number": task.data.pr_number, "episode_id": task.data.episode_id, "success": True,
-               "submitted_findings": [], "findings": [], "review_message": "No changes requested."}
+               "submitted_findings": [f.model_dump(exclude_unset=True) for f in submitted],
+               "findings": [f.recorded() for f in submitted],
+               "review_message": review.get("message", "No changes requested.")}
         put(folder / "sample.json", {"sample_id": "s", "sample_index": 0,
             "task_global_index": task.data.global_index, "created_at": "2026-11-25", "updated_at": "2026-11-25",
             "attempts": [{"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
@@ -81,6 +92,8 @@ def provider(checkout, monkeypatch):
         put(task_dir / "task_result.json", raw)
         return SimpleNamespace(task_results=[raw])
 
+    reviews = {}
+    accept.reviews = reviews
     monkeypatch.setattr(runner.TaskOrchestrator, "run", accept)
 
     return accept
@@ -184,3 +197,82 @@ def test_overlapping_reviewers_can_finish_and_resume_independently(provider, mon
     a, b = ordinary["episodes"]["42184"], history["episodes"]["42184"]
     assert a["message_sha256"] == b["message_sha256"]
     assert set(b["mcp"]) - set(a["mcp"]) == {"precedent_search"}
+
+
+def saved_42184_reviews(repo):
+    """The two accepted 42184 submissions recorded by the historical route, as their author filed them."""
+    saved = json.loads((repo / PROBE.parent / "convention-scope-2026-11-24/full_tool_reviews.json").read_text())
+    reviews = {}
+    for review in saved:
+        sample = {"ordinary": "ordinary", "comparison": "guided"}[review["arm"]]
+        reviews[sample] = {"message": review["review_message"], "findings": [
+            {"claim": f["claim"], "suggested_fix": f["requested_change"], "path": f["anchor"]["path"],
+             "line_start": f["anchor"]["line_start"], "line_end": f["anchor"]["line_end"]}
+            for f in sorted(review["findings"], key=lambda f: f["submitted_rank"])]}
+    return reviews
+
+
+DISABLED_GENERATION = """
+import sys
+from ape.orchestration import TaskOrchestrator
+from src.mathlib_review.review import cli, reviewers, runner
+
+def refuse(*args, **kwargs):
+    raise SystemExit("generation is disabled in this process")
+
+TaskOrchestrator.run = runner.run = reviewers.run_reviewer = refuse
+sys.exit(cli.main(sys.argv[1:]))
+"""
+
+
+def score_without_generation(repo, *args):
+    env = {**os.environ, "PYTHONPATH": f"{repo / 'src'}{os.pathsep}{repo}"}
+    done = subprocess.run([sys.executable, "-c", DISABLED_GENERATION, "score", *args],
+                          env=env, capture_output=True, text=True, timeout=300)
+    assert done.returncode == 0, done.stdout + done.stderr
+    return done.stdout
+
+
+def copy_reference(repo):
+    reference = submissions.probes.load_probe_set(submissions.REFERENCE)
+    reference.probe_dir.mkdir(parents=True, exist_ok=True)
+    for path in (reference.asks_file, reference.feedback_file):
+        shutil.copy(repo / path, path)
+
+
+def matcher_messages(alias):
+    """Each final matcher message prepared for one saved review, by question policy."""
+    out = {}
+    for path in Path(".ape/review-comparisons").rglob(submissions.matching.PLAN_FILE):
+        plan = submissions.matching.load_plan(path.parent)
+        if set(plan.seal["42184"].values()) == {alias}:
+            policy = plan.identity.question_policy
+            out[policy] = render_matcher_prompt(plan.packets, policy)
+    return out
+
+
+def test_named_reading_reproduces_the_pre_change_matcher_input(checkout, provider, monkeypatch):
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+
+    def index(collection):
+        directory = Path("frozen-index")
+        put(directory / "manifest.json", {"corpus_sha256": collection.sha256})
+        return directory
+
+    monkeypatch.setattr(reviewers.ExcerptCollection, "index", index)
+    monkeypatch.setattr(PrecedentIndex, "shared", lambda *a, **kw: None)
+    saved = saved_42184_reviews(checkout)
+    assert [len(saved[s]["findings"]) for s in ("ordinary", "guided")] == [1, 2]
+    assert saved["guided"]["findings"][0]["line_start"] == 239
+    for sample, reviewer in (("ordinary", "solo-v1"), ("guided", "pr-search-v1")):
+        provider.reviews[sample] = saved[sample]
+        assert cli.main(run_options(reviewer, sample)) == 0
+    copy_reference(checkout)
+    for sample in ("ordinary", "guided"):
+        for scorer in ("round1-requests-v1", "round1-questions-v1"):
+            score_without_generation(checkout, "--of", sample, "--using", scorer)
+        rendered = matcher_messages(sample)
+        assert set(rendered) == {"request_only", "questions"}
+        for policy, text in rendered.items():
+            baseline = checkout / PROBE / "before" / f"matcher-{sample}-named-{policy}.txt"
+            assert text == baseline.read_text(), (sample, policy)

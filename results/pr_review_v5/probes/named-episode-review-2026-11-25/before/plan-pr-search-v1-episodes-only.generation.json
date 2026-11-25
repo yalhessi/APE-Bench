@@ -1,0 +1,60 @@
+{
+  "definition": {
+    "history": {
+      "before": "2026-01-01T00:00:00Z",
+      "excluded": [
+        41930,
+        42184
+      ],
+      "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "sha256": "1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03",
+      "source": "data/pr_review_v5/first_round_development_before_2026-01-01.jsonl"
+    },
+    "profile": "configs/designs/whole_pr_familiar.yaml"
+  },
+  "fixture": false,
+  "history_sha256": "1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03",
+  "index_manifest_sha256": "4d8ba49ed1c6292e2b5337b09be369b4c417f84aa32124a5f0794781b1a86fac",
+  "profile_sha256": "012ac33c63fa405cb26aebc441fc51f2a180bffb9878b4bdaf155fd2796547cd",
+  "release": "<episodes-only copy>",
+  "reviewer": "pr-search-v1",
+  "runs": {
+    "pr-search-v1": {
+      "episodes": {
+        "42184": {
+          "base_sha": "5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3",
+          "builtins": [
+            "Glob",
+            "Grep",
+            "Read"
+          ],
+          "cli_version": "2.1.285",
+          "cost_cap": 1.5,
+          "cutoff": "2026-07-28T12:41:04Z",
+          "effort": "xhigh",
+          "episode_id": "leanprover-community/mathlib4:42184:round1:c5474cb4a68a515228b49225b38a2507264f91f7",
+          "max_turns": 40,
+          "mcp": [
+            "code_goto",
+            "code_hover",
+            "declaration_search",
+            "get_lean_goal",
+            "lean_verify",
+            "lean_verify_edit",
+            "precedent_search",
+            "submit_findings"
+          ],
+          "mcp_schema_sha256": "142c97fea45efbedc326a621cf0956f4cc3290f7006f0cd68bfc0fdc74af3f0f",
+          "message_sha256": "1e07684b151bb46c1295a20ddb7b21672cc8095aa6f5db70633380784219d2b3",
+          "model": "claude-opus-5-5",
+          "patch_sha256": "75ebc25bc5f5ec39926f4c600e054def8c1688e54825e6a9a9f4113ecbd2e18d",
+          "reviewed_head_sha": "c5474cb4a68a515228b49225b38a2507264f91f7",
+          "token_cap": 600000
+        }
+      },
+      "history_sha256": "1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03",
+      "run": "rc68dde83b4119d9123847525"
+    }
+  },
+  "sample": 1
+}

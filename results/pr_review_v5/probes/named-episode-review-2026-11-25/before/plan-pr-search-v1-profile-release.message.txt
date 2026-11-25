@@ -1,0 +1,60 @@
+You work through tools: they are how you read, search, compile and check anything in the workspace. The task's submission tool records your result and ends the session. Call it once, when you have finished.
+
+<WORKSPACE_PATHS>
+**Your working directory contains:**
+
+- **{attempt_workspaces}/scratch**: Your workspace (read-write)
+  - Your primary workspace for creating and editing files
+- **/research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3+0f03738044bd**: Lean project (read-only)
+  - The library environment for verification
+
+**Use absolute paths in file operations:**
+- Your files: `{attempt_workspaces}/scratch/...`
+- Target files: `/research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3+0f03738044bd/...`
+
+</WORKSPACE_PATHS>
+
+IMPORTANT: Your current working directory is `{attempt_workspaces}`. Use absolute paths like `{attempt_workspaces}/scratch/`, `{attempt_workspaces}/target/`. Never use relative paths.
+
+
+================================================================================
+
+Review this Mathlib PR at the supplied revision. What changes, if any, would you ask the author to make? Give an ordered list of findings. For each finding, say what to change and why. You may return an empty list.
+
+Submit with `mcp__core__submit_findings`.
+
+## Pull request #42184
+
+feat(Topology/InfiniteSum): non-negativity of tprod
+
+A surprisingly missing lemma. Hopefully I didn't miss anything
+
+Reviewed revision: `c5474cb4a68a515228b49225b38a2507264f91f7`
+
+Changed files:
+- `Mathlib/Topology/Algebra/InfiniteSum/Order.lean`
+
+```diff
+diff --git a/Mathlib/Topology/Algebra/InfiniteSum/Order.lean b/Mathlib/Topology/Algebra/InfiniteSum/Order.lean
+--- a/Mathlib/Topology/Algebra/InfiniteSum/Order.lean
++++ b/Mathlib/Topology/Algebra/InfiniteSum/Order.lean
+@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip
+ 
+ end OrderedCommGroup
+ 
++section WithZero
++
++theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]
++    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :
++    0 ≤ ∏'[L] x, f x := by
++  by_cases h : Multipliable f L
++  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i
++  · simp [tprod_eq_one_of_not_multipliable h]
++
++end WithZero
++
+ section CanonicallyOrderedMul
+ 
+ variable [CommMonoid α] [PartialOrder α] [IsOrderedMonoid α]
+
+```
