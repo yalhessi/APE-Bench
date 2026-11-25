@@ -1,5 +1,4 @@
 """Freeze actual PacketSession inputs and exercise the two selector paths without a model."""
-import importlib.util
 import json
 from pathlib import Path
 
@@ -8,26 +7,26 @@ import pytest
 from src.mathlib_review.analysis import sessions
 from src.mathlib_review.io import jsonl_bytes, pretty_json_bytes, sha256_file
 
-SCRIPT = (Path(__file__).resolve().parents[2] / "results/pr_review_v5/probes"
-          / "convention-scope-2026-11-24/pilot/conventions.py")
-spec = importlib.util.spec_from_file_location("four_review_conventions", SCRIPT)
-study = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(study)
+from src.mathlib_review.analysis import probes
+from src.mathlib_review.conventions import selection as study
+from src.mathlib_review.review.study import ReviewStudy
+import yaml
 
 
-def test_source_only_and_separate_selectors(tmp_path, monkeypatch):
+@pytest.mark.parametrize("selectors", [("automatic", "exact"), ("automatic",), ("exact",)])
+def test_source_only_and_separate_selectors(tmp_path, monkeypatch, selectors):
     source = tmp_path / "history/excerpts.jsonl"
     source.parent.mkdir()
     source.write_bytes(jsonl_bytes([{"comment_id": 123, "pr_number": 42, "diff_hunk": "+lemma foo",
                                      "body": "Use the theorem with weaker assumptions."}]))
     (source.parent / "manifest.json").write_bytes(pretty_json_bytes({"corpus_sha256": sha256_file(source)}))
     out = tmp_path / "private"
+    spec = ReviewStudy.model_validate(yaml.safe_load(Path("configs/studies/familiar-conventions.yaml").read_text()))
+    inputs = {"reference": probes.load_probe_set(spec.reference), "heads": spec.heads, "config": spec.selector,
+              "selectors": selectors}
     stages = []
 
-    def local_observations(args, *, check):
-        directory = Path(args[args.index("--plan") + 1])
-        run = args[args.index("--run-name") + 1]
-        plan = sessions.load_session_plan(directory)
+    def local_observations(plan, directory, config, run):
         stage = directory.parent.name
         stages.append(stage)
         rows = []
@@ -58,23 +57,25 @@ def test_source_only_and_separate_selectors(tmp_path, monkeypatch):
                                         "task", {"attempt": str(attempt)}, {}, {"answer.json": json.dumps(value)}))
         sessions._write_index(directory, f"task-{run}", rows)
 
-    monkeypatch.setattr(study.subprocess, "run", local_observations)
-    assert study.prepare(out, source) is None
+    monkeypatch.setattr(study, "execute_packets", local_observations)
+    assert study.prepare(out, source, **inputs) is None
     assert stages == []
     with monkeypatch.context() as changed:
         changed.setattr(study, "AUTO", "Use a different selector contract.")
         with pytest.raises(FileExistsError, match="protocol.json"):
-            study.prepare(out, source, execute=True)
+            study.prepare(out, source, **inputs, execute=True)
     assert stages == []
-    actual = study.prepare(out, source, execute=True)
-    assert stages == ["extract", "merge", "automatic", "exact"]
-    assert actual["automatic"] == {"prs": {"41930": ["C0001"], "42184": ["C0001"]}}
-    assert actual["exact"] == {"prs": {"41930": [], "42184": []}}
-    assert study.load_verified(out, source) == actual
-    assert len(stages) == 4
-    (out / "automatic.json").write_text("{}")
-    with pytest.raises(ValueError, match="changed since selection"):
-        study.load_verified(out, source)
+    actual = study.prepare(out, source, **inputs, execute=True)
+    assert stages == ["extract", "merge", *selectors]
+    if "automatic" in selectors:
+        assert actual["automatic"] == {"prs": {"41930": ["C0001"], "42184": ["C0001"]}}
+    if "exact" in selectors:
+        assert actual["exact"] == {"prs": {"41930": [], "42184": []}}
+    assert study.prepare(out, source, **inputs) == actual
+    assert len(stages) == 2 + len(selectors)
+    (out / f"{selectors[0]}.json").write_text("{}")
+    with pytest.raises(FileExistsError, match=selectors[0]):
+        study.prepare(out, source, **inputs)
 
 
 def test_reject_fabricated_citation_in_anotherwise_valid_rule():

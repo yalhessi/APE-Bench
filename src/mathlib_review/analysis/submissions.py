@@ -3,17 +3,12 @@
 import asyncio
 import json
 import re
-import subprocess
-import sys
 from pathlib import Path
 
 from ape.orchestration.persistence import TaskStorage
 from src.mathlib_review.analysis import matching, probes
 from src.mathlib_review.io import jsonl_rows, pretty_json_bytes, sha256_bytes, sha256_file, write_once
 from src.mathlib_review.paths import run_dir
-
-SET = Path("configs/probe_sets/postcutoff_2026_07_08_v1.yaml")
-CONFIG = Path("configs/match/ask_match_opus55_claude_sub.yaml")
 
 
 def read(path):
@@ -126,7 +121,7 @@ async def capture(out, runs):
     return artifact
 
 
-def prepare_reading(out, sources, prs, question_form, reading=None):
+def prepare_reading(out, sources, prs, question_form, *, reference, name, reading=None):
     # Two rubrics on the same blind order and same source bytes can be read side by side.
     seal_path = out / "seal.json"
     if not seal_path.exists():
@@ -143,16 +138,16 @@ def prepare_reading(out, sources, prs, question_form, reading=None):
             raise ValueError(f"{folder}: saved reading belongs to another rubric or seal")
     else:
         plan = matching.plan_matching(
-            probes.load_probe_set(SET), name=f"familiar_four_{out.name}_{key}",
+            reference, name=f"{name}_{out.name}_{key}",
             seal=read(seal_path), seal_path=seal_path,
             sources={k: probes.Source.model_validate(v) for k, v in sources.items()},
             out_dir=folder, version="2-task", question_policy=policy, replicates=2, harness_blind=True)
     return plan, folder
 
 
-def compare(out, question_form, execute, reading=None):
+def compare(out, question_form, execute, *, reference, name, config, reading=None):
     if not (out / "generation.json").is_file():
-        raise ValueError(f"{out}: no frozen generation plan")
+        raise ValueError(f"{out}: no saved generation. Generate this sample with study run --execute first.")
     generation = read(out / "generation.json")
     if generation["fixture"]:
         raise ValueError("Synthetic wiring fixtures cannot be evaluated as pilot runs")
@@ -160,26 +155,25 @@ def compare(out, question_form, execute, reading=None):
     artifact = read(path) if path.is_file() else asyncio.run(capture(out, generation["runs"]))
     if artifact["generation_sha256"] != sha256_file(out / "generation.json"):
         raise ValueError("The archived reviews refer to another generation plan")
+    arms = set(generation["runs"])
+    if arms != set(artifact["sources"]) or arms != set(artifact["projection_sha256"]):
+        raise ValueError(f"{out}: archived finding sources differ from the planned strategies")
     for arm, digest in artifact["projection_sha256"].items():
         if sha256_file(Path(artifact["sources"][arm]["path"])) != digest:
             raise ValueError(f"{arm}: archived matcher input changed")
     prs = sorted(int(pr) for pr in generation["runs"]["solo"]["episodes"])
-    plan, folder = prepare_reading(out, artifact["sources"], prs, question_form, reading)
-    cli = [sys.executable, "-m", "src.mathlib_review.review.cli"]
-    name = "m" + plan.source_sha256[:20]
-    subprocess.run([*cli, "match", "--plan", str(folder), "--config", str(CONFIG), "--run-name", name,
-                    *(["--execute"] if execute else [])], check=True)
+    plan, folder = prepare_reading(out, artifact["sources"], prs, question_form,
+                                   reference=reference, name=name, reading=reading)
+    print(f"{folder}: {plan.expected_cells} cells per reading, {plan.identity.replicates} readings")
     if execute:
-        subprocess.run([*cli, "report", "match", "--plan", str(folder), "--producer", "task-" + name], check=True)
+        from ape.utils.logging import create_logger
+        from src.mathlib_review.review.preflight import assert_credentials
+        from src.mathlib_review.run_config import load_run
 
-
-def replay_check(out):
-    # Real, previously accepted reviews. The live-era recipe predates the new task contract.
-    runs = {"ordinary": "scope_solo_opus55_42184_ordinary_20261124",
-            "guided": "scope_solo_opus55_42184_comparison_20261124"}
-    sources = {s: {"kind": "solo", "run": name} for s, name in runs.items()}
-    a, _ = prepare_reading(out, sources, [42184], False)
-    b, _ = prepare_reading(out, sources, [42184], True)
-    if a.packets != b.packets or a.identity.rubric_sha256 == b.identity.rubric_sha256 or a.expected_cells != 4:
-        raise ValueError("The two readings did not reuse the same archived findings with different rubrics")
-    print("Archive replay: two real submissions, identical blind packets, two distinct rubric hashes.")
+        _, scaffold, _ = load_run(config, matching.MatchDatasetConfig)
+        assert_credentials(scaffold)
+        run = "m" + plan.source_sha256[:20]
+        rows = asyncio.run(matching.run_matching(plan, folder, scaffold, run, create_logger()))
+        if len(rows) != len(plan.batches) * plan.identity.replicates:
+            raise ValueError(f"{folder}: incomplete matcher results")
+        print(json.dumps(matching.report_matching(folder, producers=["task-" + run]), indent=2))

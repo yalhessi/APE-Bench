@@ -199,12 +199,11 @@ def test_pinned_index_uses_the_same_dated_excerpts_as_catalogue(tmp_path, monkey
 
 
 def test_pilot_freezes_the_anchor_and_checks_full_text_before_cropping():
-    from pathlib import Path
-    from runpy import run_path
+    from functools import partial
+    from src.mathlib_review.retrieval.excerpts import excerpt
     from src.mathlib_review.retrieval_gate import RetrievalGate
 
-    freeze_excerpt = run_path(str(Path("results/pr_review_v5/probes")
-                                  / "convention-scope-2026-11-24/pilot/history.py"))["excerpt"]
+    freeze_excerpt = partial(excerpt, targets=[41930, 42184])
     gate = RetrievalGate(as_of="2026-01-01T00:00:00Z")
     raw = {"id": 12, "path": "Mathlib/A.lean", "user": {"login": "reviewer"},
            "diff_hunk": "h" * 1000 + "+the_anchor", "body": "b" * 500,

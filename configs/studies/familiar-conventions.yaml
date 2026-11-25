@@ -1,0 +1,12 @@
+name: familiar-four-v1
+output: .ape/four-review-pilot
+reviewer: configs/designs/whole_pr_familiar.yaml
+selector: configs/session/packet_session_opus55_claude_sub.yaml
+matcher: configs/match/ask_match_opus55_claude_sub.yaml
+reference: configs/probe_sets/postcutoff_2026_07_08_v1.yaml
+history: data/pr_review_v5/first_round_development_before_2026-01-01.jsonl
+history_before: '2026-01-01T00:00:00Z'
+strategies: [solo, history, automatic, exact]
+heads:
+  41930: ec56eae52c28b70ec6cc92f1a295973c193353a0
+  42184: c5474cb4a68a515228b49225b38a2507264f91f7

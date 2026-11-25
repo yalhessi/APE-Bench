@@ -71,6 +71,14 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
   merging them rewrites every frozen hash. Task `type` strings keep their `v5` spelling because they
   sit inside spec hashes.
 
+## Compare review strategies
+
+Use the review CLI’s `study` command for paired comparisons of solo, excerpt search, automatic convention delivery and reference-informed delivery. A study YAML supplies the cases, earlier source collection, cutoff, reviewer, selector, matcher and reference set. For a different comparison, give the study its own output directory and choose its pinned heads and strategies. For example, `strategies: [solo, history]` compares direct search to solo without spending on convention learning or selection. [Familiar PR study](../../configs/studies/familiar-conventions.yaml)
+
+- `study plan NAME` inspects reviewer messages and tools without model calls.
+- `study prepare NAME --execute` builds the catalogue and selections. `study run NAME --execute` also handles missing preparation, generates the paired reviews and archives the accepted submissions.
+- `study score NAME --execute` judges the archived sample. Use `--sample` to identify a generation and `--reading` to name another evaluation of it. [Worked example and commands](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md)
+
 ## Reporting results
 
 - **Every number names its measurement.** Two instruments are live and they answer different

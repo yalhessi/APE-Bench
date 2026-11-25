@@ -1,7 +1,6 @@
 """An accepted empty review can be reread. A failed attempt cannot occupy that cell."""
 
 import asyncio
-import importlib.util
 import json
 from pathlib import Path
 
@@ -9,10 +8,7 @@ import pytest
 
 from src.mathlib_review.io import pretty_json_bytes, sha256_bytes
 
-PROBE = Path(__file__).resolve().parents[2] / "results/pr_review_v5/probes/convention-scope-2026-11-24"
-SPEC = importlib.util.spec_from_file_location("familiar_measure", PROBE / "pilot/measure.py")
-measure = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(measure)
+from src.mathlib_review.analysis import submissions as measure
 
 
 def put(path, obj):
@@ -66,3 +62,30 @@ def test_archive_selects_accepted_attempt_and_preserves_order(tmp_path, monkeypa
     put(folder / "sample.json", sample)
     with pytest.raises(ValueError, match="no accepted submission"):
         asyncio.run(measure.capture(out, runs))
+
+
+def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
+    from src.mathlib_review.review.cli import main
+    from src.mathlib_review.io import sha256_file
+    import yaml
+
+    spec = yaml.safe_load(Path("configs/studies/familiar-conventions.yaml").read_text())
+    spec["heads"].pop(41930)
+    spec.update(name="one-reviewed-head", output=str(tmp_path), history="unavailable")
+    config = tmp_path / "study.yaml"
+    config.write_text(yaml.safe_dump(spec))
+    out = tmp_path / "sample-2"
+    sources = {}
+    for arm in ("solo", "history", "automatic", "exact"):
+        path = out / arm / "findings.json"
+        put(path, {"42184": []})
+        sources[arm] = {"kind": "findings_file", "path": str(path)}
+    put(out / "generation.json", {"fixture": False, "runs": {arm: {"episodes": {"42184": {}}} for arm in sources}})
+    put(out / "archive.json", {"generation_sha256": sha256_file(out / "generation.json"), "sources": sources,
+                               "projection_sha256": {a: sha256_file(Path(v["path"])) for a, v in sources.items()}})
+    for flags in ([], ["--question-form"]):
+        assert main(["study", "score", str(config), "--sample", "2", *flags]) == 0
+    plans = [measure.matching.load_plan(path) for path in (out / "readings").iterdir()]
+    assert len(plans) == 2 and plans[0].packets == plans[1].packets
+    assert plans[0].identity.rubric_sha256 != plans[1].identity.rubric_sha256
+    assert not (tmp_path / "conventions").exists()

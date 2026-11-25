@@ -44,7 +44,8 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match", "session"})
+SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match", "session",
+                    "study prepare", "study run", "study score"})
 
 
 def _producer(args) -> int:
@@ -159,6 +160,26 @@ def build_parser() -> argparse.ArgumentParser:
         prog="pr-review", description=__doc__.split("\n")[0],
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
+
+    study = sub.add_parser("study", help="paired convention review studies, configured in configs/studies")
+    stages = study.add_subparsers(dest="study_action", required=True)
+    for action, summary in (
+        ("plan", "inspect the reviewer inputs and tool grants using local fixtures"),
+        ("prepare", "freeze the shared excerpts, learn conventions and select them for each PR"),
+        ("run", "prepare missing selections and generate a paired sample of reviews"),
+        ("score", "read a saved sample against its reference feedback"),
+    ):
+        stage = stages.add_parser(action, help=summary)
+        stage.add_argument("study", help="study name in configs/studies or path to a study YAML")
+        if f"study {action}" in SPENDS:
+            _add_execute(stage)
+        if action in ("run", "score"):
+            stage.add_argument("--sample", type=int, default=1)
+        if action == "prepare":
+            stage.add_argument("--retry", action="append", default=[], metavar="STAGE=N")
+        if action == "score":
+            stage.add_argument("--reading", help="name a new comparison of the same submissions")
+            stage.add_argument("--question-form", action="store_true", help="apply the alternative question rubric")
 
     plan = sub.add_parser("plan", help="render and price a run; call no model")
     plan.add_argument("--config", type=Path, required=True)
@@ -1172,6 +1193,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         overrides.setdefault("dataset", {})["run_name"] = args.run_name
     logger = create_logger()
 
+    if args.command == "study":
+        from src.mathlib_review.review.study import run_study
+        try:
+            return run_study(args, logger)
+        except (ValueError, FileNotFoundError, FileExistsError, BlockingIOError) as error:
+            parser.error(str(error))
     if args.command == "plan":
         return _plan(args.config, overrides, logger, of_run=args.of_run)
     if args.command == "run":

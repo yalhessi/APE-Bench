@@ -1,6 +1,5 @@
 """Freeze the same dated inline excerpts for precedent search and catalogue construction."""
 
-import argparse
 import json
 import tempfile
 from collections import Counter
@@ -18,13 +17,7 @@ from src.mathlib_review.retrieval.precedent_index import (
 from src.mathlib_review.retrieval_gate import RetrievalGate, UngatedTimestamp
 
 
-SOURCE = Path("data/pr_review_v5/first_round_development_before_2026-01-01.jsonl")
-DEFAULT_OUT = Path(".ape/four-review-pilot/history")
-CUTOFF = "2026-01-01T00:00:00Z"
-TARGETS = (41930, 42184)
-
-
-def excerpt(number, author, raw, gate):
+def excerpt(number, author, raw, gate, targets):
     """Return the actual display text available before the cutoff, or its exclusion reason."""
     if raw is None:
         return None, "raw_comment_missing"
@@ -42,7 +35,7 @@ def excerpt(number, author, raw, gate):
     hunk = (raw.get("diff_hunk") or "").strip()
     if not body or not hunk or not raw.get("path"):
         return None, "missing_comment_or_anchor"
-    if any(references_pr(text, pr) for pr in TARGETS for text in (body, hunk)):
+    if any(references_pr(text, pr) for pr in targets for text in (body, hunk)):
         return None, "references_pilot_target"
     return {
         "comment_id": raw["id"], "pr_number": number, "path": raw["path"],
@@ -51,11 +44,11 @@ def excerpt(number, author, raw, gate):
     }, None
 
 
-def freeze(out):
-    episodes = jsonl_rows(SOURCE)
+def freeze(out, source, cutoff, targets):
+    episodes = jsonl_rows(source)
     store = PullRequestStore()
-    gate = RetrievalGate(as_of=CUTOFF)
-    withheld = set(scored_pr_numbers()) | set(TARGETS)
+    gate = RetrievalGate(as_of=cutoff)
+    withheld = set(scored_pr_numbers()) | set(targets)
     rows = []
     excluded = []
     for episode in episodes:
@@ -70,7 +63,7 @@ def freeze(out):
             elif request["kind"] != "review_comment":
                 reason = request["kind"]
             else:
-                row, reason = excerpt(number, author, comments.get(key), gate)
+                row, reason = excerpt(number, author, comments.get(key), gate, targets)
             if reason:
                 excluded.append({"pr_number": number, "id": key, "reason": reason})
             else:
@@ -82,9 +75,9 @@ def freeze(out):
     write_once(corpus, jsonl_bytes(rows))
     write_once(out / "exclusions.jsonl", jsonl_bytes(excluded))
     manifest = {
-        "view": "familiar-pr-inline-excerpts/v1", "source": str(SOURCE),
-        "source_sha256": sha256_file(SOURCE), "source_prs": len(episodes),
-        "cutoff_exclusive": CUTOFF, "withheld_targets": list(TARGETS),
+        "view": "familiar-pr-inline-excerpts/v1", "source": str(source),
+        "source_sha256": sha256_file(source), "source_prs": len(episodes),
+        "cutoff_exclusive": cutoff, "withheld_targets": list(targets),
         "source_requests": len(rows) + len(excluded), "rows": len(rows),
         "retained_prs": len({row["pr_number"] for row in rows}),
         "comment_prefix_chars": MAX_SNIPPET, "hunk_suffix_chars": 2 * MAX_SNIPPET,
@@ -96,8 +89,8 @@ def freeze(out):
     return corpus, manifest
 
 
-def prepare(out):
-    corpus, manifest = freeze(out)
+def prepare(out, source, cutoff, targets):
+    corpus, manifest = freeze(out, source, cutoff, targets)
     index = out / "index"
     if not index.exists():
         # Publish a complete index atomically. A concurrent preparer can finish first.
@@ -121,10 +114,3 @@ def prepare(out):
             or [r["comment_id"] for r in loaded.meta] != [r["comment_id"] for r in jsonl_rows(corpus)]):
         raise ValueError("Search index and catalogue source disagree")
     return manifest
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    args = parser.parse_args()
-    print(json.dumps(prepare(args.out), indent=2))
