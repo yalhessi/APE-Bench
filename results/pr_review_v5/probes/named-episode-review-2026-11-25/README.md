@@ -21,3 +21,16 @@ diff -r results/pr_review_v5/probes/named-episode-review-2026-11-25/before <new-
 The saved samples are `scope_solo_opus55_42184_ordinary_20261124`, which filed one request, and `..._comparison_20261124`, which filed two, the first at line 239. Both guided requests reach the named reading, although the verified channel kept neither. The comparison fixes the reference, blind label and policy, and it says nothing about scores.
 
 `tests/mathlib_review/test_named_reviewers.py` replays the same two submissions through `run` with a local provider. It scores them in a new process in which generation raises, and checks the matcher messages against the named files in `before/`.
+
+## Archives written before the change
+
+Archives written by the code at `067749d3` still reopen on the new route. The test at that commit wrote the archives, and `reopen_pre_change.py` opened them with the current code. Generation raised in that process. Both 42184 archives, one finding and two findings, reopened. Each reading prepared matcher input byte-identical to `before/`. A pre-change generation with its archive removed, the state of an interruption before archiving, was rebuilt from its `run_plan.json` into a byte-identical archive.
+
+```bash
+base=.claude/worktrees/named-baseline-check old=<scratch>/old-archives
+git worktree add --detach "$base" 067749d3 && .claude/worktree-setup.sh "$base"
+(cd "$base" && PYTHONPATH="$PWD/src:$PWD" ape/bin/python -m pytest -q tests/mathlib_review/test_named_reviewers.py --basetemp="$old")
+cp -a "$old/test_named_reading_reproduces_0" <scratch>/reopen && rm -rf <scratch>/reopen/.ape/review-comparisons
+PYTHONPATH="$PWD/src:$PWD" ape/bin/python results/pr_review_v5/probes/named-episode-review-2026-11-25/reopen_pre_change.py \
+  <scratch>/reopen "$PWD/results/pr_review_v5/probes/named-episode-review-2026-11-25/before"
+```
