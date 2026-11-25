@@ -300,6 +300,15 @@ def test_a_pre_change_run_interrupted_before_its_run_plan_resumes_and_archives(c
     assert archive["records"][0]["findings"] == 0
 
 
+def test_a_run_records_the_profile_its_plan_previewed(checkout, provider, capsys):
+    assert cli.main(["plan", "--reviewer", "solo-v1", "--case", "42184@c5474cb4"]) == 0
+    printed = capsys.readouterr().out
+    previewed = json.loads(printed[printed.rindex("\n{\n") + 1:])
+    assert cli.main(run_options("solo-v1", "profiled-42184")) == 0
+    recorded = submissions.read(submissions.review_directory("profiled-42184") / "generation.json")
+    assert recorded["profile_sha256"] == previewed["profile_sha256"]
+
+
 def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch):
     alias = "no-login-42184"
 

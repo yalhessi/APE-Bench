@@ -2414,8 +2414,6 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         logger.info("%s: the submitted review is already archived; nothing to run", dataset.run_name)
         return None
 
-    scaffold.execution.sample_max_cost = dataset.solo_cost_cap
-    scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     scratch = _scratch_dirs(dataset.run_name, scaffold)
     tasks_dir = scaffold.execution.get_tasks_path(scratch[0])
     tasks = [create_task_from_data(item, scaffold, task_config_overrides=scaffold.task_config_overrides)
@@ -2427,6 +2425,10 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         assert_ready(scaffold, logger, enforce=True)
         _report_budget(dataset, {}, len(data), logger, enforce=True, scaffold=scaffold)
     await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
+    # After the generation record, which hashes the profile as `plan` previews it; the orchestrator
+    # reads the session ceilings from here.
+    scaffold.execution.sample_max_cost = dataset.solo_cost_cap
+    scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     if recovering:
         # Interrupted after the session was accepted and before it was archived. The orchestrator
         # finishes the task's publication, its result and outcome records included, and schedules
