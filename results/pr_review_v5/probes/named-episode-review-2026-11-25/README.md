@@ -29,7 +29,7 @@ Archives written by the code at `067749d3` still reopen on the new route, and a 
 - `reopen_pre_change.py` reopens both 42184 archives, with one finding and with two. It prepares both readings, whose matcher input is byte-identical to `before/`. It then removes the guided archive, the state of an interruption before archiving, and rebuilds it from the run's `run_plan.json` byte for byte.
 - `resume_pre_change.py` removes a finished run's archive and resumes it with `run --resume`, with no credential. It must run from the checkout that started the run, because the generation record hashes the scaffold, whose tool paths resolve inside the checkout. That was already true before this change. APE completes the task's missing outcome record without a session. The generation record is unchanged, no `inputs.json` is written because the run plan sealed the inputs, and the archive is byte-identical. The script restores the folder afterwards, so it can be run again.
 
-From the root of this branch's checkout, in zsh or bash. The block runs in a subshell that stops at the first failure. It creates its worktree under a new temporary folder, so it never touches an existing one.
+From the root of this branch's checkout, in zsh or bash. The block runs in a subshell that stops at the first failure. It creates its worktree under a new temporary folder, so it never touches an existing one, and removes it on exit, whether the checks pass or fail.
 
 ```bash
 (
@@ -40,16 +40,17 @@ From the root of this branch's checkout, in zsh or bash. The block runs in a sub
   scratch=$(mktemp -d)
   base=$scratch/baseline old=$scratch/old-archives
   git worktree add --detach "$base" 067749d3
+  trap 'git -C "$repo" worktree remove --force "$base"' EXIT
   .claude/worktree-setup.sh "$base"
   git -C "$base" apply "$probe/pre-change-provider.patch"
   (cd "$base" && PYTHONPATH="$base/src:$base" ape/bin/python -m pytest -q tests/mathlib_review/test_named_reviewers.py --basetemp="$old")
   cp -a "$old/test_named_reading_reproduces_0" "$scratch/reopen"
   rm -rf "$scratch/reopen/.ape/review-comparisons"
   ape/bin/python "$probe/reopen_pre_change.py" "$scratch/reopen" "$probe/before"
-  git -C "$base" checkout -- . && git -C "$base" checkout --detach named-episode-review
+  git -C "$base" checkout -- .
+  git -C "$base" checkout --detach named-episode-review
   (cd "$base" && PYTHONPATH="$base/src:$base" ape/bin/python "$probe/resume_pre_change.py" \
     "$old/test_cli_accepts_empty_review_0" solo-42184-b "$base")
-  git worktree remove --force "$base"
   echo "pre-change checks passed"
 )
 ```
