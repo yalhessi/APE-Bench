@@ -48,14 +48,14 @@ ape/bin/python -m src.mathlib_review.review.cli plan --reviewer solo-v1 --case 4
 ape/bin/python -m src.mathlib_review.review.cli plan --reviewer pr-search-v1 --case 42184@c5474cb4
 ```
 
-Both plans print the reviewer's first message, granted tools, model, budget and reviewed revision. The search plan also resolves the frozen local index. Start each review under its own name. The following generation commands can run in separate terminals.
+Both plans print the reviewer's first message, granted tools, model, budget and reviewed revision. The search plan also resolves the frozen local index. `--case` must name exactly one reviewed episode in the profile's release; a head prefix that matches none or several is refused. A named review reads only the release's `input/episodes.jsonl`, with the pinned Mathlib workspace and, for search, the pinned history. It needs no work units, change graph or expert feedback. Start each review under its own name. The following generation commands can run in separate terminals.
 
 ```bash
 ape/bin/python -m src.mathlib_review.review.cli run --reviewer solo-v1 --case 42184@c5474cb4 --run-name solo-42184-a --execute
 ape/bin/python -m src.mathlib_review.review.cli run --reviewer pr-search-v1 --case 42184@c5474cb4 --run-name search-42184-a --execute
 ```
 
-Add `--resume` to the same run command after an interruption. A fresh name requests an independent sample. The accepted task result, original findings, overall message, transcript, tool audit and matcher projection are recorded under `.ape/reviews/<run-name>/`. The presence of `archive.json` marks a submitted review, including one with zero findings.
+Add `--resume` to the same run command after an interruption. If the session was already accepted, the resume archives it without starting another session. Otherwise the run continues from its saved attempts, and a session lost to system errors runs again. A fresh name requests an independent sample. The run ends at the accepted submission. It performs no anchoring, finalization or run manifest, and those stay with `run --config`. The accepted task result, original findings, overall message, transcript, tool audit and matcher projection are recorded under `.ape/reviews/<run-name>/`. Its `generation.json` records the first message, the tool grant and the run's design and search index. The presence of `archive.json` marks a submitted review, including one with zero findings. A session that ends without submitting prints `NO ACCEPTED REVIEW`, exits 1 and archives nothing. `score` refuses that name.
 
 ```bash
 ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a search-42184-a --using round1-requests-v1 --execute

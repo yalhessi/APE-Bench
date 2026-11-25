@@ -124,6 +124,8 @@ matcher; "the conventions list" is the maintainers' conventions census (438 entr
 
 ## Infrastructure
 
+- **Does the named reviewer see the same first message and tools, and does its matcher see the same input, once it runs from the episode alone?** Yes, on 42184 at `c5474cb4`. For `solo-v1` and `pr-search-v1`, previewed from the profile release and from a release holding only its episodes, the first message and tool schemas were identical before and after the change. The final matcher message for both saved samples was identical under both question policies. The historical solo loader and the named projection still differ only in severity, `"advisory"` against `null`. (2026-11-25, `probes/named-episode-review-2026-11-25`)
+
 - **Which validation descriptions supply explicit references to earlier work?** — Twelve of 41 verified descriptions name 15 distinct same-repository PRs that existed at the focal reviewed head. Four have detailed local PR records. Two references in PR 36648 identify respectively the parent change and a reviewer’s earlier reason (2026-11-24, [dated lookup and evidence](research/industrial-review-harness-internals-2026-11-24.md#3-treat-the-historical-example-selector-as-part-of-the-reviewer)).
 
 - **How often does the style operator detect the same rule on the same text in the base and reviewed declaration?** — 9 of 11 reviewed-side hits on 1,348 validation targets and 2 of 5 on 1,209 evaluation targets. These are operator detections from the frozen change graphs (2026-11-24, [paired replay and notation counterexample](research/industrial-review-harness-internals-2026-11-24.md#1-establish-what-the-contribution-introduced)).

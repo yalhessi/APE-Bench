@@ -1,0 +1,50 @@
+{
+  "definition": {
+    "history": null,
+    "profile": "configs/designs/whole_pr_familiar.yaml"
+  },
+  "fixture": false,
+  "profile_sha256": "012ac33c63fa405cb26aebc441fc51f2a180bffb9878b4bdaf155fd2796547cd",
+  "release": "inputs/probes/probe-2026-07-08-v1",
+  "reviewer": "solo-v1",
+  "runs": {
+    "solo-v1": {
+      "episodes": {
+        "42184": {
+          "base_sha": "5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3",
+          "builtins": [
+            "Glob",
+            "Grep",
+            "Read"
+          ],
+          "cli_version": "2.1.285",
+          "cost_cap": 1.5,
+          "cutoff": "2026-07-28T12:41:04Z",
+          "effort": "xhigh",
+          "episode_id": "leanprover-community/mathlib4:42184:round1:c5474cb4a68a515228b49225b38a2507264f91f7",
+          "max_turns": 40,
+          "mcp": [
+            "code_goto",
+            "code_hover",
+            "declaration_search",
+            "get_lean_goal",
+            "lean_verify",
+            "lean_verify_edit",
+            "submit_findings"
+          ],
+          "mcp_schema_sha256": "79444858b82a25bc167da6d7ee4f42b13b9f553232d3707d0fed70d8b8508014",
+          "message_sha256": "1e07684b151bb46c1295a20ddb7b21672cc8095aa6f5db70633380784219d2b3",
+          "model": "claude-opus-5-5",
+          "patch_sha256": "75ebc25bc5f5ec39926f4c600e054def8c1688e54825e6a9a9f4113ecbd2e18d",
+          "reviewed_head_sha": "c5474cb4a68a515228b49225b38a2507264f91f7",
+          "token_cap": 600000
+        }
+      },
+      "inputs": {
+        "design": "whole_pr"
+      },
+      "run": "rc68dde83b4119d9123847525"
+    }
+  },
+  "sample": 1
+}

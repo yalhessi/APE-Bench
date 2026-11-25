@@ -1,0 +1,84 @@
+# Matching reviewer findings to maintainer asks
+
+You are judging, for a research study, which review findings reach which real maintainer requests
+on one Mathlib pull request. One anonymous reviewers, `R1` to `R1`, reviewed each PR without
+seeing the maintainers' comments. Their labels are shuffled per PR, so `R1` on one PR is not
+necessarily `R1` on another.
+
+**Inputs.** They are given below, one section for each:
+- `asks_pr<N>.json`: the maintainers' first-round asks on PR N. Each has an `ask_id`, the file
+  `path`, `code_at_comment` (the code the comment is attached to, ending at the commented line),
+  the `comment`, and the comment it replies to, if any.
+- `R1_pr<N>.json` to `R1_pr<N>.json`: each reviewer's findings, a list, indexed from 0.
+
+## For every ask, and each reviewer
+
+Choose one value:
+
+| value | when |
+|---|---|
+| `reached` | Some finding asks for the same change on the same thing, or for a change that, if the author made it, would satisfy the maintainer's ask. Wording may differ. "Use the existing `foo`" reaches "this is `foo`". |
+| `partial` | Some finding is about the same thing and the same kind of issue, but asks for a different change that would not satisfy the maintainer. For example, both say the name is wrong but propose different names, and the maintainer's reason is absent. |
+| `no` | Anything else. |
+
+A finding may be a question to the author. Judge it like any other finding: it `reached` the ask when
+the change it asks about is the maintainer's change (the author answering yes and making it would
+satisfy the maintainer), or when the maintainer's ask is itself that question; it is `partial` when it
+asks about the same thing and the same kind of issue without naming the maintainer's change.
+
+Also give the index of the best finding, or `null`.
+
+Judge only whether the finding would lead the author to the maintainer's change. Do not judge
+whether the finding is otherwise good.
+
+## Output
+
+Call `submit_matches` once, with two arguments:
+- `asks`: one entry per ask, `{"pr": N, "ask_id": "...", "verdicts": [{"reviewer": "R1", "value": "reached|partial|no", "finding": i|null}, ...], "note": "<= 25 words"}`, with a verdict for each of `R1` to `R1`.
+- `unmatched`: `{"<pr>": {"R1": <count of R1 findings reaching no ask>, ..., "R1": <count>}}`.
+
+The tool refuses a submission that misses an ask or a reviewer, or names a finding that does not exist, and says which; correct it and submit again.
+
+## Inputs
+
+### `asks_pr42184.json`
+
+```json
+[
+ {
+  "ask_id": "p0002",
+  "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+  "comment": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)",
+  "replies_to": null
+ },
+ {
+  "ask_id": "p0003",
+  "path": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+  "code_at_comment": "@@ -234,6 +234,17 @@ protected theorem Multipliable.one_lt_tprod [L.LeAtTop] [L.NeBot] (hsum : Multip\n \n end OrderedCommGroup\n \n+section WithZero\n+\n+theorem tprod_nonneg [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n+    [PosMulMono α] [ClosedIciTopology α] [L.NeBot] {f : ι → α} (hf : ∀ i, 0 ≤ f i) :\n+    0 ≤ ∏'[L] x, f x := by\n+  by_cases h : Multipliable f L\n+  · exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i",
+  "comment": "and maybe you can provide a HasProd version of this lemma (as this seems to be the convention in this file)",
+  "replies_to": "It seems like that at this step you can use `by_cases : L.NeBot` to remove the typeclass `L.NeBot` (and to do this, you probably need to generalize the typeclasses used in [finprod_nonneg](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finprod.html#finprod_nonneg) first)"
+ }
+]
+```
+
+### `R1_pr42184.json`
+
+```json
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+  "claim": "`tprod_nonneg` assumes `[L.NeBot]`, but the statement holds without it. The sibling lemmas `one_le_tprod`/`tsum_nonneg` and `tprod_le_one` in the same file have no `NeBot` assumption: they handle the `¬L.NeBot` case through `tprod_bot`, which turns the product into a `finprod`. With `NeBot`, the new lemma is weaker than its neighbours and callers must supply an extra instance.",
+  "requested_change": "Remove `[L.NeBot]` and handle the bot case the way `one_le_tprod` does:\n```lean\ntheorem tprod_nonneg (hf : ∀ i, 0 ≤ f i) : 0 ≤ ∏'[L] i, f i := by\n  by_cases h : Multipliable f L\n  · by_cases hL : L.NeBot\n    · exact h.hasProd.nonneg hf\n    · rw [tprod_bot hL]\n      exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf\n  · simp [tprod_eq_one_of_not_multipliable h]\n```\nThis compiles in the file, using the instance assumptions `[CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α] [PosMulMono α] [ClosedIciTopology α]`.",
+  "severity": null
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:239",
+  "claim": "The PR adds only the `tprod` form of non-negativity. A caller who already has `HasProd f a L` has no direct lemma for `0 ≤ a`. To use `tprod_nonneg` they must rewrite with `HasProd.tprod_eq`, which also needs `[T2Space α]`, so that route fails in non-Hausdorff spaces. The file's neighbouring non-strict bound uses a two-level API: `HasProd.one_le` (and `HasSum.nonneg` via `to_additive`), from which `one_le_tprod` is derived. The first branch of `tprod_nonneg` (`ge_of_tendsto' h.hasProd …`) already proves exactly the `HasProd` statement inline.",
+  "requested_change": "Add the `HasProd` lemma, mirroring `HasProd.one_le`, and derive `tprod_nonneg` from it:\n```lean\nvariable [CommMonoidWithZero α] [TopologicalSpace α] [Preorder α] [ZeroLEOneClass α]\n  [PosMulMono α] [ClosedIciTopology α] {f : ι → α} {a : α}\n\ntheorem HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a :=\n  ge_of_tendsto' ha fun s ↦ s.prod_nonneg fun i _ ↦ hf i\n```\nthen use `h.hasProd.nonneg hf` in `tprod_nonneg`.",
+  "severity": null
+ }
+]
+```

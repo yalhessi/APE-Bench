@@ -1,0 +1,321 @@
+{
+  "code_goto": [
+    "Jump to definition of a symbol.\n\n**Supported**: Lean\n\n**Returns**: Definition locations with file path, line, content",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "Symbol name or unique snippet to identify",
+          "type": "string"
+        },
+        "file_path": {
+          "description": "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling `lean_verify_edit` takes), or one of your own as `scratch/...`",
+          "type": "string"
+        },
+        "line": {
+          "description": "Line number where symbol appears (1-indexed)",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file_path",
+        "line",
+        "content"
+      ],
+      "type": "object"
+    }
+  ],
+  "code_hover": [
+    "Get hover information at code position.\n\n**Supported**: Lean\n\n**Returns**: Type information, documentation, diagnostics at position",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "Unique content snippet on that line to identify position",
+          "type": "string"
+        },
+        "file_path": {
+          "description": "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling `lean_verify_edit` takes), or one of your own as `scratch/...`",
+          "type": "string"
+        },
+        "line": {
+          "description": "Line number (1-indexed)",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file_path",
+        "line",
+        "content"
+      ],
+      "type": "object"
+    }
+  ],
+  "declaration_search": [
+    "Find where a declaration is DEFINED in Mathlib at this PR's base commit — used to check whether something already exists before claiming it is new, or to locate the canonical spelling of an API. Matches declaration sites only, not mentions in comments or imports. Give a real identifier (e.g. `Finset.sum_comm`), not prose.\n\nTwo corpora, reported separately: the tree BEFORE this PR (the base commit), and the files this PR changes, as this PR leaves them. A name found only in the second is one this PR introduces or renames -- which is what refutes a duplication or 'already exists' claim, and what lets a rename be looked up under its new name. An empty result in the base corpus is an ANSWER, not a failure. Do not re-query a name that came back empty in both.",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "identifier": {
+          "description": "Declaration name, dotted or snake_cased",
+          "type": "string"
+        },
+        "limit": {
+          "default": 5,
+          "description": "Max files (capped at 8)",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "identifier"
+      ],
+      "type": "object"
+    }
+  ],
+  "get_lean_goal": [
+    "Get Lean proof goals at position.\n\n**Two modes**:\n- With content: exact position goal\n- Without content: goals before/after line\n\n**Returns**: Current proof state (goals list)",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Content snippet at position (omit for before/after mode)"
+        },
+        "file_path": {
+          "description": "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling `lean_verify_edit` takes), or one of your own as `scratch/...`",
+          "type": "string"
+        },
+        "line": {
+          "description": "Line number (1-indexed)",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file_path",
+        "line"
+      ],
+      "type": "object"
+    }
+  ],
+  "lean_verify": [
+    "Compile a self-contained Lean SNIPPET against the library at this PR's reviewed state: a `#check`, an `example`, an `exact?`, a candidate lemma statement. Give the `import` lines it needs; the PR's own changed modules are importable. This answers questions about the library, not about the reviewed file: to test a change to a reviewed file, use `lean_verify_edit`. `outcome` says whether Lean answered: `compiled` (no errors) and `compile_errors` (Lean ran and the code has the errors listed -- an answer about the code, not a tool failure) are answers; `timeout` and `environment_failure` mean the check did not complete, which says nothing about the code; `invalid_request` means the call's arguments were refused.",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "The snippet, with its imports",
+          "type": "string"
+        },
+        "max_messages": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 20,
+          "description": "Max messages to return (prioritized: error > warning > info)"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "type": "object"
+    }
+  ],
+  "lean_verify_edit": [
+    "Test an in-file edit, recompiling the WHOLE file and returning the compile result. Use it to confirm a change you want to suggest actually compiles in context. Two ways to specify the edit: PREFERRED — `declaration_name` + `new_declaration` replaces that whole declaration (robust for match/structured proofs; no line counting). You may include the declaration's `@[...]` attributes and modifiers or omit them; either way they are not duplicated. Or `line_start`/`line_end` + `replacement` to splice a line span, with no `replacement` to delete the span. Your edit may reference the PR's own new declarations. Omitting all edit args answers a DIFFERENT question — whether the file compiles as the PR leaves it — and returns `compiles` plus `errors_already_in_the_file`, with no `success` field, because nothing was verified: it tests none of the changes you are weighing. Errors come back split into `errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only the former; line numbers refer to the whole spliced file, so use `code_line` to locate them. Warnings are Mathlib's standard linters, as CI runs them, split the same way. `outcome` says whether Lean answered: `compiled` (no errors) and `compile_errors` (Lean ran and the code has the errors listed -- an answer about the code, not a tool failure) are answers; `timeout` and `environment_failure` mean the check did not complete, which says nothing about the code; `invalid_request` means the call's arguments were refused.",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "declaration_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Full name of the declaration to replace whole, as it is declared"
+        },
+        "line_end": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Line mode: last line of the span (inclusive)"
+        },
+        "line_start": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Line mode: first line of the span to replace (1-based)"
+        },
+        "max_messages": {
+          "default": 20,
+          "description": "Max compile messages to return",
+          "type": "integer"
+        },
+        "new_declaration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Full replacement declaration (from its theorem/lemma/def keyword)"
+        },
+        "path": {
+          "description": "Reviewed file path, e.g. Mathlib/.../X.lean",
+          "type": "string"
+        },
+        "replacement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Line mode: exact Lean text to substitute for that span; omit it to delete the span"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    }
+  ],
+  "precedent_search": [
+    "Search earlier review excerpts by similarity to the Lean code you supply. Each excerpt contains a dated review comment and its code hunk. Decide whether a retrieved comment applies to the current change.",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "The Lean code you are reviewing, or a distinctive fragment of it",
+          "type": "string"
+        },
+        "limit": {
+          "default": 5,
+          "description": "Max precedents (capped at 8)",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "type": "object"
+    }
+  ],
+  "submit_findings": [
+    "Submit your ordered review findings. This ends the review.",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "findings": {
+          "description": "Ordered findings. An empty list is valid.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "claim": {
+                "description": "Why you would ask for this change.",
+                "pattern": "\\S",
+                "type": "string"
+              },
+              "line_end": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Last line, if giving a range."
+              },
+              "line_start": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "First line, if relevant."
+              },
+              "path": {
+                "anyOf": [
+                  {
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "File, if the finding concerns one."
+              },
+              "suggested_fix": {
+                "description": "What you would ask the author to change.",
+                "pattern": "\\S",
+                "type": "string"
+              }
+            },
+            "required": [
+              "claim",
+              "suggested_fix"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "message": {
+          "default": "",
+          "description": "Optional summary of the findings.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "findings"
+      ],
+      "type": "object"
+    }
+  ]
+}
