@@ -1,5 +1,7 @@
 # Plans
 
+For the fresh Mathlib PR reviewer, start with the [v6 worker handoff](2026-11-25-fresh-pr-review.md). It specifies the first two commands, evidence from released reviewers and acceptance cases for each worker.
+
 The two plans this branch was built from, kept verbatim, plus a status walk.
 
 | | |
