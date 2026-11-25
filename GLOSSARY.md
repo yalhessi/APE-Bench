@@ -34,6 +34,9 @@ Sources for the inherited vocabulary: [paper, §4](https://arxiv.org/html/2504.1
 
 ## Mathlib PR review in this fork
 
+**Review episode**
+An occasion on which a particular revision of a contribution is reviewed. A historical episode identifies the PR, the round and the reviewed head. Several reviewers can assess the same episode.
+
 **Reviewed head**
 The revision of the author's contribution that the reviewer is asked to assess. Later changes made in response to feedback belong to the history of the PR.
 
@@ -66,6 +69,9 @@ A first-round request expressed in the maintainer's own words. One request can a
 
 **Gold obligation**
 An individual point derived from historical review feedback that the benchmark uses to assess whether a reviewer identified the same issue.
+
+**Review work unit**
+A group of changes packaged together for a reviewer to investigate. Its membership depends on how a review design divides the work.
 
 **Review finding**
 A point raised by the reviewer being evaluated about the contribution under review. A finding can address a concern the historical maintainer never mentioned.
