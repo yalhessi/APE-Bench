@@ -190,19 +190,32 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         submissions.saved_reviews(out)
 
 
-def test_empty_question_and_failed_reviews_have_distinct_outcomes(checkout, provider, capsys):
+def test_empty_mixed_and_failed_reviews_have_distinct_outcomes(checkout, provider, capsys):
+    guided = saved_42184_reviews(checkout)["guided"]
     question = {"claim": "The description does not say why the NeBot instance was needed.",
                 "suggested_fix": "Could you say in the description whether any caller relies on it?"}
-    provider.reviews.update({"question": {"findings": [question], "message": "One question."}, "failed": "fail"})
-    for alias in ("empty", "question"):
+    provider.reviews.update({
+        "empty": {"findings": [], "message": "I would merge this as it is."},
+        "mixed": {"findings": [*guided["findings"], question], "message": guided["message"]},
+        "failed": "fail"})
+    for alias in ("empty", "mixed"):
         assert cli.main(run_options("solo-v1", alias)) == 0
-    projections = {}
-    for alias in ("empty", "question"):
+    saved = {}
+    for alias in ("empty", "mixed"):
         _, archive = submissions.saved_reviews(submissions.review_directory(alias))
-        projections[alias] = submissions.read(Path(archive["sources"]["solo-v1"]["path"]))["42184"]
-    assert projections["empty"] == []
-    assert projections["question"] == [{"target": submissions.probes.PR_LEVEL_TARGET, "claim": question["claim"],
-                                        "requested_change": question["suggested_fix"]}]
+        record, = archive["records"]
+        raw = submissions.read(Path(record["files"]["task_result.json"]["path"]))
+        projected = submissions.read(Path(archive["sources"]["solo-v1"]["path"]))["42184"]
+        saved[alias] = (record["findings"], raw["review_message"], projected)
+        assert raw["review_message"] == provider.reviews[alias]["message"]
+    assert saved["empty"][0] == 0 and saved["empty"][2] == []
+    count, _, projected = saved["mixed"]
+    assert count == 3
+    assert projected == [
+        *({"target": f"{f['path']}:{f['line_start']}", "claim": f["claim"], "requested_change": f["suggested_fix"]}
+          for f in guided["findings"]),
+        {"target": submissions.probes.PR_LEVEL_TARGET, "claim": question["claim"],
+         "requested_change": question["suggested_fix"]}]
     assert cli.main(run_options("solo-v1", "failed")) == 1
     assert "NO ACCEPTED REVIEW" in capsys.readouterr().err
     failed = submissions.review_directory("failed")
@@ -210,7 +223,7 @@ def test_empty_question_and_failed_reviews_have_distinct_outcomes(checkout, prov
     with pytest.raises(SystemExit) as refused:
         cli.main(["score", "--of", "failed", "--using", "round1-requests-v1"])
     assert refused.value.code == 2
-    assert provider.sessions == ["empty", "question", "failed"]
+    assert provider.sessions == ["empty", "mixed", "failed"]
 
 
 def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, provider, monkeypatch, capsys):
@@ -302,7 +315,10 @@ def test_overlapping_reviewers_can_finish_and_resume_independently(provider, mon
         with pytest.raises(InterruptedError, match="lost solo session"):
             first.result()
     monkeypatch.setattr(runner.TaskOrchestrator, "run", provider)
+    # The solo session was lost before acceptance, so its resume generates once.
+    assert provider.sessions == ["second"]
     assert cli.main([*solo, "--resume"]) == 0
+    assert provider.sessions == ["second", "first"]
     solo_plan, _ = submissions.saved_reviews(submissions.review_directory("first"))
     search_plan, _ = submissions.saved_reviews(submissions.review_directory("second"))
     ordinary = solo_plan["runs"]["solo-v1"]
