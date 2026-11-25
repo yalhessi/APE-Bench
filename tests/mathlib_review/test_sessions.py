@@ -153,6 +153,18 @@ def test_a_session_plan_holds_every_input_and_refuses_a_finished_folder(tmp_path
                         out_dir=tmp_path / "plan3", packet_ids=["pr33117"])
 
 
+def test_generated_packets_and_folder_inputs_plan_the_same_session(tmp_path):
+    root = _packets(tmp_path / "packets")
+    options = dict(name="compare", brief=EXTRACTOR_BRIEF, outputs=OUTPUTS, replicates=2)
+    disk = S.plan_sessions(root, **options, out_dir=tmp_path / "plan")
+    inputs = {packet.packet_id: packet.files for packet in reversed(disk.packets)}
+    memory = S.plan_packets(inputs, **options)
+    assert S.session_payloads(memory) == S.session_payloads(disk)
+    assert memory.packets == disk.packets
+    with pytest.raises(ValueError, match="inside the folder"):
+        S.plan_packets({"pr": {"../outside": "text"}}, **options)
+
+
 def _run(monkeypatch, tmp_path, plan, plan_dir, run_name, goal):
     """`run_sessions` with the orchestrator's execution done by real tasks and no model."""
     from ape.orchestration import orchestrator as orchestrator_module

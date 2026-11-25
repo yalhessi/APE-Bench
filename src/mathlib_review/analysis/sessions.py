@@ -112,35 +112,26 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
     `allow_unmatched`, which lists it with the reason.
     Either way `lineage.json` records the binding."""
 
-    from ape.tasks.packet_session import DIR_TOKEN, OutputSpec
-
-    specs = [OutputSpec.model_validate(o).model_dump(mode="json") for o in outputs]
-    if DIR_TOKEN not in brief:
-        raise ValueError(f"the brief never says where the folder is ({DIR_TOKEN})")
     folders = sorted(p for p in Path(packets_root).iterdir() if p.is_dir())
     if packet_ids:
         missing = sorted(set(packet_ids) - {p.name for p in folders})
         if missing:
             raise ValueError(f"no packet folders {missing} under {packets_root}")
         folders = [p for p in folders if p.name in set(packet_ids)]
-    packets, bound, unmatched = [], {}, {}
+    packets, bound, unmatched = {}, {}, {}
     for folder in folders:
-        files = _packet_files(folder, [s["name"] for s in specs], include)
+        files = _packet_files(folder, [output["name"] for output in outputs], include)
         if inputs_from:
             files, bound[folder.name], missed = _bind_inputs(
                 folder.name, files, inputs_from, (upstream_packets or {}).get(folder.name, folder.name),
                 historical=include is not None)
             if missed:
                 unmatched[folder.name] = missed
-        packets.append(SessionPacket(packet_id=folder.name, files=files,
-                                     files_sha256=sha256_bytes(canonical_json_bytes(files))))
+        packets[folder.name] = files
     if unmatched and not allow_unmatched:
         raise ValueError(f"inputs no upstream observation holds: {unmatched}; bind them to the "
                          "producer that wrote them, or plan with allow_unmatched to record them so")
-    plan = sealed_model(SessionPlan, plan_id=name, brief=brief,
-                        brief_sha256=sha256_bytes(brief.encode("utf-8")), outputs=specs,
-                        packets=packets, replicates=replicates,
-                        created_at=datetime.now(timezone.utc).isoformat())
+    plan = plan_packets(packets, name=name, brief=brief, outputs=outputs, replicates=replicates)
     if inputs_from:
         # The lineage first: a plan without its lineage would read as one with no upstream.
         lineage = sealed_model(InputLineage, plan_id=name, plan_sha256=plan.source_sha256,
@@ -148,6 +139,31 @@ def plan_sessions(packets_root: Path, *, name: str, brief: str, outputs: List[Di
         write_once(Path(out_dir) / LINEAGE_FILE, pretty_json_bytes(lineage))
     write_once(Path(out_dir) / PLAN_FILE, pretty_json_bytes(plan))
     return plan
+
+
+def plan_packets(packets: Dict[str, Dict[str, str]], *, name: str, brief: str,
+                 outputs: List[Dict[str, Any]], replicates: int = 1) -> SessionPlan:
+    """Seal the actual input texts for a batch of model sessions."""
+    from ape.tasks.packet_session import DIR_TOKEN, OutputSpec, PacketFile
+
+    specs = [OutputSpec.model_validate(o).model_dump(mode="json") for o in outputs]
+    if DIR_TOKEN not in brief:
+        raise ValueError(f"the brief never says where the folder is ({DIR_TOKEN})")
+    output_names = {s["name"] for s in specs}
+    sealed = []
+    for key, files in sorted(packets.items()):
+        if not key or key in (".", "..") or Path(key).name != key:
+            raise ValueError(f"invalid packet ID {key!r}")
+        if not files or output_names.intersection(files):
+            raise ValueError(f"{key}: expected input files distinct from the declared outputs")
+        for path, content in files.items():
+            PacketFile(path=path, content=content)
+        sealed.append(SessionPacket(packet_id=key, files=files,
+                                    files_sha256=sha256_bytes(canonical_json_bytes(files))))
+    return sealed_model(SessionPlan, plan_id=name, brief=brief,
+                        brief_sha256=sha256_bytes(brief.encode("utf-8")), outputs=specs,
+                        packets=sealed, replicates=replicates,
+                        created_at=datetime.now(timezone.utc).isoformat())
 
 
 def _bind_inputs(packet_id: str, files: Dict[str, str], inputs_from: Dict[str, Any],
