@@ -25,6 +25,7 @@ OUT = ROOT / "conventions"
 CASES = (41930, 42184)
 BATCH_SIZE = 100
 LIMIT = 25
+EXECUTION = {"max_concurrency": 1, "sample_max_tokens": 600000}
 CONFIG = Path("configs/session/packet_session_opus55_claude_sub.yaml")
 EPISODES = Path("inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl")
 REFERENCE = Path("results/pr_review_v5/probes/postcutoff-2026-09-29")
@@ -106,12 +107,15 @@ def run_stage(root, name, instructions, inputs, *, execute, retry, stages):
                                           outputs=[{"name": OUTPUT, "kind": "json"}], out_dir=directory)
     record = root / f"{name}.producer.json"
     held = json.loads(record.read_text()) if record.exists() else {}
+    if held and held["plan_sha256"] != plan.source_sha256:
+        raise ValueError(f"{name} already has an accepted producer for different inputs")
     attempt = retry.get(name, held.get("attempt", 1))
     run = f"sc_{plan.source_sha256[:18]}_{attempt}"
     producer = f"task-{run}"
     args = [sys.executable, "-m", "src.mathlib_review.review.cli", "session", "--plan", str(directory),
-            "--config", str(CONFIG), "--run-name", run, "--set", "execution.max_concurrency=1",
-            "--set", "execution.sample_max_tokens=600000"]
+            "--config", str(CONFIG), "--run-name", run]
+    for key, value in EXECUTION.items():
+        args.extend(["--set", f"execution.{key}={value}"])
     rows = sessions.session_outputs(directory, producer)
     if len(rows) != len(packets):
         if not execute:
@@ -224,7 +228,16 @@ def prepare(out, history, *, execute=False, retry=None):
     if (not rows or any(row["pr_number"] in CASES for row in rows)
             or len({row["comment_id"] for row in rows}) != len(rows)):
         raise ValueError("expected distinct, earlier source excerpts with no pilot targets")
+    # Freeze the complete source/selection protocol before any charge, including stages
+    # that can only be materialized once earlier model outputs exist.
+    protocol = {"history_sha256": digest, "config_sha256": sha256_file(CONFIG),
+                "batch_size": BATCH_SIZE, "selection_limit": LIMIT, "target_prs": list(CASES),
+                "briefs": {key: text for key, text in (("session", BRIEF), ("extract", EXTRACT),
+                           ("merge", MERGE), ("automatic", AUTO), ("exact", EXACT))},
+                "execution": EXECUTION}
+    write_once(out / "protocol.json", pretty_json_bytes(protocol))
     stages = {}
+
     def run(name, instructions, inputs):
         return run_stage(out, name, instructions, inputs, execute=execute, retry=retry, stages=stages)
 
@@ -269,7 +282,7 @@ def prepare(out, history, *, execute=False, retry=None):
     exact_ids = {key: select(rows, known, ask_ids=[a["ask_id"] for a in asks[key]]) for key, rows in exact.items()}
     accept("exact")
     write_once(out / "exact.json", pretty_json_bytes({"prs": exact_ids}))
-    seal = {"source_sha256": digest, "stages": stages,
+    seal = {"source_sha256": digest, "protocol_sha256": sha256_file(out / "protocol.json"), "stages": stages,
             "files": {name: sha256_file(out / name) for name in ("catalogue.json", "automatic.json", "exact.json")}}
     write_once(out / "seal.json", pretty_json_bytes(seal))
     return {"catalogue": catalogue, "automatic": {"prs": auto_ids}, "exact": {"prs": exact_ids}}

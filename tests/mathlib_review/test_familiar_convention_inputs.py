@@ -61,6 +61,11 @@ def test_source_only_and_separate_selectors(tmp_path, monkeypatch):
     monkeypatch.setattr(study.subprocess, "run", local_observations)
     assert study.prepare(out, source) is None
     assert stages == []
+    with monkeypatch.context() as changed:
+        changed.setattr(study, "AUTO", "Use a different selector contract.")
+        with pytest.raises(FileExistsError, match="protocol.json"):
+            study.prepare(out, source, execute=True)
+    assert stages == []
     actual = study.prepare(out, source, execute=True)
     assert stages == ["extract", "merge", "automatic", "exact"]
     assert actual["automatic"] == {"prs": {"41930": ["C0001"], "42184": ["C0001"]}}
