@@ -1,5 +1,7 @@
 # Plans
 
+For current Mathlib PR review work, start with the [named whole-PR review reorganization](2026-11-25-named-whole-pr-review.md). It traces one episode through review and scoring and gives the implementation ticket and acceptance cases.
+
 The two plans this branch was built from, kept verbatim, plus a status walk.
 
 | | |

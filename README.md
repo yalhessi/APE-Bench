@@ -18,7 +18,7 @@
 
 ## Start here for Mathlib PR review
 
-Given a Mathlib PR that compiles, what changes would a maintainer ask the author to make, and why? Follow one saved review of PR **42184**. It added `tprod_nonneg`, a lemma about products of nonnegative terms. The October comparison reused review sample **X1**. You can follow it without running a model.
+Given a Mathlib PR that compiles, what changes would a maintainer ask the author to make, and why? Start with [what an extracted PR contains before and after review](docs/guides/review-episodes.md). Then follow one saved review of PR **42184**. It added `tprod_nonneg`, a lemma about products of nonnegative terms. The October comparison reused review sample **X1**. You can follow it without running a model.
 
 | Question | Where to look |
 |---|---|
