@@ -46,6 +46,17 @@ class Reviewer(BaseModel):
     history: ExcerptCollection | None = None
 
 
+@dataclass(frozen=True)
+class PreparedRun:
+    """What one named run records before its reviewer is dispatched."""
+    message: str
+    manifest: dict
+    inputs: dict
+    run_name: str
+    #: The name already holds a record that keeps its inputs inside it (`holds_inline_inputs`).
+    inline_inputs: bool
+
+
 @dataclass
 class ReviewRequest:
     reviewer: str
@@ -87,15 +98,13 @@ class ReviewRequest:
             raise ValueError(f"{self.reviewer}: expected {sorted(expected)}, got {sorted(tools)}")
         record.update(mcp_schemas=tools, reviewed_head_sha=ep.reviewed_head_sha, base_sha=ep.base_sha,
                       message=str(self.directory / "first-message.txt"))
-        prepared = {"message": message, "manifest": manifest, "inputs": inputs, "name": dataset.run_name,
-                    "inline_inputs": False}
+        inline = False
         saved = self.directory / "generation.json"
         if saved.is_file():
             held = submissions.read(saved)
-            if any("inputs" in r for r in held.get("runs", {}).values()):
-                # Recorded between 968c285e and 86bb0f88, with the inputs inside the record itself.
+            if submissions.holds_inline_inputs(held):
                 run["inputs"] = inputs
-                prepared["inline_inputs"] = True
+                inline = True
             kept = {saved: pretty_json_bytes(manifest),
                     self.directory / "first-message.txt": message.encode()}
             if (self.directory / submissions.INPUTS_FILE).is_file():
@@ -108,18 +117,18 @@ class ReviewRequest:
                 raise ValueError(f"{self.directory}: this name holds a different review ({'; '.join(cases)}) "
                                  "or one recorded with other inputs. Resume it with its own reviewer and case, "
                                  "or choose a fresh name.")
-        return prepared
+        return PreparedRun(message, manifest, inputs, dataset.run_name, inline)
 
     def preview(self, prepared):
-        print(prepared["message"])
-        print(json.dumps(prepared["manifest"], indent=2))
-        print(f"Run inputs: {json.dumps(prepared['inputs'], sort_keys=True)}", file=sys.stderr)
+        print(prepared.message)
+        print(json.dumps(prepared.manifest, indent=2))
+        print(f"Run inputs: {json.dumps(prepared.inputs, sort_keys=True)}", file=sys.stderr)
 
     def record(self, prepared):
-        if not prepared["inline_inputs"]:
-            submissions.record_inputs(self.directory, prepared["name"], prepared["inputs"])
-        write_once(self.directory / "generation.json", pretty_json_bytes(prepared["manifest"]))
-        write_once(self.directory / "first-message.txt", prepared["message"].encode())
+        if not prepared.inline_inputs:
+            submissions.record_inputs(self.directory, prepared.run_name, prepared.inputs)
+        write_once(self.directory / "generation.json", pretty_json_bytes(prepared.manifest))
+        write_once(self.directory / "first-message.txt", prepared.message.encode())
 
 
 def run_reviewer(args, logger):

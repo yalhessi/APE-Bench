@@ -217,9 +217,15 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
         submissions.saved_reviews(out)
 
 
-@pytest.mark.parametrize("tamper", ["containment_audit.json", "claude_code_session.json", "transcript",
-                                    "sample.json", "records", "evidence list"])
-def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper):
+@pytest.mark.parametrize("tamper, reason", [
+    ("containment_audit.json", "archived containment_audit.json changed"),
+    ("claude_code_session.json", "archived claude_code_session.json changed"),
+    ("transcript", "archived claude_code_conversation_1.jsonl changed"),
+    ("sample.json", "archived sample.json changed"),
+    ("records", "cover PRs []"),
+    ("evidence list", "lacks ['claude_code_session.json', 'containment_audit.json', 'task_result.json', "
+                      "'sample.json', 'claude_code_conversation_*.jsonl']")])
+def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper, reason):
     alias = "guided-42184"
     provider.reviews[alias] = saved_42184_reviews(checkout)["guided"]
     assert cli.main(run_options("solo-v1", alias)) == 0
@@ -239,9 +245,10 @@ def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper):
         target = Path(files[name]["path"])
         target.write_text(json.dumps({"clean": False, "usable": False}) if tamper == "containment_audit.json"
                           else target.read_text() + " ")
+    capsys.readouterr()
     with pytest.raises(SystemExit) as refused:
         cli.main(["score", "--of", alias, "--using", "round1-requests-v1"])
-    assert refused.value.code == 2
+    assert refused.value.code == 2 and reason in capsys.readouterr().err
     assert not Path(".ape/review-comparisons").exists()
 
 
@@ -363,21 +370,24 @@ def test_an_accepted_run_recorded_with_inline_inputs_resumes(checkout, provider,
     assert archive["records"][0]["findings"] == 0
 
 
-@pytest.mark.parametrize("missing", ["assert_ready", "assert_reviewed_workspaces_prebuilt"])
-def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch, missing):
+def no_login(*args, **kwargs):
+    raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
+
+
+async def no_reviewed_workspace(*args, **kwargs):
+    raise RuntimeError("reviewed workspace for 42184 is not prebuilt")
+
+
+@pytest.mark.parametrize("check, refusal", [("assert_ready", no_login),
+                                            ("assert_reviewed_workspaces_prebuilt", no_reviewed_workspace)])
+def test_a_run_refused_by_the_environment_can_start_again(checkout, provider, monkeypatch, check, refusal):
     alias = "refused-42184"
-    present = getattr(runner, missing)
-
-    async def absent_workspace(*args, **kwargs):
-        raise RuntimeError("reviewed workspace for 42184 is not prebuilt")
-
-    def no_credential(*args, **kwargs):
-        raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
-
-    monkeypatch.setattr(runner, missing, no_credential if missing == "assert_ready" else absent_workspace)
+    present = getattr(runner, check)
+    monkeypatch.setattr(runner, check, refusal)
     with pytest.raises(RuntimeError, match="Claude login|not prebuilt"):
         cli.main(run_options("solo-v1", alias))
-    monkeypatch.setattr(runner, missing, present)
+    assert not any(submissions.review_directory(alias).glob("*.json"))
+    monkeypatch.setattr(runner, check, present)
     assert cli.main(run_options("solo-v1", alias)) == 0
     assert provider.sessions == [alias]
 

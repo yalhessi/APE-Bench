@@ -85,7 +85,8 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
     for arm in sources:
         # One accepted session per arm and head, with the evidence `capture` keeps of it.
         files = {}
-        for name in (*measure.ATTEMPT_EVIDENCE, *measure.TASK_EVIDENCE, measure.TRANSCRIPT_PREFIX + "1.jsonl"):
+        for name in ("claude_code_session.json", "containment_audit.json", "claude_code_conversation_1.jsonl",
+                     "task_result.json", "sample.json"):
             kept = out / arm / "42184" / name
             put(kept, {"pr_number": 42184, "success": True, "submitted_findings": []})
             files[name] = {"path": str(kept), "sha256": sha256_file(kept)}

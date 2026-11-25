@@ -28,6 +28,12 @@ def archive(path, target):
     return {"path": str(target), "sha256": sha256_bytes(payload)}
 
 
+#: What an archive keeps of each accepted session: these from its attempt, its transcript
+#: (`claude_code_conversation_*.jsonl`), and the task's result and sample record.
+ATTEMPT_EVIDENCE = ("claude_code_session.json", "containment_audit.json")
+TASK_EVIDENCE = ("task_result.json", "sample.json")
+TRANSCRIPT_PREFIX = "claude_code_conversation_"
+
 def check_attempt(attempt, expected):
     session = read(attempt / "claude_code_session.json")
     init = session["init"]
@@ -45,7 +51,7 @@ def check_attempt(attempt, expected):
     audit = read(attempt / "containment_audit.json")
     if not (audit["clean"] and audit["usable"]):
         raise ValueError(f"{attempt}: inspect the containment audit before comparing this review")
-    transcript, = attempt.glob("claude_code_conversation_*.jsonl")
+    transcript, = attempt.glob(TRANSCRIPT_PREFIX + "*.jsonl")
     first = next(row for row in jsonl_rows(transcript) if row.get("type") == "user")
     normalized = first["message"]["content"].replace(init["cwd"], "{attempt_workspaces}")
     if sha256_bytes(normalized.encode()) != expected["message_sha256"]:
@@ -54,14 +60,14 @@ def check_attempt(attempt, expected):
     return transcript, calls
 
 
-#: What an archive keeps of each accepted session: these from its attempt, its transcript
-#: (`claude_code_conversation_*.jsonl`), and the task's result and sample record.
-ATTEMPT_EVIDENCE = ("claude_code_session.json", "containment_audit.json")
-TASK_EVIDENCE = ("task_result.json", "sample.json")
-TRANSCRIPT_PREFIX = "claude_code_conversation_"
-
 #: A named review's design and search index, by run, written before its reviewer is dispatched.
 INPUTS_FILE = "inputs.json"
+
+
+def holds_inline_inputs(generation):
+    """Whether a generation record keeps its inputs inside itself, as the development branch
+    recorded them between 968c285e and 86bb0f88, rather than in `inputs.json`."""
+    return any("inputs" in run for run in generation.get("runs", {}).values())
 
 
 def record_inputs(out, name, inputs):
@@ -87,7 +93,7 @@ def generation_inputs(out, name, run):
     """
     if (out / INPUTS_FILE).is_file():
         return read(out / INPUTS_FILE)[name]
-    if "inputs" in run:  # recorded between 968c285e and 86bb0f88, inside the generation record
+    if holds_inline_inputs({"runs": {name: run}}):
         return run["inputs"]
     plan = read(run_dir(name) / "run_plan.json")
     if plan["run_name"] != name:
@@ -153,8 +159,8 @@ async def capture(out, runs):
                 raise ValueError(f"{attempt}: search used an unverified corpus or cutoff")
             dest = base / pr
             files = {f: archive(attempt / f, dest / f) for f in (*ATTEMPT_EVIDENCE, transcript.name)}
-            files["task_result.json"] = archive(task_dir / "task_result.json", dest / "task_result.json")
-            files["sample.json"] = archive(task_dir / "samples/0/sample.json", dest / "sample.json")
+            task_files = dict(zip(TASK_EVIDENCE, (task_dir / "task_result.json", task_dir / "samples/0/sample.json")))
+            files.update({name: archive(path, dest / name) for name, path in task_files.items()})
             # The accepted list is ordered. The classifier's default severity is not an author's finding.
             findings[pr] = [{"target": probes._solo_target(f), "claim": f["claim"],
                              "requested_change": f["suggested_fix"]} for f in raw["submitted_findings"]]
