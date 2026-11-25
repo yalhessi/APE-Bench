@@ -1,5 +1,7 @@
 # Run the four-reviewer pilot
 
+To run solo or PR search on one head and score its saved submission, use the [independent reviewer commands](../../../../docs/guides/checkout-and-runs.md#run-and-score-one-reviewer).
+
 One generation sample produces eight reviews. Four whole-PR reviewers assess the same two familiar Mathlib revisions. Both PRs have an expert first review round. The comparison asks which historical requests each submission recovers and how many findings it asks an author to read. These cases were selected with knowledge of the historical results.
 
 | Strategy | Earlier review evidence available |

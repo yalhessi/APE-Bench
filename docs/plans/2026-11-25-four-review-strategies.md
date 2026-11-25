@@ -1,6 +1,6 @@
 # Generate four comparable reviews on familiar Mathlib PRs
 
-The [pilot runbook](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md) documents the commands available today. The implementation target below supersedes the pilot's study-first interface. The original map and case-selection rationale follow it.
+The [run guide](../guides/checkout-and-runs.md#run-and-score-one-reviewer) covers the independent solo and PR-search reviewers. The [pilot runbook](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md) covers the existing four-strategy study.
 
 ## Run one named reviewer
 
@@ -8,9 +8,9 @@ A researcher chooses a reviewer design, a reviewed head and a run name. The comm
 
 ### Four standard definitions
 
-These are proposed public names. All four use one whole-PR reviewer session per head and sample. The agent sees the title, description, changed files, diff and pinned Mathlib checkout. Its task instruction asks what changes, if any, it would request, and why. It chooses what to investigate. File reads and search, declaration lookup, hover, go-to-definition, Lean goal inspection and Lean verification are available. It submits ordered findings with a reason and requested change, optional locations and an optional overall message. An empty list completes the review. The whole-PR task supplies this instruction in the user message. [Task and submission format](../../src/ape/tasks/lean_tasks/formal_math/review/whole_pr.py)
+Solo and PR search have named definitions. The two convention names below describe the next milestone. All four use one whole-PR reviewer session per head and sample. The agent sees the title, description, changed files, diff and pinned Mathlib checkout. Its task instruction asks what changes, if any, it would request, and why. It chooses what to investigate. File reads and search, declaration lookup, hover, go-to-definition, Lean goal inspection and Lean verification are available. It submits ordered findings with a reason and requested change, optional locations and an optional overall message. An empty list completes the review. The whole-PR task supplies this instruction in the user message. [Task and submission format](../../src/ape/tasks/lean_tasks/formal_math/review/whole_pr.py)
 
-| Proposed design | Additional evidence and procedure |
+| Reviewer design | Additional evidence and procedure |
 |---|---|
 | `solo-v1` | The code and Lean tools above are the full investigation grant. Earlier PR search, Zulip, delivered convention lists, target feedback and the historical per-target checklist are absent. |
 | `pr-search-v1` | Add one optional tool that searches a pinned collection of earlier inline comment-and-code excerpts. The starting review message is identical to solo. Record the grant even if the reviewer makes zero calls. |
@@ -21,9 +21,9 @@ Each name resolves to one checked-in definition shared by the CLI and every stud
 
 The first execution profile pins the pilot's Claude Code 2.1.285, Opus 5.5, xhigh effort, 40 turns, 600,000 processed tokens and the configured $1.50 per-review cost cap. Publish the effective profile alongside the design. A run with a different profile remains identifiable. The initial source edition is the pilot's 997 excerpts from 328 PRs before 1 January 2026. Pin the collection digest for search and learning, and record the catalogue, selector instructions, producer and exact delivered text for convention runs. Zero selected entries deliver the solo message. Selector rationales and expert requests stay outside the reviewer workspace. [Pilot artifacts and settings](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md#what-is-frozen)
 
-### Researcher commands to implement
+### Run and score a reviewer
 
-These examples use proposed options on the existing review CLI. The case argument resolves a PR and unique reviewed head in the pinned release. The scorer name resolves the first-round expert reference for that head, ordered submitted-findings projection, request-only rubric, matcher profile and two blind readings. Plan output shows those choices before execution.
+These commands use the existing review CLI. The case argument resolves a PR and unique reviewed head in the pinned release. The scorer name resolves the first-round expert reference for that head, ordered submitted-findings projection, request-only rubric, matcher profile and two blind readings. Plan output shows those choices before execution.
 
 ```bash
 ape/bin/python -m src.mathlib_review.review.cli plan --reviewer solo-v1 --case 42184@c5474cb4
@@ -32,7 +32,7 @@ ape/bin/python -m src.mathlib_review.review.cli run --reviewer pr-search-v1 --ca
 ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a --using round1-questions-v1 --execute
 ```
 
-The target interface allows the two run commands to start in separate terminals when two model sessions are available. The pilot’s per-run concurrency limit of one applies to the tasks launched by each process. Omit `--score` for generation only. Substitute either convention reviewer name to run it alone. `plan` lists any missing preparation, including model calls and the evidence each participant will receive. `run --execute` may perform that preparation and reuse its completed products. If scoring fails, retry scoring against the saved submission. A distinct run name requests a fresh sample in these single-head examples. Resuming the same run preserves its sample. Keep researcher-facing names out of model-visible paths.
+The two run commands can start in separate terminals when capacity allows. The pilot’s per-run concurrency limit of one applies to the tasks launched by each process. Omit `--score` for generation only. For PR search, the first plan or run builds the excerpt index from local data. The convention reviewers still use the study command. Step 4 below describes the preparation they need to run independently. If scoring fails, retry scoring against the saved submission. A distinct run name requests a fresh sample in these single-head examples. Resuming the same run preserves its sample. Keep researcher-facing names out of model-visible paths.
 
 ### Implementation and acceptance
 
@@ -46,7 +46,7 @@ The target interface allows the two run commands to start in separate terminals 
 
 **Smallest runnable milestone.** Deliver steps 1–3 for solo and search and exercise step 5 on that pair. Then enable both convention designs with step 4 and repeat the concurrency check with shared preparation. Finally make the existing study command invoke the same operations. Its useful additional check is whether the paired reviewer inputs differ only in the ways the study declared.
 
-**Evidence at this revision.** At `b5009f69`, two independent native `plan --config` processes for PR 42184, one solo and one with the excerpt-search overrides, each resolved a single whole-PR task and a prebuilt reviewed workspace. The lower-level matcher also built a one-subject plan from the archived ordinary review with one submitted finding, two expert requests and two readings. These were local preflights. Live concurrent reviews and the proposed named commands are implementation acceptance tests.
+**Earlier preflight.** At `b5009f69`, two independent native `plan --config` processes for PR 42184, one solo and one with the excerpt-search overrides, each resolved a single whole-PR task and a prebuilt reviewed workspace. The lower-level matcher also built a one-subject plan from the archived ordinary review with one submitted finding, two expert requests and two readings. These were local preflights. The named interfaces now resolve both reviewers on this head. Their first-message hashes agree, and PR search adds only `precedent_search` to the tool grant. In the [CLI regression](../../tests/mathlib_review/test_named_reviewers.py), a substitute provider holds solo open while PR search completes. A duplicate solo launch is refused, the interrupted solo resumes, and both submissions have distinct task stores. A separate check reduces the paired 42184 reference from two requests to one and observes a new plan with two judgment cells per reading in place of four. A fresh live pair and its judged scores are still outstanding.
 
 ## Map issue
 

@@ -38,6 +38,32 @@ The operational notes below were moved from the October project guide. Provider 
   through the tooling (`verify_frozen build-lock`) and run `verify_frozen verify` after any change
   near them.
 
+## Run and score one reviewer
+
+From this worktree root, use the shared Python environment with the worktree’s sources. Use an authenticated shell for commands with `--execute`.
+
+```bash
+export PYTHONPATH="$PWD/src:$PWD"
+ape/bin/python -m src.mathlib_review.review.cli plan --reviewer solo-v1 --case 42184@c5474cb4
+ape/bin/python -m src.mathlib_review.review.cli plan --reviewer pr-search-v1 --case 42184@c5474cb4
+```
+
+Both plans print the reviewer's first message, granted tools, model, budget and reviewed revision. The search plan also resolves the frozen local index. Start each review under its own name. The following generation commands can run in separate terminals.
+
+```bash
+ape/bin/python -m src.mathlib_review.review.cli run --reviewer solo-v1 --case 42184@c5474cb4 --run-name solo-42184-a --execute
+ape/bin/python -m src.mathlib_review.review.cli run --reviewer pr-search-v1 --case 42184@c5474cb4 --run-name search-42184-a --execute
+```
+
+Add `--resume` to the same run command after an interruption. A fresh name requests an independent sample. The accepted task result, original findings, overall message, transcript, tool audit and matcher projection are recorded under `.ape/reviews/<run-name>/`. The presence of `archive.json` marks a submitted review, including one with zero findings.
+
+```bash
+ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a search-42184-a --using round1-requests-v1 --execute
+ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a search-42184-a --using round1-questions-v1 --execute
+```
+
+Omit `--execute` from a score command to inspect its blinded plan without a judge call. For a single review, supply one name to `score --of`, or append `--score round1-requests-v1` to its generation command. The scorer uses the ordered findings and the first-round expert requests for that head. The questions rubric can credit a finding phrased as a question. Each comparison keeps the submitted review bytes and the blind labels fixed across rubrics. Plans and reports live under `.ape/review-comparisons/`. Each completed reading reports eligible requests, requests reached, finding count and the finding index credited for each match. A joint reading presents both reviews to the same judge and has its own plan. [Reviewer definitions](../../configs/designs/reviewers/) · [Scoring rubric](../../src/mathlib_review/judge/ask_matching.py)
+
 ## Preparing a pilot or evaluation
 
 1. Start with the command the researcher will use. Inspect `ape/bin/python -m src.mathlib_review.review.cli --help`, a comparable config and its saved run. Follow each handoff from the command that produces the artifact to the command that consumes it. When those commands cover the work, put the study inputs in config and the invocations in the runbook.
