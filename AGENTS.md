@@ -10,6 +10,12 @@ In the [filing-contract experiment](results/pr_review_v5/probes/filing-contract-
 
 When a case changes a project decision, record what we observed, what we inferred, and why it changed the choice. Keep an unresolved explanation in the investigation where it can be challenged.
 
+## Designing a change
+
+Before adding a script, command or helper, trace the closest existing caller to the module that owns the behavior. If its interface falls short, identify the specific operation the caller needs. Extend the owner and exercise the change through the caller. Add a CLI command when a researcher needs to invoke that operation directly.
+
+When preparing a pilot or handing off a run or evaluation, follow the [workflow design procedure](docs/guides/checkout-and-runs.md#preparing-a-pilot-or-evaluation). Show how the next run or reading uses the same command with different inputs.
+
 ## Agent skills
 
 ### Issue tracker
