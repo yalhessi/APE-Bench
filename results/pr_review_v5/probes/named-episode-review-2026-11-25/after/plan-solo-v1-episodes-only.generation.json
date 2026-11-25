@@ -40,9 +40,6 @@
           "token_cap": 600000
         }
       },
-      "inputs": {
-        "design": "whole_pr"
-      },
       "run": "rc68dde83b4119d9123847525"
     }
   },

@@ -25,6 +25,7 @@ for alias in ("ordinary", "guided"):
     assert all("inputs" not in run for run in generation["runs"].values()), "expected a pre-change generation"
     for scorer in ("round1-requests-v1", "round1-questions-v1"):
         assert cli.main(["score", "--of", alias, "--using", scorer]) == 0
+    checked = set()
     for plan_file in Path(".ape/review-comparisons").rglob(submissions.matching.PLAN_FILE):
         plan = submissions.matching.load_plan(plan_file.parent)
         if set(plan.seal["42184"].values()) == {alias}:
@@ -34,6 +35,8 @@ for alias in ("ordinary", "guided"):
             print(f"reopened {alias}: {archive['records'][0]['findings']} findings, {policy} matcher input "
                   f"{'matches' if same else 'DIFFERS FROM'} the pre-change bytes")
             assert same
+            checked.add(policy)
+    assert checked == {"request_only", "questions"}, f"{alias}: readings found for {sorted(checked)}"
 
 # A pre-change generation interrupted before its archive: recovered through its run plan.
 out = submissions.review_directory("guided")
@@ -43,5 +46,5 @@ shutil.rmtree(out / "submissions")
 generation, archive = submissions.saved_reviews(out, recover=True)
 run_name = generation["runs"]["pr-search-v1"]["run"]
 assert Path("results/pr_review_v5/runs", run_name, "run_plan.json").is_file()
-print("recovered guided from run_plan.json; archive bytes", "identical" if (out / "archive.json").read_bytes() == before
-      else "differ")
+assert (out / "archive.json").read_bytes() == before, "the recovered archive differs from the pre-change one"
+print("recovered guided from run_plan.json; archive bytes identical")

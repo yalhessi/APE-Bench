@@ -53,19 +53,6 @@
         }
       },
       "history_sha256": "1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03",
-      "inputs": {
-        "context_index_sha256": {
-          "precedent_corpus": "1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03",
-          "precedent_index_version": "v5-precedent-index/2",
-          "precedent_manifest": "4d8ba49ed1c6292e2b5337b09be369b4c417f84aa32124a5f0794781b1a86fac",
-          "precedent_meta_version": "v5-precedent-meta/2",
-          "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
-          "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-          "precedent_rows": "997",
-          "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
-        },
-        "design": "whole_pr"
-      },
       "run": "rc68dde83b4119d9123847525"
     }
   },
