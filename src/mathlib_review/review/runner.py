@@ -2378,7 +2378,6 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
     if dataset.design != "whole_pr" or dataset.routing_mode != "solo":
         raise ValueError(f"A named reviewer runs the whole_pr design under routing_mode solo, "
                          f"not {dataset.design!r} under {dataset.routing_mode!r}")
-    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
     input_files = pin_input_files(scaffold)
     assert_the_model_keeps_its_reasoning(scaffold)
     assert_run_is_named(dataset)
@@ -2390,14 +2389,18 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
                             out / "context_trace.jsonl")
     inputs: Dict[str, Any] = {"design": dataset.design}
     if dataset.solo_precedent_index is not None:
-        inputs["context_index_sha256"] = _context_index_identity(
-            dataset.solo_precedent_index, dataset.solo_precedent_manifest_sha256)
+        # Only the index the reviewer is granted: a corpus it cannot search is not its input.
+        identity = _context_index_identity(dataset.solo_precedent_index,
+                                           dataset.solo_precedent_manifest_sha256)
+        inputs["context_index_sha256"] = {key: value for key, value in identity.items()
+                                          if key.startswith("precedent_")}
     (payload,) = data
     await request.inspect(payload, episode, dataset, scaffold, inputs=inputs)
     _report_budget(dataset, {}, len(data), logger, enforce=not dataset.dry_run, scaffold=scaffold)
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")
+        assert_ready(scaffold, logger, enforce=False)
         guard_run_name(dataset, logger, scaffold, fatal=False, resume=resume)
         missing = await assert_reviewed_workspaces_prebuilt(
             [episode], required=dataset.require_reviewed_workspaces, logger=logger)
@@ -2421,6 +2424,8 @@ async def review_episode(dataset: V5DatasetConfig, scaffold, task_overrides, log
         logger.info("%s: the accepted session is on disk; archiving it without another session",
                     dataset.run_name)
         return None
+    # Everything from here on is needed only to run a session.
+    assert_ready(scaffold, logger, enforce=True)
     if resume and not any(path.exists() for path in scratch):
         # Interrupted after the generation inputs were recorded and before the first attempt.
         resume = False

@@ -292,6 +292,30 @@ def test_a_pre_change_run_interrupted_before_its_run_plan_resumes_and_archives(c
     assert archive["records"][0]["findings"] == 0
 
 
+def test_recovering_an_accepted_review_needs_no_generation_resources(checkout, provider, frozen_history,
+                                                                     monkeypatch):
+    from src.datasets.zulip.config import ZulipConfig
+
+    alias = "search-42184"
+    opts = run_options("pr-search-v1", alias)
+    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("absent/zulip.sqlite3")))
+    provider.reviews[alias] = {**saved_42184_reviews(checkout)["guided"], "then": "kill"}
+    with pytest.raises(InterruptedError, match="accepted"):
+        cli.main(opts)
+    # A Zulip index the reviewer was never granted appears, and the session credential is gone.
+    Path("zulip.sqlite3").write_text("")
+    monkeypatch.setattr(ZulipConfig, "sqlite_path", property(lambda self: Path("zulip.sqlite3").resolve()))
+
+    def no_credential(*args, **kwargs):
+        raise RuntimeError("1 prerequisite(s) are not met on this machine: [Claude login]")
+
+    monkeypatch.setattr(runner, "assert_ready", no_credential)
+    assert cli.main([*opts, "--resume"]) == 0
+    assert provider.sessions == [alias]
+    _, archive = submissions.saved_reviews(submissions.review_directory(alias))
+    assert archive["records"][0]["findings"] == 2
+
+
 def test_a_session_lost_to_system_errors_runs_again_on_resume(checkout, provider, capsys):
     alias = "lost-42184"
     provider.reviews[alias] = "lost"
