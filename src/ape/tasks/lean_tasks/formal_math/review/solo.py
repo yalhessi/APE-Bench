@@ -40,7 +40,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from pydantic import Field, model_validator
 
-from ape.tasks.base import register_task
+from ape.tasks.base import knob, register_task
 
 from .base import (
     BasePRReviewConfig,
@@ -307,8 +307,8 @@ class SoloReviewData(BasePRReviewData):
     #: read that could see the future is not allowed to happen at all" -- and that refusal is
     #: the whole temporal-isolation story for an agent that is otherwise unconstrained.
     retrieval_cutoff: Optional[str] = None
-    precedent_index_dir: Optional[Path] = Field(default=None, exclude_if=lambda value: value is None)
-    precedent_manifest_sha256: Optional[str] = Field(default=None, exclude_if=lambda value: value is None)
+    precedent_index_dir: Optional[Path] = knob("Directory containing the study's frozen excerpt index")
+    precedent_manifest_sha256: Optional[str] = knob("Digest of the excerpt index manifest sealed by the run")
 
     #: What every context tool stamps its trace row with. An arm's is its `(unit, arm)` pair;
     #: a whole-PR review has one per episode, so it is minted from the episode.
