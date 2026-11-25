@@ -282,6 +282,31 @@ def test_the_review_runs_from_a_release_holding_only_its_episodes(checkout, prov
     assert set(search["mcp"]) - set(solo["mcp"]) == {"precedent_search"} and set(solo["mcp"]) < set(search["mcp"])
 
 
+def episode_rows(checkout):
+    source = checkout / "inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl"
+    return {row["pr_number"]: row for row in (json.loads(line) for line in source.read_text().split("\n")
+                                              if line.strip())}
+
+
+@pytest.mark.parametrize("patch", ["another PR", "empty"])
+def test_an_episode_whose_patch_disagrees_with_its_digest_is_refused(checkout, provider, capsys, patch):
+    rows = episode_rows(checkout)
+    episode, other = rows[42184], rows[41930]
+    swapped = ({**episode, "diff": "", "changed_files": []} if patch == "empty" else
+               {**episode, "base_sha": other["base_sha"], "diff": other["diff"],
+                "changed_files": other["changed_files"]})
+    release = Path("swapped")
+    (release / "input").mkdir(parents=True)
+    (release / "input/episodes.jsonl").write_text(json.dumps(swapped) + "\n")
+    provider.release = release.resolve()
+    for command in (["plan", "--reviewer", "solo-v1", "--case", "42184@c5474cb4"],
+                    run_options("solo-v1", "swapped")):
+        with pytest.raises(SystemExit) as refused:
+            cli.main(command)
+        assert refused.value.code == 2 and "patch hash mismatch" in capsys.readouterr().err
+    assert provider.sessions == [] and not (submissions.review_directory("swapped") / "generation.json").exists()
+
+
 def test_a_case_names_exactly_one_reviewed_episode(checkout, provider, capsys):
     source = checkout / "inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl"
     (episode,) = [json.loads(line) for line in source.read_text().split("\n")

@@ -24,6 +24,17 @@ from src.mathlib_review.schema import (
 )
 
 
+def validate_episode(episode: ReviewEpisodeInput) -> None:
+    """Refuse an episode whose visible patch is not the one its digest and file index record."""
+    if sha256_bytes(episode.diff.encode("utf-8")) != episode.patch_sha256:
+        raise ValueError(f"{episode.episode_id}: patch hash mismatch")
+    if changed_files_from_diff(episode.diff) != episode.changed_files:
+        raise ValueError(f"{episode.episode_id}: changed-files index mismatch")
+    if episode.description.provenance == "legacy_post_edit_risk_omitted":
+        if episode.description.text is not None:
+            raise ValueError(f"{episode.episode_id}: risky legacy description was not omitted")
+
+
 def validate_release(release_dir: Path) -> Dict[str, int]:
     manifest = DatasetManifest.model_validate_json((release_dir / "manifest.json").read_text())
     artifacts = (
@@ -59,13 +70,7 @@ def validate_release(release_dir: Path) -> Dict[str, int]:
     if len({episode.episode_id for episode in episodes}) != len(episodes):
         raise ValueError("duplicate episode_id")
     for episode in episodes:
-        if sha256_bytes(episode.diff.encode("utf-8")) != episode.patch_sha256:
-            raise ValueError(f"{episode.episode_id}: patch hash mismatch")
-        if changed_files_from_diff(episode.diff) != episode.changed_files:
-            raise ValueError(f"{episode.episode_id}: changed-files index mismatch")
-        if episode.description.provenance == "legacy_post_edit_risk_omitted":
-            if episode.description.text is not None:
-                raise ValueError(f"{episode.episode_id}: risky legacy description was not omitted")
+        validate_episode(episode)
 
     events: List[SourceEvent] = []
     event_ref = next(

@@ -425,7 +425,8 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
 
     Reads only `input/episodes.jsonl`: the visible author text, the merge base and the patch.
     A release can hold several rounds of one PR, so the head is part of the request, and a
-    prefix that names none or several of them is refused rather than resolved by order.
+    prefix that names none or several of them is refused rather than resolved by order. The
+    episode is checked as release validation checks it, so its patch is the one its digest names.
     """
 
     episodes = load_jsonl(Path(release) / "input/episodes.jsonl", ReviewEpisodeInput)
@@ -438,6 +439,9 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
     if len(found) > 1:
         raise ValueError(f"{release}: {pr_number}@{head} names {len(found)} reviewed episodes "
                          f"({sorted(ep.episode_id for ep in found)}); give more of the head")
+    from src.mathlib_review.release.validate import validate_episode
+
+    validate_episode(found[0])
     return found[0]
 
 
