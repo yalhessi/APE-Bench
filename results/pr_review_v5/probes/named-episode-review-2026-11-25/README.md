@@ -24,24 +24,25 @@ The saved samples are `scope_solo_opus55_42184_ordinary_20261124`, which filed o
 
 ## Archives written before the change
 
-Archives written by the code at `067749d3` still reopen on the new route, and a run that code left unfinished still resumes. The test at that commit wrote them, with one correction: its local provider built a task result by hand, which lacked fields every real task result carries (`task_id`, `task_type`, `global_index`, `score`). APE's own reconciliation refuses such a result, so the provider was changed to build its result through the task's result class, as the submission tool does. No other line of the earlier code changed. A new session raises in the processes below.
+Archives written by the code at `067749d3` still reopen on the new route, and a run that code left unfinished still resumes. The test at that commit writes them, with one correction in `pre-change-provider.patch`. Its local provider built the task result by hand, and that result lacked fields every real task result carries (`task_id`, `task_type`, `global_index`, `score`). APE's reconciliation refuses such a result. The patch builds the result through the task's result class, as the submission tool does, and changes nothing else. A new session raises in both checks below, and each check fails on any differing byte.
 
 - `reopen_pre_change.py` reopens both 42184 archives, with one finding and with two. It prepares both readings, whose matcher input is byte-identical to `before/`. It then removes the guided archive, the state of an interruption before archiving, and rebuilds it from the run's `run_plan.json` byte for byte.
-- `resume_pre_change.py` removes a finished run's archive and resumes it with `run --resume`. The run is resumed from the checkout that started it, because the generation record hashes the scaffold, whose tool paths resolve inside the checkout. That was already true before this change. APE completes the task's missing outcome record without a session, and no credential is needed. The archive is the original apart from the digest of the `inputs.json` the resume now records. Every archived file is unchanged, and the recorded design agrees with the run plan the earlier code sealed.
+- `resume_pre_change.py` removes a finished run's archive and resumes it with `run --resume`, with no credential. It must run from the checkout that started the run, because the generation record hashes the scaffold, whose tool paths resolve inside the checkout. That was already true before this change. APE completes the task's missing outcome record without a session. The generation record is unchanged, no `inputs.json` is written because the run plan sealed the inputs, and the archive is byte-identical. The script restores the folder afterwards, so it can be run again.
+
+From the root of this branch's checkout:
 
 ```bash
-base=.claude/worktrees/named-baseline-check old=<scratch>/old-archives
+export PYTHONPATH="$PWD/src:$PWD"
+probe=results/pr_review_v5/probes/named-episode-review-2026-11-25
+base=.claude/worktrees/named-baseline-check
+old=$(mktemp -d)/old-archives
 git worktree add --detach "$base" 067749d3 && .claude/worktree-setup.sh "$base"
-# In tests/mathlib_review/test_named_reviewers.py, build `raw` with task.create_result(success=True, score=1.0,
-# pr_number=..., review_message=..., findings=..., submitted_findings=...).model_dump(mode="json").
+git -C "$base" apply "$PWD/$probe/pre-change-provider.patch"
 (cd "$base" && PYTHONPATH="$PWD/src:$PWD" ape/bin/python -m pytest -q tests/mathlib_review/test_named_reviewers.py --basetemp="$old")
-cp -a "$old/test_named_reading_reproduces_0" <scratch>/reopen && rm -rf <scratch>/reopen/.ape/review-comparisons
-PYTHONPATH="$PWD/src:$PWD" ape/bin/python results/pr_review_v5/probes/named-episode-review-2026-11-25/reopen_pre_change.py \
-  <scratch>/reopen "$PWD/results/pr_review_v5/probes/named-episode-review-2026-11-25/before"
-# Then, with the current code checked out in "$base":
-(cd "$base" && git checkout --detach <this branch> && PYTHONPATH="$PWD/src:$PWD" ape/bin/python \
-  <this checkout>/results/pr_review_v5/probes/named-episode-review-2026-11-25/resume_pre_change.py \
+cp -a "$old/test_named_reading_reproduces_0" "$old/reopen" && rm -rf "$old/reopen/.ape/review-comparisons"
+ape/bin/python "$probe/reopen_pre_change.py" "$old/reopen" "$PWD/$probe/before"
+git -C "$base" checkout -- . && git -C "$base" checkout --detach named-episode-review
+(cd "$base" && PYTHONPATH="$PWD/src:$PWD" ape/bin/python "$OLDPWD/$probe/resume_pre_change.py" \
   "$old/test_cli_accepts_empty_review_0" solo-42184-b "$PWD")
+git worktree remove --force "$base"
 ```
-
-Both scripts fail with an assertion if any compared byte differs.

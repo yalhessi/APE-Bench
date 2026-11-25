@@ -7,16 +7,14 @@ the resume reads the configs of the checkout the run was started from, as a rese
 
 The folder is one of the test directories written at 067749d3 (see README). Its archive is removed
 first, which leaves the state of a run interrupted after acceptance. A new session raises in this process,
-no credential is needed, and the resume must archive the accepted session again, unchanged apart from the inputs it now records.
+no credential is needed, and the resume must archive the accepted session again, byte for byte.
 """
-import json
 import shutil
 import sys
 from pathlib import Path
 
 from ape.orchestration import TaskOrchestrator
 from src.mathlib_review.analysis import submissions
-from src.mathlib_review.io import sha256_file
 from src.mathlib_review.review import cli, runner
 
 
@@ -55,20 +53,12 @@ reviewer = next(iter(submissions.read(out / "generation.json")["runs"]))
 try:
     assert cli.main(["run", "--reviewer", reviewer, "--case", "42184@c5474cb4", "--run-name", alias,
                      "--execute", "--resume"]) == 0
-except BaseException:
+    assert (out / "generation.json").read_bytes() == generation, "the pre-change generation record was rewritten"
+    # The run sealed its inputs in its run plan, so the resume records no other copy of them.
+    assert not (out / submissions.INPUTS_FILE).exists(), "the resume recorded inputs the run plan already sealed"
+    assert (out / "archive.json").read_bytes() == before, "the resumed archive differs from the pre-change one"
+finally:
+    # Put the pre-change folder back, so the check can be run again.
     shutil.rmtree(out)
-    shutil.copytree(root / f"{alias}.saved", out)
-    raise
-assert (out / "generation.json").read_bytes() == generation, "the pre-change generation record was rewritten"
-# The resume records the run's inputs before it could dispatch a reviewer, so the archive gains their
-# digest. Everything else, every archived file included, must be what the pre-change code archived.
-rebuilt, original = submissions.read(out / "archive.json"), json.loads(before)
-assert rebuilt.pop("inputs_sha256") == sha256_file(out / submissions.INPUTS_FILE)
-assert rebuilt == original, "the resumed archive differs from the pre-change one"
-for record in original["records"]:
-    for kept in record["files"].values():
-        assert sha256_file(Path(kept["path"])) == kept["sha256"], kept["path"]
-(name,) = (run["run"] for run in submissions.read(out / "generation.json")["runs"].values())
-sealed = json.loads((Path("results/pr_review_v5/runs") / name / "run_plan.json").read_bytes())
-assert submissions.read(out / submissions.INPUTS_FILE)[name]["design"] == sealed["evaluation_settings"]["design"]
-print(f"resumed {alias}: archive identical apart from the added inputs digest; inputs agree with its run plan")
+    shutil.move(root / f"{alias}.saved", out)
+print(f"resumed {alias}: archive bytes identical")

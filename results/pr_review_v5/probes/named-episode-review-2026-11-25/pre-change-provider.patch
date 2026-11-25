@@ -1,0 +1,21 @@
+diff --git a/tests/mathlib_review/test_named_reviewers.py b/tests/mathlib_review/test_named_reviewers.py
+index 14933c91..1f2d6d79 100644
+--- a/tests/mathlib_review/test_named_reviewers.py
++++ b/tests/mathlib_review/test_named_reviewers.py
+@@ -80,10 +80,12 @@ def provider(checkout, monkeypatch):
+             json.dumps({"type": "user", "message": {"content": message}}) + "\n")
+         review = reviews.get(Path(plan_path).parent.name, {})
+         submitted = [SubmittedFinding(**finding) for finding in review.get("findings", [])]
+-        raw = {"pr_number": task.data.pr_number, "episode_id": task.data.episode_id, "success": True,
+-               "submitted_findings": [f.model_dump(exclude_unset=True) for f in submitted],
+-               "findings": [f.recorded() for f in submitted],
+-               "review_message": review.get("message", "No changes requested.")}
++        # A complete task result, built by the task's own result class as the submission tool builds it.
++        raw = task.create_result(
++            success=True, score=1.0, pr_number=task.data.pr_number,
++            review_message=review.get("message", "No changes requested."),
++            findings=[f.recorded() for f in submitted],
++            submitted_findings=[f.model_dump(exclude_unset=True) for f in submitted]).model_dump(mode="json")
+         put(folder / "sample.json", {"sample_id": "s", "sample_index": 0,
+             "task_global_index": task.data.global_index, "created_at": "2026-11-25", "updated_at": "2026-11-25",
+             "attempts": [{"attempt_id": 1, "path": str(attempt), "status": "success", "created_at": "2026-11-25",
