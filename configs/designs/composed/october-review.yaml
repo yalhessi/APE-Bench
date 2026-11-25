@@ -3,5 +3,5 @@ stages:
     operations: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
     context_tools: [zulip_search, precedent_search, declaration_search, naming_norm, proof_profile]
     task:
-      system_prompt_file: results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/brief_G.md
+      system_prompt_file: configs/designs/composed/brief_G.md
     case_context: true
