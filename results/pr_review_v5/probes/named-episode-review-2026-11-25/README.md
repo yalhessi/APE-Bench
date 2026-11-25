@@ -29,6 +29,8 @@ Archives written by the code at `067749d3` still reopen on the new route, and a 
 - `reopen_pre_change.py` reopens both 42184 archives, with one finding and with two. It prepares both readings, whose matcher input is byte-identical to `before/`. It then removes the guided archive, the state of an interruption before archiving, and rebuilds it from the run's `run_plan.json` byte for byte.
 - `resume_pre_change.py` removes a finished run's archive and resumes it with `run --resume`, with no credential. It must run from the checkout that started the run, because the generation record hashes the scaffold, whose tool paths resolve inside the checkout. That was already true before this change. APE completes the task's missing outcome record without a session. The generation record is unchanged, no `inputs.json` is written because the run plan sealed the inputs, and the archive is byte-identical. The script restores the folder afterwards, so it can be run again.
 
+The intermediate search reviewer at `86bb0f88` recorded the local Zulip digest alongside its precedent-index pins inside `generation.json`. In a local-provider replay of 42184, the current runner recovered both submitted findings after interruption, with new sessions disabled and the original generation bytes intact. The regression also changes the recorded precedent manifest digest and checks that resume refuses it. [Named CLI tests](../../../../tests/mathlib_review/test_named_reviewers.py)
+
 From the root of this branch's checkout, in zsh or bash. The block runs in a subshell that stops at the first failure. It creates its worktree under a new temporary folder, so it never touches an existing one, and removes it on exit, whether the checks pass or fail.
 
 ```bash
