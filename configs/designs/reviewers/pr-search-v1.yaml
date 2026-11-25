@@ -1,0 +1,7 @@
+profile: configs/designs/whole_pr_familiar.yaml
+history:
+  source: data/pr_review_v5/first_round_development_before_2026-01-01.jsonl
+  before: '2026-01-01T00:00:00Z'
+  excluded: [41930, 42184]
+  model_revision: 1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+  sha256: 1a7b07366da7f69298b2a7780ba57ca35f9f1eb4f83cd384bb700e81d6242f03

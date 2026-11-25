@@ -9,6 +9,13 @@ from ape.orchestration.persistence import TaskStorage
 from src.mathlib_review.analysis import matching, probes
 from src.mathlib_review.io import jsonl_rows, pretty_json_bytes, sha256_bytes, sha256_file, write_once
 from src.mathlib_review.paths import run_dir
+from src.mathlib_review.run_state import claim_execution
+
+
+def review_directory(alias):
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", alias):
+        raise ValueError("Use a run name containing letters, digits, dots, underscores or hyphens")
+    return Path(".ape/reviews") / alias
 
 
 def read(path):
@@ -50,24 +57,28 @@ def check_attempt(attempt, expected):
 async def capture(out, runs):
     sources, records = {}, []
     generation = read(out / "generation.json")
+    named = "reviewer" in generation
     for arm, run in runs.items():
         name = run["run"]
-        task_root = Path(".ape/runs") / name / "tasks"
+        task_root = Path(run.get("tasks_dir", Path(".ape/runs") / name / "tasks"))
         manifest = run_dir(name) / "run_manifest.json"
-        if not manifest.exists() or read(manifest)["completion_status"] != "complete":
+        if not named and (not manifest.exists() or read(manifest)["completion_status"] != "complete"):
             raise ValueError(f"{name}: review generation is incomplete; resume the generation command")
         plan = read(run_dir(name) / "run_plan.json")
         if plan["run_name"] != name or plan["evaluation_settings"].get("design") != "whole_pr":
             raise ValueError(f"{name}: run plan belongs to a different reviewer")
-        if arm == "history":
+        search = "history_sha256" in run or arm == "history"
+        if search:
             index = plan["context_index_sha256"]
             if (index.get("precedent_corpus"), index.get("precedent_manifest")) != (
                     generation["history_sha256"], generation["index_manifest_sha256"]):
                 raise ValueError(f"{name}: the live search index differs from the generation plan")
         base = out / "submissions" / name
         findings = {}
-        run_files = {f: archive(run_dir(name) / f, base / f) for f in
-                     ("run_manifest.json", "run_plan.json", "context_trace.jsonl")
+        files_to_keep = ["run_plan.json", "context_trace.jsonl"]
+        if not named:
+            files_to_keep.append("run_manifest.json")
+        run_files = {f: archive(run_dir(name) / f, base / f) for f in files_to_keep
                      if (run_dir(name) / f).exists()}
         trace_file = run_dir(name) / "context_trace.jsonl"
         search_rows = [r for r in jsonl_rows(trace_file) if r["tool"] == "precedent_search"] if trace_file.exists() else []
@@ -94,7 +105,7 @@ async def capture(out, runs):
             traced = [r for r in search_rows if r.get("invocation_id") == raw.get("invocation_id")]
             if len(samples[0].attempts) == 1 and calls != len(traced):
                 raise ValueError(f"{attempt}: search calls in the transcript disagree with the run trace")
-            if traced and (arm != "history" or any(
+            if traced and (not search or any(
                     r.get("corpus_sha256") != run.get("history_sha256") or r.get("as_of") != expected["cutoff"]
                     for r in traced)):
                 raise ValueError(f"{attempt}: search used an unverified corpus or cutoff")
@@ -132,26 +143,28 @@ def prepare_reading(out, sources, prs, question_form, *, reference, name, readin
     digest = matching.rubric_sha256(matching.V2_TASK, policy)
     key = f"{reading or policy}-{digest[:12]}"
     folder = out / "readings" / key
-    if (folder / matching.PLAN_FILE).exists():
-        plan = matching.load_plan(folder)
-        if plan.identity.rubric_sha256 != digest or plan.identity.seal_sha256 != sha256_file(seal_path):
-            raise ValueError(f"{folder}: saved reading belongs to another rubric or seal")
-    else:
-        plan = matching.plan_matching(
-            reference, name=f"{name}_{out.name}_{key}",
-            seal=read(seal_path), seal_path=seal_path,
-            sources={k: probes.Source.model_validate(v) for k, v in sources.items()},
-            out_dir=folder, version="2-task", question_policy=policy, replicates=2, harness_blind=True)
+    seal = read(seal_path)
+    if (set(seal) != set(map(str, prs)) or not set(prs) <= set(reference.pr_numbers)
+            or any(sorted(labels.values()) != sorted(sources) for labels in seal.values())):
+        raise ValueError("Reference population or saved blind labels differ from the requested subjects")
+    plan = matching.plan_matching(
+        reference, name=f"{name}_{out.name}_{key}",
+        seal=seal, seal_path=seal_path,
+        sources={k: probes.Source.model_validate(v) for k, v in sources.items()},
+        out_dir=folder, version="2-task", question_policy=policy, replicates=2, harness_blind=True,
+        reuse=True)
     return plan, folder
 
 
-def compare(out, question_form, execute, *, reference, name, config, reading=None):
+def saved_reviews(out, *, recover=False):
     if not (out / "generation.json").is_file():
-        raise ValueError(f"{out}: no saved generation. Generate this sample with study run --execute first.")
+        raise ValueError(f"{out}: no saved generation. Run the reviewer before scoring its submission.")
     generation = read(out / "generation.json")
     if generation["fixture"]:
         raise ValueError("Synthetic wiring fixtures cannot be evaluated as pilot runs")
     path = out / "archive.json"
+    if not path.is_file() and not recover:
+        raise ValueError(f"{out}: submission not yet archived. Resume the review before scoring.")
     artifact = read(path) if path.is_file() else asyncio.run(capture(out, generation["runs"]))
     if artifact["generation_sha256"] != sha256_file(out / "generation.json"):
         raise ValueError("The archived reviews refer to another generation plan")
@@ -161,19 +174,105 @@ def compare(out, question_form, execute, *, reference, name, config, reading=Non
     for arm, digest in artifact["projection_sha256"].items():
         if sha256_file(Path(artifact["sources"][arm]["path"])) != digest:
             raise ValueError(f"{arm}: archived matcher input changed")
-    prs = sorted(int(pr) for pr in generation["runs"]["solo"]["episodes"])
+    if "reviewer" in generation:
+        for record in artifact["records"]:
+            original = record["files"]["task_result.json"]
+            if sha256_file(Path(original["path"])) != original["sha256"]:
+                raise ValueError(f"{out}: accepted task result changed")
+    return generation, artifact
+
+
+def compare(out, question_form, execute, *, reference, name, config, reading=None):
+    generation, artifact = saved_reviews(out, recover=True)
+    prs = sorted(map(int, generation["runs"]["solo"]["episodes"]))
     plan, folder = prepare_reading(out, artifact["sources"], prs, question_form,
                                    reference=reference, name=name, reading=reading)
+    score_plan(plan, folder, config, execute)
+
+
+def score_plan(plan, folder, config, execute, *, scaffold=None):
     print(f"{folder}: {plan.expected_cells} cells per reading, {plan.identity.replicates} readings")
     if execute:
         from ape.utils.logging import create_logger
         from src.mathlib_review.review.preflight import assert_credentials
         from src.mathlib_review.run_config import load_run
 
-        _, scaffold, _ = load_run(config, matching.MatchDatasetConfig)
+        if scaffold is None:
+            _, scaffold, _ = load_run(config, matching.MatchDatasetConfig)
         assert_credentials(scaffold)
         run = "m" + plan.source_sha256[:20]
         rows = asyncio.run(matching.run_matching(plan, folder, scaffold, run, create_logger()))
         if len(rows) != len(plan.batches) * plan.identity.replicates:
             raise ValueError(f"{folder}: incomplete matcher results")
         print(json.dumps(matching.report_matching(folder, producers=["task-" + run]), indent=2))
+
+
+SCORERS = {"round1-requests-v1": False, "round1-questions-v1": True}
+REFERENCE = Path("configs/probe_sets/postcutoff_2026_07_08_v1.yaml")
+MATCHER = Path("configs/match/ask_match_opus55_claude_sub.yaml")
+
+
+def scoring_description(scorer):
+    policy = "question form" if SCORERS[scorer] else "request only"
+    return (f"{scorer}: ordered submitted findings against {REFERENCE}, "
+            f"{policy} rubric, two blind readings via {MATCHER}")
+
+
+def score_reviews(directories, scorer, *, execute):
+    """Read independently accepted submissions on the same reviewed head."""
+    from src.mathlib_review.io import canonical_json_bytes
+
+    if len(directories) != len(set(directories)):
+        raise ValueError("Each requested submission must be distinct")
+    reference = probes.load_probe_set(REFERENCE)
+    reference_heads = {(r["pr_number"], r["episode_id"], r["patch_sha256"], r["reviewed_head_sha"])
+                       for r in jsonl_rows(reference.release / "input/episodes.jsonl")}
+    sources = {}
+    case = None
+    receipts = {}
+    subjects = {}
+    if not directories:
+        raise ValueError("Supply at least one saved run to score")
+    for directory in sorted(directories):
+        generation, archive_record = saved_reviews(directory)
+        reviewer = generation.get("reviewer")
+        if reviewer is None or set(generation["runs"]) != {reviewer}:
+            raise ValueError(f"{directory}: expected one named reviewer")
+        ((pr, episode),) = generation["runs"][reviewer]["episodes"].items()
+        current = (int(pr), episode["episode_id"], episode["patch_sha256"], episode["reviewed_head_sha"])
+        if current not in reference_heads or (case is not None and current != case):
+            raise ValueError("Submissions and reference must cover the same reviewed revision")
+        case = current
+        sources[directory.name] = archive_record["sources"][reviewer]
+        receipt = sha256_file(directory / "archive.json")
+        receipts[directory.name] = receipt
+        subjects[directory.name] = {
+            "reviewer": reviewer, "pr": current[0], "head": current[3], "archive_sha256": receipt,
+            "profile_sha256": generation["profile_sha256"], "model": episode["model"], "effort": episode["effort"],
+            "history_sha256": generation.get("history_sha256"),
+        }
+    out = Path(".ape/review-comparisons") / sha256_bytes(canonical_json_bytes(receipts))[:24]
+    with claim_execution(out):
+        write_once(out / "subjects.json", pretty_json_bytes(subjects))
+        from src.mathlib_review.run_config import load_run
+        _, scaffold, _ = load_run(MATCHER, matching.MatchDatasetConfig)
+        asks = probes.ask_packet(read(reference.feedback_file), read(reference.asks_file)["asks"][str(case[0])])
+        settings = {
+            "name": scorer, "config": str(MATCHER), "executor": matching.executor_of(scaffold),
+            "route_sha256": matching.route_sha256(scaffold), "max_turns": scaffold.execution.max_turns,
+            "token_cap": scaffold.execution.sample_max_tokens, "cost_cap": scaffold.execution.sample_max_cost,
+        }
+        identity = sha256_bytes(canonical_json_bytes([asks, settings]))
+        plan, folder = prepare_reading(out, sources, [case[0]], SCORERS[scorer],
+                                       reference=reference, name="reviews", reading=f"{scorer}-{identity[:16]}")
+        write_once(folder / "scorer.json", pretty_json_bytes(settings))
+        print(scoring_description(scorer))
+        packet, = plan.packets
+        for label, found in packet.reviewers.items():
+            alias = plan.seal[str(case[0])][label]
+            subject = subjects[alias]
+            print(f"{alias} ({subject['reviewer']}, {subject['model']}, {subject['effort']}), "
+                  f"PR {case[0]}@{case[3][:8]}: {len(found)} findings, {len(packet.asks)} eligible requests")
+    with claim_execution(folder):
+        score_plan(plan, folder, MATCHER, execute, scaffold=scaffold)
+    return 0

@@ -26,13 +26,27 @@ the silent path where a partial run is judged as though it were complete.
 
 from __future__ import annotations
 
+import fcntl
 import json
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, FrozenSet, List, Optional, Sequence
 
 from src.mathlib_review.io import sha256_file
+
+
+@contextmanager
+def claim_execution(directory: Path):
+    """One process owns a named execution; the OS releases its claim on exit."""
+    directory.mkdir(parents=True, exist_ok=True)
+    with (directory / ".lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ValueError(f"{directory}: already active in another process") from None
+        yield
 
 
 class RunState(str, Enum):

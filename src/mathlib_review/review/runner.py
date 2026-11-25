@@ -2049,7 +2049,8 @@ def agenda_for_release(dataset, release, units, episodes, selected_prs):
     )
 
 
-async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
+async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False,
+              review_request=None):
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
@@ -2072,6 +2073,22 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
     report = agenda_report(agenda, work_unit_ids=[unit.work_unit_id for unit in units])
+
+    named_data = None
+    if review_request is not None:
+        named_data = _solo_task_data(agenda, episodes, dataset, cutoffs_by_episode(episodes),
+                                     run_dir(dataset.run_name) / "context_trace.jsonl",
+                                     graphs=release["graphs"], stage_rows=stage_rows)
+        await review_request.inspect(named_data, episodes, dataset, scaffold)
+        manifest = run_dir(dataset.run_name) / "run_manifest.json"
+        if not dataset.dry_run and resume:
+            if (review_request.directory / "archive.json").is_file():
+                return run_dir(dataset.run_name)
+            if manifest.exists() and json.loads(manifest.read_bytes())["completion_status"] == "complete":
+                return run_dir(dataset.run_name)
+        if resume and not manifest.exists() and not any(p.exists() for p in _scratch_dirs(dataset.run_name, scaffold)):
+            # An interrupt between sealing the named inputs and starting its first attempt.
+            resume = False
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")
@@ -2181,8 +2198,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         # No census, no arm pool, no journal: there is nothing to route. The agenda was still
         # built and sealed above, which is what makes this run's `agenda_report.json` scope
         # identically to the `lead` run on the same config.
-        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
-                               graphs=release["graphs"], stage_rows=stage_rows)
+        data = named_data if named_data is not None else _solo_task_data(
+            agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs=release["graphs"], stage_rows=stage_rows)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
         scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     else:
@@ -2202,6 +2219,10 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                     logger=logger)
     results = await orchestrator.run(tasks)
+    if review_request is not None and not _solo_coverage_gaps(results, data):
+        from src.mathlib_review.analysis import submissions
+        generation = submissions.read(review_request.directory / "generation.json")
+        await submissions.capture(review_request.directory, generation["runs"])
     children = (await _direct_children(orchestrator, tasks, data, agenda, scaffold, logger)
                 if dataset.routing_mode not in ("lead", "solo") else None)
 
