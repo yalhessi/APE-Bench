@@ -75,22 +75,29 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
     config = tmp_path / "study.yaml"
     config.write_text(yaml.safe_dump(spec))
     out = tmp_path / "sample-2"
-    sources = {}
+    runs, sources, records = {}, {}, []
     for arm in ("solo", "history", "automatic", "exact"):
-        path = out / arm / "findings.json"
+        base = out / "submissions" / arm
+        path = base / "findings.json"
         put(path, {"42184": []})
         sources[arm] = {"kind": "findings_file", "path": str(path)}
-    put(out / "generation.json", {"fixture": False, "runs": {arm: {"episodes": {"42184": {}}} for arm in sources}})
-    records = []
-    for arm in sources:
-        # One accepted session per arm and head, with the evidence `capture` keeps of it.
+        prompt = out / "inputs" / f"{arm}-42184.txt"
+        prompt.parent.mkdir(exist_ok=True)
+        prompt.write_text("Review 42184.")
+        episode = {"episode_id": "42184-round1", "message": str(prompt), "message_sha256": sha256_file(prompt)}
+        runs[arm] = {"run": arm, "episodes": {"42184": episode}}
         files = {}
-        for name in ("claude_code_session.json", "containment_audit.json", "claude_code_conversation_1.jsonl",
-                     "task_result.json", "sample.json"):
-            kept = out / arm / "42184" / name
-            put(kept, {"pr_number": 42184, "success": True, "submitted_findings": []})
+        evidence = {"claude_code_session.json": {}, "containment_audit.json": {"transcripts": []},
+                    "claude_code_conversation_1.jsonl": {}, "sample.json": {"attempts": [{}]},
+                    "task_result.json": {"pr_number": 42184, "episode_id": episode["episode_id"],
+                                         "success": True, "submitted_findings": []}}
+        for name, content in evidence.items():
+            kept = base / "42184" / name
+            put(kept, content)
             files[name] = {"path": str(kept), "sha256": sha256_file(kept)}
-        records.append({"strategy": arm, "pr": "42184", "run_files": {}, "files": files})
+        records.append({"strategy": arm, "pr": "42184", "run": arm, "episode_id": episode["episode_id"],
+                        "attempts": 1, "findings": 0, "search_calls": 0, "run_files": {}, "files": files})
+    put(out / "generation.json", {"fixture": False, "runs": runs})
     put(out / "archive.json", {"generation_sha256": sha256_file(out / "generation.json"), "sources": sources,
                                "records": records,
                                "projection_sha256": {a: sha256_file(Path(v["path"])) for a, v in sources.items()}})

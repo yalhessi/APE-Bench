@@ -34,6 +34,11 @@ ATTEMPT_EVIDENCE = ("claude_code_session.json", "containment_audit.json")
 TASK_EVIDENCE = ("task_result.json", "sample.json")
 TRANSCRIPT_PREFIX = "claude_code_conversation_"
 
+
+def precedent_calls(audit):
+    return sum(t["by_tool"].get("mcp__core__precedent_search", 0) for t in audit["transcripts"])
+
+
 def check_attempt(attempt, expected):
     session = read(attempt / "claude_code_session.json")
     init = session["init"]
@@ -56,8 +61,7 @@ def check_attempt(attempt, expected):
     normalized = first["message"]["content"].replace(init["cwd"], "{attempt_workspaces}")
     if sha256_bytes(normalized.encode()) != expected["message_sha256"]:
         raise ValueError(f"{attempt}: live first user message differs from the preflight")
-    calls = sum(t["by_tool"].get("mcp__core__precedent_search", 0) for t in audit["transcripts"])
-    return transcript, calls
+    return transcript, precedent_calls(audit)
 
 
 #: A named review's design and search index, by run, written before its reviewer is dispatched.
@@ -94,6 +98,12 @@ def generation_inputs(out, name, run):
         raise ValueError(f"{name}: run plan belongs to a different reviewer")
     return {"design": plan["evaluation_settings"].get("design"),
             "context_index_sha256": plan.get("context_index_sha256", {})}
+
+
+def matcher_findings(raw):
+    # Keep the author's order and wording. The classifier's default severity is not a submitted finding.
+    return [{"target": probes._solo_target(f), "claim": f["claim"], "requested_change": f["suggested_fix"]}
+            for f in raw["submitted_findings"]]
 
 
 async def capture(out, runs):
@@ -155,9 +165,7 @@ async def capture(out, runs):
             files = {f: archive(attempt / f, dest / f) for f in (*ATTEMPT_EVIDENCE, transcript.name)}
             task_files = dict(zip(TASK_EVIDENCE, (task_dir / "task_result.json", task_dir / "samples/0/sample.json")))
             files.update({name: archive(path, dest / name) for name, path in task_files.items()})
-            # The accepted list is ordered. The classifier's default severity is not an author's finding.
-            findings[pr] = [{"target": probes._solo_target(f), "claim": f["claim"],
-                             "requested_change": f["suggested_fix"]} for f in raw["submitted_findings"]]
+            findings[pr] = matcher_findings(raw)
             records.append({"strategy": arm, "pr": pr, "run": name, "episode_id": raw["episode_id"],
                             "findings": len(findings[pr]), "search_calls": calls, "attempts": len(samples[0].attempts),
                             "files": files, "run_files": run_files})
@@ -198,6 +206,57 @@ def prepare_reading(out, sources, prs, question_form, *, reference, name, readin
     return plan, folder
 
 
+def check_archived_run(out, arm, run, artifact):
+    """Check the matcher's source and its evidence against the same run and reviewed episodes."""
+    base = out / "submissions" / run["run"]
+    source = artifact["sources"][arm]
+    path = base / "findings.json"
+    if source["kind"] != "findings_file" or Path(source["path"]).resolve() != path.resolve():
+        raise ValueError(f"{arm}: archived matcher input belongs to a different run")
+    if sha256_file(path) != artifact["projection_sha256"][arm]:
+        raise ValueError(f"{arm}: archived matcher input changed")
+
+    records = [r for r in artifact["records"] if r["strategy"] == arm]
+    covered = sorted(r["pr"] for r in records)
+    if covered != sorted(run["episodes"]):
+        raise ValueError(f"{out}: archive records for {arm} cover PRs {covered}, "
+                         f"not the generated {sorted(run['episodes'])}")
+    findings = {}
+    for record in records:
+        pr = record["pr"]
+        episode = run["episodes"][pr]
+        if record.get("run") != run["run"] or record.get("episode_id") != episode["episode_id"]:
+            raise ValueError(f"{out}: archive record for {arm} PR {pr} belongs to a different run or episode")
+        if sha256_file(Path(episode["message"])) != episode["message_sha256"]:
+            raise ValueError(f"{out}: archived first message changed for {arm} PR {pr}")
+        dest = base / pr
+        files = record["files"]
+        missing = [name for name in (*ATTEMPT_EVIDENCE, *TASK_EVIDENCE) if name not in files]
+        transcripts = [name for name in files if Path(name).match(TRANSCRIPT_PREFIX + "*.jsonl")]
+        if len(transcripts) != 1:
+            missing.append(TRANSCRIPT_PREFIX + "*.jsonl")
+        if missing:
+            raise ValueError(f"{out}: the archive record for PR {pr} lacks {missing}")
+        for directory, kept_files in ((dest, files), (base, record["run_files"])):
+            for name, kept in kept_files.items():
+                expected_path = directory / name
+                if Path(name).name != name or Path(kept["path"]).resolve() != expected_path.resolve():
+                    raise ValueError(f"{out}: archived {name} belongs to a different run or episode")
+                if sha256_file(expected_path) != kept["sha256"]:
+                    what = "accepted task result" if name == "task_result.json" else f"archived {name}"
+                    raise ValueError(f"{out}: {what} changed")
+        raw = read(dest / "task_result.json")
+        if str(raw["pr_number"]) != pr or raw["episode_id"] != episode["episode_id"] or not raw["success"]:
+            raise ValueError(f"{out}: accepted task result differs from the generated episode for {arm} PR {pr}")
+        findings[pr] = matcher_findings(raw)
+        if (record["findings"] != len(findings[pr])
+                or record["attempts"] != len(read(dest / "sample.json")["attempts"])
+                or record["search_calls"] != precedent_calls(read(dest / "containment_audit.json"))):
+            raise ValueError(f"{out}: archive counts differ from the accepted evidence for {arm} PR {pr}")
+    if read(path) != findings:
+        raise ValueError(f"{arm}: archived matcher input differs from the accepted submissions")
+
+
 def saved_reviews(out, *, recover=False):
     if not (out / "generation.json").is_file():
         raise ValueError(f"{out}: no saved generation. Run the reviewer before scoring its submission.")
@@ -210,29 +269,16 @@ def saved_reviews(out, *, recover=False):
     artifact = read(path) if path.is_file() else asyncio.run(capture(out, generation["runs"]))
     if artifact["generation_sha256"] != sha256_file(out / "generation.json"):
         raise ValueError("The archived reviews refer to another generation plan")
-    if "inputs_sha256" in artifact and artifact["inputs_sha256"] != sha256_file(out / INPUTS_FILE):
-        raise ValueError(f"{out}: the recorded run inputs changed")
+    if (out / INPUTS_FILE).exists() or "inputs_sha256" in artifact:
+        if artifact.get("inputs_sha256") != sha256_file(out / INPUTS_FILE):
+            raise ValueError(f"{out}: the recorded run inputs changed")
     arms = set(generation["runs"])
     if arms != set(artifact["sources"]) or arms != set(artifact["projection_sha256"]):
         raise ValueError(f"{out}: archived finding sources differ from the planned strategies")
-    for arm, digest in artifact["projection_sha256"].items():
-        if sha256_file(Path(artifact["sources"][arm]["path"])) != digest:
-            raise ValueError(f"{arm}: archived matcher input changed")
+    if any(record["strategy"] not in arms for record in artifact["records"]):
+        raise ValueError(f"{out}: archived record belongs to an unplanned strategy")
     for arm, run in generation["runs"].items():
-        covered = sorted(r["pr"] for r in artifact["records"] if r["strategy"] == arm)
-        if covered != sorted(run["episodes"]):
-            raise ValueError(f"{out}: archive records for {arm} cover PRs {covered}, "
-                             f"not the generated {sorted(run['episodes'])}")
-    for record in artifact["records"]:
-        missing = [name for name in (*ATTEMPT_EVIDENCE, *TASK_EVIDENCE) if name not in record["files"]]
-        if not any(name.startswith(TRANSCRIPT_PREFIX) for name in record["files"]):
-            missing.append(TRANSCRIPT_PREFIX + "*.jsonl")
-        if missing:
-            raise ValueError(f"{out}: the archive record for PR {record['pr']} lacks {missing}")
-        for name, kept in {**record["files"], **record["run_files"]}.items():
-            if sha256_file(Path(kept["path"])) != kept["sha256"]:
-                what = "accepted task result" if name == "task_result.json" else f"archived {name}"
-                raise ValueError(f"{out}: {what} changed")
+        check_archived_run(out, arm, run, artifact)
     return generation, artifact
 
 

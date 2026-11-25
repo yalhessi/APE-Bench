@@ -222,6 +222,8 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
     ("claude_code_session.json", "archived claude_code_session.json changed"),
     ("transcript", "archived claude_code_conversation_1.jsonl changed"),
     ("sample.json", "archived sample.json changed"),
+    ("first-message.txt", "archived first message changed"),
+    ("episode_id", "different run or episode"),
     ("records", "cover PRs []"),
     ("evidence list", "lacks ['claude_code_session.json', 'containment_audit.json', 'task_result.json', "
                       "'sample.json', 'claude_code_conversation_*.jsonl']")])
@@ -233,7 +235,12 @@ def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper, 
     out = submissions.review_directory(alias)
     path = out / "archive.json"
     archive = submissions.read(path)
-    if tamper == "records":
+    if tamper == "first-message.txt":
+        (out / tamper).write_text("A different first message.")
+    elif tamper == "episode_id":
+        archive["records"][0]["episode_id"] = "another reviewed head"
+        put(path, archive)
+    elif tamper == "records":
         archive["records"] = []
         put(path, archive)
     elif tamper == "evidence list":
@@ -249,6 +256,30 @@ def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper, 
     with pytest.raises(SystemExit) as refused:
         cli.main(["score", "--of", alias, "--using", "round1-requests-v1"])
     assert refused.value.code == 2 and reason in capsys.readouterr().err
+    assert not Path(".ape/review-comparisons").exists()
+
+
+@pytest.mark.parametrize("swapped", ["record", "files", "projection"])
+def test_scoring_refuses_another_samples_evidence(checkout, provider, swapped):
+    # Same reviewer and head, independently accepted submissions with one and two findings.
+    provider.reviews.update(saved_42184_reviews(checkout))
+    for alias in ("ordinary", "guided"):
+        assert cli.main(run_options("solo-v1", alias)) == 0
+    copy_reference(checkout)
+    path = submissions.review_directory("ordinary") / "archive.json"
+    ordinary = submissions.read(path)
+    guided = submissions.read(submissions.review_directory("guided") / "archive.json")
+    if swapped == "record":
+        ordinary["records"] = guided["records"]
+    elif swapped == "files":
+        ordinary["records"][0]["files"] = guided["records"][0]["files"]
+    else:
+        ordinary["sources"] = guided["sources"]
+        ordinary["projection_sha256"] = guided["projection_sha256"]
+    put(path, ordinary)
+    with pytest.raises(SystemExit) as refused:
+        cli.main(["score", "--of", "ordinary", "--using", "round1-requests-v1"])
+    assert refused.value.code == 2
     assert not Path(".ape/review-comparisons").exists()
 
 
