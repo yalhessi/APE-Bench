@@ -1,6 +1,52 @@
 # Generate four comparable reviews on familiar Mathlib PRs
 
-Tracker draft for `yalhessi/APE-Bench`. The [implemented pilot and run commands](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md) record the local checks and model-backed steps. The first section is the map issue. The four decision tickets and their dependencies follow it.
+The [pilot runbook](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md) documents the commands available today. The implementation target below supersedes the pilot's study-first interface. The original map and case-selection rationale follow it.
+
+## Run one named reviewer
+
+A researcher chooses a reviewer design, a reviewed head and a run name. The command can score the accepted submission immediately. The same scoring operation can read it again later. A study may supply a list of these invocations. A run can start even when nobody has defined a study or launched another reviewer. See the [glossary](../../GLOSSARY.md#mathlib-pr-review-in-this-fork).
+
+### Four standard definitions
+
+These are proposed public names. All four use one whole-PR reviewer session per head and sample. The agent sees the title, description, changed files, diff and pinned Mathlib checkout. Its task instruction asks what changes, if any, it would request, and why. It chooses what to investigate. File reads and search, declaration lookup, hover, go-to-definition, Lean goal inspection and Lean verification are available. It submits ordered findings with a reason and requested change, optional locations and an optional overall message. An empty list completes the review. The whole-PR task supplies this instruction in the user message. [Task and submission format](../../src/ape/tasks/lean_tasks/formal_math/review/whole_pr.py)
+
+| Proposed design | Additional evidence and procedure |
+|---|---|
+| `solo-v1` | The code and Lean tools above are the full investigation grant. Earlier PR search, Zulip, delivered convention lists, target feedback and the historical per-target checklist are absent. |
+| `pr-search-v1` | Add one optional tool that searches a pinned collection of earlier inline comment-and-code excerpts. The starting review message is identical to solo. Record the grant even if the reviewer makes zero calls. |
+| `conventions-auto-v1` | A separate selector receives the incoming PR and a fixed catalogue induced from those same earlier excerpts. It may choose zero to 25 entries. Deliver their sentences in catalogue order, with the shared advisory instruction. The reviewer has the solo tool grant. |
+| `conventions-reference-v1` | The selector also receives the expert first-round requests for this head. It maps each request to supporting entries or records it as uncovered, with the same overall limit. Use the automatic design's renderer and reviewer grant. The reviewer sees only the selected sentences and advice. This measures reference-informed selection within this catalogue. |
+
+Each name resolves to one checked-in definition shared by the CLI and every study. The definition specifies the task instruction and submission format, evidence grants, preparation procedure and delivery wording. A change to any of those creates a new design revision. The resolved run records the case, concrete evidence edition, selector outputs, execution profile and sample separately. Two runs can use the same design and different evidence or models. A comparison must show these differences before treating their scores as evidence about the design.
+
+The first execution profile pins the pilot's Claude Code 2.1.285, Opus 5.5, xhigh effort, 40 turns, 600,000 processed tokens and the configured $1.50 per-review cost cap. Publish the effective profile alongside the design. A run with a different profile remains identifiable. The initial source edition is the pilot's 997 excerpts from 328 PRs before 1 January 2026. Pin the collection digest for search and learning, and record the catalogue, selector instructions, producer and exact delivered text for convention runs. Zero selected entries deliver the solo message. Selector rationales and expert requests stay outside the reviewer workspace. [Pilot artifacts and settings](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md#what-is-frozen)
+
+### Researcher commands to implement
+
+These examples use proposed options on the existing review CLI. The case argument resolves a PR and unique reviewed head in the pinned release. The scorer name resolves the first-round expert reference for that head, ordered submitted-findings projection, request-only rubric, matcher profile and two blind readings. Plan output shows those choices before execution.
+
+```bash
+ape/bin/python -m src.mathlib_review.review.cli plan --reviewer solo-v1 --case 42184@c5474cb4
+ape/bin/python -m src.mathlib_review.review.cli run --reviewer solo-v1 --case 42184@c5474cb4 --run-name solo-42184-a --score round1-requests-v1 --execute
+ape/bin/python -m src.mathlib_review.review.cli run --reviewer pr-search-v1 --case 42184@c5474cb4 --run-name search-42184-a --score round1-requests-v1 --execute
+ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a --using round1-questions-v1 --execute
+```
+
+The target interface allows the two run commands to start in separate terminals when two model sessions are available. The pilot’s per-run concurrency limit of one applies to the tasks launched by each process. Omit `--score` for generation only. Substitute either convention reviewer name to run it alone. `plan` lists any missing preparation, including model calls and the evidence each participant will receive. `run --execute` may perform that preparation and reuse its completed products. If scoring fails, retry scoring against the saved submission. A distinct run name requests a fresh sample in these single-head examples. Resuming the same run preserves its sample. Keep researcher-facing names out of model-visible paths.
+
+### Implementation and acceptance
+
+| Order | Change in the existing owner | Observable check |
+|---|---|---|
+| 1 | Add named design definitions alongside [existing design configs](../../configs/designs/). Extend [CLI plan and run](../../src/mathlib_review/review/cli.py) to resolve a definition and case. Move the [study's](../../src/mathlib_review/review/study.py) message and tool inspection into the normal runner's task preparation. Plan and execute consume the same resolved task. Include the exact rendered messages, tool schemas, profile, head, patch and evidence digests. Existing configs remain usable. New reviewer definitions can use the same run and score commands without adding a strategy branch to the study driver. | Plan and run `solo-v1` with the history files and expert feedback unavailable. Plan search independently. On 42184 its only reviewer-visible difference is the extra search tool. October's ordinary reviewer actually used that tool and cannot stand in for this solo baseline. [Archived search call](../../results/pr_review_v5/probes/postcutoff-2026-09-29/pr42184/X1/calls.jsonl#L26) |
+| 2 | Make the runner publish [the accepted submission](../../src/mathlib_review/analysis/submissions.py) for each head and sample. Use APE's accepted attempt, preserve its exact submitted fields, and check the live transcript and grants against the plan. Retain the study archive as a reader of existing results. | A single review immediately yields a stable submission reference. A successful empty review yields one too. An interrupted attempt can resume. Failure on a different head or reviewer leaves the completed submission available. |
+| 3 | Teach the [matcher](../../src/mathlib_review/analysis/matching.py) to read one or several accepted submissions directly. Have `run --score` call that same operation after saving. Resolve the reference bytes, projected findings, rubric, blinding and matcher settings before reusing a reading. Show requests reached out of eligible requests, findings submitted and the finding index credited for each match. | Score one archived 42184 review by itself with generation unavailable. For two archived reviews, revising the reference from two asks to one under the same reading name must change four judgments to two or identify the conflict. Zero expert requests still yields a finding count and an undefined recovery rate. Jointly scoring two reviews is a separate reading from scoring each alone. |
+| 4 | Split [convention preparation](../../src/mathlib_review/conventions/selection.py) into reusable catalogue production and per-head selection. Reuse its packet sessions, source checks and selector outputs. Share completed immutable products across run names. Limit exclusive preparation to the particular missing product. | Search can finish while catalogue learning is pending. Two convention reviewers requesting the same missing catalogue pay for one preparation. Equal selections render byte-identical reviewer messages, and their separate producer records identify which selector saw the expert feedback. |
+| 5 | Verify process isolation at the run entry point. APE already places task storage under the orchestrator ID and controls concurrency within a run. Give independent runs private writable workspaces, traces and output locations, and share pinned read-only inputs. Claim a run name atomically before spending. | Start solo and search on the same head with two workers and a capacity of two. Observe overlapping executions and two attributable submissions. Interrupt one and complete the other. A second launch with the same active name must observe the running job without executing it again. Resuming a name with a different resolved design, head or profile must identify the mismatch. A scorer can start on either completed submission. |
+
+**Smallest runnable milestone.** Deliver steps 1–3 for solo and search and exercise step 5 on that pair. Then enable both convention designs with step 4 and repeat the concurrency check with shared preparation. Finally make the existing study command invoke the same operations. Its useful additional check is whether the paired reviewer inputs differ only in the ways the study declared.
+
+**Evidence at this revision.** At `b5009f69`, two independent native `plan --config` processes for PR 42184, one solo and one with the excerpt-search overrides, each resolved a single whole-PR task and a prebuilt reviewed workspace. The lower-level matcher also built a one-subject plan from the archived ordinary review with one submitted finding, two expert requests and two readings. These were local preflights. Live concurrent reviews and the proposed named commands are implementation acceptance tests.
 
 ## Map issue
 
