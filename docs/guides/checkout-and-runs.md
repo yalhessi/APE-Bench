@@ -38,6 +38,14 @@ The operational notes below were moved from the October project guide. Provider 
   through the tooling (`verify_frozen build-lock`) and run `verify_frozen verify` after any change
   near them.
 
+## Preparing a pilot or evaluation
+
+1. Start with the command the researcher will use. Inspect `ape/bin/python -m src.mathlib_review.review.cli --help`, a comparable config and its saved run. Follow each handoff from the command that produces the artifact to the command that consumes it. When those commands cover the work, put the study inputs in config and the invocations in the runbook.
+2. For a missing operation, find the module that already makes the related decision. The study supplies cases, treatments and rubric choices. The runner owns resume, the sample store identifies the accepted attempt, and the matcher reads the submitted findings. A shell wrapper may handle job submission or environment setup. A one-off analysis of a named result can live beside its evidence.
+3. Verify reuse through the researcher's command with a concrete variation the study needs. For example, change the rubric on saved reviews and check that both readings consume the same submitted findings with generation unavailable. Inspect the resulting artifacts. If that takes a copy of the driver or an edit to a dated script, the workflow still lacks a supported operation.
+
+The November 2026 convention pilot illustrates the distinction. Its `four_reviews.py` already invoked the review CLI for each arm. The paired run identities and the choice of accepted submissions still lived under a dated probe, and tests loaded its Python by file path. The pilot branch moved those decisions behind `study run` and `study score` and removed the launcher (`8ff71d8d` to `790593a5`). Simply checking for a CLI invocation would have accepted both versions.
+
 ## Code: native to APE, and minimal
 
 The framework is `src/ape/` (the top-level `ape/` directory is the venv). Before writing any runner,
@@ -58,12 +66,11 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 | Reading run artifacts | `TaskStorage.load_all_samples` → `Sample.successful_attempt.path`, never mtime globbing; workspaces via `WorkspaceStateManager`, never raw `.state` JSON |
 | Lean execution and retrieval | `ape.toolkits.execute.lean`, `ape.toolkits.retrieve.lean` |
 
-- Minimal: no new module when an existing one can hold it; no duplicate helpers; delete superseded
-  code in the same commit that supersedes it. `tests/datasets/test_package_boundaries.py` and
-  `test_pr_review_v4_no_duplicate_helpers.py` pin the current counts, which may only go down.
-- One entrypoint per pipeline: `ape/bin/python -m src.mathlib_review.review.cli
-  <plan|run|judge|bench|report|trajectory>`; PR data through `-m src.datasets.pull_requests.*`.
-  Nothing that spends money runs without `--execute`; `--run-name` is required.
+- When consolidating duplicated behavior, migrate its callers and remove the superseded implementation
+  in the same change. Preserve the saved inputs and outputs used to reproduce earlier results.
+- Expose review operations through the existing `src.mathlib_review.review.cli` entry point
+  and PR data operations through `src.datasets.pull_requests`. Review stages that call a model
+  require `--execute`. Name each standalone review run with `--run-name`.
 - Every knob that changes what a run does goes into the run name or the run plan, or the
   orchestrator silently resumes the wrong run.
 - Data never moves, only code moves. All tooling runs from the repo root (`paths.assert_repo_root`).
