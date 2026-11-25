@@ -218,7 +218,7 @@ def test_an_interrupted_review_is_archived_from_its_accepted_session(checkout, p
 
 
 @pytest.mark.parametrize("tamper", ["containment_audit.json", "claude_code_session.json", "transcript",
-                                    "sample.json", "records"])
+                                    "sample.json", "records", "evidence list"])
 def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper):
     alias = "guided-42184"
     provider.reviews[alias] = saved_42184_reviews(checkout)["guided"]
@@ -229,6 +229,9 @@ def test_scoring_refuses_an_altered_archive(checkout, provider, capsys, tamper):
     archive = submissions.read(path)
     if tamper == "records":
         archive["records"] = []
+        put(path, archive)
+    elif tamper == "evidence list":
+        archive["records"][0].update(files={}, run_files={})
         put(path, archive)
     else:
         files = archive["records"][0]["files"]

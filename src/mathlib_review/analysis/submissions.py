@@ -54,6 +54,12 @@ def check_attempt(attempt, expected):
     return transcript, calls
 
 
+#: What an archive keeps of each accepted session: these from its attempt, its transcript
+#: (`claude_code_conversation_*.jsonl`), and the task's result and sample record.
+ATTEMPT_EVIDENCE = ("claude_code_session.json", "containment_audit.json")
+TASK_EVIDENCE = ("task_result.json", "sample.json")
+TRANSCRIPT_PREFIX = "claude_code_conversation_"
+
 #: A named review's design and search index, by run, written before its reviewer is dispatched.
 INPUTS_FILE = "inputs.json"
 
@@ -72,18 +78,17 @@ def record_inputs(out, name, inputs):
     write_once(path, pretty_json_bytes({name: inputs}))
 
 
-def generation_inputs(out, name):
+def generation_inputs(out, name, run):
     """The design and search index one generation ran with.
 
-    A named run records them in `inputs.json` beside its generation record. Study generations,
-    and named ones archived before 25 November 2026, sealed them in the runner's `run_plan.json`.
+    A named run records them in `inputs.json` beside its generation record; one recorded on the
+    development branch between 968c285e and 86bb0f88 kept them inside that record. Study
+    generations, and named ones from before the change, sealed them in the runner's `run_plan.json`.
     """
     if (out / INPUTS_FILE).is_file():
         return read(out / INPUTS_FILE)[name]
-    inline = [r["inputs"] for r in read(out / "generation.json")["runs"].values()
-              if r["run"] == name and "inputs" in r]
-    if inline:  # recorded between 968c285e and 86bb0f88, inside the generation record
-        return inline[0]
+    if "inputs" in run:  # recorded between 968c285e and 86bb0f88, inside the generation record
+        return run["inputs"]
     plan = read(run_dir(name) / "run_plan.json")
     if plan["run_name"] != name:
         raise ValueError(f"{name}: run plan belongs to a different reviewer")
@@ -101,7 +106,7 @@ async def capture(out, runs):
         manifest = run_dir(name) / "run_manifest.json"
         if not named and (not manifest.exists() or read(manifest)["completion_status"] != "complete"):
             raise ValueError(f"{name}: review generation is incomplete; resume the generation command")
-        inputs = generation_inputs(out, name)
+        inputs = generation_inputs(out, name, run)
         if inputs["design"] != "whole_pr":
             raise ValueError(f"{name}: generated with design {inputs['design']!r}, not a whole-PR review")
         search = "history_sha256" in run or arm == "history"
@@ -147,8 +152,7 @@ async def capture(out, runs):
                     for r in traced)):
                 raise ValueError(f"{attempt}: search used an unverified corpus or cutoff")
             dest = base / pr
-            files = {f: archive(attempt / f, dest / f) for f in
-                     ("claude_code_session.json", "containment_audit.json", transcript.name)}
+            files = {f: archive(attempt / f, dest / f) for f in (*ATTEMPT_EVIDENCE, transcript.name)}
             files["task_result.json"] = archive(task_dir / "task_result.json", dest / "task_result.json")
             files["sample.json"] = archive(task_dir / "samples/0/sample.json", dest / "sample.json")
             # The accepted list is ordered. The classifier's default severity is not an author's finding.
@@ -220,6 +224,11 @@ def saved_reviews(out, *, recover=False):
             raise ValueError(f"{out}: archive records for {arm} cover PRs {covered}, "
                              f"not the generated {sorted(run['episodes'])}")
     for record in artifact["records"]:
+        missing = [name for name in (*ATTEMPT_EVIDENCE, *TASK_EVIDENCE) if name not in record["files"]]
+        if not any(name.startswith(TRANSCRIPT_PREFIX) for name in record["files"]):
+            missing.append(TRANSCRIPT_PREFIX + "*.jsonl")
+        if missing:
+            raise ValueError(f"{out}: the archive record for PR {record['pr']} lacks {missing}")
         for name, kept in {**record["files"], **record["run_files"]}.items():
             if sha256_file(Path(kept["path"])) != kept["sha256"]:
                 what = "accepted task result" if name == "task_result.json" else f"archived {name}"

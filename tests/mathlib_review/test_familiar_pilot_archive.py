@@ -83,11 +83,13 @@ def test_study_cli_rescores_a_saved_sample_without_generation(tmp_path):
     put(out / "generation.json", {"fixture": False, "runs": {arm: {"episodes": {"42184": {}}} for arm in sources}})
     records = []
     for arm in sources:
-        # One accepted task result per arm and head, as `capture` records it.
-        result = out / arm / "42184" / "task_result.json"
-        put(result, {"pr_number": 42184, "success": True, "submitted_findings": []})
-        records.append({"strategy": arm, "pr": "42184", "run_files": {},
-                        "files": {"task_result.json": {"path": str(result), "sha256": sha256_file(result)}}})
+        # One accepted session per arm and head, with the evidence `capture` keeps of it.
+        files = {}
+        for name in (*measure.ATTEMPT_EVIDENCE, *measure.TASK_EVIDENCE, measure.TRANSCRIPT_PREFIX + "1.jsonl"):
+            kept = out / arm / "42184" / name
+            put(kept, {"pr_number": 42184, "success": True, "submitted_findings": []})
+            files[name] = {"path": str(kept), "sha256": sha256_file(kept)}
+        records.append({"strategy": arm, "pr": "42184", "run_files": {}, "files": files})
     put(out / "archive.json", {"generation_sha256": sha256_file(out / "generation.json"), "sources": sources,
                                "records": records,
                                "projection_sha256": {a: sha256_file(Path(v["path"])) for a, v in sources.items()}})
