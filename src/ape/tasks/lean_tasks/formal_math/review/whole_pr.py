@@ -5,10 +5,17 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ape.tasks.base import EvaluationResult, register_task
+from ape.tasks.base import EvaluationResult, knob, register_task
 
 from .context_tools import register_context_tools
 from .solo import SoloReviewConfig, SoloReviewData, SoloReviewResult, SoloReviewTask
+
+
+DEFAULT_BRIEF = (
+    "Review this Mathlib PR at the supplied revision. What changes, if any, would you ask "
+    "the author to make? Give an ordered list of findings. For each finding, say what to "
+    "change and why. You may return an empty list."
+)
 
 
 class WholePRConfig(SoloReviewConfig):
@@ -20,6 +27,7 @@ class WholePRConfig(SoloReviewConfig):
 
 
 class WholePRData(SoloReviewData):
+    brief: str | None = knob("The study design’s review instructions.", pattern=r"\S")
     task_type: str = "lean_pr_review_v5_whole_pr"
     context_tools: list[Literal["declaration_search", "precedent_search"]] = Field(default_factory=list)
 
@@ -64,6 +72,10 @@ class WholePRReviewTask(SoloReviewTask):
     task_result_class = WholePRResult
     design_version = "whole-pr/1"
 
+    @classmethod
+    def design_payload(cls, *, episode, graph, dataset, stage):
+        return {"brief": dataset.whole_pr_brief} if dataset.whole_pr_brief is not None else {}
+
     async def create_system_prompt(self) -> str:
         return ""
 
@@ -98,9 +110,7 @@ class WholePRReviewTask(SoloReviewTask):
         data = self.data
         files = "\n".join(f"- `{path}`" for path in data.changed_files)
         return (
-            "Review this Mathlib PR at the supplied revision. What changes, if any, would you ask "
-            "the author to make? Give an ordered list of findings. For each finding, say what to "
-            "change and why. You may return an empty list.\n\n"
+            f"{data.brief or DEFAULT_BRIEF}\n\n"
             f"Submit with `{self.submit_tool_name}`.\n\n"
             f"## Pull request #{data.pr_number}\n\n{data.pr_title}\n\n{data.pr_description}\n\n"
             f"Reviewed revision: `{data.snapshot_head_sha}`\n\nChanged files:\n{files}\n\n"

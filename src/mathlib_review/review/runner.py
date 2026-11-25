@@ -104,6 +104,8 @@ class V5DatasetConfig(BaseModel):
 
     @model_validator(mode="after")
     def _inventory_for_arms(self):
+        if self.whole_pr_brief is not None and self.design != "whole_pr":
+            raise ValueError("whole_pr_brief requires the whole_pr design")
         if self.design != "whole_pr" and self.modification_inventory is None:
             raise ValueError("modification_inventory is required for the specialist agenda")
         return self
@@ -238,6 +240,7 @@ class V5DatasetConfig(BaseModel):
     #: Sealed into the plan's evaluation settings when it is not the baseline, and carried in
     #: the run name by convention, so a resumed run cannot be a different design.
     design: str = "solo"
+    whole_pr_brief: Optional[str] = Field(None, pattern=r"\S")
     #: A chained design (`reads_stage`) reads its first stage's per-PR output -- the verdict
     #: ledgers of a finished run of the stage before it -- through `StageInput`. Supplied at
     #: the invocation (`--of <run_name>`), like the judge's, never checked into a config: a
@@ -367,7 +370,7 @@ class V5DatasetConfig(BaseModel):
     run_total_token_cap: int = 0
 
 
-def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
+def load_run(config_path: Path | dict, overrides: Optional[Dict[str, Any]] = None):
     """Load a v5 generation run. The convention itself is in `mathlib_review.run_config`, which existed
     three times byte-identical except for the model validated against."""
 
@@ -431,8 +434,17 @@ def select_episode(release: Path, pr_number: int, head: str) -> ReviewEpisodeInp
     and, when the release carries its manifest, the episode file is the one the release hashed.
     """
 
+    return select_reviewed_episodes(release, {pr_number: head})[0]
+
+
+def select_reviewed_episodes(release, heads):
+    """Read and verify the frozen episode file once for an entire named case selection."""
     check_released_episodes(Path(release))
     episodes = load_jsonl(Path(release) / EPISODES_PATH, ReviewEpisodeInput)
+    return [_episode_at_head(episodes, release, pr, head) for pr, head in heads.items()]
+
+
+def _episode_at_head(episodes, release, pr_number, head):
     found = [ep for ep in episodes
              if ep.pr_number == pr_number and ep.reviewed_head_sha.startswith(head.lower())]
     if not found:
@@ -1181,6 +1193,8 @@ def evaluation_settings(dataset) -> Dict[str, Any]:
         "apply_lead_synthesis": dataset.apply_lead_synthesis,
         "use_exposure_index": dataset.use_exposure_index,
     }
+    if getattr(dataset, "whole_pr_brief", None) is not None:
+        settings["whole_pr_brief"] = dataset.whole_pr_brief
     if dataset.forbid_abstention:
         settings["forbid_abstention"] = True
     if dataset.target_verdicts:
@@ -1251,9 +1265,9 @@ def assert_solo_task_config_builds(dataset, task_overrides) -> None:
     """
     if dataset.routing_mode != "solo":
         return
-    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+    from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 
-    SoloReviewConfig(**(task_overrides or {}))
+    DESIGNS[getattr(dataset, "design", "solo")].task_config_class.model_validate(task_overrides or {})
 
 
 def assert_the_judge_model_is_pinned(dataset, logger) -> None:
@@ -1732,6 +1746,10 @@ def pin_input_files(scaffold) -> Dict[str, Dict[str, str]]:
     from src.mathlib_review.review.inputs import pin_overrides, resolve_input_files
 
     resolved = resolve_input_files(getattr(scaffold, "task_config_overrides", None))
+    for field, actual in pin_overrides(resolved).items():
+        expected = scaffold.task_config_overrides.get(field)
+        if expected is not None and expected != actual:
+            raise ValueError(f"{field}: input bytes changed since the plan was resolved")
     if resolved:
         scaffold.task_config_overrides = {**(scaffold.task_config_overrides or {}),
                                           **pin_overrides(resolved)}
@@ -1928,7 +1946,7 @@ def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
 #: stays findable; the sealed plan and its revisions, which the resume extends; and the agenda,
 #: which the resume regenerates byte for byte. Everything else is derived from the
 #: orchestrator's state and is rebuilt; `write_once` would refuse it otherwise.
-_REOPEN_KEEPS = frozenset({"run_plan.json", "agenda.json", "agenda_report.json", "census.json"})
+_REOPEN_KEEPS = frozenset({".lock", "condition.json", "run_plan.json", "agenda.json", "agenda_report.json", "census.json"})
 
 
 async def reopen_partial_run(dataset: V5DatasetConfig, scaffold, logger, *,
@@ -2111,7 +2129,8 @@ def agenda_for_release(dataset, release, units, episodes, selected_prs):
     )
 
 
-async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
+async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False,
+              reviewed_episodes=None):
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
@@ -2128,6 +2147,12 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     release = load_release(dataset)
     units, episodes = select_units_and_episodes(dataset, release)
     selected_prs = sorted({episode.pr_number for episode in episodes})
+    if reviewed_episodes is not None:
+        expected = {ep["episode_id"]: (ep["reviewed_head_sha"], ep["patch_sha256"]) for ep in reviewed_episodes}
+        if {ep.episode_id: (ep.reviewed_head_sha, ep.patch_sha256) for ep in episodes} != expected:
+            raise ValueError(f"{dataset.run_name}: selected review episodes differ from the composed plan")
+        for ep in episodes:
+            validate_episode(ep)
     review_count = len(episodes) if dataset.design == "whole_pr" else len(selected_prs)
     stage_rows = stage_rows_for(dataset, selected_prs, logger, dry_run=dataset.dry_run)
 

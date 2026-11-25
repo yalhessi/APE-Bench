@@ -56,7 +56,7 @@ def scaffold_config_class(scaffold_type: str) -> Type:
     return scaffold_class.config_class
 
 
-def load_run(config_path: Path, dataset_model: Type,
+def load_run(config_path: Path | dict, dataset_model: Type,
              overrides: Optional[Dict[str, Any]] = None) -> Tuple[Any, Any, Dict[str, Any]]:
     """`(dataset, scaffold, task_overrides)` for one run config.
 
@@ -70,7 +70,7 @@ def load_run(config_path: Path, dataset_model: Type,
     from src.mathlib_review.paths import assert_one_tree
 
     assert_one_tree()
-    raw = load_yaml(config_path)
+    raw = config_path.copy() if isinstance(config_path, dict) else load_yaml(config_path)
     if overrides:
         raw = deep_merge(raw, overrides)
     dataset = dataset_model.model_validate(raw.pop("dataset"))

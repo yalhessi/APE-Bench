@@ -26,10 +26,10 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 import yaml
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # The matcher's instrument definition moved to `judge/ask_matching.py` (2026-10-22): its rubrics,
 # blind projection, seal and unblinding. Re-exported here because readers on disk under `results/`
@@ -71,6 +71,8 @@ class ProbeSet(BaseModel):
     #: The PRs reviewed. Asks are matched only on these.
     pr_numbers: List[int]
     feedback: FeedbackSource
+    heads: Dict[int, Annotated[str, Field(pattern=r"^[0-9a-fA-F]{7,40}$")]] = {}
+    review_context: Optional[Path] = None
     #: Comment ids are `<prefix><4 digits>`, numbered over the whole source.
     cid_prefix: str = "v"
     #: Where this set's packets, sessions, feedback and asks live.
@@ -98,7 +100,9 @@ class ProbeSet(BaseModel):
 
 
 def load_probe_set(path: Path) -> ProbeSet:
-    return ProbeSet.model_validate(yaml.safe_load(Path(path).read_text()))
+    from ape.utils.config_loader import load_yaml
+
+    return ProbeSet.model_validate(load_yaml(Path(path)))
 
 
 def _test_prs() -> set:
