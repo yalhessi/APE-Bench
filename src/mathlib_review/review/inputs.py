@@ -129,3 +129,30 @@ async def first_message(task, cwd, target):
     scaffold = ClaudeCodeScaffold()
     scaffold.task, scaffold.logger = task, logging.getLogger(__name__)
     return await scaffold._initial_prompt(scaffold._session_cwd())
+
+
+COMMON_TOOLS = {"code_goto", "code_hover", "declaration_search", "get_lean_goal",
+                "lean_verify", "lean_verify_edit", "submit_findings"}
+
+
+async def inspect_review(payload, ds, scaffold, ep):
+    """Render one whole-PR task through the same scaffold and tool registrar as execution."""
+    from ape.tasks.base import create_task_from_data
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+    from src.mathlib_review.io import canonical_json_bytes
+
+    task = create_task_from_data(payload, scaffold, task_config_overrides=scaffold.task_config_overrides)
+    key = reviewed_workspace_key(task.data.snapshot_base_sha, task.data.diff)
+    target = Path("data/code_execute/repos/mathlib4/workspaces") / key
+    cwd = (Path(".ape/runs") / ds.run_name / "workspaces").resolve()
+    message = (await first_message(task, cwd, target)).replace(str(cwd), "{attempt_workspaces}")
+    tools = await mcp_signatures(task)
+    return message, tools, {
+        "episode_id": ep.episode_id, "patch_sha256": ep.patch_sha256, "cutoff": payload["retrieval_cutoff"],
+        "message_sha256": sha256_bytes(message.encode()),
+        "mcp": sorted(tools), "mcp_schema_sha256": sha256_bytes(canonical_json_bytes(tools)),
+        "builtins": sorted(scaffold.tools), "model": scaffold.claude_model,
+        "effort": scaffold.effort, "cli_version": scaffold.cli_version,
+        "max_turns": scaffold.execution.max_turns, "token_cap": ds.solo_token_cap,
+        "cost_cap": ds.solo_cost_cap,
+    }

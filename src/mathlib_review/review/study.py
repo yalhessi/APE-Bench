@@ -8,7 +8,6 @@ from typing import Literal, NamedTuple
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
 from src.mathlib_review.io import (
     canonical_json_bytes, jsonl_bytes, pretty_json_bytes, sha256_bytes, sha256_file, write_once,
 )
@@ -17,7 +16,7 @@ from src.mathlib_review.conventions import selection
 from src.mathlib_review.retrieval import excerpts
 from src.mathlib_review.retrieval_gate import RetrievalGate
 from src.mathlib_review.review import runner
-from src.mathlib_review.review.inputs import first_message, mcp_signatures
+from src.mathlib_review.review.inputs import COMMON_TOOLS, inspect_review
 
 Strategy = Literal["solo", "history", "automatic", "exact"]
 DEFAULT_STRATEGIES = ("solo", "history", "automatic", "exact")
@@ -96,8 +95,6 @@ class ReviewStudy(BaseModel):
 
 
 ADVICE = "Use these conventions when they apply. Decide whether any change is worth asking the author to make."
-COMMON_TOOLS = {"code_goto", "code_hover", "declaration_search", "get_lean_goal",
-                "lean_verify", "lean_verify_edit", "submit_findings"}
 
 
 def context_rows(episodes, rules, choices):
@@ -176,12 +173,8 @@ async def generation_plan(study, out, sample, fixture, cases, products):
         record = {"run": name, "overrides": overrides, "episodes": {}}
         for payload in tasks:
             pr = payload["pr_number"]
-            task = runner.create_task_from_data(payload, scaffold, task_config_overrides=scaffold.task_config_overrides)
-            key = reviewed_workspace_key(task.data.snapshot_base_sha, task.data.diff)
-            target = Path("data/code_execute/repos/mathlib4/workspaces") / key
-            cwd = (Path(".ape/runs") / name / "workspaces").resolve()
-            message = (await first_message(task, cwd, target)).replace(str(cwd), "{attempt_workspaces}")
-            tools = await mcp_signatures(task)
+            ep = next(e for e in episodes if e.pr_number == pr)
+            message, tools, details = await inspect_review(payload, ds, scaffold, ep)
             if set(tools) != expected_tools:
                 raise ValueError(f"{arm}/{pr}: unexpected tool grants {sorted(tools)}")
             shared = {k: tools[k] for k in sorted(COMMON_TOOLS)}
@@ -198,16 +191,7 @@ async def generation_plan(study, out, sample, fixture, cases, products):
             # Preserve the expected full first message for comparison with the live SDK transcript.
             message_path = out / "inputs" / f"{name}-{pr}.txt"
             write_once(message_path, message.encode())
-            ep = next(e for e in episodes if e.pr_number == pr)
-            record["episodes"][str(pr)] = {
-                "episode_id": ep.episode_id, "patch_sha256": ep.patch_sha256, "cutoff": cutoffs[ep.episode_id],
-                "message": str(message_path), "message_sha256": sha256_file(message_path),
-                "mcp": sorted(tools), "mcp_schema_sha256": sha256_bytes(canonical_json_bytes(tools)),
-                "builtins": sorted(scaffold.tools), "model": scaffold.claude_model,
-                "effort": scaffold.effort, "cli_version": scaffold.cli_version,
-                "max_turns": scaffold.execution.max_turns, "token_cap": ds.solo_token_cap,
-                "cost_cap": ds.solo_cost_cap,
-            }
+            record["episodes"][str(pr)] = {**details, "message": str(message_path)}
         if set(record["episodes"]) != {str(pr) for pr in study.heads}:
             raise ValueError(f"{arm}: incomplete episode coverage")
         manifest["runs"][arm] = record
