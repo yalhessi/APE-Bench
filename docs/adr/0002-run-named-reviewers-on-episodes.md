@@ -1,0 +1,5 @@
+# Run named whole-PR reviewers on episodes in the existing package
+
+On 25 November 2026 we retired the fresh v6 package proposal and chose a smaller reorganization inside `src/mathlib_review/`. Named whole-PR review runs from a reviewed episode to an accepted submission. Independent readings consume that submission. Historical specialist and obligation workflows continue to own their work-unit and placement requirements.
+
+The pilot already archives the accepted attempt and reopens it for scoring. The walkthrough already previews episodes from a release with no specialist files. On PR 42184 the guided review submitted two requests, while its verified projection contained zero. The accepted submission is therefore the appropriate boundary for a researcher asking what the reviewer requested. These observations narrow the implementation to the named run path and establish a regression case. [Saved case](../../results/pr_review_v5/probes/convention-scope-2026-11-24/full-tool.md) · [Retired proposal (#3)](https://github.com/yalhessi/APE-Bench/issues/3) · [Implementation plan](../plans/2026-11-25-named-whole-pr-review.md)
