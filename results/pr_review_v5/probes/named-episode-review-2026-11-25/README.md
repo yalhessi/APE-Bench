@@ -34,3 +34,10 @@ cp -a "$old/test_named_reading_reproduces_0" <scratch>/reopen && rm -rf <scratch
 PYTHONPATH="$PWD/src:$PWD" ape/bin/python results/pr_review_v5/probes/named-episode-review-2026-11-25/reopen_pre_change.py \
   <scratch>/reopen "$PWD/results/pr_review_v5/probes/named-episode-review-2026-11-25/before"
 ```
+
+A pre-change run interrupted after acceptance also resumes. Use the folder of a test run written at `067749d3` and remove its archive. Then run `run --resume` with the current code, from the checkout that started the run. It archives the accepted session without another session. The archive is byte-identical to the original, and the pre-change `generation.json` is kept as it was. Archiving reads that run's inputs from its `run_plan.json`. The checkout matters because the generation record hashes the scaffold, whose tool paths resolve inside the checkout. That was already true before this change.
+
+```bash
+PYTHONPATH="$PWD/src:$PWD" ape/bin/python results/pr_review_v5/probes/named-episode-review-2026-11-25/resume_pre_change.py \
+  "$old/test_cli_accepts_empty_review_0" solo-42184-b "$PWD"
+```
