@@ -1,0 +1,4 @@
+extends: october-review.yaml
+stages:
+  reviewer:
+    algorithm: solo

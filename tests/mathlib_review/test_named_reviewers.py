@@ -99,6 +99,24 @@ def provider(checkout, monkeypatch):
         message = Path(record["message"]).read_text().replace("{attempt_workspaces}", cwd)
         (attempt / "claude_code_conversation_1.jsonl").write_text(
             json.dumps({"type": "user", "message": {"content": message}}) + "\n")
+        if self.config.scaffold_type in ("ape_agent", "codex") or record.get("relay"):
+            prefix = self.config.mcp_server_name
+            tools = record["builtins"] + [prefix + t for t in record["mcp"]]
+            rows = [{"type": "tool_definitions", "message": {"tools": [
+                {"type": "function", "function": {"name": t}} for t in tools]}},
+                {"type": "user", "cwd": str(Path(cwd) / "scratch"),
+                 "message": {"content": [{"type": "text", "text": message}]}}]
+            if self.config.scaffold_type == "ape_agent":
+                (attempt / "ape_agent_session_fixture.jsonl").write_text(
+                    "".join(json.dumps(r) + "\n" for r in rows))
+            else:
+                tree = {"node": rows[0], "children": [{"node": rows[1], "children": []}]}
+                # The relay writes a JSON object on each line.
+                (attempt / "conversation_trees.jsonl").write_text(json.dumps({"tree": tree}) + "\n")
+                (attempt / "codex_events.jsonl").write_text('{"type":"turn.completed"}\n')
+        if record.get("relay"):
+            (attempt / "claude_code_conversation_1.jsonl").write_text(json.dumps(
+                {"type": "user", "cwd": cwd, "message": {"content": message}}) + "\n")
         review = accept.reviews.get(alias, {})
         sample = {"sample_id": "s", "sample_index": 0, "task_global_index": task.data.global_index,
                   "created_at": "2026-11-25", "updated_at": "2026-11-25"}
@@ -759,3 +777,81 @@ def test_named_reading_reproduces_the_pre_change_matcher_input(checkout, provide
         for policy, text in rendered.items():
             baseline = checkout / PROBE / "before" / f"matcher-{sample}-named-{policy}.txt"
             assert text == baseline.read_text(), (sample, policy)
+
+
+def test_composed_review_dispatches_its_planned_inputs_and_can_be_read_without_generation(
+        checkout, provider, monkeypatch, capsys):
+    # Edit the design on a private copy so this test dispatches a genuinely non-default brief.
+    import yaml
+    catalogue = Path("catalogue")
+    for folder in ("designs/composed", "models", "scaffolds", "probe_sets", "studies"):
+        shutil.copytree(Path("configs") / folder, catalogue / folder)
+    design_file = catalogue / "designs/composed/whole-pr.yaml"
+    design = yaml.safe_load(design_file.read_text())
+    design["stages"]["reviewer"]["brief"] = "Review the declaration names introduced by this patch."
+    design_file.write_text(yaml.safe_dump(design))
+    study = str(catalogue / "studies/whole-pr-subscription.yaml")
+    assert cli.main(["plan", "--study", study]) == 0
+    cell, = json.loads(capsys.readouterr().out)["conditions"]
+    dispatches = []
+
+    async def capture(self, tasks):
+        task, = tasks
+        dispatches.append((task.data.model_dump(mode="json"), self.config.claude_model,
+                           await task.create_user_prompt()))
+        return await provider(self, tasks)
+
+    monkeypatch.setattr(runner.TaskOrchestrator, "run", capture)
+    command = ["run", "--study", study, "--run-name", "pilot", "--execute"]
+    assert cli.main(command) == 0
+    data, model, brief = dispatches[0]
+    ep, = cell["episodes"]
+    stage = cell["stages"]["reviewer"]
+    assert data["snapshot_head_sha"] == ep["reviewed_head_sha"]
+    assert "asks" not in data and "author" not in data
+    assert model == stage["model"] and stage["brief"] in brief
+    alias, = provider.sessions
+    saved = submissions.review_directory(alias)
+    generation, _ = submissions.saved_reviews(saved)
+    assert generation["condition"] == cell
+    assert generation["runs"]["whole-pr"]["episodes"]["42184"]["episode_id"] == ep["episode_id"]
+    refuse_new_sessions(monkeypatch)
+    assert cli.main([*command, "--resume"]) == 0
+    copy_reference(checkout)
+    assert cli.main(["score", "--of", alias, "--using", "round1-requests-v1"]) == 0
+
+
+@pytest.mark.parametrize("scaffold", ["ape-agent", "codex"])
+def test_native_whole_pr_archive_reopens_through_score(checkout, provider, monkeypatch, scaffold):
+    assert cli.main(["run", "--study", "review-matrix", "--condition",
+                     f"design=whole-pr,model=gpt55,scaffold={scaffold}", "--run-name", "native", "--execute"]) == 0
+    alias, = provider.sessions
+    generation, archive = submissions.saved_reviews(submissions.review_directory(alias))
+    ep = generation["runs"]["whole-pr"]["episodes"]["42184"]
+    assert ep["model"] == "gpt_5.5" and "file_read" in ep["mcp"]
+    files = archive["records"][0]["files"]
+    transcript = "codex_events.jsonl" if scaffold == "codex" else "ape_agent_session_fixture.jsonl"
+    assert transcript in files
+    refuse_new_sessions(monkeypatch)
+    copy_reference(checkout)
+    assert cli.main(["score", "--of", alias, "--using", "round1-questions-v1",
+                     "--reference", "configs/probe_sets/post-42184.yaml"]) == 0
+
+
+def test_claude_relay_reopens_from_its_provider_record(checkout, provider, tmp_path):
+    import yaml
+    catalogue = tmp_path / "study-configs"
+    for folder in ("designs", "models", "scaffolds", "probe_sets"):
+        (catalogue / folder).parent.mkdir(exist_ok=True)
+        (catalogue / folder).symlink_to(checkout / "configs" / folder)
+    path = catalogue / "studies/relay.yaml"
+    path.parent.mkdir()
+    path.write_text(yaml.safe_dump({"designs": ["whole-pr"], "models": ["gpt55"], "scaffolds": ["claude-relay"],
+                                    "cases": ["post-42184"], "samples": 1,
+                                    "budget": {"max_turns": 10, "solo_token_cap": 1000, "solo_cost_cap": 1}}))
+    assert cli.main(["run", "--study", str(path), "--run-name", "relay", "--execute"]) == 0
+    alias, = provider.sessions
+    generation, archive = submissions.saved_reviews(submissions.review_directory(alias))
+    assert generation["runs"]["whole-pr"]["episodes"]["42184"]["relay"]
+    assert "conversation_trees.jsonl" in archive["records"][0]["files"]
+    assert "claude_code_session.json" not in archive["records"][0]["files"]

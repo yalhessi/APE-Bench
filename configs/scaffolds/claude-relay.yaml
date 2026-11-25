@@ -1,0 +1,9 @@
+scaffold_type: claude_code
+batch_preamble: plain
+workspace_environment: false
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true

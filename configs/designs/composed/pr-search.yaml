@@ -1,0 +1,5 @@
+extends: whole-pr.yaml
+stages:
+  reviewer:
+    context_tools: [declaration_search, precedent_search]
+    history_from: configs/designs/reviewers/pr-search-v1.yaml

@@ -1,0 +1,9 @@
+extends: structured.yaml
+stages:
+  selector:
+    algorithm: structured
+    operations: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
+    context_tools: [declaration_search]
+  reviewer:
+    algorithm: structured_critic
+    reads: selector

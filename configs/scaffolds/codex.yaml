@@ -1,0 +1,10 @@
+scaffold_type: codex
+sandbox_mode: read-only
+approval_policy: never
+web_search: false
+disabled_features: [shell_tool, unified_exec, browser_use, computer_use, image_generation, apps, plugins, multi_agent, memories, goals]
+relayed_builtin_tools: [update_plan]
+use_native_tools: true
+list_mcp_tools_upfront: true
+execution:
+  max_concurrency: 4

@@ -1,0 +1,2 @@
+extends: gpt-responses.yaml
+model_name: gpt_5.2

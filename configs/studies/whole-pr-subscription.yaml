@@ -1,0 +1,6 @@
+designs: [whole-pr]
+models: [opus55]
+scaffolds: [claude-subscription]
+cases: [post-42184]
+samples: 1
+budget: {max_turns: 40, solo_cost_cap: 1.5, solo_token_cap: 600000}

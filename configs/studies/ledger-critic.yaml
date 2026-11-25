@@ -1,0 +1,4 @@
+extends: review-matrix.yaml
+designs: [ledger-critic]
+models: [gpt54, gpt55]
+stage_models: {selector: gpt52}

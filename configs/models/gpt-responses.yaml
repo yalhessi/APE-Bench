@@ -1,0 +1,6 @@
+reasoning_effort: high
+openai_api: responses
+openai_responses_reasoning_carryover: true
+max_tokens: 32000
+thinking_budget_tokens: 30000
+temperature: 1.0

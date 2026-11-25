@@ -1,0 +1,5 @@
+extends: postcutoff_2026_07_08_v1.yaml
+name: post-42184
+pr_numbers: [42184]
+heads: {42184: c5474cb4a68a515228b49225b38a2507264f91f7}
+review_context: results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/model_context.jsonl

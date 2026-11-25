@@ -1,0 +1,9 @@
+designs: [solo, whole-pr, structured, filing_contract]
+models: [gpt52, gpt54, gpt55, luna]
+scaffolds: [ape-agent, codex]
+cases: [post-42184]
+samples: 1
+budget:
+  max_turns: 160
+  solo_cost_cap: 20
+  solo_token_cap: 24000000

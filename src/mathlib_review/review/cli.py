@@ -206,12 +206,15 @@ def build_parser() -> argparse.ArgumentParser:
     for stage in (plan, run):
         source = stage.add_mutually_exclusive_group(required=True)
         source.add_argument("--config", type=Path)
+        source.add_argument("--study", help="a composition in configs/studies, or its YAML path")
+        stage.add_argument("--condition", metavar="AXIS=NAME,...", help="select cells from --study")
         source.add_argument("--reviewer", choices=reviewer_names, help="a versioned whole-PR reviewer")
         stage.add_argument("--case", metavar="PR@HEAD", help="pinned release revision for --reviewer")
         stage.add_argument("--score", choices=SCORERS, help="score this named review after submission")
     score = sub.add_parser("score", help="score saved submissions without generating reviews")
     score.add_argument("--of", dest="runs", nargs="+", required=True, metavar="RUN")
     score.add_argument("--using", choices=SCORERS, required=True)
+    score.add_argument("--reference", type=Path, help="probe set providing the eligible historical requests")
     _add_execute(score)
 
     probe = sub.add_parser("probe", help="the reviewer-model probe on a set (analysis/probes.py)")
@@ -1204,11 +1207,25 @@ def main(argv: Optional[List[str]] = None) -> int:
         overrides.setdefault("dataset", {})["run_name"] = args.run_name
     logger = create_logger()
 
+    if args.command in ("plan", "run") and args.study:
+        from src.mathlib_review.review.composition import run_composition
+        from src.mathlib_review.review.preflight import PreflightError
+        from src.mathlib_review.review.runner import NoSubmittedReview
+        try:
+            return run_composition(args, create_logger(console_stream=sys.stderr))
+        except NoSubmittedReview as error:
+            print(f"NO SUBMITTED REVIEW: {error}", file=sys.stderr)
+            return 1
+        except (PreflightError, ValueError, FileNotFoundError, FileExistsError, BlockingIOError) as error:
+            parser.error(str(error))
+    if getattr(args, "condition", None):
+        parser.error("--condition requires --study")
     if args.command == "score" or getattr(args, "reviewer", None):
         try:
             if args.command == "score":
                 from src.mathlib_review.analysis.submissions import review_directory, score_reviews
-                return score_reviews([review_directory(name) for name in args.runs], args.using, execute=args.execute)
+                options = {"reference_path": args.reference} if args.reference else {}
+                return score_reviews([review_directory(name) for name in args.runs], args.using, execute=args.execute, **options)
             from src.mathlib_review.review.reviewers import run_reviewer
             from src.mathlib_review.review.runner import NoSubmittedReview
             try:
