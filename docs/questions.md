@@ -72,6 +72,8 @@ matcher; "the conventions list" is the maintainers' conventions census (438 entr
 
 ## Conventions and knowledge
 
+- **On PR 42184, did the automatic selector miss either convention behind the two expert requests?** No. It picked both among 25 entries. They reached the reviewer as sentences 2 and 13, with an instruction to file departures. The selector's locations and reasons stayed out of the review prompt. (2026-11-25, [four-design input audit](../results/pr_review_v5/probes/convention-scope-2026-11-24/design-audit.md))
+
 - **Did ordinary solo have access to earlier PRs in the October convention comparison?** Yes. On the ten PRs actually run, both ordinary samples called precedent search on all ten, 18 and 15 calls in total. Replaying the original judgments reproduced all four tables. The comparison measured the addition of convention sentences to a reviewer that already used PR history. (2026-11-25, [tool traces and replay commands](../results/pr_review_v5/probes/convention-scope-2026-11-24/reproduce-review-reading.md))
 
 - **Does comparing aggregate and witness-level clients help the solo reviewer decide what to ask?** — In one whole-PR Opus pair on known 42184, the guided reviewer alone filed the historical companion request. Both edits compiled together, but the finalizer suppressed both guided requests from the verified channel. In two packet repeats the guided arm requested the missing companion 1/2 vs 0/2 solo. Each arm reused a provided companion 2/2 and made zero redundant requests on the natural control. A diff-only screen fired on 1/390 earlier development inputs and 1/10 July inputs. (2026-11-24, `probes/convention-scope-2026-11-24`)

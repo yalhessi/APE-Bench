@@ -72,6 +72,8 @@ done
 
 ## Run a matched example on PR 42184
 
+This example reconstructs the earlier setup for diagnosis. Its absolute workspace paths tell the reviewer which strategy it is running. Its shared prompt prescribes a checklist, and its direct search uses a different collection from the convention catalogue. The [input audit](design-audit.md) checks these details against a real transcript. The [shared-history decision](../../../../docs/adr/0001-shared-history-for-review-comparisons.md) applies to the new comparison.
+
 This known case tests the wiring. It has a prepared workspace, two recorded expert requests, saved selector choices and saved exact labels. A fresh study needs its own target PRs, a catalogue derived from earlier sources and exact labels for those targets. Freeze that catalogue before selecting the automatic list. Keep the target discussion available only to the evaluator and the offline exact selector.
 
 For evidence about incoming reviews, choose PRs before inspecting their expert feedback. Include quiet PRs and identifiable AI-assisted PRs. Give each design the same reviewed heads, model, scaffold, brief and reviewer budget. Record the work of the selector separately. Run independent samples of each design. Regrading the same sample measures variation in reading the review. A fresh reviewer sample measures variation in producing it.
@@ -103,7 +105,7 @@ for label, selection in [('solo', None), ('selected', 'applicable'), ('exact', '
 PY
 ```
 
-The command below checks four plans. All four resolved the cutoff and the reviewed workspace in our local check. The Claude subscription credential was absent from that shell. To generate reviews, run `run_four --execute` in your authenticated Claude subscription shell after loading the function. Keep each run's plan, task result including the complete review, tool grants and trace, and final output. A new independent sample needs a new run name.
+The command below checks four plans. All four resolved the cutoff and the reviewed workspace in our local check. The Claude subscription credential was absent from that shell. Running `run_four --execute` in an authenticated Claude subscription shell reproduces these named diagnostic conditions. Keep each run's plan, task result including its findings and optional message, tool grants and trace, and final output. The generation names, source names, matching plan and matcher name in this example all refer to the first sample. An independent sample needs its own generation names, source mapping, matching plan and matcher run.
 
 ```bash
 run_four() (

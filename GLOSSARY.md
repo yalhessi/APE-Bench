@@ -49,6 +49,9 @@ The feedback a reviewer hands in about a particular revision on a particular occ
 **Reference feedback**
 The feedback selected for comparison with a submitted review. In a historical first review round, it can include comments and replies from several maintainers.
 
+**Convention selection and delivery**
+Selection chooses conventions for a particular PR. Delivery is what the reviewer sees from that choice. A selector can identify a relevant declaration and deliver only the general convention. [Example on PR 42184](results/pr_review_v5/probes/convention-scope-2026-11-24/design-audit.md#what-differs-before-submission)
+
 **Raw ask**
 A first-round request expressed in the maintainer's own words. One request can ask the author to address several things.
 
