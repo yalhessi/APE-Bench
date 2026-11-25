@@ -64,6 +64,44 @@ ape/bin/python -m src.mathlib_review.review.cli score --of solo-42184-a search-4
 
 Omit `--execute` from a score command to inspect its blinded plan without a judge call. For a single review, supply one name to `score --of`, or append `--score round1-requests-v1` to its generation command. The scorer uses the ordered findings and the first-round expert requests for that head. The questions rubric can credit a finding phrased as a question. Each comparison keeps the submitted review bytes and the blind labels fixed across rubrics. Plans and reports live under `.ape/review-comparisons/`. Each completed reading reports eligible requests, requests reached, finding count and the finding index credited for each match. A joint reading presents both reviews to the same judge and has its own plan. [Reviewer definitions](../../configs/designs/reviewers/) · [Scoring rubric](../../src/mathlib_review/judge/ask_matching.py)
 
+## Compose a review study
+
+The example study crosses four reviewer designs, four model choices and two scaffolds on PR 42184 at its frozen first-round head. Each condition requests one sample. From the worktree root, preview the entire study or select one cell. Both commands print JSON to stdout. The cell in the second plan has the same settings, sources, grants and reviewed head as its counterpart in the first. [Study declaration](../../configs/studies/review-matrix.yaml)
+
+```bash
+export PYTHONPATH="$PWD/src:$PWD"
+review=(ape/bin/python -m src.mathlib_review.review.cli)
+"${review[@]}" plan --study review-matrix
+"${review[@]}" plan --study review-matrix --condition design=whole-pr,model=gpt55,scaffold=codex
+```
+
+Each condition records its source paths and the SHA-256 digest of each resolved YAML definition, its ordinary APE run config, effective scaffold and task settings, episode count and reviewed revisions. The preview renders each available task and records its first-message hash and tool grants. A critic receives its ledger when its upstream stage finishes. The preview identifies that dependency. The findings, authorship metadata and reference feedback have separate destinations. Authorship annotations from the release stay in the plan, and the whole-PR task receives the visible text, patch, revision and permitted tools.
+
+| To change | Edit |
+| --- | --- |
+| The algorithm or brief | A stage under `configs/designs/composed/`. It names the registered review algorithm, required operations and context tools. A whole-PR stage accepts `brief`; historical solo designs use `task.system_prompt_file`. |
+| Model identity or inference | A file in `configs/models/`. The reviewer gets the model chosen by the matrix. A study can bind an upstream role in `stage_models`. |
+| Tool delivery and execution | A file in `configs/scaffolds/`. For example, Claude Code supplies `Read` for the design's `file_read` operation. APE-Agent and the contained Codex example deliver it through APE. |
+| Reviewed PRs | A named selection in `configs/probe_sets/`. It can inherit a release, select `pr_numbers` and specify `heads` when the release contains multiple rounds. The study includes every selected PR regardless of AI authorship or eligible ask count. |
+| Repetitions and limits | `samples` and `budget` in the study. Each sample runs every stage. Cost and token limits apply to each stage's review session. Each stage's run-total cap defaults to its session cap times the number of episodes. |
+
+Add a design name to the study to cross it with all eight model and scaffold combinations. Each definition supports the standard single-parent `extends`. The `ledger-critic` example varies the final reviewer, keeps the structured first-stage model fixed at GPT-5.2, and hands that stage's ledger to the critic. An optional `controls` mapping from case-set name to standalone config checks the shared reviewer settings against a historical run before dispatch. [Two-stage study](../../configs/studies/ledger-critic.yaml)
+
+```bash
+"${review[@]}" plan --study ledger-critic
+"${review[@]}" plan --study whole-pr-subscription
+```
+
+For a user-run generation, use an authenticated shell. The first command below runs the selected Codex cell. After an interruption, repeat it with `--resume`. A fresh run name requests an independent repetition. The study seals its selected plan under `.ape/studies/matrix-codex-a/plan.json`. Whole-PR generation prints the accepted review directory. Historical algorithms produce their ordinary run outputs and save `condition.json` there.
+
+```bash
+"${review[@]}" run --study review-matrix --condition design=whole-pr,model=gpt55,scaffold=codex --run-name matrix-codex-a --execute
+"${review[@]}" score --of r6d3057396b9b8f86fd1ba728 --using round1-requests-v1 --reference configs/probe_sets/postcutoff_2026_07_08_v1.yaml
+"${review[@]}" score --of r6d3057396b9b8f86fd1ba728 --using round1-questions-v1 --reference configs/probe_sets/postcutoff_2026_07_08_v1.yaml
+```
+
+The two score commands preview independent readings of the same accepted submission. Add `--execute` to a score command to run its semantic judge. The matcher is independent of every generation model in the study.
+
 ## Preparing a pilot or evaluation
 
 1. Start with the command the researcher will use. Inspect `ape/bin/python -m src.mathlib_review.review.cli --help`, a comparable config and its saved run. Follow each handoff from the command that produces the artifact to the command that consumes it. When those commands cover the work, put the study inputs in config and the invocations in the runbook.
