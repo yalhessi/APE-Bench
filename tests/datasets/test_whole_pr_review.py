@@ -97,3 +97,40 @@ async def test_submit_tool_preserves_exact_order_fields_and_successful_empty_rev
         assert [f["suggested_fix"] for f in result.findings] == [f["suggested_fix"] for f in submitted]
     with pytest.raises(ValidationError):
         WholePRConfig(system_prompt_file=__file__)
+
+
+def test_plan_reviews_every_requested_episode_without_specialist_inputs(tmp_path, caplog, monkeypatch):
+    import logging
+    from pathlib import Path
+
+    from src.mathlib_review.review import cli
+
+    monkeypatch.setattr("ape.utils.logging.create_logger", lambda: logging.getLogger("whole-pr-test"))
+    profile = Path("configs/designs/whole_pr_familiar.yaml")
+    release = Path("inputs/probes/probe-2026-07-08-v1")
+    (tmp_path / "input").mkdir()
+    (tmp_path / "input/episodes.jsonl").symlink_to((release / "input/episodes.jsonl").resolve())
+    args = ["plan", "--config", str(profile), "--run-name", "test_whole_pr_scope",
+            "--set", f"dataset.release={tmp_path}", "--set", "dataset.modification_inventory=null",
+            "--set", "dataset.require_reviewed_workspaces=false"]
+    with caplog.at_level(logging.INFO):
+        assert cli.main(args) == 0
+    assert "design=whole_pr task_type=lean_pr_review_v5_whole_pr tasks=2" in caplog.text
+    assert '"proposals_enumerated": 0' in caplog.text
+    assert '41930' in caplog.text and '42184' in caplog.text
+    with pytest.raises(ValueError, match="999999"):
+        cli.main([*args, "--set", "dataset.pr_numbers=[42184,999999]"])
+
+
+def test_projection_counts_submissions_when_a_release_has_no_change_graph():
+    from types import SimpleNamespace
+
+    from src.mathlib_review.review.candidates import anchoring_report
+    from src.mathlib_review.review.runner import solo_responses
+
+    result = {"success": True, "episode_id": "ep", "pr_number": 12,
+              "findings": [{"claim": "Explain the new assumption.", "suggested_fix": "Add a rationale."}]}
+    responses, rows = solo_responses(SimpleNamespace(task_results=[result]), graphs=[], units=[])
+    assert responses == []
+    assert rows[0]["episode_id"] == "ep" and rows[0]["ordinal"] == 0
+    assert anchoring_report(rows)["by_failure"] == {"no_change_graph": 1}

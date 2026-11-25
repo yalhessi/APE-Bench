@@ -159,6 +159,15 @@ class AgendaProposal(StrictModel):
     source_sha256: str
 
 
+class WholePRTarget(StrictModel):
+    episode_id: str
+    pr_number: int
+    reviewed_head_sha: str
+    input_sha256: str
+    # Eligible anchors for downstream projections of the submitted findings.
+    work_unit_ids: List[str]
+
+
 class ReviewAgenda(StrictModel):
     """The full enumerated pool for one run, sealed before the first model call."""
 
@@ -168,11 +177,20 @@ class ReviewAgenda(StrictModel):
     routing_mode: Literal["fanout", "rules", "lead", "solo"]
     release: str
     modification_inventory: Optional[str] = None
+    whole_pr_targets: Optional[List[WholePRTarget]] = Field(default=None, exclude_if=lambda v: v is None)
     arms: List[ReviewArm]
     proposals: List[AgendaProposal]
     scheduler_version: str
     renderer_version: str
     source_sha256: str
+
+
+def agenda_pr_numbers(record: dict) -> set[int]:
+    """PR scope of a saved agenda, including historical specialist-based records."""
+    rows = record.get("whole_pr_targets")
+    if rows is None:
+        rows = record.get("proposals", [])
+    return {row["pr_number"] for row in rows}
 
 
 class DelegationJob(StrictModel):

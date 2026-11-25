@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.mathlib_review.io import jsonl_rows
+from src.mathlib_review.schema.review import agenda_pr_numbers
 from src.mathlib_review.paths import RESULTS, run_dir
 from src.mathlib_review.review.trace import routing_report
 
@@ -179,7 +180,7 @@ def scoped_obligations(run_name: str,
         agenda = json.loads(stage.path("agenda").read_text())
     except (MissingArtifact, FileNotFoundError):
         return None
-    reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
+    reviewed = agenda_pr_numbers(agenda)
     if stage.release is None:
         return None
     judgments = stage.release / "gold/judgments.jsonl"
@@ -476,7 +477,7 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     directory = stage.run_dir
     agenda = json.loads(stage.path("agenda").read_text())
     release = stage.release
-    pr_numbers = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
+    pr_numbers = sorted(agenda_pr_numbers(agenda))
 
     judge = audit_dir if audit_dir and audit_dir.is_dir() else None
 
@@ -1058,7 +1059,7 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
             require=("agenda", "delegations", "arm_responses", "findings"),
             allow_partial=True)
         agenda = json.loads(stage.path("agenda").read_text())
-        reviewed = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
+        reviewed = sorted(agenda_pr_numbers(agenda))
         findings = jsonl_rows(stage.path("findings"))
         responses = {row["invocation_id"]: row
                      for row in jsonl_rows(stage.path("arm_responses"))}

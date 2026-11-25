@@ -488,7 +488,7 @@ ANCHOR_FAILURES = ("no_location", "unknown_path", "unresolved_line", "no_work_un
 def anchor_submitted_findings(
     findings: Iterable[Dict[str, Any]],
     *,
-    graph: ChangeGraph,
+    graph: Optional[ChangeGraph],
     units: Iterable[ReviewWorkUnit],
     logger=None,
 ) -> Tuple[Dict[str, List[Dict[str, Any]]], List[Dict[str, Any]]]:
@@ -516,12 +516,12 @@ def anchor_submitted_findings(
     )
     from src.mathlib_review.legacy_pipeline.migrate_interventions import GraphIndex
 
-    index = GraphIndex(graph)
+    index = GraphIndex(graph) if graph is not None else None
     unit_by_change: Dict[str, ReviewWorkUnit] = {}
     for unit in units:
         for change_id in unit.change_ids:
             unit_by_change.setdefault(change_id, unit)
-    paths = {target.path for target in graph.targets}
+    paths = {target.path for target in graph.targets} if graph is not None else set()
 
     by_work_unit: Dict[str, List[Dict[str, Any]]] = {}
     rows: List[Dict[str, Any]] = []
@@ -536,7 +536,9 @@ def anchor_submitted_findings(
             "change_ids": [], "work_unit_id": None, "method": None, "failure": None,
         }
 
-        if not path or not isinstance(line, int):
+        if index is None:
+            row["failure"] = "no_change_graph"
+        elif not path or not isinstance(line, int):
             row["failure"] = "no_location"
         elif path not in paths:
             # The PR did not touch this file, or the model invented the path. Either way the

@@ -104,6 +104,8 @@ def reconcile(
         # than from the plan. An anchoring that attributed a finding to a unit outside the
         # run's scope would otherwise reach the judge as ordinary output.
         planned_units = {item.work_unit_id for item in agenda.proposals}
+        if agenda.whole_pr_targets is not None:
+            planned_units = {u for target in agenda.whole_pr_targets for u in target.work_unit_ids}
         orphan = [
             response.get("invocation_id") for response in responses
             if response.get("work_unit_id") not in planned_units
