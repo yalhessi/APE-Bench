@@ -1,6 +1,6 @@
 # Generate four comparable reviews on familiar Mathlib PRs
 
-Tracker draft for `yalhessi/APE-Bench`. The first section is the map issue. The four decision tickets and their dependencies follow it.
+Tracker draft for `yalhessi/APE-Bench`. The [implemented pilot and run commands](../../results/pr_review_v5/probes/convention-scope-2026-11-24/pilot.md) record the local checks and model-backed steps. The first section is the map issue. The four decision tickets and their dependencies follow it.
 
 ## Map issue
 
