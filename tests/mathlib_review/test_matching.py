@@ -235,6 +235,13 @@ def test_a_v2_run_reads_every_replicate_back_and_reports(monkeypatch, tmp_path):
     # Reach is asks reached over every ask in the seal (two): each session reached its one.
     assert report["task-v2demo_run:1"]["reach"] == {"S1": 0.5, "S2": 0.5}
     assert report["task-v2demo_run:2"]["reach"] == {"S1": 0.0, "S2": 0.0}
+    row = next(row for row in report["reviews"] if (row["pr"], row["session"], row["reading"]) ==
+               (8, "S2", "task-v2demo_run:1"))
+    assert (row["eligible_asks"], row["shown_findings"], row["reached"]) == (1, 1, 1)
+    assert row["matches"] == {"a8": {"verdict": "reached", "finding": 0}}
+    scoped = MA.report_matching(tmp_path / "m", families={}, scope={"unused"}, write=False)
+    assert scoped["task-v2demo_run:1"]["condition_reach"] == {"S": None}
+    assert all(r["eligible_asks"] == 0 for r in scoped["reviews"])
     trace = trace_matching(tmp_path / "m", 8, "a8", "S2")
     assert trace["seal"]["label"] == "R1"
     assert trace["original"]["findings"][0]["claim"] == "golf"

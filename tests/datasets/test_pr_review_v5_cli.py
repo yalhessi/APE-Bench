@@ -31,12 +31,14 @@ def test_every_spending_subcommand_has_an_execute_gate():
     """Structural, so a new subcommand cannot be added without one. `SPENDS` is the list;
     this checks the list is honoured rather than merely written down."""
 
+    import argparse
     parser = cli.build_parser()
-    subparsers = [action for action in parser._actions
-                  if isinstance(action, __import__("argparse")._SubParsersAction)][0]
     for name in cli.SPENDS:
-        assert name in subparsers.choices, f"{name} is listed as spending but has no parser"
-        options = {s for action in subparsers.choices[name]._actions
+        sub = parser
+        for word in name.split():
+            choices = next(a.choices for a in sub._actions if isinstance(a, argparse._SubParsersAction))
+            sub = choices[word]
+        options = {s for action in sub._actions
                    for s in action.option_strings}
         assert "--execute" in options, f"{name} spends money and has no --execute gate"
 

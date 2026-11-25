@@ -1,0 +1,3 @@
+extends: ../bases/familiar_reviews.yaml
+dataset:
+  design: whole_pr

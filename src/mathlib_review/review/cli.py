@@ -44,7 +44,8 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline", "match", "session"})
+SPENDS = frozenset({"score", "run", "judge", "bench", "replay", "pipeline", "match", "session",
+                    "study prepare", "study run", "study score"})
 
 
 def _producer(args) -> int:
@@ -160,14 +161,32 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
 
+    study = sub.add_parser("study", help="paired convention review studies, configured in configs/studies")
+    stages = study.add_subparsers(dest="study_action", required=True)
+    for action, summary in (
+        ("plan", "inspect the reviewer inputs and tool grants using local fixtures"),
+        ("prepare", "freeze the shared excerpts, learn conventions and select them for each PR"),
+        ("run", "prepare missing selections and generate a paired sample of reviews"),
+        ("score", "read a saved sample against its reference feedback"),
+    ):
+        stage = stages.add_parser(action, help=summary)
+        stage.add_argument("study", help="study name in configs/studies or path to a study YAML")
+        if f"study {action}" in SPENDS:
+            _add_execute(stage)
+        if action in ("run", "score"):
+            stage.add_argument("--sample", type=int, default=1)
+        if action == "prepare":
+            stage.add_argument("--retry", action="append", default=[], metavar="STAGE=N")
+        if action == "score":
+            stage.add_argument("--reading", help="name a new comparison of the same submissions")
+            stage.add_argument("--question-form", action="store_true", help="apply the alternative question rubric")
+
     plan = sub.add_parser("plan", help="render and price a run; call no model")
-    plan.add_argument("--config", type=Path, required=True)
     _add_run_name(plan)
     _add_stage_input(plan)
     _add_set(plan)
 
     run = sub.add_parser("run", help="a generation run")
-    run.add_argument("--config", type=Path, required=True)
     _add_run_name(run)
     _add_stage_input(run)
     _add_set(run)
@@ -181,6 +200,19 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--cost-model", default=None,
                      help="how to read provider token accounting when pricing calls")
     _add_execute(run)
+
+    from src.mathlib_review.analysis.submissions import SCORERS
+    reviewer_names = sorted(p.stem for p in Path("configs/designs/reviewers").glob("*.yaml"))
+    for stage in (plan, run):
+        source = stage.add_mutually_exclusive_group(required=True)
+        source.add_argument("--config", type=Path)
+        source.add_argument("--reviewer", choices=reviewer_names, help="a versioned whole-PR reviewer")
+        stage.add_argument("--case", metavar="PR@HEAD", help="pinned release revision for --reviewer")
+        stage.add_argument("--score", choices=SCORERS, help="score this named review after submission")
+    score = sub.add_parser("score", help="score saved submissions without generating reviews")
+    score.add_argument("--of", dest="runs", nargs="+", required=True, metavar="RUN")
+    score.add_argument("--using", choices=SCORERS, required=True)
+    _add_execute(score)
 
     probe = sub.add_parser("probe", help="the reviewer-model probe on a set (analysis/probes.py)")
     probe_sub = probe.add_subparsers(dest="probe_command", required=True)
@@ -1172,6 +1204,23 @@ def main(argv: Optional[List[str]] = None) -> int:
         overrides.setdefault("dataset", {})["run_name"] = args.run_name
     logger = create_logger()
 
+    if args.command == "score" or getattr(args, "reviewer", None):
+        try:
+            if args.command == "score":
+                from src.mathlib_review.analysis.submissions import review_directory, score_reviews
+                return score_reviews([review_directory(name) for name in args.runs], args.using, execute=args.execute)
+            from src.mathlib_review.review.reviewers import run_reviewer
+            return run_reviewer(args, logger)
+        except (ValueError, FileNotFoundError, FileExistsError) as error:
+            parser.error(str(error))
+    if args.command in ("plan", "run") and (args.case or args.score):
+        parser.error("--case and --score require --reviewer")
+    if args.command == "study":
+        from src.mathlib_review.review.study import run_study
+        try:
+            return run_study(args, logger)
+        except (ValueError, FileNotFoundError, FileExistsError, BlockingIOError) as error:
+            parser.error(str(error))
     if args.command == "plan":
         return _plan(args.config, overrides, logger, of_run=args.of_run)
     if args.command == "run":

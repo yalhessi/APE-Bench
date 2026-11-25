@@ -1,0 +1,221 @@
+{
+  "coverage": {
+    "complete": true,
+    "expected": 12,
+    "forensic": false,
+    "missing": [],
+    "observations": 12,
+    "unreadable": []
+  },
+  "observations": [
+    {
+      "clean": true,
+      "file": "p04-1.json",
+      "findings": 0,
+      "inputs_read": [
+        "Ring.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 75641,
+      "sha256": "4749653e39b7954fa3c3643d648a547419ec169f8197111fa88e736451d69b4e",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p04-2.json",
+      "findings": 0,
+      "inputs_read": [
+        "Ring.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 91640,
+      "sha256": "2df1f7e56a90305a4cbe319663d84243f9297c86e6c63eb72349e4318d501141",
+      "turns": 7,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p19-1.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 83923,
+      "sha256": "f9553be0ffaa12c56f0b38cb404fb328bddf165184ffab234607bd1b2152fe03",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p19-2.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 85687,
+      "sha256": "398d0761a5b796278c46e42d8eca33fe60500e1b76be2c9e18b5af744cf7bc35",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p37-1.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 81442,
+      "sha256": "abf69118fbe1d4e16cdbe000f8890cc713b9baec54e7c1196c90d09d9055f974",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p37-2.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 80928,
+      "sha256": "58d135ebcdb1f643862fcc2e08b0a44b8d864f63e3e6620cdb1474f0e1f1a14a",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p52-1.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 100333,
+      "sha256": "13ed414d60c4af0bf6e21a5359199d217e84982cf7e14c45cdd9191275051f7d",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p52-2.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 73851,
+      "sha256": "9884173adf97605056054c40869b1e96e82cfa8c8b3758b1354892aaedb7306b",
+      "turns": 5,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p68-1.json",
+      "findings": 0,
+      "inputs_read": [
+        "Ring.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 94825,
+      "sha256": "57607b0c8c1324d47ad36ec09e9c198f9cd8943d28187b74d7f631bd9e544119",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p68-2.json",
+      "findings": 0,
+      "inputs_read": [
+        "Ring.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 88071,
+      "sha256": "bb341285988c8eb92e49cf72fab3744668bf4c6037162ae57a1a947f42127ad9",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p83-1.json",
+      "findings": 2,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 109551,
+      "sha256": "bd1be3800bf66a58106532edfc19f0c0a387429fbeedec656b1955714df36933",
+      "turns": 6,
+      "usable": true
+    },
+    {
+      "clean": true,
+      "file": "p83-2.json",
+      "findings": 1,
+      "inputs_read": [
+        "Order.lean",
+        "changes.diff",
+        "operation.md",
+        "pr.md"
+      ],
+      "processed_tokens": 105246,
+      "sha256": "08b6421bda4b1a462d61c93bafbcfd8d4c96f79cd1830f20ffe962e9b6528535",
+      "turns": 6,
+      "usable": true
+    }
+  ],
+  "packets": [
+    {
+      "id": "p04",
+      "sha256": "77de736ef3e0d8b2822b569be92356b4c8ed4b342f78fac4d8890e1f00398bdc"
+    },
+    {
+      "id": "p19",
+      "sha256": "6ab8513b078ffa651f23f2ae8b7cb16926d2dc94b045621d54f38becc478985f"
+    },
+    {
+      "id": "p37",
+      "sha256": "d4ffac49dfd7bce1d14886d9831cc4955e204ee99d50efb1b6023f0d677cce18"
+    },
+    {
+      "id": "p52",
+      "sha256": "8cb939b509e8685130fd0440c0f6ef2055a9975637ff893cf426670a8fde2751"
+    },
+    {
+      "id": "p68",
+      "sha256": "20e79dc76daf959867582762584404a2629839c721467e4783c88bfc58a67d17"
+    },
+    {
+      "id": "p83",
+      "sha256": "075d95c3f870a22e660e2dc0111dc989b4507b5cebc7c5a82b6890350a22ccf1"
+    }
+  ],
+  "plan_id": "convention-scope-whole-pr",
+  "plan_sha256": "5b870ac4a653c7d64a506f835b11774a8406d3f9d0822f917d036de309195422",
+  "run": "scope_packets_opus55_20261124"
+}

@@ -25,6 +25,7 @@ import argparse
 import asyncio
 import json
 import re
+from functools import cached_property
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
@@ -240,6 +241,22 @@ class V5DatasetConfig(BaseModel):
     solo_context_tools: List[str] = Field(
         default_factory=lambda: ["zulip_search", "precedent_search", "declaration_search",
                                  "proof_profile"])
+    #: Optional read-only index built from a study's shared collection of earlier excerpts.
+    solo_precedent_index: Optional[Path] = None
+
+    @cached_property
+    def solo_precedent_manifest_sha256(self) -> Optional[str]:
+        if self.solo_precedent_index is None:
+            return None
+        if self.routing_mode != "solo" or "precedent_search" not in self.solo_context_tools:
+            raise ValueError("solo_precedent_index needs a solo run with precedent_search")
+        from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+
+        directory = self.solo_precedent_index.resolve()
+        digest = sha256_file(directory / "manifest.json")
+        PrecedentIndex.shared(directory, expected_manifest_sha256=digest)
+        return digest
+
     #: DIAGNOSTIC. Refuse arm abstentions, so every arm must name its best candidate however
     #: weak. Never for a production run: it inverts the contract that makes the control PRs
     #: measurable, and a control's whole value is that a correct reviewer emits nothing there.
@@ -381,7 +398,8 @@ def select_units_and_episodes(dataset: V5DatasetConfig, release: Dict[str, Any])
     return units, episodes
 
 
-def _context_index_identity() -> Dict[str, str]:
+def _context_index_identity(index_dir: Optional[Path] = None,
+                            manifest_sha256: Optional[str] = None) -> Dict[str, str]:
     """Hashes of the corpora a context read ranks over.
 
     Recorded in the plan because a retrieval result is only interpretable relative to the
@@ -390,7 +408,11 @@ def _context_index_identity() -> Dict[str, str]:
     """
 
     identity: Dict[str, str] = {}
-    manifest = PRECEDENT_INDEX / "manifest.json"
+    manifest = (index_dir or PRECEDENT_INDEX) / "manifest.json"
+    if index_dir is not None:
+        if sha256_file(manifest) != manifest_sha256:
+            raise ValueError("precedent index manifest changed during planning")
+        identity["precedent_manifest"] = manifest_sha256
     if manifest.is_file():
         payload = json.loads(manifest.read_text())
         identity["precedent_corpus"] = payload.get("corpus_sha256", "")
@@ -530,6 +552,10 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
 
     design_cls = DESIGNS[dataset.design]
     graph_by_episode = {graph.episode_id: graph for graph in graphs}
+    source = {}
+    if dataset.solo_precedent_index is not None:
+        source = {"precedent_index_dir": str(dataset.solo_precedent_index.resolve()),
+                  "precedent_manifest_sha256": dataset.solo_precedent_manifest_sha256}
     wanted = {item.episode_id for item in agenda.proposals}
     data = []
     for episode in sorted(episodes, key=lambda item: item.episode_id):
@@ -547,6 +573,7 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
             "snapshot_head_sha": episode.reviewed_head_sha,
             "snapshot_base_sha": episode.base_sha,
             "context_tools": list(dataset.solo_context_tools),
+            **source,
             "retrieval_cutoff": cutoff_by_episode.get(episode.episode_id),
             # One invocation per episode, and both fields are load-bearing rather than
             # bookkeeping: every context tool stamps its trace row with `invocation_id` before
@@ -1699,7 +1726,8 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
             item.invocation_id: item.prompt_sha256 for item in agenda.proposals
         },
         arm_sha256_by_id={arm.arm_id: arm.source_sha256 for arm in agenda.arms},
-        context_index_sha256=_context_index_identity(),
+        context_index_sha256=_context_index_identity(dataset.solo_precedent_index,
+                                                     dataset.solo_precedent_manifest_sha256),
         model_name=model_name,
         scaffold_config_sha256=sha256_bytes(
             canonical_json_bytes(scaffold.model_dump(mode="json"))),
@@ -2006,7 +2034,23 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
                        exc_info=True)
 
 
-async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
+def agenda_for_release(dataset, release, units, episodes, selected_prs):
+    return build_agenda(
+        run_name=dataset.run_name, routing_mode=dataset.routing_mode,
+        release=dataset.release, modification_inventory=dataset.modification_inventory,
+        units=units, episodes=episodes, graphs=release["graphs"],
+        release_prompts=release["release_prompts"], modifications=release["modifications"],
+        pr_numbers=selected_prs,
+        use_exposure_index=dataset.use_exposure_index,
+        generalist_floor=dataset.generalist_floor,
+        submission_verification_policy=dataset.submission_verification_policy,
+        target_verdicts=dataset.target_verdicts,
+        arm_ids=dataset.arm_ids,
+    )
+
+
+async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False,
+              review_request=None):
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
@@ -2025,21 +2069,26 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     selected_prs = sorted({unit.pr_number for unit in units})
     stage_rows = stage_rows_for(dataset, selected_prs, logger, dry_run=dataset.dry_run)
 
-    agenda, pool = build_agenda(
-        run_name=dataset.run_name, routing_mode=dataset.routing_mode,
-        release=dataset.release, modification_inventory=dataset.modification_inventory,
-        units=units, episodes=episodes, graphs=release["graphs"],
-        release_prompts=release["release_prompts"], modifications=release["modifications"],
-        pr_numbers=selected_prs,
-        use_exposure_index=dataset.use_exposure_index,
-        generalist_floor=dataset.generalist_floor,
-        submission_verification_policy=dataset.submission_verification_policy,
-        target_verdicts=dataset.target_verdicts,
-        arm_ids=dataset.arm_ids,
-    )
+    agenda, pool = agenda_for_release(dataset, release, units, episodes, selected_prs)
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
     report = agenda_report(agenda, work_unit_ids=[unit.work_unit_id for unit in units])
+
+    named_data = None
+    if review_request is not None:
+        named_data = _solo_task_data(agenda, episodes, dataset, cutoffs_by_episode(episodes),
+                                     run_dir(dataset.run_name) / "context_trace.jsonl",
+                                     graphs=release["graphs"], stage_rows=stage_rows)
+        await review_request.inspect(named_data, episodes, dataset, scaffold)
+        manifest = run_dir(dataset.run_name) / "run_manifest.json"
+        if not dataset.dry_run and resume:
+            if (review_request.directory / "archive.json").is_file():
+                return run_dir(dataset.run_name)
+            if manifest.exists() and json.loads(manifest.read_bytes())["completion_status"] == "complete":
+                return run_dir(dataset.run_name)
+        if resume and not manifest.exists() and not any(p.exists() for p in _scratch_dirs(dataset.run_name, scaffold)):
+            # An interrupt between sealing the named inputs and starting its first attempt.
+            resume = False
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")
@@ -2149,8 +2198,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         # No census, no arm pool, no journal: there is nothing to route. The agenda was still
         # built and sealed above, which is what makes this run's `agenda_report.json` scope
         # identically to the `lead` run on the same config.
-        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
-                               graphs=release["graphs"], stage_rows=stage_rows)
+        data = named_data if named_data is not None else _solo_task_data(
+            agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs=release["graphs"], stage_rows=stage_rows)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
         scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     else:
@@ -2170,6 +2219,10 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                     logger=logger)
     results = await orchestrator.run(tasks)
+    if review_request is not None and not _solo_coverage_gaps(results, data):
+        from src.mathlib_review.analysis import submissions
+        generation = submissions.read(review_request.directory / "generation.json")
+        await submissions.capture(review_request.directory, generation["runs"])
     children = (await _direct_children(orchestrator, tasks, data, agenda, scaffold, logger)
                 if dataset.routing_mode not in ("lead", "solo") else None)
 

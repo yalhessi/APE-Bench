@@ -40,6 +40,27 @@ The revision of the author's contribution that the reviewer is asked to assess. 
 **First review round**
 The exchange that begins with the first maintainer review. For the first-round task, the feedback window runs from that first event to the author's next push.
 
+**Reviewer design**
+A reusable specification of who investigates a reviewed head, which evidence each participant may see, how evidence reaches the reviewer, and what the reviewer may submit. An ordinary solo reviewer and a reviewer with access to earlier PRs are distinct designs even when neither calls a search tool.
+
+**Review run**
+An execution of a named reviewer design on specified reviewed heads with a recorded model, scaffold, budget and requested samples. Several runs can contribute submitted reviews to the same comparison.
+
+**Solo review**
+One reviewer assesses the whole PR in a single session with the review brief and the permitted tools. In an ordinary solo review, the reviewer chooses what to investigate from the PR and the sources it can inspect.
+
+**Submitted review**
+The feedback a reviewer hands in about a particular revision on a particular occasion. It can include a whole-review message, ordered comments, a verdict and suggested edits. A reviewer can complete a review with zero comments.
+
+**Reference feedback**
+The feedback selected for comparison with a submitted review. In a historical first review round, it can include comments and replies from several maintainers.
+
+**Reading**
+An evaluation of identified submitted reviews against specified reference feedback under a stated rubric. Another reading can use the same submissions, including a successful review with zero findings.
+
+**Convention selection and delivery**
+Selection chooses conventions for a particular PR. Delivery is what the reviewer sees from that choice. A selector can identify a relevant declaration and deliver only the general convention. [Example on PR 42184](results/pr_review_v5/probes/convention-scope-2026-11-24/design-audit.md#what-differs-before-submission)
+
 **Raw ask**
 A first-round request expressed in the maintainer's own words. One request can ask the author to address several things.
 

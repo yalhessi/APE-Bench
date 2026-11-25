@@ -99,7 +99,7 @@ def plan_matching(spec, *, name: str, seal: Dict[str, Dict[str, str]], seal_path
                   question_policy: str = "request_only", replicates: int = 2,
                   batch_size: Optional[int] = None, harness_blind: bool = False,
                   ask_packets: Optional[Dict[str, List[Dict[str, Any]]]] = None,
-                  ask_packets_path: Optional[Path] = None) -> MatchingPlan:
+                  ask_packets_path: Optional[Path] = None, reuse: bool = False) -> MatchingPlan:
     """Seal a matching before any matcher runs; returns the plan written to `out_dir`.
 
     `version` is `2-task` for a matching the Task will run, or `1-session` to bind an existing
@@ -157,6 +157,13 @@ def plan_matching(spec, *, name: str, seal: Dict[str, Dict[str, str]], seal_path
         expected_cells=sum(len(p.asks) * len(p.reviewers) for p in packets),
         created_at=_now(),
     )
+    if reuse and (Path(out_dir) / PLAN_FILE).exists():
+        saved = load_plan(out_dir)
+        fields = {"identity", "packets", "batches", "seal", "session_stats"}
+        if saved.model_dump(include=fields) != plan.model_dump(include=fields):
+            raise ValueError(f"{out_dir}: saved reading differs from the requested inputs or rubric; "
+                             "use a new reading name")
+        return saved
     write_once(Path(out_dir) / PLAN_FILE, pretty_json_bytes(plan))
     return plan
 
@@ -588,6 +595,21 @@ def report_matching(plan_dir: Path, families: Optional[Dict[str, str]] = None,
         },
         **numbers,
     }
+    report["reviews"] = []
+    for reading, table in tables.items():
+        for packet in plan.packets:
+            eligible = {ask.ask_id for ask in packet.asks
+                        if scope is None or (families or {}).get(ask.ask_id) in scope}
+            decisions = [a for a in table["matches"]["asks"]
+                         if int(a["pr"]) == packet.pr and a["ask_id"] in eligible]
+            for label, session in plan.seal[str(packet.pr)].items():
+                report["reviews"].append({
+                    "reading": reading, "pr": packet.pr, "session": session,
+                    "shown_findings": len(packet.reviewers[label]), "eligible_asks": len(eligible),
+                    "reached": sum(a.get(label) == "reached" for a in decisions),
+                    "matches": {a["ask_id"]: {"verdict": a.get(label), "finding": a.get(f"{label}_finding")}
+                                for a in decisions},
+                })
     if write:
         path = plan_dir / REPORT_FILE
         tmp = path.with_name(f".{path.name}.tmp")

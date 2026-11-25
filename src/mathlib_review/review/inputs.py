@@ -103,3 +103,56 @@ def verified_text(path: Path, expected_sha256: Optional[str], field: str) -> str
             "was edited after the plan was sealed. A session must not read other bytes than its "
             "run's: use a new run name for the edited file.")
     return data.decode("utf-8")
+
+
+async def mcp_signatures(task):
+    import logging
+    from fastmcp import FastMCP
+    from ape.toolkits.mcp_manager import MCPManager
+
+    # Use the same tool binding as MCPManager.setup_http_mode, entirely in memory.
+    manager = MCPManager(task, logging.getLogger(__name__), task.config, use_native_tools=task.config.use_native_tools)
+    manager.mcp_server = FastMCP("inspect")
+    manager._bind_tools_to_server(manager.calculate_enabled_tools())
+    await task.register_task_tools(manager.mcp_server)
+    return {tool.name: (tool.description, tool.parameters) for tool in await manager.mcp_server.list_tools()}
+
+
+async def first_message(task, cwd, target):
+    import logging
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+    from ape.tasks.models import WorkspaceInfo
+
+    task.workspaces_dir = cwd
+    task.scratch_workspace = WorkspaceInfo(name="scratch", path=cwd / "scratch")
+    task.target_workspace = WorkspaceInfo(name="target", path=target, read_only_path_patterns=["**/*"])
+    scaffold = ClaudeCodeScaffold()
+    scaffold.task, scaffold.logger = task, logging.getLogger(__name__)
+    return await scaffold._initial_prompt(scaffold._session_cwd())
+
+
+COMMON_TOOLS = {"code_goto", "code_hover", "declaration_search", "get_lean_goal",
+                "lean_verify", "lean_verify_edit", "submit_findings"}
+
+
+async def inspect_review(payload, ds, scaffold, ep):
+    """Render one whole-PR task through the same scaffold and tool registrar as execution."""
+    from ape.tasks.base import create_task_from_data
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+    from src.mathlib_review.io import canonical_json_bytes
+
+    task = create_task_from_data(payload, scaffold, task_config_overrides=scaffold.task_config_overrides)
+    key = reviewed_workspace_key(task.data.snapshot_base_sha, task.data.diff)
+    target = Path("data/code_execute/repos/mathlib4/workspaces") / key
+    cwd = (Path(".ape/runs") / ds.run_name / "workspaces").resolve()
+    message = (await first_message(task, cwd, target)).replace(str(cwd), "{attempt_workspaces}")
+    tools = await mcp_signatures(task)
+    return message, tools, {
+        "episode_id": ep.episode_id, "patch_sha256": ep.patch_sha256, "cutoff": payload["retrieval_cutoff"],
+        "message_sha256": sha256_bytes(message.encode()),
+        "mcp": sorted(tools), "mcp_schema_sha256": sha256_bytes(canonical_json_bytes(tools)),
+        "builtins": sorted(scaffold.tools), "model": scaffold.claude_model,
+        "effort": scaffold.effort, "cli_version": scaffold.cli_version,
+        "max_turns": scaffold.execution.max_turns, "token_cap": ds.solo_token_cap,
+        "cost_cap": ds.solo_cost_cap,
+    }

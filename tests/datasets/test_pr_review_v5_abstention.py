@@ -458,14 +458,17 @@ def test_a_pool_built_without_the_contract_is_refused_rather_than_stamped():
     assert built == before, "a pool that carries the contract is checked, not rewritten"
 
 
-def test_the_runner_hands_the_contract_to_build_agenda():
-    import inspect
-
+def test_the_runner_hands_the_contract_to_build_agenda(monkeypatch):
     from src.mathlib_review.review import runner
 
-    source = inspect.getsource(runner.run)
-    assert "submission_verification_policy=dataset.submission_verification_policy" in source
-    assert "target_verdicts=dataset.target_verdicts" in source
+    received = {}
+    monkeypatch.setattr(runner, "build_agenda", lambda **kwargs: received.update(kwargs))
+    dataset = _dataset(release="release", modification_inventory="inventory", target_verdicts=True,
+                       submission_verification_policy="verify_edits_if_present")
+    release = {"graphs": [], "release_prompts": [], "modifications": []}
+    runner.agenda_for_release(dataset, release, [], [], [])
+    assert received["target_verdicts"] is True
+    assert received["submission_verification_policy"] == "verify_edits_if_present"
 
 
 def test_an_ordinary_run_stamps_nothing_and_seals_nothing_new():

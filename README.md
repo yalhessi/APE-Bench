@@ -16,6 +16,8 @@
 
 **APE-Bench** is the reference implementation for the paper "[APE-Bench: Evaluating Automated Proof Engineering for Formal Math Libraries](https://arxiv.org/abs/2504.19110v3)". This codebase implements the complete infrastructure described in the paper, including APE-Bench automated pipeline, APE-Harness task contract framework, and multi-version verification/retrieval services.
 
+For the Mathlib PR-review experiments in this fork, see [comparing review strategies](docs/guides/checkout-and-runs.md#compare-review-strategies).
+
 ## Table of Contents
 * [Paper to Code Mapping](#paper-to-code-mapping)
 * [Installation](#installation)

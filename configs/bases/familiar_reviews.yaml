@@ -1,0 +1,14 @@
+# Four strategies share one whole-PR contract and one reviewer route.
+extends: ../pr_review_v5_probe_2026_07_08_v1_opus55_G_claude_sub.yaml
+batch_preamble: plain
+workspace_environment: false
+tools: [Read, Grep, Glob]
+task_config:
+  system_prompt_file: null
+  context_file: null
+execution:
+  max_concurrency: 1
+dataset:
+  pr_numbers: [41930, 42184]
+  solo_context_tools: [declaration_search]
+  solo_token_cap: 600000
