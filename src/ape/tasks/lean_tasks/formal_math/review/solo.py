@@ -307,6 +307,8 @@ class SoloReviewData(BasePRReviewData):
     #: read that could see the future is not allowed to happen at all" -- and that refusal is
     #: the whole temporal-isolation story for an agent that is otherwise unconstrained.
     retrieval_cutoff: Optional[str] = None
+    precedent_index_dir: Optional[Path] = Field(default=None, exclude_if=lambda value: value is None)
+    precedent_manifest_sha256: Optional[str] = Field(default=None, exclude_if=lambda value: value is None)
 
     #: What every context tool stamps its trace row with. An arm's is its `(unit, arm)` pair;
     #: a whole-PR review has one per episode, so it is minted from the episode.

@@ -262,6 +262,8 @@ def build(
     out_dir: Path = PRECEDENT_INDEX,
     model_name: str = DEFAULT_MODEL,
     logger=None,
+    *,
+    local_files_only: bool = False,
 ) -> Path:
     """Embed the corpus once and write the index. Idempotent by content."""
 
@@ -288,7 +290,7 @@ def build(
                     len(rows), len(excluded))
 
     authors = _pr_authors({row.get("pr_number") for row in rows if row.get("pr_number")}, logger)
-    model = SentenceTransformer(model_name)
+    model = SentenceTransformer(model_name, local_files_only=local_files_only)
     model_revision = _model_revision(model_name)
     texts = [embedding_text(row.get("diff_hunk") or "", model.tokenizer) for row in rows]
     embeddings = model.encode(
@@ -333,8 +335,9 @@ class PrecedentIndex:
     _shared: Optional["PrecedentIndex"] = None
     _lock = threading.Lock()
 
-    def __init__(self, directory: Path):
+    def __init__(self, directory: Path, *, expected_manifest_sha256: Optional[str] = None):
         import numpy as np
+        from src.mathlib_review.io import sha256_bytes, sha256_file
 
         manifest_path = directory / "manifest.json"
         if not manifest_path.is_file():
@@ -345,12 +348,25 @@ class PrecedentIndex:
                 "would pay a one-off cost in every worker of every run."
             )
         self.directory = directory
-        self.manifest = json.loads(manifest_path.read_text())
+        contents = manifest_path.read_bytes()
+        self.manifest_sha256 = sha256_bytes(contents)
+        self.manifest = json.loads(contents)
+        self.pinned = expected_manifest_sha256 is not None
+        if self.pinned:
+            if self.manifest_sha256 != expected_manifest_sha256:
+                raise StalePrecedentIndex("precedent index manifest differs from the sealed plan")
+            hashes = self.manifest.get("artifacts_sha256", {})
+            for name in ("embeddings.npy", "meta.jsonl"):
+                artifact = directory / name
+                if not artifact.is_file() or sha256_file(artifact) != hashes.get(name):
+                    raise StalePrecedentIndex(f"unverified {name} in the pinned precedent index")
+            if not self.manifest.get("model_revision"):
+                raise StalePrecedentIndex("pinned precedent index has no query model revision")
         self.corpus_sha256 = self.manifest.get("corpus_sha256")
         corpus = Path(self.manifest.get("corpus_path") or "")
+        if self.pinned and not corpus.is_file():
+            raise StalePrecedentIndex("pinned precedent index is missing its dated excerpt source")
         if corpus.is_file():
-            from src.mathlib_review.io import sha256_file
-
             current = sha256_file(corpus)
             if current != self.corpus_sha256:
                 raise StalePrecedentIndex(
@@ -378,14 +394,26 @@ class PrecedentIndex:
                 f"rows vs {self.embeddings.shape[0]} embeddings. Rebuild it."
             )
         self._created = np.asarray([row["created_epoch"] for row in self.meta], dtype="int64")
+        if self.pinned:
+            excerpts = _load_corpus(corpus)
+            if [r["comment_id"] for r in excerpts] != [r["comment_id"] for r in self.meta]:
+                raise StalePrecedentIndex("pinned index and dated excerpts have different rows")
+            # This text was available in this form only from its last edit.
+            updated = np.asarray([_iso_to_epoch(r.get("updated_at")) for r in excerpts])
+            self._created = np.where((self._created != UNDATED) & (updated >= self._created),
+                                     updated, UNDATED)
         self._pr = np.asarray([row["pr_number"] or -1 for row in self.meta], dtype="int64")
         self._model = None
 
     @classmethod
-    def shared(cls, directory: Path = PRECEDENT_INDEX) -> "PrecedentIndex":
+    def shared(cls, directory: Path = PRECEDENT_INDEX, *,
+               expected_manifest_sha256: Optional[str] = None) -> "PrecedentIndex":
         with cls._lock:
-            if cls._shared is None or cls._shared.directory != directory:
-                cls._shared = PrecedentIndex(directory)
+            cached = cls._shared
+            if (cached is None or cached.directory != directory
+                    or cached.pinned != (expected_manifest_sha256 is not None)
+                    or (cached.pinned and cached.manifest_sha256 != expected_manifest_sha256)):
+                cls._shared = cls(directory, expected_manifest_sha256=expected_manifest_sha256)
             return cls._shared
 
     def _encode(self, text: str):
@@ -396,7 +424,8 @@ class PrecedentIndex:
             # can reach the Hugging Face Hub and, if the cache were missing or `refs/main`
             # moved, silently embed against a different snapshot than the index was built
             # with -- a retrieval regime change with nothing in the run saying so.
-            self._model = SentenceTransformer(self.model_name, local_files_only=True)
+            revision = self.manifest["model_revision"] if self.pinned else None
+            self._model = SentenceTransformer(self.model_name, local_files_only=True, revision=revision)
         # The query is cut by the same 256-token window as a row, so it gets the same slice:
         # an arm pasting a long declaration would otherwise be matched on its opening lines.
         return self._model.encode(
@@ -436,7 +465,7 @@ class PrecedentIndex:
 
     def search(
         self, code: str, k: int = 5, *, as_of: Optional[str] = None,
-        exclude_pr: Optional[int] = None,
+        exclude_pr: Optional[int] = None, distinct_hunks: bool = True,
     ) -> List[Dict[str, Any]]:
         """The `k` best eligible precedents, one per distinct hunk.
 
@@ -476,7 +505,7 @@ class PrecedentIndex:
                 # from the full body at build time.
                 continue
             hunk = row.get("diff_hunk")
-            if hunk in seen_hunks:
+            if distinct_hunks and hunk in seen_hunks:
                 continue
             seen_hunks.add(hunk)
             hits.append({**row, "score": order[int(index)]})

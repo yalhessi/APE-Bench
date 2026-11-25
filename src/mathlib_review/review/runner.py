@@ -25,6 +25,7 @@ import argparse
 import asyncio
 import json
 import re
+from functools import cached_property
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
@@ -240,6 +241,22 @@ class V5DatasetConfig(BaseModel):
     solo_context_tools: List[str] = Field(
         default_factory=lambda: ["zulip_search", "precedent_search", "declaration_search",
                                  "proof_profile"])
+    #: Optional read-only index built from a study's shared collection of earlier excerpts.
+    solo_precedent_index: Optional[Path] = None
+
+    @cached_property
+    def solo_precedent_manifest_sha256(self) -> Optional[str]:
+        if self.solo_precedent_index is None:
+            return None
+        if self.routing_mode != "solo" or "precedent_search" not in self.solo_context_tools:
+            raise ValueError("solo_precedent_index needs a solo run with precedent_search")
+        from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
+
+        directory = self.solo_precedent_index.resolve()
+        digest = sha256_file(directory / "manifest.json")
+        PrecedentIndex.shared(directory, expected_manifest_sha256=digest)
+        return digest
+
     #: DIAGNOSTIC. Refuse arm abstentions, so every arm must name its best candidate however
     #: weak. Never for a production run: it inverts the contract that makes the control PRs
     #: measurable, and a control's whole value is that a correct reviewer emits nothing there.
@@ -381,7 +398,8 @@ def select_units_and_episodes(dataset: V5DatasetConfig, release: Dict[str, Any])
     return units, episodes
 
 
-def _context_index_identity() -> Dict[str, str]:
+def _context_index_identity(index_dir: Optional[Path] = None,
+                            manifest_sha256: Optional[str] = None) -> Dict[str, str]:
     """Hashes of the corpora a context read ranks over.
 
     Recorded in the plan because a retrieval result is only interpretable relative to the
@@ -390,7 +408,11 @@ def _context_index_identity() -> Dict[str, str]:
     """
 
     identity: Dict[str, str] = {}
-    manifest = PRECEDENT_INDEX / "manifest.json"
+    manifest = (index_dir or PRECEDENT_INDEX) / "manifest.json"
+    if index_dir is not None:
+        if sha256_file(manifest) != manifest_sha256:
+            raise ValueError("precedent index manifest changed during planning")
+        identity["precedent_manifest"] = manifest_sha256
     if manifest.is_file():
         payload = json.loads(manifest.read_text())
         identity["precedent_corpus"] = payload.get("corpus_sha256", "")
@@ -530,6 +552,10 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
 
     design_cls = DESIGNS[dataset.design]
     graph_by_episode = {graph.episode_id: graph for graph in graphs}
+    source = {}
+    if dataset.solo_precedent_index is not None:
+        source = {"precedent_index_dir": str(dataset.solo_precedent_index.resolve()),
+                  "precedent_manifest_sha256": dataset.solo_precedent_manifest_sha256}
     wanted = {item.episode_id for item in agenda.proposals}
     data = []
     for episode in sorted(episodes, key=lambda item: item.episode_id):
@@ -547,6 +573,7 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
             "snapshot_head_sha": episode.reviewed_head_sha,
             "snapshot_base_sha": episode.base_sha,
             "context_tools": list(dataset.solo_context_tools),
+            **source,
             "retrieval_cutoff": cutoff_by_episode.get(episode.episode_id),
             # One invocation per episode, and both fields are load-bearing rather than
             # bookkeeping: every context tool stamps its trace row with `invocation_id` before
@@ -1699,7 +1726,8 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
             item.invocation_id: item.prompt_sha256 for item in agenda.proposals
         },
         arm_sha256_by_id={arm.arm_id: arm.source_sha256 for arm in agenda.arms},
-        context_index_sha256=_context_index_identity(),
+        context_index_sha256=_context_index_identity(dataset.solo_precedent_index,
+                                                     dataset.solo_precedent_manifest_sha256),
         model_name=model_name,
         scaffold_config_sha256=sha256_bytes(
             canonical_json_bytes(scaffold.model_dump(mode="json"))),

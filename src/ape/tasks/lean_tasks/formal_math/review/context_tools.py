@@ -198,8 +198,15 @@ def _register_zulip(task, mcp) -> None:
 # --------------------------------------------------------------------------------------
 
 def _register_precedent(task, mcp) -> None:
-    @mcp.tool(
-        description=(
+    index_dir = getattr(task.data, "precedent_index_dir", None)
+    if index_dir is not None:
+        description = (
+            "Search earlier review excerpts by similarity to the Lean code you supply. "
+            "Each excerpt contains a dated review comment and its code hunk. "
+            "Decide whether a retrieved comment applies to the current change."
+        )
+    else:
+        description = (
             "EXPERIMENTAL. Find review comments left on SIMILAR-LOOKING code in earlier PRs. "
             "Matching is by code similarity alone — the comment text is not searched — so the "
             "results are often about something else, and the similarity score does not tell "
@@ -210,7 +217,8 @@ def _register_precedent(task, mcp) -> None:
             "principle only if it genuinely bears on this code, and never invent a finding "
             "to match one."
         )
-    )
+
+    @mcp.tool(description=description)
     async def precedent_search(
         code: Annotated[str, Field(description="The Lean code you are reviewing, or a distinctive fragment of it")],
         limit: Annotated[int, Field(description=f"Max precedents (capped at {MAX_HITS})")] = 5,
@@ -243,29 +251,40 @@ def _register_precedent(task, mcp) -> None:
             return refuse(str(exc))
         limit = max(1, min(int(limit or 5), MAX_HITS))
         try:
-            index = PrecedentIndex.shared()
+            if index_dir is None:
+                index = PrecedentIndex.shared()
+            else:
+                digest = getattr(task.data, "precedent_manifest_sha256", None)
+                if not digest:
+                    return refuse("The configured excerpt index has no pinned manifest.", as_of)
+                index = PrecedentIndex.shared(Path(index_dir), expected_manifest_sha256=digest)
         except PrecedentIndexMissing as exc:
             return refuse(str(exc), as_of)
         try:
             # The filter runs BEFORE ranking, not after: filtering a ranked list silently
             # shortens it, so a query whose best matches are all ineligible would return a
             # handful of weak precedents and look like a thin corpus rather than a gated one.
-            hits = index.search(
-                code, k=limit, as_of=as_of, exclude_pr=task.data.pr_number,
-            )
+            options = {"distinct_hunks": False} if index_dir is not None else {}
+            hits = index.search(code, k=limit, as_of=as_of, exclude_pr=task.data.pr_number,
+                                **options)
         except Exception as exc:  # noqa: BLE001
             return refuse(f"precedent search failed: {exc}", as_of)
 
         blocks = []
         for rank, hit in enumerate(hits, 1):
-            body = (hit.get("body") or "").strip()[:MAX_SNIPPET]
+            body = hit.get("body") or ""
+            if index_dir is None:
+                body = body.strip()
+            body = body[:MAX_SNIPPET]
             # The TAIL of the hunk, not the head. GitHub builds a review comment's hunk so
             # that it ENDS at the line being commented on, so taking the first N characters
             # drops exactly the line the comment is about. Measured over every precedent
             # delivered to an arm in the v5 runs: 711 of 2,825 hits (25%) had a hunk longer
             # than this budget, and every one of them was shown code the comment was not
             # about, under the words of a comment about something else.
-            whole = (hit.get("diff_hunk") or "").strip()
+            whole = hit.get("diff_hunk") or ""
+            if index_dir is None:
+                whole = whole.strip()
             snippet = whole[-(MAX_SNIPPET * 2):]
             if len(snippet) < len(whole):
                 snippet = "…(earlier lines of this hunk omitted)\n" + snippet
@@ -274,12 +293,20 @@ def _register_precedent(task, mcp) -> None:
             # so 46% of delivered hits were the PR author replying to a reviewer ("Done.",
             # "My bad, thanks.") presented to the arm as a maintainer's judgement.
             who = hit.get("commenter") or "someone"
+            source_id = f" · comment {hit['comment_id']}" if index_dir is not None else ""
             blocks.append(
-                f"{rank}. PR #{hit.get('pr_number')} · `{hit.get('path')}` · "
+                f"{rank}. PR #{hit.get('pr_number')}{source_id} · `{hit.get('path')}` · "
                 f"{hit.get('created_at')} (similarity {hit.get('score'):.3f})\n"
                 f"   {who} wrote: \"{body}\"\n   on this code:\n```\n{snippet}\n```"
             )
         rendered, truncated = _truncate("\n\n".join(blocks))
+        if truncated and index_dir is not None:
+            # The pilot receipts identify the exact excerpts the reviewer received.
+            # Keep the final displayed block whole, including its anchored code.
+            while blocks and len("\n\n".join(blocks)) > MAX_RESULT_CHARS:
+                blocks.pop()
+            rendered = "\n\n".join(blocks)
+            hits = hits[:len(blocks)]
         _append_trace(task, {
             "schema_version": "v5-context-call1",
             "invocation_id": task.data.invocation_id,

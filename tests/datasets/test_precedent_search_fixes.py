@@ -167,6 +167,56 @@ def _corpus_row(cid, pr, commenter="alice", body="looks wrong"):
             "author_association": "COLLABORATOR", "created_at": "2025-01-01T00:00:00Z"}
 
 
+def test_pinned_index_uses_the_same_dated_excerpts_as_catalogue(tmp_path, monkeypatch):
+    import json
+    from src.mathlib_review.io import jsonl_bytes, sha256_file
+    from src.mathlib_review.retrieval.precedent_index import meta_row
+    from src.mathlib_review.review.runner import _context_index_identity
+
+    rows = [{**_corpus_row(i, 100), "updated_at": "2025-02-01T00:00:00Z"} for i in range(3)]
+    rows[-1]["updated_at"] = "2026-01-01T00:00:00Z"
+    d, corpus = _fake_index(tmp_path, rows)
+    (d / "meta.jsonl").write_bytes(jsonl_bytes(meta_row(row) for row in rows))
+    np.save(d / "embeddings.npy", np.ones((len(rows), 2), dtype="float32"))
+    manifest = d / "manifest.json"
+    meta = json.loads(manifest.read_text())
+    meta.update(model_revision="f" * 40, artifacts_sha256={
+        name: sha256_file(d / name) for name in ("embeddings.npy", "meta.jsonl")})
+    manifest.write_text(json.dumps(meta))
+    digest = sha256_file(manifest)
+    identity = _context_index_identity(d, digest)
+    assert identity["precedent_corpus"] == sha256_file(corpus)
+    assert identity["precedent_manifest"] == digest
+    index = PrecedentIndex(d, expected_manifest_sha256=digest)
+    monkeypatch.setattr(index, "_encode", lambda _: np.ones(2))
+    hits = index.search("x", as_of="2026-01-01T00:00:00Z", distinct_hunks=False)
+    assert {hit["comment_id"] for hit in hits} == {0, 1}
+    with pytest.raises(StalePrecedentIndex, match="manifest"):
+        PrecedentIndex(d, expected_manifest_sha256="9" * 64)
+    (d / "meta.jsonl").write_bytes(b"")
+    with pytest.raises(StalePrecedentIndex, match="meta.jsonl"):
+        PrecedentIndex(d, expected_manifest_sha256=digest)
+
+
+def test_pilot_freezes_the_anchor_and_checks_full_text_before_cropping():
+    from pathlib import Path
+    from runpy import run_path
+    from src.mathlib_review.retrieval_gate import RetrievalGate
+
+    freeze_excerpt = run_path(str(Path("results/pr_review_v5/probes")
+                                  / "convention-scope-2026-11-24/pilot/history.py"))["excerpt"]
+    gate = RetrievalGate(as_of="2026-01-01T00:00:00Z")
+    raw = {"id": 12, "path": "Mathlib/A.lean", "user": {"login": "reviewer"},
+           "diff_hunk": "h" * 1000 + "+the_anchor", "body": "b" * 500,
+           "created_at": "2025-12-24T00:00:00Z", "updated_at": "2025-12-25T00:00:00Z"}
+    row, reason = freeze_excerpt(29121, "author", raw, gate)
+    assert reason is None and len(row["diff_hunk"]) == 800
+    assert row["diff_hunk"].endswith("+the_anchor") and len(row["body"]) == 400
+    for updates in ({"updated_at": None}, {"updated_at": gate.as_of},
+                    {"body": raw["body"] + " see #42184"}, {"user": {"login": "author"}}):
+        assert freeze_excerpt(29121, "author", {**raw, **updates}, gate)[0] is None
+
+
 def test_refresh_refuses_when_the_corpus_no_longer_reproduces_the_indexed_rows(tmp_path, monkeypatch):
     """The embeddings are reused, so the rows must line up. Alignment is proved against the
     existing meta, not assumed: a shifted corpus would silently give every row its neighbour's
