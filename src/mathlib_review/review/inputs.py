@@ -103,3 +103,29 @@ def verified_text(path: Path, expected_sha256: Optional[str], field: str) -> str
             "was edited after the plan was sealed. A session must not read other bytes than its "
             "run's: use a new run name for the edited file.")
     return data.decode("utf-8")
+
+
+async def mcp_signatures(task):
+    import logging
+    from fastmcp import FastMCP
+    from ape.toolkits.mcp_manager import MCPManager
+
+    # Use the same tool binding as MCPManager.setup_http_mode, entirely in memory.
+    manager = MCPManager(task, logging.getLogger(__name__), task.config, use_native_tools=task.config.use_native_tools)
+    manager.mcp_server = FastMCP("inspect")
+    manager._bind_tools_to_server(manager.calculate_enabled_tools())
+    await task.register_task_tools(manager.mcp_server)
+    return {tool.name: (tool.description, tool.parameters) for tool in await manager.mcp_server.list_tools()}
+
+
+async def first_message(task, cwd, target):
+    import logging
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+    from ape.tasks.models import WorkspaceInfo
+
+    task.workspaces_dir = cwd
+    task.scratch_workspace = WorkspaceInfo(name="scratch", path=cwd / "scratch")
+    task.target_workspace = WorkspaceInfo(name="target", path=target, read_only_path_patterns=["**/*"])
+    scaffold = ClaudeCodeScaffold()
+    scaffold.task, scaffold.logger = task, logging.getLogger(__name__)
+    return await scaffold._initial_prompt(scaffold._session_cwd())

@@ -14,11 +14,7 @@ import json
 import logging
 from pathlib import Path
 
-from fastmcp import FastMCP
-
-from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
-from ape.tasks.models import WorkspaceInfo
-from ape.toolkits.mcp_manager import MCPManager
+from src.mathlib_review.review.inputs import first_message, mcp_signatures
 from src.mathlib_review.analysis import probes
 from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.review import runner
@@ -31,24 +27,6 @@ CONFIG = Path("configs/pr_review_v5_probe_2026_07_08_v1_opus55_G_claude_sub.yaml
 ARCHIVE = PROBE.parent / "conventions-ceiling-2026-10-04"
 BOOK = PROBE.parents[1] / "adjudications/conventions-census-v1/reader_A/codebook.json"
 LOGGER = logging.getLogger("inspect_four")
-
-
-async def mcp_signatures(task):
-    # Use the same tool binding as MCPManager.setup_http_mode, entirely in memory.
-    manager = MCPManager(task, LOGGER, task.config, use_native_tools=task.config.use_native_tools)
-    manager.mcp_server = FastMCP("inspect")
-    manager._bind_tools_to_server(manager.calculate_enabled_tools())
-    await task.register_task_tools(manager.mcp_server)
-    return {tool.name: (tool.description, tool.parameters) for tool in await manager.mcp_server.list_tools()}
-
-
-async def first_message(task, cwd, target):
-    task.workspaces_dir = cwd
-    task.scratch_workspace = WorkspaceInfo(name="scratch", path=cwd / "scratch")
-    task.target_workspace = WorkspaceInfo(name="target", path=target, read_only_path_patterns=["**/*"])
-    scaffold = ClaudeCodeScaffold()
-    scaffold.task, scaffold.logger = task, LOGGER
-    return await scaffold._initial_prompt(scaffold._session_cwd())
 
 
 async def main():

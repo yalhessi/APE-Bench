@@ -2034,6 +2034,21 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
                        exc_info=True)
 
 
+def agenda_for_release(dataset, release, units, episodes, selected_prs):
+    return build_agenda(
+        run_name=dataset.run_name, routing_mode=dataset.routing_mode,
+        release=dataset.release, modification_inventory=dataset.modification_inventory,
+        units=units, episodes=episodes, graphs=release["graphs"],
+        release_prompts=release["release_prompts"], modifications=release["modifications"],
+        pr_numbers=selected_prs,
+        use_exposure_index=dataset.use_exposure_index,
+        generalist_floor=dataset.generalist_floor,
+        submission_verification_policy=dataset.submission_verification_policy,
+        target_verdicts=dataset.target_verdicts,
+        arm_ids=dataset.arm_ids,
+    )
+
+
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
@@ -2053,18 +2068,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     selected_prs = sorted({unit.pr_number for unit in units})
     stage_rows = stage_rows_for(dataset, selected_prs, logger, dry_run=dataset.dry_run)
 
-    agenda, pool = build_agenda(
-        run_name=dataset.run_name, routing_mode=dataset.routing_mode,
-        release=dataset.release, modification_inventory=dataset.modification_inventory,
-        units=units, episodes=episodes, graphs=release["graphs"],
-        release_prompts=release["release_prompts"], modifications=release["modifications"],
-        pr_numbers=selected_prs,
-        use_exposure_index=dataset.use_exposure_index,
-        generalist_floor=dataset.generalist_floor,
-        submission_verification_policy=dataset.submission_verification_policy,
-        target_verdicts=dataset.target_verdicts,
-        arm_ids=dataset.arm_ids,
-    )
+    agenda, pool = agenda_for_release(dataset, release, units, episodes, selected_prs)
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
     report = agenda_report(agenda, work_unit_ids=[unit.work_unit_id for unit in units])
